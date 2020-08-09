@@ -20,7 +20,7 @@ build_script:
   - Rscript -e "tic::install()"
   # data.table::fread segfault in v1.13.0
   # ref: https://github.com/Rdatatable/data.table/issues/4644
-  - Rscript -e "remotes::install_version('data.table', '1.12.4')"
+  - Rscript -e "remotes::install_version('data.table', '1.12.8')"
 after_build: Rscript -e "tic::after_install()"
 before_test: Rscript -e "tic::before_script()"
 test_script: Rscript -e "tic::script()"

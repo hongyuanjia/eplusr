@@ -230,7 +230,7 @@ test_that("parse_idd_file()", {
          A1 ; \\invalid-slash-key")
     expect_error(parse_idd_file(idd_wrong), "Invalid slash key", class = "eplusr_error_parse_idd")
 
-    # can detect error of invaid type key
+    # can detect error of invalid type key
     idd_wrong <- c(
         "!IDD_Version 9.9.9
          !IDD_BUILD 7c3bbe4830
@@ -241,7 +241,7 @@ test_that("parse_idd_file()", {
     )
     expect_error(parse_idd_file(idd_wrong), "Invalid type value", class = "eplusr_error_parse_idd")
 
-    # can detect error of invaid external list key
+    # can detect error of invalid external list key
     idd_wrong <- c(
         "!IDD_Version 9.9.9
          !IDD_BUILD 7c3bbe4830

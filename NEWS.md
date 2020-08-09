@@ -72,7 +72,11 @@
   - `"SpecialDay"`: Equivalent to `"DesignDay"` plus `"CustomDay"`
   - `"NormalDay"`: Equivalent to `"Weekday"` and `"Weekend"` plus `"Holiday"`
 * Some internal functions have been exported. They are mainly useful for
-  developers to handle internal IDD and IDF data more efficiently.
+  developers to handle internal IDD and IDF data more efficiently (#260).
+* A new `IdfScheduleCompact` class is introduced. A constructor function
+  `schedule_compact()` is added. `IdfScheduleCompact` class provides more
+  detailed methods to add, modify and extract schedule values. For more details,
+  see `vignette("schedule")` (#256).
 
 ## Major changes
 

@@ -864,7 +864,6 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
     if ("choice" %chin% type && any(i <- dt_value$type_enum == IDDFIELD_TYPE$choice)) {
         dt_value[i, value_chr := {
             i <- apply2_int(stri_trans_tolower(value_chr), lapply(choice, stri_trans_tolower), chmatch)
-            std <- apply2_chr(choice, i, .subset2)
             value_chr[!is.na(i)] <- apply2_chr(choice[!is.na(i)], i[!is.na(i)], .subset2)
             value_chr
         }]

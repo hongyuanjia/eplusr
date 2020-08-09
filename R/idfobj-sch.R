@@ -1,7 +1,45 @@
+#' Create an `IdfScheduleCompact` object.
+#'
+#' `schedule_compact()` takes a parent `Idf` object, a name for
+#' `Schedule:Compact` object, and returns a corresponding [IdfScheduleCompact]
+#' object.
+#'
+#' If `new` is `TRUE`, an empty [IdfScheduleCompact] is created,
+#' with all field values being empty. The empty [IdfScheduleCompact] is directly
+#' added into the parent [Idf] object. It is recommended to use `$validate()`
+#' method in [IdfScheduleCompact] to see what kinds of further modifications are
+#' needed for those empty fields and use `$set()` and `$update()` method to set
+#' field values.
+#'
+#' @param parent An [Idf] object.
+#' @param name A valid name (a string) for a `Schedule:Compact` object.
+#' @param new If `TRUE`, a new empty [IdfScheduleCompact] is created. Default:
+#'        `FALSE`.
+#' @return An [IdfScheduleCompact] object.
+#' @examples
+#' \dontrun{
+#' model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+#'
+#' # create an empty 'Schedule:Compact'
+#' schedule_compact(model, "sch", TRUE)
+#'
+#' # get an existing 'Schedule:Compact'
+#' schedule_compact(model, "sch")
+#' }
+#' @export
+#' @name IdfSchedule
+# schedule_compact {{{
+schedule_compact <- function (parent, name, new = FALSE) {
+    obj <- IdfScheduleCompact$new(name, parent, new)
+    add_idfobj_field_bindings(obj)
+}
+# }}}
+
 #' Create and Modify an EnergyPlus Schedule
 #'
-#' `IdfScheduleCompact` is an abstraction of a single schedule in an [Idf]. It
-#' provides more detailed methods to modify schedule values.
+#' `IdfScheduleCompact` is an abstraction of a single `Schedule:Compact` object
+#' in an [Idf]. It provides more detailed methods to add, modify and extract
+#' schedule values.
 #'
 #' @importFrom R6 R6Class
 #' @docType class
@@ -56,6 +94,11 @@ IdfScheduleCompact <- R6::R6Class(classname = "IdfScheduleCompact", lock_objects
         #' @description
         #' Set schedule values
         #'
+        #' @details
+        #' Please note that all schedules will be applied for all days in a
+        #' year. For detailed modifications, please check `$update()` method
+        #' which accepts data.frame input.
+        #'
         #' @param ... Schedule day types and value specifications in lists.
         #'
         #' * Group day types inside `c(...)` at the LHS of `:=`
@@ -83,60 +126,200 @@ IdfScheduleCompact <- R6::R6Class(classname = "IdfScheduleCompact", lock_objects
 
         # update {{{
         #' @description
-        #' Update schedule values
+        #' Update schedule values using data.frame
         #'
-        #' @param data A [data.table::data.table()] of at least 4 columns:
+        #' @param data A data.frame of at least 4 columns:
         #'
-        #' * `year_day`
-        #' * `daytype`
-        #' * `time`
-        #' * `value`
+        #' * `year_day`: Used for the `Through:` fields. Can be in one of the
+        #'   following formats:
+        #'   - `character`: Day specifications in either `mm/dd` or `mm-dd`
+        #'     where `mm` is the month in `1:12` or in character and `dd` is the
+        #'     day in month in `1:31`
+        #'   - `Date`: The year component will be ignored and only the month and
+        #'     day component will be used
+        #'   - `integer`: Julian day, e.g. `360`, `365` and etc
+        #' * `id` (Optional): Integer type. Used to group together different day
+        #'   types with same schedule values.  Grouped day types will be
+        #'   compacted in a single `For:` field, e.g. `For: Weekdays
+        #'   SummaryDesignDay`. Grouped day types should have the same schedule
+        #'   values. Otherwise an error will be issued.
+        #' * `daytype`: Character type. Used for the `For:` fields. All possible
+        #'   values are listed below. Case-insensitive matching is used.
+        #'   Different day types can be grouped using the `id` column mentioned
+        #'   above or put together directly in a single string separate by comma
+        #'   (`,`), e.g. `"weekend, holiday"`
+        #'   - `"AllDay(s)"`
+        #'   - `"Weekday(s)"`, and also `"Monday"`, `"Tuesday"`, `"Wednesday"`,
+        #'     `"Thursday"` and `"Friday"`
+        #'   - `"Weekend(s)"`, and also `"Saturday"` and `"Sunday"`
+        #'   - `"SummaryDesignDay"` and `"WinterDesignDay"`
+        #'   - `"Holiday"`
+        #'   - `"CustomDay1"` and `"CustomDay2"`
+        #'   - `"AllOtherDay(s)"`
+        #' * `time`: Used for the `Until:` fields. Can be in one of the
+        #'   following formats:
+        #'   - `character`: Time specifications in `HH:MM`
+        #'     where `HH` is the hour in `0:24` and `MM` is the
+        #'     minute in `0:60`
+        #'   - `integer`: Time differences from `00:00:00` in **minutes**, e.g.
+        #'     `seq(60, 60 * 24, by = 60)`
+        #'   - `hms`: `hms` objects constructed using `hms::hms()` or
+        #'     equivalents, e.g.  `hms::hms(minutes = 30, hours = 1)`, and
+        #'     `hms::as_hms("1:30:00")`
+        #'   - `difftime`: `difftime` objects constructed using `as.difftime()`
+        #'     or equivalents, e.g. `as.difftime(1:24, units = "hours")`
+        #'   - `ITime`: `ITime` objects constructed using
+        #'     `data.table::as.ITime()`, e.g. `as.ITime("01:30:00")`
+        #' * `value`: Numeric type. Used for the actual schedule values
         #'
         #' @param check_range If `TRUE`, schedule values will be checked based
         #'        on `$type_limits()`. Default: `TRUE`.
         #'
         #' @param compact If `TRUE`, same schedule values from different day
-        #'        types will be compacted together. Also, time periods that have
-        #'        the same schedule values will also be compacted. Default:
-        #'        `TRUE`.
+        #'        types will be compacted together.  Also, time periods that
+        #'        have the same schedule values will also be compacted.
+        #'        Note that only `"Holiday"`, `"CustomDay1"` and `"CustomDay2"`
+        #'        will be compacted into `"AllOtherDays"`. For example, if the
+        #'        `daytype` column contains only `"Weekdays"`,
+        #'        `"SummerDesignDay"` and `"AllOtherDays"`, `"AllOtherDays"`
+        #'        will be expanded to `"Weekends"`, `"WinterDesignDay"` and
+        #'        `"AllOtherDays"`.  Default: `FALSE`.
         #'
         #' @return The modified `IdfScheduleCompact` object.
         #'
         #' @examples
         #' \dontrun{
         #' sch$update(sch$extract())
+        #'
+        #' val1 <- data.table::data.table(
+        #'     year_day = "12/31",
+        #'     daytype = "weekday,summerdesignday",
+        #'     time = c("6:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
+        #'     value = c(0.2,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
+        #' )
+        #' val2 <- data.table::data.table(
+        #'     year_day = "12/31", daytype = "allotherday",
+        #'     time = "24:00", value = 0.0
+        #' )
+        #' val <- data.table::rbindlist(list(val1, val2))
+        #' sch$update(val)
         #' }
-        update = function (data, check_range = TRUE, compact = TRUE)
+        update = function (data, check_range = TRUE, compact = FALSE)
             idfsch_cmpt_update(super, self, private, data, check_range, compact),
         # }}}
 
         # validate {{{
         #' @description
-        #' Validate schedule values
+        #' Check possible object field value errors
         #'
-        #' Check schedule values based on `$type_limits()`.
+        #' @details
+        #' `$validate()` checks if there are errors in current
+        #' `IdfScheduleCompact` object under specified validation level and
+        #' returns an `IdfValidity` object.
+        #' Schedule value ranges will be checked if current validate level
+        #' contains range checking (if corresponding `ScheduleTypeLimits`
+        #' `Numeric Type` is `Continuous`) or choice checking (if corresponding
+        #' `ScheduleTypeLimits` `Numeric Type` is `Discrete`).
+        #'
+        #' For detailed description on validate checking, see
+        #' \href{../../eplusr/html/IdfObject.html#method-validate}{\code{IdfObject$validate()}}
+        #' documentation above.
+        #'
+        #' @param level One of `"none"`, `"draft"`, `"final"` or a list of 10
+        #'        elements with same format as [custom_validate()] output.
         #'
         #' @return An `IdfValidity` object.
         #'
         #' @examples
         #' \dontrun{
         #' sch$validate()
+        #'
+        #' # check at predefined validate level
+        #' sch$validate("none")
+        #' sch$validate("draft")
+        #' sch$validate("final")
         #' }
-        validate = function ()
-            idfsch_cmpt_validate(super, self, private),
+        validate = function (level = eplusr_option("validate_level"))
+            idfsch_cmpt_validate(super, self, private, level),
+        # }}}
+
+        # is_valid {{{
+        #' @description
+        #' Check if there is any error in current object
+        #'
+        #' @details
+        #' `$is_valid()` returns `TRUE` if there is no error in current
+        #' `IdfScheduleCompact` object under specified validation level.
+        #' Schedule value ranges will be checked if current validate level
+        #' contains range checking (if corresponding `ScheduleTypeLimits`
+        #' `Numeric Type` is `Continuous`) or choice checking (if corresponding
+        #' `ScheduleTypeLimits` `Numeric Type` is `Discrete`).
+        #'
+        #' `$is_valid()` checks if there are errors in current `IdfObject` object
+        #' under specified validation level and returns `TRUE` or `FALSE`
+        #' accordingly. For detailed description on validate checking, see
+        #' \href{../../eplusr/html/IdfObject.html#method-validate}{\code{IdfObject$validate()}}
+        #' documentation above.
+        #'
+        #' @param level One of `"none"`, `"draft"`, `"final"` or a list of 10
+        #'        elements with same format as [custom_validate()] output.
+        #'
+        #' @return A single logical value of `TRUE` or `FALSE`.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' sch$is_valid()
+        #' }
+        #'
+        is_valid = function (level = eplusr_option("validate_level"))
+            idfsch_cmpt_is_valid(super, self, private, level),
         # }}}
 
         # extract {{{
         #' @description
         #' Extract schedule values
         #'
-        #' @param daytype If `"compact"`, same schedule values from different day
-        #'        types will be compacted together. If `"expand"`, all compacted
-        #'        day types will be expanded. Default: `NULL`.
-        #' @param timestep If specified, the time step of schedule values will
-        #'        be updated if possible. Default: `NULL`.
+        #' @param daytype Should be one of:
         #'
-        #' @return A [data.table::data.table()]
+        #' * `NULL`: Do nothing Grouped day types will be concatenated with a
+        #'   comma, e.g. `Weekdays,SummerDesignDay`. This is the default
+        #'   behavior.
+        #' * `TRUE` or `"expand"`: All compacted day types will be expanded.
+        #' * `FALSE` or `"compact"`: Same schedule values from different day
+        #'   types will be compacted together.
+        #' * A character vector specifying the grouped day types, e.g.
+        #'   `c("weekday", "summerdesignday")`. All other days except specified
+        #'   ones will be classified into day type `AllOtherDays`, if possible.
+        #'   If not possible, those day types will still be extracted
+        #'   separately.
+        #'
+        #' @param timestep The time step of schedule values, e.g. "10 mins" and
+        #'        "1 hour". Valid units include `sec(s)`, `min(s)`, and
+        #'        `hour(s)`. If `NULL`, the original time specifications will be
+        #'        kept. If `"auto"`, the time periods with the same schedule
+        #'        values will be compacted. Default: `NULL`.
+        #'
+        #' @return `NULL` if current schedule is empty. Otherwise, a
+        #' [data.table::data.table()] of 5 columns:
+        #'
+        #' * `year_day`: Character type. Used for the `Through:` fields.
+        #'   Day specifications in `mm/dd` format
+        #' * `id`: Integer type. The group index of day types
+        #' * `daytype`: Character type. Used for the `For:` fields. All possible
+        #'   values are:
+        #'   - `"AllDay"`
+        #'   - `"Weekday"`, and also `"Monday"`, `"Tuesday"`, `"Wednesday"`,
+        #'     `"Thursday"` and `"Friday"`
+        #'   - `"Weekend"`, and also `"Saturday"` and `"Sunday"`
+        #'   - `"SummaryDesignDay"` and `"WinterDesignDay"`
+        #'   - `"Holiday"`
+        #'   - `"CustomDay1"` and `"CustomDay2"`
+        #'   - `"AllOtherDay"`
+        #' * `time`: `hms` vector. Used for the `Until:` fields. It is handy for
+        #'   plotting since `hms` object is directly supported by the scale
+        #'   system of [ggplot2](https://cran.r-project.org/package=ggplot2)
+        #'   package
+        #' * `value`: Numeric type. Actual schedule values
         #'
         #' @examples
         #' \dontrun{
@@ -178,7 +361,7 @@ idfsch_cmpt_init <- function (super, self, private, object, parent, new = FALSE)
         private$m_data <- parse_sch_cmpt(get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id))
     } else {
         assert_string(object, .var.name = "Name of Schedule:Compact")
-        obj <- without_checking(private$m_parent$add(Schedule_Compact = list(object))[[1L]])
+        obj <- private$m_parent$add(Schedule_Compact = list(object))[[1L]]
 
         private$m_object_id <- obj$id()
         private$m_class_id <- obj$definition()$class_index()
@@ -223,13 +406,15 @@ idfsch_cmpt_set <- function (super, self, private, ..., .default = "min", .check
 
     # check daytype
     if (anyNA(val$name)) {
-        abort(sprintf("Invalid daytype found: %s", val[is.na(name), collapse(id)]))
+        abort(sprintf("Invalid daytype found: %s", val[is.na(name), collapse(id)]),
+            "idfschcmpt_daytype")
     }
 
     # format hour
     if (anyNA(val$field_name)) {
         if (length(invld <- val[J(NA_integer_, NA_character_), on = c("field_index", "field_name"), nomatch = 0L, which = TRUE])) {
-            abort(sprintf("Invalid time specification found for day type %s. Each schedule value should be named with a time value.", collapse(unique(val$name[invld]))))
+            abort(sprintf("Invalid time specification found for day type %s. Each schedule value should be named with a time value.",
+                collapse(unique(val$name[invld]))), "idfschcmpt_time")
         }
         val[J(NA_integer_), on = "field_name", field_name :=
             stri_sub(format(hms::hms(hours = field_index)), to = -4L)
@@ -238,7 +423,8 @@ idfsch_cmpt_set <- function (super, self, private, ..., .default = "min", .check
 
     # check invalid number
     if (anyNA(val$value_num)) {
-        abort(sprintf("Invalid schedule value found: %s", val[is.na(value_num), collapse(value_chr)]))
+        abort(sprintf("Invalid schedule value found: %s", val[is.na(value_num), collapse(value_chr)]),
+            "idfschcmpt_value")
     }
     set(val, NULL, c("each_rleid", "id", "field_index", "value_chr"), NULL)
 
@@ -264,6 +450,9 @@ idfsch_cmpt_update <- function (super, self, private, data, check_range = TRUE, 
         data, check_range, compact
     )
     composed <- compose_sch_cmpt(load$type_limits, load$meta, load$value)
+
+    # in case type limit is still not set
+    if (is.na(load$type_limits$type_limits)) set(load$type_limits, NULL, "type_limits", NULL)
 
     # update data
     private$m_data <- load
@@ -296,15 +485,28 @@ idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep 
         return(invisible())
     }
 
-    if (!is.null(daytype)) {
+    keep_order <- TRUE
+    if (is.null(daytype)) {
+        set(meta, NULL, "daytype", vcapply(meta$daytype, paste0, collapse = ","))
+    } else {
         if (isTRUE(daytype) || identical(daytype, "expand")) {
             meta <- expand_sch_daytype(meta)
+            keep_order <- FALSE
         } else if ((checkmate::test_flag(daytype) && !daytype) || identical(daytype, "compact")){
             meta <- compact_sch_daytype(meta)
+        } else if (checkmate::test_character(daytype, any.missing = FALSE, unique = TRUE)) {
+            meta <- compact_sch_daytype(meta, daytype, invert = TRUE)
+        } else {
+            abort(paste0("Invalid 'daytype'. 'daytype' should be NULL, ",
+                "a single logicial value, ", "\"compact\", \"expand\" or ",
+                "a character vector of valid day type specifications."),
+                "idfschcmpt_daytype"
+            )
         }
     }
 
     if (!is.null(timestep)) {
+        assert_string(timestep)
         value <- expand_sch_time(meta, value, timestep = "1 min")
         value <- compact_sch_time(meta, value, timestep = timestep)
     }
@@ -313,14 +515,25 @@ idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep 
         , by = "value_index", {
             len <- each_length(daytype)
             list(year_day = rep(year_day, len),
+                 id = rep(daytype_index, len),
                  daytype = unlist(daytype, FALSE, FALSE),
                  time = rep(time, len),
                  value = rep(value, len)
             )
         }
-    ][J(unique(c(unlist(DAYTYPE, FALSE, FALSE), names(DAYTYPE), "AllOtherDay"))),
-        on = "daytype", nomatch = NULL]
+    ]
 
+    # keep day type order
+    if (!is.null(daytype)) {
+        if (keep_order) {
+            val <- val[J(unlist(meta$daytype, FALSE, FALSE)), on = "daytype"]
+        } else {
+            val <- val[J(unique(c(unlist(DAYTYPE, FALSE, FALSE), names(DAYTYPE), "AllOtherDay"))),
+                on = "daytype", nomatch = NULL]
+        }
+    }
+
+    # clean
     set(val, NULL, "value_index", NULL)
 
     # use hms
@@ -331,14 +544,13 @@ idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep 
 }
 # }}}
 # idfsch_cmpt_validate {{{
-idfsch_cmpt_validate <- function (super, self, private) {
-    type_limits <- private$m_data$type_limits$type_limits
-
-    if (is.null(type_limits)) {
-        verbose_info("Schedule Type Limits have not been set yet. No validation has been performed.")
-        return(invisible())
-    }
-
-    validate_sch_cmpt(private$idd_env(), private$idf_env(), private$m_object_id, type_limits)
+idfsch_cmpt_validate <- function (super, self, private, level = eplusr_option("validate_level")) {
+    validate_sch_cmpt(private$idd_env(), private$idf_env(),
+        private$m_object_id, private$m_data$type_limits$type_limits, level)
+}
+# }}}
+# idfsch_cmpt_is_valid {{{
+idfsch_cmpt_is_valid <- function (super, self, private, level = eplusr_option("validate_level")) {
+    count_check_error(idfsch_cmpt_validate(super, self, private, level)) == 0L
 }
 # }}}

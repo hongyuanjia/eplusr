@@ -3,13 +3,50 @@
 \docType{class}
 \name{IdfSchedule}
 \alias{IdfSchedule}
+\alias{schedule_compact}
 \alias{IdfScheduleCompact}
-\title{Create and Modify an EnergyPlus Schedule}
+\title{Create an \code{IdfScheduleCompact} object.}
+\usage{
+schedule_compact(parent, name, new = FALSE)
+}
+\arguments{
+\item{parent}{An \link{Idf} object.}
+
+\item{name}{A valid name (a string) for a \code{Schedule:Compact} object.}
+
+\item{new}{If \code{TRUE}, a new empty \link{IdfScheduleCompact} is created. Default:
+\code{FALSE}.}
+}
+\value{
+An \link{IdfScheduleCompact} object.
+}
 \description{
-\code{IdfScheduleCompact} is an abstraction of a single schedule in an \link{Idf}. It
-provides more detailed methods to modify schedule values.
+\code{schedule_compact()} takes a parent \code{Idf} object, a name for
+\code{Schedule:Compact} object, and returns a corresponding \link{IdfScheduleCompact}
+object.
+
+\code{IdfScheduleCompact} is an abstraction of a single \code{Schedule:Compact} object
+in an \link{Idf}. It provides more detailed methods to add, modify and extract
+schedule values.
+}
+\details{
+If \code{new} is \code{TRUE}, an empty \link{IdfScheduleCompact} is created,
+with all field values being empty. The empty \link{IdfScheduleCompact} is directly
+added into the parent \link{Idf} object. It is recommended to use \verb{$validate()}
+method in \link{IdfScheduleCompact} to see what kinds of further modifications are
+needed for those empty fields and use \verb{$set()} and \verb{$update()} method to set
+field values.
 }
 \examples{
+\dontrun{
+model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+
+# create an empty 'Schedule:Compact'
+schedule_compact(model, "sch", TRUE)
+
+# get an existing 'Schedule:Compact'
+schedule_compact(model, "sch")
+}
 
 ## ------------------------------------------------
 ## Method `IdfScheduleCompact$set`
@@ -30,6 +67,19 @@ sch$set(c("weekday", "summerdesignday") := list(
 
 \dontrun{
 sch$update(sch$extract())
+
+val1 <- data.table::data.table(
+    year_day = "12/31",
+    daytype = "weekday,summerdesignday",
+    time = c("6:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
+    value = c(0.2,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
+)
+val2 <- data.table::data.table(
+    year_day = "12/31", daytype = "allotherday",
+    time = "24:00", value = 0.0
+)
+val <- data.table::rbindlist(list(val1, val2))
+sch$update(val)
 }
 
 ## ------------------------------------------------
@@ -38,7 +88,21 @@ sch$update(sch$extract())
 
 \dontrun{
 sch$validate()
+
+# check at predefined validate level
+sch$validate("none")
+sch$validate("draft")
+sch$validate("final")
 }
+
+## ------------------------------------------------
+## Method `IdfScheduleCompact$is_valid`
+## ------------------------------------------------
+
+\dontrun{
+sch$is_valid()
+}
+
 
 ## ------------------------------------------------
 ## Method `IdfScheduleCompact$extract`
@@ -67,6 +131,7 @@ Hongyuan Jia
 \item \href{#method-set}{\code{IdfScheduleCompact$set()}}
 \item \href{#method-update}{\code{IdfScheduleCompact$update()}}
 \item \href{#method-validate}{\code{IdfScheduleCompact$validate()}}
+\item \href{#method-is_valid}{\code{IdfScheduleCompact$is_valid()}}
 \item \href{#method-extract}{\code{IdfScheduleCompact$extract()}}
 \item \href{#method-clone}{\code{IdfScheduleCompact$clone()}}
 }
@@ -83,7 +148,6 @@ Hongyuan Jia
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node">}\href{../../eplusr/html/IdfObject.html#method-has_ref_node}{\code{eplusr::IdfObject$has_ref_node()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to">}\href{../../eplusr/html/IdfObject.html#method-has_ref_to}{\code{eplusr::IdfObject$has_ref_to()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id">}\href{../../eplusr/html/IdfObject.html#method-id}{\code{eplusr::IdfObject$id()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="is_valid">}\href{../../eplusr/html/IdfObject.html#method-is_valid}{\code{eplusr::IdfObject$is_valid()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name">}\href{../../eplusr/html/IdfObject.html#method-name}{\code{eplusr::IdfObject$name()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent">}\href{../../eplusr/html/IdfObject.html#method-parent}{\code{eplusr::IdfObject$parent()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print">}\href{../../eplusr/html/IdfObject.html#method-print}{\code{eplusr::IdfObject$print()}}\out{</span>}
@@ -175,6 +239,12 @@ on \verb{$type_limits()}. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Please note that all schedules will be applied for all days in a
+year. For detailed modifications, please check \verb{$update()} method
+which accepts data.frame input.
+}
+
 \subsection{Returns}{
 The modified \code{IdfScheduleCompact} object.
 }
@@ -198,29 +268,76 @@ sch$set(c("weekday", "summerdesignday") := list(
 \if{html}{\out{<a id="method-update"></a>}}
 \if{latex}{\out{\hypertarget{method-update}{}}}
 \subsection{Method \code{update()}}{
-Update schedule values
+Update schedule values using data.frame
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfScheduleCompact$update(data, check_range = TRUE, compact = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfScheduleCompact$update(data, check_range = TRUE, compact = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data}}{A \code{\link[data.table:data.table]{data.table::data.table()}} of at least 4 columns:
+\item{\code{data}}{A data.frame of at least 4 columns:
 \itemize{
-\item \code{year_day}
-\item \code{daytype}
-\item \code{time}
-\item \code{value}
+\item \code{year_day}: Used for the \verb{Through:} fields. Can be in one of the
+following formats:
+\itemize{
+\item \code{character}: Day specifications in either \code{mm/dd} or \code{mm-dd}
+where \code{mm} is the month in \code{1:12} or in character and \code{dd} is the
+day in month in \code{1:31}
+\item \code{Date}: The year component will be ignored and only the month and
+day component will be used
+\item \code{integer}: Julian day, e.g. \code{360}, \code{365} and etc
+}
+\item \code{id} (Optional): Integer type. Used to group together different day
+types with same schedule values.  Grouped day types will be
+compacted in a single \verb{For:} field, e.g. \verb{For: Weekdays SummaryDesignDay}. Grouped day types should have the same schedule
+values. Otherwise an error will be issued.
+\item \code{daytype}: Character type. Used for the \verb{For:} fields. All possible
+values are listed below. Case-insensitive matching is used.
+Different day types can be grouped using the \code{id} column mentioned
+above or put together directly in a single string separate by comma
+(\verb{,}), e.g. \code{"weekend, holiday"}
+\itemize{
+\item \code{"AllDay(s)"}
+\item \code{"Weekday(s)"}, and also \code{"Monday"}, \code{"Tuesday"}, \code{"Wednesday"},
+\code{"Thursday"} and \code{"Friday"}
+\item \code{"Weekend(s)"}, and also \code{"Saturday"} and \code{"Sunday"}
+\item \code{"SummaryDesignDay"} and \code{"WinterDesignDay"}
+\item \code{"Holiday"}
+\item \code{"CustomDay1"} and \code{"CustomDay2"}
+\item \code{"AllOtherDay(s)"}
+}
+\item \code{time}: Used for the \verb{Until:} fields. Can be in one of the
+following formats:
+\itemize{
+\item \code{character}: Time specifications in \code{HH:MM}
+where \code{HH} is the hour in \code{0:24} and \code{MM} is the
+minute in \code{0:60}
+\item \code{integer}: Time differences from \code{00:00:00} in \strong{minutes}, e.g.
+\code{seq(60, 60 * 24, by = 60)}
+\item \code{hms}: \code{hms} objects constructed using \code{hms::hms()} or
+equivalents, e.g.  \code{hms::hms(minutes = 30, hours = 1)}, and
+\code{hms::as_hms("1:30:00")}
+\item \code{difftime}: \code{difftime} objects constructed using \code{as.difftime()}
+or equivalents, e.g. \code{as.difftime(1:24, units = "hours")}
+\item \code{ITime}: \code{ITime} objects constructed using
+\code{data.table::as.ITime()}, e.g. \code{as.ITime("01:30:00")}
+}
+\item \code{value}: Numeric type. Used for the actual schedule values
 }}
 
 \item{\code{check_range}}{If \code{TRUE}, schedule values will be checked based
 on \verb{$type_limits()}. Default: \code{TRUE}.}
 
 \item{\code{compact}}{If \code{TRUE}, same schedule values from different day
-types will be compacted together. Also, time periods that have
-the same schedule values will also be compacted. Default:
-\code{TRUE}.}
+types will be compacted together.  Also, time periods that
+have the same schedule values will also be compacted.
+Note that only \code{"Holiday"}, \code{"CustomDay1"} and \code{"CustomDay2"}
+will be compacted into \code{"AllOtherDays"}. For example, if the
+\code{daytype} column contains only \code{"Weekdays"},
+\code{"SummerDesignDay"} and \code{"AllOtherDays"}, \code{"AllOtherDays"}
+will be expanded to \code{"Weekends"}, \code{"WinterDesignDay"} and
+\code{"AllOtherDays"}.  Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -231,6 +348,19 @@ The modified \code{IdfScheduleCompact} object.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 sch$update(sch$extract())
+
+val1 <- data.table::data.table(
+    year_day = "12/31",
+    daytype = "weekday,summerdesignday",
+    time = c("6:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
+    value = c(0.2,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
+)
+val2 <- data.table::data.table(
+    year_day = "12/31", daytype = "allotherday",
+    time = "24:00", value = 0.0
+)
+val <- data.table::rbindlist(list(val1, val2))
+sch$update(val)
 }
 }
 \if{html}{\out{</div>}}
@@ -242,11 +372,31 @@ sch$update(sch$extract())
 \if{html}{\out{<a id="method-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-validate}{}}}
 \subsection{Method \code{validate()}}{
-Validate schedule values
-
-Check schedule values based on \verb{$type_limits()}.
+Check possible object field value errors
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfScheduleCompact$validate()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfScheduleCompact$validate(level = eplusr_option("validate_level"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level}}{One of \code{"none"}, \code{"draft"}, \code{"final"} or a list of 10
+elements with same format as \code{\link[=custom_validate]{custom_validate()}} output.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$validate()} checks if there are errors in current
+\code{IdfScheduleCompact} object under specified validation level and
+returns an \code{IdfValidity} object.
+Schedule value ranges will be checked if current validate level
+contains range checking (if corresponding \code{ScheduleTypeLimits}
+\verb{Numeric Type} is \code{Continuous}) or choice checking (if corresponding
+\code{ScheduleTypeLimits} \verb{Numeric Type} is \code{Discrete}).
+
+For detailed description on validate checking, see
+\href{../../eplusr/html/IdfObject.html#method-validate}{\code{IdfObject$validate()}}
+documentation above.
 }
 
 \subsection{Returns}{
@@ -256,7 +406,59 @@ An \code{IdfValidity} object.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 sch$validate()
+
+# check at predefined validate level
+sch$validate("none")
+sch$validate("draft")
+sch$validate("final")
 }
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid}{}}}
+\subsection{Method \code{is_valid()}}{
+Check if there is any error in current object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfScheduleCompact$is_valid(level = eplusr_option("validate_level"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level}}{One of \code{"none"}, \code{"draft"}, \code{"final"} or a list of 10
+elements with same format as \code{\link[=custom_validate]{custom_validate()}} output.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid()} returns \code{TRUE} if there is no error in current
+\code{IdfScheduleCompact} object under specified validation level.
+Schedule value ranges will be checked if current validate level
+contains range checking (if corresponding \code{ScheduleTypeLimits}
+\verb{Numeric Type} is \code{Continuous}) or choice checking (if corresponding
+\code{ScheduleTypeLimits} \verb{Numeric Type} is \code{Discrete}).
+
+\verb{$is_valid()} checks if there are errors in current \code{IdfObject} object
+under specified validation level and returns \code{TRUE} or \code{FALSE}
+accordingly. For detailed description on validate checking, see
+\href{../../eplusr/html/IdfObject.html#method-validate}{\code{IdfObject$validate()}}
+documentation above.
+}
+
+\subsection{Returns}{
+A single logical value of \code{TRUE} or \code{FALSE}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+sch$is_valid()
+}
+
 }
 \if{html}{\out{</div>}}
 
@@ -275,17 +477,54 @@ Extract schedule values
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{daytype}}{If \code{"compact"}, same schedule values from different day
-types will be compacted together. If \code{"expand"}, all compacted
-day types will be expanded. Default: \code{NULL}.}
+\item{\code{daytype}}{Should be one of:
+\itemize{
+\item \code{NULL}: Do nothing Grouped day types will be concatenated with a
+comma, e.g. \verb{Weekdays,SummerDesignDay}. This is the default
+behavior.
+\item \code{TRUE} or \code{"expand"}: All compacted day types will be expanded.
+\item \code{FALSE} or \code{"compact"}: Same schedule values from different day
+types will be compacted together.
+\item A character vector specifying the grouped day types, e.g.
+\code{c("weekday", "summerdesignday")}. All other days except specified
+ones will be classified into day type \code{AllOtherDays}, if possible.
+If not possible, those day types will still be extracted
+separately.
+}}
 
-\item{\code{timestep}}{If specified, the time step of schedule values will
-be updated if possible. Default: \code{NULL}.}
+\item{\code{timestep}}{The time step of schedule values, e.g. "10 mins" and
+"1 hour". Valid units include \code{sec(s)}, \code{min(s)}, and
+\code{hour(s)}. If \code{NULL}, the original time specifications will be
+kept. If \code{"auto"}, the time periods with the same schedule
+values will be compacted. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}}
+\code{NULL} if current schedule is empty. Otherwise, a
+\code{\link[data.table:data.table]{data.table::data.table()}} of 5 columns:
+\itemize{
+\item \code{year_day}: Character type. Used for the \verb{Through:} fields.
+Day specifications in \code{mm/dd} format
+\item \code{id}: Integer type. The group index of day types
+\item \code{daytype}: Character type. Used for the \verb{For:} fields. All possible
+values are:
+\itemize{
+\item \code{"AllDay"}
+\item \code{"Weekday"}, and also \code{"Monday"}, \code{"Tuesday"}, \code{"Wednesday"},
+\code{"Thursday"} and \code{"Friday"}
+\item \code{"Weekend"}, and also \code{"Saturday"} and \code{"Sunday"}
+\item \code{"SummaryDesignDay"} and \code{"WinterDesignDay"}
+\item \code{"Holiday"}
+\item \code{"CustomDay1"} and \code{"CustomDay2"}
+\item \code{"AllOtherDay"}
+}
+\item \code{time}: \code{hms} vector. Used for the \verb{Until:} fields. It is handy for
+plotting since \code{hms} object is directly supported by the scale
+system of \href{https://cran.r-project.org/package=ggplot2}{ggplot2}
+package
+\item \code{value}: Numeric type. Actual schedule values
+}
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}

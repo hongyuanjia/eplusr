@@ -38,8 +38,9 @@ parse_sch_cmpt <- function (dt_value) {
     s_until[stri_sub(s_until, 1L, 1L) == ":"] <- stri_trim_left(stri_sub(s_until[stri_sub(s_until, 1L, 1L) == ":"], 2L))
     # use difftime to parse
     until <- as.integer(as.difftime(as.character(s_until), format = "%H:%M", units = "mins"))
-    if (anyNA(until)) {
-        invld <- val[J(which(is.na(until))[[1L]]), on = "value_index"]
+    # NOTE: as.difftime("1:00:00", format = "%H:%M") did not give NA
+    if (anyNA(until) || any(stri_count_fixed(s_until, ":") != 1L)) {
+        invld <- val[J(which(is.na(until) | stri_count_fixed(s_until, ":") != 1L)[[1L]]), on = "value_index"]
         abort_bad_sch_compt_field("until", "Invalid time format in 'Until:' field found",
             get_object_info(obj, numbered = FALSE, prefix = ""),
             invld$field_index, invld$value_chr, invld$field_name)
@@ -72,7 +73,7 @@ parse_sch_cmpt <- function (dt_value) {
     set(sch, NULL, "value", suppressWarnings(as.double(sch$value)))
     if (anyNA(sch$value)) {
         invld <- val[J(which(is.na(sch$value))[1L]), on = "value_index"]
-        abort_bad_sch_compt_field("until", "Incomplete day time specifications found in 'Until:' fields",
+        abort_bad_sch_compt_field("until", "Invalid schedule value found in 'Value:' fields",
             get_object_info(obj, numbered = FALSE, prefix = ""),
             invld$field_index, invld$value_chr, invld$field_name)
     }
@@ -81,16 +82,6 @@ parse_sch_cmpt <- function (dt_value) {
     setcolorder(sch, c("value_index", "daytype_index", "time", "value"))
 
     list(type_limits = obj, meta = meta, value = sch)
-}
-# }}}
-
-# abort_bad_sch_compt_field {{{
-abort_bad_sch_compt_field <- function (type, reason, object, index, value, field) {
-    abort(paste0(reason, " for ", object, "\n",
-        paste0(sprintf("  #%i: \"%s\", !- %s", index, value, field), collapse = "\n")
-        ),
-        paste0("idfschcmpt_", type)
-    )
 }
 # }}}
 
@@ -118,7 +109,7 @@ mark_sch_cmpt_field <- function (dt_value) {
         i_thr <- which(stri_startswith_fixed(value_chr, "through"))
 
         # make sure through appears at latest in the 3rd field
-        if (length(i_thr) == 0L || i_thr[[1L]] != 1L) {
+        if (!length(i_thr) || i_thr[[1L]] != 1L) {
             abort_bad_sch_compt_field("through", "Failed to locate 'Through:' fields",
                 get_object_info(obj, numbered = FALSE, prefix = ""),
                 field_index[1L], value_chr[1L], field_name[1L])
@@ -130,14 +121,16 @@ mark_sch_cmpt_field <- function (dt_value) {
         s_date <- stri_trim_left(s_date)
 
         # convert to an EpwDate
-        yr_day <- lubridate::yday(epw_date(s_date, leapyear = FALSE))
-
-        if (anyNA(yr_day)) {
-            invld <- .SD[i_thr[is.na(yr_day)]]
+        date <- epw_date(s_date, leapyear = FALSE)
+        if (anyNA(date) || any(!is_epwdate_type(date, "md"))) {
+            invld <- .SD[i_thr[is.na(date) | !is_epwdate_type(date, "md")]]
             abort_bad_sch_compt_field("through", "Invalid date format found in 'Through:' fields",
                 get_object_info(obj, numbered = FALSE, prefix = ""),
                 invld$field_index, invld$value_chr, invld$field_name)
         }
+
+        # get year day
+        yr_day <- lubridate::yday(date)
         if (!identical(order(yr_day), seq_along(yr_day))) {
             invld <- .SD[i_thr]
             abort_bad_sch_compt_field("through", "Invalid date order found in 'Through:' fields",
@@ -153,8 +146,8 @@ mark_sch_cmpt_field <- function (dt_value) {
 
         # make sure next field for a through field is a "for"
         if (any(invld <- !stri_startswith_fixed(value_chr[i_thr + 1L], "for"))) {
-            invld <- .SD[sort(c(i_thr[invld] - 1L, i_thr[invld]))]
-            abort_bad_sch_compt_field("through", "Expected a 'For:' field below 'Through:' field",
+            invld <- .SD[unique(sort(c(i_thr[invld] - 1L, i_thr[invld])))]
+            abort_bad_sch_compt_field("through", "Expected a 'For:' field below 'Through:' fields",
                 get_object_info(obj, numbered = FALSE, prefix = ""),
                 invld$field_index, invld$value_chr, invld$field_name)
         }
@@ -168,8 +161,6 @@ mark_sch_cmpt_field <- function (dt_value) {
     # mark for {{{
     val[, by = c("rleid", "object_id"), c("enum", "daytype", "index_daytype") := {
         i_for <- which(stri_startswith_fixed(value_chr, "for"))
-
-        if (!length(i_for)) abort_bad_sch_compt_field(obj, val, "for", "Failed to locate 'For:' fields", c(.BY, .SD))
 
         # extract day types
         s_type <- stri_sub(value_chr[i_for], 4L)
@@ -242,8 +233,8 @@ mark_sch_cmpt_field <- function (dt_value) {
         set(val, NULL, "interpolate", "no")
     } else {
         if (any(not_for <- val$enum[i_int - 1L] != 2L)) {
-            invld <- val[i_int[not_for][1L]]
-            abort_bad_sch_compt_field("interpolate", "Expected a 'For' field before 'Interpolate:' field",
+            invld <- val[c(i_int[not_for][1L] - 1L, i_int[not_for][1L])]
+            abort_bad_sch_compt_field("interpolate", "Expected a 'For' field before 'Interpolate:' fields",
                 get_object_info(obj, numbered = FALSE, prefix = ""),
                 invld$field_index, invld$value_chr, invld$field_name)
         }
@@ -254,7 +245,8 @@ mark_sch_cmpt_field <- function (dt_value) {
         all_int <- c("no", "linear", "average")
         if (anyNA(int <- chmatch(s_int, all_int))) {
             invld <- val[i_int[is.na(int)][1L]]
-            abort_bad_sch_compt_field("interpolate", "Expected a 'For' field before 'Interpolate:' field",
+            abort_bad_sch_compt_field("interpolate",
+                "Invalid value found in 'Interpolate:' fields",
                 get_object_info(obj, numbered = FALSE, prefix = ""),
                 invld$field_index, invld$value_chr, invld$field_name)
         }
@@ -262,14 +254,16 @@ mark_sch_cmpt_field <- function (dt_value) {
         set(val, i_int, "enum", 3L)
         set(val, i_int, "interpolate", s_int)
         set(val, i_int, "int_idx", int)
-        data.table::setnafill(val, "locf", cols = "int_idx")
+        val[, by = c("year_day", "index_daytype"), int_idx := data.table::nafill(int_idx, "locf")]
+        val[J(NA_integer_), on = "int_idx", int_idx := 1L]
+        set(val, 1:(i_int[[1L]] - 1L), "int_idx", NA_integer_)
         set(val, NULL, "interpolate", all_int[val$int_idx])
         set(val, NULL, "int_idx", NULL)
     }
     # }}}
 
     # pair until and value {{{
-    set(val, NULL, "pair_type", "value")
+    set(val, NULL, "pair_type", NA_character_)
     val[J(0L), on = "enum", by = c("rleid", "object_id", "year_day", "index_daytype"),
         c("pair_type", "index_schedule_value") := {
             is_until <- seq_len(.N) %% 2 == 1L
@@ -281,12 +275,24 @@ mark_sch_cmpt_field <- function (dt_value) {
             }
 
             pair_type[is_until] <- "until"
+            pair_type[!is_until] <- "value"
             list(pair_type, index_schedule_value = rep(seq_len(.N/2), each = 2L))
         }
     ]
     # }}}
 
     list(object = obj, value = val)
+}
+# }}}
+
+# abort_bad_sch_compt_field {{{
+abort_bad_sch_compt_field <- function (type, reason, object, index, value, field) {
+    abort(paste0(reason, " for ", object, "\n",
+        paste0(sprintf("  --> %i: \"%s\", !- %s", index, value, field), collapse = "\n")
+        ),
+        paste0("idfschcmpt_", type),
+        data = list(field_index = index, field_name = field, value_chr = value)
+    )
 }
 # }}}
 
@@ -337,8 +343,11 @@ compose_sch_cmpt <- function (type_limits, meta, value) {
     # clean
     set(meta, NULL, c("through", "for", "interp"), NULL)
     set(value, NULL, c("until", "pair"), NULL)
-    if (!nrow(val)) {
-        set(val, NULL, c("rleid", "object_id"), list(integer(), integer()))
+
+    # in case type limit is not specified
+    if (!has_names(type_limits, "type_limits")) {
+        set(type_limits, NULL, "type_limits", NA_character_)
+        on.exit(set(type_limits, NULL, "type_limits", NULL), add = TRUE)
     }
 
     val <- val[, by = c("rleid", "object_id"), list(value_chr = list(unlist(value_chr, FALSE, FALSE)))][
@@ -385,32 +394,48 @@ compact_sch_cmpt <- function (meta, value) {
 # }}}
 
 # compact_sch_daytype {{{
-compact_sch_daytype <- function (meta, other_day = c("CustomDay", "Holiday")) {
+compact_sch_daytype <- function (meta, other_day = c("CustomDay", "Holiday"), invert = FALSE) {
     if (!is.null(other_day)) {
         # expand
         meta <- expand_sch_daytype(meta, other_day = TRUE)
 
         # validate
-        s_end <- stri_endswith_fixed(other_day, "s", case_insensitive = TRUE)
-        if (any(s_end)) other_day[s_end] <- stri_sub(other_day[s_end], to = -2L)
-        cmpt <- match_in_vec(other_day, label = TRUE, names(DAYTYPE))
-        iscmpt <- !is.na(cmpt)
-        other_day <- as.list(other_day)
-        other_day[iscmpt] <- DAYTYPE[names(DAYTYPE) %chin% unlist(other_day[iscmpt], FALSE, FALSE)]
-        other_day[!iscmpt] <- lapply(other_day[!iscmpt], match_in_vec, unlist(DAYTYPE, FALSE, FALSE), label = TRUE)
-        other_day <- unlist(other_day, FALSE, FALSE)
+        if (!invert) {
+            s_end <- stri_endswith_fixed(other_day, "s", case_insensitive = TRUE)
+            if (any(s_end)) other_day[s_end] <- stri_sub(other_day[s_end], to = -2L)
+            cmpt <- match_in_vec(other_day, label = TRUE, names(DAYTYPE))
+            iscmpt <- !is.na(cmpt)
+            other_day <- as.list(other_day)
+            other_day[iscmpt] <- DAYTYPE[names(DAYTYPE) %chin% unlist(other_day[iscmpt], FALSE, FALSE)]
+            other_day[!iscmpt] <- lapply(other_day[!iscmpt], match_in_vec, unlist(DAYTYPE, FALSE, FALSE), label = TRUE)
+        } else {
+            other_day <- match_daytype(other_day, TRUE, FALSE)
+            setattr(other_day, "names", other_day)
+            other_day <- lapply(other_day, match_daytype, TRUE, TRUE)
+        }
     }
 
+    if (!invert) {
+        dict <- c(list(AllDay = unlist(DAYTYPE, FALSE, FALSE)), DAYTYPE[c("Weekday", "Weekend")])
+        other_day <- unlist(other_day, FALSE, FALSE)
+    } else {
+        if (is.null(other_day)) abort("'other_day' should be given when 'invert' is TRUE.")
+        dict <- other_day[!names(other_day) %chin% "AllOtherDay"]
+        other_day <- setdiff(c(unlist(DAYTYPE, FALSE, FALSE)), unlist(other_day, FALSE, FALSE))
+    }
+
+    found_otherday <- FALSE
     meta[, by = c("rleid", "object_id", "daytype_index"), "daytype" := {
         # validate
         daytype <- lapply(daytype, match_daytype, sch = TRUE)
 
-        dict <- c(list(AllDay = unlist(DAYTYPE, FALSE, FALSE)), DAYTYPE[c("Weekday", "Weekend")])
-        if (!is.null(other_day)) dict <- c(list(AllOtherDay = other_day), dict)
+        if (length(other_day)) dict <- c(dict, list(AllOtherDay = other_day))
 
         for (i in seq_along(dict)) {
             if (all(dict[[i]] %chin% daytype[[1L]])) {
+                # make sure AllOtherDay is at the end
                 if ("AllOtherDay" %chin% names(dict[i])) {
+                    found_otherday <<- TRUE
                     daytype <- list(c(setdiff(daytype[[1L]], dict[[i]]), names(dict[i])))
                 } else {
                     daytype <- list(c(names(dict[i]), setdiff(daytype[[1L]], dict[[i]])))
@@ -418,9 +443,36 @@ compact_sch_daytype <- function (meta, other_day = c("CustomDay", "Holiday")) {
             }
         }
 
+        # keep the input order
+        dict <- dict[names(dict) != "AllOtherDay"]
+        daytype <- list(c(intersect(names(dict), daytype[[1L]]), setdiff(daytype[[1L]], names(dict))))
+
         list(daytype)
     }]
 
+    if (invert) {
+
+        # still put those 3 day types into AllOtherDay
+        if (!found_otherday && all(c("CustomDay1", "CustomDay2") %chin% other_day)) {
+            other_day <- c("CustomDay1", "CustomDay2")
+            meta[, by = c("rleid", "object_id", "daytype_index"), "daytype" := {
+                if (all(other_day %chin% daytype[[1L]])) {
+                    daytype <- list(c(setdiff(daytype[[1L]], other_day), "AllOtherDay"))
+                    found_otherday <<- TRUE
+                }
+
+                list(daytype)
+            }]
+        }
+
+        # compact all days in the same index of AllOtherDay
+        if (found_otherday) {
+            dict <- dict[names(dict) != "AllOtherDay"]
+            meta[vlapply(daytype, function (x) "AllOtherDay" %chin% x), "daytype" := {
+                list(list(c(intersect(names(dict), daytype[[1L]]), "AllOtherDay")))
+            }]
+        }
+    }
     meta
 }
 # }}}
@@ -438,7 +490,7 @@ expand_sch_daytype <- function (meta, other_day = TRUE) {
         if (length(miss <- setdiff(unlist(DAYTYPE, FALSE, FALSE), daytype_flat))) {
             other <- vlapply(daytype, function (x) "AllOtherDay" %chin% x)
             if (!any(other)) {
-                stop(paste0("Missing assignment for day type (", collapse(miss), ")"))
+                abort(paste0("Missing assignment for day type (", collapse(miss), ")"), "idfschcmpt_daytype")
             }
 
             # expand allotherday
@@ -454,8 +506,6 @@ expand_sch_daytype <- function (meta, other_day = TRUE) {
 
 # compact_sch_time {{{
 compact_sch_time <- function (meta, value, timestep = "auto") {
-    if (timestep != "auto") ts <- parse_sch_timestep(timestep)
-
     if (timestep == "auto") {
         # add interpolate
         value[meta, on = "daytype_index", interpolate := i.interpolate]
@@ -475,11 +525,15 @@ compact_sch_time <- function (meta, value, timestep = "auto") {
         ]
         val_cmpt <- value[, by = c("daytype_index", "time_rleid"), .SD[.N], .SDcols = c("value", "time")]
     } else {
+        ts <- parse_sch_timestep(timestep)
+
         value[, by = "daytype_index", time_rleid := {
             dt <- c(time[[1L]], diff(time))
             if (!all(i <- ts >= dt & ts %% dt == 0L)) {
-                stop("Invalid timestep specification: ", surround(timestep), ". ",
-                    "It must be divisible by ", collapse(max(unique(dt[!i])), NULL), " mins.")
+                abort(paste0("Invalid timestep specification: ", surround(timestep), ". ",
+                    "It must be divisible by ", collapse(max(unique(dt[!i])), NULL), " mins."),
+                    "idfschcmpt_timestep"
+                )
             }
             mod <- cumsum(dt) %% ts
             div <- cumsum(dt) %/% ts
@@ -509,9 +563,20 @@ expand_sch_time <- function (meta, value, timestep = "auto") {
 
     # find the minimal timestep
     full_time <- value[, by = "daytype_index", {
-        # default to 1 hour
         if (.N == 1L && time == 1440L) {
-            list(value = value, time = seq(60L, 1440L, by = 60L))
+            # default to 1 min
+            if (timestep == "auto") {
+                list(value = value, time = 1L:1440L)
+            } else {
+                if (1440 %% ts != 0L) {
+                    abort(paste0("Invalid timestep specification: ", surround(timestep), ". ",
+                        "It should be a divisor of 1440 mins."),
+                        "idfschcmpt_timestep"
+                    )
+                }
+                ts <- as.integer(ts)
+                list(value = value, time = seq(ts, 1440L, by = ts))
+            }
         } else {
             d <- min(diff(time))
             gcd <- min(gcd(time, d))
@@ -519,8 +584,10 @@ expand_sch_time <- function (meta, value, timestep = "auto") {
             if (timestep == "auto") {
                 ts <- gcd
             } else if (ts == 0 || ts > gcd || gcd %% ts != 0L) {
-                stop("Invalid timestep specification: ", surround(timestep), ". ",
-                    "It should be a divisor of ", gcd, " mins.")
+                abort(paste0("Invalid timestep specification: ", surround(timestep), ". ",
+                    "It should be a divisor of ", gcd, " mins."),
+                    "idfschcmpt_timestep"
+                )
             }
 
             ts <- as.integer(ts)
@@ -551,21 +618,45 @@ expand_sch_time <- function (meta, value, timestep = "auto") {
 
 # get_sch_type_limits {{{
 get_sch_type_limits <- function (idd_env, idf_env, name) {
+    assert_string(name)
+
     range <- tryCatch(
         get_idf_value(idd_env, idf_env, class = "ScheduleTypeLimits", object = name, field = 4L,
             complete = TRUE, ignore_case = TRUE),
         eplusr_error_invalid_object_name = function (e) {
             msg <- sprintf("Invalid object name found in class 'ScheduleTypeLimits': '%s'", e$value)
-            abort(msg, "invaid_object_name")
+            abort(msg, "invalid_object_name")
         }
     )
     range <- standardize_idf_value(idd_env, idf_env, range, type = "choice")
 
     type <- range$value_chr[4]
+    # empty then use continuous default
+    if (is.na(type)) type <- "Continuous"
+
     if (type == "Continuous") {
-        r <- ranger(range$value_num[2], TRUE, range$value_num[3], TRUE)
+        lower_incbounds <- TRUE
+        upper_incbounds <- TRUE
+        if (is.na(range$value_num[2])) {
+            range$value_num[2] <- -Inf
+            lower_incbounds <- FALSE
+        }
+        if (is.na(range$value_num[3])) {
+            range$value_num[3] <- Inf
+            upper_incbounds <- FALSE
+        }
+        r <- ranger(range$value_num[2], lower_incbounds, range$value_num[3], upper_incbounds)
     } else if (type == "Discrete") {
-        r <- seq(range$value_num[2], range$value_num[3])
+        if (is.na(range$value_num[2]) || is.na(range$value_num[3])) {
+            r <- list()
+        } else if (range$value_num[2] > range$value_num[3]) {
+            abort(sprintf("Invalid 'Lower Limit Value' (%s) for ScheduleTypeLimits object '%s' [ID:%i]. Should be no larger than 'Upper Limit Value' (%s)",
+                range$value_num[2], range$object_name[1], range$object_id[1], range$value_num[3]),
+                "idfschcmpt_typelimit"
+            )
+        } else {
+            r <- seq(range$value_num[2], range$value_num[3])
+        }
     } else {
         r <- list()
     }
@@ -575,41 +666,72 @@ get_sch_type_limits <- function (idd_env, idf_env, name) {
 # }}}
 
 # validate_sch_cmpt {{{
-validate_sch_cmpt <- function (idd_env, idf_env, object, type_limits) {
-    lim <- get_sch_type_limits(idd_env, idf_env, type_limits)
+validate_sch_cmpt <- function (idd_env, idf_env, object, type_limits, level = eplusr_option("validate_level")) {
+    if (is.null(type_limits)) {
+        lim <- NULL
+    } else {
+        lim <- get_sch_type_limits(idd_env, idf_env, type_limits)
+    }
 
-    prop <- c("type_enum", "required_field")
+    prop <- c("type_enum", "units", "ip_units")
 
     if (is.numeric(lim$range)) {
-        choice <- TRUE
-        range <- FALSE
         prop <- c(prop, "choice")
-    } else {
-        choice <- FALSE
-        range <- TRUE
+    } else if (inherits(lim$range, "Range")) {
         prop <- c(prop, "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds")
     }
 
     obj <- get_idf_object(idd_env, idf_env, object = object)
     val <- get_idf_value(idd_env, idf_env, object = object, property = prop)
 
-    m <- mark_sch_cmpt_field(val)
-    val[m$value, on = "field_index", pair_type := i.pair_type]
+    # make all visible fields required
+    set(val, NULL, "required_field", TRUE)
 
-    if (is.numeric(lim$range)) {
-        val[J("value"), on = "pair_type", `:=`(type_enum = IDDFIELD_TYPE$choice, choice = list(lim$range))]
-    } else if (inherits(lim$range, "Range")) {
-        val[J("value"), on = "pair_type", `:=`(type_enum = IDDFIELD_TYPE$choice,
-            has_range = TRUE,
-            maximum = lim$range$maximum, minimum = lim$range$minimum,
-            lower_incbounds = lim$range$lower_incbounds, upper_incbounds = lim$range$upper_incbounds
-        )]
+    m <- tryCatch(mark_sch_cmpt_field(val),
+        eplusr_error_idfschcmpt_through = function (e) e,
+        eplusr_error_idfschcmpt_for = function (e) e,
+        eplusr_error_idfschcmpt_interpolate = function (e) e,
+        eplusr_error_idfschcmpt_until = function (e) e
+    )
+
+    if (!inherits(m, "eplusr_error")) {
+        val[m$value, on = "field_index", pair_type := i.pair_type]
+
+        if (is.numeric(lim$range)) {
+            val[J("value"), on = "pair_type", `:=`(type_enum = IDDFIELD_TYPE$choice, choice = list(lim$range))]
+        } else if (inherits(lim$range, "Range")) {
+            val[J("value"), on = "pair_type", `:=`(type_enum = IDDFIELD_TYPE$real,
+                has_range = TRUE,
+                maximum = lim$range$maximum, minimum = lim$range$minimum,
+                lower_incbounds = lim$range$lower_incbounds, upper_incbounds = lim$range$upper_incbounds,
+                value_num = suppressWarnings(as.double(value_chr))
+            )]
+        }
     }
 
-    validate_objects(idd_env, idf_env, obj, val,
-        required_field = TRUE, unique_name = TRUE, type = TRUE,
-        choice = choice, range = range
-    )
+    validity <- validate_on_level(idd_env, idf_env, obj, val, level)
+
+    # add schedule type limits checking
+    if (is.na(val$value_chr[2])) {
+        invld <- val[J(2L), on = "field_index"]
+        setattr(invld, "bullet", "Failed to locate schedule type limits:")
+        validity$invalid_schedule_type_limits <- invld
+    }
+
+    if (inherits(m, "eplusr_error")) {
+        type <- stringi::stri_replace_first_fixed(class(m)[1L], "eplusr_error_idfschcmpt", "invalid")
+        type <- paste0(type, "_field")
+
+        invld <- val[J(m$data$field_index), on = "field_index"]
+
+        # add additional message
+        mes <- stri_extract_first_regex(m$message, ".+field")
+        setattr(invld, "bullet", mes)
+
+        validity[[type]] <- invld
+    }
+
+    validity
 }
 # }}}
 
@@ -647,15 +769,48 @@ preprocess_sch_compt_data <- function (data, type_limits = NULL) {
         time <- as.integer(time) / 60L
     }
     if (!checkmate::test_integerish(time, lower = 1L, upper = 1440L, any.missing = FALSE)) {
-        abort("'time' should be or at least can be converted into 'HH:MM' format.")
+        invld <- is.na(time) | time < 1L | time > 1440L
+        abort(paste0("'time' should be or at least can be converted into 'HH:MM' format for one day. ",
+            "Invalid time specification found: ", collapse(unique(data$time[invld]))), "idfschcmpt_until")
     }
     set(data, NULL, "time", as.integer(time))
 
-    daytype <- match_daytype(data$daytype, TRUE, FALSE)
-    if (anyNA(daytype)) {
-        abort(paste0("Invalid day type (", collapse(data$daytype[is.na(daytype)]), ") found"))
+    dt <- unique(data$daytype)
+    if (!any(stri_detect_fixed(dt, ","))) {
+        daytype <- match_daytype(data$daytype, TRUE, FALSE, FALSE)
+        if (anyNA(daytype)) {
+            abort(paste0("Invalid day type found: ", collapse(unique(data$daytype[is.na(daytype)]))), "idfschcmpt_for")
+        }
+        set(data, NULL, "daytype", daytype)
+    } else {
+        dt_s <- stringi::stri_split_regex(dt, "\\s*,\\s*", omit_empty = TRUE, simplify = FALSE)
+        dt_s <- lapply(dt_s, function (s) {
+            m <- match_daytype(s, sch = TRUE, expand = FALSE, stop = FALSE)
+            if (anyNA(m)) {
+                abort(paste0("Invalid day type found: ", collapse(s[is.na(m)])), "idfschcmpt_for")
+            }
+            m
+        })
+        dt <- data.table(daytype = dt, daytype_split = dt_s, group_id = seq_along(dt))
+
+        # in case there is an 'id' column
+        if (!has_names(data, "id")) set(data, NULL, "id", 1L)
+
+        # keep original daytype order
+        data <- data[dt, on = "daytype", `:=`(daytype_split = i.daytype_split, group_id = i.group_id)]
+        data <- data[, by = "id", {
+            len <- each_length(daytype_split)
+            list(year_day = rep(year_day, len),
+                 daytype = unlist(daytype_split, FALSE, FALSE),
+                 time = rep(time, len),
+                 value = rep(value, len),
+                 group_id = rep(group_id, len)
+            )
+        }][J(unique(unlist(dt_s, FALSE, FALSE))), on = "daytype"]
+
+        set(data, NULL, "id", rleid(data$id, data$group_id))
+        set(data, NULL, "group_id", NULL)
     }
-    set(data, NULL, "daytype", daytype)
 
     # check range
     if (!is.null(type_limits)) {
@@ -665,14 +820,14 @@ preprocess_sch_compt_data <- function (data, type_limits = NULL) {
             if (nrow(invld)) {
                 abort(paste0("Invalid schedule value found (", collapse(unique(invld$value)), "). ",
                     "Should be a subset of ", collapse(type_limits$range), " as defined in ScheduleTypeLimits ",
-                    surround(type_limits$name), "."))
+                    surround(type_limits$name), "."), "idfschcmpt_value")
             }
         } else if (inherits(type_limits$range, "Range")) {
             invld <- data[!in_range(value, type_limits$range)]
             if (nrow(invld)) {
                 abort(paste0("Invalid schedule value found (", collapse(unique(invld$value)), "). ",
                     "Should be in range ", format(type_limits$range), " as defined in ScheduleTypeLimits ",
-                    surround(type_limits$name), "."))
+                    surround(type_limits$name), "."), "idfschcmpt_value")
             }
         }
     }
@@ -684,13 +839,15 @@ preprocess_sch_compt_data <- function (data, type_limits = NULL) {
         meta <- data[, by = c("id", "year_day"), list(daytype = list(unique(daytype)))]
 
         # check if values are the same when grouped by id
-        data <- unique(data, by = c("id", "year_day", "time", "value"))[, by = c("id", "year_day"), {
-            dayt <- unique(daytype)
-            if (length(dayt) > 1L) {
-                abort(sprintf("Invalid 'id' (%i) found. Schedule data of 'daytype' %s mismatch.", .BY$id, collapse(dayt)))
+        data <- data[, list(num = .N, daytype = list(unique(daytype))), by = c("id", "year_day", "time", "value")][, by = c("id", "year_day"),
+        {
+            if (length(unique(num)) > 1L) {
+                abort(sprintf("Invalid 'id' (%i) found. Schedule data of day type %s mismatch.",
+                    .BY$id, collapse(daytype[[1L]])), "idfschcmpt_id")
             }
             .SD
         }]
+        set(data, NULL, c("num", "daytype"), NULL)
 
         set(meta, NULL, "daytype_index", rleid(meta$id, meta$year_day))
         set(data, NULL, "daytype_index", rleid(data$id, data$year_day))
@@ -717,8 +874,13 @@ update_sch_compt <- function (idd_env, idf_env, type_limits, meta, value, data, 
     assert_flag(compact)
 
     limits <- NULL
-    if (check_range && !is.null(type_limits$type_limits)) {
-        limits <- get_sch_type_limits(idd_env, idf_env, type_limits$type_limits)
+    if (check_range) {
+        if (is.null(type_limits$type_limits)) {
+            verbose_info("'.check_range' is set to 'TRUE' but 'Schedule Type Limits' is not set. ",
+                "No range checking on schedule values will be performed.")
+        } else {
+            limits <- get_sch_type_limits(idd_env, idf_env, type_limits$type_limits)
+        }
     }
     pre <- preprocess_sch_compt_data(data, limits)
 
@@ -746,7 +908,7 @@ update_sch_compt <- function (idd_env, idf_env, type_limits, meta, value, data, 
 # }}}
 
 # match_daytype {{{
-match_daytype <- function (daytype, sch = FALSE, expand = TRUE) {
+match_daytype <- function (daytype, sch = FALSE, expand = TRUE, stop = TRUE) {
     # for SQL
     if (!sch) {
         dt <- match_in_vec(daytype, label = TRUE, c(
@@ -766,8 +928,9 @@ match_daytype <- function (daytype, sch = FALSE, expand = TRUE) {
         ))
     }
 
-    if (anyNA(dt)) {
-        abort(paste0("Invalid day type found: ", collapse(daytype[is.na(dt)]), "."), "invalid_daytype", data = daytype[is.na(dt)])
+    if (stop && anyNA(dt)) {
+        abort(paste0("Invalid day type found: ", collapse(unique(daytype[is.na(dt)])), "."),
+            "invalid_daytype", data = daytype[is.na(dt)])
     }
 
     if (!expand) return(dt)
@@ -782,30 +945,34 @@ match_daytype <- function (daytype, sch = FALSE, expand = TRUE) {
         if ("CustomDay" %chin% dt) expd <- c(expd, DAYTYPE$CustomDay)
         if ("SpecialDay" %chin% dt) expd <- c(expd, DAYTYPE$SpecialDay)
         if ("NormalDay" %chin% dt) expd <- c(expd, DAYTYPE$NormalDay)
-        dt <- setdiff(dt, c("Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay"))
+        # setdiff will remove duplicates
+        dict <- c("Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay")
+        dt <- dt[chmatch(dt, dict, 0L) == 0L]
     } else {
         if ("AllDay" %chin% dt) expd <- c(expd, unlist(DAYTYPE, FALSE, FALSE))
-        dt <- setdiff(dt, c("Weekday", "Weekend", "AllDay"))
+        dict <- c("Weekday", "Weekend", "AllDay")
+        dt <- dt[chmatch(dt, dict, 0L) == 0L]
     }
 
-    if (sch) c(dt, expd) else unique(c(dt, expd))
+    c(dt, expd)
 }
 # }}}
 
 # parse_sch_timestep {{{
 # adopted from scales:::fullseq.difftime()
 parse_sch_timestep <- function (timestep) {
+    assert_string(timestep)
     s <- stri_split_fixed(timestep, " ")[[1L]]
-    if (length(s) == 1L) stop("Invalid timestep specification: ", surround(timestep))
+    if (length(s) == 1L) abort(paste0("Invalid timestep specification: ", surround(timestep)), "idfschcmpt_timestep")
 
     value <- suppressWarnings(as.numeric(s[[1L]]))
-    if (is.na(value)) stop("Invalid timestep specification: ", surround(timestep))
+    if (is.na(value)) abort(paste0("Invalid timestep specification: ", surround(timestep)), "idfschcmpt_timestep")
 
     unit <- gsub("s$", "", s[[2L]])
     unit_in_sec <- c("sec" = 1L, "min" = 60L, "hour" = 3600L)
     unit <- unit_in_sec[unit]
-    if (is.na(unit)) stop("Invalid timestep specification: ", surround(timestep))
-    if (unit %% 60L != 0L) stop("Invalid timestep specification: ", surround(timestep))
+    if (is.na(unit)) abort(paste0("Invalid timestep specification: ", surround(timestep)), "idfschcmpt_timestep")
+    if (unit %% 60L != 0L) abort(paste0("Invalid timestep specification: ", surround(timestep)), "idfschcmpt_timestep")
 
     # converted into minutes
     value * (unit %/% 60L)
@@ -817,7 +984,7 @@ transform_sch_date <- function (date, leapyear = FALSE) {
     if (is.integer(date)) {
         set_epwdate_year(epw_date(date, leapyear = leapyear),
             if (leapyear) EPWDATE_YEAR$leap$md else EPWDATE_YEAR$noleap$md
-        )[]
+        )
     } else {
         lubridate::yday(epw_date(date, leapyear = leapyear))
     }
