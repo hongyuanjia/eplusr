@@ -700,7 +700,8 @@ format_single_validity <- function (single_validity, type, epw = FALSE) {
         invalid_integer = "Invalid Integer",
         invalid_choice = "Invalid Choice",
         invalid_range = "Range Exceeding",
-        invalid_reference = "Invalid Reference"
+        invalid_reference = "Invalid Reference",
+        stringi::stri_trans_totitle(stri_replace_all_fixed(type, "_", " "))
     )
 
     bullet <- switch(type,
@@ -716,7 +717,13 @@ format_single_validity <- function (single_validity, type, epw = FALSE) {
         invalid_integer = "Fields below are not or cannot be coerced into integers:",
         invalid_choice = "Fields below are not one of prescribed choices:",
         invalid_range = "Fields below exceed prescribed ranges:",
-        invalid_reference = "Fields below are not one of valid references:")
+        invalid_reference = "Fields below are not one of valid references:",
+        "Fields below are not valid:"
+    )
+
+    if (!is.null(attr(single_validity[[type]], "bullet"))) {
+        bullet <- attr(single_validity[[type]], "bullet")
+    }
 
     out <- c("",
         cli::rule(paste0("[", error_num, "] ", title), width = cli::console_width() - 2L),

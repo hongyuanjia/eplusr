@@ -1,5 +1,5 @@
 ---
-title: "Handle 'Schedule:Compact' objects"
+title: "Work with 'Schedule:Compact' objects"
 author: "Hongyuan Jia"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     df_print: "paged"
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Handle 'Schedule:Compact' objects}
+  %\VignetteIndexEntry{Work with 'Schedule:Compact' objects}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,8 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
     screenshot.force = FALSE,
-    fig.align = "center"
+    fig.align = "center",
+    out.lines = 40
 )
 
 # the default output hook
@@ -37,102 +38,332 @@ knitr::knit_hooks$set(output = function(x, options) {
 })
 
 options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
 ```
 
-## The `IdfScheduleCompact` class
+## The `Schedule:Compact` class
+
+`Schedule:Compact` class is quite commonly used in EnergyPlus models. Unlike
+other classes in EnergyPlus, it is quite flexible in value specifications and
+does not follow the usual definitions for fields. Starting from `Field 1`, the
+number of fields and positions are not set, and cannot really be described in
+the usual `Field #` manner.
 
 ```{r}
 library(eplusr)
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 idf <- read_idf(path_idf)
+idf$definition("Schedule:Compact")
 ```
 
-Create a new `IdfScheduleCompact` object.
+Thus, starting from the 3rd field, all fields in `Schedule:Compact` class are
+tagged as "alpha" (string) in IDD.
 
 ```{r}
-sch <- IdfScheduleCompact$new("schedule", idf, TRUE)
+unique(idf$definition("Schedule:Compact")$field_type()[-(1:2)])
+```
+
+This makes it hard to add, modify, extract and validate schedule values solely
+based its definitions. For example, an empty `Schedule:Compact` object is still
+"valid", even through it does not contain any schedule data.
+
+```{r}
+sch <- idf$add(Schedule_Compact = list("sch"))[[1L]]
 sch
+
+sch$validate()
+
 ```
 
-## Get type limits
+Wrong schedule specifications cannot directly be caught by
+`IdfObject$validate()` since all fields are treated as arbitrary strings.
 
 ```{r}
-sch$type_limits()
+sch$set(..3 = "Through: -1")
+
+sch$validate()
 ```
 
-## Set type limits
+Moreover, every field value should be given as a string, even for schedule
+values.
+
+```{r, error = TRUE}
+sch$set(..3 = "Through: 12/31", ..4 = "For: AllDays", ..5 = "Until: 24:00", ..6 = 1.0)
+```
+
+As a result, the output from `$value()` and `$to_table()` method is not very
+useful.
 
 ```{r}
+sch$set(..3 = "Through: 12/31", ..4 = "For: AllDays", ..5 = "Until: 24:00", ..6 = "1.0")
+
+sch$value()
+
+print(sch$to_table())
+```
+
+## Introduce the `IdfScheduleCompact` class
+
+In order to solve this inconvenience, eplusr introduces a new
+`IdfScheduleCompact` class which is designed to ease the processing of
+`Schedule:Compact` objects. A short description of the core methods is given
+below.
+
+| Method           | Functionality                                 |
+| :---             | :---                                          |
+| `$type_limits()` | Get or set schedule type limit                |
+| `$set()`         | Modify schedule values using list input       |
+| `$update()`      | Modify schedule values using data.frame input |
+| `$validate()`    | Check any errors in the schedule              |
+| `$is_valid()`    | Check if no error exists in the schedule      |
+| `$extract()`     | Extract schedule values in a data.table       |
+
+Table: Core methods of `IdfScheduleCompact` class
+
+Note that `IdfScheduleCompact` class inherits `IdfObject` class, which means
+that methods available for an `IdfObject` object are still available for an
+`IdfScheduleCompact` object.
+
+### Create an `IdfScheduleCompact` object
+
+To create an `IdfScheduleCompact` object from an existing `Schedule:Compact`
+object, you can use the `schedule_compact()` constructor.
+
+```{r}
+schedule_compact(parent = idf, name = "sch")
+```
+
+To directly create a new `Schedule:Compact` object in the parent `Idf`, set
+`new` to `TRUE`.
+
+```{r}
+sch <- schedule_compact(idf, "sch1", new = TRUE)
+print(sch)
+```
+
+### Get type limits
+
+`$type_limits()` is used to get the type limits of a schedule. It will be used
+to validate the schedule values to make sure they do not exceed the range
+specified. `$type_limits()` gives `NULL` if no type limits have been set yet.
+
+```{r}
+(sch$type_limits())
+```
+
+To set the type limits, direct give the name of an existing
+`ScheduleTypeLimits` object.
+
+```{r}
+idf$object_name("ScheduleTypeLimits")
+
 sch$type_limits("fraction")
 ```
 
-## Set schedule values
+### Set schedule values using lists
 
-* Group day types inside `c(...)` at the LHS of `:=`
-* Put actual schedule values inside `list(...)` at the RHS of `:=`
+The `$set()` method provides a flexible interface to modify schedule values
+using lists:
+
+* Day types can be grouped inside `c(...)` at the LHS of `:=`
+* Put actual schedule values inside `list(...)` at the RHS
 * Each schedule value should be named a time. Time can be given in
   either `..H` or `"HH:MM"`.
+
+> Please note that currently `$set()` does not support specifying the
+> `Through:` fields and `Interpolate:` fields. All schedules will be applied
+> for all days in a year (.i.e. `Through: 12/31`). For detailed modifications,
+> please use `$update()` method which will be described later. For now,
+> neither `$set()` nor `$update()` supports interpolation specifications.
+> `Interpolate: No` is assumed for all input. However, `IdfScheduleCompact`
+> does support other `Interpolate` option when parsing and data extraction
+> using `$extract()`.
 
 ```{r}
 sch$set(c("weekday", "summerdesignday") := list(
     ..6 = 0.2, "8:00" = 0.5,
     ..12 = 0.95, "13:30" = 0.6, ..14 = 0.8,
     ..18 = 0.95, ..19 = 0.2, ..24 = 0),
-    allotherday = list(..24 = 0)
+    allotherday = list(..24 = 0),
+    .check_range = FALSE
 )
 ```
 
-## Check schedule value ranges
+If schedule type limit is set, you can set `.check_range` to `TRUE` to validate
+schedule values during modification.
+
+```{r, error = TRUE}
+sch$set(allday = list(..24 = 2), .check_range = TRUE)
+```
+
+You can also use `$validate()` and `$is_valid()` method to check existing
+schedule values.
 
 ```{r}
 sch$validate()
+
+sch$is_valid()
 ```
 
-## Extract schedule values
+### Set schedule values using data.frame
+
+The `$update()` method takes a data.frame and modify schedule values
+accordingly. It is designed to work together with `$extract()` method which
+will be described later. The input data.frame of `$upate()` should contain at
+least 4 columns:
+
+* `year_day`: Used for the `Through:` fields. Can be in one of the following
+  formats:
+  - `character`: Day specifications in either `mm/dd` or `mm-dd` where `mm` is
+    the month in `1:12` or in character and `dd` is the day in month in `1:31`
+  - `Date`: The year component will be ignored and only the month and day
+    component will be used
+  - `integer`: Julian day, e.g. `360`, `365` and etc.
+* `id` (Optional): Integer type. Used to group together different day types
+  with same schedule values. Grouped day types will be compacted in a single
+  `For:` field, e.g. `For: Weekdays SummaryDesignDay`. Grouped day types should
+  have the same schedule values. Otherwise an error will be issued.
+* `daytype`: Character type. Used for the `For:` fields. All possible values
+  are listed below. Case-insensitive matching is used. Different day types can
+  be grouped using the `id` column mentioned above, or put together directly in
+  a single string separate by a comma (`,`), e.g. `"weekend, holiday"`.
+  - `"AllDay(s)"`
+  - `"Weekday(s)"`, and also `"Monday"`, `"Tuesday"`, `"Wednesday"`,
+    `"Thursday"` and `"Friday"`
+  - `"Weekend(s)"`, and also `"Saturday"` and `"Sunday"`
+  - `"SummaryDesignDay"` and `"WinterDesignDay"`
+  - `"Holiday"`
+  - `"CustomDay1"` and `"CustomDay2"`
+  - `"AllOtherDay(s)"`
+* `time`: Used for the `Until:` fields. Can be in one of the
+  following formats:
+  - `character`: Time specifications in `HH:MM`
+    where `HH` is the hour in `0:24` and `MM` is the
+    minute in `0:60`
+  - `integer`: Time differences from `00:00:00` in **minutes**, e.g.
+    `seq(60, 60 * 24, by = 60)`
+  - `hms`: `hms` objects constructed using `hms::hms()` or
+    equivalents, e.g.  `hms::hms(minutes = 30, hours = 1)`, and
+    `hms::as_hms("1:30:00")`
+  - `difftime`: `difftime` objects constructed using `as.difftime()`
+    or equivalents, e.g. `as.difftime(1:24, units = "hours")`
+  - `ITime`: `ITime` objects constructed using
+    `data.table::as.ITime()`, e.g. `as.ITime("01:30:00")`
+* `value`: Numeric type. Used for the actual schedule values
 
 ```{r}
-d <- sch$extract()
-print(d)
+val1 <- data.table::data.table(year_day = "12/31",
+    daytype = "weekday, summerdesignday",
+    time = c("6:00", "7:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
+    value = c(0.2,    0.5,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
+)
+val2 <- data.table::data.table(year_day = "12/31", daytype = "allotherday", time = "24:00", value = 0.0)
+val <- data.table::rbindlist(list(val1, val2))
+val
+
+sch$update(val, check_range = TRUE)
 ```
 
-Expand day types
+### Extract schedule values into a data.table
+
+Most of the time, we will be dealing with existing schedules instead of
+creating new ones from scratch. It would be quite handy if we could extract
+schedule data of given day types and time step. The `$extract()` is designed
+for this. It extracts schedule data into a data.table with 5 columns:
+
+* `year_day`: Character type. Used for the `Through:` fields. Day
+  specifications in `mm/dd` format.
+* `id`: Integer type. The group index of day types.
+* `daytype`: Character type. Used for the `For:` fields. Note that all trailing
+  `s` are removed, e.g. `AllDays` and `Weekdays` become `AllDay` and `Weekday`,
+  respectively.
+* `time`: [`hms`](https://cran.r-project.org/package=hms) vector. Used for the
+  `Until:` fields.
+* `value`: Numeric type. Actual schedule values.
 
 ```{r}
-d <- sch$extract(daytype = "expand")
-print(d)
+print(sch$extract())
 ```
 
-Change time step
+By default, grouped day types are concatenated together using `,`. The
+compacted day types, e.g. `Weekday` and `AllOtherDay` are kept. If you want to
+expand all possible day types, set `daytype` to `TRUE` or `"expand"`. This
+becomes handy when you want to specifically extract data of a certain day type.
+
+We can see from the following table that all 12 day types are extracted, with
+the `id` column showing their original group.
 
 ```{r}
-d <- sch$extract(timestep = "1 hour")
-print(d)
+print(sch$extract(daytype = TRUE))
+# OR sch$extract(daytype = "expand")
 ```
 
-Visualization
+#### Compact or expand day types
+
+If you want to compact day types with same schedule values, set `daytype` to
+`FALSE` or `"compact"`. It will try to group weekdays into `Weekday`, weekends
+into `Weekend`, and put all `CustomDay1`, `CustomDay2` and `Holiday` into
+`AllOtherDay`, **if possible**. This is because, for most of the time,
+`Weekday`, `Weekend`, design days including `SummerDesignDay` and
+`WinterDesignDay` are the most commonly used day types. Please note that if it
+is not possible to compact those day types, for instance, schedules of `Monday`
+and `Friday` are different, the original day types are kept and no compact day
+types will be made.
+
+For this specific schedule, we can see from the following table that the
+original `AllOtherDay` has been divided into 3, i.e. `Weekend`,
+`WinterDesignDay` and `AllOtherDay`.
+
+```{r}
+print(sch$extract(daytype = FALSE))
+# OR sch$extract(daytype = "compact")
+```
+
+If you want to specify your own grouped day types, you can directly pass a
+character vector to `daytype`. All other days except specified ones will be
+classified into `AllOtherDay`, if possible.
+
+Let's say we want to compact the weekdays, but keep the weekends separately. We
+can achieve it by:
+
+```{r}
+print(sch$extract(c("weekday", "saturday", "sunday")))
+```
+
+#### Compact or expand schedule times
+
+It is convenient to specify schedule values only at times when they change.
+However, it is useful to get schedule values at a given time step, e.g.
+1-hour, especially when we try to visualize the schedule values.
+
+You can achieve this by passing a time step specification to `timestep`.
+
+```{r}
+print(sch$extract(timestep = "3 hour"))
+
+print(sch$extract(timestep = "1 hour"))
+```
+
+As described above, the `time` column is a `hms` vector. It is handy for
+plotting since `hms` object is directly supported by the scale system of
+[ggplot2](https://cran.r-project.org/package=ggplot2) package.
 
 ```{r, fig.width = 8, fig.hight = 5}
 library(ggplot2)
 
-ggplot(sch$extract(timestep = "1 hour")) +
+ggplot(sch$extract(FALSE, "1 hour")) +
     geom_col(aes(time, value, fill = daytype), color = "black") +
     facet_wrap(~daytype)
 ```
 
-## Update schedue values using data.frame
+If your schedule contains multiple time periods that have the same schedule
+value, you can compact the schedule times and values by setting `timestep` to
+`"auto"`.
 
-Steps:
-
-1. Extract values using `$extract()`.
-2. Modify values as you wish.
-3. Update schedule values using `$update()`.
+For this example, time periods 06:00 -- 07:00 and 07:00 -- 08:00 have the same
+schedule value (0.5). The following table has compact these 2 time periods
+together into one (06:00 -- 08:00).
 
 ```{r}
-d <- sch$extract(timestep = "2 hour")
-
-d[daytype == "Weekday" & time >= hms::hms(hours = 8) & time <= hms::as_hms("18:00:00"),
-    value := value * 0.6]
-
-sch$update(d)
+print(sch$extract(timestep = "auto"))
 ```
-

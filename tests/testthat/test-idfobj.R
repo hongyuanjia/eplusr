@@ -145,7 +145,7 @@ test_that("$value()", {
         c("WD01", "MediumSmooth", "0.019099999", "0.115", "513", "1381", "0.9", "0.78", "0.78")
     )
 
-    # can detect invaid `index` values
+    # can detect invalid `index` values
     expect_error(mat$value("1"), class = "eplusr_error_invalid_field_name")
     expect_error(mat$value(c(1, 10:11)), class = "eplusr_error_invalid_field_index")
 

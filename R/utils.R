@@ -14,7 +14,7 @@ NULL
 # }}}
 
 # collapse {{{
-collapse <- function (x, out = "'", or = FALSE) {
+collapse <- function (x, out = "'", or = FALSE, max_num = 5L) {
     if (is.null(out)) {
         s <- as.character(x)
     } else {
@@ -26,6 +26,14 @@ collapse <- function (x, out = "'", or = FALSE) {
     }
     if (length(s) == 1L) return (s)
 
+    if (!is.null(max_num)) {
+        assert_count(max_num)
+        l <- length(s)
+        if (max_num + 1L <= l) {
+            s <- s[1:(max_num + 1L)]
+            s[length(s)] <- "etc"
+        }
+    }
     b <- paste0(s[-length(s)], collapse = ", ")
     e <- s[length(s)]
     if (is.null(or)) {
@@ -49,7 +57,7 @@ surround <- function (x, out = "'") {
 }
 # }}}
 
-# `get_self_env`{{{
+# get_self_env{{{
 #' Get the enclosed environment of an R6 object
 #'
 #' @details
@@ -67,16 +75,16 @@ surround <- function (x, out = "'") {
 #' @keywords internal
 #' @export
 #' @name get_env
-`get_self_env` <- function (x) {
+get_self_env <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "self")
 }
 # }}}
 
-# `get_priv_env`{{{
+# get_priv_env{{{
 #' @keywords internal
 #' @export
 #' @name get_env
-`get_priv_env` <- function (x) {
+get_priv_env <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
 }
 # }}}
