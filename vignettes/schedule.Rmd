@@ -39,10 +39,11 @@ knitr::knit_hooks$set(output = function(x, options) {
 
 options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
+library(eplusr)
 use_idd(8.8, "auto")
 ```
 
-## The `Schedule:Compact` class
+# The `Schedule:Compact` class
 
 `Schedule:Compact` class is quite commonly used in EnergyPlus models. Unlike
 other classes in EnergyPlus, it is quite flexible in value specifications and
@@ -51,7 +52,6 @@ number of fields and positions are not set, and cannot really be described in
 the usual `Field #` manner.
 
 ```{r}
-library(eplusr)
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 idf <- read_idf(path_idf)
 idf$definition("Schedule:Compact")
@@ -103,7 +103,7 @@ sch$value()
 print(sch$to_table())
 ```
 
-## Introduce the `IdfScheduleCompact` class
+# Introduce the `IdfScheduleCompact` class
 
 In order to solve this inconvenience, eplusr introduces a new
 `IdfScheduleCompact` class which is designed to ease the processing of
@@ -125,7 +125,7 @@ Note that `IdfScheduleCompact` class inherits `IdfObject` class, which means
 that methods available for an `IdfObject` object are still available for an
 `IdfScheduleCompact` object.
 
-### Create an `IdfScheduleCompact` object
+## Create an `IdfScheduleCompact` object
 
 To create an `IdfScheduleCompact` object from an existing `Schedule:Compact`
 object, you can use the `schedule_compact()` constructor.
@@ -142,7 +142,7 @@ sch <- schedule_compact(idf, "sch1", new = TRUE)
 print(sch)
 ```
 
-### Get type limits
+## Get type limits
 
 `$type_limits()` is used to get the type limits of a schedule. It will be used
 to validate the schedule values to make sure they do not exceed the range
@@ -161,7 +161,7 @@ idf$object_name("ScheduleTypeLimits")
 sch$type_limits("fraction")
 ```
 
-### Set schedule values using lists
+## Set schedule values using lists
 
 The `$set()` method provides a flexible interface to modify schedule values
 using lists:
@@ -206,7 +206,7 @@ sch$validate()
 sch$is_valid()
 ```
 
-### Set schedule values using data.frame
+## Set schedule values using data.frame
 
 The `$update()` method takes a data.frame and modify schedule values
 accordingly. It is designed to work together with `$extract()` method which
@@ -265,7 +265,7 @@ val
 sch$update(val, check_range = TRUE)
 ```
 
-### Extract schedule values into a data.table
+## Extract schedule values into a data.table
 
 Most of the time, we will be dealing with existing schedules instead of
 creating new ones from scratch. It would be quite handy if we could extract
@@ -299,7 +299,7 @@ print(sch$extract(daytype = TRUE))
 # OR sch$extract(daytype = "expand")
 ```
 
-#### Compact or expand day types
+### Compact or expand day types
 
 If you want to compact day types with same schedule values, set `daytype` to
 `FALSE` or `"compact"`. It will try to group weekdays into `Weekday`, weekends
@@ -331,7 +331,7 @@ can achieve it by:
 print(sch$extract(c("weekday", "saturday", "sunday")))
 ```
 
-#### Compact or expand schedule times
+### Compact or expand schedule times
 
 It is convenient to specify schedule values only at times when they change.
 However, it is useful to get schedule values at a given time step, e.g.
