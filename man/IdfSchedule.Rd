@@ -68,12 +68,16 @@ sch$set(c("weekday", "summerdesignday") := list(
 \dontrun{
 sch$update(sch$extract())
 
-val1 <- data.table::data.table(year_day = "12/31",
+val1 <- data.table::data.table(
+    year_day = "12/31",
     daytype = "weekday,summerdesignday",
     time = c("6:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
     value = c(0.2,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
 )
-val2 <- data.table::data.table(year_day = "12/31", daytype = "allotherday", time = "24:00", value = 0.0)
+val2 <- data.table::data.table(
+    year_day = "12/31", daytype = "allotherday",
+    time = "24:00", value = 0.0
+)
 val <- data.table::rbindlist(list(val1, val2))
 sch$update(val)
 }
@@ -345,12 +349,16 @@ The modified \code{IdfScheduleCompact} object.
 \preformatted{\dontrun{
 sch$update(sch$extract())
 
-val1 <- data.table::data.table(year_day = "12/31",
+val1 <- data.table::data.table(
+    year_day = "12/31",
     daytype = "weekday,summerdesignday",
     time = c("6:00", "8:00", "12:00", "13:30", "14:00", "18:00", "19:00", "24:00"),
     value = c(0.2,    0.5,    0.95,    0.6,     0.8,     0.95,    0.2,     0.0)
 )
-val2 <- data.table::data.table(year_day = "12/31", daytype = "allotherday", time = "24:00", value = 0.0)
+val2 <- data.table::data.table(
+    year_day = "12/31", daytype = "allotherday",
+    time = "24:00", value = 0.0
+)
 val <- data.table::rbindlist(list(val1, val2))
 sch$update(val)
 }
