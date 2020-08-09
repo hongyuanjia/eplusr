@@ -76,7 +76,7 @@
 * A new `IdfScheduleCompact` class is introduced. A constructor function
   `schedule_compact()` is added. `IdfScheduleCompact` class provides more
   detailed methods to add, modify and extract schedule values. For more details,
-  see `vignette("schedule")`.
+  see `vignette("schedule")` (#256).
 
 ## Major changes
 
