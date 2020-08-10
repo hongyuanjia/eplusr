@@ -1,5 +1,5 @@
 ---
-title: "Update IDF version"
+title: "Frequently asked questions about eplusr"
 author: "Hongyuan Jia"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     df_print: "paged"
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Update IDF version}
+  %\VignetteIndexEntry{Frequently asked questions about eplusr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,5 +1,5 @@
 ---
-title: "Parametric simulations"
+title: "Update IDF version"
 author: "Hongyuan Jia"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     df_print: "paged"
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Parametric simulations}
+  %\VignetteIndexEntry{Update IDF version}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
