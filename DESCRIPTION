@@ -36,6 +36,7 @@ Imports:
 Suggests:
     covr,
     decido,
+    dplyr,
     ggplot2,
     knitr,
     pkgdown,
