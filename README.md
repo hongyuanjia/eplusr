@@ -122,10 +122,10 @@ Please see these vignettes and articles about {eplusr}
     exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
   - [Rarametric
     simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
-  - [Work with weather
-    files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
   - [Update IDF
     version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
+  - [Work with weather
+    files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
   - [Work with `Schedule:Compact`
     objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
   - [Frequently asked
@@ -141,6 +141,11 @@ Please see these vignettes and articles about {eplusr}
 ``` r
 # read IDF
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+#> IDD v8.8.0 has not been parsed before.
+#> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
+#> IDD file found: '/home/hongyuanjia/.local/EnergyPlus-8-8-0/Energy+.idd'.
+#> Start parsing...
+#> Parsing completed.
 idf
 #> ── EnergPlus Input Data File ────────────────────────────
 #>  * Path: '/mnt/c/Users/hongy/Dropbox/github_repo/epl...
@@ -369,7 +374,7 @@ job <- idf$run(epw)
 #> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.
 #> Replace the existing IDF located at /tmp/RtmpgL7ywt/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.10 14:34
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.10 15:11
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -404,7 +409,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-08-10 14:34:00
+#>   * Simulation started: 2020-08-10 15:11:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 3
@@ -491,12 +496,30 @@ job$tabular_data(table_name = "site and source energy", row_name = "total site e
 
 ## How to cite
 
-To cite eplusr package in publications, please use:
-
-> Hongyuan Jia and Adrian Chong, (2020). eplusr: A framework for
-> integrating building energy simulation and data-driven analytics.
-> <https://CRAN.R-project.org/package=eplusr>. doi:
-> 10.13140/RG.2.2.34326.16966
+``` r
+citation("eplusr")
+#> 
+#> To cite eplusr in publications use:
+#> 
+#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A
+#>   framework for integrating building energy
+#>   simulation and data-driven analytics. doi:
+#>   10.13140/RG.2.2.34326.16966
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Article{,
+#>     title = {eplusr: A framework for integrating building energy simulation and data-driven analytics},
+#>     author = {Hongyuan Yu and Adrian Chong},
+#>     year = {2020},
+#>     journal = {Current Protocols in Bioinformatics},
+#>     volume = {69},
+#>     pages = {e96},
+#>     number = {1},
+#>     url = {https://CRAN.R-project.org/package=eplusr},
+#>     doi = {10.13140/RG.2.2.34326.16966},
+#>   }
+```
 
 ## Additional resources
 

@@ -156,8 +156,8 @@ Please see these vignettes and articles about {eplusr}
 * [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/idf.html)
 * [Run simulation and data exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
 * [Rarametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
-* [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
 * [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
+* [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
 * [Work with `Schedule:Compact` objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
 * [Frequently asked questions](https://hongyuanjia.github.io/eplusr/articles/faq.html)
 
@@ -238,11 +238,9 @@ unlink(idf$path())
 
 ## How to cite
 
-To cite eplusr package in publications, please use:
-
-> Hongyuan Jia and Adrian Chong, (2020). eplusr: A framework for integrating
-> building energy simulation and data-driven analytics.
-> https://CRAN.R-project.org/package=eplusr. doi: 10.13140/RG.2.2.34326.16966
+```{r}
+citation("eplusr")
+```
 
 ## Additional resources
 
