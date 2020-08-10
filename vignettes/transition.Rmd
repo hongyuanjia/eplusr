@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(8.8)) install_eplus(8.8)
+if (!is_avail_eplus(9.2)) install_eplus(9.2)
 ```
 
 # Motivation
