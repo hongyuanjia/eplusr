@@ -48,6 +48,13 @@ library(dplyr)
 library(ggplot2)
 ```
 
+This vignette showcases the basic features of the `EplusJob` class with the
+main focus on how the tidy data interface can provide a seamless workflow to
+extract EnergyPlus output, feed it into data analysis pipelines and turn the
+results into understanding and knowledge.
+
+---
+
 # Run simulations
 
 The `Idf` class provides a `$run()` method to call EnergyPlus and run
@@ -391,3 +398,12 @@ aircon_out_mon %>%
     facet_wrap(vars(air_system), ncol = 1) +
     labs(x = "", y = "Heating and cooling demands / MJ m-2")
 ```
+
+# Summary
+
+In this vignette, we have went through core methods in `EplusJob` class to
+run simulations and extract results in tidy format.
+
+In next vignette *"Parametric simulations"*, we will introduce the
+`ParametricJob` class to run parametric simulations.
+
