@@ -35,8 +35,8 @@ environment:
   R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
   matrix:
     - R_VERSION: devel
-    - R_VERSION: release
-    - R_VERSION: oldrel
+  # - R_VERSION: release
+  # - R_VERSION: oldrel
 
 matrix:
   fast_finish: true
