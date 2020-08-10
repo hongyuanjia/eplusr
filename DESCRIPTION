@@ -36,14 +36,13 @@ Imports:
 Suggests:
     covr,
     decido,
+    dplyr,
     ggplot2,
     knitr,
     pkgdown,
     rgl,
     rmarkdown,
     testthat (>= 2.1.0)
-VignetteBuilder:
-    knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",

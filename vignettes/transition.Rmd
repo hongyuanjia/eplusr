@@ -1,0 +1,253 @@
+---
+title: "Update IDF version"
+author: "Hongyuan Jia"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: "paged"
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Update IDF version}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE,
+    fig.align = "center"
+)
+
+# the default output hook
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
+    }
+    hook_output(x, options)
+})
+
+options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
+
+library(eplusr)
+if (!is_avail_eplus(9.2)) install_eplus(9.2)
+```
+
+# Motivation
+
+EnergyPlus provides a preprocessor call **IDFVersionUpdater** to update IDF to
+the latest version. It is written in Fortran and the program itself evolves
+along with EnergyPlus. Once a new version of EnergyPlus is published,
+IDFVersionUpdater will add the support of that version.
+
+The original IDFVersionUpdater program is a GUI program and does not provide
+command line interface. This makes it hard to update lots of IDF files
+programmatically. The good news is that IDFVersionUpdater itself is a wrapper
+to call different standalone transition programs for each single version
+update. For example, when updating your model from EnergyPlus v8.7 to v8.9,
+`Transition-V8-7-0-to-V8-8-0` will be called, and then
+`Transition-V8-8-0-to-V8-9-0`.
+
+# Introduce `version_updater()`
+
+[`version_updater()`](https://hongyuanjia.github.io/eplusr/reference/version_updater.html)
+is [eplusr](https://hongyuanjia.github.io/eplusr/index.html)'s version of
+IDFVersionUpdater. `version_updater()` itself is not complicated. Compared to
+IDFVersionUpdater, `version_updater()` has some improvements:
+
+* IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01) fails to
+  translate `FenesreationSurface:Detailed` objects. `version_updater()` will
+  try to use the transition programs that come from the latest EnergyPlus
+  installed on your computer, but will skip v9.0 if possible.
+
+* Like IDFVersionUpdater, `version_updater()` also renames all output file with
+  suffix `VXY0`, where `X` and `Y` indicates the major and minor version of
+  input IDF file. However, `version_updater()` always keep the original input
+  file untouched and save a copy and rename it in the same pattern.
+
+* All messages generated from each transition program are parsed, stored in a
+  list and saved as an attributes named `errors`. So that you can easily
+  extract all messages by `attr(results, "errors")`. The error messages are
+  parsed and stored as [`data.table`s](http://r-datatable.com) which make it
+  easy for post-processing.
+
+* A `dir` argument can be given to further specify where the updated models to
+  be saved.
+
+Unfortunately, even though the transition programs are written in Fortran, it
+could still take several minutes to complete the update process
+
+```{r}
+path <- "RefBldgLargeOfficeNew2004_Chicago.idf"
+read_idf(path)$version()
+
+(t_vu <- system.time(verup <- version_updater(path, 9.2)))
+```
+
+# Introduce `transition()`
+
+Having a clear mental model on how the transition works, the most cumbersome
+work left is to translate all those actions written in Fortran into R and write
+tests to make sure that the R implement should be the same as IDFVersionUpdater.
+It takes me days to do that. In the end, the
+[transition.R](https://github.com/hongyuanjia/eplusr/blob/master/R/transition.R)
+has more than 2700 lines. You can try it out using by install the development of
+eplusr doing `remotes::install_github("hongyuanjia/eplusr")`.
+
+[`transition()`](https://hongyuanjia.github.io/eplusr/reference/transition.html)
+is a pure R implementation of transition programs. It takes similar arguments
+as `version_updater()` except it has an additional argument `save` to control
+whether to save the resultant `Idf` objects to IDF files or not.
+
+```{r}
+(t_tr <- system.time(trans <- transition(path, 9.2)))
+```
+
+It is about `r round(t_vu["elapsed"]/t_tr["elapsed"], 1)` times faster.
+
+Fast is always good. The most important thing is to ensure that `transition()`
+can provide reasonable results. Here we compare the results.
+
+```{r}
+setdiff(verup$to_string(format = "sorted"), trans$to_string(format = "sorted"))
+```
+
+As we can see from below, there is only one difference between results from
+`transition()` and `version_updater()`:
+
+* An empty field `Treat Weather as Actual` in `RunPeriod` exists in
+  `version_updater()` version, but not in `transition()` version. This is
+  because this field is not an required field and eplusr tried to only save
+  minimum-necessary fields.
+
+```{r, include = FALSE}
+unlink(verup$path())
+```
+
+# How the transition works
+
+During version updates, some classes in the original IDF are removed, some
+classes are splitted into several classes, some fields are removed and there is
+no way to extract those information back. For example, from EnergyPlus v8.8 to
+v8.9, one single object in class `GroundHeatExchanger:Vertical` will be
+splitted into 4 different objects in class:
+
+* `GroundHeatExchanger:System`,
+* `GroundHeatExchanger:Vertical:Properties`,
+* `Site:GroundTemperature:Undisturbed:KusudaAchenbach`
+* `GroundHeatExchanger:ResponseFactors`
+
+A basic transition on a single class is a combination of different transition
+actions. Below I will describe most typical ones together with the related
+transition program source code:
+
+* Insert: Insert a new field. The code block below means that if input class is
+  `OtherEquipment`, get the definition of it from IDD, fill new objects
+  with all old field values except insert a new field #2 with value `"None"`.
+
+    ```fortran
+    CASE('OTHEREQUIPMENT')
+      nodiff = .false.
+      CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+      OutArgs(1) = InArgs(1)
+      OutArgs(2) = 'None'
+      OutArgs(3:11) = InArgs(2:10)
+      CurArgs = CurArgs+1
+    ```
+
+* Reset: Replace old value with new value. The code block below means that if
+  input class is `Exterior:FuelEquipment`, get the definition of it from IDD,
+  fill new objects with all old field values except replace field #2 with
+  `"NaturalGas"` if old value is `"Gas"` and `PropaneGas` if `LPG`. Conversion
+  for other classes looks similar.
+
+    ```fortran
+    CASE('EXTERIOR:FUELEQUIPMENT')
+        ObjectName='Exterior:FuelEquipment'
+        CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+        nodiff=.false.
+        OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+        if (samestring('Gas',InArgs(2))) then
+          OutArgs(2)='NaturalGas'
+        endif
+        if (samestring('LPG',InArgs(2))) then
+          OutArgs(2)='PropaneGas'
+        endif
+    ```
+
+* Delete: Delete the old field, offset indices of all other field by the number
+  of fields deleted. The code block below means that if input class is
+  `HVACTemplate:System:Unitary`, get the definition of it from IDD, fill new objects
+  with all old field values except removing #40.
+
+    ```fortran
+    CASE('HVACTEMPLATE:SYSTEM:UNITARY')
+        ObjectName='HVACTemplate:System:Unitary'
+        CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+        nodiff=.false.
+        OutArgs(1:39)=InArgs(1:39) ! No change
+        OutArgs(40:CurArgs-1)=InArgs(41:CurArgs) ! Remove Dehumidification Control Zone Name
+        CurArgs = CurArgs-1
+    ```
+
+* Offset: Set the new value of field #N as the old value of field #M. The code
+  block means that if input class is `Daylight:Controls`, get the definition of
+  it from IDD, add a suffix `_DaylCtrl` to old #1 as new #1, use old #1 as new #2,
+  set new #3 as `"SplitFlux"` and use #20 as new #4.
+
+    ```fortran
+    CASE('DAYLIGHTING:CONTROLS')
+      nodiff=.false.
+      CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+      OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+      OutArgs(2) = InArgs(1)
+      OutArgs(3) = 'SplitFlux'
+      OutArgs(4) = InArgs(20)
+    ......
+    ```
+
+The combinations of those four actions together builds a skeleton of an
+EnergyPlus transition program, together with some pre-processes and
+post-processes.
+
+In eplusr, all IDF data are stored as data.tables. So transition means to write
+a function to perform the similar actions on field values stored in
+data.tables. `trans_action()` is designed for this purpose.
+
+For example, the equivalent transition implemented in R for
+`Exterior:FuelEquipment` objects demonstrated in the **Reset** code block would
+be:
+
+```{r, eval = FALSE}
+# Insert
+dt1 <- trans_action(idf, "OtherEquipment", insert = list(2L, "None"))
+
+# Reset
+dt2 <- trans_action(idf, "Exterior:FuelEquipment",
+    reset = list(2L, "Gas", "NaturalGas"),
+    reset = list(2L, "LPG", "PropaneGas")
+)
+
+# Delete
+dt3 <- trans_action(idf, "HVACTemplate:System:Unitary", delete = list(40L))
+
+# Offset
+dt4 <- trans_action(idf, "Daylighting:Controls",
+    offset = list(20L, 4L),
+    reset = list(3, "SplitFlux")
+)
+```
+
+Having the updated IDF data, we can then easily insert them to the next new
+version of IDF by simply doing `new_idf$load(dt)`.
+

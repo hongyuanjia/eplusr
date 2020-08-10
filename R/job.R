@@ -398,8 +398,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'   `HVAC System`
         #' * `key_value`: Key name of the data
         #' * `name`: Actual report data name
-        #' * `reporting_frequency`:
-        #' * `schedule_name`: Name of the the schedule that controls reporting
+        #' * `reporting_frequency`: Data reporting frequency
+        #' * `schedule_name`: Name the the schedule that controls reporting
         #'     frequency.
         #' * `units`: The data units
         #'

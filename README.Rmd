@@ -79,10 +79,10 @@ are helper functions in eplusr to download and install it automatically on major
 operating systems (Windows, macOS and Linux):
 
 ```{r eplus-install, eval = FALSE}
-# install the latest version (currently v9.1.0)
+# install the latest version (currently v9.2.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v9.1.0) and run the installer
+# OR download the latest version (currently v9.2.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -140,41 +140,36 @@ knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools
 knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true")
 ```
 
-## Usage overview
+## Resources
 
-### Class structure
+### Articles
 
-Below shows the class structure in eplusr.
+* Hongyuan Jia, Adrian Chong (2020). eplusr: A framework for integrating
+  building energy simulation and data-driven analytics. doi:
+  10.13140/RG.2.2.34326.16966
+  - [Source code and data to reproduce figures in the article](https://github.com/ideas-lab-nus/eplusr-paper)
 
-```{r, echo = FALSE, fig.align = "center"}
-knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/man/figures/class_structure.png?raw=true")
-```
+### Vignettes
 
-Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
-class to present a single object in an IDF. Both `Idf` and `IdfObject` class
-contain member functions for helping modify the data in IDF so it complies with
-the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is
-wrapped into two classes, i.e. `Idd` and `IddObject`.
+Please see these vignettes and articles about {eplusr}
 
-Besides, `Epw` class is used to present EnergyPlus Weather files; `EplusJob` to
-run single EnergyPlus simulation and collect outputs, `ParametricJob` to run
-parametric EnergyPlus simulations and collect all outputs.
+* [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/idf.html)
+* [Run simulation and data exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
+* [Rarametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
+* [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
+* [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
+* [Work with `Schedule:Compact` objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
+* [Frequently asked questions](https://hongyuanjia.github.io/eplusr/articles/faq.html)
 
-It is highly recommended to read the documentation to get a thorough
-understanding on each class.
+### Slides
 
-### Getting started
+* [Slides: Interfacing EnergyPlus using R](https://hongyuanjia.github.io/eplusrIntro)
+
+## Getting started
 
 ```{r load, out.lines = 30}
-library(eplusr)
-
-# parse IDD
-idd <- use_idd(8.8, download = "auto")
-
 # read IDF
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
-
-# print idf
 idf
 
 # extract object
@@ -198,24 +193,16 @@ idf$Construction$FLOOR$value_possible("Outside Layer")
 # extract object data
 idf$to_table(class = "BuildingSurface:Detailed", string_value = FALSE, unit = TRUE)
 
+# save the IDF
+idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
+
 # read EPW
 path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 epw <- read_epw(path_epw)
-
-# print weather
 epw
 
 # get location
 (loc <- epw$location())
-
-# update Site:Location according to EPW LOCATION header
-idf$Site_Location$set(
-  name = paste(loc$city, loc$state_province, loc$country),
-  loc$latitude, loc$longitude, loc$time_zone, loc$elevation
-)
-
-# save the IDF
-idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 
 # extract weather data
 (weather <- head(epw$data()))
@@ -249,11 +236,21 @@ clean_wd(idf$path())
 unlink(idf$path())
 ```
 
+## How to cite
+
+```{r}
+citation("eplusr")
+```
+
 ## Additional resources
 
-* Slides: https://hongyuanjia.github.io/eplusrIntro
-* eplusr website: https://hongyuanjia.github.io/eplusr/
+* eplusr manual: https://hongyuanjia.github.io/eplusr/
 * eplusr Docker image: https://github.com/hongyuanjia/eplusr-docker
+* [epwshiftr](https://CRAN.R-project.org/package=epwshiftr) for creating future
+  EnergyPlus weather files using CMIP6 data
+* [epluspar](https://github.com/hongyuanjia/epluspar) for conducting parametric
+  analysis on EnergyPlus models, including sensitivity analysis, Bayesian
+  calibration and optimization.
 
 ## Acknowledgement
 

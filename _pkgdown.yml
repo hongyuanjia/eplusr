@@ -15,19 +15,41 @@ development:
   model: auto
 
 navbar:
-  left:
-    - icon: fa-home fa-lg
+  structure:
+    left:  [home, intro, slides, articles, reference, news]
+    right: [github]
+  components:
+    home:
+      icon: fas fa-home fa-lg
       href: index.html
-    - text: "Get started"
-      href: articles/eplusr.html
-    - text: "Slides"
-      href: https://github.com/hongyuanjia/eplusrIntro
-    - text: "Reference"
+    intro:
+      text: "Get started"
+      href: articles/idf.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: "Introduction to eplusr"
+        href: articles/idf.html
+      - text: "Run simulation and data exploration"
+        href: articles/job.html
+      - text: "Parametric simulations"
+        href: articles/param.html
+      - text: "Update IDF version"
+        href: articles/transition.html
+      - text: "Work with weather files"
+        href: articles/epw.html
+      - text: "Work with `Schedule:Compact` objects"
+        href: articles/schedule.html
+      - text: "Frequently asked questions"
+        href: articles/faq.html
+    reference:
+      text: Manual
       href: reference/index.html
-    - text: Changelog
+    news:
+      text: News
       href: news/index.html
-  right:
-    - icon: fa-github fa-lg
+    github:
+      icon: fa-github fa-lg
       href: https://github.com/hongyuanjia/eplusr
 
 reference:
@@ -44,6 +66,7 @@ reference:
       - as.character.IddObject
       - format.Idd
       - format.IddObject
+
   - title: IDF
     desc: Read, modify and run an EnergyPlus Input Data File (IDF)
     contents:
@@ -60,8 +83,8 @@ reference:
       - as.character.IdfObject
       - format.Idf
       - format.IdfObject
-  - title: Specifc for IDF schedules
-    desc: Class specific for IDF `Schedule:Compact` objects
+  - title: IDF schedules
+    desc: Class for IDF `Schedule:Compact` objects
     contents:
       - IdfScheduleCompact
       - schedule_compact
@@ -71,6 +94,7 @@ reference:
       - Epw
       - read_epw
       - download_weather
+
   - title: Configure EnergyPlus
     contents:
       - install_eplus
@@ -79,6 +103,7 @@ reference:
       - eplus_config
       - avail_eplus
       - is_avail_eplus
+
   - title: Job
     desc: Run EnergyPlus and collect outputs
     contents:
@@ -97,6 +122,7 @@ reference:
       - read_rdd
       - read_mdd
       - print.ErrFile
+
   - title: Data Helpers
     desc: Help to create and format IDF data
     contents:
@@ -104,6 +130,7 @@ reference:
       - rdd_to_load
       - mdd_to_load
       - reload
+
   - title: Assertion
     desc: Check Types
     contents:
@@ -115,6 +142,7 @@ reference:
       - is_idd_ver
       - is_eplus_ver
       - is_eplus_path
+
   - title: eplusr Options
     contents:
       - eplusr-package

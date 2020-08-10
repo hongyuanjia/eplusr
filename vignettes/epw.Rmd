@@ -1,0 +1,222 @@
+---
+title: "Work with weather files"
+author: "Hongyuan Jia"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: "paged"
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Work with weather files}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE,
+    fig.align = "center"
+)
+
+# the default output hook
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
+    }
+    hook_output(x, options)
+})
+
+options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
+
+library(eplusr)
+if (!is_avail_eplus(8.8)) install_eplus(8.8)
+```
+
+This vignette introduces the `Epw` class which is designed to read and modify
+EnergyPlus Weather Files (EPWs).
+
+---
+
+# Download EnergyPlus Weather File (EPW) and Design Day File (DDY)
+
+eplusr contains a helper function `download_weather()` which can be used to
+download EnergyPlus EPW and DDY files from [EnergyPlus weather
+website](https://energyplus.net/weather).
+
+`download_weather()` takes a regular expression to search weather
+specifications and gives you a menu to choose files to download from matched
+results. Note that the matching is case-insensitive. Files downloaded will be
+renamed according to input `filename` argument.
+
+```{r, eval = FALSE}
+download_weather("los angeles", filename = "Los Angeles", dir = tempdir())
+
+#> 3 matched results found. Please select which one to download:
+#>
+#> ── [1] USA_CA_Los.Angeles.722950_TMY2 ───────────────────
+#>  * Country: United States of America
+#>  * State or Province: CA
+#>  * Location: CA_Los.Angeles
+#>  * WMO number: 722950
+#>  * Source type: TMY2
+#>  * Longitude: -118.4
+#>  * Latitude: 33.93
+#>
+#> ── [2] USA_CA_Los.Angeles.Intl.AP.722950_TMY ────────────
+#>  * Country: United States of America
+#>  * State or Province: CA
+#>  * Location: CA_Los.Angeles.Intl.AP
+#>  * WMO number: 722950
+#>  * Source type: TMY
+#>  * Longitude: -118.4
+#>  * Latitude: 33.93
+#>
+#> ── [3] USA_CA_Los.Angeles.Intl.AP.722950_TMY3 ───────────
+#>  * Country: United States of America
+#>  * State or Province: CA
+#>  * Location: CA_Los.Angeles.Intl.AP
+#>  * WMO number: 722950
+#>  * Source type: TMY3
+#>  * Longitude: -118.4
+#>  * Latitude: 33.93
+#>
+#> 1: USA_CA_Los.Angeles.722950_TMY2
+#> 2: USA_CA_Los.Angeles.Intl.AP.722950_TMY
+#> 3: USA_CA_Los.Angeles.Intl.AP.722950_TMY3
+#> 4: All
+#>
+#> Selection:
+```
+
+By default, it will download both EPW and DDY files of selected results. You
+can change that by modifying the `type` argument to only download either EPW
+files or DDY files.
+
+# Read and parse EPW
+
+Reading an EPW file starts with function `read_epw()`, which parses an EPW
+file and returns an `Epw` object. The parsing process is basically the same as
+`EnergyPlus/WeatherManager.cc` in EnergyPlus, with some simplifications.
+
+An EPW file can be divided into two parts, headers and weather data. The
+first eight lines of a standard EPW file are normally headers which contains
+data of location, design conditions, typical/extreme periods, ground
+temperatures, holidays/daylight savings, data periods and other comments.
+
+`Epw` class provides methods to directly extract those data. For details on
+the data structure of EPW file, please see "Chapter 2 - Weather Converter
+Program" in EnergyPlus "Auxiliary Programs" documentation. An online version
+can be found [here](https://bigladdersoftware.com/epx/docs/).
+
+```{r}
+path <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+
+epw <- read_epw(path)
+epw
+```
+
+# Extract and modify header data
+
+`Epw` class provides 10 methods to extract and modify EPW header data, including:
+
+| Header                      | Method                                       |
+| :---                        | :---                                         |
+| `LOCATION`                  | `$location()`                                |
+| `DESIGN CONDITIONS`         | `$design_condition()`                        |
+| `TYPICAL/EXTREME PERIODS`   | `$typical_extreme_period()`                  |
+| `GROUND TEMPERATURES`       | `$ground_temperature()`                      |
+| `HOLIDAYS/DAYLIGHT SAVINGS` | `$holiday()`                                 |
+| `COMMENTS 1`                | `$comment1()`                                |
+| `COMMENTS 2`                | `$comment2()`                                |
+| `DATA PERIODS`              | `$num_period()`, `$interval()` & `$period()` |
+
+Table: Methods of `Epw` class to extract and modify headers
+
+# Extract weather data
+
+## Core data
+
+`$data()` can be used to extract the core weather data.
+Usually, EPW file downloaded from EnergyPlus website contains TMY weather data.
+As years of weather data is not consecutive, it may be more convenient to align
+the year values to be consecutive, which will makes it possible to direct
+analyze and plot weather data. The `start_year` argument in `$data()` method
+can help to achieve this. However, randomly setting the `year` may result in a
+date time series that does not have the same start day of week as specified in
+the `DATA PERIODS` header.  eplusr provides a simple solution for this. By
+setting `year` to `NULL` and `align_wday` to `TRUE`, eplusr will calculate a
+year value (from current year backwards) for each data period that compliance
+with the start day of week restriction.
+
+```{r}
+str(head(epw$data()))
+```
+
+## Abnormal data
+
+`$abnormal_data()` returns abnormal data of specific data period.
+Basically, there are 2 types of abnormal data in `Epw`, i.e. missing
+values and out-of-range values. Sometimes, it may be useful to
+extract and inspect those data especially when inserting measured
+weather data. `$abnormal_data()` does this.
+
+In the returned `data.table`, a column named `line` is created indicating the
+line numbers where abnormal data occur in the actual EPW file.
+
+```{r}
+print(epw$abnormal_data(cols = "albedo", keep_all = FALSE))
+```
+
+You can use `$make_na()` to turn all abnormal data into NAs:
+
+```{r}
+epw$make_na(missing = TRUE, out_of_range = TRUE)
+
+print(epw$abnormal_data(cols = "albedo", keep_all = FALSE))
+```
+
+Or use `$fill_abnormal()` to fill NAs back to missing codes:
+
+```{r}
+epw$fill_abnormal(missing = TRUE, out_of_range = TRUE)
+
+print(epw$abnormal_data(cols = "albedo", keep_all = FALSE))
+```
+
+# Modify weather data
+
+`Epw` class provides `$add()`, `$set()` and `$del()` methods to add, update and
+delete a new data period, respectively.
+
+Below we extract weather data with automatically calculated year values, and
+replace the existing data and turn it into an AMY weather data.
+
+```{r}
+d <- epw$data()
+
+print(d[, .(datetime)])
+
+epw$set(d, realyear = TRUE)
+```
+
+`Epw` class supports multiple data periods in a single EPW file:
+
+```{r, warning = TRUE}
+d <- epw$data(start_year = 2014, align_wday = FALSE)
+
+epw$add(d, after = 0L, realyear = TRUE)
+
+epw$period()
+```
+

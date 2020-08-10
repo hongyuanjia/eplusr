@@ -36,105 +36,26 @@ knitr::knit_hooks$set(output = function(x, options) {
     hook_output(x, options)
 })
 
-knitr::opts_knit$set(root.dir = tempdir())
-
 options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
 
-can_run <- eplusr:::os_type() != "unknown"
+library(eplusr)
+if (!is_avail_eplus(8.8)) install_eplus(8.8)
 ```
 
-eplusr provides a rich toolkit of using whole building energy simulation program
-[EnergyPlus](https://energyplus.net) directly in R, which enables programmatic
-navigation, modification of EnergyPlus models, conducts parametric simulations
-and retrieves outputs. More information about EnergyPlus can be found at [its
-website](https://energyplus.net).
+This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
+and perform modifications on them. Familiarity with
+[data.table](https://cloud.r-project.org/package=data.table) is useful, but not
+essential to follow this vignette.
 
-## Installation
+---
 
-You can install the latest stable release of eplusr from CRAN.
-
-```{r cran-install, eval = FALSE}
-install.packages("eplusr")
-```
-
-Alternatively, you can install the development version from GitHub.
-
-```{r gh-installation, eval = FALSE}
-# install.packages("remotes")
-remotes::install_github("hongyuanjia/eplusr")
-```
-
-Since running the IDF files requires EnergyPlus (https://energyplus.net),
-EnergyPlus has to be installed before running any models. There are helper
-functions in eplusr to download and install it automatically on major operating
-systems (Windows, macOS and Linux):
-
-```{r eplus-install, eval = FALSE}
-# install the latest version (currently v9.1.0)
-eplusr::install_eplus("latest")
-
-# OR download the latest version (currently v9.1.0) and run the installer
-# manually by yourself
-eplusr::download_eplus("latest", dir = tempdir())
-```
-
-Note that the installation process in `install_eplus()` requires
-**administrative privileges**. If you are not in interactive mode, you have to
-run R with administrator (or with sudo if you are on macOS or Linux) to make it
-work.
-
-```{r install_eplus, include = FALSE, eval = can_run}
-# download portable EnergyPlus
-if (!eplusr::is_avail_eplus(8.8)) {
-    binary_url <- eplusr:::eplus_download_url(8.8)
-    if (eplusr:::is_windows()) {
-        ext <- ".zip"
-    } else {
-        ext <- ".tar.gz"
-    }
-    port_url <- paste0(tools::file_path_sans_ext(binary_url), ext)
-    dest <- file.path(tempdir(), basename(port_url))
-    dl <- eplusr:::download_file(port_url, dest)
-    eplus_dir <- file.path(tools::file_path_sans_ext(basename(binary_url)), "EnergyPlus-8-8-0")
-    if (eplusr:::is_windows()) {
-        unzip(dest, exdir = tempdir())
-    } else {
-        untar(dest, exdir = tempdir())
-    }
-    eplusr::use_eplus(file.path(tempdir(), eplus_dir))
-}
-```
-
-## Features
-
-* Download and install EnergyPlus in R
-* Read, parse and modify EnergyPlus:
-  - Input Data File (IDF)
-  - Weather File (EPW)
-  - Report Data Dictionary (RDD) & Meter Data Dictionary (MDD)
-  - Error File (ERR)
-* Modify multiple versions of IDFs and run corresponding EnergyPlus both in the
-  background and in the front
-* Rich-featured interfaces to query and modify IDFs
-* Automatically handle referenced fields and validate input during modification
-* Take fully advantage of most common used data structure for data science in
-  R – data.frame
-  - Extract model, weather data into data.frames
-  - Modify multiple objects via data.frames input
-  - Query output via SQL in Tidy format which is much better for data analysis
-    and visualization
-* Provide a simple yet extensible prototype of conducting parametric simulations
-  and collect all results in one go
-* A pure R-based version updater which is more than
-  [20X](https://hongyuanjia.me/en/2019/08/update-energyplus-using-eplusr-transition)
-  faster than VersionUpdater distributed with EnergyPlus
-
-## Class structure
+# Class structure
 
 Below shows the class structure in eplusr.
 
-```{r, echo = FALSE, eval = can_run, include = can_run, figure.width = "400px"}
-knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/man/figures/class_structure.png?raw=true")
+```{r, echo = FALSE, figure.width = "400px"}
+knitr::include_graphics("class_structure.png")
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
@@ -143,48 +64,54 @@ contain member functions for helping modify the data in IDF so it complies with
 the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is
 wrapped into two classes, i.e. `Idd` and `IddObject`.
 
-Besides, `Epw` class is used to present EnergyPlus Weather files; `EplusJob` to
-run single EnergyPlus simulation and collect outputs, `ParametricJob` to run
-parametric EnergyPlus simulations and collect all outputs.
+Besides, `Epw` class is used to present EnergyPlus Weather files; `EplusJob`
+and `GroupEplusJob` to run single and multiple EnergyPlus simulations and
+collect outputs, `ParametricJob` to run parametric EnergyPlus simulations and
+collect all outputs.
 
 It is highly recommended to read the documentation to get a thorough
 understanding on each class.
 
-```{r copy_example, include = FALSE, eval = can_run}
-library(eplusr)
-
-cfg <- eplus_config(8.8)
-
-example_name <- "5Zone_Transformer.idf"
-weather_name <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-ddy_name <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
-
-path_example <- file.path(cfg$dir, "ExampleFiles", example_name)
-path_weather <- file.path(cfg$dir, "WeatherData", weather_name)
-path_ddy <- file.path(cfg$dir, "WeatherData", ddy_name)
-
-file.copy(path_example, tempdir(), overwrite = TRUE)
-file.copy(c(path_weather, path_ddy),
-  file.path(tempdir(), c("San_Francisco.epw", "San_Francisco.ddy")), overwrite = TRUE)
-```
-
-## Read and parse
-
-All IDF reading process starts with function `read_idf()`, which returns an `Idf`
-object. The model will be printed in a similar style you see in IDFEditor, with
-additional heading lines showing the `Path`, `Version` of the model. The classes
-of objects in the model are ordered by groups and the number of objects in
-classes are shown in square bracket.
+# Preparation
 
 Parsing an IDF requires the IDD data of that version, which serves as the
-schema. Usually, when you try to edit an IDF, the corresponding EnergyPlus is
+schema. The IDD file will be parsed first and an `Idd` object will be created and
+cached. That `Idd` object will be reused whenever parsing IDFs with that
+version. For more details, please see `?use_idd()` and `?idd`.
+
+## Locate EnergyPlus
+
+Usually, when you try to edit an IDF, the corresponding EnergyPlus is
 likely to be installed already. If EnergyPlus is installed in standard location
 (`C:\EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on Linux and
 `/Applications/EnergyPlus-X-Y-0` on macOS), eplusr is able to find it and use
 the `Energy+.idd` file distributed with that release to parse the input IDF.
-The IDD file will be parsed first and an `Idd` object will be created and
-cached. That `Idd` object will be reused whenever parsing IDFs with that
-version. For more details, please see `?use_idd()` and `?idd`.
+
+You can get all detected EnergyPlus versions using `avail_eplus()` and meta
+data of EnergyPlus configuration using `eplus_config()`.
+
+```{r avail_eplus}
+avail_eplus()
+
+eplus_config(8.8)
+```
+
+If your EnergyPlus was not installed in standard location, you can add that
+location using `use_eplus()`. After adding, all models of that version will use
+this path to call EnergyPlus.
+
+```{r use_eplus, eval = FALSE}
+use_eplus("C:/EnergyPlusV8-8-0")
+```
+
+If the needed version of EnergyPlus was not installed, you can use
+`install_eplus()` to install it.
+
+```{r install, eval = FALSE}
+install_eplus(ver = 8.8)
+```
+
+## Download EnergyPlus IDD
 
 Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
@@ -200,29 +127,28 @@ use_idd(path_idd)
 use_idd(8.8, download = TRUE)
 ```
 
+# Read and parse IDF
+
+All IDF reading process starts with function `read_idf()`, which returns an
+`Idf` object. The IDF will be printed in a similar style you see in IDF Editor,
+with additional heading lines showing the `Path`, `Version` of the model. The
+classes of objects in the model are ordered by groups and the number of objects
+in classes are shown in square bracket.
+
 Now let's read an IDF file distributed with EnergyPlus 8.8.0. As we have already
 got the IDD, we can just ignore the `idd` argument.
 
-```{r idd_solaris, include = FALSE, eval = !can_run}
-library(eplusr)
-use_idd(8.8, download = TRUE)
-path_example <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/testfiles/5Zone_Transformer.idf"
-path_weather <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-path_ddy <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
-
-eplusr:::download_file(path_example, file.path(tempdir(), basename(path_example)))
-eplusr:::download_file(path_weather, file.path(tempdir(), "San_Francisco.epw"))
-eplusr:::download_file(path_ddy, file.path(tempdir(), "San_Francisco.ddy"))
-```
-
 ```{r read, out.lines = 10}
-model <- read_idf(path = "5Zone_Transformer.idf", idd = NULL)
+path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+model <- read_idf(path)
 
 model
 ```
 
+# Methods in `Idf` class
+
 `Idf` class provides lots of methods to programmatically query and modify
-EnergyPlus models. See table below.  This vignette will demonstrate some of
+EnergyPlus models. See table below. This vignette will demonstrate some of
 them.
 
 | Category            | Method                   | Functionality                                     |
@@ -277,7 +203,7 @@ Table: Methods of `Idf` class
 
 Below will show same example usage of methods listed above.
 
-## Basic Info
+# Basic Info
 
 If you want to see what groups and classes exist in your model, use
 `$group_name()` and `$class_name()` respectively.
@@ -288,6 +214,9 @@ model$group_name()
 
 ```{r all_cls, out.lines = 5}
 model$class_name()
+
+# categorize by group names
+model$class_name(by_group = TRUE)
 ```
 
 You can use `$is_valid_group()` and `$is_valid_class()` to check if curtain
@@ -298,7 +227,7 @@ model$is_valid_group("Schedules")
 model$is_valid_class("ZoneInfiltration:DesignFlowRate")
 ```
 
-## Class definition
+# Class definition
 
 You can get class definition using `$definition()`, which returns an
 `IddObject`. All required fields in each class are marked with `*`. For example,
@@ -339,21 +268,21 @@ str(def_val)
 ```
 Please see `?IddObject` for detailed documentation on `IddObject` class.
 
-## Get object
+# Get object
 
 In an `Idf`, each object in the model is assigned with an unique `ID` according
 to its appearance sequence in the IDF file. You can find all valid `ID`s using
 `$object_id()`.
 
 ```{r all_id}
-model$object_id(class = c("Material", "Construction"), simplify = FALSE)
+model$object_id(c("Material", "Construction"))
 ```
 
 You can get all object names using `$object_name()`. If the class does not have
 name attribute, `NA` will returned.
 
 ```{r obj_nm}
-model$object_name(class = c("Version", "Material", "Construction"), simplify = FALSE)
+model$object_name(c("Version", "Material", "Construction"))
 ```
 
 Object number in each class can be retrieved using `$object_num()`.
@@ -382,7 +311,7 @@ model$objects_in_class("Material")
 Also, you can get all objects in a single class using `"$"` or `"[["`. Class
 names can be given in underscore-style. For example, you can just use
 `model$Material_NoMass` instead of `` model$`Material:Nomass` `` to save some
-typing.
+typings.
 
 ```{r obj_in_cls_shortcut_1, out.lines = 30}
 model$Material_NoMass
@@ -398,7 +327,7 @@ rp <- model$RunPeriod[[1]]
 ```
 
 For unique object, such like `SimulationControl` and `Building`, you can use
-`$object_unique()`
+`$object_unique()` which returns a single `IdfObject` object.
 
 ```{r objuni}
 model$object_unique("Building")
@@ -441,7 +370,7 @@ R.
 rp$Begin_Day_of_Month
 
 # OR
-# rp[["Begin_Day_of_Month"]]
+# rp[["Begin Day of Month"]]
 # rp[[3]]
 ```
 
@@ -451,7 +380,7 @@ You can also make a chain.
 model$RunPeriod$WinterDay$Begin_Day_of_Month
 ```
 
-## Modify object
+# Modify object
 
 There are two ways to modify objects in eplusr. One is using methods in `Idf`
 which works on multiple objects, and the other way is using methods in
@@ -461,35 +390,32 @@ which works on multiple objects, and the other way is using methods in
 > strictness level (`none`, `draft`, `final` or custom yours using
 > `custom_validate()`). For detailed explanations, please see `?level_checks`.
 
-`Idf` class provides 9 methods for modifying objects, including `$dup()`,
-`$add()`, `$set()`, `$del()`, `$rename()`, `$insert()`, `$load()` `$update()`
-and `$paste()`.
-
 Object IDs will be appended after new objects are added, and the most-newly
 added object will always have the max ID. Object IDs will never be reused, even
-though their binded objects have been deleted using `$del()`.
+when their binded objects have been deleted.
 
-For modifying object's comments and values, you can also use `$comment()`
-and `$set()` in `IdfObject` class.
-
-### Duplicate objects
+## Duplicate existing objects (`Idf$dup()`)
 
 `$dup()` duplicates objects specified by object IDs or names. If the
 target classes have a name attribute, you can assign new names to the duplicated
 objects in form `new_name = "old_name"`. If new name is not given, the newly
 added object will have the same name as the original object except a appended
-suffix of "`_1`", "`_2`" and etc.
+suffix of "` 1`", "` 2`" and etc.
 
 ```{r dup}
 model$dup(c(my_roof = "ROOF-1", "ROOF-1", "WALL-1"))
 ```
 
-### Add new objects
+## Add new objects using lists (`Idf$add()`)
 
 You can add new objects using `$add()`. With `.default` being `TRUE`, the
 default behavior, all empty fields are filled with default values, if possible.
 Only minimum fields will be added by default. But you can change it by setting
 `.all` to `TRUE`.
+
+Fields can be given using either indices or names. Field index `X` is specified
+in format `..X`. Field name can be given in underscore-style, e.g. all `Begin
+Month`, `begin month` and `begin_month` refer to the same field.
 
 You can also add new comments alongside with new values using the special
 element `.comment`.
@@ -501,12 +427,27 @@ rp1 <- list(RunPeriod = list("rp_test_1", 1, 1, 2, 1, .comment = c("Comment for 
 
 model$add(rp1,
   RunPeriod = list(name = "rp_test_2", begin_month = 3, begin_day_of_month = 1,
-    end_month = 4, end_day_of_month = 1, .comment = "Comment for new object 2"
+    ..4 = 4, ..5 = 1, .comment = "Comment for new object 2"
   )
 )
 ```
 
-### Set new values and comments
+If you want to create multiple objects in one go, you can use `:=`, instead of
+`=`. For instance, below we create 3 materials. Note that field values with
+shorter length are automatically recycled.
+
+```{r}
+model$add(Material := list(
+  sprintf("mat%i", 1:3),
+  c("Rough", "MediumSmooth", "Smooth"),
+  c(0.05, 0.1, 0.2),
+  0.72,
+  c(1800, 1850, 1800),
+  840
+))
+```
+
+## Set new values and comments using lists (`Idf$set()`)
 
 Changing values of existing objects can be conducted using `$set()` in
 `Idf` and `IdfObject`:
@@ -519,7 +460,25 @@ model$set(
 )
 ```
 
-For setting a single value, you can even write in a chain:
+You can modify all objects in a class using `class := list(...)`:
+
+```{r}
+model$set(RunPeriod := list(
+  ..6 = c("Monday", "Tuesday", "Wednesday", "Thursday"),
+  ..8 = "No"
+))
+```
+
+> If the target class is store as a variable, e.g. `cls <- "RunPeriod"`, you
+> can input it inside `..()`, i.e. `model$set(..(cls) := list(...))`
+
+Multiple objects can be grouped inside `.()` or `c()`:
+
+```{r}
+model$set(.("WinterDay", "SummerDay") := list(..8 = "Yes"))
+```
+
+For setting a single value on one object, you can write it in a chain:
 
 ```{r set_chain}
 (model$RunPeriod$rp_test_2$End_Day_of_Month <- 2)
@@ -546,15 +505,17 @@ class.
 mat$value_possible(c(2, 7))
 ```
 
-### Insert objects
+## Insert objects from another IDF (`Idf$insert()`)
 
-Sometimes it may be useful to insert objects from other IDFs. For example, you
-may want to import some design days and update location data from a ".ddy" file.
-You can achieve that using `$insert()`.
+Sometimes it may be useful to insert objects from other IDFs.
+For example, you may want to import some design days and update location data
+from a ".ddy" file. You can achieve that using `$insert()`.
 
-```{r ddy, warning=TRUE, out.lines = 20}
+```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-ddy <- read_idf("San_Francisco.ddy", idd = 8.8)
+path_ddy <- file.path(eplus_config(8.8)$dir, "WeatherData",
+  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+ddy <- read_idf(path_ddy, idd = model$version())
 
 model$insert(ddy$SizingPeriod_DesignDay)
 
@@ -562,10 +523,9 @@ model$insert(ddy$SizingPeriod_DesignDay)
 loc <- ddy$Site_Location$value()
 
 model$Site_Location$set(loc)
-
 ```
 
-### Load objects
+## Load objects using characters or data.frames (`Idf$load()`)
 
 Here `load` means **insert**. You can use character vectors or data.frames to
 load new objects.
@@ -589,7 +549,7 @@ model$object_relation("new_const1")
 model$object_relation("new_const2")
 ```
 
-### Update objects
+## Update objects using characters or data.frames (`Idf$update()`)
 
 Here `update` means **set**. You can use character vectors or data.frames to
 update existing objects.
@@ -607,9 +567,7 @@ dt[1, value := "ROOF"]
 model$update(dt)
 ```
 
-### Delete object
-
-#### `$del()`
+## Delete existing objects (`Idf$del()`)
 
 `$del()` will delete objects specified by object IDs or names.
 For example, in current model, there is a material named `"MAT-CLNG-1"` in class
@@ -638,16 +596,18 @@ setting `.force` to `TRUE`.
 model$del("mat-clng-1", .force = TRUE)
 ```
 
-#### `$purge()`
+## Purge unused resource objects (`Idf$purge()`)
 
 `$purge()` will delete resource objects specified that are not used by any
-objects. Below we remove all schedules that are not currently used.
+objects. Resource objects refer to objects that can be referenced by other objects, e.g. `Material`, `Construction`, `Schedule:Compact` and etc.
+
+Below we remove all schedules that are not currently used.
 
 ```{r purge}
 model$purge(group = "Schedules")
 ```
 
-#### `$duplicated()` and `$unique()`
+## Find and remove duplicates (`Idf$duplicated()` & `Idf$unique()`)
 
 `$duplicatd()` and `$unique()` can be used to detect and remove duplicated
 objects, respectively. Here duplicated objects refer to objects whose field
@@ -655,23 +615,23 @@ values are the same except the names. Object comments are ignored during
 comparison. These two methods can be useful when doing model cleaning.
 
 ```{r duplicated}
-model$duplicated(group = "Schedules")
+print(model$duplicated(group = "Schedules"))
 ```
 
 ```{r unique}
 model$unique(group = "Schedules")
 ```
 
-### Paste from IDF Editor
+## Paste objects from IDF Editor (`Idf$paste()`)
 
 Once an IDF file is opened in IDF Editor, you can copy objects by clicking the
 `Copy Obj` button in IDF Editor, and use `$paste()` to insert those objects into
 current `Idf`. Note that IDF Editor only exists on Windows, which means that
 `$paste()` will also work only on that platform.
 
-## Validate
+# Check possible field errors (`Idf$validate()`)
 
-`$validate()` checks if there are errors in current `Idf` under specified
+`$validate()` checks if there are any errors in current `Idf` under specified
 validation level. You can customize what kind of errors to check by changing the
 `level` argument. The default validation level is equal to
 `eplusr_option("validate_level")`.
@@ -721,236 +681,24 @@ Now let's change the construction's `Outside Layer` to `WD10`.
 model$object(id)$set(Outside_Layer = "WD10")
 ```
 
-## Save
+# Save to an IDF file (`Idf$save()`)
 
 You can save your model using `$save()`. If no path is given, the path of model
 itself will be used. This may overwrite the current file which has a risk of
 losing your original file and data. You have to set `overwrite` to `TRUE` to
 confirm the process.
 
-```{r save, eval = FALSE}
+```{r save}
+(model$save(tempfile(fileext = ".idf")))
+
 model$save(overwrite = TRUE)
-
-model$save("test.idf")
 ```
 
-## Run and Collect Output
+# Summary
 
-eplusr uses the EnergyPlus command line interface which was introduced since
-EnergyPlus v8.3.0, which means that `$run()` only supports models with version
-higher than v8.3.0.
+So far we have went through core methods in `Idf` class to modify an IDF file
+and save the results.
 
-eplusr will auto-detect already installed EnergyPlus in the standard
-installation locations. You can get all detected EnergyPlus versions using
-`avail_eplus()`.
+Let's turn our attention to run EnergyPlus simulations in the next vignette
+*"Run simulation and data exploration"*.
 
-```{r avail_eplus}
-avail_eplus()
-```
-
-`$run()` will issue an error if corresponding version of EnergyPlus is not found.
-If your EnergyPlus was not installed in standard location, you can add that
-location using `use_eplus()`. After adding, all models of that version will use
-this path to call EnergyPlus.
-
-```{r use_eplus, eval = FALSE}
-use_eplus("C:/EnergyPlusV8-8-0")
-```
-
-If the needed version of EnergyPlus was not installed, you can use
-`install_eplus()` to install it.
-
-```{r install, eval = FALSE}
-install_eplus(ver = 8.8)
-```
-
-`$run()` will run the current model with specified weather using corresponding
-version of EnergyPlus. The model and the weather used will be copied to the
-output directory. An `EplusJob` object will be returned which provides detailed
-information of the simulation and methods to collect simulation output. Please
-see `?EplusJob` for details.
-
-```{r run, eval = can_run, out.lines = 10}
-# read the model again
-model <- read_idf("5Zone_Transformer.idf")
-path_epw <- "San_Francisco.epw"
-
-job <- model$run(path_epw, wait = TRUE)
-```
-
-### Print simulation errors
-
-You can get simulation errors using `$errors()`.
-
-```{r errors, eval = can_run}
-job$errors()
-```
-
-### Retrieve simulation output
-
-eplusr uses the EnergyPlus SQL output for extracting simulation output. In
-order to do so, an object in `Output:SQLite` class with `Option Type` value of
-`SimpleAndTabular` will be automatically created if it does not exists.
-`EplusJob` has provided some wrappers that do SQL queries to get report data
-results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
-`Output:Table` results, you have to be familiar with the structure of the
-EnergyPlus SQL output, especially for table *"TabularDataWithStrings"*. For
-details, please see *"2.20 eplusout.sql"*, especially *"2.20.4.4 TabularData
-Table"* in EnergyPlus *"Output Details and Examples"* documentation.
-
-`$report_data_dict()` returns a data.table which contains all information about
-report data. For details on the meaning of each columns, please see
-*"2.20.2.1 ReportDataDictionary Table"* in EnergyPlus *"Output Details and
-Examples"* documentation.
-
-```{r dict, eval = can_run}
-str(job$report_data_dict())
-```
-
-`$report_data()` extracts the report data using key values and variable names.
-Just for demonstration, let's get the transformer input electric power at 11 a.m
-for the first day of RunPeriod named `SUMMERDAY`, tag this simulation as case
-`example`, and return all possible output columns.
-
-```{r output, eval = can_run}
-power <- job$report_data("transformer 1", "transformer input electric power", case = "example",
-  all = TRUE, simulation_days = 1, environment_name = "summerday", hour = 11, minute = 0)
-
-str(power)
-```
-
-`$report_data()` can also directly take the whole or subset results of
-`$report_data_dict()` to extract report data. In some case this may be quite
-handy. Let's get all report variable with Celsius degree unit.
-
-```{r dict_extract, eval = can_run}
-str(job$report_data(job$report_data_dict()[units == "C"]))
-```
-
-`$tabular_data()` extracts tabular data. For details on the meaning of each
-columns, please see *"2.20.4.4 TabularData Table"* in EnergyPlus *"Output
-Details and Examples"* documentation.
-
-Now let's get the total site energy per total building area. Note that the
-`value` column in the returned `data.table` is character types, as some table
-store not just numbers. We need to manually convert it.
-
-```{r tab, eval = can_run}
-site_energy <- job$tabular_data(
-    column_name = "energy per total building area", row_name = "total site energy",
-    wide = TRUE, string_value = FALSE
-)[[1]]
-str(site_energy)
-```
-
-```{r del_job, include = FALSE, eval = can_run}
-clean_wd(model$path())
-```
-
-## Run Parametric Analysis
-
-eplusr provides tools to do parametric simulations which take full advantages of
-eplusr's model editing and result collecting functionalities. You can create a
-parametric job using `param_job()`, which takes an IDF file or an `Idf` object
-as the *seed* and an EPW file or an `Epw` object as *weather*.
-
-```{r param, eval = can_run}
-param <- param_job(idf = model, epw = path_epw)
-
-param
-```
-
-`param_job()` returns a `ParametricJob` object which provides a prototype of
-conducting parametric analysis of EnergyPlus simulations. For more details,
-please see `?param`.
-
-### Apply measure
-
-`$apply_measure()` allows to apply a measure to an `Idf` and create parametric
-models for simulations. Here, the concept of measure in eplusr is inspired by
-"measures" in [OpenStudio](https://nrel.github.io/OpenStudio-user-documentation/getting_started/about_measures/).
-Basically, a measure is just a function that takes an `Idf` object and other
-arguments as input, and returns a modified `Idf` object as output. Use `...` to
-supply different arguments to that measure.
-
-Let's create a function that modifies infiltration rate:
-
-```{r mea, eval = can_run}
-set_infil_rate <- function (idf, infil_rate) {
-
-  # validate input value
-  # this is optional, as validations will be made when setting values
-  stopifnot(is.numeric(infil_rate), infil_rate >= 0)
-
-  if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
-    stop("Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`")
-
-  # get all object IDS
-  ids <- idf$object_id("ZoneInfiltration:DesignFlowRate", simplify = TRUE)
-
-  # make a list of new values to set
-  new_val <- list(design_flow_rate_calculation_method = "AirChanges/Hour", air_changes_per_hour = infil_rate)
-
-  # create proper format for all objects in that class
-  val <- rep(list(new_val), length(ids))
-  names(val) <- paste0("..", ids)
-
-  idf$set(val)
-
-  idf
-}
-```
-
-The measure `set_infil_rate()` is pretty simple. First, it gets all
-objects in class `ZoneInfiltration:DesignFlowRate`. Then it sets ACH in all
-zones to the input value.
-
-Now, let's apply this measure to the seed model with different infiltration
-rates from 0.0 to 4.0, respectively.
-
-```{r apply, eval = can_run}
-param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = NULL)
-```
-
-As we can see, 5 models have been created. As we left `.names` as `NULL`, each
-newly created models will be named as a combination of measure name and model
-number.
-
-### Run in parallel and collect results
-
-Now let's run the parametric job. All simulations will be run in parallel. The
-number of parallel EnergyPlus processes can be specified using option
-`num_parallel`. Now let's run all simulations and wait them to finish.
-
-```{r param_run, eval = can_run}
-param$run(wait = TRUE)
-```
-
-After all simulations completed, let's see the variations of total energy.
-
-```{r param_res, eval = can_run}
-tab <- param$tabular_data(
-    table_name = "Site and Source Energy",
-    column_name = "Total Energy",
-    row_name = "Total Site Energy"
-)
-
-total_eng <- tab[, list(case, `Total Energy (GJ)` = as.numeric(value))]
-```
-
-```{r eval = FALSE}
-total_eng
-```
-
-```{r echo = FALSE, results="asis", eval = can_run}
-knitr::kable(total_eng)
-```
-
-```{r del_param, include = FALSE, eval = can_run}
-dir_nms <- paste0("set_infil_rate_", 1:5)
-lapply(dir_nms, unlink, recursive = TRUE, force = TRUE)
-```
-
-```{r clean_files, include = FALSE, eval = can_run}
-unlink(file.path(tempdir(), c(example_name, "San_Francisco.epw", "San_Francisco.ddy")))
-```

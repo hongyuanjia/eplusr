@@ -1,0 +1,68 @@
+---
+title: "Frequently asked questions about eplusr"
+author: "Hongyuan Jia"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: "paged"
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Frequently asked questions about eplusr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE,
+    fig.align = "center"
+)
+
+# the default output hook
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
+    }
+    hook_output(x, options)
+})
+
+options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
+
+library(eplusr)
+if (!is_avail_eplus(8.8)) install_eplus(8.8)
+```
+
+# How to get auto-completion in RStudio?
+
+Use the `autocomplete` option:
+
+```{r, eval = FALSE}
+eplusr_option(autocomplete = TRUE)
+```
+
+Underneath, [makeActiveBinding()] is used to add or move active bindings in
+[Idf] and [IdfObject]s to directly return objects in class or field values.
+This will make it possible to dynamically show current class and field
+names in both RStudio and in the terminal. However, this process does have
+a penalty on the performance. It can make adding or modifying large mounts
+of [Idf] and [IdfObject]s slower.
+
+# How to control the maximum number of parallel simulations?
+
+Use the `num_parallel` option:
+
+```{r, eval = FALSE}
+eplusr_option(num_parallel = 2)
+```
+
