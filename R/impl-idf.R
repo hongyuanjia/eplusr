@@ -4441,6 +4441,8 @@ assign_idf_value_default <- function (idd_env, idf_env, dt_value) {
         dt_value <- field_default_to_unit(idd_env, dt_value, "si", "ip")
     }
 
+    if (!has_names(dt_value, "value_chr")) set(dt_value, NULL, "value_chr", NA_character_)
+
     if (has_names(dt_value, "defaulted")) {
         dt_value[J(TRUE), on = "defaulted", `:=`(value_chr = default_chr, value_num = default_num)]
     } else {
