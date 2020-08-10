@@ -3079,7 +3079,7 @@ trans_postprocess <- function (idf, from, to) {
         new <- NULL # eliminate check warning of no visible binding
 
         # delete deprecatd variable first
-        id_obj <- dt[mapping[is.na(new)], on = c(value_lower = "old"), unique(id)]
+        id_obj <- dt[mapping[!is.na(old) & is.na(new)], on = c(value_lower = "old"), unique(id)]
         id_del <<- c(id_del, id_obj[!is.na(id_obj)])
         dt <- dt[!J(id_obj), on = "id"]
 
