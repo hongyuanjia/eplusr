@@ -30,16 +30,18 @@ navbar:
       menu:
       - text: "Introduction to eplusr"
         href: articles/idf.html
-      - text: "Data exploration"
+      - text: "Run simulation and data exploration"
         href: articles/job.html
       - text: "Parametric simulations"
         href: articles/param.html
+      - text: "Update IDF version"
+        href: articles/transition.html
       - text: "Work with weather files"
         href: articles/epw.html
       - text: "Work with `Schedule:Compact` objects"
         href: articles/schedule.html
-      - text: "Tips and ticks"
-        href: articles/tips.html
+      - text: "Frequently asked questions"
+        href: articles/faq.html
     reference:
       text: Manual
       href: reference/index.html
