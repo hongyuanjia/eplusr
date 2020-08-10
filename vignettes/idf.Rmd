@@ -515,7 +515,7 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 # read ddy file as normal IDF
 path_ddy <- file.path(eplus_config(8.8)$dir, "WeatherData",
   "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
-ddy <- read_idf(path_ddy, idd = idf$version())
+ddy <- read_idf(path_ddy, idd = model$version())
 
 model$insert(ddy$SizingPeriod_DesignDay)
 
