@@ -3332,8 +3332,8 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
         private$m_log$job <- EplusJob$new(self, epw)
     }
 
-    private$m_log$job$run(dir = dir, wait = wait, force = force, echo = echo,
-        copy_external = copy_external
+    private$m_log$job$run(epw = epw, dir = dir, wait = wait, force = force,
+        echo = echo, copy_external = copy_external
     )
 }
 # }}}

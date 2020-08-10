@@ -840,8 +840,8 @@ different tables
 \verb{HVAC System}
 \item \code{key_value}: Key name of the data
 \item \code{name}: Actual report data name
-\item \code{reporting_frequency}:
-\item \code{schedule_name}: Name of the the schedule that controls reporting
+\item \code{reporting_frequency}: Data reporting frequency
+\item \code{schedule_name}: Name the the schedule that controls reporting
 frequency.
 \item \code{units}: The data units
 }
