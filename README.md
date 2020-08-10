@@ -51,10 +51,10 @@ download and install it automatically on major operating systems
 (Windows, macOS and Linux):
 
 ``` r
-# install the latest version (currently v9.1.0)
+# install the latest version (currently v9.2.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v9.1.0) and run the installer
+# OR download the latest version (currently v9.2.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -141,11 +141,6 @@ Please see these vignettes and articles about {eplusr}
 ``` r
 # read IDF
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
-#> IDD v8.8.0 has not been parsed before.
-#> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
-#> IDD file found: '/home/hongyuanjia/.local/EnergyPlus-8-8-0/Energy+.idd'.
-#> Start parsing...
-#> Parsing completed.
 idf
 #> ── EnergPlus Input Data File ────────────────────────────
 #>  * Path: '/mnt/c/Users/hongy/Dropbox/github_repo/epl...
@@ -374,7 +369,7 @@ job <- idf$run(epw)
 #> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.
 #> Replace the existing IDF located at /tmp/RtmpgL7ywt/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.10 15:11
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.10 15:45
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -409,7 +404,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-08-10 15:11:00
+#>   * Simulation started: 2020-08-10 15:45:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 3
