@@ -6,8 +6,8 @@
 \title{Read, and modify an EnergyPlus Weather File (EPW)}
 \description{
 Reading an EPW file starts with function \code{\link[=read_epw]{read_epw()}}, which parses an EPW
-file and returns an \code{Epw} object. The parsing process is basically as
-[EnergyPlus/WeatherManager.cc] in EnergyPlus, with some simplifications.
+file and returns an \code{Epw} object. The parsing process is basically the same
+as [EnergyPlus/WeatherManager.cc] in EnergyPlus, with some simplifications.
 }
 \details{
 An EPW file can be divided into two parts, headers and weather data. The

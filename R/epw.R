@@ -49,8 +49,8 @@ epwidd_print <- function (self, private) {
 #' Read, and modify an EnergyPlus Weather File (EPW)
 #'
 #' Reading an EPW file starts with function [read_epw()], which parses an EPW
-#' file and returns an `Epw` object. The parsing process is basically as
-#' \[EnergyPlus/WeatherManager.cc\] in EnergyPlus, with some simplifications.
+#' file and returns an `Epw` object. The parsing process is basically the same
+#' as \[EnergyPlus/WeatherManager.cc\] in EnergyPlus, with some simplifications.
 #'
 #' An EPW file can be divided into two parts, headers and weather data. The
 #' first eight lines of a standard EPW file are normally headers which contains

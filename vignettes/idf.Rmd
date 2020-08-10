@@ -127,7 +127,7 @@ use_idd(path_idd)
 use_idd(8.8, download = TRUE)
 ```
 
-# Read and parse
+# Read and parse IDF
 
 All IDF reading process starts with function `read_idf()`, which returns an
 `Idf` object. The IDF will be printed in a similar style you see in IDF Editor,
