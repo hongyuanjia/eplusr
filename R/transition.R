@@ -3263,9 +3263,9 @@ trans_postprocess <- function (idf, from, to) {
     if (!nrow(dt)) return(idf)
 
     if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
-        trans_process_load(idf$clone()$del(id_del), idf, dt)
+        trans_process_load(idf$clone()$del(id_del), idf, dt, empty = FALSE)
     } else {
-        trans_process_load(idf$clone(), idf, dt)
+        trans_process_load(idf$clone(), idf, dt, empty = FALSE)
     }
 }
 # }}}
@@ -3420,7 +3420,7 @@ trans_fun_names <- function (vers) {
 }
 # }}}
 # trans_process_load {{{
-trans_process_load <- function (new_idf, old_idf, dt) {
+trans_process_load <- function (new_idf, old_idf, dt, empty = TRUE) {
     if (!nrow(dt)) return(new_idf)
 
     # get object table from old input
@@ -3430,7 +3430,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     new_before <- get_priv_env(new_idf)$idf_env()$object
 
     # insert new objects
-    new_idf$load(dt, .unique = FALSE, .default = FALSE, .empty = TRUE)
+    new_idf$load(dt, .unique = FALSE, .default = FALSE, .empty = empty)
 
     if (is.null(unlist(old$comment, use.names = FALSE))) return(new_idf)
 
