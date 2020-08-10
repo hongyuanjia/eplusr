@@ -3,14 +3,14 @@
 
 matrix:
   include:
-    - os: osx
-      r: release
-      env:
-      - NOT_CRAN=false
-    - os: osx
-      r: oldrel
-      env:
-      - NOT_CRAN=false
+  # - os: osx
+  #   r: release
+  #   env:
+  #   - NOT_CRAN=false
+  # - os: osx
+  #   r: oldrel
+  #   env:
+  #   - NOT_CRAN=false
     - os: linux
       r: devel
       env:
@@ -20,10 +20,10 @@ matrix:
       env:
       - BUILD_PKGDOWN=true
       - NOT_CRAN=false
-    - os: linux
-      r: oldrel
-      env:
-      - NOT_CRAN=false
+  # - os: linux
+  #   r: oldrel
+  #   env:
+  #   - NOT_CRAN=false
 
 # meta -------------------------------------------------------------------------
 language: r
