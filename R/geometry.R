@@ -109,39 +109,28 @@ extract_geometry <- function (idf) {
 get_global_geom_rules <- function (idf) {
     if (idf$is_valid_class("GlobalGeometryRules")) {
         rules <- idf$to_table(class = "GlobalGeometryRules", all = TRUE)
-        rules <- setattr(as.list(stri_trans_tolower(rules$value)), "names",
-            stri_trans_tolower(gsub(" ", "_", rules$field, fixed = TRUE)))
+        rules <- setattr(as.list(rules$value), "names", rules$field)
 
-        invalid <- idf$object_unique("GlobalGeometryRules")$validate(custom_validate(choice = TRUE))$invalid_choice
-        if (nrow(invalid)) {
-            if (1L %in% invalid$field_index) {
-                warn(paste0("Invalid coordinate system found ", surround(rules$starting_vertex_position), ". ",
-                    "Assuming 'UpperLeftCorner'."
-                ), "warn_invalid_start_vertex_pos")
-                rules$starting_vertex_position <- "upperleftcorner"
-            }
+        # get all possible values
+        choices <- idf$definition("GlobalGeometryRules")$field_choice()
 
-            if (2L %in% invalid$field_index) {
-                warn(paste0("Invalid vertex entry direction found ", surround(rules$vertex_entry_direction), ". ",
-                    "Assuming 'Counterclockwise'."
-                ), "warn_invalid_vertex_entry_dir")
-                rules$vertex_entry_direction <- "counterclockwise"
-            }
-
-            if (3L %in% invalid$field_index) {
-                warn(paste0("Invalid coordinate system found ", surround(rules$coordinate_system), ". ",
-                    "Assuming 'Relative'."
-                ), "warn_invalid_global_coord_sys")
-                rules$coordinate_system <- "relative"
-            }
-
-            if (5L %in% invalid$field_index) {
-                warn(paste0("Invalid rectangular coordinate system found ", surround(rules$rectangular_surface_coordinate_system), ". ",
-                    "Assuming 'Relative'."
-                ), "warn_invalid_rectsurface_coord_sys")
-                rules$rectangular_surface_coordinate_system <- "relative"
+        for (i in seq_along(rules)) {
+            if (is.na(rules[[i]])) {
+                warn(sprintf("Empty '%s' found in 'GlobalGeometryRules'. Assuming '%s'.",
+                    names(rules[i]), choices[[i]][[1L]]
+                ), "warn_invalid_ggr")
+                rules[[i]] <- stri_trans_tolower(choices[[i]][[1L]])
+            } else if (!stri_trans_tolower(rules[[i]]) %chin% stri_trans_tolower(choices[[i]])) {
+                warn(sprintf("Invalid '%s' found ('%s') in 'GlobalGeometryRules'. Assuming '%s'.",
+                    names(rules[i]), rules[[i]], choices[[i]][[1L]]
+                ), "warn_invalid_ggr")
+                rules[[i]] <- stri_trans_tolower(choices[[i]][[1L]])
+            } else {
+                rules[[i]] <- stri_trans_tolower(rules[[i]])
             }
         }
+
+        setattr(rules, "names", lower_name(names(rules)))
     } else {
         warn("No 'GlobalGeometryRules' object found in current IDF. Assuming all defaults.",
             "warn_no_global_geom_rules"
@@ -154,8 +143,6 @@ get_global_geom_rules <- function (idf) {
             rectangular_surface_coordinate_system = "relative"
         )
     }
-
-    idf$definition("GlobalGeometryRules")$field_default()
 
     rules
 }
