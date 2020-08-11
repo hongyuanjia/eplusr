@@ -46,7 +46,7 @@ if (any(avail_eplus()) > 7.2) {
     updated <- version_updater(idf, max(avail_eplus()))
 
     # convert it from v7.2 to the latest EnergyPlus installed and keep all
-    intermediate versions
+    # intermediate versions
     updated <- version_updater(idf, max(avail_eplus()), keep_all = TRUE)
 
     # see transition error messages

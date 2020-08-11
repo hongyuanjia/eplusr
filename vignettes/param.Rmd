@@ -211,6 +211,9 @@ taking the code snippets developed in data exploration for a single simulation
 and applying them to each of the parametric simulations.
 
 ```{r, out.lines = 30}
+# read building area from Standard Reports
+area <- param$tabular_data(table_name = "Building Area", wide = TRUE)[[1L]]
+
 # calculate EUI breakdown
 param_eui <- param_end_use %>%
     select(case, category = row_name, electricity = `Electricity [kWh]`) %>%
