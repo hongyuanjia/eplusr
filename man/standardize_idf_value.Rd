@@ -8,7 +8,8 @@ standardize_idf_value(
   idd_env,
   idf_env,
   dt_value,
-  type = c("choice", "reference")
+  type = c("choice", "reference"),
+  keep = TRUE
 )
 }
 \arguments{
@@ -18,19 +19,14 @@ field, and reference.}
 \item{idf_env}{An environment or list contains IDF tables including object,
 value, and reference.}
 
+\item{dt_value}{An data.table of object field values.}
+
 \item{type}{A character vector to specify what type of values to be
 standardized. Should be a subset of \code{c("choice", "reference")}.
 Default: \code{c("choice", "reference")}.}
 
-\item{class}{An integer vector of valid class indexes or a character vector
-of valid class names. Default: \code{NULL}.}
-
-\item{object}{An integer vector of valid object IDs or a character vector
-of valid object names. Default: \code{NULL}.}
-
-\item{field}{An integer vector of valid field indexes or a character
-vector of valid field names (can be in in underscore style). \code{class}
-and \code{field} should have the same length.}
+\item{keep}{If \code{TRUE}, the original value will be kept even if it is invalid.
+If \code{FALSE}, invalid values will be converted into NAs. Default: \code{TRUE}.}
 }
 \value{
 A data.table

@@ -37,10 +37,6 @@ stored in three tables:
 \item \code{reference}: contains cross-reference data of field values.
 }
 }
-\note{
-When rendering by surface types, the exterior and interior face
-detection may be not 100\% right.
-}
 \examples{
 
 ## ------------------------------------------------
@@ -816,6 +812,15 @@ idf$last_job()
 
 
 ## ------------------------------------------------
+## Method `Idf$geometry`
+## ------------------------------------------------
+
+\dontrun{
+idf$geometry()
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$view`
 ## ------------------------------------------------
 
@@ -904,6 +909,7 @@ Hongyuan Jia
 \item \href{#method-save}{\code{Idf$save()}}
 \item \href{#method-run}{\code{Idf$run()}}
 \item \href{#method-last_job}{\code{Idf$last_job()}}
+\item \href{#method-geometry}{\code{Idf$geometry()}}
 \item \href{#method-view}{\code{Idf$view()}}
 \item \href{#method-save_view}{\code{Idf$save_view()}}
 \item \href{#method-print}{\code{Idf$print()}}
@@ -4038,6 +4044,41 @@ idf$last_job()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-geometry"></a>}}
+\if{latex}{\out{\hypertarget{method-geometry}{}}}
+\subsection{Method \code{geometry()}}{
+Extract \code{Idf} geometries
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$geometry(object = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{object}}{Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+
+}
+
+\subsection{Returns}{
+An \link{IdfGeometry} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+idf$geometry()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-view"></a>}}
 \if{latex}{\out{\hypertarget{method-view}{}}}
 \subsection{Method \code{view()}}{
@@ -4136,32 +4177,12 @@ By default, x-y coordinates are set to zeros.\preformatted{* If 1 number, the wi
 package to visualize the IDF geometry in 3D in a similar way as
 \href{https://www.openstudio.net}{OpenStudio}.
 
-Current only detailed geometry classes are supported, including:
-\itemize{
-\item Surfaces:
-\itemize{
-\item \code{BuildingSurface:Detailed}
-\item \code{Wall:Detailed}
-\item \code{RoofCeiling:Detailed}
-\item \code{Floor:Detailed}
-}
-\item Sub-surfaces:
-\itemize{
-\item \code{FenestrationSurface:Detailed}
-}
-\item Shadings:
-\itemize{
-\item \code{Shading:Site:Detailed}
-\item \code{Shading:Building:Detailed}
-\item \code{Shading:Zone:Detailed}
-}
-}
-
 In the rgl window, you can control the view using your mouse:
 \itemize{
 \item Left button: Trackball
 \item Right button: Pan
-\item Middle button: Field-of-view (FOV)
+\item Middle button: Field-of-view (FOV). '0' means orthographic
+projection.
 \item Wheel: Zoom
 }
 }

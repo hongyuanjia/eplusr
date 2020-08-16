@@ -1,0 +1,940 @@
+# rgl_init {{{
+#' @importFrom checkmate assert_flag assert_numeric
+rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
+                      zoom = 1, background = "white", size = c(0, 30, 800)) {
+    checkmate::assert_flag(new)
+    checkmate::assert_flag(clear)
+    checkmate::assert_numeric(size, max.len = 4L)
+
+    if (clear) {
+        if (rgl::rgl.cur() == 0) new <- TRUE else rgl::rgl.clear()
+    }
+
+    if (!new) {
+        dev <- rgl::rgl.cur()
+    } else {
+        rgl::rgl.open()
+        dev <- rgl::rgl.cur()
+
+        # set window size and position
+        if (length(size) == 1L) {
+            size = c(0, 0, size, size)
+        } else if (length(size) == 2L) {
+            size = c(0, 0, size)
+        } else if (length(size) == 3L) {
+            size = c(size[1:2], size[1:2] + size[3L])
+        } else if (length(size) == 4L) {
+            size = c(size[1:2], size[1:2] + size[3:4])
+        }
+
+        rgl::par3d(windowRect = size)
+
+        # set viewpoint
+        rgl::rgl.viewpoint(theta, phi, fov, zoom)
+
+        # change mouse control method
+        cur <- rgl::par3d("mouseMode")
+        cur[["left"]] <- "trackball"
+        cur[["wheel"]] <- "push"
+        cur[["middle"]] <- "fov"
+        pan3d(2L)
+    }
+
+    library(rgl)
+    rgl::rgl.bg(color = background)
+
+    rgl::rgl.set(dev)
+    dev
+}
+# }}}
+
+# rgl_view {{{
+rgl_view <- function (dev, geoms, show = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
+                      type = "surface_type", zone = NULL, surface = NULL,
+                      wireframe = TRUE, x_ray = FALSE,
+                      axis = TRUE, ground = FALSE, show_hidden = FALSE) {
+    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
+    assert_flag(wireframe)
+    assert_flag(x_ray)
+    assert_flag(axis)
+    assert_flag(ground)
+    assert_flag(show_hidden)
+
+    # init id
+    id_axis <- integer()
+    id_ground <- integer()
+    id_point <- list(daylighting = integer())
+    id_line <- list(surface = integer(), subsurface = integer(), shading = integer())
+    id_surface <- list(
+        surface = list(detailed = integer(), simple = integer()),
+        subsurface = list(detailed = integer(), simple = integer()),
+        shading = list(detailed = integer(), simple = integer())
+    )
+
+    if (axis) id_axis <- rgl_view_axis(dev, geoms)
+    if (ground) id_ground <- rgl_view_ground(dev, geoms)
+
+    # plot wireframe before subsetting
+    if (wireframe && show_hidden) {
+        id_line$surface <- rgl_view_wireframe(dev, geoms$surface)
+        id_line$subsurface <- rgl_view_wireframe(dev, geoms$subsurface)
+        id_line$shading <- rgl_view_wireframe(dev, geoms$shading, width = 2)
+    }
+
+    geoms <- subset_geom(geoms, show, zone, surface)
+
+    if (wireframe && !show_hidden) {
+        # handle special cases
+        if (!any(geoms$surface$vertices$index < 0L)) {
+            id_line$surface <- rgl_view_wireframe(dev, geoms$surface)
+            id_line$subsurface <- rgl_view_wireframe(dev, geoms$subsurface)
+        } else {
+            id_line$surface <- rgl_view_wireframe(dev,
+                list(meta = geoms$surface$meta, vertices = geoms$surface$vertices[index > 0L])
+            )
+
+            v <- geoms$surface$vertices[index < 0L][, index := -index]
+            v[J(1L), on = "index", id := .I]
+            v[, id := id[[1L]], by = list(cumsum(index == 1L))]
+
+            id_line$subsurface <- rgl_view_wireframe(dev,
+                list(meta = geoms$subsurface$meta,
+                     vertices = rbindlist(list(geoms$subsurface$vertices, v))
+                )
+            )
+        }
+        id_line$shading <- rgl_view_wireframe(dev, geoms$shading, width = 2)
+    }
+
+    if ("daylighting" %chin% show) {
+        id_point$daylighting <- rgl_view_point(dev, geoms$daylighting_point)
+    }
+
+    id_surface <- rgl_view_surface(dev, geoms, type = type, x_ray = x_ray)
+
+    c(list(axis = id_axis, ground = id_ground, point = id_point, line = id_line), id_surface)
+}
+# }}}
+
+# rgl_view_surface {{{
+rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, lit = FALSE) {
+    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
+    assert_flag(x_ray)
+
+    rgl::rgl.set(dev)
+
+    geoms <- map_view_color(geoms, type = type, x_ray = x_ray)
+
+    id_surface_detailed <- integer()
+    id_surface_simple <- integer()
+    id_subsurface_detailed <- integer()
+    id_subsurface_simple <- integer()
+    id_shading_detailed <- integer()
+    id_shading_simple <- integer()
+
+    # handle special cases
+    if (!any(geoms$surface$vertices$index < 0L)) {
+        id_line_surface <- rgl_view_wireframe(dev, geoms$surface)
+        id_line_subsurface <- rgl_view_wireframe(dev, geoms$subsurface)
+    } else {
+        id_line_surface <- rgl_view_wireframe(dev,
+            list(meta = geoms$surface$meta, vertices = geoms$surface$vertices[index > 0L])
+        )
+
+        v <- geoms$surface$vertices[index < 0L][, index := -index]
+        v[J(1L), on = "index", id := .I]
+        v[, id := id[[1L]], by = list(cumsum(index == 1L))]
+
+        id_line_subsurface <- rgl_view_wireframe(dev,
+            list(meta = geoms$subsurface$meta,
+                 vertices = rbindlist(list(geoms$subsurface$vertices, v))
+            )
+        )
+    }
+    id_line_shading <- rgl_view_wireframe(dev, geoms$shading, width = 2)
+
+    # surface type {{{
+    if (type == "surface_type") {
+        if (nrow(geoms$surface$meta)) {
+            detailed <- add_surface_hole_vertices(geoms$surface, geoms$subsurface)
+            detailed <- triangulate_surfaces(detailed)
+
+            detailed[geoms$surface$meta, on = "id", `:=`(color_ext = i.color_ext, color_int = i.color_int, alpha = i.alpha)]
+            id_surface_detailed <- rgl_view_surface_twoside_tri(detailed, lit)
+        }
+
+        # simple subsurfaces are just rectangulars
+        if (nrow(geoms$subsurface$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$subsurface$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$subsurface$vertices[
+                    geoms$subsurface$meta[is_simple, list(id, color_ext, color_int, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_subsurface_simple <- rgl_view_surface_twoside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$subsurface$vertices[J(geoms$subsurface$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$subsurface$meta[!is_simple], on = "id",
+                    `:=`(color_ext = i.color_ext, color_int = i.color_int, alpha = i.alpha)]
+                id_subsurface_detailed <- rgl_view_surface_twoside_tri(detailed, lit)
+            }
+        }
+
+        # simple shading are just rectangulars
+        if (nrow(geoms$shading$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$shading$vertices[
+                    geoms$shading$meta[is_simple, list(id, color_ext, color_int, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_shading_simple <- rgl_view_surface_twoside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$shading$vertices[J(geoms$shading$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$shading$meta[!is_simple], on = "id",
+                    `:=`(color_ext = i.color_ext, color_int = i.color_int, alpha = i.alpha)]
+                id_shading_detailed <- rgl_view_surface_twoside_tri(detailed, lit)
+            }
+        }
+    # }}}
+    # boundary & construction {{{
+    } else if (type == "boundary" || type == "construction") {
+        if (nrow(geoms$surface$meta)) {
+            detailed <- add_surface_hole_vertices(geoms$surface, geoms$subsurface)
+            detailed <- triangulate_surfaces(detailed)
+
+            detailed[geoms$surface$meta, on = "id", `:=`(color = i.color, alpha = i.alpha)]
+            id_surface_detailed <- rgl_view_surface_oneside_tri(detailed, lit)
+        }
+
+        # simple subsurfaces are just rectangulars
+        if (nrow(geoms$subsurface$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$subsurface$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$subsurface$vertices[
+                    geoms$subsurface$meta[is_simple, list(id, color, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_subsurface_simple <- rgl_view_surface_oneside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$subsurface$vertices[J(geoms$subsurface$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$subsurface$meta[!is_simple], on = "id", `:=`(color = i.color, alpha = i.alpha)]
+                id_subsurface_detailed <- rgl_view_surface_oneside_tri(detailed, lit)
+            }
+        }
+
+        # simple shading are just rectangulars
+        if (nrow(geoms$shading$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$shading$vertices[
+                    geoms$shading$meta[is_simple, list(id, color, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_shading_simple <- rgl_view_surface_oneside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$shading$vertices[J(geoms$shading$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$shading$meta[!is_simple], on = "id",
+                    `:=`(color = i.color, alpha = i.alpha)]
+                id_shading_detailed <- rgl_view_surface_oneside_tri(detailed, lit)
+            }
+        }
+    # }}}
+    # zone {{{
+    # no need to plot subsurface
+    } else if (type == "zone") {
+        # simple surfaces are just rectangulars
+        if (nrow(geoms$surface$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$surface$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$surface$vertices[
+                    geoms$surface$meta[is_simple, list(id, color, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_surface_simple <- rgl_view_surface_oneside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$surface$vertices[J(geoms$surface$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$surface$meta[!is_simple], on = "id", `:=`(color = i.color, alpha = i.alpha)]
+                id_surface_detailed <- rgl_view_surface_oneside_tri(detailed, lit)
+            }
+        }
+
+        # simple shading are just rectangulars
+        if (nrow(geoms$shading$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$shading$vertices[
+                    geoms$shading$meta[is_simple, list(id, color, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_shading_simple <- rgl_view_surface_oneside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$shading$vertices[J(geoms$shading$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$shading$meta[!is_simple], on = "id", `:=`(color = i.color, alpha = i.alpha)]
+                id_shading_detailed <- rgl_view_surface_oneside_tri(detailed, lit)
+            }
+        }
+    # }}}
+    # normal {{{
+    } else if (type == "normal") {
+        # simple surfaces are just rectangulars
+        if (nrow(geoms$surface$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$surface$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$surface$vertices[
+                    geoms$surface$meta[is_simple, list(id, color_ext, color_int, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_surface_simple <- rgl_view_surface_twoside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$surface$vertices[J(geoms$surface$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$surface$meta[!is_simple], on = "id",
+                    `:=`(color_ext = i.color_ext, color_int = i.color_int, alpha = i.alpha)]
+                id_surface_detailed <- rgl_view_surface_twoside_tri(detailed, lit)
+            }
+        }
+
+        # simple shading are just rectangulars
+        if (nrow(geoms$shading$meta)) {
+            is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed")
+            if (any(is_simple)) {
+                simple <- geoms$shading$vertices[
+                    geoms$shading$meta[is_simple, list(id, color_ext, color_int, alpha)],
+                    on = "id", nomatch = NULL
+                ]
+                id_shading_simple <- rgl_view_surface_twoside_quad(simple, lit)
+            }
+
+            if (any(!is_simple)) {
+                # triangulate
+                detailed <- triangulate_surfaces(geoms$shading$vertices[J(geoms$shading$meta$id[!is_simple]), on = "id"])
+                detailed[geoms$shading$meta[!is_simple], on = "id",
+                    `:=`(color_ext = i.color_ext, color_int = i.color_int, alpha = i.alpha)]
+                id_shading_detailed <- rgl_view_surface_twoside_tri(detailed, lit)
+            }
+        }
+    }
+    # }}}
+
+    list(surface = list(line = id_line_surface, detailed = id_surface_detailed, simple = id_surface_simple),
+         subsurface = list(line = id_line_subsurface, detailed = id_subsurface_detailed, simple = id_subsurface_simple),
+         shading = list(line = id_line_shading, detailed = id_shading_detailed, simple = id_shading_simple)
+    )
+}
+# }}}
+
+# rgl_view_surface_twoside_tri {{{
+rgl_view_surface_twoside_tri <- function (vertices, lit = FALSE) {
+    ext <- rgl::rgl.triangles(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color_ext", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        front = "filled", back = "culled", lit = lit
+    )
+    int <- rgl::rgl.triangles(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color_int", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        front = "culled", back = "filled", lit = lit
+    )
+    c(ext, int)
+}
+# }}}
+
+# rgl_view_surface_twoside_quad {{{
+rgl_view_surface_twoside_quad <- function (vertices, lit = FALSE) {
+    ext <- rgl::rgl.quads(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color_ext", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        front = "filled", back = "culled", lit = lit
+    )
+    int <- rgl::rgl.quads(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color_int", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        front = "culled", back = "filled", lit = lit
+    )
+    c(ext, int)
+}
+# }}}
+
+# rgl_view_surface_oneside_tri {{{
+rgl_view_surface_oneside_tri <- function (vertices, lit = FALSE) {
+    rgl::rgl.triangles(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        lit = lit
+    )
+}
+# }}}
+
+# rgl_view_surface_oneside_quad {{{
+rgl_view_surface_oneside_quad <- function (vertices, lit = FALSE) {
+    rgl::rgl.quads(
+        x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
+        color = as.matrix(fast_subset(vertices, rep("color", 3L))),
+        alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
+        lit = lit
+    )
+}
+# }}}
+
+# rgl_view_wireframe {{{
+rgl_view_wireframe <- function (dev, geom, color = "black", width = 1.5, alpha = 1.0, ...) {
+    if (!nrow(geom$vertices)) return(integer())
+
+    rgl::rgl.set(dev)
+    l <- pair_line_vertex(geom$vertices)
+    rgl::rgl.lines(l$x, l$y, l$z, color = color, lwd = width, lit = FALSE, alpha = alpha, ...)
+}
+# }}}
+
+# rgl_view_point {{{
+rgl_view_point <- function (dev, geom, color = "red", size = 8.0, lit = TRUE, ...) {
+    if (!nrow(geom$vertices)) return(integer())
+
+    rgl::rgl.set(dev)
+    rgl::rgl.points(geom$vertices$x, geom$vertices$y, geom$vertices$z,
+        color = color, size = size, lit = lit, ...)
+}
+# }}}
+
+# rgl_view_axis {{{
+rgl_view_axis <- function (dev, geoms, expand = 1.02, width = 1.5, color = c("red", "green", "blue"), alpha = 1.0) {
+    assert_number(expand, finite = TRUE, lower = 1.0)
+    assert_number(width, finite = TRUE, lower = 1E-5)
+    assert_character(color, len = 3, any.missing = FALSE)
+    assert_number(alpha, lower = 0, upper = 1)
+
+    types <- c("surface", "subsurface", "shading", "daylighting_point")
+
+    x <- y <- z <- 0.0
+    for (nm in types) {
+        if (nrow(geoms[[nm]]$vertices)) {
+            x <- max(c(geoms[[nm]]$vertices$x, x))
+            y <- max(c(geoms[[nm]]$vertices$y, y))
+            z <- max(c(geoms[[nm]]$vertices$z, z))
+        }
+    }
+
+    if (x == y && y == z && x == 0.0) return(integer())
+
+    vert <- data.table(
+        id = 1L, index = 1:6,
+        x = c(0.0, x, rep(0.0, 4L)),
+        y = c(rep(0.0, 2L), 0.0, y, rep(0.0, 2L)),
+        z = c(rep(0.0, 4L), 0.0, z)
+    )
+
+    rgl_view_wireframe(dev, list(vertices = vert), width = width, alpha = alpha,
+        color = rep(c(color[[1L]], color[[3L]], color[[2L]]), each = 2L))
+}
+# }}}
+
+# rgl_view_ground {{{
+rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha = 1.0) {
+    assert_number(expand, finite = TRUE, lower = 1.0)
+    assert_number(alpha, lower = 0.0, upper = 1.0)
+    assert_string(color)
+
+    types <- c("surface", "subsurface", "shading", "daylighting_point")
+
+    x <- y <- c(0.0, 0.0)
+    for (nm in types) {
+        if (nrow(geoms[[nm]]$vertices)) {
+            x <- range(c(geoms[[nm]]$vertices$x, x))
+            y <- range(c(geoms[[nm]]$vertices$y, y))
+        }
+    }
+
+    if (x == y && x == 0.0) return(integer())
+
+    dis_x <- x[2L] - x[1L]
+    dis_y <- y[2L] - y[1L]
+    expand <- expand - 1.0
+    rgl::rgl.quads(
+        c(x[[1L]] - dis_x * expand,
+          x[[2L]] + dis_x * expand,
+          x[[2L]] + dis_x * expand,
+          x[[1L]] - dis_x * expand),
+        c(y[[1L]] - dis_y * expand,
+          y[[1L]] - dis_y * expand,
+          y[[2L]] + dis_y * expand,
+          y[[2L]] + dis_y * expand),
+        0,
+        color = color, lit = FALSE, alpha = alpha
+    )
+}
+# }}}
+
+# pair_line_vertex {{{
+pair_line_vertex <- function (vertices) {
+    # for lines, vertices should be provided in pairs
+    # only need to plot surfaces here, since windows and holes are the same
+    # things here
+    vertices[, by = "id", {
+        idx <- c(sort(c(index, index[-1L])), 1L)
+        list(x = x[idx], y = y[idx], z = z[idx])
+    }]
+}
+# }}}
+
+# add_surface_hole_vertices {{{
+add_surface_hole_vertices <- function (geom_surface, geom_subsurface) {
+    if (!nrow(geom_subsurface$meta)) return(geom_surface$vertices)
+
+    geom_subsurface$meta[geom_surface$meta, on = c("building_surface_name" = "name"), `:=`(id_surface = i.id)]
+    on.exit(set(geom_subsurface$meta, NULL, "id_surface", NULL), add = TRUE)
+
+    holes <- geom_subsurface$vertices[fast_subset(geom_subsurface$meta, c("id", "id_surface")), on = "id", nomatch = NULL]
+
+    if (!nrow(holes)) return(geom_surface$vertices)
+
+    set(holes, NULL, c("id", "id_surface", "index"), list(holes$id_surface, NULL, -holes$index))
+    # add windows as holes
+    setorderv(rbindlist(list(geom_surface$vertices, holes)), "id")
+}
+# }}}
+
+# triangulate_surfaces {{{
+triangulate_surfaces <- function (vertices) {
+    trans <- align_face(vertices)
+    vertices[trans, on = "id", by = .EACHI,
+        {
+            hole <- which(index == -1L)
+            if (!length(hole)) hole <- 0L
+            i.trans[[1L]]
+            align_inv <- solve(i.trans[[1L]])
+            align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) align_inv %*% x)[1:3,]
+
+            tri <- decido::earcut(list(align_vert[1L,], align_vert[2L,]), hole)
+
+            rbind(align_vert[,tri], rep(1.0, length(tri)))
+
+            vert <- apply(
+                t(rbind(align_vert[,tri], rep(1.0, length(tri)))),
+                1, function (x) i.trans[[1L]] %*% x)
+
+            list(index = seq_along(tri), x = vert[1L,], y = vert[2L,], z = vert[3L,])
+        }
+    ]
+}
+# }}}
+
+# pan3d {{{
+# adapted from rgl examples
+pan3d <- function(button, dev = rgl::rgl.cur(), subscene = rgl::currentSubscene3d(dev)) {
+    start <- list()
+
+    begin <- function(x, y) {
+        activeSubscene <- rgl::par3d("activeSubscene", dev = dev)
+        start$listeners <<- rgl::par3d("listeners", dev = dev, subscene = activeSubscene)
+        for (sub in start$listeners) {
+            init <- rgl::par3d(c("userProjection", "viewport"), dev = dev, subscene = sub)
+            init$pos <- c(x/init$viewport[3], 1 - y/init$viewport[4], 0.5)
+            start[[as.character(sub)]] <<- init
+        }
+    }
+
+    update <- function(x, y) {
+        for (sub in start$listeners) {
+            init <- start[[as.character(sub)]]
+            xlat <- 2*(c(x/init$viewport[3], 1 - y/init$viewport[4], 0.5) - init$pos)
+            mouseMatrix <- rgl::translationMatrix(xlat[1], xlat[2], xlat[3])
+            rgl::par3d(userProjection = mouseMatrix %*% init$userProjection, dev = dev, subscene = sub)
+        }
+    }
+    rgl::rgl.setMouseCallbacks(button, begin, update, dev = dev, subscene = subscene)
+}
+# }}}
+
+# rgl_pop {{{
+rgl_pop <- function (id, type = "shapes") {
+    try(rgl::rgl.pop(id = id, type = "shapes"), silent = TRUE)
+}
+# }}}
+
+# map_view_color {{{
+map_view_color <- function (geoms, type = "surface_type", x_ray = FALSE) {
+    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
+    alpha <- if (x_ray) 0.4 else 1.0
+
+    set.seed(1L)
+
+    if (type == "normal") {
+        # add surface
+        if (nrow(geoms$surface$meta)) {
+            set(geoms$surface$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["NormalMaterial_Ext"],
+                     COLOR_MAP$surface_type["NormalMaterial_Int"],
+                     alpha
+                )
+            )
+        }
+        if (nrow(geoms$subsurface$meta)) {
+            set(geoms$subsurface$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["NormalMaterial_Ext"],
+                     COLOR_MAP$surface_type["NormalMaterial_Int"],
+                     alpha
+                )
+            )
+        }
+        if (nrow(geoms$shading$meta)) {
+            set(geoms$shading$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["NormalMaterial_Ext"],
+                     COLOR_MAP$surface_type["NormalMaterial_Int"],
+                     alpha
+                )
+            )
+        }
+    } else if (type == "surface_type") {
+        map <- data.table(
+            surface_type = names(COLOR_MAP$surface_type),
+            color = COLOR_MAP$surface_type
+        )[!J("Undefined"), on = "surface_type"]
+        map <- map[
+          !(seq_len(nrow(map)) %% 3L == 1L)][
+          , `:=`(surface_type = gsub("_.+", "", surface_type),
+                 type = rep(c("ext", "int"), .N/2)
+          )
+        ]
+        map <- dcast.data.table(map, surface_type ~ type, value.var = "color")
+
+        # add surface
+        if (nrow(geoms$surface$meta)) {
+            set(geoms$surface$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"],
+                     COLOR_MAP$surface_type["Undefined"],
+                     alpha
+                )
+            )
+            geoms$surface$meta[map, on = "surface_type", `:=`(color_ext = i.ext, color_int = i.int)]
+        }
+        if (nrow(geoms$subsurface$meta)) {
+            set(geoms$subsurface$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"],
+                     COLOR_MAP$surface_type["Undefined"],
+                     alpha
+                )
+            )
+            geoms$subsurface$meta[map, on = "surface_type", `:=`(color_ext = i.ext, color_int = i.int)]
+            geoms$subsurface$meta[J(c("Window", "GlassDoor")), on = "surface_type", `:=`(alpha = 0.6)]
+        }
+        if (nrow(geoms$shading$meta)) {
+            set(geoms$shading$meta, NULL, c("color_ext", "color_int", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"],
+                     COLOR_MAP$surface_type["Undefined"],
+                     alpha
+                )
+            )
+            geoms$shading$meta[map, on = "surface_type", `:=`(color_ext = i.ext, color_int = i.int)]
+        }
+    } else if (type == "boundary") {
+        map <- data.table(
+            boundary = names(COLOR_MAP$boundary),
+            color = COLOR_MAP$boundary
+        )
+
+        # add surface
+        if (nrow(geoms$surface$meta)) {
+            set(geoms$surface$meta, NULL, c("color", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"], alpha)
+            )
+            geoms$surface$meta[map, on = c("outside_boundary_condition" = "boundary"), `:=`(color = i.color)]
+            geoms$surface$meta[J("Outdoors", "SunExposed", "NoWind"),
+                on = c("outside_boundary_condition", "sun_exposure", "wind_exposure"),
+                `:=`(color = COLOR_MAP$boundary["Outdoors_Sun"])]
+            geoms$surface$meta[J("Outdoors", "NoSun", "WindExposed"),
+                on = c("outside_boundary_condition", "sun_exposure", "wind_exposure"),
+                `:=`(color = COLOR_MAP$boundary["Outdoors_Wind"])]
+            geoms$surface$meta[J("Outdoors", "SunExposed", "WindExposed"),
+                on = c("outside_boundary_condition", "sun_exposure", "wind_exposure"),
+                `:=`(color = COLOR_MAP$boundary["Outdoors_Sunwind"])]
+        }
+        if (nrow(geoms$subsurface$meta)) {
+            set(geoms$subsurface$meta, NULL, c("color", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"], alpha)
+            )
+        }
+        if (nrow(geoms$shading$meta)) {
+            set(geoms$shading$meta, NULL, c("color", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"], alpha)
+            )
+        }
+    } else if (type == "construction") {
+        const <- unique(c(
+            geoms$surface$meta$construction_name,
+            geoms$subsurface$meta$construction_name
+        ))
+        map <- data.table(
+            construction_name = const,
+            color = sample(COLOR_MAP$color, length(const), replace = TRUE)
+        )
+
+        # add surface
+        if (nrow(geoms$surface$meta)) {
+            set(geoms$surface$meta, NULL, "alpha", list(alpha))
+            geoms$surface$meta[map, on = "construction_name", `:=`(color = i.color)]
+        }
+        if (nrow(geoms$subsurface$meta)) {
+            set(geoms$subsurface$meta, NULL, "alpha", list(alpha))
+            geoms$subsurface$meta[map, on = "construction_name", `:=`(color = i.color)]
+        }
+        if (nrow(geoms$shading$meta)) {
+            set(geoms$shading$meta, NULL, c("color", "alpha"),
+                list(COLOR_MAP$surface_type["Undefined"], alpha)
+            )
+        }
+    } else if (type == "zone") {
+        set(geoms$zone, NULL, c("color", "alpha"), list(sample(COLOR_MAP$color, nrow(geoms$zone), replace = TRUE), alpha))
+        # add surface
+        if (nrow(geoms$surface$meta)) {
+            set(geoms$surface$meta, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+            geoms$surface$meta[geoms$zone, on = c("zone_name" = "name"), `:=`(color = i.color, alpha = i.alpha)]
+
+            if (nrow(geoms$subsurface$meta)) {
+                set(geoms$subsurface$meta, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+                geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"),
+                    `:=`(color = i.color, alpha = i.alpha)]
+            }
+            if (nrow(geoms$shading$meta)) {
+                set(geoms$shading$meta, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+                geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"),
+                    `:=`(color = i.color, alpha = i.alpha)]
+            }
+        }
+    }
+
+    geoms
+}
+# }}}
+
+# COLOR_MAP {{{
+# Reference: 'openstudio\openstudiocore\ruby\openstudio\sketchup_plugin\lib\interfaces\MaterialsInterface.rb'
+COLOR_MAP <- list(
+    surface_type = c(
+        Undefined = "#FFFFFFFF",
+        NormalMaterial = "#FFFFFFFF",
+        NormalMaterial_Ext = "#FFFFFFFF",
+        NormalMaterial_Int = "#FF0000FF",
+        Floor = "#808080FF",
+        Floor_Ext = "#808080FF",
+        Floor_Int = "#BFBFBFFF",
+        Wall = "#CCB266FF",
+        Wall_Ext = "#CCB266FF",
+        Wall_Int = "#EBE2C5FF",
+        Roof = "#994C4CFF",
+        Roof_Ext = "#994C4CFF",
+        Roof_Int = "#CA9595FF",
+        Ceiling = "#994C4CFF",
+        Ceiling_Ext = "#994C4CFF",
+        Ceiling_Int = "#CA9595FF",
+        Window = "#66B2CC99",
+        Window_Ext = "#66B2CC99",
+        Window_Int = "#C0E2EB99",
+        Door = "#99854CFF",
+        Door_Ext = "#99854CFF",
+        Door_Int = "#CABC95FF",
+        Glassdoor = "#99854CFF",
+        Glassdoor_Ext = "#99854CFF",
+        Glassdoor_Int = "#CABC95FF",
+        SiteShading = "#4B7C95FF",
+        SiteShading_Ext = "#4B7C95FF",
+        SiteShading_Int = "#BBD1DCFF",
+        BuildingShading = "#714C99FF",
+        BuildingShading_Ext = "#714C99FF",
+        BuildingShading_Int = "#D8CBE5FF",
+        ZoneShading = "#4C6EB2FF",
+        ZoneShading_Ext = "#4C6EB2FF",
+        ZoneShading_Int = "#B7C5E0FF",
+        InteriorPartitionSurface = "#9EBC8FFF",
+        InteriorPartitionSurface_Ext = "#9EBC8FFF",
+        InteriorPartitionSurface_Int = "#D5E2CFFF"
+    ),
+    boundary = c(
+        Adiabatic = "#FF65B2",
+        Surface = "#009900",
+        Zone = "#FF0000",
+        Outdoors = "#A3CCCC",
+        Outdoors_Sun = "#28CCCC",
+        Outdoors_Wind = "#099FA2",
+        Outdoors_Sunwind = "#4477A1",
+        Foundation = "#A600AF",
+        Ground = "#CCB77A",
+        GroundFCfactorMethod = "#997A1E",
+        OtherSideCoefficients = "#3F3F3F",
+        OtherSideConditionsModel = "#99004C",
+        GroundSlabPreprocessorAverage = "#FFBF00",
+        GroundSlabPreprocessorCore = "#FFB632",
+        GroundSlabPreprocessorPerimeter = "#FFB265",
+        GroundBasementPreprocessorAverageWall = "#CC3300",
+        GroundBasementPreprocessorAverageFloor = "#CC5128",
+        GroundBasementPreprocessorUpperWall = "#CC7051",
+        GroundBasementPreprocessorLowerWall = "#CCADA3"
+    ),
+    color = c(
+        AliceBlue = "#F0F8FF",
+        AntiqueWhite = "#FAEBD7",
+        Aqua = "#00FFFF",
+        Aquamarine = "#7FFFD4",
+        Azure = "#F0FFFF",
+        Beige = "#F5F5DC",
+        Bisque = "#FFE4C4",
+        Black = "#000000",
+        BlanchedAlmond = "#FFEBCD",
+        Blue = "#0000FF",
+        BlueViolet = "#8A2BE2",
+        Brown = "#A52A2A",
+        BurlyWood = "#DEB887",
+        CadetBlue = "#5F9EA0",
+        Chartreuse = "#7FFF00",
+        Chocolate = "#D2691E",
+        Coral = "#FF7F50",
+        CornflowerBlue = "#6495ED",
+        Cornsilk = "#FFF8DC",
+        Crimson = "#DC143C",
+        Cyan = "#00FFFF",
+        DarkBlue = "#00008B",
+        DarkCyan = "#008B8B",
+        DarkGoldenrod = "#B8860B",
+        DarkGray = "#A9A9A9",
+        DarkGreen = "#006400",
+        DarkKhaki = "#BDB76B",
+        DarkMagenta = "#8B008B",
+        DarkOliveGreen = "#556B2F",
+        DarkOrange = "#FF8C00",
+        DarkOrchid = "#9932CC",
+        DarkRed = "#8B0000",
+        DarkSalmon = "#E9967A",
+        DarkSeaGreen = "#8FBC8F",
+        DarkSlateBlue = "#483D8B",
+        DarkSlateGray = "#2F4F4F",
+        DarkTurquoise = "#00CED1",
+        DarkViolet = "#9400D3",
+        DeepPink = "#FF1493",
+        DeepSkyBlue = "#00BFFF",
+        DimGray = "#696969",
+        DodgerBlue = "#1E90FF",
+        FireBrick = "#B22222",
+        FloralWhite = "#FFFAF0",
+        ForestGreen = "#228B22",
+        Fuchsia = "#FF00FF",
+        Gainsboro = "#DCDCDC",
+        GhostWhite = "#F8F8FF",
+        Gold = "#FFD700",
+        Goldenrod = "#DAA520",
+        Gray = "#808080",
+        Green = "#008000",
+        GreenYellow = "#ADFF2F",
+        Honeydew = "#F0FFF0",
+        HotPink = "#FF69B4",
+        IndianRed = "#CD5C5C",
+        Indigo = "#4B0082",
+        Ivory = "#FFFFF0",
+        Khaki = "#F0E68C",
+        Lavender = "#E6E6FA",
+        LavenderBlush = "#FFF0F5",
+        LawnGreen = "#7CFC00",
+        LemonChiffon = "#FFFACD",
+        LightBlue = "#ADD8E6",
+        LightCoral = "#F08080",
+        LightCyan = "#E0FFFF",
+        LightGoldenrodYellow = "#FAFAD2",
+        LightGreen = "#90EE90",
+        LightGrey = "#D3D3D3",
+        LightPink = "#FFB6C1",
+        LightSalmon = "#FFA07A",
+        LightSeaGreen = "#20B2AA",
+        LightSkyBlue = "#87CEFA",
+        LightSlateGray = "#778899",
+        LightSteelBlue = "#B0C4DE",
+        LightYellow = "#FFFFE0",
+        Lime = "#00FF00",
+        LimeGreen = "#32CD32",
+        Linen = "#FAF0E6",
+        Magenta = "#FF00FF",
+        Maroon = "#800000",
+        MediumAquamarine = "#66CDAA",
+        MediumBlue = "#0000CD",
+        MediumOrchid = "#BA55D3",
+        MediumPurple = "#9370DB",
+        MediumSeaGreen = "#3CB371",
+        MediumSlateBlue = "#7B68EE",
+        MediumSpringGreen = "#00FA9A",
+        MediumTurquoise = "#48D1CC",
+        MediumVioletRed = "#C71585",
+        MidnightBlue = "#191970",
+        MintCream = "#F5FFFA",
+        MistyRose = "#FFE4E1",
+        Moccasin = "#FFE4B5",
+        NavajoWhite = "#FFDEAD",
+        Navy = "#000080",
+        OldLace = "#FDF5E6",
+        Olive = "#808000",
+        OliveDrab = "#808000",
+        Orange = "#FFA500",
+        OrangeRed = "#FF4500",
+        Orchid = "#DA70D6",
+        PaleGoldenrod = "#EEE8AA",
+        PaleGreen = "#98FB98",
+        PaleTurquoise = "#AFEEEE",
+        PaleVioletRed = "#DB7093",
+        PapayaWhip = "#FFEFD5",
+        PeachPuff = "#FFDAB9",
+        Peru = "#CD853F",
+        Pink = "#FFC0CB",
+        Plum = "#DDA0DD",
+        PowderBlue = "#B0E0E6",
+        Purple = "#800080",
+        Red = "#FF0000",
+        RosyBrown = "#BC8F8F",
+        RoyalBlue = "#4169E1",
+        SaddleBrown = "#8B4513",
+        Salmon = "#FA8072",
+        SandyBrown = "#F4A460",
+        SeaGreen = "#2E8B57",
+        Seashell = "#FFF5EE",
+        Sienna = "#A0522D",
+        Silver = "#C0C0C0",
+        SkyBlue = "#87CEEB",
+        SlateBlue = "#6A5ACD",
+        SlateGray = "#708090",
+        Snow = "#FFFAFA",
+        SpringGreen = "#00FF7F",
+        SteelBlue = "#4682B4",
+        Tan = "#D2B48C",
+        Teal = "#D2B48C",
+        Thistle = "#D8BFD8",
+        Tomato = "#FF6347",
+        Turquoise = "#40E0D0",
+        Violet = "#EE82EE",
+        Wheat = "#F5DEB3",
+        WhiteSmoke = "#F5F5F5",
+        Yellow = "#FFFF00",
+        YellowGreen = "#9ACD32"
+    )
+)
+# }}}

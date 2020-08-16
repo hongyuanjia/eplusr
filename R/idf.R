@@ -2467,6 +2467,25 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             idf_last_job(self, private),
         # }}}
 
+        # geometry {{{
+        #' @description
+        #' Extract `Idf` geometries
+        #'
+        #' @details
+        #'
+        #' @param object Default: `NULL`.
+        #'
+        #' @return An [IdfGeometry] object.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' idf$geometry()
+        #' }
+        #'
+        geometry = function (object = NULL)
+            idf_geom(self, private, object),
+        # }}}
+
         # view {{{
         #' @description
         #' View 3D `Idf` geometry
@@ -2476,30 +2495,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' package to visualize the IDF geometry in 3D in a similar way as
         #' [OpenStudio](https://www.openstudio.net).
         #'
-        #' Current only detailed geometry classes are supported, including:
-        #'
-        #' * Surfaces:
-        #'     * `BuildingSurface:Detailed`
-        #'     * `Wall:Detailed`
-        #'     * `RoofCeiling:Detailed`
-        #'     * `Floor:Detailed`
-        #' * Sub-surfaces:
-        #'     * `FenestrationSurface:Detailed`
-        #' * Shadings:
-        #'     * `Shading:Site:Detailed`
-        #'     * `Shading:Building:Detailed`
-        #'     * `Shading:Zone:Detailed`
-        #'
         #' In the rgl window, you can control the view using your mouse:
         #'
         #' * Left button: Trackball
         #' * Right button: Pan
-        #' * Middle button: Field-of-view (FOV)
+        #' * Middle button: Field-of-view (FOV). '0' means orthographic
+        #'   projection.
         #' * Wheel: Zoom
-        #'
-        #' @note
-        #' When rendering by surface types, the exterior and interior face
-        #' detection may be not 100% right.
         #'
         #' @param new If `TRUE`, a new rgl window will be open using
         #'        [rgl::rgl.open()]. If `FALSE`, existing rgl window will be
@@ -3340,6 +3342,11 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 # idf_last_job {{{
 idf_last_job <- function (self, private) {
     private$m_log$job
+}
+# }}}
+# idf_geom {{{
+idf_geom <- function (self, private, object = NULL) {
+    idf_geometry(self, object)
 }
 # }}}
 # idf_view {{{

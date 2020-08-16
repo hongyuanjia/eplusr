@@ -835,21 +835,17 @@ init_idf_value <- function (idd_env, idf_env, class, field = NULL, property = NU
 #'        field, and reference.
 #' @param idf_env An environment or list contains IDF tables including object,
 #'        value, and reference.
-#' @param class An integer vector of valid class indexes or a character vector
-#'        of valid class names. Default: `NULL`.
-#' @param object An integer vector of valid object IDs or a character vector
-#'        of valid object names. Default: `NULL`.
-#' @param field An integer vector of valid field indexes or a character
-#'        vector of valid field names (can be in in underscore style). `class`
-#'        and `field` should have the same length.
+#' @param dt_value An data.table of object field values.
 #' @param type A character vector to specify what type of values to be
 #'        standardized. Should be a subset of `c("choice", "reference")`.
 #'        Default: `c("choice", "reference")`.
+#' @param keep If `TRUE`, the original value will be kept even if it is invalid.
+#'        If `FALSE`, invalid values will be converted into NAs. Default: `TRUE`.
 #'
 #' @return A data.table
 #' @keywords internal
 #' @export
-standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice", "reference")) {
+standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice", "reference"), keep = TRUE) {
     type <- assert_subset(type, c("choice", "reference"), empty.ok = FALSE)
 
     prop <- "type_enum"
@@ -865,6 +861,7 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
         dt_value[i, value_chr := {
             i <- apply2_int(stri_trans_tolower(value_chr), lapply(choice, stri_trans_tolower), chmatch)
             value_chr[!is.na(i)] <- apply2_chr(choice[!is.na(i)], i[!is.na(i)], .subset2)
+            if (!keep) value_chr[is.na(i)] <- NA_character_
             value_chr
         }]
     }
@@ -873,7 +870,12 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
         ref <- idf_env$reference[J(dt_value$value_id[i]), on = "value_id", nomatch = NULL]
         ref[idf_env$value, on = c("src_value_id" = "value_id"),
             `:=`(src_value_chr = i.value_chr, src_value_num = i.value_num)]
-        dt_value[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
+        if (keep) {
+            dt_value[ref[!J(NA_character_), on = "value_chr"], on = "value_id",
+                `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
+        } else {
+            dt_value[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
+        }
     }
 
     if (!is.null(prop)) set(dt_value, NULL, prop, NULL)
@@ -2825,7 +2827,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
 #'
 #' @keywords internal
 #' @export
-set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE, level = eplusr_option("validate_level")) {
+set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE, level = eplusr_option("validate_level"), replace = FALSE) {
     chk <- level_checks(level)
     # stop if try to modify version
     if (any(invld <- dt_object$class_name == "Version")) {
@@ -2904,9 +2906,17 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     idf_env$value[ref[!J(NA_character_), on = "value_chr"], on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
 
     if (length(id_del)) {
-        value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")
+        if (replace) {
+            value <- append_dt(idf_env$value[!J(id_del), on = "object_id"], dt_value, "object_id")
+        } else {
+            value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")
+        }
     } else {
-        value <- append_dt(idf_env$value, dt_value, "value_id")
+        if (replace) {
+            value <- append_dt(idf_env$value, dt_value, "object_id")
+        } else {
+            value <- append_dt(idf_env$value, dt_value, "value_id")
+        }
     }
 
     order_idf_data(list(

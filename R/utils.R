@@ -430,3 +430,14 @@ match_in_vec <- function (x, vec, abbr = NULL, label = FALSE) {
     }
 }
 # }}}
+
+# copy_list {{{
+copy_list <- function(x) {
+    if (data.table::is.data.table(x)) {
+        copy(x)
+    } else if (is.list(x)) {
+        x[] <- lapply(x, copy_list)
+    }
+    x
+}
+# }}}

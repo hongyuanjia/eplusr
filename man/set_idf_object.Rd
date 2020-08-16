@@ -10,7 +10,8 @@ set_idf_object(
   dt_object,
   dt_value,
   empty = FALSE,
-  level = eplusr_option("validate_level")
+  level = eplusr_option("validate_level"),
+  replace = FALSE
 )
 }
 \arguments{
