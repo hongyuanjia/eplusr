@@ -556,5 +556,13 @@ test_that("parse_idf_file()", {
     file.create(ddy)
     expect_silent(idf_parsed <- parse_idf_file(ddy, 8.8))
     unlink(ddy)
+
+    # can handle trailing spaces after class names
+    idf_str <- "
+        Version , 8.8 ;
+        SurfaceConvectionAlgorithm:Inside   ,
+            Simple  ; !- Algorithm
+    "
+    expect_is(idf_parsed <- parse_idf_file(idf_str, 8.8), "list")
 })
 # }}}

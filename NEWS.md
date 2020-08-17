@@ -166,6 +166,7 @@
   bug report (#263).
 * Fix output directory creation error in `EplusGroupJob`(#270).
 * Fix IDF header option parsing (#278).
+* Trailing spaces after class names in IDF can be handled correctly (#294).
 
 # eplusr 0.12.0
 
