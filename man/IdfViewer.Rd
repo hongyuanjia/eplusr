@@ -36,13 +36,17 @@ geom <- IdfGeometry$new(path_idf)
 ## Method `IdfViewer$parent`
 ## ------------------------------------------------
 
+\dontrun{
 geom$parent()
+}
 
 ## ------------------------------------------------
 ## Method `IdfViewer$geometry`
 ## ------------------------------------------------
 
+\dontrun{
 viewer$geometry()
+}
 
 ## ------------------------------------------------
 ## Method `IdfViewer$device`
@@ -247,7 +251,9 @@ An \link{Idf} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{geom$parent()
+\preformatted{\dontrun{
+geom$parent()
+}
 }
 \if{html}{\out{</div>}}
 
@@ -272,7 +278,9 @@ An \link{IdfGeometry} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{viewer$geometry()
+\preformatted{\dontrun{
+viewer$geometry()
+}
 }
 \if{html}{\out{</div>}}
 

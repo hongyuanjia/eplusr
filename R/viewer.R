@@ -82,7 +82,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
             private$log_geom_uuid()
 
             # log data
-            private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$m_geoms)
+            private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
         },
         # }}}
 
@@ -497,7 +497,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
 
         geoms = function () {
             if (private$geom_uuid() != private$cached_geom_uuid()) {
-                private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$m_geoms)
+                private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
             }
 
             private$m_log$geoms <- align_coord_system(

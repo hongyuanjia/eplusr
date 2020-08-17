@@ -3395,7 +3395,7 @@ idf_print <- function (self, private, zoom = c("object", "class", "group", "fiel
     if (is.null(private$m_path)) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_path)
 
     cli::cat_line(" * ", c(
-        str_trunc(paste0("Path: ", path), width = getOption("width") - 3L),
+        str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
         paste0("Version: ", surround(private$m_version))
     ))
 

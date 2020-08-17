@@ -18,7 +18,8 @@ get_geom_class <- function (idf, object = NULL) {
     if (is.null(object)) return(cls)
 
     obj <- get_idf_object(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        object = object, ignore_case = TRUE)[, list(class = class_name, object = object_id)]
+        object = object, ignore_case = TRUE)[, list(class = class_name,
+            id = object_id, name = object_name)]
 
     cls[obj, on = "class", nomatch = NULL]
 }
@@ -83,7 +84,7 @@ get_building_transformation <- function (idf) {
     if (!idf$is_valid_class("Building")) {
         warn("Could not find 'Building' object, assuming 0 rotation", "geom_no_building")
 
-        list(id = NA_integer_, building = NA_character_, north = 0.0)
+        list(id = NA_integer_, name = NA_character_, north = 0.0)
     } else {
         bldg <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
             "Building", field = 2L, complete = TRUE)
@@ -96,7 +97,7 @@ get_building_transformation <- function (idf) {
             north_axis <- 0.0
         }
 
-        list(id = id, building = name, north_axis = north_axis)
+        list(id = id, name = name, north_axis = north_axis)
     }
 }
 # }}}
@@ -202,7 +203,7 @@ extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, complete = TRUE,
+        class = geom_class$class, object = geom_class$id, complete = TRUE,
         property = "extensible_group"
     )[field_name %chin% fld | extensible_group > 0L]
 
@@ -240,7 +241,7 @@ extract_geom_surface_simple <- function (idf, geom_class = NULL, object = NULL) 
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, all = TRUE)
+        class = geom_class$class, object = geom_class$id, all = TRUE)
 
     dt <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), dt, keep = FALSE)
 
@@ -337,7 +338,7 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, all = TRUE
+        class = geom_class$class, object = geom_class$id, all = TRUE
     )
 
     # meta
@@ -372,7 +373,7 @@ extract_geom_subsurface_simple <- function (idf, geom_class = NULL, object = NUL
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, all = TRUE)
+        class = geom_class$class, object = geom_class$id, all = TRUE)
 
     dt <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), dt, keep = FALSE)
 
@@ -478,7 +479,7 @@ extract_geom_shading_detailed <- function (idf, geom_class = NULL, object = NULL
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object,
+        class = geom_class$class, object = geom_class$id,
         complete = TRUE, property = "extensible_group"
     )[field_name %chin% c("Name", "Base Surface Name") | extensible_group > 0L]
 
@@ -516,7 +517,7 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, all = TRUE)
+        class = geom_class$class, object = geom_class$id, all = TRUE)
 
     dt <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), dt, keep = FALSE)
 
@@ -774,7 +775,7 @@ extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NUL
 
         # extract data
         dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-            class = geom_class$class, object = geom_class$object, all = TRUE)
+            class = geom_class$class, object = geom_class$id, all = TRUE)
 
         # meta
         meta <- dt[J(2L), on = "field_index"]
@@ -860,26 +861,29 @@ extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NUL
 # }}}
 
 # convert_geom {{{
-convert_geom <- function (idf, type = c("surface", "subsurface", "shading")) {
+convert_geom <- function (idf, geoms = NULL, type = c("surface", "subsurface", "shading")) {
     assert_subset(type, c("surface", "subsurface", "shading"), empty.ok = FALSE)
+
+    if (is.null(geoms)) geoms <- extract_geom(idf)
 
     surf <- list()
     if ("surface" %chin% type) {
-        surf <- convert_geom_surface_simple(idf)
+        surf <- convert_geom_surface_simple(idf, geoms$surface)
     }
     subsurf <- list()
     if ("subsurface" %chin% type) {
-        subsurf <- convert_geom_subsurface_simple(idf)
+        subsurf <- convert_geom_subsurface_simple(idf, geoms$subsurface)
     }
     shading <- list()
     if ("shading" %chin% type) {
-        shading <- convert_geom_shading_simple(idf)
+        shading <- convert_geom_shading_simple(idf, geoms$shading)
     }
 
     object <- rbindlist(list(surf$object, subsurf$object, shading$object))
     if (!nrow(object)) return(idf)
 
     value <- rbindlist(list(surf$value, subsurf$value, shading$value))
+    map <- rbindlist(list(surf$map, subsurf$map, shading$map))
 
     object_set <- object[object_id > 0L]
     value_set <- value[object_id > 0L]
@@ -905,13 +909,19 @@ convert_geom <- function (idf, type = c("surface", "subsurface", "shading")) {
         get_priv_env(idf)$update_idf_env(add)
     }
 
-    idf
+    # update actual object id for newly add objects in the mapping
+    id <- get_idf_object(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
+        class = map[new_id < 0L, new_class], object = map[new_id < 0L, new_name]
+    )$object_id
+    map[new_id < 0L, new_id := id]
+
+    list(idf = idf, map = map)
 }
 # }}}
 
 # convert_geom_simple {{{
 convert_geom_simple <- function (idf, geom, target_class, field_keep = NULL, first_vertex) {
-    if (!length(geom)) return(list(object = data.table(), value = data.table()))
+    if (!nrow(geom$meta)) return(list(object = data.table(), value = data.table(), map = data.table()))
 
     # init object table {{{
     obj <- init_idf_object(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
@@ -921,6 +931,11 @@ convert_geom_simple <- function (idf, geom, target_class, field_keep = NULL, fir
     ori_obj <- get_idf_object(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), object = geom$meta$id)
     set(obj, NULL, c("object_id", "object_name", "object_name_lower", "comment"),
         list(ori_obj$object_id, ori_obj$object_name, ori_obj$object_name_lower, ori_obj$comment))
+
+    # store mapping
+    ori_map <- fast_subset(ori_obj, c("object_id", "object_name", "class_name"))
+    new_map <- fast_subset(obj, c("object_id", "object_name", "class_name"))
+    map <- setnames(cbind(ori_map, new_map), c("ori_id", "ori_name", "ori_class", "new_id", "new_name", "new_class"))
     # }}}
 
     # init value table {{{
@@ -960,13 +975,22 @@ convert_geom_simple <- function (idf, geom, target_class, field_keep = NULL, fir
     val[J(NA_integer_), on = "value_id", value_id := -seq_len(.N)]
     # }}}
 
-    list(object = obj, value = val)
+    list(object = obj, value = val, map = map)
 }
 # }}}
 
 # convert_geom_surface_simple {{{
 convert_geom_surface_simple <- function (idf, geom = NULL) {
-    if (is.null(geom)) geom <- extract_geom_surface_simple(idf)
+    if (is.null(geom)) {
+        geom <- extract_geom_surface_simple(idf)
+    } else {
+        if (!any(is_simple <- !stri_endswith_fixed(geom$meta$class, "Detailed"))) {
+            geom <- list(meta = data.table(), vertices = data.table())
+        } else {
+            geom$meta <- geom$meta[is_simple]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+        }
+    }
     convert_geom_simple(idf, geom, "BuildingSurface:Detailed",
         c("Name", "Construction Name", "Zone Name", "Outside Boundary Condition Object"),
         first_vertex = 11L
@@ -976,7 +1000,16 @@ convert_geom_surface_simple <- function (idf, geom = NULL) {
 
 # convert_geom_subsurface_simple {{{
 convert_geom_subsurface_simple <- function (idf, geom = NULL) {
-    if (is.null(geom)) geom <- extract_geom_subsurface_simple(idf)
+    if (is.null(geom)) {
+        geom <- extract_geom_subsurface_simple(idf)
+    } else {
+        if (!any(is_simple <- geom$meta$class != "FenestrationSurface:Detailed")) {
+            geom <- list(meta = data.table(), vertices = data.table())
+        } else {
+            geom$meta <- geom$meta[is_simple]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+        }
+    }
     convert_geom_simple(idf, geom, "FenestrationSurface:Detailed",
         c("Name", "Construction Name", "Building Surface Name", "Frame and Divider Name", "Outside Boundary Condition Object"),
         first_vertex = if (idf$version() < 9.0) 11L else 10L
@@ -986,8 +1019,18 @@ convert_geom_subsurface_simple <- function (idf, geom = NULL) {
 
 # convert_geom_shading_simple {{{
 convert_geom_shading_simple <- function (idf, geom = NULL) {
-    if (is.null(geom)) geom <- extract_geom_shading_simple(idf)
-    if (!length(geom)) return(list(object = data.table(), value = data.table()))
+    if (is.null(geom)) {
+        geom <- extract_geom_shading_simple(idf)
+    } else {
+        if (!any(is_simple <- !stri_endswith_fixed(geom$meta$class, "Detailed"))) {
+            geom <- list(meta = data.table(), vertices = data.table())
+        } else {
+            geom$meta <- geom$meta[is_simple]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+        }
+    }
+
+    if (!nrow(geom$meta)) return(list(object = data.table(), value = data.table(), map = data.table()))
 
     meta <- split(geom$meta, by = "surface_type")
 
@@ -997,14 +1040,14 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 
     if ("SiteShading" %chin% names(meta)) {
         site <- convert_geom_simple(idf,
-            list(meta = meta$Site, vertices = geom$vertices[J(meta$Site$id), on = "id"]),
+            list(meta = meta$SiteShading, vertices = geom$vertices[J(meta$SiteShading$id), on = "id"]),
             "Shading:Site:Detailed", c("Name", "Transmittance Schedule Name"),
             first_vertex = 4L
         )
     }
     if ("BuildingShading" %chin% names(meta)) {
         bldg <- convert_geom_simple(idf,
-            list(meta = meta$Building, vertices = geom$vertices[J(meta$Building$id), on = "id"]),
+            list(meta = meta$BuildingShading, vertices = geom$vertices[J(meta$BuildingShading$id), on = "id"]),
             "Shading:Building:Detailed", c("Name", "Transmittance Schedule Name"),
             first_vertex = 4L
         )
@@ -1013,55 +1056,78 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
         overhang <- list()
         fin <- list()
 
-        if (any(c("Shading:Overhang", "Shading:Overhang:Projection") %chin% meta$Zone$class)) {
-            overhang$meta <- meta$Zone[J(c("Shading:Overhang", "Shading:Overhang:Projection")), on = "class", nomatch = NULL]
+        if (any(c("Shading:Overhang", "Shading:Overhang:Projection") %chin% meta$ZoneShading$class)) {
+            overhang$meta <- meta$ZoneShading[J(c("Shading:Overhang", "Shading:Overhang:Projection")), on = "class", nomatch = NULL]
             overhang$vertices <- geom$vertices[J(overhang$meta$id), on = "id"]
 
             overhang <- convert_geom_simple(idf, overhang, "Shading:Zone:Detailed", "Name", first_vertex = 5L)
         }
 
         # should handle fin shading separately
-        if (any(c("Shading:Fin", "Shading:Fin:Projection") %chin% meta$Zone$class)) {
-            fin$meta <- meta$Zone[J(c("Shading:Fin", "Shading:Fin:Projection")), on = "class", nomatch = NULL]
+        if (any(c("Shading:Fin", "Shading:Fin:Projection") %chin% meta$ZoneShading$class)) {
+            fin$meta <- meta$ZoneShading[J(c("Shading:Fin", "Shading:Fin:Projection")), on = "class", nomatch = NULL]
             fin$vertices <- geom$vertices[J(fin$meta$id), on = "id"]
 
             fin_left <- convert_geom_simple(idf,
                 list(meta = fin$meta[id > 0L], vertices = fin$vertices[id > 0L]),
                 "Shading:Zone:Detailed", "Name", first_vertex = 5L
             )
-            fin_left$value[J(1L), on = "field_index", value_chr := paste(value_chr, "Left")]
             set(fin_left$object, NULL, c("object_name", "object_name_lower"),
                 list(paste(fin_left$object$object_name, "Left"),
                     paste(fin_left$object$object_name_lower, "left")
                 )
             )
-            set(fin_left$value, NULL, "object_name", list(paste(fin_left$value$object_name, "Left")))
+            # in case adding a suffix 'Left' can introduce name conflict
+            fin_left$object <- make_idf_object_name(
+                get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
+                fin_left$object, use_old = TRUE
+            )
+            # update name
+            set(fin_left$object, NULL, c("object_name", "object_name_lower"), NULL)
+            setnames(fin_left$object, c("new_object_name", "new_object_name_lower"), c("object_name", "object_name_lower"))
+            fin_left$value[fin_left$object, on = "object_id", object_name := i.object_name]
+            fin_left$value[J(1L), on = "field_index", value_chr := object_name]
+            set(fin_left$map, NULL, "new_name", fin_left$object$object_name)
 
             fin_right <- convert_geom_simple(idf,
                 list(meta = fin$meta[id < 0L][, id := -id], vertices = fin$vertices[id < 0L][, id := -id]),
                 "Shading:Zone:Detailed", "Name", first_vertex = 5L
             )
-            fin_left$value[J(1L), on = "field_index", value_chr := paste(value_chr, "Right")]
             set(fin_right$object, NULL, c("object_name", "object_name_lower"),
                 list(paste(fin_right$object$object_name, "Right"),
                     paste(fin_right$object$object_name_lower, "right")
                 )
             )
-            set(fin_right$value, NULL, "object_name", list(paste(fin_right$value$object_name, "Left")))
+            # in case adding a suffix 'Right' can introduce name conflict
+            fin_right$object <- make_idf_object_name(
+                get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
+                fin_right$object, use_old = TRUE
+            )
+            # update name
+            set(fin_right$object, NULL, c("object_name", "object_name_lower"), NULL)
+            setnames(fin_right$object, c("new_object_name", "new_object_name_lower"), c("object_name", "object_name_lower"))
+            fin_right$value[fin_right$object, on = "object_id", object_name := i.object_name]
+            fin_right$value[J(1L), on = "field_index", value_chr := object_name]
+            set(fin_right$map, NULL, "new_name", fin_right$object$object_name)
 
             set(fin_right$object, NULL, "object_id", -fin_right$object$object_id)
             set(fin_right$value, NULL, "object_id", -fin_right$value$object_id)
+            set(fin_right$map, NULL, "new_id", -fin_right$map$new_id)
 
             fin$object <- rbindlist(list(fin_left$object, fin_right$object))
             fin$value <- rbindlist(list(fin_left$value, fin_right$value))
+            fin$map <- rbindlist(list(fin_left$map, fin_right$map))
         }
 
-        zone$object <- rbindlist(list(overhang$object, fin$object))
+        zone$object <- rbindlist(list(overhang$object, fin$object), use.names = TRUE)
         zone$value <- rbindlist(list(overhang$value, fin$value))
+        zone$map <- rbindlist(list(overhang$map, fin$map))
     }
 
-    list(object = rbindlist(list(site$object, bldg$object, zone$object)),
-         value = rbindlist(list(site$value, bldg$value, zone$value)))
+    list(object = rbindlist(list(site$object, bldg$object, zone$object), use.names = TRUE),
+         value = rbindlist(list(site$value, bldg$value, zone$value)),
+         map = rbindlist(list(site$map, bldg$map, zone$map))
+    )
 }
 # }}}
 
@@ -1307,7 +1373,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
 
 # set_geom_vertices {{{
 set_geom_vertices <- function (idf, geom, digits = NULL) {
-    if (!length(geom)) return(idf)
+    if (!NROW(geom$meta)) return(idf)
 
     # only works for detailed geometry classes
     map <- data.table(
@@ -1323,7 +1389,7 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
 
     vert <- geom$vertices[meta, on = "id", nomatch = NULL]
     if (!is.null(digits)) {
-        assert_count(digits, positive = TRUE)
+        assert_count(digits)
         vert[, c("x", "y", "z") := lapply(.SD, round, digits = digits), .SDcols = c("x", "y", "z")]
     }
 
@@ -1331,12 +1397,15 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
     setorderv(vert, c("id", "index"))
     vert[, field_index := first_vertex - 1L + seq_len(.N), by = "id"]
 
-    get_priv_env(idf)$idf_env()$value[get_priv_env(idf)$idd_env()$field,
-        on = c("object_id", "field_id"), field_index := i.field_index][
-        vert, on = c("object_id" = "id", "field_index"),
+    add_field_property(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env()$value, "field_index")
+    get_priv_env(idf)$idf_env()$value[vert, on = c("object_id" = "id", "field_index"),
         `:=`(value_chr = as.character(i.value), value_num = i.value)]
-
     set(get_priv_env(idf)$idf_env()$value, NULL, "field_index", NULL)
+
+    # log
+    get_priv_env(idf)$log_new_order(unique(vert$id))
+    get_priv_env(idf)$log_unsaved()
+    get_priv_env(idf)$log_new_uuid()
 
     idf
 }
@@ -1476,20 +1545,29 @@ align_face <- function (vertices) {
 }
 # }}}
 
-# get_outward_normal {{{
-get_outward_normal <- function (vertices) {
-    # calculate normal vector of surfaces using Newell Method
+# get_newall_vector {{{
+get_newall_vector <- function (vertices) {
     # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
     vertices[, by = "id", {
         nx <- seq_len(.N) %% .N + 1L
         # calculate the distance from the origin to the first point on each polygon
-        norm <- normalize(c(
+        norm <- c(
             x = sum((z + z[nx]) * (y - y[nx])),
             y = sum((x + x[nx]) * (z - z[nx])),
             z = sum((y + y[nx]) * (x - x[nx]))
-        ))
+        )
         setattr(as.list(norm), "names", c("x", "y", "z"))
     }]
+}
+# }}}
+
+# get_outward_normal {{{
+get_outward_normal <- function (vertices) {
+    # calculate normal vector of surfaces using Newell Method
+    # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
+    vertices <- get_newall_vector(vertices)
+    vertices[, by = "id", c("x", "y", "z") := as.list(normalize(c(x, y, z)))]
+    vertices
 }
 # }}}
 
@@ -1562,5 +1640,11 @@ get_tilt <- function (out_norm) {
 # get_azimuth {{{
 get_azimuth <- function (out_norm) {
     get_angle(out_norm, c(0, 1, 0))
+}
+# }}}
+
+# get_area {{{
+get_area <- function (newall) {
+    sqrt(sum(newall ^ 2)) / 2.0
 }
 # }}}

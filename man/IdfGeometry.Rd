@@ -55,6 +55,14 @@ geom$convert()
 }
 
 ## ------------------------------------------------
+## Method `IdfGeometry$coord_system`
+## ------------------------------------------------
+
+\dontrun{
+geom$coord_system("absolute", "absolute", "absolute")
+}
+
+## ------------------------------------------------
 ## Method `IdfGeometry$round_digits`
 ## ------------------------------------------------
 
@@ -68,22 +76,6 @@ geom$round_digits()
 
 \dontrun{
 geom$area()
-}
-
-## ------------------------------------------------
-## Method `IdfGeometry$outward_normal`
-## ------------------------------------------------
-
-\dontrun{
-geom$outward_normal()
-}
-
-## ------------------------------------------------
-## Method `IdfGeometry$centroid`
-## ------------------------------------------------
-
-\dontrun{
-geom$centroid()
 }
 
 ## ------------------------------------------------
@@ -117,18 +109,8 @@ geom$extract()
 \dontrun{
 idf$view()
 idf$view(render_by = "zone")
-idf$view(new, render_by = "construction")
+idf$view(new = TRUE, render_by = "construction")
 }
-
-## ------------------------------------------------
-## Method `IdfGeometry$save_snapshot`
-## ------------------------------------------------
-
-\dontrun{
-geom$view()
-geom$save_snapshot(tempfile(fileext = ".png"))
-}
-
 
 ## ------------------------------------------------
 ## Method `IdfGeometry$print`
@@ -151,17 +133,14 @@ Hongyuan Jia
 \item \href{#method-parent}{\code{IdfGeometry$parent()}}
 \item \href{#method-rules}{\code{IdfGeometry$rules()}}
 \item \href{#method-convert}{\code{IdfGeometry$convert()}}
+\item \href{#method-coord_system}{\code{IdfGeometry$coord_system()}}
 \item \href{#method-round_digits}{\code{IdfGeometry$round_digits()}}
 \item \href{#method-area}{\code{IdfGeometry$area()}}
-\item \href{#method-outward_normal}{\code{IdfGeometry$outward_normal()}}
-\item \href{#method-centroid}{\code{IdfGeometry$centroid()}}
 \item \href{#method-azimuth}{\code{IdfGeometry$azimuth()}}
 \item \href{#method-tilt}{\code{IdfGeometry$tilt()}}
 \item \href{#method-extract}{\code{IdfGeometry$extract()}}
 \item \href{#method-view}{\code{IdfGeometry$view()}}
-\item \href{#method-save_snapshot}{\code{IdfGeometry$save_snapshot()}}
 \item \href{#method-print}{\code{IdfGeometry$print()}}
-\item \href{#method-clone}{\code{IdfGeometry$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -265,10 +244,7 @@ An \link{Idf} object.
 \subsection{Method \code{convert()}}{
 Convert simple geometry objects
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$convert(
-  type = c("surface", "subsurface", "shading"),
-  object = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$convert(type = c("surface", "subsurface", "shading"))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -278,10 +254,6 @@ Convert simple geometry objects
 geometries should be converted. Should be a subset of
 \code{"surface"}, \code{"subsurface"} and \code{"shading"}. Default is set to
 all of them.}
-
-\item{\code{object}}{A character vector of valid names or an integer
-vector of valid IDs of targeting objects to be converted.
-Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -315,6 +287,46 @@ geom$convert()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-coord_system"></a>}}
+\if{latex}{\out{\hypertarget{method-coord_system}{}}}
+\subsection{Method \code{coord_system()}}{
+Convert vertices to specified coordinate systems
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$coord_system(detailed = NULL, simple = NULL, daylighting = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{detailed, simple, daylighting}}{A string specifying the coordinate
+system for detailed geometries, simple (rectangular surface)
+geometries, and daylighting reference points. Should be one of
+\code{"relative"} and \code{"absolute"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$coord_system()} converts all vertices of geometries into specified
+coordinate systems, e.g. from absolute to relative, and vice versa.
+Besides, it also updates the \code{GlobalGeometryRules} in parent \link{Idf}
+accordingly.
+}
+
+\subsection{Returns}{
+The modified \link{Idf} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+geom$coord_system("absolute", "absolute", "absolute")
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-round_digits"></a>}}
 \if{latex}{\out{\hypertarget{method-round_digits}{}}}
 \subsection{Method \code{round_digits()}}{
@@ -327,14 +339,18 @@ Round digits on geometry vertices
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{digits}}{An integer giving the number of decimal places to be
-used. Default: \code{5}.}
+used. Default: \code{4}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$round_digits()} performs number rounding on geometry object
-vertices. It may be useful for clean up IDF files generated using
-OpenStudio which often gives vertices with long trailing digits.
+\verb{$round_digits()} performs number rounding on vertices of detailed
+geometry object vertices, e.g. \code{BuildingSurface:Detailed},
+\code{FenestrationSurface:Detailed} and etc.
+
+\verb{$round_digits()} may be useful for clean up IDF files generated
+using OpenStudio which often gives vertices with long trailing
+digits.
 }
 
 \subsection{Returns}{
@@ -380,11 +396,13 @@ area is returned. Default: \code{FALSE}.}
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
+\item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{type}: Character type. Surface types.
 \item \code{area}: Numeric type. Surface Area in m2.
 }
 }
@@ -392,100 +410,6 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 geom$area()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-outward_normal"></a>}}
-\if{latex}{\out{\hypertarget{method-outward_normal}{}}}
-\subsection{Method \code{outward_normal()}}{
-Get outward normal vector
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$outward_normal(class = NULL, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{class}}{A character vector of valid geometry class names.
-Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
-vector of valid IDs of targeting objects.
-Default: \code{NULL}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$outward_normal()} returns the outward normal vector of surfaces.
-}
-
-\subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
-\itemize{
-\item \code{id}: Integer type. Object IDs.
-\item \code{name}: Character type. Object names.
-\item \code{class}: Character type. Class names.
-\item \code{x}: Numeric type. X axis value.
-\item \code{y}: Numeric type. Y axis value.
-\item \code{z}: Numeric type. Z axis value.
-}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$outward_normal()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-centroid"></a>}}
-\if{latex}{\out{\hypertarget{method-centroid}{}}}
-\subsection{Method \code{centroid()}}{
-Get centroid
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$centroid(class = NULL, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{class}}{A character vector of valid geometry class names.
-Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
-vector of valid IDs of targeting objects.
-Default: \code{NULL}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$centroid()} returns the centroid of surfaces.
-}
-
-\subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
-\itemize{
-\item \code{id}: Integer type. Object IDs.
-\item \code{name}: Character type. Object names.
-\item \code{class}: Character type. Class names.
-\item \code{x}: Numeric type. X axis value.
-\item \code{y}: Numeric type. Y axis value.
-\item \code{z}: Numeric type. Z axis value.
-}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$centroid()
 }
 }
 \if{html}{\out{</div>}}
@@ -519,11 +443,13 @@ Default: \code{NULL}.}
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
+\item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{type}: Character type. Surface types.
 \item \code{azimuth}: Numeric type. Azimuth in degree.
 }
 }
@@ -564,11 +490,13 @@ Default: \code{NULL}.}
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
+\item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{type}: Character type. Surface types.
 \item \code{tilt}: Numeric type. Azimuth in degree.
 }
 }
@@ -649,23 +577,11 @@ geom$extract()
 View 3D geometry
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$view(
-  new = TRUE,
-  clear = TRUE,
-  show = "all",
+  new = FALSE,
   render_by = "surface_type",
-  zone = NULL,
-  surface = NULL,
   wireframe = TRUE,
   x_ray = FALSE,
-  axis = TRUE,
-  line_width = 1.5,
-  line_color = "black",
-  theta = 0,
-  phi = -60,
-  fov = 60,
-  zoom = 1,
-  background = "white",
-  size = c(0, 30, 800)
+  axis = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -698,37 +614,6 @@ Default: \code{FALSE}.}
 
 \item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the
 global origin. Default: \code{TRUE}.}
-
-\item{\code{line_width}}{The line width of wireframes. Default: \code{1.5}.}
-
-\item{\code{line_color}}{The color of wireframes. Default: \code{black}.}
-
-\item{\code{theta}}{The rotation around z-axis in degrees. Default: \code{0}.}
-
-\item{\code{phi}}{The azimuth angle in degrees. Default: \code{-60}.}
-
-\item{\code{fov}}{The field-of-view angle in degrees. \code{0} means isometric.
-Default: \code{60}.}
-
-\item{\code{zoom}}{The zoom factor. Default: \code{1}.}
-
-\item{\code{background}}{The color of the backports. Default: \code{"white"}.}
-
-\item{\code{size}}{A numeric vector specifying the x-y coordiates, width and
-height of the rgl device. The x-y coordinates are based on the
-original located in the upper left corner of current screen.
-By default, x-y coordinates are set to zeros.
-\itemize{
-\item If 1 number, the width and height of rgl windows will be
-the same as input number.
-\item If 2 numbers, the width and height of rgl windows will be
-set based on input number
-\item If 3 numbers, the first 2 numbers will be used as x-y
-coordinates and the 3rd number will be used for both window
-width and height.
-\item If 4 numbers, the first 2 numbers will be used as x-y
-coordinates. The next 2 specify the window size.
-}}
 }
 \if{html}{\out{</div>}}
 }
@@ -736,6 +621,9 @@ coordinates. The next 2 specify the window size.
 \verb{$view()} uses the \href{https://cran.r-project.org/package=rgl}{rgl}
 package to visualize the IDF geometry in 3D in a similar way as
 \href{https://www.openstudio.net}{OpenStudio}.
+
+\verb{$view()} returns an \link{IdfViewer} object which can be used to further
+tweak the viewer scene.
 
 In the rgl window, you can control the view using your mouse:
 \itemize{
@@ -745,6 +633,8 @@ In the rgl window, you can control the view using your mouse:
 projection.
 \item Wheel: Zoom
 }
+
+For more detailed control on the scene, see \link{IdfViewer}.
 }
 
 \subsection{Returns}{
@@ -755,61 +645,8 @@ An \link{IdfViewer} object
 \preformatted{\dontrun{
 idf$view()
 idf$view(render_by = "zone")
-idf$view(new, render_by = "construction")
+idf$view(new = TRUE, render_by = "construction")
 }
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save_snapshot"></a>}}
-\if{latex}{\out{\hypertarget{method-save_snapshot}{}}}
-\subsection{Method \code{save_snapshot()}}{
-Capture and save current rgl view as an image
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$save_snapshot(filename, bring_to_front = TRUE, axis = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{filename}}{A single string specifying the file name. Current
-supported formats are \code{png}, \code{pdf}, \code{svg}, \code{ps}, \code{eps}, \code{tex}
-and \code{pgf}.}
-
-\item{\code{bring_to_front}}{If \code{TRUE}, The rgl window will be brought to
-the front when saving. Default: \code{FALSE}.}
-
-\item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be saved in the
-image. Default: \code{FALSE}.}
-
-\item{\code{autoview}}{If \code{TRUE}, a new view will be created if there is no
-existing one using
-\href{../../eplusr/html/Idf.html#method-view}{\code{$view()}}
-Default: \code{FALSE}.}
-
-\item{\code{autoclose}}{If \code{TRUE}, current rgl window will be closed after
-saving. Default: \code{FALSE}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$save_view()} captures the current rgl view and saves it as an
-image file to disk.
-}
-
-\subsection{Returns}{
-The \code{Idf} object itself, invisibly.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$view()
-geom$save_snapshot(tempfile(fileext = ".png"))
-}
-
 }
 \if{html}{\out{</div>}}
 
@@ -838,22 +675,5 @@ geom$print()
 
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$clone(deep = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
 }
 }
