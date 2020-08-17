@@ -1232,7 +1232,7 @@ sep_object_table <- function (dt, type_enum, idd) {
             # in case there are invalid class names ends with semicolon
             n[is.na(n)] <- 0L
             l <- stri_length(body)
-            class_name_lower <- stri_trans_tolower(stri_sub(body, to = n - 1L))
+            class_name_lower <- stri_trim_right(stri_trans_tolower(stri_sub(body, to = n - 1L)))
             body[n < l] <- stri_trim_left(stri_sub(body[n < l], n[n < l] + 1L))
             type[n <  l] <- type_enum$object_value
             type[n == l] <- type_enum$object
