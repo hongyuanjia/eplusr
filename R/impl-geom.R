@@ -92,11 +92,11 @@ get_building_transformation <- function (idf) {
         north_axis <- bldg$value_num[[2L]]
 
         if (is.na(north_axis)) {
-            warn("North Axis unknown, using 0", "geom_unknown_north_axis")
+            warn("North Axis unknown. Using 0.", "geom_unknown_north_axis")
             north_axis <- 0.0
         }
 
-        list(id = id, building = id, north_axis = north_axis)
+        list(id = id, building = name, north_axis = north_axis)
     }
 }
 # }}}
@@ -133,8 +133,6 @@ get_zone_transformation <- function (idf) {
 # extract_geom {{{
 extract_geom <- function (idf, object = NULL) {
     geom_class <- get_geom_class(idf, object)
-
-    if (!nrow(geom_class)) return(list())
 
     # get current global geometry rules
     rules <- get_global_geom_rules(idf)
@@ -182,10 +180,13 @@ extract_geom_surface <- function (idf, geom_class = NULL, object = NULL) {
     detailed <- extract_geom_surface_detailed(idf, geom_class)
     simple <- extract_geom_surface_simple(idf, geom_class)
 
-    list(
-        meta = setorderv(rbindlist(list(detailed$meta, simple$meta)), "id"),
-        vertices = setorderv(rbindlist(list(detailed$vertices, simple$vertices)), "id")
-    )
+    meta <- rbindlist(list(detailed$meta, simple$meta))
+    vertices <- rbindlist(list(detailed$vertices, simple$vertices))
+    if (nrow(meta)) {
+        list(meta = setorderv(meta, "id"), vertices = setorderv(vertices, "id"))
+    } else {
+        list(meta = meta, vertices = vertices)
+    }
 }
 # }}}
 
@@ -201,7 +202,7 @@ extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, align = TRUE, complete = TRUE,
+        class = geom_class$class, object = geom_class$object, complete = TRUE,
         property = "extensible_group"
     )[field_name %chin% fld | extensible_group > 0L]
 
@@ -315,10 +316,13 @@ extract_geom_subsurface <- function (idf, geom_class = NULL, object = NULL, surf
     detailed <- extract_geom_subsurface_detailed(idf, geom_class)
     simple <- extract_geom_subsurface_simple(idf, geom_class, surface = surface)
 
-    list(
-        meta = setorderv(rbindlist(list(detailed$meta, simple$meta)), "id"),
-        vertices = setorderv(rbindlist(list(detailed$vertices, simple$vertices)), "id")
-    )
+    meta <- rbindlist(list(detailed$meta, simple$meta))
+    vertices <- rbindlist(list(detailed$vertices, simple$vertices))
+    if (nrow(meta)) {
+        list(meta = setorderv(meta, "id"), vertices = setorderv(vertices, "id"))
+    } else {
+        list(meta = meta, vertices = vertices)
+    }
 }
 # }}}
 
@@ -455,10 +459,13 @@ extract_geom_shading <- function (idf, geom_class = NULL, object = NULL, subsurf
     detailed <- extract_geom_shading_detailed(idf, geom_class)
     simple <- extract_geom_shading_simple(idf, geom_class, subsurface = subsurface)
 
-    list(
-        meta = setorderv(rbindlist(list(detailed$meta, simple$meta)), "id"),
-        vertices = setorderv(rbindlist(list(detailed$vertices, simple$vertices)), "id")
-    )
+    meta <- rbindlist(list(detailed$meta, simple$meta))
+    vertices <- rbindlist(list(detailed$vertices, simple$vertices))
+    if (nrow(meta)) {
+        list(meta = setorderv(meta, "id"), vertices = setorderv(vertices, "id"))
+    } else {
+        list(meta = meta, vertices = vertices)
+    }
 }
 # }}}
 
@@ -471,7 +478,7 @@ extract_geom_shading_detailed <- function (idf, geom_class = NULL, object = NULL
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
-        class = geom_class$class, object = geom_class$object, align = TRUE,
+        class = geom_class$class, object = geom_class$object,
         complete = TRUE, property = "extensible_group"
     )[field_name %chin% c("Name", "Base Surface Name") | extensible_group > 0L]
 
@@ -640,7 +647,7 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
 
         # calculate vertices
         vertices_fin <- fin[!J(1:2), on = "field_index"]
-        vertices_fin[J("Shading:Fin:Projection"), on = "class_name", field_name := gsub("((Left|Right) Depth).*", "\\2", field_name)]
+        vertices_fin[J("Shading:Fin:Projection"), on = "class_name", field_name := gsub("((Left|Right) Depth).*", "\\1", field_name)]
         vertices_fin <- dcast.data.table(vertices_fin, object_id + object_name + class_name + surface_type ~ field_name, value.var = "value_num")
         setnames(vertices_fin, lower_name(names(vertices_fin)))
         setnames(vertices_fin, gsub("_from.+", "", names(vertices_fin)))
@@ -1202,68 +1209,54 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
     assert_choice(simple, c("absolute", "relative"), null.ok = TRUE)
     assert_choice(daylighting, c("absolute", "relative"), null.ok = TRUE)
 
+    align <- function (vertices, zone, mult = 1, rotate = TRUE, north = 0) {
+        if (!NROW(zone)) return(vertices)
+
+        vertices[zone, on = c("zone_name" = "name"),
+            `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
+                 deg = mult * (i.dir_relative_north + north)
+            )
+        ]
+        # rotate
+        if (rotate) {
+            vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
+                c("x", "y", "z") := {
+                    v <- matrix(c(x, y, z), ncol = 3L)
+                    vert <- rgl::rotate3d(v, deg_to_rad(deg[[1L]]), 0, 0, 1)
+                    list(vert[,1L], vert[,2L], vert[,3L])
+                }
+            ]
+        }
+        set(vertices, NULL, c("zone_name", "deg"), NULL)
+    }
+
     if (!is.null(detailed) && detailed != geoms$rules$coordinate_system) {
         geoms$rules$coordinate_system <- detailed
         # -1 for absolute to relative and 1 for relative to absolute
         mult <- if (detailed == "relative") -1L else 1L
         if (any(is_detailed <- stri_endswith_fixed(geoms$surface$meta$class, "Detailed"))) {
             geoms$surface$vertices[geoms$surface$meta[is_detailed], on = "id", zone_name := i.zone_name]
-            geoms$surface$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (i.dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$surface$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$surface$vertices, NULL, c("zone_name", "deg"), NULL)
+            geoms$surface$vertices <- align(geoms$surface$vertices, geoms$zone, mult)
         }
-        if (any(is_detailed <- geoms$subsurface$meta$class == "Fenestration:Detailed")) {
+        if (any(is_detailed <- geoms$subsurface$meta$class == "FenestrationSurface:Detailed")) {
             # get zone name
-            geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+            if (nrow(geoms$surface$meta)) {
+                geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
 
-            geoms$subsurface$vertices[geoms$subsurface$meta[is_detailed], on = "id", zone_name := i.zone_name]
-            geoms$subsurface$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$subsurface$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$subsurface$meta, NULL, "zone_name", NULL)
-            set(geoms$subsurface$vertices, NULL, c("zone_name", "deg"), NULL)
+                geoms$subsurface$vertices[geoms$subsurface$meta[is_detailed], on = "id", zone_name := i.zone_name]
+                geoms$subsurface$vertices <- align(geoms$subsurface$vertices, geoms$zone, mult)
+                set(geoms$subsurface$meta, NULL, "zone_name", NULL)
+            }
         }
         if (any(is_detailed <- stri_endswith_fixed(geoms$shading$meta$class, "Detailed"))) {
             # get zone name
-            geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+            if (nrow(geoms$surface$meta)) {
+                geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
 
-            geoms$shading$vertices[geoms$shading$meta[is_detailed], on = "id", zone_name := i.zone_name]
-            geoms$shading$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$shading$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$shading$meta, NULL, "zone_name", NULL)
-            set(geoms$shading$vertices, NULL, c("zone_name", "deg"), NULL)
+                geoms$shading$vertices[geoms$shading$meta[is_detailed], on = "id", zone_name := i.zone_name]
+                geoms$shading$vertices <- align(geoms$shading$vertices, geoms$zone, mult)
+                set(geoms$shading$meta, NULL, "zone_name", NULL)
+            }
         }
     }
 
@@ -1273,62 +1266,27 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         mult <- if (simple == "relative") -1L else 1L
         if (any(is_simple <- !stri_endswith_fixed(geoms$surface$meta$class, "Detailed"))) {
             geoms$surface$vertices[geoms$surface$meta[is_simple], on = "id", zone_name := i.zone_name]
-            geoms$surface$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (i.dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$surface$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$surface$vertices, NULL, c("zone_name", "deg"), NULL)
+            geoms$surface$vertices <- align(geoms$surface$vertices, geoms$zone, mult)
         }
-        if (any(is_simple <- geoms$subsurface$meta$class != "Fenestration:Detailed")) {
+        if (any(is_simple <- geoms$subsurface$meta$class != "FenestrationSurface:Detailed")) {
             # get zone name
-            geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+            if (nrow(geoms$surface$meta)) {
+                geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
 
-            geoms$subsurface$vertices[geoms$subsurface$meta[is_simple], on = "id", zone_name := i.zone_name]
-            geoms$subsurface$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$subsurface$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$subsurface$meta, NULL, "zone_name", NULL)
-            set(geoms$subsurface$vertices, NULL, c("zone_name", "deg"), NULL)
+                geoms$subsurface$vertices[geoms$subsurface$meta[is_simple], on = "id", zone_name := i.zone_name]
+                geoms$subsurface$vertices <- align(geoms$subsurface$vertices, geoms$zone, mult)
+                set(geoms$subsurface$meta, NULL, "zone_name", NULL)
+            }
         }
         if (any(is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed"))) {
             # get zone name
-            geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+            if (nrow(geoms$surface$meta)) {
+                geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
 
-            geoms$shading$vertices[geoms$shading$meta[is_simple], on = "id", zone_name := i.zone_name]
-            geoms$shading$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                     deg = mult * (dir_relative_north + geoms$building$north_axis)
-                )
-            ]
-            # rotate
-            geoms$shading$vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    m <- rgl::rotationMatrix(deg_to_rad(deg), 0, 0, 1)
-                    vert <- matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L) %*% m
-                    list(vert[1L,], vert[2L,], vert[3L,])
-                }
-            ]
-            set(geoms$shading$meta, NULL, "zone_name", NULL)
-            set(geoms$shading$vertices, NULL, c("zone_name", "deg"), NULL)
+                geoms$shading$vertices[geoms$shading$meta[is_simple], on = "id", zone_name := i.zone_name]
+                geoms$shading$vertices <- align(geoms$shading$vertices, geoms$zone, mult)
+                set(geoms$shading$meta, NULL, "zone_name", NULL)
+            }
         }
     }
 
@@ -1339,10 +1297,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
             mult <- if (daylighting == "relative") -1L else 1L
 
             geoms$daylighting_point$vertices[geoms$daylighting_point$meta, on = "id", zone_name := i.zone_name]
-            geoms$daylighting_point$vertices[geoms$zone, on = c("zone_name" = "name"),
-                `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z)
-            ]
-            set(geoms$daylighting_point$vertices, NULL, "zone_name", NULL)
+            geoms$daylighting_point$vertices <- align(geoms$daylighting_point$vertices, geoms$zone, mult, rotate = FALSE)
         }
     }
 

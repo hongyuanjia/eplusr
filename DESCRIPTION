@@ -40,7 +40,7 @@ Suggests:
     ggplot2,
     knitr,
     pkgdown,
-    rgl,
+    rgl (>= 0.100.26),
     rmarkdown,
     testthat (>= 2.1.0)
 Encoding: UTF-8

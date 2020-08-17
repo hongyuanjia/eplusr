@@ -343,28 +343,39 @@ viewer$background("blue")
 Set the viewpoint orientation of the scene
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfViewer$viewpoint(
-  theta = 0,
-  phi = -60,
-  fov = 60,
-  zoom = 1,
-  scale = c(1, 1, 1)
+  look_at = "iso",
+  theta = NULL,
+  phi = NULL,
+  fov = NULL,
+  zoom = NULL,
+  scale = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{theta}}{Theta in polar coordinates. Default: \code{0}.}
+\item{\code{look_at}}{A single string indicating a standard view. If
+specified, \code{theta} and \code{phi} will be ignored. Should be
+one of \code{c("top", "bottom", "left", "right", "front", "back", "iso")}. \code{look_at} will be ignored if any of \code{theta} and \code{phi}
+is specified. Default: \code{iso} (i.e. isometric).}
 
-\item{\code{phi}}{Phi in polar coordinates. Default: \code{-60}.}
+\item{\code{theta}}{Theta in polar coordinates. If \code{NULL}, no changes will
+be made to current scene. Default: \code{NULL}.}
+
+\item{\code{phi}}{Phi in polar coordinates. If \code{NULL}, no changes will be
+made to current scene. Default: \code{NULL}.}
 
 \item{\code{fov}}{Field-of-view angle in degrees. If \code{0}, a parallel or
-orthogonal projection is used. Default: \code{60}.}
+orthogonal projection is used. If \code{NULL}, no changes will
+be made to current scene. Default: \code{NULL}.}
 
-\item{\code{zoom}}{Zoom factor. Default: \code{1}.}
+\item{\code{zoom}}{Zoom factor. If \code{NULL}, no changes will be made to
+current scene. Default: \code{NULL}.}
 
 \item{\code{scale}}{A numeric vector of length 3 giving the rescaling to
-apply to each axis. Default: \code{c(1, 1, 1)}.}
+apply to each axis. If \code{NULL}, no changes will be made to
+current scene. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -468,9 +479,9 @@ Toggle axis in the scene
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfViewer$axis(
   add = TRUE,
-  expand = 1.02,
+  expand = 2,
   width = 1.5,
-  color = c("red", "green", "blue"),
+  color = c("red", "green", "blue", "orange"),
   alpha = 1
 )}\if{html}{\out{</div>}}
 }
@@ -482,12 +493,13 @@ Toggle axis in the scene
 removed in the scene.}
 
 \item{\code{expand}}{A single number giving the factor to expand based on
-the largest X, Y and Z coordinate values. Default: \code{1.02}.}
+the largest X, Y and Z coordinate values. Default: \code{2.0}.}
 
-\item{\code{width}}{A number giving the line width of axis. Default: \code{1.5}.}
+\item{\code{width}}{A number giving the line width of axis. \code{width * 2} is
+used for the true north axis. Default: \code{1.5}.}
 
-\item{\code{color}}{A character of length 3 giving the color of X, Y and Z
-axis. Default: \code{c("red", "green", "blue")}.}
+\item{\code{color}}{A character of length 4 giving the color of X, Y, Z and
+true north axis. Default: \code{c("red", "green", "blue", "orange")}.}
 
 \item{\code{alpha}}{A number giving the alpha value of axis. Default: \code{1.0}.}
 }
@@ -782,7 +794,7 @@ viewer$close()
 \subsection{Method \code{snapshot()}}{
 Capture and save current rgl view as an image
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfViewer$snapshot(filename, bring_to_front = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfViewer$snapshot(filename)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -791,17 +803,6 @@ Capture and save current rgl view as an image
 \item{\code{filename}}{A single string specifying the file name. Current
 supported formats are \code{png}, \code{pdf}, \code{svg}, \code{ps}, \code{eps}, \code{tex}
 and \code{pgf}.}
-
-\item{\code{bring_to_front}}{If \code{TRUE}, The rgl window will be brought to
-the front when saving. Default: \code{FALSE}.}
-
-\item{\code{autoview}}{If \code{TRUE}, a new view will be created if there is no
-existing one using
-\href{../../eplusr/html/Idf.html#method-view}{\code{$view()}}
-Default: \code{FALSE}.}
-
-\item{\code{autoclose}}{If \code{TRUE}, current rgl window will be closed after
-saving. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

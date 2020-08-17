@@ -1,118 +1,39 @@
-# rgl_init {{{
-#' @importFrom checkmate assert_flag assert_numeric
-rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
-                      zoom = 1, background = "white", size = c(0, 30, 800)) {
-    checkmate::assert_flag(new)
-    checkmate::assert_flag(clear)
-    checkmate::assert_numeric(size, max.len = 4L)
+# rgl_viewpoint {{{
+rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
+    assert_choice(look_at, c("iso", "top", "bottom", "front", "back", "left", "right"), null.ok = TRUE)
+    assert_number(phi, lower = -90, upper = 90, null.ok = TRUE)
+    assert_number(fov, lower = 0, upper = 179, null.ok = TRUE)
 
-    if (clear) {
-        if (rgl::rgl.cur() == 0) new <- TRUE else rgl::rgl.clear()
-    }
+    if (is.null(fov)) fov <- rgl::par3d(dev = dev, "FOV")
+    if (is.null(zoom)) zoom <- rgl::par3d(dev = dev, "zoom")
+    if (is.null(scale)) scale <- rgl::par3d(dev = dev, "scale")
 
-    if (!new) {
-        dev <- rgl::rgl.cur()
+    if (!is.null(theta) || !is.null(phi)) {
+        rot <- get_viewpoint_rotation(dev)
+
+        if (!is.null(theta)) rot[2L] <- theta
+        if (!is.null(phi)) rot[1L] <- phi
+    } else if (!is.null(look_at)) {
+        rot <- switch(look_at,
+            top = c(0, 0, 0),
+            bottom = c(180, 0, 0),
+            front = c(-90, 0, 0),
+            back = c(-90, 0, -180),
+            left = c(-90, 0, 90),
+            right = c(-90, 0, -90),
+            iso = c(-75, 0, -30)
+        )
     } else {
-        rgl::rgl.open()
-        dev <- rgl::rgl.cur()
-
-        # set window size and position
-        if (length(size) == 1L) {
-            size = c(0, 0, size, size)
-        } else if (length(size) == 2L) {
-            size = c(0, 0, size)
-        } else if (length(size) == 3L) {
-            size = c(size[1:2], size[1:2] + size[3L])
-        } else if (length(size) == 4L) {
-            size = c(size[1:2], size[1:2] + size[3:4])
-        }
-
-        rgl::par3d(windowRect = size)
-
-        # set viewpoint
-        rgl::rgl.viewpoint(theta, phi, fov, zoom)
-
-        # change mouse control method
-        cur <- rgl::par3d("mouseMode")
-        cur[["left"]] <- "trackball"
-        cur[["wheel"]] <- "push"
-        cur[["middle"]] <- "fov"
-        pan3d(2L)
+        # do nothing
+        return(list(userMatrix = rgl::par3d(dev = dev, "userMatrix"), fov = fov, zoom = zoom, scale = scale))
     }
 
-    library(rgl)
-    rgl::rgl.bg(color = background)
+    m <- get_viewpoint_matrix(rot[1], rot[2], rot[3])
 
     rgl::rgl.set(dev)
-    dev
-}
-# }}}
+    rgl::rgl.viewpoint(fov = fov, zoom = zoom, scale = scale, userMatrix = m)
 
-# rgl_view {{{
-rgl_view <- function (dev, geoms, show = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
-                      type = "surface_type", zone = NULL, surface = NULL,
-                      wireframe = TRUE, x_ray = FALSE,
-                      axis = TRUE, ground = FALSE, show_hidden = FALSE) {
-    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
-    assert_flag(wireframe)
-    assert_flag(x_ray)
-    assert_flag(axis)
-    assert_flag(ground)
-    assert_flag(show_hidden)
-
-    # init id
-    id_axis <- integer()
-    id_ground <- integer()
-    id_point <- list(daylighting = integer())
-    id_line <- list(surface = integer(), subsurface = integer(), shading = integer())
-    id_surface <- list(
-        surface = list(detailed = integer(), simple = integer()),
-        subsurface = list(detailed = integer(), simple = integer()),
-        shading = list(detailed = integer(), simple = integer())
-    )
-
-    if (axis) id_axis <- rgl_view_axis(dev, geoms)
-    if (ground) id_ground <- rgl_view_ground(dev, geoms)
-
-    # plot wireframe before subsetting
-    if (wireframe && show_hidden) {
-        id_line$surface <- rgl_view_wireframe(dev, geoms$surface)
-        id_line$subsurface <- rgl_view_wireframe(dev, geoms$subsurface)
-        id_line$shading <- rgl_view_wireframe(dev, geoms$shading, width = 2)
-    }
-
-    geoms <- subset_geom(geoms, show, zone, surface)
-
-    if (wireframe && !show_hidden) {
-        # handle special cases
-        if (!any(geoms$surface$vertices$index < 0L)) {
-            id_line$surface <- rgl_view_wireframe(dev, geoms$surface)
-            id_line$subsurface <- rgl_view_wireframe(dev, geoms$subsurface)
-        } else {
-            id_line$surface <- rgl_view_wireframe(dev,
-                list(meta = geoms$surface$meta, vertices = geoms$surface$vertices[index > 0L])
-            )
-
-            v <- geoms$surface$vertices[index < 0L][, index := -index]
-            v[J(1L), on = "index", id := .I]
-            v[, id := id[[1L]], by = list(cumsum(index == 1L))]
-
-            id_line$subsurface <- rgl_view_wireframe(dev,
-                list(meta = geoms$subsurface$meta,
-                     vertices = rbindlist(list(geoms$subsurface$vertices, v))
-                )
-            )
-        }
-        id_line$shading <- rgl_view_wireframe(dev, geoms$shading, width = 2)
-    }
-
-    if ("daylighting" %chin% show) {
-        id_point$daylighting <- rgl_view_point(dev, geoms$daylighting_point)
-    }
-
-    id_surface <- rgl_view_surface(dev, geoms, type = type, x_ray = x_ray)
-
-    c(list(axis = id_axis, ground = id_ground, point = id_point, line = id_line), id_surface)
+    list(userMatrix = m, fov = fov, zoom = zoom, scale = scale)
 }
 # }}}
 
@@ -423,34 +344,49 @@ rgl_view_point <- function (dev, geom, color = "red", size = 8.0, lit = TRUE, ..
 # }}}
 
 # rgl_view_axis {{{
-rgl_view_axis <- function (dev, geoms, expand = 1.02, width = 1.5, color = c("red", "green", "blue"), alpha = 1.0) {
+rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0) {
     assert_number(expand, finite = TRUE, lower = 1.0)
-    assert_number(width, finite = TRUE, lower = 1E-5)
-    assert_character(color, len = 3, any.missing = FALSE)
+    assert_number(width, lower = 1E-5, finite = TRUE)
     assert_number(alpha, lower = 0, upper = 1)
+    assert_character(color, len = 4L, any.missing = FALSE)
 
     types <- c("surface", "subsurface", "shading", "daylighting_point")
 
     x <- y <- z <- 0.0
     for (nm in types) {
         if (nrow(geoms[[nm]]$vertices)) {
-            x <- max(c(geoms[[nm]]$vertices$x, x))
-            y <- max(c(geoms[[nm]]$vertices$y, y))
-            z <- max(c(geoms[[nm]]$vertices$z, z))
+            x <- max(c(geoms[[nm]]$vertices$x, x), na.rm = TRUE)
+            y <- max(c(geoms[[nm]]$vertices$y, y), na.rm = TRUE)
+            z <- max(c(geoms[[nm]]$vertices$z, z), na.rm = TRUE)
         }
     }
 
-    if (x == y && y == z && x == 0.0) return(integer())
+    if (x == y && y == z && x == 0.0) return(list(north = integer(), axis = integer()))
+
+    val <- max(c(x, y, z))
+
+    # add north axis
+    id_north <- integer()
+    if (!is.na(geoms$building$north_axis) && geoms$building$north_axis != 0.0) {
+        north <- geoms$building$north_axis
+        v <- matrix(c(0, 0, 0, 1, 0, val, 0, 1), ncol = 4L, byrow = TRUE)
+        v <- rgl::rotate3d(v, deg_to_rad(-north), 0, 0, 1)
+        v <- set(setnames(as.data.table(v[, 1:3]), c("x", "y", "z")), NULL, c("id", "index"), list(1L, 1:2))
+
+        id_north <- rgl_view_wireframe(dev, list(vertices = v), color = color[4L], width = width * 2)
+    }
 
     vert <- data.table(
         id = 1L, index = 1:6,
-        x = c(0.0, x, rep(0.0, 4L)),
-        y = c(rep(0.0, 2L), 0.0, y, rep(0.0, 2L)),
-        z = c(rep(0.0, 4L), 0.0, z)
+        x = c(0.0, val * expand, rep(0.0, 4L)),
+        y = c(rep(0.0, 2L), 0.0, val * expand, rep(0.0, 2L)),
+        z = c(rep(0.0, 4L), 0.0, val * max(c(1.25, expand / 2)))
     )
 
-    rgl_view_wireframe(dev, list(vertices = vert), width = width, alpha = alpha,
-        color = rep(c(color[[1L]], color[[3L]], color[[2L]]), each = 2L))
+    list(north = id_north,
+        axis = rgl_view_wireframe(dev, list(vertices = vert), width = width,
+            alpha = alpha, color = rep(c(color[[1L]], color[[3L]], color[[2L]]), each = 2L))
+    )
 }
 # }}}
 
@@ -465,8 +401,8 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
     x <- y <- c(0.0, 0.0)
     for (nm in types) {
         if (nrow(geoms[[nm]]$vertices)) {
-            x <- range(c(geoms[[nm]]$vertices$x, x))
-            y <- range(c(geoms[[nm]]$vertices$y, y))
+            x <- range(c(geoms[[nm]]$vertices$x, x), na.rm = TRUE)
+            y <- range(c(geoms[[nm]]$vertices$y, y), na.rm = TRUE)
         }
     }
 
@@ -487,6 +423,86 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
         0,
         color = color, lit = FALSE, alpha = alpha
     )
+}
+# }}}
+
+# rgl_snapshot {{{
+rgl_snapshot <- function (dev, filename) {
+    assert_string(filename)
+
+    # set the last plot device as active
+    rgl::rgl.set(dev)
+
+    if (!dir.exists(dirname(filename))) dir.create(dirname(filename), recursive = TRUE)
+
+    if (has_ext(filename, "png")) {
+        rgl::rgl.snapshot(filename, "png", top = FALSE)
+    } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
+        if (bring_to_front) rgl::rgl.bringtotop()
+        rgl::rgl.postscript(filename, tools::file_ext(filename))
+    } else {
+        abort(paste0("Not supported export format ", surround(tools::file_ext(filename)), ". ",
+            "Current supported: ", collapse(c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"), max_num = 10)
+        ))
+    }
+
+    normalizePath(filename)
+}
+# }}}
+
+# get_viewpoint_rotation {{{
+get_viewpoint_rotation <- function (dev) {
+    m <- rgl::par3d(dev = dev, "userMatrix")
+
+    x <- atan2(-m[2L, 3L], m[3L, 3L])
+    y <- -asin(m[1L, 3L])
+
+    sin_z <- cos(x) * m[2L, 1L] + sin(x) * m[3L, 1L]
+    cos_z <- cos(x) * m[2L, 2L] + sin(x) * m[3L, 2L]
+    z <- atan2(sin_z, cos_z)
+
+    if (x * 180 / pi < -90) x <- x + pi
+
+    if (x * 180 / pi > 90) x <- x - pi
+
+    c(x, y, z) * 180 / pi
+}
+# }}}
+
+# get_viewpoint_matrix {{{
+get_viewpoint_matrix <- function (deg_x, deg_y, deg_z) {
+    viewpoint_rotate_matrix("x", deg_x) %*%
+    viewpoint_rotate_matrix("y", deg_y) %*%
+    viewpoint_rotate_matrix("z", deg_z)
+}
+# }}}
+
+# viewpoint_rotate_matrix {{{
+viewpoint_rotate_matrix <- function (axis, degree) {
+    rad <- deg_to_rad(degree)
+    s <- sin(rad)
+    c <- cos(rad)
+
+    m <- diag(4L)
+
+    if (axis == "x") {
+        m[2L, 2L] <- c
+        m[2L, 3L] <- -s
+        m[3L, 2L] <- s
+        m[3L, 3L] <- c
+    } else if (axis == "y") {
+        m[1L, 1L] <- c
+        m[1L, 3L] <- s
+        m[3L, 1L] <- -s
+        m[3L, 3L] <- c
+    } else if (axis == "z") {
+        m[1L, 1L] <- c
+        m[1L, 2L] <- -s
+        m[2L, 1L] <- s
+        m[2L, 2L] <- c
+    }
+
+    m
 }
 # }}}
 
@@ -568,6 +584,17 @@ pan3d <- function(button, dev = rgl::rgl.cur(), subscene = rgl::currentSubscene3
         }
     }
     rgl::rgl.setMouseCallbacks(button, begin, update, dev = dev, subscene = subscene)
+}
+# }}}
+
+# pan_view {{{
+pan_view <- function (dev, x, y, z) {
+    init <- rgl::par3d(c("userProjection", "viewport"), dev = dev)
+    init$pos <- c(0.5, 0.5, 0.5)
+
+    xlat <- 2 * (c(x, y, z) - init$pos)
+    mouseMatrix <- rgl::translationMatrix(xlat[1], xlat[2], xlat[3])
+    rgl::par3d(userProjection = mouseMatrix %*% init$userProjection, dev = dev)
 }
 # }}}
 
@@ -758,9 +785,9 @@ COLOR_MAP <- list(
         Door = "#99854CFF",
         Door_Ext = "#99854CFF",
         Door_Int = "#CABC95FF",
-        Glassdoor = "#99854CFF",
-        Glassdoor_Ext = "#99854CFF",
-        Glassdoor_Int = "#CABC95FF",
+        GlassDoor = "#66B2CC99",
+        GlassDoor_Ext = "#66B2CC99",
+        GlassDoor_Int = "#C0E2EB99",
         SiteShading = "#4B7C95FF",
         SiteShading_Ext = "#4B7C95FF",
         SiteShading_Int = "#BBD1DCFF",

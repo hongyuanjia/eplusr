@@ -97,7 +97,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' @return An [Idf] object.
         #'
         #' @examples
+        #' \dontrun{
         #' geom$parent()
+        #' }
         parent = function ()
             idfviewer_parent(self, private),
         # }}}
@@ -112,7 +114,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' @return An [IdfGeometry] object.
         #'
         #' @examples
+        #' \dontrun{
         #' viewer$geometry()
+        #' }
         geometry = function ()
             idfviewer_geometry(self, private),
         # }}}
@@ -155,24 +159,35 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' @description
         #' Set the viewpoint orientation of the scene
         #'
-        #' @param theta Theta in polar coordinates. Default: `0`.
+        #' @param look_at A single string indicating a standard view. If
+        #'        specified, `theta` and `phi` will be ignored. Should be
+        #'        one of `c("top", "bottom", "left", "right", "front", "back",
+        #'        "iso")`. `look_at` will be ignored if any of `theta` and `phi`
+        #'        is specified. Default: `iso` (i.e. isometric).
         #'
-        #' @param phi Phi in polar coordinates. Default: `-60`.
+        #' @param theta Theta in polar coordinates. If `NULL`, no changes will
+        #'        be made to current scene. Default: `NULL`.
+        #'
+        #' @param phi Phi in polar coordinates. If `NULL`, no changes will be
+        #'        made to current scene. Default: `NULL`.
         #'
         #' @param fov Field-of-view angle in degrees. If `0`, a parallel or
-        #'        orthogonal projection is used. Default: `60`.
+        #'        orthogonal projection is used. If `NULL`, no changes will
+        #'        be made to current scene. Default: `NULL`.
         #'
-        #' @param zoom Zoom factor. Default: `1`.
+        #' @param zoom Zoom factor. If `NULL`, no changes will be made to
+        #'        current scene. Default: `NULL`.
         #'
         #' @param scale A numeric vector of length 3 giving the rescaling to
-        #'        apply to each axis. Default: `c(1, 1, 1)`.
+        #'        apply to each axis. If `NULL`, no changes will be made to
+        #'        current scene. Default: `NULL`.
         #'
         #' @examples
         #' \dontrun{
         #' geom$viewpoint()
         #' }
-        viewpoint = function (theta = 0, phi = -60, fov = 60, zoom = 1, scale = c(1, 1, 1))
-            idfviewer_viewpoint(self, private, theta, phi, fov, zoom, scale),
+        viewpoint = function (look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL)
+            idfviewer_viewpoint(self, private, look_at, theta, phi, fov, zoom, scale),
         # }}}
 
         # win_size {{{
@@ -236,12 +251,13 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        removed in the scene.
         #'
         #' @param expand A single number giving the factor to expand based on
-        #'        the largest X, Y and Z coordinate values. Default: `1.02`.
+        #'        the largest X, Y and Z coordinate values. Default: `2.0`.
         #'
-        #' @param width A number giving the line width of axis. Default: `1.5`.
+        #' @param width A number giving the line width of axis. `width * 2` is
+        #'        used for the true north axis. Default: `1.5`.
         #'
-        #' @param color A character of length 3 giving the color of X, Y and Z
-        #'        axis. Default: `c("red", "green", "blue")`.
+        #' @param color A character of length 4 giving the color of X, Y, Z and
+        #'        true north axis. Default: `c("red", "green", "blue", "orange")`.
         #'
         #' @param alpha A number giving the alpha value of axis. Default: `1.0`.
         #'
@@ -251,7 +267,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$axis()
         #' }
-        axis = function (add = TRUE, expand = 1.02, width = 1.5, color = c("red", "green", "blue"), alpha = 1.0)
+        axis = function (add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0)
             idfviewer_axis(self, private, add, expand, width, color, alpha),
         # }}}
 
@@ -436,17 +452,6 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        supported formats are `png`, `pdf`, `svg`, `ps`, `eps`, `tex`
         #'        and `pgf`.
         #'
-        #' @param autoview If `TRUE`, a new view will be created if there is no
-        #'        existing one using
-        #'        \href{../../eplusr/html/Idf.html#method-view}{\code{$view()}}
-        #'        Default: `FALSE`.
-        #'
-        #' @param autoclose If `TRUE`, current rgl window will be closed after
-        #'        saving. Default: `FALSE`.
-        #'
-        #' @param bring_to_front If `TRUE`, The rgl window will be brought to
-        #'        the front when saving. Default: `FALSE`.
-        #'
         #' @return A single string of the file path.
         #'
         #' @examples
@@ -455,12 +460,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' viewer$snapshot(tempfile(fileext = ".png"))
         #' }
         #'
-        snapshot = function (filename, bring_to_front = TRUE)
-            idfviewer_snapshot(self, private, filename, bring_to_front)
+        snapshot = function (filename)
+            idfviewer_snapshot(self, private, filename)
         # }}}
-
-        # mesh3d
-        # as.data.table
     ),
 
     private = list(
@@ -468,14 +470,14 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         m_geom = NULL,
         m_device = NULL,
         m_background = "white",
-        m_viewpoint = list(theta = 0, phi = -60, fov = 60, zoom = 1, scale = c(1, 1, 1)),
+        m_viewpoint = list(look_at = "iso", fov = 30),
         m_mouse_mode = list(left = "trackball", right = "pan", middle = "fov", wheel = "push"),
         m_x_ray = FALSE,
         m_show_hidden = FALSE,
         m_render_by = "surface_type",
         m_win_size = c(0, 0, 600, 600),
-        m_axis = list(expand = 1.02, width = 1.5, color = c("red", "green", "blue"), alpha = 1.0),
-        m_ground = list(expand = 1.02, color = "#EDEDEB", alpha = 1.0),
+        m_axis = list(expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0),
+        m_ground = list(add = FALSE),
         m_wireframe = list(width = 1.5, color = "black", alpha = 1.0),
         m_id_axis = NULL,
         m_id_ground = NULL,
@@ -537,9 +539,10 @@ idfviewer_background <- function (self, private, color = "white") {
 }
 # }}}
 # idfviewer_viewpoint {{{
-idfviewer_viewpoint <- function (self, private, theta = 0, phi = -60, fov = 60, zoom = 1, scale = c(1, 1, 1)) {
-    private$m_viewpoint <- list(theta = theta, phi = phi, fov = fov, zoom = zoom, scale = scale)
-    if (!is.null(self$device())) do.call(rgl::rgl.viewpoint, private$m_viewpoint)
+idfviewer_viewpoint <- function (self, private, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
+    private$m_viewpoint <- list(look_at = look_at, theta = theta, phi = phi, fov = fov, zoom = zoom, scale = scale)
+    if (is.null(self$device())) return(invisible())
+    do.call(rgl_viewpoint, c(list(dev = private$m_device), private$m_viewpoint))
     invisible()
 }
 # }}}
@@ -582,11 +585,11 @@ idfviewer_mouse_mode <- function (self, private, left = "trackball", right = "pa
 }
 # }}}
 # idfviewer_axis {{{
-idfviewer_axis <- function (self, private, add = TRUE, expand = 1.02, width = 1.5, color = c("red", "green", "blue"), alpha = 1.0) {
+idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0) {
     assert_flag(add)
     assert_number(expand, lower = 1.0)
     assert_number(width, lower = 1E-5, finite = TRUE)
-    assert_character(color, len = 3, any.missing = TRUE)
+    assert_character(color, len = 4, any.missing = TRUE)
     assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
 
     if (add) {
@@ -600,7 +603,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 1.02, width = 1.
             }
 
             if (length(private$m_id_axis)) {
-                rgl_pop(id = private$m_id_axis)
+                rgl_pop(id = unlist(private$m_id_axis))
             }
 
             private$m_id_axis <- do.call(rgl_view_axis,
@@ -612,7 +615,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 1.02, width = 1.
             on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
             rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
 
-            rgl_pop(id = private$m_id_axis)
+            rgl_pop(id = unlist(private$m_id_axis))
         }
         private$m_id_axis <- NULL
         private$m_axis <- NULL
@@ -744,7 +747,7 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
         rgl::par3d(dev = private$m_device, windowRect = private$m_win_size)
 
         # apply viewpoint
-        do.call(rgl::rgl.viewpoint, private$m_viewpoint)
+        do.call(self$viewpoint, private$m_viewpoint)
 
         # apply background
         rgl::rgl.bg(color = private$m_background)
@@ -760,6 +763,9 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
 
         # add wireframe
         if (length(private$m_wireframe)) do.call(self$wireframe, private$m_wireframe)
+
+        # make sure building is at roughly the center with default settings
+        pan_view(private$m_device, 0.75, 0.5, 0.5)
     }
 
     if (length(private$m_id_dayl)) {
@@ -812,32 +818,12 @@ idfviewer_close <- function (self, private) {
 }
 # }}}
 # idfviewer_snapshot {{{
-idfviewer_snapshot <- function (self, private, filename, bring_to_front = TRUE) {
-    if (!requireNamespace("rgl", quietly = TRUE)) {
-        abort(paste0("'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
-            "please add this to your library with install.packages('rgl') and try agian."
-        ))
-    }
-
+idfviewer_snapshot <- function (self, private, filename) {
     if (!length(self$device())) {
         abort("No viewer window currently open. Please run '$show()' first.")
     }
 
-    # set the last plot device as active
-    rgl::rgl.set(private$m_device)
-
-    if (has_ext(filename, "png")) {
-        rgl::rgl.snapshot(filename, "png", top = bring_to_front)
-    } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
-        if (bring_to_front) rgl::rgl.bringtotop()
-        rgl::rgl.postscript(filename, tools::file_ext(filename))
-    } else {
-        abort(paste0("Not supported export format ", surround(tools::file_ext(filename)), ". ",
-            "Current supported: ", collapse(c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"), max_num = 10)
-        ))
-    }
-
-    filename
+    rgl_snapshot(private$m_device, filename)
 }
 # }}}
 
