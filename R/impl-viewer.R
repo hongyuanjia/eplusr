@@ -537,26 +537,35 @@ add_surface_hole_vertices <- function (geom_surface, geom_subsurface) {
 
 # triangulate_surfaces {{{
 triangulate_surfaces <- function (vertices) {
+    # tweaked for speed
     trans <- align_face(vertices)
-    vertices[trans, on = "id", by = .EACHI,
-        {
-            hole <- which(index == -1L)
-            if (!length(hole)) hole <- 0L
-            i.trans[[1L]]
-            align_inv <- solve(i.trans[[1L]])
-            align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) align_inv %*% x)[1:3,]
+    set(trans, NULL, "rev_trans", lapply(trans$trans, solve.default))
+    add_joined_cols(trans, vertices, "id", c("trans", "rev_trans"))
+    set(vertices, NULL, "vertice_index", seq_len(nrow(vertices)))
 
-            tri <- decido::earcut(list(align_vert[1L,], align_vert[2L,]), hole)
+    vertices[, by = "vertice_index", c("rev_x", "rev_y", "rev_z") := {
+        v <- rev_trans[[1L]] %*% c(x, y, z, 1L)
+        list(v[1L,], v[2L,], v[3L,])
+    }]
 
-            rbind(align_vert[,tri], rep(1.0, length(tri)))
+    vertices[, by = "id", `:=`(hole = max(which(index == -1L), 0L))]
 
-            vert <- apply(
-                t(rbind(align_vert[,tri], rep(1.0, length(tri)))),
-                1, function (x) i.trans[[1L]] %*% x)
+    vert <- vertices[, by = "id", {
+        tri <- decido::earcut(list(rev_x, rev_y), hole[1L])
+        list(index = seq_along(tri),
+             x = rev_x[tri], y = rev_y[tri], z = rev_z[tri],
+             trans = trans[1L]
+        )
+    }]
 
-            list(index = seq_along(tri), x = vert[1L,], y = vert[2L,], z = vert[3L,])
-        }
-    ]
+    set(vert, NULL, "vertice_index", seq_len(nrow(vert)))
+    vert[, by = "vertice_index", c("x", "y", "z") := {
+        v <- trans[[1L]] %*% c(x, y, z, 1L)
+        list(v[1L,], v[2L,], v[3L,])
+    }]
+
+    # clean
+    set(vert, NULL, c("trans", "vertice_index"), NULL)
 }
 # }}}
 
