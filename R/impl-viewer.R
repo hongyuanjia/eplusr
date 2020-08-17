@@ -369,7 +369,7 @@ rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red
     id_north <- integer()
     if (!is.na(geoms$building$north_axis) && geoms$building$north_axis != 0.0) {
         north <- geoms$building$north_axis
-        v <- matrix(c(0, 0, 0, 1, 0, val, 0, 1), ncol = 4L, byrow = TRUE)
+        v <- matrix(c(0, 0, 0, 1, 0, val * expand, 0, 1), ncol = 4L, byrow = TRUE)
         v <- rgl::rotate3d(v, deg_to_rad(-north), 0, 0, 1)
         v <- set(setnames(as.data.table(v[, 1:3]), c("x", "y", "z")), NULL, c("id", "index"), list(1L, 1:2))
 
