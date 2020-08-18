@@ -120,7 +120,19 @@ utils::globalVariables(c(
     "i.pair_type", "i.through", "i.type_limits", "index_daytype",
     "index_schedule_value", "interpolate", "pair", "pair_type", "time",
     "time_rleid", "value_index", "year_day", "daytype_split", "i.daytype_split",
-    "i.group_id", "int_idx"
+    "i.group_id", "int_idx", "base_surface_name", "building_surface_name",
+    "category", "color_ext", "defaulted", "deg", "depth",
+    "extensible_group_index", "first_vertex", "hole", "i.alpha", "i.area",
+    "i.base_surface_name", "i.building_surface_name", "i.class", "i.color_ext",
+    "i.color_int", "i.dir_relative_north", "i.ext", "i.int", "i.max_x",
+    "i.max_y", "i.min_x", "i.min_y", "i.sun_exposure", "i.surface_type",
+    "i.trans", "i.wind_exposure", "i.window_or_door_name", "left_depth",
+    "left_distance_above", "left_distance_below", "left_extension",
+    "left_tilt_angle", "max_x", "max_y", "min_x", "min_y", "misc", "new_class",
+    "new_name", "rev_trans", "rev_x", "rev_y", "rev_z", "right_depth",
+    "right_distance_above", "right_distance_below", "right_extension",
+    "right_tilt_angle", "subtype", "trans", "window_or_door_name", "x0", "z0",
+    "zone", "GlobalGeometryRules"
 ))
 # }}}
 # nocov end

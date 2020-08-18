@@ -151,53 +151,53 @@ model
 EnergyPlus models. See table below. This vignette will demonstrate some of
 them.
 
-| Category            | Method                   | Functionality                                     |
-| :---                | :---                     | :---                                              |
-| Basic Info          | `$version()`             | Get Idf version                                   |
-|                     | `$path()`                | Get Idf file path                                 |
-|                     | `$group_name()`          | Get group names                                   |
-|                     | `$class_name()`          | Get class names                                   |
-|                     | `$is_valid_group()`      | Check group existence                             |
-|                     | `$is_valid_class()`      | Check class existence                             |
-| Definition          | `$definition()`          | Get corresponding `IddObject`                     |
-| Object Info         | `$object_id()`           | Get object unique ID                              |
-|                     | `$object_name()`         | Get object name                                   |
-|                     | `$object_num()`          | Get object number in class                        |
-|                     | `$is_valid_id()`         | Check object ID existence                         |
-|                     | `$is_valid_name()`       | Check object name existence                       |
-| Object Relation     | `$object_relation()`     | Get object relation with others                   |
-| Object Query        | `$object()`              | Get single object                                 |
-|                     | `$objects()`             | Get multiple objects                              |
-|                     | `$object_unique()`       | Get the unique object                             |
-|                     | `$objects_in_class()`    | Get objects in class                              |
-|                     | `$objects_in_group()`    | Get objects in group                              |
-|                     | `$objects_in_relation()` | Get objects in relation                           |
-|                     | `$search_object()`       | Get objects using regular expression              |
-| Object Modification | `$dup()`                 | Duplicate objects                                 |
-|                     | `$add()`                 | Add new objects                                   |
-|                     | `$set()`                 | Modify existing objects                           |
-|                     | `$del()`                 | Delete existing objects                           |
-|                     | `$purge()`               | Delete unused resource objects                    |
-|                     | `$duplicated()`          | Detect duplicated objects                         |
-|                     | `$unique()`              | Delete duplicated objects                         |
-|                     | `$rename()`              | Change object names                               |
-|                     | `$insert()`              | Add new objects from other `IdfObject`s           |
-|                     | `$load()`                | Add new objects from strings and data.frames      |
-|                     | `$update()`              | Update object values from strings and data.frames |
-|                     | `$paste()`               | Add new objects from IDF Editor `Copy obj`        |
-|                     | `$search_value()`        | Get objects whose values match regular expression |
-|                     | `$replace_value()`       | Modify object values using regular expression     |
-| Validation          | `$validate()`            | Check any errors in `Idf`                         |
-|                     | `$is_valid()`            | Check if no error exists in `Idf`                 |
-| Data Extraction     | `$to_table()`            | Extract `Idf` data in data.frames                 |
-|                     | `$to_string()`           | Extract `Idf` data in strings                     |
-| Save                | `$is_unsaved()`          | Check if unsaved changes exist                    |
-|                     | `$save()`                | Save `Idf` to an `.idf` file                      |
-| Clone               | `$clone()`               | Create an copy                                    |
-| Run                 | `$run()`                 | Run `Idf` together with an `Epw`                  |
-| Visualize           | `$view()`                | Show `Idf` 3D geometry using the rgl package      |
-|                     | `$save_view()`           | Save current view as an image                     |
-| Print               | `$print()`               | Print `Idf` in different details                  |
+| Category            | Method                   | Functionality                                         |
+| :---                | :---                     | :---                                                  |
+| Basic Info          | `$version()`             | Get Idf version                                       |
+|                     | `$path()`                | Get Idf file path                                     |
+|                     | `$group_name()`          | Get group names                                       |
+|                     | `$class_name()`          | Get class names                                       |
+|                     | `$is_valid_group()`      | Check group existence                                 |
+|                     | `$is_valid_class()`      | Check class existence                                 |
+| Definition          | `$definition()`          | Get corresponding `IddObject`                         |
+| Object Info         | `$object_id()`           | Get object unique ID                                  |
+|                     | `$object_name()`         | Get object name                                       |
+|                     | `$object_num()`          | Get object number in class                            |
+|                     | `$is_valid_id()`         | Check object ID existence                             |
+|                     | `$is_valid_name()`       | Check object name existence                           |
+| Object Relation     | `$object_relation()`     | Get object relation with others                       |
+| Object Query        | `$object()`              | Get single object                                     |
+|                     | `$objects()`             | Get multiple objects                                  |
+|                     | `$object_unique()`       | Get the unique object                                 |
+|                     | `$objects_in_class()`    | Get objects in class                                  |
+|                     | `$objects_in_group()`    | Get objects in group                                  |
+|                     | `$objects_in_relation()` | Get objects in relation                               |
+|                     | `$search_object()`       | Get objects using regular expression                  |
+| Object Modification | `$dup()`                 | Duplicate objects                                     |
+|                     | `$add()`                 | Add new objects                                       |
+|                     | `$set()`                 | Modify existing objects                               |
+|                     | `$del()`                 | Delete existing objects                               |
+|                     | `$purge()`               | Delete unused resource objects                        |
+|                     | `$duplicated()`          | Detect duplicated objects                             |
+|                     | `$unique()`              | Delete duplicated objects                             |
+|                     | `$rename()`              | Change object names                                   |
+|                     | `$insert()`              | Add new objects from other `IdfObject`s               |
+|                     | `$load()`                | Add new objects from strings and data.frames          |
+|                     | `$update()`              | Update object values from strings and data.frames     |
+|                     | `$paste()`               | Add new objects from IDF Editor `Copy obj`            |
+|                     | `$search_value()`        | Get objects whose values match regular expression     |
+|                     | `$replace_value()`       | Modify object values using regular expression         |
+| Validation          | `$validate()`            | Check any errors in `Idf`                             |
+|                     | `$is_valid()`            | Check if no error exists in `Idf`                     |
+| Data Extraction     | `$to_table()`            | Extract `Idf` data in data.frames                     |
+|                     | `$to_string()`           | Extract `Idf` data in strings                         |
+| Save                | `$is_unsaved()`          | Check if unsaved changes exist                        |
+|                     | `$save()`                | Save `Idf` to an `.idf` file                          |
+| Clone               | `$clone()`               | Create an copy                                        |
+| Run                 | `$run()`                 | Run `Idf` together with an `Epw`                      |
+| Geometry            | `$geometry()`            | Extract `Idf` geometry and perform operations on them |
+|                     | `$view()`                | Show `Idf` 3D geometry using the rgl package          |
+| Print               | `$print()`               | Print `Idf` in different details                      |
 
 Table: Methods of `Idf` class
 

@@ -1063,16 +1063,20 @@ test_that("$last_job()", {
 })
 # }}}
 
-# VIEW {{{
-test_that("$view()", {
-    expect_is(x <- empty_idf(8.8)$view(), "Idf")
+# GEOMETRY {{{
+test_that("$geometry()", {
+    expect_warning(empty_idf(8.8)$geometry())
+    expect_is(read_idf(example())$geometry(), "IdfGeometry")
 })
 # }}}
 
-# SAVE_VIEW {{{
-test_that("$save_view()", {
-    expect_is(idf <- read_idf(example()), "Idf")
-    expect_error(idf$save_view())
+# VIEW {{{
+test_that("$view()", {
+    expect_warning(empty_idf(8.8)$view())
+    expect_is(read_idf(example())$view(), "IdfViewer")
+
+    expect_is(v <- plot(read_idf(example())), "IdfViewer")
+    v$close()
 })
 # }}}
 
