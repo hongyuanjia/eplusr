@@ -82,8 +82,9 @@
   operations on them, while `IdfViewer` is to view IDF geoemtry in 3D using the
   rgl package in a similar way as OpenStudio SketchUp Plugin. `Idf$geometry()`
   and `Idf$view()` methods are added to directly create an `IdfGeometry` and
-  `IdfViewer` object based on current `Idf` object, respectively.
-* A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`.
+  `IdfViewer` object based on current `Idf` object, respectively (#296).
+* A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`
+  (#296).
 
 ## Major changes
 
