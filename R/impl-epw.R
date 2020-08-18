@@ -1317,7 +1317,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
 
     # validate_datetime_range {{{
     validate_datetime_range <- function (datetime, matched, realyear) {
-        if (length(datetime) - matched$line + 1L < length(matched$num)) {
+        if (length(datetime) - matched$line + 1L < matched$num) {
             parse_error("epw", paste("Invalid WEATHER DATA"), subtype = "data",
                 post = sprintf("%i rows of weather data (starting from row %i) are expected for data period #%i '%s', but only '%i' were found.",
                     matched$num, matched$line, matched$index, matched$name, length(datetime) - matched$line + 1L
