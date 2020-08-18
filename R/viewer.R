@@ -863,7 +863,7 @@ idfviewer_print <- function (self, private) {
 
     cli::cat_line(" * ", c(
         str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
-        paste0("Version: ", surround(private$m_parent$version()))
+        paste0("Version: ", surround(private$m_geom$parent()$version()))
     ))
 }
 # }}}
