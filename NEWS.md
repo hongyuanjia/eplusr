@@ -145,6 +145,8 @@
   names are allowed.
 * The suffix of automatcially created names in `Idf$dup()` has been changed
   from `_X` to ` X`.
+* The `warning` parameter in `read_epw()`, `Epw$add()` and `Epw$set()` has been
+  deprecated (#298).
 
 ## Minor changes
 
