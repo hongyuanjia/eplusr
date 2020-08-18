@@ -388,7 +388,7 @@ epw$purge()
 \dontrun{
 # will fail since date time in input data has already been covered by
 # existing data period
-epw$add(epw$data())
+try(epw$add(epw$data()), silent = TRUE)
 }
 
 
@@ -398,7 +398,7 @@ epw$add(epw$data())
 
 \dontrun{
 # change the weather data
-epw$set(epw$data(), warning = FALSE)
+epw$set(epw$data())
 }
 
 
@@ -477,7 +477,7 @@ Hongyuan Jia
 \subsection{Method \code{new()}}{
 Create an \code{Epw} object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$new(path, warning = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$new(path)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -487,9 +487,6 @@ Create an \code{Epw} object
 single string or a raw vector) to an EnergyPlus Weather File
 (EPW).  If a file path, that file usually has a extension
 \code{.epw}.}
-
-\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
-out-of-range data are found. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1737,8 +1734,7 @@ Add a data period
   realyear = FALSE,
   name = NULL,
   start_day_of_week = NULL,
-  after = 0L,
-  warning = TRUE
+  after = 0L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1766,9 +1762,6 @@ AMY data.  Default: \code{NULL}.}
 where input new data period to be inserted after. IF \code{0},
 input new data period will be the first data period. Default:
 \code{0}.}
-
-\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
-out-of-range data are found. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1806,7 +1799,7 @@ The modified \code{Epw} object itself, invisibly.
 \preformatted{\dontrun{
 # will fail since date time in input data has already been covered by
 # existing data period
-epw$add(epw$data())
+try(epw$add(epw$data()), silent = TRUE)
 }
 
 }
@@ -1826,8 +1819,7 @@ Replace a data period
   realyear = FALSE,
   name = NULL,
   start_day_of_week = NULL,
-  period = 1L,
-  warning = TRUE
+  period = 1L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1853,9 +1845,6 @@ AMY data.  Default: \code{NULL}.}
 
 \item{\code{period}}{A single integer identifying the index of data period
 to set.}
-
-\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
-out-of-range data are found. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1891,7 +1880,7 @@ The modified \code{Epw} object itself, invisibly.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 # change the weather data
-epw$set(epw$data(), warning = FALSE)
+epw$set(epw$data())
 }
 
 }

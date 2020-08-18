@@ -130,9 +130,6 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        (EPW).  If a file path, that file usually has a extension
         #'        `.epw`.
         #'
-        #' @param warning If `TRUE`, warnings are given if any missing data,
-        #'        out-of-range data are found. Default: `TRUE`.
-        #'
         #' @return An `Epw` object.
         #'
         #' @examples
@@ -155,14 +152,14 @@ Epw <- R6::R6Class(classname = "Epw",
         #' }
         #' }
         #'
-        initialize = function (path, warning = FALSE) {
+        initialize = function (path) {
             if (checkmate::test_file_exists(path, "r")) {
                 private$m_path <- normalizePath(path)
             }
 
             private$m_idd <- get_epw_idd()
 
-            epw_file <- parse_epw_file(path, warning = warning, idd = private$m_idd)
+            epw_file <- parse_epw_file(path, idd = private$m_idd)
 
             private$m_idf_env <- list2env(epw_file$header, parent = emptyenv())
             private$m_data <- epw_file$data
@@ -1085,8 +1082,6 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        where input new data period to be inserted after. IF `0`,
         #'        input new data period will be the first data period. Default:
         #'        `0`.
-        #' @param warning If `TRUE`, warnings are given if any missing data,
-        #'        out-of-range data are found. Default: `TRUE`.
         #'
         #' @return The modified `Epw` object itself, invisibly.
         #'
@@ -1094,11 +1089,11 @@ Epw <- R6::R6Class(classname = "Epw",
         #' \dontrun{
         #' # will fail since date time in input data has already been covered by
         #' # existing data period
-        #' epw$add(epw$data())
+        #' try(epw$add(epw$data()), silent = TRUE)
         #' }
         #'
-        add = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
-            epw_add(self, private, data, realyear, name, start_day_of_week, after, warning),
+        add = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L)
+            epw_add(self, private, data, realyear, name, start_day_of_week, after),
         # }}}
 
         # set {{{
@@ -1143,19 +1138,17 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        AMY data.  Default: `NULL`.
         #' @param period A single integer identifying the index of data period
         #'        to set.
-        #' @param warning If `TRUE`, warnings are given if any missing data,
-        #'        out-of-range data are found. Default: `TRUE`.
         #'
         #' @return The modified `Epw` object itself, invisibly.
         #'
         #' @examples
         #' \dontrun{
         #' # change the weather data
-        #' epw$set(epw$data(), warning = FALSE)
+        #' epw$set(epw$data())
         #' }
         #'
-        set = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-            epw_set(self, private, data, realyear, name, start_day_of_week, period, warning),
+        set = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L)
+            epw_set(self, private, data, realyear, name, start_day_of_week, period),
         # }}}
 
         # del {{{
@@ -1295,9 +1288,6 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' simplifications. For more details on `Epw`, please see [Epw] class.
 #'
 #' @param path A path of an EnergyPlus `EPW` file.
-#' @param warning If `TRUE`, warnings are given if any missing data, out of
-#' range data and redundant data is found. Default: `FALSE`. All these data can
-#' be also retrieved using methods in [Epw] class.
 #' @return An `Epw` object.
 #' @examples
 #' \dontrun{
@@ -1323,8 +1313,8 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' @author Hongyuan Jia
 #' @export
 # read_epw {{{
-read_epw <- function (path, warning = FALSE) {
-    Epw$new(path, warning = warning)
+read_epw <- function (path) {
+    Epw$new(path)
 }
 # }}}
 
@@ -1571,10 +1561,10 @@ epw_holiday <- function (self, private, leapyear, dst, holiday) {
     )
 }
 # }}}
-# epw_comment1 {{{
+# epw_comment {{{
 #' @importFrom checkmate assert_string
-epw_comment1 <- function (self, private, comment) {
-    val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$comment1)
+epw_comment <- function (self, private, index = 1L, comment) {
+    val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS[[paste0("comment", index)]])
 
     if (missing(comment)) return(val$value_chr)
 
@@ -1586,8 +1576,16 @@ epw_comment1 <- function (self, private, comment) {
     comment
 }
 # }}}
+# epw_comment1 {{{
+#' @importFrom checkmate assert_string
+epw_comment1 <- function (self, private, comment) {
+    epw_comment(self, private, 1L, comment)
+}
+# }}}
 # epw_comment2 {{{
-epw_comment2 <- epw_comment1
+epw_comment2 <- function (self, private, comment) {
+    epw_comment(self, private, 2L, comment)
+}
 # }}}
 # epw_num_period {{{
 epw_num_period <- function (self, private) {
@@ -1650,12 +1648,12 @@ epw_period <- function (self, private, period, name, start_day_of_week) {
 # }}}
 # epw_missing_code {{{
 epw_missing_code <- function (self, private) {
-    get_epw_data_missing_code()
+    get_epw_data_missing_code()[]
 }
 # }}}
 # epw_initial_missing_value {{{
 epw_initial_missing_value <- function (self, private) {
-    get_epw_data_init_value()
+    get_epw_data_init_value()[]
 }
 # }}}
 # epw_range_exist {{{
@@ -1829,9 +1827,9 @@ epw_align_data_status <- function (self, private, data, period = NULL) {
 # }}}
 # epw_add {{{
 epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
-                     start_day_of_week = NULL, after = 0L, warning = TRUE) {
+                     start_day_of_week = NULL, after = 0L) {
     lst <- add_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
-        data, realyear, name, start_day_of_week, after, warning)
+        data, realyear, name, start_day_of_week, after)
 
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
     private$m_data <- lst$data
@@ -1862,9 +1860,9 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
 # }}}
 # epw_set {{{
 epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
-                     start_day_of_week = NULL, period = 1L, warning = TRUE) {
+                     start_day_of_week = NULL, period = 1L) {
     lst <- set_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
-        data, realyear, name, start_day_of_week, period, warning)
+        data, realyear, name, start_day_of_week, period)
 
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
 

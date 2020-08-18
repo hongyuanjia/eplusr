@@ -1257,14 +1257,23 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
 
     # find first match
     if (length(unique(realyear)) == 1L) {
-        if (!realyear[[1]]) col_on <- setdiff(col_on, "year")
+        if (!realyear[[1L]]) col_on <- setdiff(col_on, "year")
         matched <- dt[data_period, on = col_on][, by = "index", .SD[1L]]
+        if (!realyear[[1L]]) {
+            set(matched, NULL, "year", NULL)
+            setnames(matched, "i.year", "year")
+        }
     } else {
         matched <- rbindlist(use.names = TRUE,
             lapply(split(data_period, by = "index"), function (dp) {
                 on <- col_on
                 if (!realyear[dp$index]) on <- setdiff(on, "year")
-                dt[dp, on = col_on, mult = "first"]
+                m <- dt[dp, on = col_on, mult = "first"]
+                if (!realyear[dp$index]) {
+                    set(m, NULL, "year", NULL)
+                    setnames(m, "i.year", "year")
+                }
+                m
             })
         )
     }
@@ -1332,16 +1341,18 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
         invld <- validate_datetime_range(dt$datetime, matched[i], realyear)
 
         if (length(invld)) {
+            # expected time
+            dtime <- dt$datetime[invld[[1L]]] + lubridate::minutes(matched[i]$step)
+
             # first actual index
-            i <- i[[1L]] + 1L
-            invld <- epw_data[i]
+            invld <- invld[[1L]] + 1L
+            invld <- epw_data[invld]
 
             set(invld, NULL, "string", paste(do.call(combine_date, invld[, .SD, .SDcols = col_on]), "..."))
             set(invld, NULL, "suffix", sprintf(" is found but date time '%s' is expected for data period #%i '%s'",
-                do.call(combine_date, matched[, .SD, .SDcols = col_on]),
-                matched$index, matched$name
+                format(dtime, "%m/%d %H:XX"), matched$index, matched$name
             ))
-            parse_error("epw", paste("Invalid WEATHER DATA"), invld, subtype = "data")
+            parse_error("epw", paste("Invalid WEATHER DATA"), invld, suffix = invld$suffix, subtype = "data")
         }
     }
 
@@ -2204,7 +2215,12 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
         if (realyear) {
             start_day_of_week <- as.character(wday(start, TRUE))
         } else {
-            start_day_of_week <- "Sunday"
+            # if reset, use the original one
+            if (reset) {
+                start_day_of_week <- p$start_day_of_week
+            } else {
+                start_day_of_week <- "Sunday"
+            }
         }
     } else {
         start_day_of_week <- get_epw_wday(start_day_of_week, TRUE)
