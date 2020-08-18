@@ -880,7 +880,7 @@ convert_geom <- function (idf, geoms = NULL, type = c("surface", "subsurface", "
     }
 
     object <- rbindlist(list(surf$object, subsurf$object, shading$object))
-    if (!nrow(object)) return(idf)
+    if (!nrow(object)) return(list(idf = idf, map = data.table()))
 
     value <- rbindlist(list(surf$value, subsurf$value, shading$value))
     map <- rbindlist(list(surf$map, subsurf$map, shading$map))

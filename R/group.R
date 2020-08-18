@@ -269,7 +269,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$locate_output(c(1, 4), ".err", strict = FALSE)
         #'
         #' # can detect if certain output file exists
-        #' try(group$locate_output(c(1, 4), ".expidf", strict = TRUE), silent = TRUE)
+        #' group$locate_output(c(1, 4), ".expidf", strict = TRUE)
         #' }
         #'
         locate_output = function (which = NULL, suffix = ".err", strict = TRUE)

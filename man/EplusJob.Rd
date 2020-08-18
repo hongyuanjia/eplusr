@@ -163,7 +163,7 @@ job$output_dir(open = TRUE)
 job$locate_output(".err", strict = FALSE)
 
 # can use to detect if certain output file exists
-try(job$locate_output(".expidf", strict = TRUE), silent = TRUE)
+job$locate_output(".expidf", strict = TRUE)
 }
 
 
@@ -708,7 +708,7 @@ by file suffix.
 job$locate_output(".err", strict = FALSE)
 
 # can use to detect if certain output file exists
-try(job$locate_output(".expidf", strict = TRUE), silent = TRUE)
+job$locate_output(".expidf", strict = TRUE)
 }
 
 }

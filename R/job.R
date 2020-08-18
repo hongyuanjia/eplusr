@@ -294,7 +294,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$locate_output(".err", strict = FALSE)
         #'
         #' # can use to detect if certain output file exists
-        #' try(job$locate_output(".expidf", strict = TRUE), silent = TRUE)
+        #' job$locate_output(".expidf", strict = TRUE)
         #' }
         #'
         locate_output = function (suffix = ".err", strict = TRUE)

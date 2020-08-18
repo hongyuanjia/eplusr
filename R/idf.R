@@ -908,7 +908,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$objects_in_relation("floor", "ref_to")
         #'
         #' # get a construction named FLOOR and all surfaces that uses it
-        #' idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+        #' idf$objects_in_relation("floor", "ref_by", class = "BuildingSurface:Detailed")
         #' }
         #'
         objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"),
@@ -1312,7 +1312,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @examples
         #' \dontrun{
         #' # purge unused "Fraction" schedule type
-        #' idf$purge("Fraction") # ScheduleTypeLimits
+        #' idf$purge("on/off") # ScheduleTypeLimits
         #'
         #' # purge all unused schedule types
         #' idf$purge(class = "ScheduleTypeLimits")
@@ -2516,17 +2516,17 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param render_by A single string specifying the way of rendering the
         #'        geometry. Possible values are:
         #'
-        #'     * `"surface_type"`: Default. Render the model by surface type
-        #'       model. Walls, roofs, windows, doors, floors, and shading
-        #'       surfaces will have unqiue colors.
-        #'     * `"boundary"`: Render the model by outside boundary condition.
-        #'       Only surfaces that have boundary conditions will be rendered
-        #'       with a color. All other surfaces will be white.
-        #'     * `"construction"`: Render the model by surface constructions.
-        #'     * `"zone"`: Render the model by zones assigned.
-        #'     * `"normal"`: Render the model by surface normal. The outside
-        #'       face of a heat transfer face will be rendered as white and the
-        #'       inside face will be rendered as red.
+        #' * `"surface_type"`: Default. Render the model by surface type
+        #'   model. Walls, roofs, windows, doors, floors, and shading
+        #'   surfaces will have unqiue colors.
+        #' * `"boundary"`: Render the model by outside boundary condition.
+        #'   Only surfaces that have boundary conditions will be rendered
+        #'   with a color. All other surfaces will be white.
+        #' * `"construction"`: Render the model by surface constructions.
+        #' * `"zone"`: Render the model by zones assigned.
+        #' * `"normal"`: Render the model by surface normal. The outside
+        #'   face of a heat transfer face will be rendered as white and the
+        #'   inside face will be rendered as red.
         #'
         #' @param axis If `TRUE`, the X, Y and Z axes will be drawn at the
         #'        global origin. Default: `TRUE`.

@@ -1089,7 +1089,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' \dontrun{
         #' # will fail since date time in input data has already been covered by
         #' # existing data period
-        #' try(epw$add(epw$data()), silent = TRUE)
+        #' epw$add(epw$data())
         #' }
         #'
         add = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L)

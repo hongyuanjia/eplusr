@@ -131,7 +131,7 @@ group$output_dir(c(1, 4))
 group$locate_output(c(1, 4), ".err", strict = FALSE)
 
 # can detect if certain output file exists
-try(group$locate_output(c(1, 4), ".expidf", strict = TRUE), silent = TRUE)
+group$locate_output(c(1, 4), ".expidf", strict = TRUE)
 }
 
 
@@ -621,7 +621,7 @@ A character vector.
 group$locate_output(c(1, 4), ".err", strict = FALSE)
 
 # can detect if certain output file exists
-try(group$locate_output(c(1, 4), ".expidf", strict = TRUE), silent = TRUE)
+group$locate_output(c(1, 4), ".expidf", strict = TRUE)
 }
 
 }

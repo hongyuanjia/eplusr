@@ -543,17 +543,19 @@ View 3D geometry
 reused if possible. Default: \code{FALSE}.}
 
 \item{\code{render_by}}{A single string specifying the way of rendering the
-geometry. Possible values are:\preformatted{* `"surface_type"`: Default. Render the model by surface type
-  model. Walls, roofs, windows, doors, floors, and shading
-  surfaces will have unqiue colors.
-* `"boundary"`: Render the model by outside boundary condition.
-  Only surfaces that have boundary conditions will be rendered
-  with a color. All other surfaces will be white.
-* `"construction"`: Render the model by surface constructions.
-* `"zone"`: Render the model by zones assigned.
-* `"normal"`: Render the model by surface normal. The outside
-  face of a heat transfer face will be rendered as white and the
-  inside face will be rendered as red.
+geometry. Possible values are:
+\itemize{
+\item \code{"surface_type"}: Default. Render the model by surface type model.
+Walls, roofs, windows, doors, floors, and shading surfaces will
+have unqiue colors.
+\item \code{"boundary"}: Render the model by outside boundary condition. Only
+surfaces that have boundary conditions will be rendered with a
+color. All other surfaces will be white.
+\item \code{"construction"}: Render the model by surface constructions.
+\item \code{"zone"}: Render the model by zones assigned.
+\item \code{"normal"}: Render the model by surface normal. The outside face of
+a heat transfer face will be rendered as white and the inside face
+will be rendered as red.
 }}
 
 \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
@@ -579,7 +581,6 @@ In the rgl window, you can control the view using your mouse:
 \itemize{
 \item Left button: Trackball
 \item Right button: Pan
-\item Middle button: Field-of-view (FOV). '0' means orthographic
 projection.
 \item Wheel: Zoom
 }

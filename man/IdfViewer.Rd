@@ -32,12 +32,12 @@ path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v
 
 # create from an Idf object
 idf <- read_idf(path_idf, use_idd(8.8, "auto"))
-geom <- idf$geometry()
-geom <- IdfGeometry$new(idf)
+viewer <- idf_viewer(idf)
+viewer <- IdfViewer$new(idf)
 
 # create from an IDF file
-geom <- idf_geometry(path_idf)
-geom <- IdfGeometry$new(path_idf)
+viewer <- idf_viewer(path_idf)
+viewer <- IdfViewer$new(path_idf)
 }
 
 ## ------------------------------------------------
@@ -45,7 +45,7 @@ geom <- IdfGeometry$new(path_idf)
 ## ------------------------------------------------
 
 \dontrun{
-geom$parent()
+viewer$parent()
 }
 
 ## ------------------------------------------------
@@ -61,7 +61,7 @@ viewer$geometry()
 ## ------------------------------------------------
 
 \dontrun{
-geom$device()
+viewer$device()
 }
 
 ## ------------------------------------------------
@@ -77,7 +77,7 @@ viewer$background("blue")
 ## ------------------------------------------------
 
 \dontrun{
-geom$viewpoint()
+viewer$viewpoint()
 }
 
 ## ------------------------------------------------
@@ -175,7 +175,7 @@ viewer$snapshot(tempfile(fileext = ".png"))
 ## ------------------------------------------------
 
 \dontrun{
-geom$print()
+viewer$print()
 }
 }
 \seealso{
@@ -236,12 +236,12 @@ path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v
 
 # create from an Idf object
 idf <- read_idf(path_idf, use_idd(8.8, "auto"))
-geom <- idf$geometry()
-geom <- IdfGeometry$new(idf)
+viewer <- idf_viewer(idf)
+viewer <- IdfViewer$new(idf)
 
 # create from an IDF file
-geom <- idf_geometry(path_idf)
-geom <- IdfGeometry$new(path_idf)
+viewer <- idf_viewer(path_idf)
+viewer <- IdfViewer$new(path_idf)
 }
 }
 \if{html}{\out{</div>}}
@@ -269,7 +269,7 @@ An \link{Idf} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-geom$parent()
+viewer$parent()
 }
 }
 \if{html}{\out{</div>}}
@@ -325,7 +325,7 @@ A number or \code{NULL}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-geom$device()
+viewer$device()
 }
 }
 \if{html}{\out{</div>}}
@@ -407,7 +407,7 @@ current scene. Default: \code{NULL}.}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-geom$viewpoint()
+viewer$viewpoint()
 }
 }
 \if{html}{\out{</div>}}
@@ -868,7 +868,7 @@ The \code{IdfViewer} itself, invisibly.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-geom$print()
+viewer$print()
 }
 }
 \if{html}{\out{</div>}}

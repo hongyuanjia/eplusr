@@ -176,7 +176,7 @@ get_epw_idd_env <- function () {
 #    01:00:00, Hour of 2 corresponds to the period between 01:00:01 to 02:00:00,
 #    and etc. The minute column is **not used** to determine currently sub-hour
 #    time.
-parse_epw_file <- function (path, warning = FALSE, idd = NULL) {
+parse_epw_file <- function (path, idd = NULL) {
     # read and parse header
     epw_header <- parse_epw_header(path)
 
@@ -1999,11 +1999,10 @@ purge_epw_data_redundant <- function (epw_data, epw_header, matched) {
 # add_epw_data {{{
 #' @importFrom checkmate assert_data_frame assert_names assert_flag
 add_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
-                          name = NULL, start_day_of_week = NULL, after = 0L,
-                          warning = TRUE) {
+                          name = NULL, start_day_of_week = NULL, after = 0L) {
     merge_epw_new_data(epw_data, epw_header, matched, data, after,
         reset = FALSE, realyear = realyear, name = name,
-        start_day_of_week = start_day_of_week, warning = warning
+        start_day_of_week = start_day_of_week
     )
 }
 # }}}
@@ -2011,11 +2010,10 @@ add_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
 #' @importFrom checkmate assert_data_frame assert_names assert_flag
 #' @importFrom checkmate assert_string assert_count
 set_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
-                          name = NULL, start_day_of_week = NULL, period = 1L,
-                          warning = TRUE) {
+                          name = NULL, start_day_of_week = NULL, period = 1L) {
     merge_epw_new_data(epw_data, epw_header, matched, data, period,
         reset = TRUE, realyear = realyear, name = name,
-        start_day_of_week = start_day_of_week, warning = warning
+        start_day_of_week = start_day_of_week
     )
 }
 # }}}
@@ -2057,7 +2055,7 @@ del_epw_data <- function (epw_data, epw_header, matched, period) {
 #' @importFrom checkmate assert_posixct
 merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_period,
                                 reset = FALSE, realyear = FALSE, name = NULL,
-                                start_day_of_week = NULL, warning = TRUE) {
+                                start_day_of_week = NULL) {
     # drop units
     epw_data <- drop_epw_data_unit(epw_data)
 
@@ -2065,7 +2063,6 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     assert_names(names(data), must.include = setdiff(names(epw_data), c("year", "month", "day", "hour", "minute")))
     assert_flag(reset)
     assert_flag(realyear)
-    assert_flag(warning)
 
     # copy the original header in case error occurs
     header <- list()

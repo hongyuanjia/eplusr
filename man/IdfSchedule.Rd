@@ -38,6 +38,11 @@ needed for those empty fields and use \verb{$set()} and \verb{$update()} method 
 field values.
 }
 \examples{
+
+## ------------------------------------------------
+## Method `IdfScheduleCompact$new`
+## ------------------------------------------------
+
 \dontrun{
 model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
@@ -45,7 +50,7 @@ model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr
 schedule_compact(model, "sch", TRUE)
 
 # get an existing 'Schedule:Compact'
-schedule_compact(model, "sch")
+sch <- schedule_compact(model, "sch")
 }
 
 ## ------------------------------------------------
@@ -187,6 +192,22 @@ Default: \code{FALSE}}
 \subsection{Returns}{
 An \code{IdfScheduleCompact} object.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+
+# create an empty 'Schedule:Compact'
+schedule_compact(model, "sch", TRUE)
+
+# get an existing 'Schedule:Compact'
+sch <- schedule_compact(model, "sch")
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-type_limits"></a>}}
