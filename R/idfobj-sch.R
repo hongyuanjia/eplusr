@@ -16,16 +16,6 @@
 #' @param new If `TRUE`, a new empty [IdfScheduleCompact] is created. Default:
 #'        `FALSE`.
 #' @return An [IdfScheduleCompact] object.
-#' @examples
-#' \dontrun{
-#' model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
-#'
-#' # create an empty 'Schedule:Compact'
-#' schedule_compact(model, "sch", TRUE)
-#'
-#' # get an existing 'Schedule:Compact'
-#' schedule_compact(model, "sch")
-#' }
 #' @export
 #' @name IdfSchedule
 # schedule_compact {{{
@@ -69,6 +59,16 @@ IdfScheduleCompact <- R6::R6Class(classname = "IdfScheduleCompact", lock_objects
         #'        Default: `FALSE`
         #'
         #' @return An `IdfScheduleCompact` object.
+        #' @examples
+        #' \dontrun{
+        #' model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+        #'
+        #' # create an empty 'Schedule:Compact'
+        #' schedule_compact(model, "sch", TRUE)
+        #'
+        #' # get an existing 'Schedule:Compact'
+        #' sch <- schedule_compact(model, "sch")
+        #' }
         initialize = function (object, parent, new = FALSE)
             idfsch_cmpt_init(super, self, private, object, parent, new),
         # }}}

@@ -3,11 +3,31 @@
 \docType{class}
 \name{EplusGroupJob}
 \alias{EplusGroupJob}
+\alias{group_job}
 \title{Create and Run Parametric Analysis, and Collect Results}
+\usage{
+group_job(idfs, epws)
+}
+\arguments{
+\item{idfs}{Paths to EnergyPlus IDF files or a list of IDF files and \link{Idf}
+objects.}
+
+\item{epws}{Paths to EnergyPlus EPW files or a list of EPW files and \link{Epw}
+objects. Each element in the list can be \code{NULL}, which will force
+design-day-only simulation when \code{\link[=EplusGroupJob]{$run()}} method is
+called. Note this needs at least one \code{Sizing:DesignDay} object exists
+in that \link{Idf}. If \code{epws} is \code{NULL}, design-day-only simulation will be
+conducted for all input models.}
+}
+\value{
+A \code{EplusGroupJob} object.
+}
 \description{
 \code{EplusGroupJob} class is a wrapper of \code{\link[=run_multi]{run_multi()}} and provides an interface
 to group multiple EnergyPlus simulations together for running and collecting
 outputs.
+
+\code{group_job()} takes IDFs and EPWs as input and returns a \code{EplusGroupJob}.
 }
 \examples{
 
@@ -23,7 +43,11 @@ if (is_avail_eplus(8.8)) {
     path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw",
         full.names = TRUE)[1:5]
 
-    group <- EplusGroupJob$new(path_idfs, path_epws)
+    # create from local files
+    group <- group_job(path_idfs, path_epws)
+
+    # create from Idfs and Epws object
+    group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
 }
 }
 
@@ -106,8 +130,8 @@ group$output_dir(c(1, 4))
 # get the file path of the error file
 group$locate_output(c(1, 4), ".err", strict = FALSE)
 
-# can use to detect if certain output file exists
-group$locate_output(c(1, 4), ".expidf", strict = TRUE)
+# can detect if certain output file exists
+try(group$locate_output(c(1, 4), ".expidf", strict = TRUE), silent = TRUE)
 }
 
 
@@ -226,6 +250,9 @@ group$print()
 }
 
 }
+\seealso{
+\code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.
+}
 \author{
 Hongyuan Jia
 }
@@ -288,7 +315,11 @@ if (is_avail_eplus(8.8)) {
     path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw",
         full.names = TRUE)[1:5]
 
-    group <- EplusGroupJob$new(path_idfs, path_epws)
+    # create from local files
+    group <- group_job(path_idfs, path_epws)
+
+    # create from Idfs and Epws object
+    group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
 }
 }
 
@@ -589,8 +620,8 @@ A character vector.
 # get the file path of the error file
 group$locate_output(c(1, 4), ".err", strict = FALSE)
 
-# can use to detect if certain output file exists
-group$locate_output(c(1, 4), ".expidf", strict = TRUE)
+# can detect if certain output file exists
+try(group$locate_output(c(1, 4), ".expidf", strict = TRUE), silent = TRUE)
 }
 
 }

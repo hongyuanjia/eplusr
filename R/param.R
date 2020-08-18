@@ -47,8 +47,12 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
         #'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
         #'
-        #'     # create from an Idf and an Epw object
+        #'     # create from an IDF and an EPW
+        #'     param <- param_job(idf_path, epw_path)
         #'     param <- ParametricJob$new(idf_path, epw_path)
+        #'
+        #'     # create from an Idf and an Epw object
+        #'     param_job(read_idf(idf_path), read_epw(epw_path))
         #' }
         #' }
         #'
@@ -357,30 +361,13 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' @param epw A path to EnergyPlus EPW file or an `Epw` object. `epw` can also
-#' be `NULL` which will force design-day-only simulation when
-#' [`$run()`][ParametricJob] method is called. Note this needs at least one
-#' `Sizing:DesignDay` object exists in the [Idf].
+#'        be `NULL` which will force design-day-only simulation when
+#'        [`$run()`][ParametricJob] method is called. Note this needs at least
+#'        one `Sizing:DesignDay` object exists in the [Idf].
 #' @return A `ParametricJob` object.
-#' @examples
-#' \dontrun{
-#' if (is_avail_eplus(8.8)) {
-#'     idf_name <- "1ZoneUncontrolled.idf"
-#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-#'
-#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
-#'
-#'     # create from local files
-#'     param_job(idf_path, epw_path)
-#'
-#'     # create from an Idf and an Epw object
-#'     param_job(read_idf(idf_path), read_epw(epw_path))
-#' }
-#' }
-#'
 #' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
+#' @name ParametricJob
 #' @export
-#' @author Hongyuan Jia
 # param_job {{{
 param_job <- function (idf, epw) {
     ParametricJob$new(idf, epw)

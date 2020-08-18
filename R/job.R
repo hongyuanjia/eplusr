@@ -45,6 +45,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' @return An `EplusJob` object.
         #'
         #' @examples
+        #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
         #'     idf_name <- "1ZoneUncontrolled.idf"
         #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -52,7 +53,12 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
         #'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
         #'
-        #'     job <- EplusJob$new(idf_path, epw_path)
+        #'     # create from local files
+        #'     job <- eplus_job(idf_path, epw_path)
+        #'
+        #'     # create from an Idf and an Epw object
+        #'     job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+        #' }
         #' }
         initialize = function (idf, epw) {
             job_initialize(self, private, idf, epw)
@@ -288,7 +294,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$locate_output(".err", strict = FALSE)
         #'
         #' # can use to detect if certain output file exists
-        #' job$locate_output(".expidf", strict = TRUE)
+        #' try(job$locate_output(".expidf", strict = TRUE), silent = TRUE)
         #' }
         #'
         locate_output = function (suffix = ".err", strict = TRUE)
@@ -745,34 +751,16 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 #' Create an EnergyPlus Simulation Job
 #'
 #' `eplus_job()` takes an IDF and EPW as input, and returns an `EplusJob` object
-#' for running EnergyPlus simulation and collecting outputs. For more details,
-#' please see [EplusJob].
+#' for running EnergyPlus simulation and collecting outputs.
 #'
 #' @param idf A path to an local EnergyPlus IDF file or an `Idf` object.
 #' @param epw A path to an local EnergyPlus EPW file or an `Epw` object. `epw`
-#' can also be `NULL` which will force design-day-only simulation when
-#' [`$run()`][EplusJob] method is called. Note this needs at least one
-#' `Sizing:DesignDay` object exists in the [Idf].
+#'        can also be `NULL` which will force design-day-only simulation when
+#'        [`$run()`][EplusJob] method is called. Note this needs at least one
+#'        `Sizing:DesignDay` object exists in the [Idf].
 #' @return An `EplusJob` object.
-#' @examples
-#' \dontrun{
-#' if (is_avail_eplus(8.8)) {
-#'     idf_name <- "1ZoneUncontrolled.idf"
-#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-#'
-#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
-#'
-#'     # create from local files
-#'     eplus_job(idf_path, epw_path)
-#'
-#'     # create from an Idf and an Epw object
-#'     eplus_job(read_idf(idf_path), read_epw(epw_path))
-#' }
-#' }
-#'
 #' @seealso [param_job()] for creating an EnergyPlus parametric job.
-#' @author Hongyuan Jia
+#' @name EplusJob
 #' @export
 # eplus_job {{{
 eplus_job <- function (idf, epw) {
