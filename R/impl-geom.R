@@ -1266,11 +1266,11 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
     # }}}
 
     # subset daylighting points by zones {{{
-    if (!is.null(zone) || !is.null(surface)) {
+    if ((!is.null(zone) || !is.null(surface)) && NROW(geoms$daylighting_point$meta)) {
         if (!NROW(geoms$surface$meta)) {
             geoms$daylighting_point$meta <- geoms$daylighting_point$meta[0L]
             geoms$daylighting_point$vertices <- geoms$daylighting_point$vertices[0L]
-        } else {
+        } else if (nrow(geoms$daylighting_point$meta)){
             geoms$daylighting_point$meta <- geoms$daylighting_point$meta[
                 J(geoms$surface$meta$zone_name), on = "zone_name", nomatch = NULL]
             geoms$daylighting_point$vertices <- geoms$daylighting_point$vertices[
