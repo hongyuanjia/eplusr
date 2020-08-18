@@ -77,6 +77,13 @@
   `schedule_compact()` is added. `IdfScheduleCompact` class provides more
   detailed methods to add, modify and extract schedule values. For more details,
   see `vignette("schedule")` (#256).
+* New `IdfGeometry` and `IdfViewer` classes are introduced. `IdfGeometry` is
+  designed to extract data for all geometry objects and perform geometric
+  operations on them, while `IdfViewer` is to view IDF geoemtry in 3D using the
+  rgl package in a similar way as OpenStudio SketchUp Plugin. `Idf$geometry()`
+  and `Idf$view()` methods are added to directly create an `IdfGeometry` and
+  `IdfViewer` object based on current `Idf` object, respectively.
+* A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`.
 
 ## Major changes
 
