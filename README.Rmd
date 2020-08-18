@@ -159,6 +159,7 @@ Please see these vignettes and articles about {eplusr}
 * [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
 * [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
 * [Work with `Schedule:Compact` objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
+* [Work with geometries](https://hongyuanjia.github.io/eplusr/articles/geom.html)
 * [Frequently asked questions](https://hongyuanjia.github.io/eplusr/articles/faq.html)
 
 ### Slides

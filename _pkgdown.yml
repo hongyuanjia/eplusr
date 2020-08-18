@@ -40,6 +40,8 @@ navbar:
         href: articles/epw.html
       - text: "Work with `Schedule:Compact` objects"
         href: articles/schedule.html
+      - text: "Work with geometries"
+        href: articles/geom.html
       - text: "Frequently asked questions"
         href: articles/faq.html
     reference:
