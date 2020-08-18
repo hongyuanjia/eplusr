@@ -24,23 +24,23 @@ Imports:
     cli (>= 1.1.0),
     crayon,
     data.table (>= 1.12.4),
+    decido,
     hms,
     lubridate,
     methods,
     processx (>= 3.2.0),
     progress (>= 1.2.0),
     R6,
+    rgl (>= 0.100.26),
     RSQLite,
     stringi,
     units
 Suggests:
     covr,
-    decido,
     dplyr,
     ggplot2,
     knitr,
     pkgdown,
-    rgl (>= 0.100.26),
     rmarkdown,
     testthat (>= 2.1.0)
 Encoding: UTF-8
