@@ -6,7 +6,15 @@
 \alias{idf_viewer}
 \title{Visualize an EnergyPlus Model Geometry and Simulation Results}
 \usage{
-idf_viewer(parent)
+idf_viewer(geometry)
+}
+\arguments{
+\item{geometry}{An \link{IdfGeometry} object. \code{geometry} can also be a
+path to an IDF file or an \link{Idf} object. In this case, an
+\code{IdfGeometry} is created based on input \link{Idf}.}
+}
+\value{
+An \code{IdfViewer} object.
 }
 \description{
 \code{IdfViewer} is a class designed to view geometry of an \link{Idf} and map
@@ -203,7 +211,7 @@ Hongyuan Jia
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an \code{IdfGeometry} object
+Create an \code{IdfViewer} object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfViewer$new(geometry)}\if{html}{\out{</div>}}
 }
@@ -717,7 +725,8 @@ Show \link{Idf} geometry
   type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
   zone = NULL,
   surface = NULL,
-  add = TRUE
+  dayl_color = "red",
+  dayl_size = 5
 )}\if{html}{\out{</div>}}
 }
 
@@ -745,9 +754,9 @@ performed.}
 of surfaces in current \link{Idf} to show. If \code{NULL}, no subsetting
 is performed.}
 
-\item{\code{add}}{If \code{TRUE}, compoents will be added to the existing scene.
-Otherwise, existing components will be removed before showing
-the new ones.}
+\item{\code{dayl_color, dayl_size}}{The color and size of daylighting
+reference points. Defaults: \code{"red"} (\code{dayl_color}) and \code{5}
+(\code{dayl_size}).}
 }
 \if{html}{\out{</div>}}
 }

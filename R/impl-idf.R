@@ -871,7 +871,7 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
         ref[idf_env$value, on = c("src_value_id" = "value_id"),
             `:=`(src_value_chr = i.value_chr, src_value_num = i.value_num)]
         if (keep) {
-            dt_value[ref[!J(NA_character_), on = "value_chr"], on = "value_id",
+            dt_value[ref[!J(NA_character_), on = "src_value_chr"], on = "value_id",
                 `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
         } else {
             dt_value[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]

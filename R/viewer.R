@@ -15,10 +15,18 @@ NULL
 NULL
 
 # idf_viewer {{{
+#' Create an `IdfViewer` object
+#'
+#' @param geometry An [IdfGeometry] object. `geometry` can also be a
+#'        path to an IDF file or an [Idf] object. In this case, an
+#'        `IdfGeometry` is created based on input [Idf].
+#'
+#' @return An `IdfViewer` object.
+#'
 #' @name IdfViewer
 #' @export
-idf_viewer <- function (parent) {
-    IdfViewer$new(parent)
+idf_viewer <- function (geometry) {
+    IdfViewer$new(geometry)
 }
 # }}}
 
@@ -28,7 +36,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
     public = list(
         # initialize {{{
         #' @description
-        #' Create an `IdfGeometry` object
+        #' Create an `IdfViewer` object
         #'
         #' @param geometry An [IdfGeometry] object. `geometry` can also be a
         #'        path to an IDF file or an [Idf] object. In this case, an
@@ -67,7 +75,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
             if (inherits(geometry, "IdfGeometry")) {
                 private$m_geom <- geometry
             } else if (is_idf(geometry)) {
-                private$m_geom <- idf$geometry()
+                private$m_geom <- geometry$geometry()
             } else if (is.character(geometry)) {
                 private$m_geom <- read_idf(geometry)$geometry()
             }
@@ -401,9 +409,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        of surfaces in current [Idf] to show. If `NULL`, no subsetting
         #'        is performed.
         #'
-        #' @param add If `TRUE`, compoents will be added to the existing scene.
-        #'        Otherwise, existing components will be removed before showing
-        #'        the new ones.
+        #' @param dayl_color,dayl_size The color and size of daylighting
+        #'        reference points. Defaults: `"red"` (`dayl_color`) and `5`
+        #'        (`dayl_size`).
         #'
         #' @return The `IdfViewer` itself, invisibly.
         #'
@@ -412,8 +420,8 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' viewer$show()
         #' }
         show = function (type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
-                         zone = NULL, surface = NULL, add = TRUE)
-            idfviewer_show(self, private, type, zone, surface, add),
+                         zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
+            idfviewer_show(self, private, type, zone, surface, dayl_color, dayl_size),
         # }}}
 
         # focus {{{
@@ -751,7 +759,7 @@ idfviewer_render_by <- function (self, private, style = c("surface_type", "bound
 }
 # }}}
 # idfviewer_show {{{
-idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = NULL, add = TRUE) {
+idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5) {
     geoms <- subset_geom(private$geoms(), type = type, zone = zone, surface = surface)
 
     # open a new device
@@ -790,7 +798,8 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
     }
 
     if (any(c("all", "daylighting") %chin% type)) {
-        private$m_id_dayl <- rgl_view_point(private$m_device, geoms$daylighting_point)
+        private$m_id_dayl <- rgl_view_point(private$m_device, geoms$daylighting_point,
+            color = dayl_color, size = dayl_size)
     }
 
     if (length(private$m_id_surface)) {
@@ -846,7 +855,11 @@ idfviewer_snapshot <- function (self, private, filename) {
 idfviewer_print <- function (self, private) {
     cli::cat_rule("EnergPlus IDF Geometry Viewer", line = 1)
 
-    if (is.null(private$m_parent$path())) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_parent$path())
+    if (is.null(private$m_geom$parent()$path())) {
+        path <- crayon::bold$bgRed("NOT LOCAL")
+    } else {
+        path <- surround(private$m_geom$parent()$path())
+    }
 
     cli::cat_line(" * ", c(
         str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),

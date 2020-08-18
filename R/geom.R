@@ -17,6 +17,16 @@ NULL
 NULL
 
 # idf_geometry {{{
+#' Create an `IdfGeometry` object
+#'
+#' @param parent A path to an IDF file or an [Idf] object.
+#'
+#' @param object A character vector of valid names or an integer
+#'        vector of valid IDs of objects to extract. If `NULL`, all
+#'        objects in geometry classes will be extracted.
+#'
+#' @return An `IdfGeometry` object.
+#'
 #' @name IdfGeometry
 #' @export
 idf_geometry <- function (parent, object = NULL) {
@@ -90,7 +100,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' @return An [Idf] object.
         #'
         #' @examples
+        #' \dontrun{
         #' geom$parent()
+        #' }
         parent = function ()
             idfgeom_parent(self, private),
         # }}}
@@ -100,12 +112,14 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' Get global geometry rules
         #'
         #' @details
-        #' `$rules()` set global geometry rules.
+        #' `$rules()` returns global geometry rules.
         #'
         #' @return An [Idf] object.
         #'
         #' @examples
+        #' \dontrun{
         #' geom$rules()
+        #' }
         rules = function ()
             idfgeom_rules(self, private),
         # }}}
@@ -289,48 +303,6 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             idfgeom_tilt(self, private, class, object),
         # }}}
 
-        # vertices {{{
-        #' @description
-        #' Extract geometry data
-        #'
-        #' @details
-        #' `$extract()` returns a list that contains data of geometry objects
-        #' specified.
-        #'
-        #' @param type A character vector of valid geometry type names,
-        #'        including:
-        #'
-        #' * `"surface"`
-        #' * `"subsurface"`
-        #' * `"shading"`
-        #' * `"daylighting_point"` (daylighting control reference points)
-        #'
-        #' If `NULL`, all types will be returned.
-        #'
-        #' @param class A character vector of valid geometry class names.
-        #'        Default: `NULL`.
-        #'
-        #' @param object A character vector of valid names or an integer
-        #'        vector of valid IDs of targeting objects.
-        #'        Default: `NULL`.
-        #'
-        #' @return A list of 4 columns:
-        #'
-        #' * `id`: Integer type. Object IDs.
-        #' * `name`: Character type. Object names.
-        #' * `class`: Character type. Class names.
-        #' * `x`: Numeric type. X axis value.
-        #' * `y`: Numeric type. Y axis value.
-        #' * `z`: Numeric type. Z axis value.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' geom$extract()
-        #' }
-        extract = function (type = NULL, class = NULL, object = NULL)
-            idfgeom_extract(self, private, type, class, object),
-        # }}}
-
         # view {{{
         #' @description
         #' View 3D geometry
@@ -511,6 +483,8 @@ idfgeom_rules <- function (self, private) {
 # }}}
 # idfgeom_coord_system {{{
 idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL, daylighting = NULL) {
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(private$m_parent)
+
     rules <- private$geoms()$rules
 
     private$m_geoms <- align_coord_system(private$geoms(), detailed, simple, daylighting)
@@ -670,11 +644,14 @@ idfgeom_area <- function (self, private, class = NULL, object = NULL, net = FALS
     if (nrow(subsurf)) set(subsurf, NULL, "building_surface_name", NULL)
 
     area <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    setcolorder(area, c("id", "name", "class", "zone", "type", "area"))
-    if (!nrow(obj)) {
-        area
+    if (!nrow(area)) {
+        data.table(id = integer(), name = character(), class = character(),
+            zone = character(), type = character(), area = double()
+        )
     } else {
-        area[J(obj$object_id), on = "id", nomatch = NULL]
+        setcolorder(area, c("id", "name", "class", "zone", "type", "area"))
+        if (nrow(obj)) area <- area[J(obj$object_id), on = "id", nomatch = NULL]
+        area
     }
 }
 # }}}
@@ -721,14 +698,15 @@ idfgeom_azimuth <- function (self, private, class = NULL, object = NULL) {
         set(shading, NULL, "base_surface_name", NULL)
     }
 
-
     azimuth <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    setcolorder(azimuth, c("id", "name", "class", "zone", "type", "azimuth"))
-
-    if (!nrow(obj)) {
-        azimuth
+    if (!nrow(azimuth)) {
+        data.table(id = integer(), name = character(), class = character(),
+            zone = character(), type = character(), azimuth = double()
+        )
     } else {
-        azimuth[J(obj$object_id), on = "id", nomatch = NULL]
+        setcolorder(azimuth, c("id", "name", "class", "zone", "type", "azimuth"))
+        if (nrow(obj)) azimuth <- azimuth[J(obj$object_id), on = "id", nomatch = NULL]
+        azimuth
     }
 }
 # }}}
@@ -775,19 +753,16 @@ idfgeom_tilt <- function (self, private, class = NULL, object = NULL) {
         set(shading, NULL, "base_surface_name", NULL)
     }
 
-
     tilt <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    setcolorder(tilt, c("id", "name", "class", "zone", "type", "tilt"))
-
-    if (!nrow(obj)) {
-        tilt
+    if (!nrow(tilt)) {
+        data.table(id = integer(), name = character(), class = character(),
+            zone = character(), type = character(), tilt = double()
+        )
     } else {
-        tilt[J(obj$object_id), on = "id", nomatch = NULL]
+        setcolorder(tilt, c("id", "name", "class", "zone", "type", "tilt"))
+        if (nrow(obj)) tilt <- tilt[J(obj$object_id), on = "id", nomatch = NULL]
+        tilt
     }
-}
-# }}}
-# idfgeom_extract {{{
-idfgeom_extract <- function (self, private, class = NULL, object = NULL) {
 }
 # }}}
 # idfgeom_view {{{
@@ -826,7 +801,8 @@ idfgeom_print <- function (self, private) {
 
     geoms <- private$geoms()
 
-    cli::cat_line(sprintf(" * Building: '%s' with North Axis %s degrees", geoms$building$name, geoms$building$north_axis))
+    cli::cat_line(sprintf(" * Building: '%s'", geoms$building$name))
+    cli::cat_line(sprintf(" * North Axis: %s\u00B0", geoms$building$north_axis))
     cli::cat_line(sprintf(" * Zone Num: %s", NROW(geoms$zone)))
     cli::cat_line(sprintf(" * Surface Num: %s", NROW(geoms$surface$meta)))
     cli::cat_line(sprintf(" * SubSurface Num: %s", NROW(geoms$subsurface$meta)))

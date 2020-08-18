@@ -406,7 +406,7 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
         }
     }
 
-    if (x == y && x == 0.0) return(integer())
+    if (all(x == y) && all(x == c(0.0, 0.0))) return(integer())
 
     dis_x <- x[2L] - x[1L]
     dis_y <- y[2L] - y[1L]

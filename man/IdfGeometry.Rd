@@ -8,6 +8,16 @@
 \usage{
 idf_geometry(parent, object = NULL)
 }
+\arguments{
+\item{parent}{A path to an IDF file or an \link{Idf} object.}
+
+\item{object}{A character vector of valid names or an integer
+vector of valid IDs of objects to extract. If \code{NULL}, all
+objects in geometry classes will be extracted.}
+}
+\value{
+An \code{IdfGeometry} object.
+}
 \description{
 \code{IdfGeometry} is an abstraction of a collection of geometry in an \link{Idf}. It
 provides more detail methods to query geometry properties, update geometry
@@ -38,13 +48,17 @@ geom <- IdfGeometry$new(path_idf)
 ## Method `IdfGeometry$parent`
 ## ------------------------------------------------
 
+\dontrun{
 geom$parent()
+}
 
 ## ------------------------------------------------
 ## Method `IdfGeometry$rules`
 ## ------------------------------------------------
 
+\dontrun{
 geom$rules()
+}
 
 ## ------------------------------------------------
 ## Method `IdfGeometry$convert`
@@ -95,14 +109,6 @@ geom$tilt()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$extract`
-## ------------------------------------------------
-
-\dontrun{
-geom$extract()
-}
-
-## ------------------------------------------------
 ## Method `IdfGeometry$view`
 ## ------------------------------------------------
 
@@ -138,7 +144,6 @@ Hongyuan Jia
 \item \href{#method-area}{\code{IdfGeometry$area()}}
 \item \href{#method-azimuth}{\code{IdfGeometry$azimuth()}}
 \item \href{#method-tilt}{\code{IdfGeometry$tilt()}}
-\item \href{#method-extract}{\code{IdfGeometry$extract()}}
 \item \href{#method-view}{\code{IdfGeometry$view()}}
 \item \href{#method-print}{\code{IdfGeometry$print()}}
 }
@@ -206,7 +211,9 @@ An \link{Idf} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{geom$parent()
+\preformatted{\dontrun{
+geom$parent()
+}
 }
 \if{html}{\out{</div>}}
 
@@ -223,7 +230,7 @@ Get global geometry rules
 }
 
 \subsection{Details}{
-\verb{$rules()} set global geometry rules.
+\verb{$rules()} returns global geometry rules.
 }
 
 \subsection{Returns}{
@@ -231,7 +238,9 @@ An \link{Idf} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{geom$rules()
+\preformatted{\dontrun{
+geom$rules()
+}
 }
 \if{html}{\out{</div>}}
 
@@ -504,65 +513,6 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 geom$tilt()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-extract"></a>}}
-\if{latex}{\out{\hypertarget{method-extract}{}}}
-\subsection{Method \code{extract()}}{
-Extract geometry data
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$extract(type = NULL, class = NULL, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{A character vector of valid geometry type names,
-including:
-\itemize{
-\item \code{"surface"}
-\item \code{"subsurface"}
-\item \code{"shading"}
-\item \code{"daylighting_point"} (daylighting control reference points)
-}
-
-If \code{NULL}, all types will be returned.}
-
-\item{\code{class}}{A character vector of valid geometry class names.
-Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
-vector of valid IDs of targeting objects.
-Default: \code{NULL}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$extract()} returns a list that contains data of geometry objects
-specified.
-}
-
-\subsection{Returns}{
-A list of 4 columns:
-\itemize{
-\item \code{id}: Integer type. Object IDs.
-\item \code{name}: Character type. Object names.
-\item \code{class}: Character type. Class names.
-\item \code{x}: Numeric type. X axis value.
-\item \code{y}: Numeric type. Y axis value.
-\item \code{z}: Numeric type. Z axis value.
-}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$extract()
 }
 }
 \if{html}{\out{</div>}}

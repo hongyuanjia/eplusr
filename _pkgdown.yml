@@ -83,11 +83,21 @@ reference:
       - as.character.IdfObject
       - format.Idf
       - format.IdfObject
+      - plot.Idf
   - title: IDF schedules
     desc: Class for IDF `Schedule:Compact` objects
     contents:
       - IdfScheduleCompact
       - schedule_compact
+
+  - title: IDF geometry
+    desc: Classes for IDF geometry
+    contents:
+      - IdfGeometry
+      - IdfViwer
+      - idf_geometry
+      - idf_viewer
+
   - title: EPW
     desc: Download, read and modify an EnergyPlus Weather (EPW)
     contents:
