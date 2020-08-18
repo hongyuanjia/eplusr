@@ -40,7 +40,7 @@ test_that("IdfViewer Implemention", {
     }
 
     dev <- rgl_init()
-    expect_is(id_axis <- rgl_view_axis(dev, geoms), "numeric")
+    expect_is(id_axis <- rgl_view_axis(dev, geoms), "list")
     expect_is(id_ground <- rgl_view_ground(dev, geoms, alpha = 1.0), "numeric")
     expect_is(id_type <- rgl_view_surface(dev, geoms, "surface_type"), "list")
     expect_is(id_surf <- rgl_view_wireframe(dev, geoms$surface), "numeric")
@@ -71,7 +71,7 @@ test_that("IdfViewer Implemention", {
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("absolute", 3L))
 
     expect_is(dev <- rgl_init(), "integer")
-    expect_is(id_axis <- rgl_view_axis(dev, geoms), "numeric")
+    expect_is(id_axis <- rgl_view_axis(dev, geoms), "list")
     expect_is(id_ground <- rgl_view_ground(dev, geoms, alpha = 1.0), "numeric")
     expect_is(id_type <- rgl_view_surface(dev, geoms, "surface_type"), "list")
     expect_is(id_surf <- rgl_view_wireframe(dev, geoms$surface), "numeric")
@@ -93,8 +93,6 @@ test_that("IdfViewer Implemention", {
     expect_is(rgl_pop(id = unlist(id_zone)), "numeric")
     expect_is(id_norm <- rgl_view_surface(dev, geoms, "normal"), "list")
 
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneSwimmingPool.idf"))
-    geoms <- extract_geom(idf)
-    geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute")
+    rgl::rgl.close()
 })
 # }}}

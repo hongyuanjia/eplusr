@@ -461,8 +461,24 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' }
         #'
         snapshot = function (filename)
-            idfviewer_snapshot(self, private, filename)
+            idfviewer_snapshot(self, private, filename),
         # }}}
+
+        # print {{{
+        #' @description
+        #' Print an `IdfViewer` object
+        #'
+        #' @return The `IdfViewer` itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' geom$print()
+        #' }
+        print = function ()
+            idfviewer_print(self, private)
+        # }}}
+
+        # TODO: as.mesh3d
     ),
 
     private = list(
@@ -826,4 +842,15 @@ idfviewer_snapshot <- function (self, private, filename) {
     rgl_snapshot(private$m_device, filename)
 }
 # }}}
+# idfviewer_print {{{
+idfviewer_print <- function (self, private) {
+    cli::cat_rule("EnergPlus IDF Geometry Viewer", line = 1)
 
+    if (is.null(private$m_parent$path())) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_parent$path())
+
+    cli::cat_line(" * ", c(
+        str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
+        paste0("Version: ", surround(private$m_parent$version()))
+    ))
+}
+# }}}

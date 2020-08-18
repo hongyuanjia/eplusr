@@ -2,7 +2,7 @@ context("IdfGeometry class")
 
 # IdfGeometry {{{
 test_that("IdfGeometry", {
-    # skip_on_cran()
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple shading
@@ -24,18 +24,20 @@ test_that("IdfGeometry", {
     expect_is(geom$round_digits(4L), "Idf")
 
     expect_is(geom$area(), "data.table")
-    expect_is(geom$area(class = "Shading:Overhang"), "data.table")
+    expect_is(geom$area(class = "Shading:Zone:Detailed"), "data.table")
     expect_is(geom$area(net = TRUE), "data.table")
 
     expect_is(geom$azimuth(), "data.table")
-    expect_is(geom$azimuth(class = "Shading:Overhang"), "data.table")
+    expect_is(geom$azimuth(class = "Shading:Zone:Detailed"), "data.table")
 
     expect_is(geom$tilt(), "data.table")
-    expect_is(geom$tilt(class = "Shading:Overhang"), "data.table")
+    expect_is(geom$tilt(class = "Shading:Zone:Detailed"), "data.table")
 
     expect_is(v1 <- geom$view(render_by = "construction"), "IdfViewer")
     expect_is(v2 <- geom$view(axis = FALSE), "IdfViewer")
     v1$close()
     v2$close()
+
+    expect_output(geom$print())
 })
 # }}}

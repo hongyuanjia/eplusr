@@ -24,13 +24,13 @@ test_that("Geometry Extraction", {
             class = c("BuildingSurface:Detailed"),
             type = c("BuildingSurface"),
             subtype = c("Detailed"),
-            misc = c("")
+            misc = c(""),
+            id = 80L, name = "WALL-1PF"
         )
     )
 
     # global geometry rules
-    expect_warning(rules <- get_global_geom_rules(idf))
-    expect_equal(rules,
+    expect_equal(get_global_geom_rules(idf),
         list(starting_vertex_position = "upperleftcorner",
              vertex_entry_direction = "counterclockwise",
              coordinate_system = "relative",
@@ -41,12 +41,13 @@ test_that("Geometry Extraction", {
 
     # building transformation
     expect_equal(get_building_transformation(idf),
-        list(building = "Building", north = 30)
+        list(id = 3L, name = "Building", north_axis = 30)
     )
 
     # zone transformation
     expect_equal(d <- get_zone_transformation(idf),
         data.table(
+            id = 74:79,
             name = c("PLENUM-1", "SPACE1-1", "SPACE2-1", "SPACE3-1", "SPACE4-1", "SPACE5-1"),
             x = 0, y = 0, z = 0, dir_relative_north = 0
         )
@@ -87,7 +88,7 @@ test_that("Geometry Extraction", {
     expect_is(shade_d <- extract_geom_shading_detailed(idf), "list")
     expect_equal(names(shade_d), c("meta", "vertices"))
     expect_equal(nrow(shade_d$meta), 25L)
-    expect_equal(names(shade_d$meta), c("id", "name", "class", "surface_type", "building_surface_name"))
+    expect_equal(names(shade_d$meta), c("id", "name", "class", "surface_type", "base_surface_name"))
     expect_equal(names(shade_d$vertices), c("id", "index", "x", "y", "z"))
     expect_equal(nrow(shade_d$vertices), 100L)
     expect_is(shade_d <- extract_geom_shading_detailed(idf, object = 5535), "list")
@@ -130,13 +131,13 @@ test_that("Geometry Extraction", {
     )
     expect_is(subsurf_s <- extract_geom_subsurface_simple(idf), "list")
     expect_equal(names(subsurf_s), c("meta", "vertices"))
-    expect_equal(nrow(subsurf_s$meta), 9L)
+    expect_equal(nrow(subsurf_s$meta), 11L)
     expect_equal(names(subsurf_s$meta),
         c("id", "name", "class", "surface_type", "construction_name",
           "building_surface_name", "outside_boundary_condition_object")
     )
     expect_equal(names(subsurf_s$vertices), c("id", "index", "x", "y", "z"))
-    expect_equal(nrow(subsurf_s$vertices), 36L)
+    expect_equal(nrow(subsurf_s$vertices), 44L)
     expect_is(subsurf_s <- extract_geom_subsurface_simple(idf, object = 84), "list")
     expect_equal(nrow(subsurf_s$meta), 1L)
     expect_equal(nrow(subsurf_s$vertices), 4L)
@@ -152,12 +153,11 @@ test_that("Geometry Extraction", {
     expect_is(shade_s <- extract_geom_shading_simple(idf), "list")
     expect_equal(names(shade_s), c("meta", "vertices"))
     expect_equal(nrow(shade_s$meta), 18L)
-    expect_equal(names(shade_s$meta), c("id", "name", "class", "surface_type", "building_surface_name"))
+    expect_equal(names(shade_s$meta), c("id", "name", "class", "surface_type", "base_surface_name"))
     expect_equal(names(shade_s$vertices), c("id", "index", "x", "y", "z"))
     expect_equal(nrow(shade_s$vertices), 72L)
 
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
-
     expect_is(geom <- extract_geom(idf), "list")
     expect_equal(names(geom), c("rules", "building", "zone", "surface", "subsurface", "shading", "daylighting_point"))
 })
@@ -173,21 +173,24 @@ test_that("Simple Geometry Conversion", {
     cls <- get_geom_class(idf)
 
     expect_is(geom <- convert_geom_surface_simple(idf), "list")
-    expect_equal(names(geom), c("object", "value"))
+    expect_equal(names(geom), c("object", "value", "map"))
     expect_equal(nrow(geom$object), 24L)
     expect_equal(nrow(geom$value), 528L)
+    expect_equal(nrow(geom$map), 24L)
 
     expect_is(geom <- convert_geom_subsurface_simple(idf), "list")
-    expect_equal(names(geom), c("object", "value"))
+    expect_equal(names(geom), c("object", "value", "map"))
     expect_equal(nrow(geom$object), 9L)
     expect_equal(nrow(geom$value), 198L)
+    expect_equal(nrow(geom$map), 9L)
 
     expect_is(geom <- convert_geom_shading_simple(idf), "list")
-    expect_equal(names(geom), c("object", "value"))
+    expect_equal(names(geom), c("object", "value", "map"))
     expect_equal(nrow(geom$object), 12L)
-    expect_equal(nrow(geom$value), 196L)
+    expect_equal(nrow(geom$value), 188L)
+    expect_equal(nrow(geom$map), 12L)
 
-    expect_is(convert_geom(idf), "Idf")
+    expect_is(convert_geom(idf), "list")
     expect_true(all(!cls$class %chin% get_geom_class(idf)$class))
 })
 # }}}

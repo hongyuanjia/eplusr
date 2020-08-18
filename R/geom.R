@@ -392,7 +392,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         view = function (new = FALSE, render_by = "surface_type",
                          wireframe = TRUE, x_ray = FALSE, axis = TRUE)
             idfgeom_view(self, private, new = new, render_by = render_by,
-                      axis = axis, wireframe = wireframe, x_ray = x_ray),
+                axis = axis, wireframe = wireframe, x_ray = x_ray),
         # }}}
 
         # print {{{
@@ -409,30 +409,18 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             idfgeom_print(self, private)
         # }}}
 
-        # set_wwr
-        #
-        # rotate
-        #
-        # scale
-        #
-        # match
-        #
-        # intersect
-        #
-        # translate(vector)
-        #
-        # global_geom_rules
-        # align_coord_system
-        #
-        # building
-        # zone
-        # surface
-        # subsurface
-        # shading
-        # daylighting_point
-        #
-        # mesh3d
-        # as.data.table
+        # TODO: set_wwr
+        # TODO: rotate
+        # TODO: scale
+        # TODO: match
+        # TODO: intersect
+        # TODO: translate
+        # TODO: building
+        # TODO: zone
+        # TODO: surface
+        # TODO: subsurface
+        # TODO: shading
+        # TODO: daylighting_point
     ),
 
     private = list(

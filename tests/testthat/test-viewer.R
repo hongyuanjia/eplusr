@@ -2,7 +2,7 @@ context("IdfViwer")
 
 # IdfViewer {{{
 test_that("IdfViewer class", {
-    skip_on_cran()
+    # skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple model
@@ -58,5 +58,7 @@ test_that("IdfViewer class", {
     expect_true(file.exists(f))
     expect_null(viewer$focus())
     expect_null(viewer$close())
+
+    expect_output(viewer$print())
 })
 # }}}

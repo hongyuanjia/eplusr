@@ -438,7 +438,6 @@ rgl_snapshot <- function (dev, filename) {
     if (has_ext(filename, "png")) {
         rgl::rgl.snapshot(filename, "png", top = FALSE)
     } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
-        if (bring_to_front) rgl::rgl.bringtotop()
         rgl::rgl.postscript(filename, tools::file_ext(filename))
     } else {
         abort(paste0("Not supported export format ", surround(tools::file_ext(filename)), ". ",
@@ -557,6 +556,9 @@ triangulate_surfaces <- function (vertices) {
              trans = trans[1L]
         )
     }]
+
+    # clean
+    set(vertices, NULL, setdiff(names(vertices), c("id", "index", "x", "y", "z")), NULL)
 
     set(vert, NULL, "vertice_index", seq_len(nrow(vert)))
     vert[, by = "vertice_index", c("x", "y", "z") := {

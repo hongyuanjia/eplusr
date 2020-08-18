@@ -161,6 +161,14 @@ viewer$show()
 viewer$snapshot(tempfile(fileext = ".png"))
 }
 
+
+## ------------------------------------------------
+## Method `IdfViewer$print`
+## ------------------------------------------------
+
+\dontrun{
+geom$print()
+}
 }
 \seealso{
 \link{IdfGeometry} class
@@ -188,6 +196,7 @@ Hongyuan Jia
 \item \href{#method-focus}{\code{IdfViewer$focus()}}
 \item \href{#method-close}{\code{IdfViewer$close()}}
 \item \href{#method-snapshot}{\code{IdfViewer$snapshot()}}
+\item \href{#method-print}{\code{IdfViewer$print()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -829,6 +838,29 @@ viewer$show()
 viewer$snapshot(tempfile(fileext = ".png"))
 }
 
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Print an \code{IdfViewer} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfViewer$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The \code{IdfViewer} itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+geom$print()
+}
 }
 \if{html}{\out{</div>}}
 
