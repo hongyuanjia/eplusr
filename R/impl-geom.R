@@ -1587,12 +1587,11 @@ get_newall_vector <- function (vertices) {
     vertices[, by = "id", {
         nx <- seq_len(.N) %% .N + 1L
         # calculate the distance from the origin to the first point on each polygon
-        norm <- c(
+        list(
             x = sum((z + z[nx]) * (y - y[nx])),
             y = sum((x + x[nx]) * (z - z[nx])),
             z = sum((y + y[nx]) * (x - x[nx]))
         )
-        setattr(as.list(norm), "names", c("x", "y", "z"))
     }]
 }
 # }}}
