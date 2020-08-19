@@ -155,10 +155,7 @@ citation("eplusr")
 #>     title = {eplusr: A framework for integrating building energy simulation and data-driven analytics},
 #>     author = {Hongyuan Yu and Adrian Chong},
 #>     year = {2020},
-#>     journal = {Current Protocols in Bioinformatics},
-#>     volume = {69},
-#>     pages = {e96},
-#>     number = {1},
+#>     journal = {*In Review*},
 #>     url = {https://CRAN.R-project.org/package=eplusr},
 #>     doi = {10.13140/RG.2.2.34326.16966},
 #>   }
