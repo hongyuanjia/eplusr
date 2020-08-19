@@ -46,7 +46,11 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'     path_epws <- list.files(file.path(dir, "WeatherData"), "\\.epw",
         #'         full.names = TRUE)[1:5]
         #'
-        #'     group <- EplusGroupJob$new(path_idfs, path_epws)
+        #'     # create from local files
+        #'     group <- group_job(path_idfs, path_epws)
+        #'
+        #'     # create from Idfs and Epws object
+        #'     group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
         #' }
         #' }
         #'
@@ -264,7 +268,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' # get the file path of the error file
         #' group$locate_output(c(1, 4), ".err", strict = FALSE)
         #'
-        #' # can use to detect if certain output file exists
+        #' # can detect if certain output file exists
         #' group$locate_output(c(1, 4), ".expidf", strict = TRUE)
         #' }
         #'
@@ -761,37 +765,19 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
 #' Create An EnergyPlus Parametric Simulation Job
 #'
 #' `group_job()` takes IDFs and EPWs as input and returns a `EplusGroupJob`.
-#' For details on `EplusGroupJob`, please see [EplusGroupJob] class.
 #'
 #' @param idfs Paths to EnergyPlus IDF files or a list of IDF files and [Idf]
-#' objects.
+#'        objects.
 #' @param epws Paths to EnergyPlus EPW files or a list of EPW files and [Epw]
-#' objects. Each element in the list can be `NULL`, which will force
-#' design-day-only simulation when [`$run()`][EplusGroupJob] method is called.
-#' Note this needs at least one `Sizing:DesignDay` object exists in that [Idf].
-#' If `epws` is `NULL`, design-day-only simulation will be conducted for all
-#' input models.
+#'        objects. Each element in the list can be `NULL`, which will force
+#'        design-day-only simulation when [`$run()`][EplusGroupJob] method is
+#'        called. Note this needs at least one `Sizing:DesignDay` object exists
+#'        in that [Idf]. If `epws` is `NULL`, design-day-only simulation will be
+#'        conducted for all input models.
 #' @return A `EplusGroupJob` object.
-#' @examples
-#' \dontrun{
-#' if (is_avail_eplus(8.8)) {
-#'     dir <- eplus_config(8.8)$dir
-#'     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf",
-#'         full.names = TRUE)[1:5]
-#'     path_epws <- list.files(file.path(dir, "WeatherData"), "\\.epw",
-#'         full.names = TRUE)[1:5]
-#'
-#'     # create from local files
-#'     group <- group_job(path_idfs, path_epws)
-#'
-#'     # create from Idfs and Epws object
-#'     group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
-#' }
-#' }
-#'
 #' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
 #' @export
-#' @author Hongyuan Jia
+#' @name EplusGroupJob
 # group_job {{{
 group_job <- function (idfs, epws) {
     EplusGroupJob$new(idfs, epws)

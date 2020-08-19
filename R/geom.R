@@ -319,7 +319,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #'
         #' * Left button: Trackball
         #' * Right button: Pan
-        #' * Middle button: Field-of-view (FOV). '0' means orthographic
+        #` * Middle button: Field-of-view (FOV). `0' means orthographic
         #'   projection.
         #' * Wheel: Zoom
         #'
@@ -332,17 +332,17 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' @param render_by A single string specifying the way of rendering the
         #'        geometry. Possible values are:
         #'
-        #'     * `"surface_type"`: Default. Render the model by surface type
-        #'       model. Walls, roofs, windows, doors, floors, and shading
-        #'       surfaces will have unqiue colors.
-        #'     * `"boundary"`: Render the model by outside boundary condition.
-        #'       Only surfaces that have boundary conditions will be rendered
-        #'       with a color. All other surfaces will be white.
-        #'     * `"construction"`: Render the model by surface constructions.
-        #'     * `"zone"`: Render the model by zones assigned.
-        #'     * `"normal"`: Render the model by surface normal. The outside
-        #'       face of a heat transfer face will be rendered as white and the
-        #'       inside face will be rendered as red.
+        #' * `"surface_type"`: Default. Render the model by surface type model.
+        #'   Walls, roofs, windows, doors, floors, and shading surfaces will
+        #'   have unqiue colors.
+        #' * `"boundary"`: Render the model by outside boundary condition. Only
+        #'   surfaces that have boundary conditions will be rendered with a
+        #'   color. All other surfaces will be white.
+        #' * `"construction"`: Render the model by surface constructions.
+        #' * `"zone"`: Render the model by zones assigned.
+        #' * `"normal"`: Render the model by surface normal. The outside face of
+        #'   a heat transfer face will be rendered as white and the inside face
+        #'   will be rendered as red.
         #'
         #' @param axis If `TRUE`, the X, Y and Z axes will be drawn at the
         #'        global origin. Default: `TRUE`.

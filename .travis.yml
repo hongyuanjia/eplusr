@@ -83,3 +83,5 @@ addons:
     packages:
       - udunits
       - llvm
+services:
+  - xvfb

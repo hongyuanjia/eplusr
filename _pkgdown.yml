@@ -75,8 +75,6 @@ reference:
       - Idf
       - IdfObject
       - idf_object
-      - IdfScheduleCompact
-      - schedule_compact
       - read_idf
       - empty_idf
       - transition
@@ -86,6 +84,7 @@ reference:
       - format.Idf
       - format.IdfObject
       - plot.Idf
+
   - title: IDF schedules
     desc: Class for IDF `Schedule:Compact` objects
     contents:

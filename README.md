@@ -128,6 +128,8 @@ Please see these vignettes and articles about {eplusr}
     files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
   - [Work with `Schedule:Compact`
     objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
+  - [Work with
+    geometries](https://hongyuanjia.github.io/eplusr/articles/geom.html)
   - [Frequently asked
     questions](https://hongyuanjia.github.io/eplusr/articles/faq.html)
 
@@ -141,9 +143,14 @@ Please see these vignettes and articles about {eplusr}
 ``` r
 # read IDF
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+#> IDD v8.8.0 has not been parsed before.
+#> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
+#> IDD file found: '/home/hongyuanjia/.local/EnergyPlus-8-8-0/Energy+.idd'.
+#> Start parsing...
+#> Parsing completed.
 idf
-#> ── EnergPlus Input Data File ────────────────────────────
-#>  * Path: '/mnt/c/Users/hongy/Dropbox/github_repo/epl...
+#> ── EnergPlus Input Data File ─────────────────────────────────────────────
+#>  * Path: '/mnt/c/Users/hongy/Dropbox/github_repo/eplusr/inst/extdata/...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -187,10 +194,10 @@ idf$Material_NoMass$R13LAYER
 
 # get object relation
 idf$object_relation("R13LAYER", "all")
-#> ── Refer to Others ──────────────────────────────────────
+#> ── Refer to Others ───────────────────────────────────────────────────────
 #> Target(s) does not refer to any other field.
 #> 
-#> ── Referred by Others ───────────────────────────────────
+#> ── Referred by Others ────────────────────────────────────────────────────
 #>  Class: <Material:NoMass>
 #>  └─ Object [ID:12] <R13LAYER>
 #>      └─ 1: "R13LAYER";    !- Name
@@ -200,7 +207,7 @@ idf$object_relation("R13LAYER", "all")
 #>               └─ 2: "R13LAYER";    !- Outside Layer
 #>     
 #> 
-#> ── Node Relation ────────────────────────────────────────
+#> ── Node Relation ─────────────────────────────────────────────────────────
 #> Target(s) has no node or their nodes have no reference to other object.
 
 # extract field value
@@ -222,11 +229,11 @@ idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 #> │─ 04*: 4,                !- End Month
 #> │─ 05*: 1,                !- End Day of Month
 #> │─ 06 : "UseWeatherFile", !- Day of Week for Start Day
-#> │─ 07 : "Yes",            !- Use Weather File Holida...
-#> │─ 08 : "Yes",            !- Use Weather File Daylig...
-#> │─ 09 : "No",             !- Apply Weekend Holiday R...
-#> │─ 10 : "Yes",            !- Use Weather File Rain I...
-#> └─ 11 : "Yes";            !- Use Weather File Snow I...
+#> │─ 07 : "Yes",            !- Use Weather File Holidays and Special Da...
+#> │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period
+#> │─ 09 : "No",             !- Apply Weekend Holiday Rule
+#> │─ 10 : "Yes",            !- Use Weather File Rain Indicators
+#> └─ 11 : "Yes";            !- Use Weather File Snow Indicators
 
 # purge unused resource objects
 idf$purge(group = "Schedules")
@@ -235,7 +242,7 @@ idf$purge(group = "Schedules")
 
 # get possible values for fields
 idf$Construction$FLOOR$value_possible("Outside Layer")
-#> ── 2: Outside Layer ─────────────────────────────────────
+#> ── 2: Outside Layer ──────────────────────────────────────────────────────
 #> * Auto value: <NA>
 #> * Default: <NA>
 #> * Choice: <NA>
@@ -280,7 +287,7 @@ idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 epw <- read_epw(path_epw)
 epw
-#> ══ EnergyPlus Weather File ══════════════════════════════
+#> ══ EnergyPlus Weather File ═══════════════════════════════════════════════
 #> [Location ]: San Francisco Intl Ap, CA, USA
 #>              {N 37°37'}, {W 122°24'}, {UTC-08:00}
 #> [Elevation]: 2m above see level
@@ -289,11 +296,11 @@ epw
 #> [Leap Year]: No
 #> [Interval ]: 60 mins
 #> 
-#> ── Data Periods ─────────────────────────────────────────
+#> ── Data Periods ──────────────────────────────────────────────────────────
 #>    Name StartDayOfWeek StartDay EndDay
 #> 1: Data         Sunday     1/ 1  12/31
 #> 
-#> ─────────────────────────────────────────────────────────
+#> ──────────────────────────────────────────────────────────────────────────
 
 # get location
 (loc <- epw$location())
@@ -342,20 +349,20 @@ epw
 #> 4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9
 #> 5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9
 #> 6: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9
-#>    dry_bulb_temperature dew_point_temperature
-#>                   <num>                 <num>
-#> 1:                  7.2                   5.6
-#> 2:                  7.2                   5.6
-#> 3:                  6.7                   5.0
-#> 4:                  6.1                   5.0
-#> 5:                  4.4                   3.9
-#> 6:                  4.4                   3.9
-#>    relative_humidity atmospheric_pressure
-#>                <num>                <num>
-#> 1:                90               102200
-#> 2:                90               102100
-#> 3:                89               102200
-#> 4:                93               102200
+#>    dry_bulb_temperature dew_point_temperature relative_humidity
+#>                   <num>                 <num>             <num>
+#> 1:                  7.2                   5.6                90
+#> 2:                  7.2                   5.6                90
+#> 3:                  6.7                   5.0                89
+#> 4:                  6.1                   5.0                93
+#> 5:                  4.4                   3.9                97
+#> 6:                  4.4                   3.9                97
+#>    atmospheric_pressure extraterrestrial_horizontal_radiation
+#>                   <num>                                 <num>
+#> 1:               102200                                     0
+#> 2:               102100                                     0
+#> 3:               102200                                     0
+#> 4:               102200                                     0
 ....
 
 # a date time column added with correct start day of week type
@@ -367,9 +374,9 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/RtmpgL7ywt/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpoFrr8y/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.10 15:45
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.08.18 21:27
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -402,37 +409,33 @@ job <- idf$run(epw)
 
 # print simulation error
 job$errors()
-#> ══ EnergyPlus Error File ════════════════════════════════
+#> ══ EnergyPlus Error File ═════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-08-10 15:45:00
+#>   * Simulation started: 2020-08-18 21:27:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 3
 #> 
-#> ── During Simulation Initiation ─────────────────────────
-#> [W 1/3] Weather file location will be used rather than
-#>         entered (IDF) Location object.
+#> ── During Simulation Initiation ──────────────────────────────────────────
+#> [W 1/3] Weather file location will be used rather than entered (IDF)
+#>         Location object.
 #>         ..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA
 #>         DESIGN_CONDITIONS
-#>         ..Weather File Location=San Francisco Intl Ap CA
-#>         USA TMY3 WMO#=724940
-#>         ..due to location differences, Latitude
-#>         difference=[2.12] degrees, Longitude
-#>         difference=[17.22] degrees.
-#>         ..Time Zone difference=[1.0] hour(s), Elevation
-#>         difference=[99.89] percent, [1827.00] meters.
-#> [W 2/3] SetUpDesignDay: Entered DesignDay Barometric
-#>         Pressure=81198 differs by more than 10% from
-#>         Standard Barometric Pressure=101301.
-#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N
-#>         ANN HTG 99% CONDNS DB, Standard Pressure (based on
-#>         elevation) will be used.
-#> [W 3/3] SetUpDesignDay: Entered DesignDay Barometric
-#>         Pressure=81198 differs by more than 10% from
-#>         Standard Barometric Pressure=101301.
-#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N
-#>         ANN CLG 1% CONDNS DB=>MWB, Standard Pressure (based
-....
+#>         ..Weather File Location=San Francisco Intl Ap CA USA TMY3
+#>         WMO#=724940
+#>         ..due to location differences, Latitude difference=[2.12] degrees,
+#>         Longitude difference=[17.22] degrees.
+#>         ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]
+#>         percent, [1827.00] meters.
+#> [W 2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198
+#>         differs by more than 10% from Standard Barometric Pressure=101301.
+#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99%
+#>         CONDNS DB, Standard Pressure (based on elevation) will be used.
+#> [W 3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198
+#>         differs by more than 10% from Standard Barometric Pressure=101301.
+#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1%
+#>         CONDNS DB=>MWB, Standard Pressure (based on elevation) will be
+#>         used.
 
 # get report data
 results <- job$report_data("zone one", "zone mean air temperature",
@@ -442,7 +445,7 @@ results <- job$report_data("zone one", "zone mean air temperature",
 str(results)
 #> Classes 'data.table' and 'data.frame':   29 obs. of  22 variables:
 #>  $ case                    : chr  "example" "example" "example" "example" ...
-#>  $ datetime                : POSIXct, format: "2017-03-06 01:00:00" ...
+#>  $ datetime                : POSIXct, format: "2017-03-06 01:00:00" "2017-03-13 01:00:00" ...
 #>  $ month                   : int  3 3 3 3 1 1 1 1 2 2 ...
 #>  $ day                     : int  6 13 20 27 7 14 21 28 4 11 ...
 #>  $ hour                    : int  1 1 1 1 1 1 1 1 1 1 ...
@@ -472,15 +475,12 @@ all(weekdays(results$datetime) == results$day_type)
 # get tabular data
 job$tabular_data(table_name = "site and source energy", row_name = "total site energy", wide = TRUE)
 #> $`AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy`
-#>      case                             report_name
-#>    <char>                                  <char>
-#> 1:  model AnnualBuildingUtilityPerformanceSummary
-#>         report_for             table_name
-#>             <char>                 <char>
-#> 1: Entire Facility Site and Source Energy
-#>             row_name Total Energy [GJ]
-#>               <char>             <num>
-#> 1: Total Site Energy             89.81
+#>      case                             report_name      report_for
+#>    <char>                                  <char>          <char>
+#> 1:  model AnnualBuildingUtilityPerformanceSummary Entire Facility
+#>                table_name          row_name Total Energy [GJ]
+#>                    <char>            <char>             <num>
+#> 1: Site and Source Energy Total Site Energy             89.81
 #>    Energy Per Total Building Area [MJ/m2]
 #>                                     <num>
 #> 1:                                 386.67
@@ -496,10 +496,9 @@ citation("eplusr")
 #> 
 #> To cite eplusr in publications use:
 #> 
-#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A
-#>   framework for integrating building energy
-#>   simulation and data-driven analytics. doi:
-#>   10.13140/RG.2.2.34326.16966
+#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A framework for
+#>   integrating building energy simulation and data-driven
+#>   analytics. doi: 10.13140/RG.2.2.34326.16966
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 

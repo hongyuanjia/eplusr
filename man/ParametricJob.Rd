@@ -3,10 +3,28 @@
 \docType{class}
 \name{ParametricJob}
 \alias{ParametricJob}
+\alias{param_job}
 \title{Create and Run Parametric Analysis, and Collect Results}
+\usage{
+param_job(idf, epw)
+}
+\arguments{
+\item{idf}{A path to EnergyPlus IDF or IMF file or an \code{Idf} object.}
+
+\item{epw}{A path to EnergyPlus EPW file or an \code{Epw} object. \code{epw} can also
+be \code{NULL} which will force design-day-only simulation when
+\code{\link[=ParametricJob]{$run()}} method is called. Note this needs at least
+one \code{Sizing:DesignDay} object exists in the \link{Idf}.}
+}
+\value{
+A \code{ParametricJob} object.
+}
 \description{
 \code{ParametricJob} class provides a prototype of conducting parametric analysis
 of EnergyPlus simulations.
+
+\code{param_job()} takes an IDF and EPW as input and returns a \code{ParametricJob}.
+For details on \code{ParametricJob}, please see \link{ParametricJob} class.
 }
 \details{
 Basically, it is a collection of multiple \code{EplusJob} objects. However, the
@@ -29,8 +47,12 @@ if (is_avail_eplus(8.8)) {
     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-    # create from an Idf and an Epw object
+    # create from an IDF and an EPW
+    param <- param_job(idf_path, epw_path)
     param <- ParametricJob$new(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    param_job(read_idf(idf_path), read_epw(epw_path))
 }
 }
 
@@ -158,6 +180,9 @@ param$print()
 }
 
 }
+\seealso{
+\code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.
+}
 \author{
 Hongyuan Jia
 }
@@ -230,8 +255,12 @@ if (is_avail_eplus(8.8)) {
     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-    # create from an Idf and an Epw object
+    # create from an IDF and an EPW
+    param <- param_job(idf_path, epw_path)
     param <- ParametricJob$new(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    param_job(read_idf(idf_path), read_epw(epw_path))
 }
 }
 

@@ -3,10 +3,28 @@
 \docType{class}
 \name{EplusJob}
 \alias{EplusJob}
+\alias{eplus_job}
 \title{Run EnergyPlus Simulation and Collect Outputs}
+\usage{
+eplus_job(idf, epw)
+}
+\arguments{
+\item{idf}{A path to an local EnergyPlus IDF file or an \code{Idf} object.}
+
+\item{epw}{A path to an local EnergyPlus EPW file or an \code{Epw} object. \code{epw}
+can also be \code{NULL} which will force design-day-only simulation when
+\code{\link[=EplusJob]{$run()}} method is called. Note this needs at least one
+\code{Sizing:DesignDay} object exists in the \link{Idf}.}
+}
+\value{
+An \code{EplusJob} object.
+}
 \description{
 \code{EplusJob} class wraps the EnergyPlus command line interface and provides
 methods to extract simulation outputs.
+
+\code{eplus_job()} takes an IDF and EPW as input, and returns an \code{EplusJob} object
+for running EnergyPlus simulation and collecting outputs.
 }
 \details{
 eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
@@ -31,6 +49,7 @@ automatically created if it does not exists.
 ## Method `EplusJob$new`
 ## ------------------------------------------------
 
+\dontrun{
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -38,7 +57,12 @@ if (is_avail_eplus(8.8)) {
     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-    job <- EplusJob$new(idf_path, epw_path)
+    # create from local files
+    job <- eplus_job(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+}
 }
 
 ## ------------------------------------------------
@@ -269,6 +293,8 @@ job$print()
 }
 \seealso{
 \link{ParametricJob} class for EnergyPlus parametric simulations.
+
+\code{\link[=param_job]{param_job()}} for creating an EnergyPlus parametric job.
 }
 \author{
 Hongyuan Jia
@@ -318,14 +344,20 @@ An \code{EplusJob} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{if (is_avail_eplus(8.8)) {
+\preformatted{\dontrun{
+if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-    job <- EplusJob$new(idf_path, epw_path)
+    # create from local files
+    job <- eplus_job(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+}
 }
 }
 \if{html}{\out{</div>}}

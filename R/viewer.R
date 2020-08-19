@@ -51,12 +51,12 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' # create from an Idf object
         #' idf <- read_idf(path_idf, use_idd(8.8, "auto"))
-        #' geom <- idf$geometry()
-        #' geom <- IdfGeometry$new(idf)
+        #' viewer <- idf_viewer(idf)
+        #' viewer <- IdfViewer$new(idf)
         #'
         #' # create from an IDF file
-        #' geom <- idf_geometry(path_idf)
-        #' geom <- IdfGeometry$new(path_idf)
+        #' viewer <- idf_viewer(path_idf)
+        #' viewer <- IdfViewer$new(path_idf)
         #' }
         initialize = function (geometry) {
             if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -106,7 +106,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' geom$parent()
+        #' viewer$parent()
         #' }
         parent = function ()
             idfviewer_parent(self, private),
@@ -142,7 +142,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' geom$device()
+        #' viewer$device()
         #' }
         device = function ()
             idfviewer_device(self, private),
@@ -192,7 +192,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' geom$viewpoint()
+        #' viewer$viewpoint()
         #' }
         viewpoint = function (look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL)
             idfviewer_viewpoint(self, private, look_at, theta, phi, fov, zoom, scale),
@@ -480,7 +480,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' geom$print()
+        #' viewer$print()
         #' }
         print = function ()
             idfviewer_print(self, private)

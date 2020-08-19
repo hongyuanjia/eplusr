@@ -334,7 +334,7 @@ idf$object_relation("floor", "ref_by")
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
-idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+idf$objects_in_relation("floor", "ref_by", class = "BuildingSurface:Detailed")
 }
 
 
@@ -477,7 +477,7 @@ idf$del(ids)
 
 \dontrun{
 # purge unused "Fraction" schedule type
-idf$purge("Fraction") # ScheduleTypeLimits
+idf$purge("on/off") # ScheduleTypeLimits
 
 # purge all unused schedule types
 idf$purge(class = "ScheduleTypeLimits")
@@ -2052,7 +2052,7 @@ An named list of \link{IdfObject} objects.
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
-idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+idf$objects_in_relation("floor", "ref_by", class = "BuildingSurface:Detailed")
 }
 
 }
@@ -2560,7 +2560,7 @@ The modified \code{Idf} object itself, invisibly.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 # purge unused "Fraction" schedule type
-idf$purge("Fraction") # ScheduleTypeLimits
+idf$purge("on/off") # ScheduleTypeLimits
 
 # purge all unused schedule types
 idf$purge(class = "ScheduleTypeLimits")
@@ -4087,17 +4087,19 @@ View 3D \code{Idf} geometry
 reused if possible. Default: \code{FALSE}.}
 
 \item{\code{render_by}}{A single string specifying the way of rendering the
-geometry. Possible values are:\preformatted{* `"surface_type"`: Default. Render the model by surface type
-  model. Walls, roofs, windows, doors, floors, and shading
-  surfaces will have unqiue colors.
-* `"boundary"`: Render the model by outside boundary condition.
-  Only surfaces that have boundary conditions will be rendered
-  with a color. All other surfaces will be white.
-* `"construction"`: Render the model by surface constructions.
-* `"zone"`: Render the model by zones assigned.
-* `"normal"`: Render the model by surface normal. The outside
-  face of a heat transfer face will be rendered as white and the
-  inside face will be rendered as red.
+geometry. Possible values are:
+\itemize{
+\item \code{"surface_type"}: Default. Render the model by surface type
+model. Walls, roofs, windows, doors, floors, and shading
+surfaces will have unqiue colors.
+\item \code{"boundary"}: Render the model by outside boundary condition.
+Only surfaces that have boundary conditions will be rendered
+with a color. All other surfaces will be white.
+\item \code{"construction"}: Render the model by surface constructions.
+\item \code{"zone"}: Render the model by zones assigned.
+\item \code{"normal"}: Render the model by surface normal. The outside
+face of a heat transfer face will be rendered as white and the
+inside face will be rendered as red.
 }}
 
 \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be

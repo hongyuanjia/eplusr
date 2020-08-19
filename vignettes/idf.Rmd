@@ -138,6 +138,12 @@ in classes are shown in square bracket.
 Now let's read an IDF file distributed with EnergyPlus 8.8.0. As we have already
 got the IDD, we can just ignore the `idd` argument.
 
+**Note**: Once an EnergyPlus version `X.Y` is successfully located, all IDFs
+with versions lower than `X.Y` can be parsed. For example, if you have
+EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using
+simply `read_idf(path)` without specifying `idd`. This is because eplusr will
+use IDD files distributed with EnergyPlus VersionUpdater program.
+
 ```{r read, out.lines = 10}
 path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
 model <- read_idf(path)
