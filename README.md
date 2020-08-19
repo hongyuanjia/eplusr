@@ -88,6 +88,7 @@ in interactive mode.
   - A pure R-based version updater which is more than
     [20X](https://hongyuanjia.github.io/eplusr/articles/transition.html)
     faster than VersionUpdater distributed with EnergyPlus
+  - Fast 3D geometry visualization
 
 **View IDF geometry in 3D**  
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true" width="60%" />
@@ -145,9 +146,10 @@ citation("eplusr")
 #> 
 #> To cite eplusr in publications use:
 #> 
-#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A framework for
-#>   integrating building energy simulation and data-driven
-#>   analytics. doi: 10.13140/RG.2.2.34326.16966
+#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A
+#>   framework for integrating building energy
+#>   simulation and data-driven analytics. doi:
+#>   10.13140/RG.2.2.34326.16966
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
