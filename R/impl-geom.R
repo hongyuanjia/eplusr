@@ -1134,11 +1134,23 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 # subset_geom {{{
 subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
                          zone = NULL, surface = NULL) {
-    assert_subset(type, c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"), empty.ok = FALSE)
+    assert_subset(type, c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"))
     zone <- assert_valid_type(zone, "Zone ID|Name", null.ok = TRUE)
     surface <- assert_valid_type(surface, "Surface ID|Name", null.ok = TRUE)
 
     # subset geoms by components {{{
+    if (!length(type)) {
+        geoms$surface$meta <- geoms$surface$meta[0L]
+        geoms$surface$vertices <- geoms$surface$vertices[0L]
+        geoms$subsurface$meta <- geoms$surface$meta[0L]
+        geoms$subsurface$vertices <- geoms$surface$vertices[0L]
+        geoms$shading$meta <- geoms$surface$meta[0L]
+        geoms$shading$vertices <- geoms$surface$vertices[0L]
+        geoms$daylighting_point$meta <- geoms$surface$meta[0L]
+        geoms$daylighting_point$vertices <- geoms$surface$vertices[0L]
+        return(geoms)
+    }
+
     ALL_COMP <- c("floor", "wall", "roof", "window", "door", "shading", "daylighting")
     if ("all" %chin% type) type <- ALL_COMP
     dshow <- setdiff(ALL_COMP, type)

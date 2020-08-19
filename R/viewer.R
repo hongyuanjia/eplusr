@@ -390,8 +390,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' Show [Idf] geometry
         #'
         #' @param type A character vector of geometry components to show. If
-        #'        `"all"`, all geometry components will be shown. Otherwise,
-        #'        should be a subset of following:
+        #'        `"all"` (default), all geometry components will be shown. If
+        #'        `NULL`, no geometry faces will be shown. Otherwise, should be
+        #'        a subset of following:
         #'
         #' * `"floor"`
         #' * `"wall"`
@@ -419,8 +420,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$show()
         #' }
-        show = function (type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
-                         zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
+        show = function (type = "all", zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
             idfviewer_show(self, private, type, zone, surface, dayl_color, dayl_size),
         # }}}
 

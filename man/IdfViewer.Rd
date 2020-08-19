@@ -722,7 +722,7 @@ viewer$render_by()
 Show \link{Idf} geometry
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfViewer$show(
-  type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
+  type = "all",
   zone = NULL,
   surface = NULL,
   dayl_color = "red",
@@ -734,8 +734,9 @@ Show \link{Idf} geometry
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{type}}{A character vector of geometry components to show. If
-\code{"all"}, all geometry components will be shown. Otherwise,
-should be a subset of following:
+\code{"all"} (default), all geometry components will be shown. If
+\code{NULL}, no geometry faces will be shown. Otherwise, should be
+a subset of following:
 \itemize{
 \item \code{"floor"}
 \item \code{"wall"}
