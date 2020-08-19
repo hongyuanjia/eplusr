@@ -508,10 +508,8 @@ viewpoint_rotate_matrix <- function (axis, degree) {
 # pair_line_vertex {{{
 pair_line_vertex <- function (vertices) {
     # for lines, vertices should be provided in pairs
-    # only need to plot surfaces here, since windows and holes are the same
-    # things here
     vertices[, by = "id", {
-        idx <- c(sort(c(index, index[-1L])), 1L)
+        idx <- c(index[[1L]], rep(index[-1L], each = 2L), index[[1L]])
         list(x = x[idx], y = y[idx], z = z[idx])
     }]
 }
