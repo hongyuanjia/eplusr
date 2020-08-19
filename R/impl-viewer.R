@@ -547,10 +547,10 @@ triangulate_surfaces <- function (vertices) {
         list(v[1L,], v[2L,], v[3L,])
     }]
 
-    vertices[, by = "id", `:=`(hole = max(which(index == -1L), 0L))]
-
     vert <- vertices[, by = "id", {
-        tri <- decido::earcut(list(rev_x, rev_y), hole[1L])
+        hole <- which(index == -1L)
+        if (!length(hole)) hole <- 0L
+        tri <- decido::earcut(list(rev_x, rev_y), hole)
         list(index = seq_along(tri),
              x = rev_x[tri], y = rev_y[tri], z = rev_z[tri],
              trans = trans[1L]
