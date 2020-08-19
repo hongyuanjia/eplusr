@@ -1544,18 +1544,40 @@ get_vertices_from_specs <- function (azimuth, tilt, length, height, x0, y0, z0) 
 # align_face {{{
 align_face <- function (vertices) {
     norm <- get_outward_normal(vertices)
-    vertices[norm, on = "id", by = .EACHI, {
-        align <- align_z_prime(i.x, i.y, i.z)
+    # get z' with outward normal
+    norm[, by = "id", trans := list(list(align_z_prime(x, y, z)))]
 
-        # get z' with outward normal
-        align_inv <- solve(align)
-        align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) align_inv %*% x)[1:3,]
+    dt_trans <- rbindlist(lapply(norm$trans, as.list))
+    dt_inv_trans <- rbindlist(lapply(norm$trans, function (x) as.list(solve.default(x))))
+    set(dt_trans, NULL, "id", norm$id)
+    set(dt_inv_trans, NULL, "id", norm$id)
 
-        # compute translation to minimum in aligned system
-        trans <- diag(nrow = 4L)
-        trans[1:3, 4L] <- apply(align_vert, 1, min)
-        list(trans = list(align %*% trans))
-    }]
+    add_joined_cols(dt_inv_trans, vertices, "id", sprintf("V%i", 1:16))
+    vertices[, `:=`(
+        inv_x = x * V1 + y * V5 + z * V9  + V13,
+        inv_y = x * V2 + y * V6 + z * V10 + V14,
+        inv_z = x * V3 + y * V7 + z * V11 + V15
+    )]
+    vert <- vertices[, by = "id", list(inv_x = min(inv_x), inv_y = min(inv_y), inv_z = min(inv_z))]
+    # clean
+    set(vertices, NULL, setdiff(names(vertices), c("id", "index", "x", "y", "z")), NULL)
+
+    add_joined_cols(dt_trans, vert, "id", sprintf("V%i", 1:16))
+
+    # 4 X 4 matrix multiplication
+    vert[, `:=`(
+        V13 = inv_x * V1 + inv_y * V5 + inv_z * V9  + V13,
+        V14 = inv_x * V2 + inv_y * V6 + inv_z * V10 + V14,
+        V15 = inv_x * V3 + inv_y * V7 + inv_z * V11 + V15,
+        V16 = inv_x * V4 + inv_y * V8 + inv_z * V12 + V16
+    )]
+
+    vert[, by = "id", list(
+        trans = list(matrix(
+            c(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16),
+            ncol = 4L
+        ))
+    )]
 }
 # }}}
 

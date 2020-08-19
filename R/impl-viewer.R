@@ -536,38 +536,41 @@ add_surface_hole_vertices <- function (geom_surface, geom_subsurface) {
 
 # triangulate_surfaces {{{
 triangulate_surfaces <- function (vertices) {
-    # tweaked for speed
+    # tweaked for speed and avoid grouping computation as long as possible
     trans <- align_face(vertices)
-    set(trans, NULL, "rev_trans", lapply(trans$trans, solve.default))
-    add_joined_cols(trans, vertices, "id", c("trans", "rev_trans"))
-    set(vertices, NULL, "vertice_index", seq_len(nrow(vertices)))
 
-    vertices[, by = "vertice_index", c("rev_x", "rev_y", "rev_z") := {
-        v <- rev_trans[[1L]] %*% c(x, y, z, 1L)
-        list(v[1L,], v[2L,], v[3L,])
-    }]
+    dt_trans <- rbindlist(lapply(trans$trans, as.list))
+    dt_inv_trans <- rbindlist(lapply(trans$trans, function (x) as.list(solve.default(x))))
+
+    set(dt_trans, NULL, "id", trans$id)
+    set(dt_inv_trans, NULL, "id", trans$id)
+
+    add_joined_cols(dt_inv_trans, vertices, "id", sprintf("V%i", 1:16))
+    vertices[, `:=`(
+        inv_x = x * V1 + y * V5 + z * V9 + V13,
+        inv_y = x * V2 + y * V6 + z * V10 + V14,
+        inv_z = x * V3 + y * V7 + z * V11 + V15
+    )]
 
     vert <- vertices[, by = "id", {
         hole <- which(index == -1L)
         if (!length(hole)) hole <- 0L
-        tri <- decido::earcut(list(rev_x, rev_y), hole)
-        list(index = seq_along(tri),
-             x = rev_x[tri], y = rev_y[tri], z = rev_z[tri],
-             trans = trans[1L]
-        )
+        tri <- decido::earcut(list(inv_x, inv_y), hole)
+        list(index = seq_along(tri), x = inv_x[tri], y = inv_y[tri], z = inv_z[tri])
     }]
 
     # clean
     set(vertices, NULL, setdiff(names(vertices), c("id", "index", "x", "y", "z")), NULL)
 
-    set(vert, NULL, "vertice_index", seq_len(nrow(vert)))
-    vert[, by = "vertice_index", c("x", "y", "z") := {
-        v <- trans[[1L]] %*% c(x, y, z, 1L)
-        list(v[1L,], v[2L,], v[3L,])
-    }]
-
+    add_joined_cols(dt_trans, vert, "id", sprintf("V%i", 1:16))
+    vert[, `:=`(
+        x = x * V1 + y * V5 + z * V9 + V13,
+        y = x * V2 + y * V6 + z * V10 + V14,
+        z = x * V3 + y * V7 + z * V11 + V15
+    )]
     # clean
-    set(vert, NULL, c("trans", "vertice_index"), NULL)
+    set(vert, NULL, setdiff(names(vert), c("id", "index", "x", "y", "z")), NULL)
+    vert
 }
 # }}}
 
