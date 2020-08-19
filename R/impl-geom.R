@@ -1547,8 +1547,8 @@ align_face <- function (vertices) {
     # get z' with outward normal
     norm[, by = "id", trans := list(list(align_z_prime(x, y, z)))]
 
-    dt_trans <- rbindlist(lapply(norm$trans, as.list))
-    dt_inv_trans <- rbindlist(lapply(norm$trans, function (x) as.list(solve.default(x))))
+    dt_trans <- setDT(data.table::transpose(norm$trans))
+    dt_inv_trans <- setDT(data.table::transpose(lapply(norm$trans, solve.default)))
     set(dt_trans, NULL, "id", norm$id)
     set(dt_inv_trans, NULL, "id", norm$id)
 
