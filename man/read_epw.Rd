@@ -4,14 +4,10 @@
 \alias{read_epw}
 \title{Read and Parse EnergyPlus Weather File (EPW)}
 \usage{
-read_epw(path, warning = FALSE)
+read_epw(path)
 }
 \arguments{
 \item{path}{A path of an EnergyPlus \code{EPW} file.}
-
-\item{warning}{If \code{TRUE}, warnings are given if any missing data, out of
-range data and redundant data is found. Default: \code{FALSE}. All these data can
-be also retrieved using methods in \link{Epw} class.}
 }
 \value{
 An \code{Epw} object.

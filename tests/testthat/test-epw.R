@@ -343,6 +343,19 @@ test_that("Data Setter", {
         )
     )
     expect_equal(nrow(epw$data()), 48L)
+
+    expect_error({
+        epw <- read_epw(path_epw)
+        suppressWarnings(d <- epw$data(start_year = 2020))
+        epw$set(d, TRUE)
+    })
+
+    expect_error({
+        epw <- read_epw(path_epw)
+        suppressWarnings(d <- epw$data(start_year = 2020))
+        d[100L, datetime := lubridate::as_datetime("2020-01-01 00:00:00")]
+        epw$set(d)
+    })
     # }}}
 
     # $add() {{{
