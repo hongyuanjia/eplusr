@@ -149,8 +149,8 @@ job$errors(info = TRUE)
 \dontrun{
 job$output_dir()
 
-# open output directory
-job$output_dir(open = TRUE)
+# Below will open output directory
+# job$output_dir(open = TRUE)
 }
 
 
@@ -665,8 +665,8 @@ Get simulation output directory
 \preformatted{\dontrun{
 job$output_dir()
 
-# open output directory
-job$output_dir(open = TRUE)
+# Below will open output directory
+# job$output_dir(open = TRUE)
 }
 
 }

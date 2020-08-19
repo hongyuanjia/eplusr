@@ -266,8 +266,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' \dontrun{
         #' job$output_dir()
         #'
-        #' # open output directory
-        #' job$output_dir(open = TRUE)
+        #' # Below will open output directory
+        #' # job$output_dir(open = TRUE)
         #' }
         #'
         output_dir = function (open = FALSE)
