@@ -153,7 +153,7 @@ knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools
 
 Please see these vignettes and articles about {eplusr}
 
-* [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/idf.html)
+* [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/eplusr.html)
 * [Run simulation and data exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
 * [Rarametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
 * [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
@@ -165,77 +165,6 @@ Please see these vignettes and articles about {eplusr}
 ### Slides
 
 * [Slides: Interfacing EnergyPlus using R](https://hongyuanjia.github.io/eplusrIntro)
-
-## Getting started
-
-```{r load, out.lines = 30}
-# read IDF
-idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
-idf
-
-# extract object
-idf$Material_NoMass$R13LAYER
-
-# get object relation
-idf$object_relation("R13LAYER", "all")
-
-# extract field value
-idf$RunPeriod[[1]][c("Begin Month", "End Month")]
-
-# add new object
-idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
-
-# purge unused resource objects
-idf$purge(group = "Schedules")
-
-# get possible values for fields
-idf$Construction$FLOOR$value_possible("Outside Layer")
-
-# extract object data
-idf$to_table(class = "BuildingSurface:Detailed", string_value = FALSE, unit = TRUE)
-
-# save the IDF
-idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
-
-# read EPW
-path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
-epw <- read_epw(path_epw)
-epw
-
-# get location
-(loc <- epw$location())
-
-# extract weather data
-(weather <- head(epw$data()))
-
-# a date time column added with correct start day of week type
-epw$period()$start_day_of_week
-weekdays(weather$datetime)
-
-# run simulation
-job <- idf$run(epw)
-
-# print simulation error
-job$errors()
-
-# get report data
-results <- job$report_data("zone one", "zone mean air temperature",
-  case = "example", month = 1:6, hour = 1, day_type = "Monday",
-  all = TRUE
-)
-str(results)
-
-# a date time column added with correct day of week type
-all(weekdays(results$datetime) == results$day_type)
-
-# get tabular data
-job$tabular_data(table_name = "site and source energy", row_name = "total site energy", wide = TRUE)
-```
-
-```{r del_job, include = FALSE}
-clean_wd(idf$path())
-unlink(idf$path())
-```
 
 ## How to cite
 

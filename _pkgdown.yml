@@ -24,12 +24,12 @@ navbar:
       href: index.html
     intro:
       text: "Get started"
-      href: articles/idf.html
+      href: articles/eplusr.html
     articles:
       text: Vignettes
       menu:
       - text: "Introduction to eplusr"
-        href: articles/idf.html
+        href: articles/eplusr.html
       - text: "Run simulation and data exploration"
         href: articles/job.html
       - text: "Parametric simulations"
