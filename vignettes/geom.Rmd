@@ -226,7 +226,7 @@ viewer$background("grey50")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_background1.png"))
 ```
 
 ```{r}
@@ -234,7 +234,7 @@ viewer$background("white")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_background2.png"))
 ```
 
 ### Change viewpoint
@@ -244,7 +244,7 @@ viewer$viewpoint("top")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_viewpoint1.png"))
 ```
 
 ```{r}
@@ -252,7 +252,7 @@ viewer$viewpoint("iso")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_viewpoint2.png"))
 ```
 
 ### Change axis style
@@ -262,7 +262,7 @@ viewer$axis(width = 5)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_axis1.png"))
 ```
 
 ```{r}
@@ -270,7 +270,7 @@ viewer$axis(FALSE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_axis2.png"))
 ```
 
 ### Change ground style
@@ -280,7 +280,7 @@ viewer$ground(TRUE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_ground.png"))
 ```
 
 ### Turn on/off X-ray style
@@ -290,7 +290,7 @@ viewer$x_ray(TRUE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_xray.png"))
 ```
 
 ```{r}
@@ -298,7 +298,7 @@ viewer$x_ray(FALSE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_xray.png"))
 ```
 
 ### Change render style
@@ -308,7 +308,7 @@ viewer$render_by("zone")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_renderby1.png"))
 ```
 
 ```{r}
@@ -316,7 +316,7 @@ viewer$render_by("surface_type")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_renderby2.png"))
 ```
 
 ### Turn on/off components
@@ -326,7 +326,7 @@ viewer$show(zone = "floor 7 clean")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_show1.png"))
 ```
 
 ```{r}
@@ -334,7 +334,7 @@ viewer$show(surface = "MOB Floor 5 Perimeter 2 Ext Wall")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_show2.png"))
 ```
 
 ```{r}
@@ -342,7 +342,7 @@ viewer$show(type = "wall")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(viewer$snapshot(tempfile(fileext = ".png")))
+knitr::include_graphics(viewer$snapshot("view_show3.png"))
 ```
 
 ## Save the snapshot
@@ -352,11 +352,11 @@ file to disk.
 
 ```{r}
 viewer$show()
-(f <- viewer$snapshot(tempfile(fileext = ".png")))
+viewer$snapshot("view.png")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics(f)
+knitr::include_graphics("view.png")
 ```
 
 ## Work with the rgl window
