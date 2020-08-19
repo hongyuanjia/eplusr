@@ -117,7 +117,7 @@ if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
 * Provide a simple yet extensible prototype of conducting parametric simulations
   and collect all results in one go
 * A pure R-based version updater which is more than
-  [20X](https://hongyuanjia.me/en/2019/08/update-energyplus-using-eplusr-transition)
+  [20X](https://hongyuanjia.github.io/eplusr/articles/transition.html)
   faster than VersionUpdater distributed with EnergyPlus
 
 **View IDF geometry in 3D**\
