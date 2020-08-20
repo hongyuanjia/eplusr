@@ -483,7 +483,7 @@ idfgeom_rules <- function (self, private) {
 # }}}
 # idfgeom_coord_system {{{
 idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL, daylighting = NULL) {
-    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(private$m_parent)
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(invisible(private$m_parent))
 
     rules <- private$geoms()$rules
 
@@ -509,25 +509,28 @@ idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL,
 
     # update vertices of detailed geometries
     if (rules$coordinate_system != private$m_geoms$rules$coordinate_system) {
-        set_geom_vertices(private$m_parent, private$m_geoms$surface)
-        set_geom_vertices(private$m_parent, private$m_geoms$subsurface)
-        set_geom_vertices(private$m_parent, private$m_geoms$shading)
+        meta <- rbindlist(list(
+            fast_subset(private$m_geoms$surface, c("id", "class")),
+            fast_subset(private$m_geoms$subsurface, c("id", "class")),
+            fast_subset(private$m_geoms$shading, c("id", "class"))
+        ))
+        set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
     }
 
     # add a uuid
-    private$m_log$uuid <- unique_id()
+    private$log_new_uuid()
 
     # log parent data
     private$log_parent_uuid()
     private$log_parent_order()
     private$log_geom_class()
 
-    private$m_parent
+    invisible(private$m_parent)
 }
 # }}}
 # idfgeom_convert {{{
 idfgeom_convert <- function (self, private, type = c("surface", "subsurface", "shading")) {
-    conv <- convert_geom(private$m_parent, type = type)
+    conv <- convert_geom(private$m_parent, private$geoms(), type = type)
     private$m_parent <- conv$idf
 
     # update geometry data
@@ -543,7 +546,7 @@ idfgeom_convert <- function (self, private, type = c("surface", "subsurface", "s
     }
 
     # add a uuid
-    private$m_log$uuid <- unique_id()
+    private$log_new_uuid()
 
     # log parent data
     private$log_parent_uuid()
@@ -553,19 +556,31 @@ idfgeom_convert <- function (self, private, type = c("surface", "subsurface", "s
     # store the mapping as an attribute
     setattr(private$m_parent, "mapping", conv$map)
 
-    private$m_parent
+    invisible(private$m_parent)
 }
 # }}}
 # idfgeom_round_digits {{{
 idfgeom_round_digits <- function (self, private, digits = 4L) {
-    set_geom_vertices(private$m_parent, private$geoms()$surface, digits = digits)
-    set_geom_vertices(private$m_parent, private$geoms()$subsurface, digits = digits)
-    set_geom_vertices(private$m_parent, private$geoms()$shading, digits = digits)
-    private$m_parent
+    meta <- rbindlist(list(
+        fast_subset(private$m_geoms$surface, c("id", "class")),
+        fast_subset(private$m_geoms$subsurface, c("id", "class")),
+        fast_subset(private$m_geoms$shading, c("id", "class"))
+    ))
+
+    # add a uuid
+    private$log_new_uuid()
+
+    # log parent data
+    private$log_parent_uuid()
+    private$log_parent_order()
+
+    set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
+
+    invisible(private$m_parent)
 }
 # }}}
-# idfgeom_subset {{{
-idfgeom_subset <- function (self, private, class = NULL, object = NULL) {
+# idfgeom_subset_vertices {{{
+idfgeom_subset_vertices <- function (self, private, class = NULL, object = NULL) {
     geoms <- private$geoms()
     obj <- data.table()
 
@@ -578,191 +593,69 @@ idfgeom_subset <- function (self, private, class = NULL, object = NULL) {
         class = class, object = object
     )
     geom_class <- get_geom_class(private$m_parent, obj$object_id)
-
-    if (any(i <- geom_class$category == "Surface")) {
-        geoms$surface$vertices <- geoms$surface$vertices[J(geom_class$id[i]), on = "id", nomatch = NULL]
-    } else {
-        geoms$surface$vertices <- geoms$surface$vertices[0L]
-    }
-    if (any(i <- geom_class$category == "SubSurface")) {
-        geoms$subsurface$vertices <- geoms$subsurface$vertices[J(geom_class$id[i]), on = "id", nomatch = NULL]
-    } else {
-        geoms$subsurface$vertices <- geoms$subsurface$vertices[0L]
-    }
-    if (any(i <- geom_class$category == "Shading")) {
-        geoms$shading$vertices <- geoms$shading$vertices[J(geom_class$id[i]), on = "id", nomatch = NULL]
-    } else {
-        geoms$shading$vertices <- geoms$shading$vertices[0L]
-    }
+    geoms$vertices <- geoms$vertices[J(geom_class$id), on = "id", nomatch = NULL]
 
     list(geoms = geoms, object = obj)
 }
 # }}}
-# idfgeom_area {{{
-idfgeom_area <- function (self, private, class = NULL, object = NULL, net = FALSE) {
-    l <- idfgeom_subset(self, private, class, object)
+# idfgeom_cal_property {{{
+idfgeom_cal_property <- function (self, private, class = NULL, object = NULL, fun) {
+    l <- idfgeom_subset_vertices(self, private, class, object)
     geoms <- l$geoms
     obj <- l$object
 
-    surf <- subsurf <- shading <- data.table()
-
-    if (nrow(geoms$surface$vertices)) {
-        surf <- get_newall_vector(geoms$surface$vertices)[, by = "id", list(area = get_area(c(x, y, z)))]
-        surf[geoms$surface$meta, on = "id", `:=`(
-            name = i.name, class = i.class, zone = zone_name, type = i.surface_type
-        )]
-    }
-    if (nrow(geoms$subsurface$vertices)) {
-        subsurf <- get_newall_vector(geoms$subsurface$vertices)[, by = "id", list(area = get_area(c(x, y, z)))]
-        subsurf[geoms$subsurface$meta, on = "id", `:=`(
-            name = i.name, class = i.class,
-            building_surface_name = i.building_surface_name, type = i.surface_type
-        )]
-        if (nrow(geoms$surface$meta)) {
-            subsurf[geoms$surface$meta, on = c("building_surface_name" = "name"), zone := i.zone_name]
-        }
-    }
-    if (nrow(geoms$shading$vertices)) {
-        shading <- get_newall_vector(geoms$shading$vertices[id > 0L])[, by = "id", list(area = get_area(c(x, y, z)))]
-        shading[geoms$shading$meta, on = "id", `:=`(
-            name = i.name, class = i.class, base_surface_name = i.base_surface_name,
-            type = i.surface_type
-        )]
-        if (nrow(geoms$shading$meta)) {
-            shading[geoms$surface$meta, on = c("base_surface_name" = "name"), zone := i.zone_name]
-        }
-        set(shading, NULL, "base_surface_name", NULL)
+    if (!nrow(geoms$vertices)) {
+        return(data.table(id = integer(), name = character(), class = character(),
+            zone = character(), type = character(), property = double()
+        ))
     }
 
-    if (net && nrow(surf) && nrow(subsurf)) {
-        hole <- subsurf[!J(NA_character_), on = "building_surface_name",
-            by = "building_surface_name", list(area = sum(area))]
-        surf[hole, on = c("name" = "building_surface_name"), area := area - i.area]
+    prop <- get_newall_vector(geoms$vertices)[, by = "id", list(property = fun(c(x, y, z)))]
+
+    add_zone_name(geoms)
+    cols <- c("id", "name", "class", "zone_name", "surface_type")
+    meta <- rbindlist(list(
+        NULL,
+        if (nrow(geoms$surface)) fast_subset(geoms$surface, cols),
+        if (nrow(geoms$subsurface)) fast_subset(geoms$subsurface, cols),
+        if (nrow(geoms$shading)) fast_subset(geoms$shading, cols)
+    ))
+    setnames(meta, c("id", "name", "class", "zone", "type"))
+    del_zone_name(geoms)
+
+    add_joined_cols(meta, prop, "id", names(meta)[-1L])
+    setcolorder(prop, names(meta))
+
+    prop
+}
+# }}}
+# idfgeom_area {{{
+idfgeom_area <- function (self, private, class = NULL, object = NULL, net = FALSE) {
+    assert_flag(net)
+    prop <- idfgeom_cal_property(self, private, class, object, get_area)
+    setnames(prop, "property", "area")
+
+    if (!net) return(prop[])
+
+    hole <- prop[J(c("Window", "Door", "GlazedDoor")), on = "type", nomatch = NULL]
+    if (nrow(hole)) {
+        add_joined_cols(private$geoms()$subsurface, hole, "id", "building_surface_name")
+        prop[hole, on = c("name" = "building_surface_name"), area := area - i.area]
     }
 
-    # clean
-    if (nrow(subsurf)) set(subsurf, NULL, "building_surface_name", NULL)
-
-    area <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    if (!nrow(area)) {
-        data.table(id = integer(), name = character(), class = character(),
-            zone = character(), type = character(), area = double()
-        )
-    } else {
-        setcolorder(area, c("id", "name", "class", "zone", "type", "area"))
-        if (nrow(obj)) area <- area[J(obj$object_id), on = "id", nomatch = NULL]
-        area
-    }
+    prop[]
 }
 # }}}
 # idfgeom_azimuth {{{
 idfgeom_azimuth <- function (self, private, class = NULL, object = NULL) {
-    l <- idfgeom_subset(self, private, class, object)
-    geoms <- l$geoms
-    obj <- l$object
-
-    surf <- subsurf <- shading <- data.table()
-
-    if (nrow(geoms$surface$vertices)) {
-        surf <- get_outward_normal(geoms$surface$vertices)[, by = "id",
-            list(azimuth = get_azimuth(c(x, y, z)))
-        ]
-        surf[geoms$surface$meta, on = "id", `:=`(
-            name = i.name, class = i.class, zone = zone_name, type = i.surface_type
-        )]
-    }
-    if (nrow(geoms$subsurface$vertices)) {
-        subsurf <- get_outward_normal(geoms$subsurface$vertices)[, by = "id",
-            list(azimuth = get_azimuth(c(x, y, z)))
-        ]
-        subsurf[geoms$subsurface$meta, on = "id", `:=`(
-            name = i.name, class = i.class, type = i.surface_type,
-            building_surface_name = i.building_surface_name
-        )]
-        if (nrow(geoms$surface$meta)) {
-            subsurf[geoms$surface$meta, on = c("building_surface_name" = "name"), zone := i.zone_name]
-        }
-        set(subsurf, NULL, "building_surface_name", NULL)
-    }
-    if (nrow(geoms$shading$vertices)) {
-        shading <- get_outward_normal(geoms$shading$vertices[id > 0L])[, by = "id",
-            list(azimuth = get_azimuth(c(x, y, z)))
-        ]
-        shading[geoms$shading$meta, on = "id", `:=`(
-            name = i.name, class = i.class, type = i.surface_type,
-            base_surface_name = i.base_surface_name
-        )]
-        if (nrow(geoms$shading$meta)) {
-            shading[geoms$surface$meta, on = c("base_surface_name" = "name"), zone := i.zone_name]
-        }
-        set(shading, NULL, "base_surface_name", NULL)
-    }
-
-    azimuth <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    if (!nrow(azimuth)) {
-        data.table(id = integer(), name = character(), class = character(),
-            zone = character(), type = character(), azimuth = double()
-        )
-    } else {
-        setcolorder(azimuth, c("id", "name", "class", "zone", "type", "azimuth"))
-        if (nrow(obj)) azimuth <- azimuth[J(obj$object_id), on = "id", nomatch = NULL]
-        azimuth
-    }
+    prop <- idfgeom_cal_property(self, private, class, object, get_azimuth)
+    setnames(prop, "property", "azimuth")[]
 }
 # }}}
 # idfgeom_tilt {{{
 idfgeom_tilt <- function (self, private, class = NULL, object = NULL) {
-    l <- idfgeom_subset(self, private, class, object)
-    geoms <- l$geoms
-    obj <- l$object
-
-    surf <- subsurf <- shading <- data.table()
-
-    if (nrow(geoms$surface$vertices)) {
-        surf <- get_outward_normal(geoms$surface$vertices)[, by = "id",
-            list(tilt = get_tilt(c(x, y, z)))
-        ]
-        surf[geoms$surface$meta, on = "id", `:=`(
-            name = i.name, class = i.class, zone = zone_name, type = i.surface_type
-        )]
-    }
-    if (nrow(geoms$subsurface$vertices)) {
-        subsurf <- get_outward_normal(geoms$subsurface$vertices)[, by = "id",
-            list(tilt = get_tilt(c(x, y, z)))
-        ]
-        subsurf[geoms$subsurface$meta, on = "id", `:=`(
-            name = i.name, class = i.class, type = i.surface_type,
-            building_surface_name = i.building_surface_name
-        )]
-        if (nrow(geoms$surface$meta)) {
-            subsurf[geoms$surface$meta, on = c("building_surface_name" = "name"), zone := i.zone_name]
-        }
-        set(subsurf, NULL, "building_surface_name", NULL)
-    }
-    if (nrow(geoms$shading$vertices)) {
-        shading <- get_outward_normal(geoms$shading$vertices[id > 0L])[, by = "id",
-            list(tilt = get_tilt(c(x, y, z)))
-        ]
-        shading[geoms$shading$meta, on = "id", `:=`(
-            name = i.name, class = i.class, type = i.surface_type,
-            base_surface_name = i.base_surface_name
-        )]
-        if (nrow(geoms$shading$meta)) {
-            shading[geoms$surface$meta, on = c("base_surface_name" = "name"), zone := i.zone_name]
-        }
-        set(shading, NULL, "base_surface_name", NULL)
-    }
-
-    tilt <- rbindlist(list(surf, subsurf, shading), use.names = TRUE)
-    if (!nrow(tilt)) {
-        data.table(id = integer(), name = character(), class = character(),
-            zone = character(), type = character(), tilt = double()
-        )
-    } else {
-        setcolorder(tilt, c("id", "name", "class", "zone", "type", "tilt"))
-        if (nrow(obj)) tilt <- tilt[J(obj$object_id), on = "id", nomatch = NULL]
-        tilt
-    }
+    prop <- idfgeom_cal_property(self, private, class, object, get_tilt)
+    setnames(prop, "property", "tilt")[]
 }
 # }}}
 # idfgeom_view {{{

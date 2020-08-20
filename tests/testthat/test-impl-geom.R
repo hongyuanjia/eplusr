@@ -159,7 +159,7 @@ test_that("Geometry Extraction", {
 
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     expect_is(geom <- extract_geom(idf), "list")
-    expect_equal(names(geom), c("rules", "building", "zone", "surface", "subsurface", "shading", "daylighting_point"))
+    expect_equal(names(geom), c("rules", "building", "zone", "surface", "subsurface", "shading", "daylighting_point", "vertices"))
 })
 # }}}
 
@@ -209,5 +209,57 @@ test_that("Align coordinate system", {
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))
     expect_is(geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("absolute", 3L))
+})
+# }}}
+
+# GEOMETRY SUBSET {{{
+test_that("subset_geom", {
+    skip_on_cran()
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
+    # simple shading
+    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    expect_is(geoms <- extract_geom(idf), "list")
+    expect_is(l <- subset_geom(geoms, "all"), "list")
+    expect_equal(nrow(l$surface), 24L)
+    expect_equal(nrow(l$subsurface), 9L)
+    expect_equal(nrow(l$shading), 12L)
+    expect_equal(nrow(l$vertices), 180L)
+
+    expect_is(l <- subset_geom(geoms, "floor"), "list")
+    expect_equal(nrow(l$surface), 4L)
+    expect_equal(nrow(l$subsurface), 0L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 16L)
+
+    expect_is(l <- subset_geom(geoms, "roof"), "list")
+    expect_equal(nrow(l$surface), 4L)
+    expect_equal(nrow(l$subsurface), 0L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 16L)
+
+    expect_is(l <- subset_geom(geoms, "wall"), "list")
+    expect_equal(nrow(l$surface), 16L)
+    expect_equal(nrow(l$subsurface), 0L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 64L)
+
+    expect_is(l <- subset_geom(geoms, c("wall", "window")), "list")
+    expect_equal(nrow(l$surface), 16L)
+    expect_equal(nrow(l$subsurface), 8L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 96L)
+
+    expect_is(l <- subset_geom(geoms, zone = "zone 1"), "list")
+    expect_equal(nrow(l$surface), 6L)
+    expect_equal(nrow(l$subsurface), 2L)
+    expect_equal(nrow(l$shading), 4L)
+    expect_equal(nrow(l$vertices), 48L)
+
+    expect_is(l <- subset_geom(geoms, surface = "Zn001:Wall001"), "list")
+    expect_equal(nrow(l$surface), 1L)
+    expect_equal(nrow(l$subsurface), 0L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 4L)
 })
 # }}}

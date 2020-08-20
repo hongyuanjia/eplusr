@@ -159,6 +159,10 @@ extract_geom <- function (idf, object = NULL) {
     # extract daylighting reference point data
     dayl_pnts <- extract_geom_daylighting_point(idf, geom_class)
 
+    # merge all vertices
+    vertices <- rbindlist(list(surface$vertices, subsurface$vertices, shading$vertices, dayl_pnts$vertices))
+    if (nrow(vertices)) setindexv(vertices, "id")
+
     # building transformation
     building <- get_building_transformation(idf)
 
@@ -166,8 +170,9 @@ extract_geom <- function (idf, object = NULL) {
     zone <- get_zone_transformation(idf)
 
     list(rules = rules, building = building, zone = zone,
-         surface = surface, subsurface = subsurface, shading = shading,
-         daylighting_point = dayl_pnts
+         surface = surface$meta, subsurface = subsurface$meta,
+         shading = shading$meta, daylighting_point = dayl_pnts$meta,
+         vertices = vertices
     )
 }
 # }}}
@@ -868,15 +873,15 @@ convert_geom <- function (idf, geoms = NULL, type = c("surface", "subsurface", "
 
     surf <- list()
     if ("surface" %chin% type) {
-        surf <- convert_geom_surface_simple(idf, geoms$surface)
+        surf <- convert_geom_surface_simple(idf, list(meta = geoms$surface, vertices = geoms$vertices))
     }
     subsurf <- list()
     if ("subsurface" %chin% type) {
-        subsurf <- convert_geom_subsurface_simple(idf, geoms$subsurface)
+        subsurf <- convert_geom_subsurface_simple(idf, list(meta = geoms$subsurface, vertices = geoms$vertices))
     }
     shading <- list()
     if ("shading" %chin% type) {
-        shading <- convert_geom_shading_simple(idf, geoms$shading)
+        shading <- convert_geom_shading_simple(idf, list(meta = geoms$shading, vertices = geoms$vertices))
     }
 
     object <- rbindlist(list(surf$object, subsurf$object, shading$object))
@@ -988,7 +993,7 @@ convert_geom_surface_simple <- function (idf, geom = NULL) {
             geom <- list(meta = data.table(), vertices = data.table())
         } else {
             geom$meta <- geom$meta[is_simple]
-            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id", nomatch = NULL]
         }
     }
     convert_geom_simple(idf, geom, "BuildingSurface:Detailed",
@@ -1007,7 +1012,7 @@ convert_geom_subsurface_simple <- function (idf, geom = NULL) {
             geom <- list(meta = data.table(), vertices = data.table())
         } else {
             geom$meta <- geom$meta[is_simple]
-            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id", nomatch = NULL]
         }
     }
     convert_geom_simple(idf, geom, "FenestrationSurface:Detailed",
@@ -1026,7 +1031,7 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
             geom <- list(meta = data.table(), vertices = data.table())
         } else {
             geom$meta <- geom$meta[is_simple]
-            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id"]
+            geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id", nomatch = NULL]
         }
     }
 
@@ -1140,14 +1145,12 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
 
     # subset geoms by components {{{
     if (!length(type)) {
-        geoms$surface$meta <- geoms$surface$meta[0L]
-        geoms$surface$vertices <- geoms$surface$vertices[0L]
-        geoms$subsurface$meta <- geoms$surface$meta[0L]
-        geoms$subsurface$vertices <- geoms$surface$vertices[0L]
-        geoms$shading$meta <- geoms$surface$meta[0L]
-        geoms$shading$vertices <- geoms$surface$vertices[0L]
-        geoms$daylighting_point$meta <- geoms$surface$meta[0L]
-        geoms$daylighting_point$vertices <- geoms$surface$vertices[0L]
+        geoms$surface <- geoms$surface[0L]
+        geoms$subsurface <- geoms$surface[0L]
+        geoms$shading <- geoms$surface[0L]
+        geoms$daylighting_point <- geoms$surface[0L]
+        geoms$vertices <- geoms$vertices[0L]
+        if (has_names(geoms, "vertices2")) geoms$vertices2 <- geoms$vertices2[0L]
         return(geoms)
     }
 
@@ -1157,39 +1160,22 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
     if (length(dshow)) {
         dshow_surf <- c("Floor", "Wall", "Roof")[c("floor", "wall", "roof") %chin% dshow]
         dshow_subsurf <- c("Window", "Door")[c("window", "door") %chin% dshow]
-        if (nrow(geoms$surface$meta)) {
+        if (nrow(geoms$surface)) {
             if ("Roof" %chin% dshow_surf) dshow_surf <- c(dshow_surf, "Ceiling")
             if (length(dshow_surf)) {
-                geoms$surface$meta <- geoms$surface$meta[!J(dshow_surf), on = "surface_type"]
-                geoms$surface$vertices <- geoms$surface$vertices[J(geoms$surface$meta$id), on = "id"]
-
-                # have to store subsurface vertices in case subsurfaces are
-                # removed and there is no way to triangulate surfaces with holes
-                subsurf <- geoms$subsurface
+                geoms$surface <- geoms$surface[!J(dshow_surf), on = "surface_type"]
             }
         }
 
-        if (nrow(geoms$subsurface$meta)) {
+        if (nrow(geoms$subsurface)) {
             if ("Door" %chin% dshow_subsurf) dshow_subsurf <- c(dshow_subsurf, "GlassDoor")
             if (length(dshow_subsurf)) {
-                # get name of sufaces whose subsurfaces have been removed
-                subsurf_show <- geoms$subsurface$meta[!J(dshow_subsurf), on = "surface_type"]
-                surf <- setdiff(geoms$subsurface$meta$building_surface_name, subsurf_show$building_surface_name)
-                surf <- intersect(geoms$surface$meta$name, surf)
-                # add hole vertices for triangulation
-                if (length(surf)) {
-                    subsurf_dshow <- geoms$subsurface$meta[J(surf), on = "building_surface_name"]
-                    geoms$surface$vertices <- add_surface_hole_vertices(geoms$surface,
-                        list(meta = subsurf_dshow, vertices = geoms$subsurface$vertices[J(subsurf_dshow$id), on = "id"])
-                    )
-                }
-                geoms$subsurface$meta <- subsurf_show
-                geoms$subsurface$vertices <- geoms$subsurface$vertices[J(subsurf_show$id), on = "id"]
+                geoms$subsurface <- geoms$subsurface[!J(dshow_subsurf), on = "surface_type"]
             }
         }
 
-        if (nrow(geoms$shading$meta) && "shading" %chin% dshow) {
-            geoms$shading <- list(meta = data.table(), vertices = data.table())
+        if (nrow(geoms$shading) && "shading" %chin% dshow) {
+            geoms$shading <- geoms$shading[0L]
         }
     }
     # }}}
@@ -1204,23 +1190,20 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
             set(geoms$zone, NULL, "name_lower", NULL)
         }
 
-        if (!nrow(geoms$zone) || !nrow(geoms$surface$meta)) {
-            geoms$surface <- list(meta = data.table(), vertices = data.table())
-            geoms$subsurface <- list(meta = data.table(), vertices = data.table())
-            geoms$shading <- list(meta = data.table(), vertices = data.table())
-            geoms$daylighting_point <- list(meta = data.table(), vertices = data.table())
+        if (!nrow(geoms$zone) || !nrow(geoms$surface)) {
+            geoms$surface <- geoms$surface[0L]
+            geoms$subsurface <- geoms$subsurface[0L]
+            geoms$shading <- geoms$shading[0L]
+            geoms$daylighting_point <- geoms$daylighting_point[0L]
         } else {
-            geoms$surface$meta <- geoms$surface$meta[J(geoms$zone$name), on = "zone_name", nomatch = NULL]
-            geoms$surface$vertices <- geoms$surface$vertices[J(geoms$surface$meta$id), on = "id", nomatch = NULL]
+            geoms$surface <- geoms$surface[J(geoms$zone$name), on = "zone_name", nomatch = NULL]
 
-            if (nrow(geoms$subsurface$meta)) {
-                geoms$subsurface$meta <- geoms$subsurface$meta[J(geoms$surface$meta$name), on = "building_surface_name", nomatch = NULL]
-                geoms$subsurface$vertices <- geoms$subsurface$vertices[J(geoms$subsurface$meta$id), on = "id", nomatch = NULL]
+            if (nrow(geoms$subsurface)) {
+                geoms$subsurface <- geoms$subsurface[J(geoms$surface$name), on = "building_surface_name", nomatch = NULL]
             }
 
-            if (nrow(geoms$shading$meta)) {
-                geoms$shading$meta <- geoms$shading$meta[J(geoms$surface$meta$name), on = "base_surface_name", nomatch = NULL]
-                geoms$shading$vertices <- geoms$shading$vertices[J(geoms$shading$meta$id), on = "id", nomatch = NULL]
+            if (nrow(geoms$shading)) {
+                geoms$shading <- geoms$shading[J(geoms$surface$name), on = "base_surface_name", nomatch = NULL]
             }
         }
     }
@@ -1234,63 +1217,54 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
             surface <- stri_trans_tolower(surface)
             on <- "name_lower"
         }
-        if (nrow(geoms$surface$meta)) {
+        if (nrow(geoms$surface)) {
             if (is.character(surface)) {
-                set(geoms$surface$meta, NULL, "name_lower", stri_trans_tolower(geoms$surface$meta$name))
+                set(geoms$surface, NULL, "name_lower", stri_trans_tolower(geoms$surface$name))
             }
-            geoms$surface$meta <- geoms$surface$meta[J(surface), on = on, nomatch = NULL]
-            geoms$surface$vertices <- geoms$surface$vertices[J(geoms$surface$meta$id), on = "id"]
+            geoms$surface <- geoms$surface[J(surface), on = on, nomatch = NULL]
             if (is.character(surface)) {
-                set(geoms$surface$meta, NULL, "name_lower", NULL)
+                set(geoms$surface, NULL, "name_lower", NULL)
             }
         }
-        if (nrow(geoms$subsurface$meta)) {
+        if (nrow(geoms$subsurface)) {
             if (is.character(surface)) {
-                set(geoms$subsurface$meta, NULL, "name_lower", stri_trans_tolower(geoms$subsurface$meta$name))
+                set(geoms$subsurface, NULL, "name_lower", stri_trans_tolower(geoms$subsurface$name))
             }
             # get name of sufaces whose subsurfaces have been removed
-            subsurf_show <- geoms$subsurface$meta[J(surface), on = on, nomatch = NULL]
+            geoms$subsurface <- geoms$subsurface[J(surface), on = on, nomatch = NULL]
             if (is.character(surface)) {
-                set(geoms$subsurface$meta, NULL, "name_lower", NULL)
-                set(subsurf_show, NULL, "name_lower", NULL)
+                set(geoms$subsurface, NULL, "name_lower", NULL)
             }
-            surf <- setdiff(geoms$subsurface$meta$building_surface_name, subsurf_show$building_surface_name)
-            surf <- intersect(geoms$surface$meta$name, surf)
-            # add hole vertices for triangulation
-            if (length(surf)) {
-                subsurf_dshow <- geoms$subsurface$meta[J(surf), on = "building_surface_name"]
-                geoms$surface$vertices <- add_surface_hole_vertices(geoms$surface,
-                    list(meta = subsurf_dshow, vertices = geoms$subsurface$vertices[J(subsurf_dshow$id), on = "id"])
-                )
-            }
-            geoms$subsurface$meta <- subsurf_show
-            geoms$subsurface$vertices <- geoms$subsurface$vertices[J(subsurf_show$id), on = "id"]
         }
-        if (nrow(geoms$shading$meta)) {
+        if (nrow(geoms$shading)) {
             if (is.character(surface)) {
-                set(geoms$shading$meta, NULL, "name_lower", stri_trans_tolower(geoms$shading$meta$name))
-                geoms$shading$meta <- geoms$shading$meta[J(surface), on = on, nomatch = NULL]
-                geoms$shading$vertices <- geoms$shading$vertices[J(geoms$shading$meta$id), on = "id"]
-                set(geoms$shading$meta, NULL, "name_lower", NULL)
+                set(geoms$shading, NULL, "name_lower", stri_trans_tolower(geoms$shading$name))
+                geoms$shading <- geoms$shading[J(surface), on = on, nomatch = NULL]
+                set(geoms$shading, NULL, "name_lower", NULL)
             }
         }
     }
     # }}}
 
     # subset daylighting points by zones {{{
-    if ((!is.null(zone) || !is.null(surface)) && NROW(geoms$daylighting_point$meta)) {
-        if (!NROW(geoms$surface$meta)) {
-            geoms$daylighting_point$meta <- geoms$daylighting_point$meta[0L]
-            geoms$daylighting_point$vertices <- geoms$daylighting_point$vertices[0L]
-        } else if (nrow(geoms$daylighting_point$meta)){
-            geoms$daylighting_point$meta <- geoms$daylighting_point$meta[
-                J(geoms$surface$meta$zone_name), on = "zone_name", nomatch = NULL]
-            geoms$daylighting_point$vertices <- geoms$daylighting_point$vertices[
-                J(geoms$daylighting_point$meta$id), on = "id", nomatch = NULL]
+    if ((!is.null(zone) || !is.null(surface)) && NROW(geoms$daylighting_point)) {
+        if (!nrow(geoms$surface)) {
+            geoms$daylighting_point <- geoms$daylighting_point[0L]
+        } else if (nrow(geoms$daylighting_point)) {
+            geoms$daylighting_point <- geoms$daylighting_point[
+                J(geoms$surface$zone_name), on = "zone_name", nomatch = NULL]
         }
     }
     # }}}
 
+    vid <- unique(c(geoms$surface$id, geoms$subsurface$id, geoms$shading$id, geoms$daylighting_point$id, geoms$hole$id))
+    if (!length(vid)) {
+        geoms$vertices <- geoms$vertices[0L]
+        if (NROW(geoms$vertices2)) geoms$vertices2 <- geoms$vertices2[0L]
+    } else if (nrow(geoms$vertices)) {
+        geoms$vertices <- geoms$vertices[J(vid), on = "id"]
+        if (NROW(geoms$vertices2)) geoms$vertices2 <- geoms$vertices2[J(vid), on = "id"]
+    }
     geoms
 }
 # }}}
@@ -1301,97 +1275,151 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
     assert_choice(simple, c("absolute", "relative"), null.ok = TRUE)
     assert_choice(daylighting, c("absolute", "relative"), null.ok = TRUE)
 
-    align <- function (vertices, zone, mult = 1, rotate = TRUE, north = 0) {
-        if (!NROW(zone)) return(vertices)
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(geoms)
+    if (!nrow(geoms$zone)) return(geoms)
 
-        vertices[zone, on = c("zone_name" = "name"),
-            `:=`(x = x + mult * i.x, y = y + mult * i.y, z = z + mult * i.z,
-                 deg = mult * (i.dir_relative_north + north)
-            )
-        ]
-        # rotate
-        if (rotate) {
-            vertices[!J(c(NA_real_, 0.0)), on = "deg", by = "id",
-                c("x", "y", "z") := {
-                    v <- matrix(c(x, y, z), ncol = 3L)
-                    vert <- rgl::rotate3d(v, deg_to_rad(deg[[1L]]), 0, 0, 1)
-                    list(vert[,1L], vert[,2L], vert[,3L])
-                }
-            ]
-        }
-        set(vertices, NULL, c("zone_name", "deg"), NULL)
+    # init
+    empty <- data.table(id = integer(), zone_name = character(), mult = integer())
+    if (nrow(geoms$surface)) {
+        set(geoms$surface, NULL, "mult", 0L)
+        on.exit(set(geoms$surface, NULL, "mult", NULL), add = TRUE)
+    } else {
+        geoms$surface <- empty
+        on.exit(geoms$surface <- data.table(), add = TRUE)
+    }
+    if (nrow(geoms$subsurface)) {
+        set(geoms$subsurface, NULL, c("mult", "zone_name"), list(0L, NA_character_))
+        on.exit(set(geoms$subsurface, NULL, c("mult", "zone_name"), NULL), add = TRUE)
+    } else {
+        geoms$subsurface <- empty
+        on.exit(geoms$subsurface <- data.table(), add = TRUE)
+    }
+    if (nrow(geoms$shading)) {
+        set(geoms$shading, NULL, c("mult", "zone_name"), list(0L, NA_character_))
+        on.exit(set(geoms$shading, NULL, c("mult", "zone_name"), NULL), add = TRUE)
+    } else {
+        geoms$shading <- empty
+        on.exit(geoms$shading <- data.table(), add = TRUE)
+    }
+    if (nrow(geoms$daylighting_point)) {
+        set(geoms$daylighting_point, NULL, "mult", 0L)
+        on.exit(set(geoms$daylighting_point, NULL, "mult", NULL), add = TRUE)
+    } else {
+        geoms$daylighting_point <- empty
+        on.exit(geoms$daylighting_point <- data.table(), add = TRUE)
     }
 
+    # indicates whether detailed/simple class names have been checked
+    has_checked <- FALSE
+    has_changed <- FALSE
+
     if (!is.null(detailed) && detailed != geoms$rules$coordinate_system) {
+        has_checked <- TRUE
+
+        is_det_surf <- stri_endswith_fixed(geoms$surface$class, "Detailed")
+        is_det_subsurf <- stri_endswith_fixed(geoms$subsurface$class, "Detailed")
+        is_det_shading <- stri_endswith_fixed(geoms$shading$class, "Detailed")
+
+        # update rules
         geoms$rules$coordinate_system <- detailed
+
         # -1 for absolute to relative and 1 for relative to absolute
         mult <- if (detailed == "relative") -1L else 1L
-        if (any(is_detailed <- stri_endswith_fixed(geoms$surface$meta$class, "Detailed"))) {
-            geoms$surface$vertices[geoms$surface$meta[is_detailed], on = "id", zone_name := i.zone_name]
-            geoms$surface$vertices <- align(geoms$surface$vertices, geoms$zone, mult)
-        }
-        if (any(is_detailed <- geoms$subsurface$meta$class == "FenestrationSurface:Detailed")) {
-            # get zone name
-            if (nrow(geoms$surface$meta)) {
-                geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
 
-                geoms$subsurface$vertices[geoms$subsurface$meta[is_detailed], on = "id", zone_name := i.zone_name]
-                geoms$subsurface$vertices <- align(geoms$subsurface$vertices, geoms$zone, mult)
-                set(geoms$subsurface$meta, NULL, "zone_name", NULL)
-            }
+        if (any(is_det_surf)) {
+            set(geoms$surface, which(is_det_surf), "mult", mult)
         }
-        if (any(is_detailed <- stri_endswith_fixed(geoms$shading$meta$class, "Detailed"))) {
-            # get zone name
-            if (nrow(geoms$surface$meta)) {
-                geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
-
-                geoms$shading$vertices[geoms$shading$meta[is_detailed], on = "id", zone_name := i.zone_name]
-                geoms$shading$vertices <- align(geoms$shading$vertices, geoms$zone, mult)
-                set(geoms$shading$meta, NULL, "zone_name", NULL)
-            }
+        if (any(is_det_subsurf) && nrow(geoms$surface)) {
+            geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+            set(geoms$subsurface, which(is_det_subsurf), "mult", mult)
+        }
+        if (any(is_det_shading) && nrow(geoms$surface)) {
+            geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+            set(geoms$shading, which(is_det_shading), "mult", mult)
         }
     }
 
     if (!is.null(simple) && simple != geoms$rules$rectangular_surface_coordinate_system) {
+        has_changed <- TRUE
+        if (has_checked) {
+            is_sim_surf <- !is_det_surf
+            is_sim_subsurf <- !is_det_subsurf
+            is_sim_shading <- !is_det_shading
+        } else {
+            is_sim_surf <- !stri_endswith_fixed(geoms$surface$class, "Detailed")
+            is_sim_subsurf <- !stri_endswith_fixed(geoms$subsurface$class, "Detailed")
+            is_sim_shading <- !stri_endswith_fixed(geoms$shading$class, "Detailed")
+        }
+
+        # update rules
         geoms$rules$rectangular_surface_coordinate_system <- simple
+
         # -1 for absolute to relative and 1 for relative to absolute
         mult <- if (simple == "relative") -1L else 1L
-        if (any(is_simple <- !stri_endswith_fixed(geoms$surface$meta$class, "Detailed"))) {
-            geoms$surface$vertices[geoms$surface$meta[is_simple], on = "id", zone_name := i.zone_name]
-            geoms$surface$vertices <- align(geoms$surface$vertices, geoms$zone, mult)
-        }
-        if (any(is_simple <- geoms$subsurface$meta$class != "FenestrationSurface:Detailed")) {
-            # get zone name
-            if (nrow(geoms$surface$meta)) {
-                geoms$subsurface$meta[geoms$surface$meta, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
 
-                geoms$subsurface$vertices[geoms$subsurface$meta[is_simple], on = "id", zone_name := i.zone_name]
-                geoms$subsurface$vertices <- align(geoms$subsurface$vertices, geoms$zone, mult)
-                set(geoms$subsurface$meta, NULL, "zone_name", NULL)
-            }
+        if (any(is_sim_surf)) {
+            set(geoms$surface, which(is_sim_surf), "mult", mult)
         }
-        if (any(is_simple <- !stri_endswith_fixed(geoms$shading$meta$class, "Detailed"))) {
-            # get zone name
-            if (nrow(geoms$surface$meta)) {
-                geoms$shading$meta[geoms$surface$meta, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
-
-                geoms$shading$vertices[geoms$shading$meta[is_simple], on = "id", zone_name := i.zone_name]
-                geoms$shading$vertices <- align(geoms$shading$vertices, geoms$zone, mult)
-                set(geoms$shading$meta, NULL, "zone_name", NULL)
-            }
+        if (any(is_sim_subsurf) && nrow(geoms$surface)) {
+            if (!has_checked) geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+            set(geoms$subsurface, which(is_sim_subsurf), "mult", mult)
+        }
+        if (any(is_sim_shading) && nrow(geoms$surface)) {
+            if (!has_checked) geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+            set(geoms$shading, which(is_sim_shading), "mult", mult)
         }
     }
 
     if (!is.null(daylighting) && daylighting != geoms$rules$daylighting_reference_point_coordinate_system) {
+        has_changed <- TRUE
+        # update rules
         geoms$rules$daylighting_reference_point_coordinate_system <- daylighting
-        if (nrow(geoms$daylighting_point$meta)) {
+
+        if (nrow(geoms$daylighting_point)) {
             # -1 for absolute to relative and 1 for relative to absolute
             mult <- if (daylighting == "relative") -1L else 1L
-
-            geoms$daylighting_point$vertices[geoms$daylighting_point$meta, on = "id", zone_name := i.zone_name]
-            geoms$daylighting_point$vertices <- align(geoms$daylighting_point$vertices, geoms$zone, mult, rotate = FALSE)
+            set(geoms$daylighting_point, NULL, "mult", mult)
         }
     }
+
+    if (!has_changed) return(geoms)
+
+    # combine
+    meta <- rbindlist(list(
+        fast_subset(geoms$surface, names(empty)),
+        fast_subset(geoms$subsurface, names(empty)),
+        fast_subset(geoms$shading, names(empty)),
+        fast_subset(geoms$daylighting_point, names(empty))
+    ))
+
+    # add init value
+    set(geoms$vertices, NULL, "deg", 0.0)
+
+    # add data to the vertices table
+    add_joined_cols(meta, geoms$vertices, "id", c("zone_name", "mult"))
+
+    # transform
+    geoms$vertices[geoms$zone, on = c("zone_name" = "name"),
+        c("x", "y", "z") := {
+            x <- x + mult * i.x
+            y <- y + mult * i.y
+            z <- z + mult * i.z
+
+            deg <- mult * (i.dir_relative_north)
+
+            # rotate by z-axis
+            # NOTE: use formula specific for z-rotation, avoid grouping to speed up
+            rot <- deg != 0.0
+            sina <- sin(deg[rot])
+            cosa <- cos(deg[rot])
+
+            x[rot] <- x[rot] *  cosa + y[rot] * sina
+            y[rot] <- x[rot] * -sina + y[rot] * cosa
+            list(x, y, z)
+        }
+    ]
+
+    set(geoms$vertices, NULL, c("zone_name", "deg", "mult"), NULL)
 
     geoms
 }
@@ -1434,6 +1462,32 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
     get_priv_env(idf)$log_new_uuid()
 
     idf
+}
+# }}}
+
+# add_zone_name {{{
+add_zone_name <- function (geoms) {
+    if (!nrow(geoms$surface)) return(geoms)
+
+    if (nrow(geoms$subsurface)) {
+        geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+    }
+    if (nrow(geoms$shading)) {
+        geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+    }
+    geoms
+}
+# }}}
+
+# del_zone_name {{{
+del_zone_name <- function (geoms) {
+    if (nrow(geoms$subsurface) && has_names(geoms$subsurface, "zone_name")) {
+        set(geoms$subsurface, NULL, "zone_name", NULL)
+    }
+    if (nrow(geoms$shading) && has_names(geoms$shading, "zone_name")) {
+        set(geoms$shading, NULL, "zone_name", NULL)
+    }
+    geoms
 }
 # }}}
 
