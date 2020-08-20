@@ -1278,6 +1278,8 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
     if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(geoms)
     if (!nrow(geoms$zone)) return(geoms)
 
+    add_zone_name(geoms)
+
     # init
     empty <- data.table(id = integer(), zone_name = character(), mult = integer())
     if (nrow(geoms$surface)) {
@@ -1288,14 +1290,14 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         on.exit(geoms$surface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$subsurface)) {
-        set(geoms$subsurface, NULL, c("mult", "zone_name"), list(0L, NA_character_))
+        set(geoms$subsurface, NULL, "mult", 0L)
         on.exit(set(geoms$subsurface, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$subsurface <- empty
         on.exit(geoms$subsurface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$shading)) {
-        set(geoms$shading, NULL, c("mult", "zone_name"), list(0L, NA_character_))
+        set(geoms$shading, NULL, "mult", 0L)
         on.exit(set(geoms$shading, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$shading <- empty
@@ -1330,11 +1332,9 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
             set(geoms$surface, which(is_det_surf), "mult", mult)
         }
         if (any(is_det_subsurf) && nrow(geoms$surface)) {
-            geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
             set(geoms$subsurface, which(is_det_subsurf), "mult", mult)
         }
         if (any(is_det_shading) && nrow(geoms$surface)) {
-            geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
             set(geoms$shading, which(is_det_shading), "mult", mult)
         }
     }
@@ -1361,11 +1361,9 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
             set(geoms$surface, which(is_sim_surf), "mult", mult)
         }
         if (any(is_sim_subsurf) && nrow(geoms$surface)) {
-            if (!has_checked) geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
             set(geoms$subsurface, which(is_sim_subsurf), "mult", mult)
         }
         if (any(is_sim_shading) && nrow(geoms$surface)) {
-            if (!has_checked) geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
             set(geoms$shading, which(is_sim_shading), "mult", mult)
         }
     }
@@ -1392,9 +1390,6 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         fast_subset(geoms$daylighting_point, names(empty))
     ))
 
-    # add init value
-    set(geoms$vertices, NULL, "deg", 0.0)
-
     # add data to the vertices table
     add_joined_cols(meta, geoms$vertices, "id", c("zone_name", "mult"))
 
@@ -1410,8 +1405,8 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
             # rotate by z-axis
             # NOTE: use formula specific for z-rotation, avoid grouping to speed up
             rot <- deg != 0.0
-            sina <- sin(deg[rot])
-            cosa <- cos(deg[rot])
+            sina <- sin(deg_to_rad(deg[rot]))
+            cosa <- cos(deg_to_rad(deg[rot]))
 
             x[rot] <- x[rot] *  cosa + y[rot] * sina
             y[rot] <- x[rot] * -sina + y[rot] * cosa
@@ -1419,7 +1414,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         }
     ]
 
-    set(geoms$vertices, NULL, c("zone_name", "deg", "mult"), NULL)
+    set(geoms$vertices, NULL, c("zone_name", "mult"), NULL)
 
     geoms
 }
