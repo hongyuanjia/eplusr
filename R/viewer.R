@@ -88,9 +88,6 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
 
             # log geomtry id
             private$log_geom_uuid()
-
-            # log data
-            private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
         },
         # }}}
 
@@ -390,8 +387,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' Show [Idf] geometry
         #'
         #' @param type A character vector of geometry components to show. If
-        #'        `"all"`, all geometry components will be shown. Otherwise,
-        #'        should be a subset of following:
+        #'        `"all"` (default), all geometry components will be shown. If
+        #'        `NULL`, no geometry faces will be shown. Otherwise, should be
+        #'        a subset of following:
         #'
         #' * `"floor"`
         #' * `"wall"`
@@ -419,8 +417,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$show()
         #' }
-        show = function (type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
-                         zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
+        show = function (type = "all", zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
             idfviewer_show(self, private, type, zone, surface, dayl_color, dayl_size),
         # }}}
 
@@ -520,13 +517,17 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         cached_geom_uuid = function () private$m_log$geom_uuid,
 
         geoms = function () {
-            if (private$geom_uuid() != private$cached_geom_uuid()) {
+            if (private$geom_uuid() != private$cached_geom_uuid() || is.null(private$m_log$geoms)) {
                 private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
-            }
 
-            private$m_log$geoms <- align_coord_system(
-                private$m_log$geoms, "absolute", "absolute", "absolute"
-            )
+                # change all vertices to world coordinate system
+                private$m_log$geoms <- align_coord_system(
+                    private$m_log$geoms, "absolute", "absolute", "absolute"
+                )
+
+                # vertices2 for triangulation
+                private$m_log$geoms$vertices2 <- triangulate_geoms(private$m_log$geoms)
+            }
 
             private$m_log$geoms
         }
@@ -627,7 +628,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5
             }
 
             if (length(private$m_id_axis)) {
-                rgl_pop(id = unlist(private$m_id_axis))
+                rgl_pop(id = private$m_id_axis)
             }
 
             private$m_id_axis <- do.call(rgl_view_axis,
@@ -639,7 +640,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5
             on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
             rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
 
-            rgl_pop(id = unlist(private$m_id_axis))
+            rgl_pop(id = private$m_id_axis)
         }
         private$m_id_axis <- NULL
         private$m_axis <- NULL
@@ -697,20 +698,17 @@ idfviewer_wireframe <- function (self, private, add = TRUE, width = 1.5, color =
     if (add) {
         private$m_wireframe <- list(width = width, color = color, alpha = alpha)
         if (length(self$device())) {
-            if (length(id <- unlist(private$m_id_wireframe, use.names = FALSE))) {
+            if (length(id <- private$m_id_wireframe)) {
                 rgl_pop("shapes", id = id)
             }
 
             geoms <- private$geoms()
-            private$m_id_wireframe <- list(
-                surface = do.call(rgl_view_wireframe, c(list(dev = private$m_device, geom = geoms$surface), private$m_wireframe)),
-                subsurface = do.call(rgl_view_wireframe, c(list(dev = private$m_device, geom = geoms$subsurface), private$m_wireframe)),
-                shading = do.call(rgl_view_wireframe, c(list(dev = private$m_device, geom = geoms$shading), private$m_wireframe))
-            )
+            private$m_id_wireframe <- do.call(rgl_view_wireframe,
+                c(list(dev = private$m_device, geoms = geoms), private$m_wireframe))
         }
     } else {
         if (length(self$device())) {
-            if (length(id <- unlist(private$m_id_wireframe, use.names = FALSE))) {
+            if (length(id <- private$m_id_wireframe)) {
                 rgl_pop("shapes", id = id)
             }
         }
@@ -727,10 +725,10 @@ idfviewer_x_ray <- function (self, private, on = TRUE) {
     private$m_x_ray <- on
 
     if (length(self$device()) && length(private$m_id_surface)) {
-        if (length(id <- unlist(private$m_id_surface, use.names = FALSE))) {
+        if (length(id <- private$m_id_surface)) {
             rgl_pop(id = id)
         }
-        private$m_id_surface <- private$m_id_surface <- rgl_view_surface(
+        private$m_id_surface <- rgl_view_surface(
             private$m_device, private$m_log$geoms_show,
             type = private$m_render_by, x_ray = private$m_x_ray
         )
@@ -746,10 +744,10 @@ idfviewer_render_by <- function (self, private, style = c("surface_type", "bound
     private$m_render_by <- style
 
     if (length(self$device()) && length(private$m_id_surface)) {
-        if (length(id <- unlist(private$m_id_surface, use.names = FALSE))) {
+        if (length(id <- private$m_id_surface)) {
             rgl_pop(id = id)
         }
-        private$m_id_surface <- private$m_id_surface <- rgl_view_surface(
+        private$m_id_surface <- rgl_view_surface(
             private$m_device, private$m_log$geoms_show,
             type = private$m_render_by, x_ray = private$m_x_ray
         )
@@ -798,12 +796,12 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
     }
 
     if (any(c("all", "daylighting") %chin% type)) {
-        private$m_id_dayl <- rgl_view_point(private$m_device, geoms$daylighting_point,
+        private$m_id_dayl <- rgl_view_point(private$m_device, geoms,
             color = dayl_color, size = dayl_size)
     }
 
     if (length(private$m_id_surface)) {
-        if (length(id <- unlist(private$m_id_surface, use.names = FALSE))) {
+        if (length(id <- private$m_id_surface)) {
             rgl_pop(id = id)
         }
         private$m_id_surface <- NULL

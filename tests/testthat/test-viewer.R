@@ -28,6 +28,7 @@ test_that("IdfViewer class", {
     expect_null(viewer$show("window"))
     expect_null(viewer$show("shading"))
     expect_null(viewer$show("wall"))
+    expect_null(viewer$show(NULL))
 
     expect_false(viewer$x_ray(FALSE))
 
@@ -37,6 +38,7 @@ test_that("IdfViewer class", {
     expect_true(viewer$ground(expand = 2, color = "grey"))
     expect_false(viewer$ground(FALSE))
 
+    expect_null(viewer$show())
     expect_equal(viewer$render_by("normal"), "normal")
     expect_equal(viewer$render_by("construction"), "construction")
     expect_equal(viewer$render_by("zone"), "zone")

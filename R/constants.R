@@ -56,7 +56,7 @@ MACRO_DICT <-
       "##symboltable", "##clear", "##reverse", "##!")
 # }}}
 # init var{{{
-`.` <- `..` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- `.BY` <- `.EACHI` <- J <- N <- V1 <- V2 <- NULL
+`.` <- `..` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- `.BY` <- `.EACHI` <- J <- N <- NULL
 
 utils::globalVariables(c(
     "..", "J", "Date/Time", "Variable", "acceptable_num", "all_name_lower",
@@ -132,7 +132,8 @@ utils::globalVariables(c(
     "new_name", "rev_trans", "rev_x", "rev_y", "rev_z", "right_depth",
     "right_distance_above", "right_distance_below", "right_extension",
     "right_tilt_angle", "subtype", "trans", "window_or_door_name", "x0", "z0",
-    "zone", "GlobalGeometryRules"
+    "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
+    "area"
 ))
 # }}}
 # nocov end
