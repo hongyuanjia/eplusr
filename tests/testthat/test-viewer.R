@@ -28,6 +28,7 @@ test_that("IdfViewer class", {
     expect_null(viewer$show("window"))
     expect_null(viewer$show("shading"))
     expect_null(viewer$show("wall"))
+    expect_null(viewer$show(NULL))
 
     expect_false(viewer$x_ray(FALSE))
 
