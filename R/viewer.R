@@ -635,7 +635,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5
             }
 
             private$m_id_axis <- do.call(rgl_view_axis,
-                c(list(dev = private$m_device, geoms = private$geoms()), private$m_log$axis))
+                c(list(dev = private$m_device, geoms = private$geoms()), private$m_axis))
         }
     } else {
         if (length(self$device()) && length(private$m_id_axis)) {
@@ -659,7 +659,7 @@ idfviewer_ground <- function (self, private, add = TRUE, expand = 1.02, color = 
     assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
 
     if (add) {
-        private$m_log$ground <- list(expand = expand, color = color, alpha = alpha)
+        private$m_ground <- list(expand = expand, color = color, alpha = alpha)
         if (length(self$device())) {
             # only extent when nothing else
             if (length(private$m_id_wireframe) || length(private$m_id_surface) || length(private$m_id_dayl)) {
@@ -673,7 +673,7 @@ idfviewer_ground <- function (self, private, add = TRUE, expand = 1.02, color = 
             }
 
             private$m_id_ground <- do.call(rgl_view_ground,
-                c(list(dev = private$m_device, geoms = private$geoms()), private$m_log$ground))
+                c(list(dev = private$m_device, geoms = private$geoms()), private$m_ground))
         }
     } else {
         if (length(self$device()) && length(private$m_id_ground)) {
@@ -686,7 +686,7 @@ idfviewer_ground <- function (self, private, add = TRUE, expand = 1.02, color = 
             rgl_pop(id = private$m_id_ground)
         }
         private$m_id_ground <- NULL
-        private$m_log$ground <- NULL
+        private$m_ground <- NULL
     }
     invisible(add)
 }
