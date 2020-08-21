@@ -38,7 +38,7 @@ rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov =
 # }}}
 
 # rgl_view_surface {{{
-rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, wireframe = TRUE) {
+rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, wireframe = TRUE, width = 1.5) {
     assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
     assert_flag(x_ray)
     # should contain vertices after triangulation
@@ -57,7 +57,7 @@ rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, 
     id_quad <- num_vert[num == 4L, id]
 
     # plot wireframe
-    if (wireframe) id <- c(id, rgl_view_wireframe(dev, geoms))
+    if (wireframe) id <- c(id, rgl_view_wireframe(dev, geoms, width = width))
 
     # plot 2 sides
     if (type %chin% c("normal", "surface_type")) {
@@ -137,7 +137,6 @@ rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, 
         }
         if (length(id)) on.exit(set(geoms$vertices2, NULL, c("color", "alpha"), NULL), add = TRUE)
     }
-
 
     id
 }

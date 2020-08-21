@@ -407,6 +407,9 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        of surfaces in current [Idf] to show. If `NULL`, no subsetting
         #'        is performed.
         #'
+        #' @param width The line width for the geometry components. Default:
+        #'        `1.5`.
+        #'
         #' @param dayl_color,dayl_size The color and size of daylighting
         #'        reference points. Defaults: `"red"` (`dayl_color`) and `5`
         #'        (`dayl_size`).
@@ -417,8 +420,8 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$show()
         #' }
-        show = function (type = "all", zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5)
-            idfviewer_show(self, private, type, zone, surface, dayl_color, dayl_size),
+        show = function (type = "all", zone = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
+            idfviewer_show(self, private, type, zone, surface, width = 1.5, dayl_color, dayl_size),
         # }}}
 
         # focus {{{
@@ -757,7 +760,8 @@ idfviewer_render_by <- function (self, private, style = c("surface_type", "bound
 }
 # }}}
 # idfviewer_show {{{
-idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = NULL, dayl_color = "red", dayl_size = 5) {
+idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = NULL,
+                            width = 1.5, dayl_color = "red", dayl_size = 5) {
     geoms <- subset_geom(private$geoms(), type = type, zone = zone, surface = surface)
 
     # open a new device
@@ -808,7 +812,8 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
     }
 
     private$m_id_surface <- rgl_view_surface(private$m_device,
-        geoms, type = private$m_render_by, x_ray = private$m_x_ray
+        geoms, type = private$m_render_by, x_ray = private$m_x_ray,
+        width = width
     )
 
     private$m_log$geoms_show <- geoms

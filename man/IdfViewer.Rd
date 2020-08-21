@@ -725,6 +725,7 @@ Show \link{Idf} geometry
   type = "all",
   zone = NULL,
   surface = NULL,
+  width = 1.5,
   dayl_color = "red",
   dayl_size = 5
 )}\if{html}{\out{</div>}}
@@ -754,6 +755,9 @@ performed.}
 \item{\code{surface}}{A character vector of names or an integer vector of IDs
 of surfaces in current \link{Idf} to show. If \code{NULL}, no subsetting
 is performed.}
+
+\item{\code{width}}{The line width for the geometry components. Default:
+\code{1.5}.}
 
 \item{\code{dayl_color, dayl_size}}{The color and size of daylighting
 reference points. Defaults: \code{"red"} (\code{dayl_color}) and \code{5}
