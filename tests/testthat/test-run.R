@@ -92,7 +92,7 @@ test_that("run_idf()", {
     expect_is(run_idf(path, NULL, tempdir(), design_day = TRUE, echo = FALSE), "list")
     expect_true(file.exists(file.path(tempdir(), "HVACTemplate-5ZoneVAVWaterCooled.expidf")))
 
-    expect_is(res <- run_idf(path, NULL, "/mnt/c/Users/hongy/Desktop/temp", design_day = TRUE, wait = FALSE), "list")
+    expect_is(res <- run_idf(path, NULL, tempdir(), design_day = TRUE, wait = FALSE), "list")
     while(res$process$is_alive()) Sys.sleep(0.2)
     expect_true(file.exists(file.path(tempdir(), "HVACTemplate-5ZoneVAVWaterCooled.expidf")))
 })
