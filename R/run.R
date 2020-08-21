@@ -677,23 +677,13 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
     # }}}
 
     # manually run ExpandObjects first
+    # see #213
     # backup original model path
     model_ori <- model
+    expanded <- FALSE
     if (expand_obj) {
-        expand_objects <- file.path(dirname(eplus), paste0("ExpandObjects", if (is_windows()) ".exe" else ""))
-        if (file.exists(expand_objects)) {
-            # create "in.idf"
-            file.copy(model, file.path(output_dir, "in.idf"), overwrite = TRUE)
-            # run ExpandObjects
-            processx::run(expand_objects, wd = output_dir)
-            # rename genereated expidf file
-            if (file.exists(file.path(output_dir, "in.expidf"))) {
-                model <- file.path(output_dir, paste0(tools::file_path_sans_ext(basename(model)), ".expidf"))
-                file.rename(file.path(output_dir, "in.expidf"), model)
-            } else {
-                unlink(file.path(output_dir, "in.idf"))
-            }
-        }
+        model <- expand_objects(eplus, model, keep_ext = FALSE)
+        expanded <- attr(model, "expanded")
     }
 
     arg_weather <- if (is.null(weather)) NULL else c("--weather", weather)
@@ -710,8 +700,15 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         model
     )
 
-    # restore original model path
-    if (expand_obj) model <- model_ori
+    if (expanded) {
+        model_exp <- model
+        model <- model_ori
+        # _exp.idf --> .expidf
+        rename_exp <- function () {
+            path <- paste0(stri_sub(tools::file_path_sans_ext(model_exp), to = -5L), ".expidf")
+            try(file.rename(model_exp, path), silent = TRUE)
+        }
+    }
 
     res <- list()
 
@@ -728,6 +725,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
             stderr <- suppressWarnings(read_lines(p_stderr)$string)
             if (!length(stdout)) stdout <- character(0)
             if (!length(stderr)) stderr <- character(0)
+            if (expanded) rename_exp()
             unlink(c(p_stdout, p_stderr))
             list(stdout = stdout, stderr = stderr, end_time = Sys.time())
         }
@@ -741,6 +739,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     # kill energyplus on exit
     exit_callback <- function () {
+        if (expanded) rename_exp()
         if (!proc$is_alive()) return(NULL)
 
         k <- tryCatch(proc$kill(), error = function (e) FALSE)
@@ -868,5 +867,51 @@ get_run_time <- function (stdout) {
 
     period <- lubridate::hms(last, quiet = TRUE)
     if (is.na(period)) NULL else period
+}
+# }}}
+# expand_objects {{{
+expand_objects <- function (eplus, idf, keep_ext = FALSE) {
+    exe <- file.path(dirname(eplus), paste0("ExpandObjects", if (is_windows()) ".exe" else ""))
+
+    dir <- dirname(idf)
+
+    # create "in.idf"
+    file.copy(idf, file.path(dir, "in.idf"), overwrite = TRUE, copy.date = TRUE)
+
+    # create ini file
+    ini <- file.path(dir, "Energy+.ini")
+    write_lines(c("[program]", sprintf("dir=%s", normalizePath(dirname(eplus)))), ini)
+
+    # run ExpandObjects
+    processx::run(exe, wd = dir)
+
+    # remove ini file
+    unlink(ini, force = TRUE)
+
+    # get output file path
+    if (keep_ext) {
+        out <- file.path(dir, paste0(tools::file_path_sans_ext(basename(idf)), ".expidf"))
+    } else {
+        out <- file.path(dir, paste0(tools::file_path_sans_ext(basename(idf)), "_exp.idf"))
+    }
+
+    # rename genereated expidf file
+    if (file.exists(file.path(dir, "in.expidf"))) {
+        file.rename(file.path(dir, "in.expidf"), out)
+        expanded <- TRUE
+    } else if (file.exists(file.path(dir, "expanded.idf"))) {
+        file.rename(file.path(dir, "expanded.idf"), out)
+        expanded <- TRUE
+    } else {
+        expanded <- FALSE
+        unlink(file.path(dir, "in.idf"), force  = TRUE)
+        unlink(file.path(dir, "expandedidf.err"), force  = TRUE)
+        unlink(file.path(dir, "fort.6"), force  = TRUE)
+    }
+
+    unlink(file.path(dirname(idf), "in.idf"), force  = TRUE)
+    unlink(file.path(dirname(idf), "expandedidf.err"), force  = TRUE)
+    unlink(file.path(dirname(idf), "fort.6"), force  = TRUE)
+    if (file.exists(out)) setattr(out, "expanded", expanded) else setattr(idf, "expanded", expanded)
 }
 # }}}
