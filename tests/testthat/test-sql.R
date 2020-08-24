@@ -69,7 +69,7 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$report_data(minute = 0)), 960)
     expect_equal(nrow(sql$report_data(interval = 15)), 3840)
     expect_equal(nrow(sql$report_data(simulation_days = 1)), 3840)
-    expect_error(sql$report_data(day_type = "what"), class = "eplusr_error")
+    expect_error(sql$report_data(day_type = "what"))
     expect_equal(nrow(sql$report_data(day_type = "weekday")), 3840)
     expect_equal(nrow(sql$report_data(day_type = "weekend")), 0)
     expect_equal(nrow(sql$report_data(day_type = "customday")), 0)
