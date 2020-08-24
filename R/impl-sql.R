@@ -566,6 +566,7 @@ read_report_data_csv <- function (csv, env, dict, time,
     env <- subset_sql_environment_periods(env, environment_name = environment_name)
 
     subset_var <- attr(dict, "filtered")
+    subset_env <- attr(env, "filtered")
 
     time <- time[env, on = "environment_period_index", nomatch = NULL]
 
@@ -611,7 +612,7 @@ read_report_data_csv <- function (csv, env, dict, time,
         month = month, day = day, hour = hour, minute = minute,
         interval = interval, simulation_days = simulation_days,
         day_type = day_type)
-    subset_time <- attr(time_sub, "filtered")
+    subset_time <- attr(time_sub, "filtered") || subset_env
 
     # subset_sql_time will change column names to upper case
     setnames(time_csv, stri_trans_tolower(names(time_csv)))
@@ -650,8 +651,10 @@ read_report_data_csv <- function (csv, env, dict, time,
     }
 
     # subet using time index
-    if (!subset_time || !nrow(time_sub)) {
+    if (!subset_time) {
         set(data, NULL, "time_index", time_sub$time_index)
+    } else if (!nrow(time_sub)) {
+        set(data, NULL, "time_index", integer())
     } else {
         set(data, NULL, "time_index", time_csv$time_index[range_csv[[1L]]:range_csv[[2L]]])
         data <- data[J(time_sub$time_index), on = "time_index"]
@@ -847,7 +850,7 @@ read_report_data_sql <- function (sql, env, dict, time,
         day_type = day_type)
 
     subset_var <- attr(dict, "filtered")
-    subset_time <- attr(time, "filtered")
+    subset_time <- attr(time, "filtered") || attr(env, "filtered")
 
     time <- time[env, on = "environment_period_index", nomatch = NULL]
     time <- complete_sql_time(time)
