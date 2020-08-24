@@ -126,6 +126,7 @@ get_sql_report_data <- function (sql, csv = NULL, key_value = NULL, name = NULL,
             year = year, tz = tz, period = period,
             month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days,
+            environment_name = environment_name,
             day_type = day_type, wide = wide, all = all, timestep = timestep)
     } else {
         res <- read_report_data_sql(sql, env, dict, time,
@@ -133,6 +134,7 @@ get_sql_report_data <- function (sql, csv = NULL, key_value = NULL, name = NULL,
             year = year, tz = tz, period = period,
             month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days,
+            environment_name = environment_name,
             day_type = day_type, wide = wide, all = all)
     }
 
