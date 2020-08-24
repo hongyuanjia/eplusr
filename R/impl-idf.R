@@ -3495,7 +3495,7 @@ remove_duplicated_objects <- function (idd_env, idf_env, dt_object, dt_value) {
     val_d <- dcast(val_d, class_id + object_id ~ field_index, value.var = "value_chr")
 
     # get indicator
-    dup <- duplicated(val_d, by = setdiff(names(val_d), c("object_id", "class_id")))
+    dup <- duplicated(val_d, by = setdiff(names(val_d), "object_id"))
 
     # only find duplicates in input
     id_dup <- val_d[dup & object_id > 0L, object_id]

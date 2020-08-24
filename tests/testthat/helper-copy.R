@@ -1,7 +1,7 @@
-copy_example <- function () {
-    if (!is_avail_eplus(8.8)) return()
+copy_example <- function (ver = 8.8) {
+    if (!is_avail_eplus(ver)) return()
 
-    cfg <- eplus_config(8.8)
+    cfg <- eplus_config(ver)
 
     example_name <- "5Zone_Transformer.idf"
     weather_name <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
