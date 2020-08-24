@@ -153,7 +153,7 @@ test_that("Group methods", {
           "schedule_name", "units", "value"
         )
     )
-    grp$report_data(2)
+
     expect_equal(nrow(grp$report_data(2, period = seq(
         lubridate::ymd_hms("2019-12-21 1:0:0"), lubridate::ymd_hms("2019-12-22 0:0:0"), "1 hour")
     )), 414)

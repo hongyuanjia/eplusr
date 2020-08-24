@@ -646,8 +646,21 @@ read_report_data_csv <- function (csv, env, dict, time,
         data <- data.table("Date/Time" = character())
     } else {
         # read actual data
-        data <- fread(csv, sep = ",", fill = TRUE, skip = skip, nrows = nrows,
-            select = select, col.names = col.names)
+        if (skip == "__auto__" || length(unique(int_var)) == 1L) {
+            data <- fread(csv, sep = ",", fill = TRUE, skip = skip, nrows = nrows,
+                select = select, col.names = col.names)
+        } else {
+            first <- fread(csv, sep = ",", fill = TRUE, skip = skip, nrows = 1L, header = FALSE)
+
+            if (ncol(first) == length(col.names)) {
+                data <- fread(csv, sep = ",", fill = TRUE, skip = skip, nrows = nrows,
+                    select = select, col.names = col.names)
+            } else {
+                data <- fread(csv, sep = ",", fill = TRUE, select = select, col.names = col.names, header = TRUE)
+                set(data, NULL, "time_index", time_csv$time_index)
+                data <- data[J(time_sub$time_index), on = "time_index"]
+            }
+        }
     }
 
     # subet using time index
