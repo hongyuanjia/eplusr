@@ -590,6 +590,9 @@ read_report_data_csv <- function (csv, env, dict, time,
     # read csv header
     vars <- names(fread(csv, nrows = 0, sep = ","))
 
+    # in case the *:MeterFileOnly
+    if (length(vars) < nrow(dict)) dict <- dict[Variable %chin% vars]
+
     # get start row and number of rows to read using fread
     # use the more detailed one for row subsetting
     int <- min(get_sql_reporting_freq(all_rpfreq))
