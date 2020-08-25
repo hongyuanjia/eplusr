@@ -760,12 +760,11 @@ read_report_data_csv <- function (csv, env, dict, time,
                 measure.vars = as.character(dict_per$report_data_dictionary_index),
                 variable.name = "report_data_dictionary_index", variable.factor = FALSE
             )
-            set(data, NULL, "report_data_dictionary_index", as.integer(data$report_data_dictionary_index))
             data
         }
 
         if (!nrow(data)) {
-            data <- data.table(time_index = integer(), report_data_dictionary_index = integer(), value = double())
+            data <- data.table(time_index = integer(), report_data_dictionary_index = character(), value = double())
         } else {
             # add time column for further subsetting
             set(data, NULL, names(time_sub), time_sub)
@@ -833,10 +832,10 @@ read_report_data_csv <- function (csv, env, dict, time,
 
         # it is possible time_sub contains duplicated time index when int is
         # Each Call and int_var is TimeStep
-        expr <- as.call(c(list(as.name(":=")), stats::setNames(lapply(paste0("i.", cols_time), as.name), cols_time)))
-        data[time_sub, on = "time_index", eval(expr)]
+        add_joined_cols(time_sub, data, "time_index", cols_time)
         data[time_index < 0L, time_index := -time_index]
 
+        set(dict, NULL, "report_data_dictionary_index", as.character(dict$report_data_dictionary_index))
         add_joined_cols(dict, data, "report_data_dictionary_index", cols_dict)
 
         setorderv(data, c("report_data_dictionary_index", "time_index"))
