@@ -27,7 +27,11 @@ methods to extract simulation outputs.
 for running EnergyPlus simulation and collecting outputs.
 }
 \details{
-eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
+eplusr uses the EnergyPlus SQL output and the CSV output for extracting
+simulation outputs. It will use the CSV output if possible, and will fall
+back to the SQL output when CSV output does not exist. Underneath,
+\code{\link[data.table:fread]{data.table::fread()}} is used to speed up the process when using CSV output.
+
 \code{EplusJob} has provide some wrappers that do SQL query to get report data
 results, i.e. results from \code{Output:Variable} and \verb{Output:Meter*}. But for
 \code{Output:Table} results, you have to be familiar with the structure of the
@@ -42,6 +46,11 @@ In order to make sure \code{.rdd} (Report Data Dictionary) and \code{.mdd} (Mete
 Dictionary) files are created during simulation, an object in
 \code{Output:VariableDictionary} class with \verb{Key Field} value being \code{IDF} will be
 automatically created if it does not exists.
+
+In order to make sure all output variables and meters are placed in one CSV
+output, all objects in class \code{Output:Meter:MeterFileOnly}and
+\code{Output:Meter:Cumulative:MeterFileOnly} will be converted into \code{Output:Meter}
+and \code{Output:Meter:Cumulative}, respectively.
 }
 \examples{
 

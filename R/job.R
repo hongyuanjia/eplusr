@@ -8,7 +8,11 @@ NULL
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
 #' methods to extract simulation outputs.
 #'
-#' eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
+#' eplusr uses the EnergyPlus SQL output and the CSV output for extracting
+#' simulation outputs. It will use the CSV output if possible, and will fall
+#' back to the SQL output when CSV output does not exist. Underneath,
+#' [data.table::fread()] is used to speed up the process when using CSV output.
+#'
 #' `EplusJob` has provide some wrappers that do SQL query to get report data
 #' results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
 #' `Output:Table` results, you have to be familiar with the structure of the
@@ -23,6 +27,11 @@ NULL
 #' Dictionary) files are created during simulation, an object in
 #' `Output:VariableDictionary` class with `Key Field` value being `IDF` will be
 #' automatically created if it does not exists.
+#'
+#' In order to make sure all output variables and meters are placed in one CSV
+#' output, all objects in class `Output:Meter:MeterFileOnly`and
+#' `Output:Meter:Cumulative:MeterFileOnly` will be converted into `Output:Meter`
+#' and `Output:Meter:Cumulative`, respectively.
 #'
 #' @docType class
 #' @name EplusJob
