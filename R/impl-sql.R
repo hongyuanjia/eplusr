@@ -409,6 +409,7 @@ complete_sql_time <- function (time) {
 
     # for annual
     cols <- c("datetime", "month", "day", "hour", "minute", "dst", "simulation_days", "day_type")
+    cols <- cols[has_names(time, cols)]
 
     update_cols <- function (dt, type, cols) {
         if (!any(i <- dt$interval_type == type)) return(dt)
@@ -478,76 +479,6 @@ tidy_sql_name <- function (x) {
     setnames(x, stri_sub(gsub("([A-Z])", "_\\L\\1", names(x), perl = TRUE), 2L))
 }
 # }}}
-# report_dt_to_wide {{{
-#' @importFrom checkmate assert_names
-report_dt_to_wide <- function (dt, date_components = FALSE) {
-    assert_names(names(dt), must.include = c(
-        "datetime", "month", "day", "hour", "minute",
-        "key_value", "name", "environment_period_index", "environment_name",
-        "reporting_frequency", "is_meter", "simulation_days", "day_type"
-    ))
-
-    dt <- add_csv_variable(dt)
-
-    # store variable order
-    ori_variable <- unique(dt$Variable)
-
-    # handle RunPeriod frequency
-    dt <- complete_sql_time(dt)
-
-    # add Date/Time column
-    dt <- add_csv_time(dt)
-
-    if (date_components) {
-        # fill day_type
-        dt[is.na(day_type) & !is.na(datetime) & hour == 24L,
-            `:=`(day_type = wday(datetime - hours(1L), label = TRUE))
-        ]
-        dt[is.na(day_type) & !is.na(datetime) & hour != 24L,
-            `:=`(day_type = wday(datetime, label = TRUE))
-        ]
-
-        if (has_names(dt, "case")) {
-            dt <- dcast.data.table(dt, case +
-                environment_period_index + environment_name + simulation_days +
-                datetime + month + day + hour + minute +
-                day_type + `Date/Time` ~ Variable,
-                value.var = "value")
-        } else {
-            dt <- dcast.data.table(dt,
-                environment_period_index + environment_name + simulation_days +
-                datetime + month + day + hour + minute +
-                day_type + `Date/Time` ~ Variable,
-                value.var = "value")
-        }
-        # restore original variable order
-        setcolorder(dt, c("case"[has_names(dt, "case")],
-            "environment_period_index", "environment_name", "simulation_days",
-            "datetime", "month", "day", "hour", "minute", "day_type", "Date/Time",
-            ori_variable
-        ))
-    } else {
-        if (has_names(dt, "case")) {
-            dt <- dcast.data.table(dt, case +
-                environment_period_index + environment_name + simulation_days +
-                `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:4)]
-        } else {
-            dt <- dcast.data.table(dt,
-                environment_period_index + environment_name + simulation_days +
-                `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:3)]
-        }
-        # restore original variable order
-        setcolorder(dt, c("case"[has_names(dt, "case")],
-            "environment_period_index", "environment_name", "simulation_days",
-            "Date/Time", ori_variable
-        ))
-    }
-
-    dt
-}
-# }}}
 # read_report_data_csv {{{
 read_report_data_csv <- function (csv, env, dict, time,
                                   # dict
@@ -559,46 +490,9 @@ read_report_data_csv <- function (csv, env, dict, time,
                                   # run period
                                   environment_name = NULL,
                                   all = FALSE, wide = FALSE, timestep = NULL) {
-    # get all reporting frequency
-    all_rpfreq <- dict$reporting_frequency
-
-    dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
-    env <- subset_sql_environment_periods(env, environment_name = environment_name)
-
-    subset_var <- attr(dict, "filtered")
-    subset_env <- attr(env, "filtered")
-
-    time <- time[env, on = "environment_period_index", nomatch = NULL]
-
-    # create datetime column
-    # necessary for running 'complete_sql_time'
-    if (is.null(year) && !"year" %chin% names(time)) {
-        # get wday of first simulation day per environment
-        w <- time[simulation_days == 1L & !is.na(day_type), .SD[1L],
-            .SDcols = c("month", "day", "day_type", "environment_period_index"),
-            by = "environment_period_index"
-        ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
-    }
-    time <- create_sql_datetime(time, w, year, tz)
-
-    # handle RunPeriod frequency
-    time <- complete_sql_time(time)
-
-    # create target columns
-    dict <- add_csv_variable(dict)
-
-    # read csv header
-    vars <- names(fread(csv, nrows = 0, sep = ","))
-
-    # in case the *:MeterFileOnly
-    if (length(vars) < nrow(dict)) dict <- dict[Variable %chin% vars]
-
-    # get start row and number of rows to read using fread
+    # get start row and number of rows to read using fread before subsetting
     # use the more detailed one for row subsetting
-    int <- min(get_sql_reporting_freq(all_rpfreq))
-
-    # get the interval type for target variables
-    int_var <- get_sql_reporting_freq(dict$reporting_frequency)
+    int <- min(get_sql_reporting_freq(dict$reporting_frequency))
 
     # get time data used for row subsetting
     # should check if detailed output is required
@@ -609,6 +503,44 @@ read_report_data_csv <- function (csv, env, dict, time,
     } else {
         time_csv <- time[J(int), on = "interval_type", nomatch = NULL]
     }
+
+    # store all time index in case used when fread failed to detect correct
+    # column numbers
+    time_index_all <- time_csv$time_index
+
+    dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
+    env <- subset_sql_environment_periods(env, environment_name = environment_name)
+
+    subset_var <- attr(dict, "filtered")
+    subset_env <- attr(env, "filtered")
+
+    time_csv <- time_csv[env, on = "environment_period_index", nomatch = NULL]
+
+    # handle RunPeriod frequency
+    time_csv <- complete_sql_time(time_csv)
+
+    # create datetime column
+    # necessary for running 'complete_sql_time'
+    if (is.null(year) && !"year" %chin% names(time_csv)) {
+        # get wday of first simulation day per environment
+        w <- time_csv[simulation_days == 1L & !is.na(day_type), .SD[1L],
+            .SDcols = c("month", "day", "day_type", "environment_period_index"),
+            by = "environment_period_index"
+        ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
+    }
+    time_csv <- create_sql_datetime(time_csv, w, year, tz)
+
+    # create target columns
+    dict <- add_csv_variable(dict)
+
+    # read csv header
+    vars <- names(fread(csv, nrows = 0, sep = ","))
+
+    # in case the *:MeterFileOnly
+    if (length(vars) < nrow(dict)) dict <- dict[Variable %chin% vars]
+
+    # get the interval type for target variables
+    int_var <- get_sql_reporting_freq(dict$reporting_frequency)
 
     # subset time using input to get the target time index
     time_sub <- subset_sql_time(time_csv, year = year, tz = tz, period = period,
@@ -659,8 +591,9 @@ read_report_data_csv <- function (csv, env, dict, time,
                 data <- fread(csv, sep = ",", fill = TRUE, skip = skip, nrows = nrows,
                     select = select, col.names = col.names)
             } else {
-                data <- fread(csv, sep = ",", fill = TRUE, select = select, col.names = col.names, header = TRUE)
-                set(data, NULL, "time_index", time_csv$time_index)
+                data <- fread(csv, sep = ",", fill = TRUE, header = TRUE,
+                    select = select, col.names = col.names)
+                set(data, NULL, "time_index", time_index_all)
                 data <- data[J(time_sub$time_index), on = "time_index"]
             }
         }
@@ -706,6 +639,8 @@ read_report_data_csv <- function (csv, env, dict, time,
             int_var <- min(int_var)
             if (int != int_var) {
                 time_sub <- time[J(int_var), on = "interval_type"]
+                # should re-subset based on targeting environment
+                time_sub <- time_sub[env, on = "environment_period_index", nomatch = NULL]
 
                 if (subset_time) {
                     time_sub <- subset_sql_time(time_sub, year = year, tz = tz, period = period,
@@ -745,6 +680,8 @@ read_report_data_csv <- function (csv, env, dict, time,
         set(dict, NULL, "interval_type", int_var)
 
         melt_data <- function (data, int_per, dict_per, time_per) {
+            if (!nrow(time_per)) return(data.table(time_index = integer(), report_data_dictionary_index = integer(), value = double()))
+
             cols <- setdiff(names(data), setdiff(dict$Variable, dict_per$Variable))
             data <- subset_by_interval(fast_subset(data, cols), int_per, timestep)
 
@@ -806,6 +743,8 @@ read_report_data_csv <- function (csv, env, dict, time,
                     time_int <- subset_by_interval(time_sub, int_per, timestep)
 
                     time_per <- time[J(int_per), on = "interval_type"]
+                    # should re-subset based on targeting environment
+                    time_per <- time_per[env, on = "environment_period_index", nomatch = NULL]
                     time_per <- subset_sql_time(time_per, year = year, tz = tz,
                         period = period, month = month, day = day, hour = hour,
                         minute = minute, interval = interval,
@@ -864,6 +803,8 @@ read_report_data_sql <- function (sql, env, dict, time,
                                   all = FALSE, wide = FALSE) {
     dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
     env <- subset_sql_environment_periods(env, environment_name = environment_name)
+    time <- time[env, on = "environment_period_index", nomatch = NULL]
+    time <- complete_sql_time(time)
     time <- subset_sql_time(time, year = year, tz = tz, period = period,
         month = month, day = day, hour = hour, minute = minute,
         interval = interval, simulation_days = simulation_days,
@@ -872,8 +813,6 @@ read_report_data_sql <- function (sql, env, dict, time,
     subset_var <- attr(dict, "filtered")
     subset_time <- attr(time, "filtered") || attr(env, "filtered")
 
-    time <- time[env, on = "environment_period_index", nomatch = NULL]
-    time <- complete_sql_time(time)
     # no subset on variables
     if (!subset_var) {
         # no subset on time
