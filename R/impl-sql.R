@@ -494,6 +494,9 @@ read_report_data_csv <- function (csv, env, dict, time,
     # use the more detailed one for row subsetting
     int <- min(get_sql_reporting_freq(dict$reporting_frequency))
 
+    # handle RunPeriod frequency
+    time <- complete_sql_time(time)
+
     # get time data used for row subsetting
     # should check if detailed output is required
     # in this case, interval_type for TimeStep will also be -1 but not 0
@@ -515,9 +518,6 @@ read_report_data_csv <- function (csv, env, dict, time,
     subset_env <- attr(env, "filtered")
 
     time_csv <- time_csv[env, on = "environment_period_index", nomatch = NULL]
-
-    # handle RunPeriod frequency
-    time_csv <- complete_sql_time(time_csv)
 
     # create datetime column
     # necessary for running 'complete_sql_time'
@@ -647,9 +647,6 @@ read_report_data_csv <- function (csv, env, dict, time,
                         month = month, day = day, hour = hour, minute = minute,
                         interval = interval, simulation_days = simulation_days,
                         day_type = day_type)
-
-                    # handle RunPeriod frequency
-                    time_sub <- complete_sql_time(time_sub)
                 }
 
                 data <- subset_by_interval(data, int_var)
