@@ -911,8 +911,10 @@ update_sch_compt <- function (idd_env, idf_env, type_limits, meta, value, data, 
 match_daytype <- function (daytype, sch = FALSE, expand = TRUE, stop = TRUE) {
     # for SQL
     if (!sch) {
+        s_end <- stri_endswith_fixed(daytype, "s", case_insensitive = TRUE)
+        if (any(s_end)) daytype[s_end] <- stri_sub(daytype[s_end], to = -2L)
         dt <- match_in_vec(daytype, label = TRUE, c(
-            unique(unlist(DAYTYPE, FALSE, FALSE), names(DAYTYPE)),
+            unique(c(unlist(DAYTYPE, FALSE, FALSE), names(DAYTYPE))),
             "SpecialDay", "NormalDay"
         ))
     } else {
@@ -943,8 +945,8 @@ match_daytype <- function (daytype, sch = FALSE, expand = TRUE, stop = TRUE) {
     if (!sch) {
         if ("DesignDay" %chin% dt) expd <- c(expd, DAYTYPE$DesignDay)
         if ("CustomDay" %chin% dt) expd <- c(expd, DAYTYPE$CustomDay)
-        if ("SpecialDay" %chin% dt) expd <- c(expd, DAYTYPE$SpecialDay)
-        if ("NormalDay" %chin% dt) expd <- c(expd, DAYTYPE$NormalDay)
+        if ("SpecialDay" %chin% dt) expd <- c(expd, DAYTYPE$DesignDay, DAYTYPE$CustomDay, DAYTYPE$Holiday)
+        if ("NormalDay" %chin% dt) expd <- c(expd, DAYTYPE$Weekday, DAYTYPE$Weekend)
         # setdiff will remove duplicates
         dict <- c("Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay")
         dt <- dt[chmatch(dt, dict, 0L) == 0L]

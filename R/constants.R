@@ -133,7 +133,7 @@ utils::globalVariables(c(
     "right_distance_above", "right_distance_below", "right_extension",
     "right_tilt_angle", "subtype", "trans", "window_or_door_name", "x0", "z0",
     "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
-    "area"
+    "area", "dt", "interval_type", "time_index", "i.time_index"
 ))
 # }}}
 # nocov end

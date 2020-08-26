@@ -3406,6 +3406,25 @@ idf_add_output_vardict <- function (idf) {
     added
 }
 # }}}
+# idf_set_output_meter {{{
+idf_set_output_meter <- function (idf) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+    modified <- FALSE
+    cls <- c("Output:Meter:MeterFileOnly", "Output:Meter:Cumulative:MeterFileOnly")
+    if (!any(i <- idf$is_valid_class(cls))) return(modified)
+
+    cls <- cls[i]
+    dt <- idf$to_table(class = cls)
+    set(dt, NULL, "class", stri_replace_all_fixed(dt$class, ":MeterFileOnly", ""))
+
+    idf$del(unique(dt$id))
+    idf$load(dt)
+    verbose_info("Moving all objects in class ", collapse(cls), " to ",
+        collapse(unique(dt$class)), " in order to use csv for data extraction.")
+
+    TRUE
+}
+# }}}
 
 #' Read an EnergyPlus Input Data File (IDF)
 #'

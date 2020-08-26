@@ -153,14 +153,14 @@ test_that("Group methods", {
           "schedule_name", "units", "value"
         )
     )
-    grp$report_data(2)
+
     expect_equal(nrow(grp$report_data(2, period = seq(
         lubridate::ymd_hms("2019-12-21 1:0:0"), lubridate::ymd_hms("2019-12-22 0:0:0"), "1 hour")
     )), 414)
     expect_equal(nrow(grp$report_data(2, month = 12)), 436)
     expect_equal(nrow(grp$report_data(2, month = 12, hour = 1)), 18)
     expect_equal(nrow(grp$report_data(2, minute = 0)), 872)
-    expect_equal(nrow(grp$report_data(2, interval = 60)), 872)
+    expect_equal(nrow(grp$report_data(2, interval = 60)), 864)
     expect_equal(nrow(grp$report_data(2, simulation_days = 1)), 872)
     expect_equal(nrow(grp$report_data(2, day_type = "WinterDesignDay")), 436)
     expect_equal(nrow(grp$report_data(2, environment_name = "DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB")), 436)

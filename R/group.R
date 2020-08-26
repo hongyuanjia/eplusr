@@ -62,7 +62,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_epws_path <- input$epws
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- input$sql | input$dict
+            private$m_log$unsaved <- input$sql | input$dict | input$csv
 
             # save uuid
             private$log_idf_uuid()
@@ -1081,9 +1081,10 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
                                interval = NULL, simulation_days = NULL, day_type = NULL,
                                environment_name = NULL) {
     sqls <- epgroup_sql_path(self, private, which)
+    csvs <- epgroup_csv_path(self, private, which)
     cases <- epgroup_case_from_which(self, private, which, name = TRUE)
 
-    rbindlist(mapply(get_sql_report_data, sql = sqls, case = cases,
+    rbindlist(mapply(get_sql_report_data, sql = sqls, csv = csvs, case = cases,
         MoreArgs = list(key_value = key_value, name = name, all = all, wide = wide, year = year,
             tz = tz, period = period, month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days, day_type = day_type,
@@ -1129,10 +1130,10 @@ epgroup_print <- function (self, private) {
 
 # helper
 # get_epgroup_input {{{
-get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
+get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE, csv = TRUE) {
     # check idf {{{
     if (is_idf(idfs)) {
-        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict))
+        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict, csv = TRUE))
     } else {
         init_idf <- function (...) {
             tryCatch(get_init_idf(...),
@@ -1141,7 +1142,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
                 eplusr_error_idf_not_saved = function (e) e
             )
         }
-        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
+        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict, csv = csv)
     }
 
     err <- c("eplusr_error_idf_not_local", "eplusr_error_idf_path_not_exist", "eplusr_error_idf_not_saved")
@@ -1155,6 +1156,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 
     sql <- vlapply(idfs, attr, "sql")
     dict <- vlapply(idfs, attr, "sql")
+    csv <- vlapply(idfs, attr, "csv")
     # }}}
 
     # check epw paths {{{
@@ -1192,7 +1194,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
         assert_same_len(idfs, epws)
     }
 
-    list(idfs = idfs, epws = epws, sql = sql, dict = dict)
+    list(idfs = idfs, epws = epws, sql = sql, dict = dict, csv = csv)
 }
 # }}}
 # epgroup_retrieve_data {{{
@@ -1313,6 +1315,34 @@ epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) 
 # epgroup_sql_path {{{
 epgroup_sql_path <- function (self, private, which) {
     epgroup_locate_output(self, private, which, ".sql")
+}
+# }}}
+# epgroup_csv_path {{{
+epgroup_csv_path <- function (self, private, which) {
+    idx <- epgroup_case_from_which(self, private, which, name = FALSE)
+
+    path_csv <- epgroup_locate_output(self, private, idx, ".csv", strict = FALSE)
+    exist_csv <- file.exists(path_csv)
+
+    # check if meter file only is set
+    cls <- c("Output:Meter:MeterFileOnly", "Output:Meeter:Cumulative:MeterFileOnly")
+    mtr_only <- vlapply(private$m_idfs[idx], function (idf) any(idf$is_valid_class(cls)))
+
+    lapply(seq_along(idx), function (i) {
+        if (!exist_csv[[i]]) {
+            verbose_info("No CSV output found for job ",
+                surround(epgroup_case_from_which(idx[i])),
+                ". Fall back to use SQL for data extraction.")
+            NULL
+        } else if (mtr_only[[i]]) {
+            verbose_info(collapse(cls, or = TRUE), " found for job ",
+                surround(epgroup_case_from_which(idx[i])),
+                ". Fall back to use SQL for data extraction")
+            NULL
+        } else {
+            path_csv[[i]]
+        }
+    })
 }
 # }}}
 # epgroup_rdd_path {{{

@@ -85,6 +85,10 @@
   `IdfViewer` object based on current `Idf` object, respectively (#296).
 * A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`
   (#296).
+* Now eplusr can utilize the CSV output for report data extraction. Benifiting
+  from the fantastic `data.table::fread`, this approach can be as 3~10X faster
+  compared to the SQLite approach. eplusr will still use the SQLite if the CSV
+  output is not available.
 
 ## Major changes
 
