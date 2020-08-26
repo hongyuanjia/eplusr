@@ -528,7 +528,6 @@ read_report_data_csv <- function (csv, env, dict, time,
             by = "environment_period_index"
         ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
     }
-    time_csv <- create_sql_datetime(time_csv, w, year, tz)
 
     # create target columns
     dict <- add_csv_variable(dict)
