@@ -1,0 +1,4 @@
+Name: Result Viewer
+Description: Viewer EnergyPlus Results
+Binding: sql_viewer
+Interactive: true

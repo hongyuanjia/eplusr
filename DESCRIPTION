@@ -38,10 +38,13 @@ Imports:
 Suggests:
     covr,
     dplyr,
+    dygraphs,
     ggplot2,
     knitr,
     pkgdown,
     rmarkdown,
+    shiny,
+    shinyWidgets,
     testthat (>= 2.1.0)
 Encoding: UTF-8
 LazyData: true
