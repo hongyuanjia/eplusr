@@ -55,8 +55,8 @@ website](https://energyplus.net).
 A comprehensive introduction to eplusr can be found using
 [`vignette("eplusr")`](https://hongyuanjia.github.io/eplusr/articles/eplusr.html).
 There is also an online slides here ([Interfacing EnergyPlus Using
-R](https://hongyuanjia.github.io/eplusrIntro)).  You can learn more about eplusr
-at https://hongyuanjia.github.io/eplusr, along with full package documentation.
+R](https://hongyuanjia.github.io/eplusrIntro/)).  You can learn more about eplusr
+at https://hongyuanjia.github.io/eplusr/, along with full package documentation.
 
 ## Installation
 
