@@ -1,4 +1,4 @@
-# Version 0.12.0
+# Version 0.13.0
 
 ## Resubmission
 
@@ -15,6 +15,4 @@
 
 ### Reverse dependencies
 
-eplusr currently has no reverse dependencies.
-
-In this resubmission, I fixed the NOTE caught in CRAN-incoming-test.
+0 errors | 0 warnings | 0 notes
