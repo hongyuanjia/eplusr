@@ -1,5 +1,7 @@
 context("IdfObject Implementation")
 
+use_idd(8.8, "auto")
+
 # VALUE {{{
 test_that("get_idfobj_value()", {
     idf_env <- parse_idf_file(text("idf", 8.8))
@@ -76,6 +78,7 @@ test_that("get_idfobj_possible()", {
         )
     )
 
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     idf_env <- parse_idf_file(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_equal(length(get_idfobj_possible(idd_env, idf_env, object = 278, 11)$source[[1]]), 88)

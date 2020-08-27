@@ -4,6 +4,7 @@ eplusr_option(verbose_info = FALSE)
 
 # NEW {{{
 test_that("NEW", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
     expect_is(idf <- read_idf(path_idf), "Idf")
@@ -21,6 +22,7 @@ test_that("NEW", {
 
 # TYPELIMITS {{{
 test_that("TYPELIMITS", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
     expect_is(idf <- read_idf(path_idf), "Idf")
@@ -38,6 +40,7 @@ test_that("TYPELIMITS", {
 
 # SET {{{
 test_that("SET", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
@@ -124,6 +127,7 @@ test_that("SET", {
 
 # UPDATE {{{
 test_that("UPDATE", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
@@ -219,6 +223,7 @@ test_that("UPDATE", {
 
 # EXTRACT {{{
 test_that("EXTRACT", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
@@ -295,6 +300,7 @@ test_that("EXTRACT", {
 
 # VALIDATE {{{
 test_that("VALIDATE", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 

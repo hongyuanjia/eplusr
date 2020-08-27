@@ -2,6 +2,7 @@ context("Reload")
 
 # Reload {{{
 test_that("Reload", {
+    skip_on_cran()
     eplusr_option(verbose_info = FALSE)
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 

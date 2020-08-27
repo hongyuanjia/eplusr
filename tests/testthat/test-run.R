@@ -24,6 +24,7 @@ test_that("utilities", {
 })
 
 test_that("run_idf()", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
@@ -99,6 +100,7 @@ test_that("run_idf()", {
 })
 
 test_that("run_multi()", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")

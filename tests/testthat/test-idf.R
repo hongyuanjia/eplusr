@@ -1,7 +1,7 @@
 context("Idf class")
 
 eplusr_option(verbose_info = FALSE)
-if (!is_avail_eplus(8.8)) install_eplus(8.8)
+use_idd(8.8, "auto")
 
 # NEW {{{
 test_that("$new()", {
@@ -272,6 +272,7 @@ test_that("$objects_in_group()", {
 
 # OBJECT_RELATION {{{
 test_that("$object_relation()", {
+    skip_on_cran()
     expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
     expect_is(idf$object_relation(2), "IdfRelation")
 
@@ -507,6 +508,7 @@ test_that("$set()", {
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
 
     # can handle references
+    skip_on_cran()
     expect_is(idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
     expect_is(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
     expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
@@ -574,6 +576,7 @@ test_that("$purge()", {
 
 # DUPLICATED {{{
 test_that("$duplicated()", {
+    skip_on_cran()
     idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_silent(dup <- idf_1$duplicated())
     expect_equal(nrow(dup), 322)
@@ -589,6 +592,7 @@ test_that("$duplicated()", {
 
 # UNIQUE {{{
 test_that("$unique()", {
+    skip_on_cran()
     idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_is(idf_1$unique(1, group = "Schedules"), "Idf")
     expect_false(all(idf_1$is_valid_id(c(35, 38, 42))))
@@ -1045,6 +1049,7 @@ test_that("$save()", {
 
 # RUN {{{
 test_that("$run()", {
+    skip_on_cran()
     expect_error(read_idf(text("idf", 8.8))$save(), class = "eplusr_error")
     expect_is(idf <- read_idf(example()), "Idf")
     expect_is(job <- idf$run(NULL, tempdir(), echo = FALSE), "EplusJob")
@@ -1057,6 +1062,7 @@ test_that("$run()", {
 
 # LAST_JOB {{{
 test_that("$last_job()", {
+    skip_on_cran()
     expect_is(idf <- read_idf(example()), "Idf")
     expect_null(idf$last_job())
     expect_is({idf$run(NULL, tempdir(), echo = FALSE); idf$last_job()}, "EplusJob")
@@ -1072,6 +1078,7 @@ test_that("$geometry()", {
 
 # VIEW {{{
 test_that("$view()", {
+    skip_on_cran()
     expect_warning(empty_idf(8.8)$view())
     expect_is(read_idf(example())$view(), "IdfViewer")
 
@@ -1204,6 +1211,7 @@ test_that("[[.Idf and $.Idf", {
 
 # S3 ASSIGN {{{
 test_that("[[<-.Idf and $<-.Idf", {
+    skip_on_cran()
     expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
     expect_error(idf$version() <- NULL)
     expect_error(idf$VERSION <- NULL)
@@ -1304,7 +1312,6 @@ test_that("[[<-.Idf and $<-.Idf", {
     idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     idf_2 <- read_idf(idf_1$path())
     expect_silent(without_checking(idf_1$BuildingSurface_Detailed <- idf_2$BuildingSurface_Detailed))
-
     # }}}
 })
 # }}}

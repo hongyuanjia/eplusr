@@ -1,5 +1,7 @@
 context("IdfObject")
 
+use_idd(8.8, "auto")
+
 # NEW {{{
 test_that("$new()", {
     expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
@@ -268,6 +270,7 @@ test_that("$validate()", {
         )
     )
 
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     idf$dup(c(my_roof = "ROOF-1", "ROOF-1", "WALL-1"))
@@ -388,7 +391,8 @@ test_that("$ref_to_object()", {
 
     expect_message(with_verbose(ver$ref_to_node()), "has no node")
     expect_message(with_verbose(ver$ref_to_node(class = "Material")), "has no node")
-
+ 
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_is(loop <- IdfObject$new(278, parent = idf), "IdfObject")
