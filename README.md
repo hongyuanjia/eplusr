@@ -137,7 +137,7 @@ Please see these vignettes and articles about {eplusr}
 ### Slides
 
   - [Slides: Interfacing EnergyPlus using
-    R](https://hongyuanjia.github.io/eplusrIntro)
+    R](https://hongyuanjia.github.io/eplusrIntro/)
 
 ## How to cite
 

@@ -13,7 +13,7 @@ Description: A rich toolkit of using the whole building
     enables programmatic navigation, modification of 'EnergyPlus' models
     and makes it less painful to do parametric simulations and analysis.
 License: MIT + file LICENSE
-URL: https://hongyuanjia.github.io/eplusr,
+URL: https://hongyuanjia.github.io/eplusr/,
     https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
