@@ -2856,15 +2856,14 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     # delete empty fields
     id_del <- integer()
     if (!empty) {
-        id_all <- dt_value$value_id
-
         # append fields before checking. See #310
         dt_chk <- idf_env$value[J(dt_object$object_id), on = "object_id"]
         dt_chk[dt_value, on = c("object_id", "field_id"), `:=`(value_chr = i.value_chr, value_num = i.value_num)]
         add_joined_cols(idf_env$object, dt_chk, "object_id", "class_id")
         add_field_property(idd_env, dt_chk, "field_index")
-        dt_chk <- remove_empty_fields(idd_env, idf_env, dt_chk)
 
+        id_all <- dt_chk$value_id
+        dt_chk <- remove_empty_fields(idd_env, idf_env, dt_chk)
         id_del <- setdiff(id_all, dt_chk$value_id)
         dt_value <- dt_value[!J(id_del), on = "value_id"]
     }
