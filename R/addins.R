@@ -191,16 +191,17 @@ sql_viewer <- function () {
 
                 # create dygraph
                 xts <- data.table::as.xts.data.table(data_per)
-                dygraphs::dygraph(xts,
+                dy <- dygraphs::dygraph(xts,
                         main = sprintf("%s [%s]", dict_per$name[1L], dict_per$units[1L]),
-                        group = "graphs", width = "100%") %>%
-                    dygraphs::dyAxis("y", labelWidth = 100) %>%
-                    dygraphs::dyLegend(show = "always", hideOnMouseOut = FALSE, width = 600) %>%
-                    dygraphs::dyRangeSelector() %>%
-                    dygraphs::dyHighlight(
-                        highlightSeriesBackgroundAlpha = 0.8,
-                        highlightSeriesOpts = list(strokeWidth = 2)) %>%
-                    dyCSScool()
+                        group = "graphs", width = "100%")
+                dy <- dygraphs::dyAxis(dy, "y", labelWidth = 100)
+                dy <- dygraphs::dyLegend(dy, show = "always", hideOnMouseOut = FALSE, width = 600)
+                dy <- dygraphs::dyRangeSelector(dy)
+                dy <- dygraphs::dyHighlight(dy,
+                    highlightSeriesBackgroundAlpha = 0.8,
+                    highlightSeriesOpts = list(strokeWidth = 2)
+                )
+                dyCSScool(dy)
             })
 
             shiny::tagList(l)
