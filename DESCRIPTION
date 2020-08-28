@@ -54,6 +54,7 @@ RoxygenNote: 7.1.1
 SystemRequirements: EnergyPlus (>= 8.3, optional)
     (<https://energyplus.net>); udunits2
 Collate:
+    'addins.R'
     'constants.R'
     'assert.R'
     'diagram.R'
