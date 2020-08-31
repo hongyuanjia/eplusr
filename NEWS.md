@@ -4,9 +4,9 @@
 
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
   there are not the last fields (#310).
-
 * Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
 * Fix coordinate system alignment in `IdfGeometry` class (#314).
+* Fix time matching in `EplusSql$report_data()` (#315).
 
 # eplusr 0.13.0
 
