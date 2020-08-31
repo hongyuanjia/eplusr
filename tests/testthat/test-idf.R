@@ -663,7 +663,7 @@ test_that("$replace_value()", {
     expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
 
     expect_equal(
-        vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1)),
+        without_checking(vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1))),
         c(`WALL-2` = 2L, `WALL-2PF` = 3L)
     )
 })
