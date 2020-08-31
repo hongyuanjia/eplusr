@@ -560,7 +560,7 @@ read_report_data_csv <- function (csv, env, dict, time,
         nrows <- 0
     } else {
         range <- range(time_sub$time_index)
-        range_csv <- match(range, time_csv$time_index)
+        range_csv <- match(range, time_index_all)
         # count from the header row which is 1
         skip <- range_csv[1L]
         nrows <- range_csv[2L] - skip + 1L
@@ -604,7 +604,7 @@ read_report_data_csv <- function (csv, env, dict, time,
     } else if (!nrow(time_sub)) {
         set(data, NULL, "time_index", integer())
     } else {
-        set(data, NULL, "time_index", time_csv$time_index[range_csv[[1L]]:range_csv[[2L]]])
+        set(data, NULL, "time_index", time_index_all[range_csv[[1L]]:range_csv[[2L]]])
         data <- data[J(time_sub$time_index), on = "time_index"]
     }
 
