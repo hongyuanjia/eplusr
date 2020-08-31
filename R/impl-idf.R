@@ -2856,8 +2856,23 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     # delete empty fields
     id_del <- integer()
     if (!empty) {
-        id_all <- dt_value$value_id
-        dt_value <- remove_empty_fields(idd_env, idf_env, dt_value)
+        dt_chk <- dt_value
+
+        # append fields before checking. See #310
+        fld_num <- idf_env$value[J(unique(dt_value$object_id)), on = "object_id",
+            by = "object_id", list(num = .N)]
+        set(fld_num, NULL, "field_index", fld_num$num)
+        fld_in <- dt_value[, list(num = .N), by = c("rleid", "object_id")]
+        fld_append <- fld_num[fld_in, on = list(num > num, object_id), nomatch = NULL]
+        if (nrow(fld_append)) {
+            fld_append <- fld_append[, by = c("rleid", "object_id"), list(field_index = seq(num + 1L, field_index))]
+            val_append <- get_idf_value(idd_env, idf_env, object = fld_append$object_id, field = fld_append$field_index)
+            set(val_append, NULL, "rleid", fld_append$rleid)
+            dt_chk <- rbindlist(list(dt_value, val_append), fill = TRUE)
+        }
+
+        id_all <- dt_chk$value_id
+        dt_value <- remove_empty_fields(idd_env, idf_env, dt_chk)
         id_del <- setdiff(id_all, dt_value$value_id)
     }
 
