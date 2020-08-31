@@ -1317,6 +1317,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
 
     if (!is.null(detailed) && detailed != geoms$rules$coordinate_system) {
         has_checked <- TRUE
+        has_changed <- TRUE
 
         is_det_surf <- stri_endswith_fixed(geoms$surface$class, "Detailed")
         is_det_subsurf <- stri_endswith_fixed(geoms$subsurface$class, "Detailed")
