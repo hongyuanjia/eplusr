@@ -1,5 +1,9 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
+
 # eplusr 0.13.0
 
 ## New features
