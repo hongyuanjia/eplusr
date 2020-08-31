@@ -610,6 +610,10 @@ idfgeom_cal_property <- function (self, private, class = NULL, object = NULL, fu
         ))
     }
 
+    # remove daylighting points
+    if (NROW(geoms$daylighting_point)) {
+        geoms$vertices <- geoms$vertices[!J(geoms$daylighting_point$id), on = "id"]
+    }
     prop <- get_newall_vector(geoms$vertices)[, by = "id", list(property = fun(c(x, y, z)))]
 
     add_zone_name(geoms)
