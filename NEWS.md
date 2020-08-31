@@ -5,6 +5,8 @@
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
   there are not the last fields (#310).
 
+* Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
+
 # eplusr 0.13.0
 
 ## New features
