@@ -85,3 +85,8 @@ addons:
       - llvm
 services:
   - xvfb
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

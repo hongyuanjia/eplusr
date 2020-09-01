@@ -61,6 +61,7 @@ if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sy
 
 # codecov
 if (Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "devel") {
-    get_stage("deploy") %>% add_code_step(covr::codecov())
+    # Ref: https://github.com/HenrikBengtsson/doFuture/issues/18
+    get_stage("after_success") %>% add_code_step(covr::codecov(quiet = FALSE))
 }
 
