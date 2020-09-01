@@ -62,7 +62,7 @@ script: R -q -e 'tic::script()'
 after_success: R -q -e 'tic::after_success()'
 after_failure: R -q -e 'tic::after_failure()'
 before_deploy:
-  - pip install travis-wait-improved
+  - sudo pip install travis-wait-improved
   - R -q -e 'tic::before_deploy()'
 deploy:
   provider: script
