@@ -204,7 +204,7 @@ subset_sql_time <- function (time, year = NULL, tz = "UTC", period = NULL,
     subset_time <- FALSE
 
     # store day of week for the first simulation day
-    if (datetime && is.null(year) && !"year" %chin% names(time)) {
+    if (datetime && is.null(year)) {
         # get wday of first simulation day per environment
         w <- time[SIMULATION_DAYS == 1L & !is.na(DAY_TYPE), .SD[1L],
             .SDcols = c("MONTH", "DAY", "DAY_TYPE", "ENVIRONMENT_PERIOD_INDEX"),
@@ -348,31 +348,31 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
 
         if ("year" %in% names(time)) {
             time[J(0L), on = "year", year := NA_integer_]
+        }
+
+        setnames(first_day, tolower(names(first_day)))
+
+        # in case there is no valid day type
+        if (!nrow(first_day)) {
+            # directly assign current year
+            set(time, NULL, "year", cur_year)
         } else {
-            setnames(first_day, tolower(names(first_day)))
+            set(first_day, NULL, "date", lubridate::make_date(cur_year, first_day$month, first_day$day))
+            set(first_day, NULL, "dt", get_epw_wday(first_day$day_type))
 
-            # in case there is no valid day type
-            if (!nrow(first_day)) {
-                # directly assign current year
-                set(time, NULL, "year", cur_year)
-            } else {
-                set(first_day, NULL, "date", lubridate::make_date(cur_year, first_day$month, first_day$day))
-                set(first_day, NULL, "dt", get_epw_wday(first_day$day_type))
+            # check leap year
+            leap <- time[J(2L, 29L), on = c("month", "day"), nomatch = NULL, .N > 0]
 
-                # check leap year
-                leap <- time[J(2L, 29L), on = c("month", "day"), nomatch = NULL, .N > 0]
-
-                if (any(!is.na(first_day$dt))) {
-                    for (i in which(!is.na(first_day$dt))) {
-                        set(first_day, i, "year", find_nearst_wday_year(first_day$date[i], first_day$dt[i], cur_year, leap))
-                    }
+            if (any(!is.na(first_day$dt))) {
+                for (i in which(!is.na(first_day$dt))) {
+                    set(first_day, i, "year", find_nearst_wday_year(first_day$date[i], first_day$dt[i], cur_year, leap))
                 }
-
-                # make sure all environments have a year value
-                first_day[is.na(dt), year := lubridate::year(Sys.Date())]
-
-                set(time, NULL, "year", first_day[J(time$environment_period_index), on = "environment_period_index", year])
             }
+
+            # make sure all environments have a year value
+            first_day[is.na(dt), year := lubridate::year(Sys.Date())]
+
+            set(time, NULL, "year", first_day[J(time$environment_period_index), on = "environment_period_index", year])
         }
 
         # for SummerDesignDay and WinterDesignDay, directly use current year
@@ -560,7 +560,7 @@ read_report_data_csv <- function (csv, env, dict, time,
         nrows <- 0
     } else {
         range <- range(time_sub$time_index)
-        range_csv <- match(range, time_csv$time_index)
+        range_csv <- match(range, time_index_all)
         # count from the header row which is 1
         skip <- range_csv[1L]
         nrows <- range_csv[2L] - skip + 1L
@@ -604,7 +604,7 @@ read_report_data_csv <- function (csv, env, dict, time,
     } else if (!nrow(time_sub)) {
         set(data, NULL, "time_index", integer())
     } else {
-        set(data, NULL, "time_index", time_csv$time_index[range_csv[[1L]]:range_csv[[2L]]])
+        set(data, NULL, "time_index", time_index_all[range_csv[[1L]]:range_csv[[2L]]])
         data <- data[J(time_sub$time_index), on = "time_index"]
     }
 
@@ -748,6 +748,7 @@ read_report_data_csv <- function (csv, env, dict, time,
                         datetime = FALSE)
                     # keep original datetime and day type
                     set(time_per, NULL, c("datetime", "day_type"), list(time_int$datetime, time_int$day_type))
+                    if (has_names(time_per, "year")) set(time_per, NULL, "year", NULL)
 
                     set(data, NULL, "interval_type", int_per)
 

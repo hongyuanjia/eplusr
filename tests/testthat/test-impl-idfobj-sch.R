@@ -284,6 +284,7 @@ test_that("expand_sch_time()", {
 
 # GET_SCH_TYPE_LIMITS {{{
 test_that("get_sch_type_limits()", {
+    skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)

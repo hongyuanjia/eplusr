@@ -129,6 +129,7 @@ test_that("Sql methods", {
 })
 
 test_that("Data extraction", {
+    skip_on_cran()
     # can handle multiple time resolution
     example <- copy_example()
     all_freq <- c("Detailed", "Timestep", "Hourly", "Daily", "Monthly",

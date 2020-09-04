@@ -59,7 +59,7 @@ install:
   - R -q -e 'remotes::install_version("data.table", "1.12.8")'
 before_script: R -q -e 'tic::before_script()'
 script: R -q -e 'tic::script()'
-after_success: R -q -e 'tic::after_success()'
+after_success: travis_wait 20 R -q -e 'tic::after_success()'
 after_failure: R -q -e 'tic::after_failure()'
 before_deploy: R -q -e 'tic::before_deploy()'
 deploy:
@@ -85,3 +85,8 @@ addons:
       - llvm
 services:
   - xvfb
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

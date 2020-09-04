@@ -21,6 +21,10 @@ if (.Platform$OS.type == "windows" || Sys.getenv("TRAVIS_OS_NAME") == "osx") arg
 
 do_package_checks(args = args, build_args = build_args, codecov = FALSE)
 
+# remove check directory
+get_stage("before_deploy") %>%
+    add_code_step(unlink("check", TRUE, TRUE))
+
 # pkgdown
 # make sure to clean site to rebuild everything
 if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "release") {
@@ -57,6 +61,7 @@ if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sy
 
 # codecov
 if (Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "devel") {
-    get_stage("deploy") %>% add_code_step(covr::codecov())
+    # Ref: https://github.com/HenrikBengtsson/doFuture/issues/18
+    get_stage("after_success") %>% add_code_step(covr::codecov(quiet = FALSE))
 }
 
