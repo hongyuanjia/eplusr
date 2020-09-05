@@ -2419,12 +2419,42 @@ format_epw_data <- function (epw_data, epw_header, fmt_digit = FALSE, fill = FAL
 
     if (fill) d <- fill_epw_data_abnormal(d, epw_header, matched, ...)
 
-    # # round digits as WeatherConvertor
-    # if (fmt_digit) {
-    #     for (nm in names(EPW_FORMAT)) {
-    #         set(d, NULL, nm, EPW_FORMAT[[nm]](d[[nm]]))
-    #     }
-    # }
+    # EPW_FORMAT {{{
+    EPW_FORMAT <- list(
+        dry_bulb_temperature = fmt_int,
+        dew_point_temperature = fmt_int,
+        relative_humidity = as.integer,
+        atmospheric_pressure = as.integer,
+        extraterrestrial_horizontal_radiation = as.integer,
+        extraterrestrial_direct_normal_radiation = as.integer,
+        horizontal_infrared_radiation_intensity_from_sky = as.integer,
+        global_horizontal_radiation = as.integer,
+        direct_normal_radiation = as.integer,
+        diffuse_horizontal_radiation = as.integer,
+        global_horizontal_illuminance = as.integer,
+        direct_normal_illuminance = as.integer,
+        diffuse_horizontal_illuminance = as.integer,
+        zenith_luminance = as.integer,
+        wind_direction = as.integer,
+        wind_speed = fmt_int,
+        visibility = fmt_int,
+        ceiling_height = as.integer,
+        precipitable_water = as.integer,
+        aerosol_optical_depth = function (x) fmt_dbl(x, 4L),
+        snow_depth = as.integer,
+        albedo = function (x) fmt_dbl(x, 3L),
+        liquid_precip_depth = fmt_int,
+        liquid_precip_rate = fmt_int
+    )
+    # }}}
+
+    # round digits as WeatherConvertor
+    if (fmt_digit) {
+        for (nm in names(EPW_FORMAT)) {
+            set(d, NULL, nm, EPW_FORMAT[[nm]](d[[nm]]))
+        }
+    }
+
     d
 }
 # }}}

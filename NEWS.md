@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## New features
+
+* `Epw$save()` gets a new option `format_digit`. If `TRUE`, the trailing digits
+  in EPW data will be formatted in the same way as Weather Converter (#323).
+
 ## Bug fixes
 
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
