@@ -2264,6 +2264,9 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     # }}}
 
     # match datetime {{{
+    # preserve input year if not AMY, see #320
+    if (!realyear) year_ori <- data$year
+
     # construct hour values
     hour <- as.integer(lubridate::hour(data$datetime))
     hour[hour == 0L] <- 24L
@@ -2282,6 +2285,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     set(data, NULL, c("year", "month", "day", "hour", "minute"),
         create_epw_datetime_components(start, end, interval, leapyear = leapyear)
     )
+    if (!realyear) set(data, NULL, "year", year_ori)
     # }}}
 
     # set column order
