@@ -2136,6 +2136,10 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
 
     # coerce input data into a data.table
     data <- as.data.table(data)
+    # remove additional columns
+    if (length(cols_del <- setdiff(names(data), names(epw_data)))) {
+        set(data, NULL, cols_del, NULL)
+    }
 
     # check datetime column type first, then others
     assert_posixct(data$datetime, any.missing = FALSE)
