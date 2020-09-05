@@ -254,6 +254,7 @@ test_that("Data Getter", {
     expect_equal(nrow(epw$abnormal_data(type = "out_of_range")), 0L)
     expect_true("line" %in% names(epw$abnormal_data()))
     expect_equal(ncol(epw$abnormal_data()), 37L)
+    expect_equal(ncol(epw$abnormal_data(keep_all = FALSE)), 12L)
     expect_equal(nrow(epw$abnormal_data(cols = "albedo")), 2160L)
     expect_equal(ncol(epw$abnormal_data(cols = "albedo", keep_all = FALSE)), 8L)
     expect_equal(nrow(epw$abnormal_data(cols = "albedo", type = "out_of_range")), 0L)

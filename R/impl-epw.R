@@ -1506,7 +1506,11 @@ check_epw_data_range <- function (epw_data, range, merge = TRUE) {
     assert_names(names(epw_data), must.include = "line")
     m[, c(names(range)) := lapply(.SD, function (x) {x[x == FALSE] <- NA;x}), .SDcols = names(range)]
     set(m, NULL, "line", epw_data$line)
-    na.omit(m, invert = TRUE)$line
+
+    # store abnormal variables. See #326
+    abnormal <- na.omit(m, invert = TRUE)
+    nm <- names(which(unlist(abnormal[, lapply(.SD, anyNA), .SDcols = -"line"])))
+    setattr(abnormal$line, "variable", nm)
 }
 # }}}
 # check_epw_data_type{{{
@@ -1720,6 +1724,11 @@ get_epw_data_abnormal <- function (epw_data, epw_header, matched, period = 1L, c
     if (type == "both") type <- c("missing", "out_of_range")
 
     ln <- locate_epw_data_abnormal(d, cols, "missing" %chin% type, "out_of_range" %chin% type, merge = TRUE)
+    # get abnormal variables. See #326
+    if (is.null(cols)) {
+        cols <- unique(c(attr(ln$missing, "variable"), attr(ln$out_of_range, "variable")))
+        cols <- names(epw_data)[names(epw_data) %chin% cols]
+    }
     ln <- sort(unique(c(ln$missing, ln$out_of_range)))
 
     if (!length(ln)) verbose_info("No abnormal data found.")
