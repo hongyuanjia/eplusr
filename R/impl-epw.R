@@ -231,11 +231,17 @@ parse_epw_header <- function (path, strict = FALSE) {
     dt <- dt$left
 
     add_class_name(idd_env, dt)
+    # handling comments to make sure they are parsed as a single string.
+    # See #318
+    ln_cmt <- dt$class_name %chin% c(EPW_CLASS$comment1, EPW_CLASS$comment2)
+    if (any(ln_cmt)) {
+        set(dt, which(ln_cmt), "body", stri_replace_all_fixed(dt$body[ln_cmt], ",", "[EPLUSRPLACEHOLDER]"))
+    }
     # detect invalid lines with multiple semicolon (;)
     # in case there are multiple semicolon in one line
-    if (any(stri_count_fixed(dt$body[!dt$class_name %chin% c("COMMENTS 1", "COMMENTS 2")], ";") > 1L)) {
+    if (any(stri_count_fixed(dt$body[!ln_cmt], ";") > 1L)) {
         parse_error("epw", "Invalid header line found",
-            dt[stri_count_fixed(body, ";") > 1L & !class_name %chin% c("COMMENTS 1", "COMMENTS 2")],
+            dt[stri_count_fixed(body, ";") > 1L & !ln_cmt],
             subtype = "header_line"
         )
     }
@@ -253,6 +259,12 @@ parse_epw_header <- function (path, strict = FALSE) {
             parse_error("epw", "Invalid header field number found", d, post = msg, subtype = "header_field")
         }
     )
+    dt_value[J(c(EPW_CLASS$comment1, EPW_CLASS$comment2)), on = "class_name",
+        value_chr := stri_replace_all_fixed(value_chr, "[EPLUSRPLACEHOLDER]", ",")
+    ]
+
+    # ln_cmt <- dt$class_name %chin% c(EPW_CLASS$comment1, EPW_CLASS$comment2)
+    # set(dt, which(ln_cmt), "value_count", stri_replace_all_fixed(dt$body[ln_cmt], ",", "[EPLUSRPLACEHOLDER]"))
 
     # update object name
     dt_object <- update_object_name(dt_object, dt_value)
