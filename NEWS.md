@@ -7,6 +7,7 @@
 * Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
 * Fix coordinate system alignment in `IdfGeometry` class (#314).
 * Fix time matching in `EplusSql$report_data()` (#315).
+* EPW `COMMENT1` and `COMMENT2` are now parsed as a single string (#318).
 
 # eplusr 0.13.0
 
