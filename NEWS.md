@@ -8,6 +8,7 @@
 * Fix coordinate system alignment in `IdfGeometry` class (#314).
 * Fix time matching in `EplusSql$report_data()` (#315).
 * EPW `COMMENT1` and `COMMENT2` are now parsed as a single string (#318).
+* Preserve input year values in `Epw$set()` (#322).
 
 # eplusr 0.13.0
 
