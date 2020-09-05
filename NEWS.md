@@ -7,6 +7,8 @@
 * Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
 * Fix coordinate system alignment in `IdfGeometry` class (#314).
 * Fix time matching in `EplusSql$report_data()` (#315).
+* Additional columns in `Epw$set()` and `Epw$add()` input are now removed
+  (#320).
 
 # eplusr 0.13.0
 

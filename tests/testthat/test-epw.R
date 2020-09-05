@@ -344,6 +344,11 @@ test_that("Data Setter", {
     )
     expect_equal(nrow(epw$data()), 48L)
 
+    # can remove extra columns
+    set(d, NULL, "extra_column", 1)
+    expect_is(epw$set(d), "Epw")
+    expect_equal(ncol(epw$data()), 36)
+
     expect_error({
         epw <- read_epw(path_epw)
         suppressWarnings(d <- epw$data(start_year = 2020))
@@ -427,6 +432,14 @@ test_that("Data Setter", {
     expect_is(epw$make_na(TRUE, TRUE), "Epw")
     expect_is(epw$add(d, realyear = TRUE), "Epw")
     expect_true(all(is.na(epw$abnormal_data(cols = "albedo", keep_all = FALSE, type = "missing")$albedo)))
+
+    # can remove extra columns
+    expect_is(epw <- Epw$new(path_epw), "Epw")
+    expect_is(d <- epw$data(start_year = 2017), "data.table")
+    set(d, NULL, "extra_column", 1)
+    expect_is(epw$add(d, realyear = TRUE), "Epw")
+    expect_warning(d <- epw$data())
+    expect_equal(ncol(d), 36)
     # }}}
 
     # $del() {{{
