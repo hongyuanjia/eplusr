@@ -18,6 +18,8 @@
   (#320).
 * Now `Epw$abnormal_data()` can keep columns that contains abnormal data when
   `keep_all` is `FALSE` (#326).
+* `Epw$save()` now formats the header in the same way as Weather Converter
+  (#328).
 * `Epw$comment1()` and `Epw$comment2()` now accepts `NULL` as input, which will
   remove the comments. And `NULL` is returned if no comments are found (#330).
 
