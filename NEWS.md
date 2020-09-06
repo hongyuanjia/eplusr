@@ -16,6 +16,8 @@
 * Preserve input year values in `Epw$set()` (#322).
 * Additional columns in `Epw$set()` and `Epw$add()` input are now removed
   (#320).
+* Now `Epw$abnormal_data()` can keep columns that contains abnormal data when
+  `keep_all` is `FALSE` (#326).
 
 # eplusr 0.13.0
 
