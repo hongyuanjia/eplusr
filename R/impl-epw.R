@@ -2445,7 +2445,14 @@ format_epw_header <- function (header) {
 
     # format ground temp
     header$value[class_name == EPW_CLASS$ground & extensible_group > 0L & !is.na(value_num), by = "extensible_group",
-        value_chr := as.character(round(value_num, 2L))
+        value_chr := {
+            num <- round(value_num, 2L)
+            idx <- c(5L:16L)[!is.na(num[5L:16L])]
+            value_chr[idx] <- fmt_dbl(num[idx])
+            idx <- c(1L:4L)[!is.na(num[1L:4L])]
+            value_chr[idx] <- as.character(num[idx])
+            value_chr
+        }
     ]
 
     # format data period
