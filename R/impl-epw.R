@@ -2413,12 +2413,61 @@ format_epw <- function (epw_data, epw_header, fmt_digit = TRUE, fill = FALSE, pu
 # }}}
 # format_epw_header {{{
 format_epw_header <- function (header) {
-    val <- get_idf_value(get_epw_idd_env(), header, property = "choice")
+    val <- get_idf_value(get_epw_idd_env(), header, property = c("choice", "type", "extensible_group"))
     header$value <- standardize_idf_value(get_epw_idd_env(), header, val, type = "choice")
+
+    # store original numeric values
+    val_num <- val$value_num
+
+    # format location header
+    header$value[J(EPW_CLASS$location, c("Latitude", "Longitude")), on = c("class_name", "field_name"),
+        value_chr := fmt_dbl(value_num)]
+    header$value[J(EPW_CLASS$location, c("Time Zone", "Elevation")), on = c("class_name", "field_name"),
+        value_chr := fmt_dbl(value_num, 1L)]
+
+    # format design condition
+    idx_int <- c(2L, 9L, 16L, 18L, 33L, 47L, 49L)
+    header$value[class_name == EPW_CLASS$design & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[!is.na(value_num)] <- round(value_num[!is.na(value_num)], 1L)
+            value_chr[idx_int] <- as.character(value_num[idx_int])
+            value_chr
+        }
+    ]
+
+    # format typical periods
+    header$value[class_name == EPW_CLASS$typical & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[c(3L, 4L)] <- format(epw_date(value_chr[c(3L, 4L)]), m_spc = FALSE)
+            value_chr
+        }
+    ]
+
+    # format ground temp
+    header$value[class_name == EPW_CLASS$ground & extensible_group > 0L & !is.na(value_num), by = "extensible_group",
+        value_chr := as.character(round(value_num, 2L))
+    ]
+
+    # format data period
+    header$value[class_name == EPW_CLASS$period & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[c(3L, 4L)] <- format(epw_date(value_chr[c(3L, 4L)]), m_spc = TRUE)
+            value_chr
+        }
+    ]
+
+    set(header$value, NULL, "value_num", NULL)
+
     fmt <- get_idf_string(get_epw_idd_env(), header, header = FALSE, comment = FALSE,
         format = "new_top", leading = 0, sep_at = -1, flat = FALSE
     )
     fmt <- lapply(fmt$format$fmt, "[[", 2L)
+
+    # assign numeric value back
+    set(header$value, NULL, "value_num", val_num)
+    cols <- c("value_id", "value_chr", "value_num", "object_id", "field_id")
+    set(header$value, NULL, setdiff(names(header$value), cols), NULL)
+    setcolorder(header$value, cols)
 
     vcapply(fmt, function (s) {
         # remove trailing semicolon

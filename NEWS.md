@@ -18,6 +18,8 @@
   (#320).
 * Now `Epw$abnormal_data()` can keep columns that contains abnormal data when
   `keep_all` is `FALSE` (#326).
+* `Epw$save()` now formats the header in the same way as Weather Converter
+  (#328).
 
 # eplusr 0.13.0
 
