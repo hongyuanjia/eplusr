@@ -45,6 +45,8 @@ test_that("Epw Header", {
     expect_equal(h$value[object_id %in% c(2, 3, 4), value_num], rep(0, 3))
     expect_equal(h$value[object_id %in% c(6, 7), value_chr], rep(NA_character_, 2))
 
+    get_idf_value(get_epw_idd_env(), h, EPW_CLASS[[paste0("comment", 1)]])
+
     # can fix mismatched extensible group and value of number field
     expect_warning(
         {
@@ -357,7 +359,7 @@ test_that("Epw Header", {
     )
 
     expect_equal(format_epw_header(h),
-        c("LOCATION,city,state,country,type,wmo,1,2,3,4",
+        c("LOCATION,city,state,country,type,wmo,1.00,2.00,3.0,4.0",
           "DESIGN CONDITIONS,0",
           "TYPICAL/EXTREME PERIODS,0",
           "GROUND TEMPERATURES,0",
