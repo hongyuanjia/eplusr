@@ -448,8 +448,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$comment1()` takes a single string of new comments and replaces the
-        #' old comment with input one. If no input is given, current comment is
-        #' returned.
+        #' old comment with input one. If `NULL` is given, the comment is
+        #' removed. Empty string or a string that contains only spaces will be
+        #' treated as `NULL`. If no input is given, current comment is returned.
+        #' If no comments exist, `NULL` is returned.
         #'
         #' @param comment A string of new comments.
         #'
@@ -472,8 +474,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$comment2()` takes a single string of new comments and replaces the
-        #' old comment with input one. If no input is given, current comment is
-        #' returned.
+        #' old comment with input one. If `NULL` is given, the comment is
+        #' removed. Empty string or a string that contains only spaces will be
+        #' treated as `NULL`. If no input is given, current comment is returned.
+        #' If no comments exist, `NULL` is returned.
         #'
         #' @param comment A string of new comments.
         #'
@@ -1568,14 +1572,24 @@ epw_holiday <- function (self, private, leapyear, dst, holiday) {
 epw_comment <- function (self, private, index = 1L, comment) {
     val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS[[paste0("comment", index)]])
 
-    if (missing(comment)) return(val$value_chr)
+    if (missing(comment)) {
+        if (is.na(val$value_chr)) return(NULL) else return(val$value_chr)
+    }
 
-    assert_string(comment)
+    assert_string(comment, null.ok = TRUE)
+    if (is.null(comment)) {
+        comment <- NA_character_
+    } else {
+        comment <- stri_trim_right(comment)
+        if (stri_isempty(comment)) {
+            comment <- NA_character_
+        }
+    }
     private$idf_env()$value[J(val$value_id), on = "value_id", value_chr := comment]
     private$log_unsaved()
     private$log_new_uuid()
 
-    comment
+    if (is.na(comment)) return(NULL) else comment
 }
 # }}}
 # epw_comment1 {{{

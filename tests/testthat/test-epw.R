@@ -140,6 +140,10 @@ test_that("Header getter and setter", {
     expect_is(epw$comment2(), "character")
     expect_equal(epw$comment2("comment2"), "comment2")
     expect_equal(epw$comment2(), "comment2")
+    expect_null(epw$comment2(""))
+    expect_null(epw$comment2())
+    expect_null(epw$comment1(NULL))
+    expect_null(epw$comment1())
     # }}}
 
     # $num_period {{{
