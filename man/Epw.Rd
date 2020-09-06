@@ -904,8 +904,10 @@ Get and modify COMMENT1 header
 }
 \subsection{Details}{
 \verb{$comment1()} takes a single string of new comments and replaces the
-old comment with input one. If no input is given, current comment is
-returned.
+old comment with input one. If \code{NULL} is given, the comment is
+removed. Empty string or a string that contains only spaces will be
+treated as \code{NULL}. If no input is given, current comment is returned.
+If no comments exist, \code{NULL} is returned.
 }
 
 \subsection{Returns}{
@@ -943,8 +945,10 @@ Get and modify COMMENT2 header
 }
 \subsection{Details}{
 \verb{$comment2()} takes a single string of new comments and replaces the
-old comment with input one. If no input is given, current comment is
-returned.
+old comment with input one. If \code{NULL} is given, the comment is
+removed. Empty string or a string that contains only spaces will be
+treated as \code{NULL}. If no input is given, current comment is returned.
+If no comments exist, \code{NULL} is returned.
 }
 
 \subsection{Returns}{
