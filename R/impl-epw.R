@@ -239,9 +239,9 @@ parse_epw_header <- function (path, strict = FALSE) {
     }
     # detect invalid lines with multiple semicolon (;)
     # in case there are multiple semicolon in one line
-    if (any(stri_count_fixed(dt$body[!ln_cmt], ";") > 1L)) {
+    if (any(stri_count_fixed(dt$body, ";") > 1L)) {
         parse_error("epw", "Invalid header line found",
-            dt[stri_count_fixed(body, ";") > 1L & !ln_cmt],
+            dt[stri_count_fixed(body, ";") > 1L],
             subtype = "header_line"
         )
     }
@@ -263,6 +263,7 @@ parse_epw_header <- function (path, strict = FALSE) {
         s <- dt$string[ln_cmt]
         comma_loc <- stri_locate_first_fixed(s, ",")[, 1L]
         s <- stri_sub(s, comma_loc + 1L)
+        s[stri_isempty(s)] <- NA_character_
         dt_value[J(c(EPW_CLASS$comment1, EPW_CLASS$comment2)), on = "class_name", value_chr := s]
     }
 
