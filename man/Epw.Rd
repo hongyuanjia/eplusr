@@ -1951,7 +1951,7 @@ epw$is_unsaved()
 \subsection{Method \code{save()}}{
 Save \code{Epw} object as an EPW file
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$save(path = NULL, overwrite = FALSE, purge = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$save(path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1965,6 +1965,9 @@ Default is \code{FALSE}.}
 
 \item{\code{purge}}{Whether to remove redundant data when saving. Default:
 \code{FALSE}.}
+
+\item{\code{format_digit}}{Whether to remove trailing digits in weather
+data. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

@@ -1207,6 +1207,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        Default is `FALSE`.
         #' @param purge Whether to remove redundant data when saving. Default:
         #'        `FALSE`.
+        #' @param format_digit Whether to remove trailing digits in weather
+        #'        data. Default: `TRUE`.
         #'
         #' @return A length-one character vector, invisibly.
         #'
@@ -1216,8 +1218,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #' epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
         #' }
         #'
-        save = function (path = NULL, overwrite = FALSE, purge = FALSE)
-            epw_save(self, private, path, overwrite, purge),
+        save = function (path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE)
+            epw_save(self, private, path, overwrite, purge, format_digit),
         # }}}
         # }}}
 
@@ -1928,7 +1930,7 @@ epw_is_unsaved <- function (self, private) {
 }
 # }}}
 # epw_save {{{
-epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE) {
+epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
             abort("The Epw object is not created from local file. Please give the path to save.", "epw_not_local")
@@ -1946,7 +1948,7 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
     fill <- if (!private$m_log$miss_filled || !private$m_log$range_filled) TRUE else FALSE
 
     p <- save_epw_file(private$m_data, private$idf_env(), private$m_log$matched,
-        path, overwrite, fmt_digit = TRUE,
+        path, overwrite, fmt_digit = format_digit,
         fill = fill,
         missing = private$m_log$miss_filled,
         out_of_range = private$m_log$range_filled,
