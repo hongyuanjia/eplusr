@@ -22,6 +22,7 @@
   (#328).
 * `Epw$comment1()` and `Epw$comment2()` now accepts `NULL` as input, which will
   remove the comments. And `NULL` is returned if no comments are found (#330).
+* Fix the error when the first field is not in the input in `Idf$update()` (#332).
 
 # eplusr 0.13.0
 
