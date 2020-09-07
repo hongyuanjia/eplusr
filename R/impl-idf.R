@@ -2390,7 +2390,8 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         # extract object table
         obj_dt <- dt[, by = c("object_rleid"),
             list(rleid = rleid[[1L]], object_id = object_id[[1L]],
-                 class_name = class_name[[1L]], num = max(field_index)
+                 class_name = class_name[[1L]], num = max(field_index),
+                 value_type = value_type[[1L]]
             )
         ]
 
@@ -2440,17 +2441,17 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         }
 
         # update class id
-        set(obj_dt, NULL, "num", NULL)
         obj_dt[val_dt, on = c("object_rleid" = "rleid"), class_id := i.class_id]
 
         # assign input value
         val_dt[dt, on = c(rleid = "object_rleid", "field_index"),
-            `:=`(value_chr = i.value_chr, value_num = i.value_num,
-                 rleid = i.rleid, object_id = i.object_id,
-                 value_type = i.value_type, object_rleid = i.object_rleid
-            )
+            `:=`(value_chr = i.value_chr, value_num = i.value_num)
         ]
-        setnafill(val_dt, type = "locf", cols = c("rleid", "object_id", "object_rleid", "value_type"))
+        # update rleid related
+        val_dt[obj_dt, on = c("rleid" = "object_rleid"),
+            `:=`(rleid = i.rleid, object_rleid = i.object_rleid, value_type = i.value_type)
+        ]
+        set(obj_dt, NULL, c("num", "value_type"), NULL)
         # if value column is a character vector, need to reset values since
         # all of them are coerced regardless of field types
         val_dt[value_type == 1L & type_enum > IDDFIELD_TYPE$real, value_num := NA_real_]
