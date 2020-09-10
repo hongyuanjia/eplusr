@@ -715,12 +715,7 @@ read_report_data_csv <- function (csv, env, dict, time,
         if (!nrow(data)) {
             data <- data.table(time_index = integer(), report_data_dictionary_index = character(), value = double())
         } else {
-            # add time column for further subsetting
-            if (!subset_time) {
-                set(data, NULL, names(time_csv_all), time_csv_all)
-            } else {
-                set(data, NULL, names(time_sub), time_sub)
-            }
+            set(data, NULL, names(time_sub), time_sub)
 
             # get time table for each frequency
             l <- lapply(split(dict, by = "interval_type"), function (dict_per) {
@@ -752,7 +747,7 @@ read_report_data_csv <- function (csv, env, dict, time,
 
                     time_per <- time[J(int_per), on = "interval_type"]
                     # should re-subset based on targeting environment
-                    time_per <- time_per[env, on = "environment_period_index", nomatch = NULL]
+                    time_per <- subset_sql_environment_periods(time_per, environment_name)
                     time_per <- subset_sql_time(time_per, year = year, tz = tz,
                         period = period, month = month, day = day, hour = hour,
                         minute = minute, interval = interval,
