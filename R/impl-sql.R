@@ -600,7 +600,7 @@ read_report_data_csv <- function (csv, env, dict, time,
 
     # subet using time index
     if (!subset_time) {
-        set(data, NULL, "time_index", time_sub$time_index)
+        set(data, NULL, "time_index", time_index_all)
     } else if (!nrow(time_sub)) {
         set(data, NULL, "time_index", integer())
     } else {
