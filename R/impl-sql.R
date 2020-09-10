@@ -497,27 +497,35 @@ read_report_data_csv <- function (csv, env, dict, time,
     # handle RunPeriod frequency
     time <- complete_sql_time(time)
 
+    # add environment data
+    # NOTE: The EnvironmentPeriods table did not contain all the environment
+    #       data in the CSV output.
+    #       See: https://github.com/NREL/EnergyPlus/issues/8268
+    time[env, on = "environment_period_index",
+        `:=`(environment_name = i.environment_name,
+             simulation_index = i.simulation_index,
+             environment_type = i.environment_type)]
+
     # get time data used for row subsetting
     # should check if detailed output is required
     # in this case, interval_type for TimeStep will also be -1 but not 0
     # timestep is in the time table
     if (int == RPFREQ["Each Call"] | int == RPFREQ["TimeStep"]) {
-        time_csv <- unique(time[J(RPFREQ["Each Call"]), on = "interval_type"], by = c("environment_period_index", "month", "day", "hour", "minute"))
+        time_csv_all <- unique(time[J(RPFREQ["Each Call"]), on = "interval_type"], by = c("environment_period_index", "month", "day", "hour", "minute"))
     } else {
-        time_csv <- time[J(int), on = "interval_type", nomatch = NULL]
+        time_csv_all <- time[J(int), on = "interval_type", nomatch = NULL]
     }
 
-    # store all time index in case used when fread failed to detect correct
-    # column numbers
-    time_index_all <- time_csv$time_index
-
     dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
-    env <- subset_sql_environment_periods(env, environment_name = environment_name)
-
     subset_var <- attr(dict, "filtered")
-    subset_env <- attr(env, "filtered")
 
-    time_csv <- time_csv[env, on = "environment_period_index", nomatch = NULL]
+    if (is.null(environment_name)) {
+        time_csv <- copy(time_csv_all)
+        subset_env <- FALSE
+    } else {
+        time_csv <- subset_sql_environment_periods(time_csv_all, environment_name)
+        subset_env <- TRUE
+    }
 
     # create datetime column
     # necessary for running 'complete_sql_time'
@@ -560,7 +568,7 @@ read_report_data_csv <- function (csv, env, dict, time,
         nrows <- 0
     } else {
         range <- range(time_sub$time_index)
-        range_csv <- match(range, time_index_all)
+        range_csv <- match(range, time_csv_all$time_index)
         # count from the header row which is 1
         skip <- range_csv[1L]
         nrows <- range_csv[2L] - skip + 1L
@@ -592,7 +600,7 @@ read_report_data_csv <- function (csv, env, dict, time,
             } else {
                 data <- fread(csv, sep = ",", fill = TRUE, header = TRUE,
                     select = select, col.names = col.names)
-                set(data, NULL, "time_index", time_index_all)
+                set(data, NULL, "time_index", time_csv_all$time_index)
                 data <- data[J(time_sub$time_index), on = "time_index"]
             }
         }
@@ -600,11 +608,11 @@ read_report_data_csv <- function (csv, env, dict, time,
 
     # subet using time index
     if (!subset_time) {
-        set(data, NULL, "time_index", time_index_all)
+        set(data, NULL, "time_index", time_csv_all$time_index)
     } else if (!nrow(time_sub)) {
         set(data, NULL, "time_index", integer())
     } else {
-        set(data, NULL, "time_index", time_index_all[range_csv[[1L]]:range_csv[[2L]]])
+        set(data, NULL, "time_index", time_csv_all$time_index[range_csv[[1L]]:range_csv[[2L]]])
         data <- data[J(time_sub$time_index), on = "time_index"]
     }
 
@@ -682,7 +690,7 @@ read_report_data_csv <- function (csv, env, dict, time,
             data <- subset_by_interval(fast_subset(data, cols), int_per, timestep)
 
             # remove time components after subsetting
-            set(data, NULL, names(time_per), NULL)
+            set(data, NULL, intersect(names(data), names(time_per)), NULL)
             # update time index
             set(data, NULL, "time_index", time_per$time_index)
 
@@ -707,7 +715,6 @@ read_report_data_csv <- function (csv, env, dict, time,
         if (!nrow(data)) {
             data <- data.table(time_index = integer(), report_data_dictionary_index = character(), value = double())
         } else {
-            # add time column for further subsetting
             set(data, NULL, names(time_sub), time_sub)
 
             # get time table for each frequency
@@ -740,7 +747,7 @@ read_report_data_csv <- function (csv, env, dict, time,
 
                     time_per <- time[J(int_per), on = "interval_type"]
                     # should re-subset based on targeting environment
-                    time_per <- time_per[env, on = "environment_period_index", nomatch = NULL]
+                    time_per <- subset_sql_environment_periods(time_per, environment_name)
                     time_per <- subset_sql_time(time_per, year = year, tz = tz,
                         period = period, month = month, day = day, hour = hour,
                         minute = minute, interval = interval,
