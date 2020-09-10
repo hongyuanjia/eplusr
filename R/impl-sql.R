@@ -511,7 +511,7 @@ read_report_data_csv <- function (csv, env, dict, time,
     # in this case, interval_type for TimeStep will also be -1 but not 0
     # timestep is in the time table
     if (int == RPFREQ["Each Call"] | int == RPFREQ["TimeStep"]) {
-        time_csv <- unique(time[J(RPFREQ["Each Call"]), on = "interval_type"], by = c("environment_period_index", "month", "day", "hour", "minute"))
+        time_csv_all <- unique(time[J(RPFREQ["Each Call"]), on = "interval_type"], by = c("environment_period_index", "month", "day", "hour", "minute"))
     } else {
         time_csv_all <- time[J(int), on = "interval_type", nomatch = NULL]
     }
