@@ -99,10 +99,6 @@ read_idf(path)$version()
 Having a clear mental model on how the transition works, the most cumbersome
 work left is to translate all those actions written in Fortran into R and write
 tests to make sure that the R implement should be the same as IDFVersionUpdater.
-It takes me days to do that. In the end, the
-[transition.R](https://github.com/hongyuanjia/eplusr/blob/master/R/transition.R)
-has more than 2700 lines. You can try it out using by install the development of
-eplusr doing `remotes::install_github("hongyuanjia/eplusr")`.
 
 [`transition()`](https://hongyuanjia.github.io/eplusr/reference/transition.html)
 is a pure R implementation of transition programs. It takes similar arguments
