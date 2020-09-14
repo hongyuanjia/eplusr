@@ -685,6 +685,7 @@ read_report_data_csv <- function (csv, env, dict, time,
 
         melt_data <- function (data, int_per, dict_per, time_per) {
             if (!nrow(time_per)) return(data.table(time_index = integer(), report_data_dictionary_index = integer(), value = double()))
+            if (!nrow(dict_per)) return(data.table(time_index = integer(), report_data_dictionary_index = integer(), value = double()))
 
             cols <- setdiff(names(data), setdiff(dict$Variable, dict_per$Variable))
             data <- subset_by_interval(fast_subset(data, cols), int_per, timestep)
