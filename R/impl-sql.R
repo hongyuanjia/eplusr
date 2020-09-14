@@ -656,7 +656,12 @@ read_report_data_csv <- function (csv, env, dict, time,
                         day_type = day_type)
                 }
 
+                # add time columns for subsetting
+                cols <- c("environment_period_index", "month", "day", "hour", "minute")
+                add_joined_cols(time, data, "time_index", cols)
                 data <- subset_by_interval(data, int_var)
+                set(data, NULL, cols, NULL)
+
                 set(data, NULL, "time_index", time_sub$time_index)
             }
         }
