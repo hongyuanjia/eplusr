@@ -25,6 +25,8 @@
 * Fix the error when the first field is not in the input in `Idf$update()` (#332).
 * Fix the error in `EplusJob$report_data()` caused by incomplete
   `EnvironmentPeriods` table in EnergyPlus SQL output (#336).
+* Make sure `Day of Week for Start Day` is reset to empty if `UseWeatherFile`
+  was used in transtion from v8.9 to v9.0 (#338).
 
 # eplusr 0.13.0
 
