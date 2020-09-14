@@ -27,6 +27,8 @@
   `EnvironmentPeriods` table in EnergyPlus SQL output (#336).
 * Make sure `Day of Week for Start Day` is reset to empty if `UseWeatherFile`
   was used in transition from v8.9 to v9.0 (#338).
+* Fix the error in `EplusJob$report_data()` when multiple reporting frequencies
+  exist in the CSV output (#340).
 
 # eplusr 0.13.0
 

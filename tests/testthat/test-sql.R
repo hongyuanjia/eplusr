@@ -459,4 +459,17 @@ test_that("CSV extraction", {
     expect_is(d2 <- get_sql_report_data(path_sqls[12], all = TRUE), "data.table")
     expect_equivalent(d1, d2)
     # }}}
+
+    # handle multiple reporting frequencies (#340)
+    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"))
+    job <- idf$run(NULL, tempdir(), echo = FALSE)
+    path_sql <- job_sql_path(job, get_priv_env(job))
+    path_csv <- job_csv_path(job, get_priv_env(job))
+    expect_is(get_sql_report_data(path_sql, path_csv, wide = TRUE), "data.table")
+    expect_is(class = "data.table",
+        get_sql_report_data(path_sql, path_csv,
+            name = c("Performance Curve Output Value", "Site Outdoor Air Drybulb Temperature"),
+            wide = TRUE
+        )
+    )
 })
