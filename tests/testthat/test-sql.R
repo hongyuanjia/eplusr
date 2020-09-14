@@ -465,6 +465,7 @@ test_that("CSV extraction", {
     job <- idf$run(NULL, tempdir(), echo = FALSE)
     path_sql <- job_sql_path(job, get_priv_env(job))
     path_csv <- job_csv_path(job, get_priv_env(job))
+    expect_is(get_sql_report_data(path_sql, path_csv), "data.table")
     expect_is(get_sql_report_data(path_sql, path_csv, wide = TRUE), "data.table")
     expect_is(class = "data.table",
         get_sql_report_data(path_sql, path_csv,
