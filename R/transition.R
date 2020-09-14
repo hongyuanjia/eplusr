@@ -1977,6 +1977,17 @@ trans_funs$f890t900 <- function (idf) {
                         ))
                     }
 
+                    if (!is.na(value[8L]) && tolower(value[8L]) == "useweatherfile") {
+                        warn(paste0(
+                                "For 'RunPeriod' ", surround(name[[1L]]), " [ID:", id[[1L]], "]:\n",
+                                "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
+                                "start week day is set by the input start date."
+                            ),
+                            "warning_trans_890_900"
+                        )
+                        value[8L] <- NA_character_
+                    }
+
                     num_rep <- as.integer(num_rep)
                 } else {
                     num_rep <- 0L
