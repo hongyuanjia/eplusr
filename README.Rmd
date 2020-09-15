@@ -58,6 +58,12 @@ There is also an online slides here ([Interfacing EnergyPlus Using
 R](https://hongyuanjia.github.io/eplusrIntro/)).  You can learn more about eplusr
 at https://hongyuanjia.github.io/eplusr/, along with full package documentation.
 
+## How to cite
+
+```{r}
+citation("eplusr")
+```
+
 ## Installation
 
 You can install the latest stable release of eplusr from CRAN.
@@ -166,12 +172,6 @@ Please see these vignettes and articles about {eplusr}
 ### Slides
 
 * [Slides: Interfacing EnergyPlus using R](https://hongyuanjia.github.io/eplusrIntro/)
-
-## How to cite
-
-```{r}
-citation("eplusr")
-```
 
 ## Additional resources
 
