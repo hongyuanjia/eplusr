@@ -256,7 +256,11 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     # clean wd
     clean_wd(loc_m)
 
-    res <- energyplus(energyplus_exe, loc_m, loc_w, output_dir = output_dir,
+    # Let energyplus commandline interface itself to handle output file
+    # directory. This is the easiest way to external file dependencies, instead
+    # of doing it on the R side.
+    # See #344
+    res <- energyplus(energyplus_exe, model, weather, output_dir = output_dir,
         annual = annual, design_day = design_day, expand_obj = expand_obj,
         wait = wait, echo = echo)
 
