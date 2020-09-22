@@ -709,8 +709,8 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         model <- model_ori
         # _exp.idf --> .expidf
         rename_exp <- function () {
-            path <- paste0(stri_sub(tools::file_path_sans_ext(model_exp), to = -5L), ".expidf")
-            try(file.rename(model_exp, path), silent = TRUE)
+            path <- basename(paste0(stri_sub(tools::file_path_sans_ext(model_exp), to = -5L), ".expidf"))
+            try(file.rename(model_exp, file.path(output_dir, path)), silent = TRUE)
         }
     }
 
@@ -916,6 +916,12 @@ expand_objects <- function (eplus, idf, keep_ext = FALSE) {
     unlink(file.path(dirname(idf), "in.idf"), force  = TRUE)
     unlink(file.path(dirname(idf), "expandedidf.err"), force  = TRUE)
     unlink(file.path(dirname(idf), "fort.6"), force  = TRUE)
-    if (file.exists(out)) setattr(out, "expanded", expanded) else setattr(idf, "expanded", expanded)
+    if (file.exists(out)) {
+        attr(out, "expanded") <- expanded
+        out
+    } else {
+        attr(idf, "expanded") <- expanded
+        idf
+    }
 }
 # }}}
