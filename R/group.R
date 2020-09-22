@@ -754,7 +754,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             vcapply(idfs, function (idf) get_priv_env(idf)$uuid())
         },
         log_idf_uuid = function (which = NULL) {
-            if (is.null(which)) which <- seq_along(private$m_log$idf_uuid)
+            if (is.null(which)) which <- seq_along(private$m_idfs)
             private$m_log$idf_uuid[which] <- private$idf_uuid(which)
         },
         cached_idf_uuid = function (which = NULL) {
