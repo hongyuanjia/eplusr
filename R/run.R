@@ -256,7 +256,11 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     # clean wd
     clean_wd(loc_m)
 
-    res <- energyplus(energyplus_exe, loc_m, loc_w, output_dir = output_dir,
+    # Let energyplus commandline interface itself to handle output file
+    # directory. This is the easiest way to external file dependencies, instead
+    # of doing it on the R side.
+    # See #344
+    res <- energyplus(energyplus_exe, model, weather, output_dir = output_dir,
         annual = annual, design_day = design_day, expand_obj = expand_obj,
         wait = wait, echo = echo)
 
@@ -705,8 +709,8 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         model <- model_ori
         # _exp.idf --> .expidf
         rename_exp <- function () {
-            path <- paste0(stri_sub(tools::file_path_sans_ext(model_exp), to = -5L), ".expidf")
-            try(file.rename(model_exp, path), silent = TRUE)
+            path <- basename(paste0(stri_sub(tools::file_path_sans_ext(model_exp), to = -5L), ".expidf"))
+            try(file.rename(model_exp, file.path(output_dir, path)), silent = TRUE)
         }
     }
 
@@ -912,6 +916,12 @@ expand_objects <- function (eplus, idf, keep_ext = FALSE) {
     unlink(file.path(dirname(idf), "in.idf"), force  = TRUE)
     unlink(file.path(dirname(idf), "expandedidf.err"), force  = TRUE)
     unlink(file.path(dirname(idf), "fort.6"), force  = TRUE)
-    if (file.exists(out)) setattr(out, "expanded", expanded) else setattr(idf, "expanded", expanded)
+    if (file.exists(out)) {
+        attr(out, "expanded") <- expanded
+        out
+    } else {
+        attr(idf, "expanded") <- expanded
+        idf
+    }
 }
 # }}}

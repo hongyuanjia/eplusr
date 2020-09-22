@@ -497,10 +497,7 @@ all models are saved in the specified directory. Default:
 \item{\code{copy_external}}{Only applicable when \code{separate} is \code{TRUE}. If
 \code{TRUE}, the external files that every \code{Idf} object depends on
 will also be copied into the saving directory. The values of
-file paths in the Idf will be changed automatically.
-Currently, only \code{Schedule:File} class is supported.  This
-ensures that the output directory will have all files needed
-for the model to run. Default: \code{FALSE}.}
+file paths in the Idf will be changed automatically.}
 }
 \if{html}{\out{</div>}}
 }

@@ -242,9 +242,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'        `TRUE`, the external files that every `Idf` object depends on
         #'        will also be copied into the saving directory. The values of
         #'        file paths in the Idf will be changed automatically.
-        #'        Currently, only `Schedule:File` class is supported.  This
-        #'        ensures that the output directory will have all files needed
-        #'        for the model to run. Default: `FALSE`.
+        #         This ensures that the output directory will have all files
+        #         needed for the model to run. Default: `FALSE`.
         #'
         #' @return A [data.table::data.table()] with two columns:
         #'

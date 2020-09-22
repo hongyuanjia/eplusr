@@ -95,9 +95,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param copy_external If `TRUE`, the external files that current `Idf`
         #'        object depends on will also be copied into the simulation
         #'        output directory. The values of file paths in the Idf will be
-        #'        changed automatically. Currently, only `Schedule:File` class
-        #'        is supported.  This ensures that the output directory will
-        #'        have all files needed for the model to run. Default is
+        #'        changed automatically. This ensures that the output directory
+        #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to
         #'        simulation status. Default: same as `wait`.
@@ -750,9 +749,18 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         uuid = function () private$m_log$uuid,
         log_new_uuid = function () log_new_uuid(private$m_log),
 
-        idf_uuid = function () vcapply(private$m_idfs, function (idf) get_priv_env(idf)$uuid()),
-        log_idf_uuid = function () private$m_log$idf_uuid <- private$idf_uuid(),
-        cached_idf_uuid = function () private$m_log$idf_uuid,
+        idf_uuid = function (which = NULL) {
+            idfs <- if (is.null(which)) private$m_idfs else private$m_idfs[which]
+            vcapply(idfs, function (idf) get_priv_env(idf)$uuid())
+        },
+        log_idf_uuid = function (which = NULL) {
+            if (is.null(which)) which <- seq_along(private$m_idfs)
+            private$m_log$idf_uuid[which] <- private$idf_uuid(which)
+        },
+        cached_idf_uuid = function (which = NULL) {
+            if (is.null(which)) which <- seq_along(private$m_log$idf_uuid)
+            private$m_log$idf_uuid[which]
+        },
 
         is_unsaved = function () private$m_log$unsaved,
         log_saved = function (which = NULL) log_saved(private$m_log, which),
@@ -872,6 +880,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
             function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
         )
+        private$log_idf_uuid(which(to_save))
         private$log_saved(which(to_save))
     }
 

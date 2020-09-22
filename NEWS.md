@@ -30,6 +30,9 @@
   was used in transition from v8.9 to v9.0 (#338).
 * Fix the error in `EplusJob$report_data()` when multiple reporting frequencies
   exist in the CSV output (#340).
+* Fix simulation error when FMU files are given in relative paths (#344). Now
+  all objects that reference to external files can be correctly copied iinto
+  output directory when `copy_external` is set to `TRUE`.
 
 # eplusr 0.13.0
 
