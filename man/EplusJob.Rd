@@ -487,9 +487,8 @@ standard output and error from EnergyPlus. Default: same as
 \item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
 object depends on will also be copied into the simulation
 output directory. The values of file paths in the Idf will be
-changed automatically. Currently, only \code{Schedule:File} class
-is supported.  This ensures that the output directory will
-have all files needed for the model to run. Default is
+changed automatically. This ensures that the output directory
+will have all files needed for the model to run. Default is
 \code{FALSE}.}
 }
 \if{html}{\out{</div>}}

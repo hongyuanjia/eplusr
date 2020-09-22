@@ -95,9 +95,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param copy_external If `TRUE`, the external files that current `Idf`
         #'        object depends on will also be copied into the simulation
         #'        output directory. The values of file paths in the Idf will be
-        #'        changed automatically. Currently, only `Schedule:File` class
-        #'        is supported.  This ensures that the output directory will
-        #'        have all files needed for the model to run. Default is
+        #'        changed automatically. This ensures that the output directory
+        #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to
         #'        simulation status. Default: same as `wait`.

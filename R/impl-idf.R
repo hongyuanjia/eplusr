@@ -4352,8 +4352,8 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
 }
 # }}}
 # resolve_idf_external_link {{{
-#  auto change full file path in `Schedule:File` to relative path and copy those
-#  files into the same directory of the model
+#  auto change full file path in `Schedule:File` and other classes to relative
+#  path and copy those files into the same directory of the model
 resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
     if (!has_names(idf_env$object, "class_name")) {
         added <- TRUE
@@ -4362,7 +4362,34 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # Currently, only `Schedule:File` class is supported
-    if (!"Schedule:File" %in% idf_env$object$class_name) return(FALSE)
+    map <- data.table(
+        class_name = c(
+            "Schedule:File:Shading",
+            "Schedule:File",
+            "Construction:WindowDataFile",
+            "ExternalInterface:FunctionalMockupUnitImport",
+            "ExternalInterface:FunctionalMockupUnitImport:From:Variable",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Actuator",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Variable",
+            "Table:IndependentVariable",
+            "Table:Lookup"
+        ),
+        field_name = c(
+            "File Name",
+            "File Name",
+            "File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "External File Name",
+            "External File Name"
+        )
+    )
+
+    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(FALSE)
 
     # get full path of old and new
     old_dir <- normalizePath(dirname(old), mustWork = FALSE)
@@ -4374,7 +4401,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     setwd(old_dir)
 
     # get object table and value table
-    val <- get_idf_value(idd_env, idf_env, class = "Schedule:File", field = "File Name",
+    val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
         property = c("units", "ip_units", "type_enum")
     )
 

@@ -154,9 +154,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' @param copy_external If `TRUE`, the external files that current `Idf`
         #'        object depends on will also be copied into the simulation
         #'        output directory. The values of file paths in the Idf will be
-        #'        changed automatically. Currently, only `Schedule:File` class
-        #'        is supported.  This ensures that the output directory will
-        #'        have all files needed for the model to run. Default is
+        #'        changed automatically. This ensures that the output directory
+        #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
         #'
         #' @return The `EplusJob` object itself, invisibly.
@@ -840,6 +839,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     # if necessary, resave the model
     if (private$is_unsaved() || !is.null(dir)) {
         path_idf <- private$m_idf$save(path_idf, overwrite = TRUE, copy_external = copy_external)
+        private$log_seed_uuid()
         private$log_saved()
     }
 
