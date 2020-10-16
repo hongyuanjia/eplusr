@@ -33,6 +33,7 @@
 * Fix simulation error when FMU files are given in relative paths (#344). Now
   all objects that reference to external files can be correctly copied iinto
   output directory when `copy_external` is set to `TRUE`.
+* Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
 
 # eplusr 0.13.0
 
