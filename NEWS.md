@@ -5,6 +5,7 @@
 * `Epw$save()` gets a new option `format_digit`. If `TRUE`, the trailing digits
   in EPW data will be formatted in the same way as Weather Converter (#323).
 * Add EnergyPlus v9.3 support (#343).
+* Add EnergyPlus v9.4 support (#347).
 
 ## Bug fixes
 
