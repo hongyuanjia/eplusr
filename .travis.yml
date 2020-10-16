@@ -79,6 +79,8 @@ addons:
       - libgdal-dev
       - libglu1-mesa-dev
       - libproj-dev
+      - libharfbuzz-dev
+      - libfribidi-dev
   homebrew:
     packages:
       - udunits
