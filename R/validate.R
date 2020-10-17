@@ -690,7 +690,7 @@ format_single_validity <- function (single_validity, type, epw = FALSE) {
     title <- switch(type,
         missing_object = paste("Missing Required", obj),
         duplicate_object = paste("Duplicated Unique", obj),
-        conflict_name = paste0("Conflicted", obj, "Names"),
+        conflict_name = paste("Conflicted", obj, "Names"),
         incomplete_extensible = "Incomplete Extensible Group",
         missing_value = "Missing Required Field",
         invalid_autosize = "Invalid Autosize Field",

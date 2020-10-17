@@ -3061,19 +3061,28 @@ idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
         .unique = FALSE, .strict = TRUE)
 
     # ignore Version object
-    if (any(l$object$class_id == 1L)) {
+    if (any(is_ver <- l$object$class_id == 1L)) {
         if (in_verbose()) {
-            m <- l$object[class_id == 1L, paste0(" #", rleid, "| Object [", object_id, ", ] --> Class 'Version'", collapse = "\n")]
+            m <- l$object[class_id == 1L, paste0(" #", rleid, "| Object [", object_id, "] --> Class 'Version'", collapse = "\n")]
             verbose_info("'Version' objects in input below have been automatically skipped:\n", m)
         }
+        id <- l$object$object_id[is_ver]
         l$object <- l$object[!J(1L), on = "class_id"]
-        l$value <- l$value[J(l$object$rleid), on = "rleid"]
+        l$value <- l$value[!J(id), on = "object_id"]
 
         if (!nrow(l$object)) {
             verbose_info("After removing Version objects, nothing to add.")
             return(invisible())
         }
     }
+
+    # assign new rleid to make sure it can be used as an identifier
+    l$object[, new_rleid := rleid(rleid, object_id)]
+    l$value[, new_rleid := rleid(rleid, object_id)]
+    set(l$object, NULL, "rleid", NULL)
+    set(l$value, NULL, "rleid", NULL)
+    setnames(l$object, "new_rleid", "rleid")
+    setnames(l$value, "new_rleid", "rleid")
 
     ins <- add_idf_object(private$idd_env(), private$idf_env(), l$object, l$value,
         default = FALSE, unique = .unique, empty = .empty
