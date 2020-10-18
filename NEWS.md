@@ -35,6 +35,7 @@
   all objects that reference to external files can be correctly copied iinto
   output directory when `copy_external` is set to `TRUE`.
 * Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
+* Sub-hourly EPW files are supported (#351).
 
 # eplusr 0.13.0
 

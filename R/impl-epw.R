@@ -1246,7 +1246,7 @@ parse_epw_data <- function (path) {
 }
 # }}}
 # match_epw_data {{{
-match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", check_minute = FALSE) {
+match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
     dp <- parse_epw_header_period(epw_header)
     holiday <- parse_epw_header_holiday(epw_header)
     data_period <- match_epw_data_period(dp$period, period)
@@ -1259,7 +1259,6 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
         get_epw_datetime_range(start_day, end_day, dp$interval, holiday$leapyear)]
 
     col_on <- c("year", "month", "day", "hour")
-    if (check_minute) col_on <- c(col_on, "minute")
 
     # extract date time
     if (!has_names(epw_data, "line")) {
@@ -1329,7 +1328,8 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
     }
 
     # validate_datetime_range {{{
-    validate_datetime_range <- function (datetime, matched, realyear) {
+    validate_datetime_range <- function (dt, matched, realyear) {
+        datetime <- dt$datetime
         if (length(datetime) - matched$line + 1L < matched$num) {
             parse_error("epw", paste("Invalid WEATHER DATA"), subtype = "data",
                 post = sprintf("%i rows of weather data (starting from row %i) are expected for data period #%i '%s', but only '%i' were found.",
@@ -1343,7 +1343,27 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
         if (any(i <- is.na(datetime))) return(which(i)[[1L]])
 
         lubridate::year(datetime) <- get_epw_datetime_year(matched$year, matched$start_day, matched$end_day, matched$num, matched$step)
+
+        # handle sub-hourly
+        if (matched$step != 60) {
+            mins <- seq(matched$step, 60, matched$step)
+            mins <- rep(mins, matched$num / length(mins))
+            datetime <- datetime + lubridate::minutes(mins) - lubridate::hours(1L)
+        }
+
         steps <- as.numeric(difftime(datetime[-1L], datetime[-matched$num], units = "mins"))
+
+        # update corrected datetime in case sub-hourly data
+        if (matched$step != 60) {
+            set(dt, matched$line - 1L + index, "datetime", datetime)
+            set(dt, matched$line - 1L + index,
+                c("month", "day", "hour", "minute"),
+                create_epw_datetime_components(
+                    matched$start_day, matched$end_day,
+                    60 / matched$step, tz, holiday$leapyear
+                )[, -"year"]
+            )
+        }
 
         which(steps != matched$step)
     }
@@ -1351,7 +1371,9 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
 
     # validate time step for each data period
     for (i in seq_len(nrow(matched))) {
-        invld <- validate_datetime_range(dt$datetime, matched[i], realyear)
+        # NOTE: In case of sub-hourly data, datetime in dt will be updated in
+        # this function
+        invld <- validate_datetime_range(dt, matched[i], realyear)
 
         if (length(invld)) {
             # expected time
@@ -1366,6 +1388,14 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
                 format(dtime, "%m/%d %H:XX"), matched$index, matched$name
             ))
             parse_error("epw", paste("Invalid WEATHER DATA"), invld, suffix = invld$suffix, subtype = "data")
+        }
+
+        # if no error found and sub-hourly data found, update input epw_data
+        # with correct datetime
+        if (matched$step[i] != 60) {
+            set(epw_data, NULL, c("datetime", "month", "day", "hour", "minute"),
+                dt[, .SD, .SDcols = c("datetime", "month", "day", "hour", "minute")]
+            )
         }
     }
 
@@ -1707,6 +1737,8 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
     set(d, NULL, "line", i + 8L)
     setcolorder(d, "line")
 
+    # for sub-hourly data, correct hour value from 1:24 to 0:23
+    if (as.integer(interval) != 1L) set(d, NULL, "hour", d$hour - 1L)
     d
 }
 # }}}
@@ -2277,17 +2309,34 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     # preserve input year if not AMY, see #320
     if (!realyear) year_ori <- data$year
 
-    # construct hour values
-    hour <- as.integer(lubridate::hour(data$datetime))
-    hour[hour == 0L] <- 24L
-    set(data, NULL, c("year", "month", "day", "hour", "minute"),
-        list(
-            year = lubridate::year(data$datetime),
-            month = lubridate::month(data$datetime),
-            day = lubridate::mday(data$datetime),
-            hour = hour, minute = if (interval == 1L) 0L else step
+    set(data, NULL, c("year", "month", "day"),
+        list(year = lubridate::year(data$datetime),
+             month = lubridate::month(data$datetime),
+             day = lubridate::mday(data$datetime)
         )
     )
+
+    if (step == 60) {
+        # construct hour values
+        hour <- as.integer(lubridate::hour(data$datetime))
+        hour[hour == 0L] <- 24L
+        set(data, NULL, "hour", hour)
+        set(data, NULL, "minute", 0L)
+    } else {
+        # construct minute values
+        minute <- as.integer(lubridate::minute(data$datetime))
+        minute[minute == 0L] <- 60L
+        set(data, NULL, "hour", lubridate::hour(data$datetime))
+        set(data, NULL, "minute", minute)
+        data[J(60L), on = "minute", c("year", "month", "day", "hour") := {
+            dtime <- datetime - lubridate::minutes(step)
+            list(lubridate::year(dtime), lubridate::month(dtime), lubridate::mday(dtime), lubridate::hour(dtime))
+        }]
+        set(data, NULL, "hour", data$hour + 1L)
+
+        # ignore minute when validation
+        set(data, NULL, "datetime", lubridate::make_datetime(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime)))
+    }
 
     m <- match_epw_data(data, header, target_period)
 
