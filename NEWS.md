@@ -36,6 +36,7 @@
   output directory when `copy_external` is set to `TRUE`.
 * Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
 * Sub-hourly EPW files are supported (#351).
+* Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
 
 # eplusr 0.13.0
 
