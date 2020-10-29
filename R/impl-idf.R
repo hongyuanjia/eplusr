@@ -2881,14 +2881,17 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     validity <- validate_on_level(idd_env, idf_env, dt_object, dt_value, level = chk)
     assert_valid(validity, "set")
 
+    # remove existing references whose fields have been set to empty. see #355
+    all_ref <- idf_env$reference[!dt_value[J(NA_character_), on = "value_chr", nomatch = NULL], on = "value_id"]
+
     # extract reference {{{
     # Since 'check_invalid_reference()' will add new field references in idf_env$reference
     # only check new sources
     if (chk$reference) {
         # extract new reference
         ref <- rbindlist(list(
-            idf_env$reference[J(dt_object$object_id), on = "object_id", nomatch = 0L],
-            idf_env$reference[J(dt_object$object_id), on = "src_object_id", nomatch = 0L]
+            all_ref[J(dt_object$object_id), on = "object_id", nomatch = 0L],
+            all_ref[J(dt_object$object_id), on = "src_object_id", nomatch = 0L]
         ))
     # manually check new reference
     } else {
@@ -2927,6 +2930,10 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
         } else {
             value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")
         }
+
+        # remove existing references whose fields have been set to empty. see #355
+        all_ref <- all_ref[!J(id_del), on = "value_id"][!J(id_del), on = "src_value_id"]
+        ref <- ref[!J(id_del), on = "value_id"][!J(id_del), on = "src_value_id"]
     } else {
         if (replace) {
             value <- append_dt(idf_env$value, dt_value, "object_id")
@@ -2938,7 +2945,7 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     order_idf_data(list(
         object = append_dt(idf_env$object, dt_object, "object_id"),
         value = value,
-        reference = append_dt(idf_env$reference, ref, "value_id"),
+        reference = append_dt(all_ref, ref, "value_id"),
         changed = c(dt_object$object_id),
         updated = setdiff(ref$object_id, dt_object$object_id)
     ))
