@@ -1340,12 +1340,12 @@ epgroup_csv_path <- function (self, private, which) {
     lapply(seq_along(idx), function (i) {
         if (!exist_csv[[i]]) {
             verbose_info("No CSV output found for job ",
-                surround(epgroup_case_from_which(idx[i])),
+                surround(epgroup_case_from_which(self, private, idx[i])),
                 ". Fall back to use SQL for data extraction.")
             NULL
         } else if (mtr_only[[i]]) {
             verbose_info(collapse(cls, or = TRUE), " found for job ",
-                surround(epgroup_case_from_which(idx[i])),
+                surround(epgroup_case_from_which(self, private, idx[i])),
                 ". Fall back to use SQL for data extraction")
             NULL
         } else {
