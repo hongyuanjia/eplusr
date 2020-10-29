@@ -37,6 +37,7 @@
 * Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
 * Sub-hourly EPW files are supported (#351).
 * Fix invalid references introduced by setting field values to empty (#355).
+* Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
 
 # eplusr 0.13.0
 
