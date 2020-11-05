@@ -191,6 +191,42 @@ eplus_download_url <- function (ver) {
              collapse(ALL_EPLUS_RELEASE_COMMIT[order(version), version]), ".", call. = FALSE)
 
     os <- switch(os_type(), windows = "Windows", macos = "Darwin", linux = "Linux")
+
+    # handle EnergyPlus v9.4 and above on Linux and macOS
+    if (ver >= 9.4) {
+        if (is_macos()) {
+            os <- sprintf("%s-macOS10.15", os)
+        } else if (is_linux()) {
+            # detect ubuntu version
+            osrel <- tryCatch(readLines("/etc/os-release", warn = FALSE),
+                error = function (e) NULL
+            )
+
+            # if fail to read, use Ubuntu 20.04
+            if (is.null(osrel)) {
+                os <- sprintf("%s-Ubuntu20.04", os)
+            } else {
+                # test if Ubuntu
+                if (!any(grepl("^ID\\s*=\\s*ubuntu", osrel))) {
+                    os <- sprintf("%s-Ubuntu20.04", os)
+                # get Ubuntu version
+                } else {
+                    vers <- stringi::stri_match_first_regex(osrel, "^BUILD_ID\\s*=\\s*(.+)")[, 2L]
+                    vers <- numeric_version(vers, strict = FALSE)
+                    vers <- vers[!is.na(vers)]
+                    # if fail to get version, use Ubuntu 20.04
+                    if (!length(vers)) {
+                        os <- sprintf("%s-Ubuntu20.04", os)
+                    } else if (any(vers >= 20.04)) {
+                        os <- sprintf("%s-Ubuntu20.04", os)
+                    } else {
+                        os <- sprintf("%s-Ubuntu18.04", os)
+                    }
+                }
+            }
+        }
+    }
+
     if (!is_windows() ||
         identical(Sys.info()[['machine']], "x86-64") ||
         identical(Sys.info()[['machine']], "x86_64")) {
