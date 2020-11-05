@@ -3,7 +3,7 @@ citHeader("To cite eplusr in publications use:")
 citEntry(
     entry  = "article",
     title = "eplusr: A framework for integrating building energy simulation and data-driven analytics",
-    author = c(person("Hongyuan", "Yu"), person("Adrian", "Chong")),
+    author = c(person("Hongyuan", "Jia"), person("Adrian", "Chong")),
     year = "2020",
     journal = "*In Review*",
     url = "https://CRAN.R-project.org/package=eplusr",

@@ -44,7 +44,7 @@ citation("eplusr")
 #> 
 #>   @Article{,
 #>     title = {eplusr: A framework for integrating building energy simulation and data-driven analytics},
-#>     author = {Hongyuan Yu and Adrian Chong},
+#>     author = {Hongyuan Jia and Adrian Chong},
 #>     year = {2020},
 #>     journal = {*In Review*},
 #>     url = {https://CRAN.R-project.org/package=eplusr},
