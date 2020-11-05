@@ -7,6 +7,15 @@
 * Add EnergyPlus v9.3 support (#343).
 * Add EnergyPlus v9.4 support (#347).
 
+## Major changes
+
+* Now eplusr will always use the SQLite output for data extraction instead of
+  using the CSV output. In EnergyPlus v9.3 and above, ReadVarsESO is deprecated
+  and EnergyPlus itself will generate CSV directly. CSVs for variables and
+  meters are always separated in this way. Together with the newly introduced
+  `Output:Control:Files` which can be set to disable CSV output, it becomes
+  very cumbersome to continuously support the CSV for data extraction (#307).
+
 ## Bug fixes
 
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
