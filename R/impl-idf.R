@@ -4368,7 +4368,6 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         on.exit(set(idf_env$object, NULL, "class_name", NULL), add = TRUE)
     }
 
-    # Currently, only `Schedule:File` class is supported
     map <- data.table(
         class_name = c(
             "Schedule:File:Shading",
@@ -4410,7 +4409,10 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     # get object table and value table
     val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
         property = c("units", "ip_units", "type_enum")
-    )
+    )[!J(NA_character_), on = "value_chr"] # remove empty fields. See #366
+
+    # remove empty fields. See #366
+    if (!nrow(val)) return(FALSE)
 
     # check existence of old files
     set(val, NULL, "old_full_path", normalizePath(val$value_chr, mustWork = FALSE))

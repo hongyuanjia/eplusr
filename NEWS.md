@@ -38,6 +38,8 @@
 * Sub-hourly EPW files are supported (#351).
 * Fix invalid references introduced by setting field values to empty (#355).
 * Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
+* Fix false positive warnings when resolving IDF external file dependencies
+  (#366).
 
 # eplusr 0.13.0
 
