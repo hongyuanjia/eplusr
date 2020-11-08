@@ -3935,8 +3935,16 @@ trans_postprocess <- function (idf, from, to) {
         dt9 <- reset_meter_resource(dt9, map, 4L, step = 3L, exclude = mtr_custom)
     }
     # }}}
+    # 10: DemandManagerAssignmentList {{{
+    dt10 <- trans_action(idf, "DemandManagerAssignmentList")
+    dt10 <- update_var(dt10, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    # }}}
+    # 11: UtilityCost:Tariff {{{
+    dt11 <- trans_action(idf, "UtilityCost:Tariff")
+    dt11 <- update_var(dt11, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:9)))
+    dt <- rbindlist(mget(paste0("dt", 1:11)))
     if (!nrow(dt)) return(idf)
 
     if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
