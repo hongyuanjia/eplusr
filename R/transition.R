@@ -3377,6 +3377,126 @@ trans_funs$f920t930 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_930_940 {{{
+#' @importFrom checkmate assert_true
+trans_funs$f930t940 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.3)
+
+    target_cls <- c(
+        "Construction:InternalSource",                 # 1
+        "EnergyManagementSystem:Actuator",             # 2
+        "Output:DebuggingData",                        # 3
+        "Output:Diagnostics",                          # 4
+        "PerformancePrecisionTradeoffs",               # 5
+        # only issue warning
+        # "PythonPlugin:Instance",
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow", # 6
+        "ZoneHVAC:LowTemperatureRadiant:Electric",     # 7
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", # 8
+        "ZoneHVAC:HybridUnitaryHVAC"                   # 9
+    )
+
+    new_idf <- trans_preprocess(idf, 9.4, target_cls)
+
+    idd_env <- get_priv_env(idf)$idd_env()
+    idf_env <- get_priv_env(idf)$idf_env()
+
+    # 1: Construction:InternalSource {{{
+    dt1 <- trans_action(idf, "Construction:InternalSource", insert = list(6, "0.0"))
+    # }}}
+    # 2: EnergyManagementSystem:Actuator {{{
+    dt2 <- trans_action(idf,
+        "EnergyManagementSystem:Actuator",
+        reset = list(4L, "Electric Power Level", "Electricity Rate"),
+        reset = list(4L, "Gas Power Level", "NaturalGas Rate")
+    )
+    # }}}
+    # 3: Output:DebuggingData {{{
+    dt3 <- trans_action(idf, "Output:DebuggingData")
+    if (nrow(dt3)) {
+        # convert 1 & 0 to Yes and No and warning if non-numeric values found
+        set(dt3, NULL, "value_num", suppressWarnings(as.numeric(dt3$value)))
+
+        dt3[is.na(value_num), by = c("id", "index"), c("value", "value_num") := {
+            warn(sprintf(paste0(
+                "Field '%s' for object [id:%s] in class 'Output:DebuggingData' ",
+                "is not a number, defaulting to 'No'."),
+                field[1L], .BY$id
+            ))
+            list("No", 0.0)
+        }]
+
+        dt3[as.integer(value_num) == 1L, value := "Yes"]
+        set(dt3, NULL, "value_num", NULL)
+    }
+    # }}}
+    # 4: Output:Diagnostics {{{
+    dt4 <- trans_action(idf, "Output:Diagnostics")
+    if (nrow(dt4)) {
+        if (length(unique(dt4$id)) > 1L) {
+            # consolidate all into one
+            warn(paste0(
+                "'Output:Diagnostics' has become an unique-object class in EnergyPlus v9.4. ",
+                "All other objects except the first one found will be listed as comments and ",
+                "their keys will be all consolidated into the first one."
+            ))
+            id_cmt <- unique(dt4$id)[-1L]
+            id_left <- dt4$id[1L]
+            cmt <- idf$to_string(id_cmt, header = FALSE, format = "new_bot")
+            idf$object(id_left)$comment(cmt)
+
+            dt4 <- unique(dt4, by = "value")
+            set(dt4, NULL, "id", id_left)
+            set(dt4, NULL, "index", seq_len(nrow(dt4)))
+        }
+    }
+    # }}}
+    # 5: PerformancePrecisionTradeoffs {{{
+    dt5 <- trans_action(idf, "PerformancePrecisionTradeoffs", reset = list(3L, "Mode05", "Mode06"))
+    # }}}
+    # 6: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
+    dt6 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "HalfFlowPower")
+    )
+    # }}}
+    # 7: ZoneHVAC:LowTemperatureRadiant:Electric {{{
+    dt7 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:Electric",
+        insert = list(10L, "HalfFlowPower")
+    )
+    # }}}
+    # 8: ZoneHVAC:LowTemperatureRadiant:ConstantFlow {{{
+    dt8 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "0.8")
+    )
+    # }}}
+    # 9: ZoneHVAC:HybridUnitaryHVAC {{{
+    dt9 <- trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC",
+        insert = list(15L, "Yes"),
+        insert = list(16L),
+        insert = list(17L)
+    )
+    # }}}
+
+    # Warning for PythonPlugin:Instance {{{
+    if (idf$is_valid_class("PythonPlugin:Instance")) {
+        warn(paste0("Objects in class 'PythonPlugin:Instance' found. "
+            "Note that the API has been changed from v9.3 and v9.4. ",
+            "Please check the docs and update with new state argument."
+        ))
+    }
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:9))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
@@ -3549,13 +3669,13 @@ trans_process <- function (new_idf, old_idf, dt) {
 # }}}
 # trans_postprocess {{{
 trans_postprocess <- function (idf, from, to) {
+    id_del <- NULL
     # reset_key {{{
     reset_key <- function (dt, field_index = 1L) {
         if (!nrow(dt)) return(dt)
         dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
     }
     # }}}
-    id_del <- NULL
     # update_var {{{
     update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
         if (!nrow(dt)) return(dt)
@@ -3597,8 +3717,6 @@ trans_postprocess <- function (idf, from, to) {
 
         # special case from v7.2 to v8.0 {{{
         if (nrow(mapping) && unique(mapping$from) == 7.2) {
-            stopifnot(is_idf(idf))
-
             has_chiller <- any(idf$is_valid_class(c(
                 "Chiller:Electric:EIR",
                 "Chiller:Electric:ReformulatedEIR",
@@ -3697,6 +3815,64 @@ trans_postprocess <- function (idf, from, to) {
         set(dt, NULL, "value_lower", NULL)
     }
     # }}}
+    # reset_meter_resource {{{
+    reset_meter_resource <- function (dt, mapping, field_index, step = NULL, exclude = character(), idf) {
+        if (to != 9.4) return(dt)
+        if (!nrow(dt)) return(dt)
+        if (!nrow(mapping)) return(dt)
+
+        # calculate field index
+        if (!is.null(step)) {
+            n <- (nrow(dt) - field_index) %/% step
+            field_index <- as.integer(c(field_index, seq.int(n) * step + field_index))
+        }
+
+        meters <- dt[J(field_index), on = "index", nomatch = NULL]
+
+        # only consider meters contain ":"
+        set(meters, NULL, "num", stri_count_fixed(meters$value, ":") + 1L)
+        meters <- meters[num > 1L]
+        if (!nrow(meters)) return(dt)
+
+        # exclude custom meters if necessary
+        set(meters, NULL, "value_lower", stri_trans_tolower(meters$value))
+        meters <- meters[!J(exclude), on = "value_lower"]
+        if (!nrow(meters)) return(dt)
+
+        # split by ":"
+        set(meters, NULL, "value_lower", stri_split_fixed(meters$value_lower, ":", meters$num))
+        # since resouce type is never in the middle, only consider the first and
+        # last components
+        set(meters, NULL, "value_lower_start", vcapply(meters$value_lower, .subset2, 1L))
+        set(meters, NULL, "value_lower_end", apply2_chr(meters$value_lower, meters$num, .subset2))
+
+        meters[mapping, on = c("value_lower_start" = "old"), c("value", "value_lower_end") := {
+            list(paste0(i.new, stri_sub(value, stri_length(value_lower_start) + 1L)), NA_character_)
+        }]
+        meters[mapping, on = c("value_lower_end" = "old"), "value" := {
+            paste0(stri_sub(value, to = -stri_length(value_lower_start) - 1L), i.new)
+        }]
+
+        dt[meters, on = c("id", "index"), value := i.value]
+    }
+    # }}}
+    # special case from v9.3 to v9.4 {{{
+    mtr_custom <- character()
+    map <- data.table()
+    if (to == 9.4) {
+        # extract names of Meter:Custom and Meter:CustomDecrement
+        cls <- c("Meter:Custom", "Meter:CustomDecrement")
+        cls <- cls[idf$is_valid_class(cls)]
+        if (length(cls)) {
+            mtr_custom <- stri_trans_tolower(unique(idf$object_name(cls, simplify = TRUE)))
+        }
+
+        map <- data.table(
+            old = c("electric", "gas", "fueloil#1", "fueloil#2"),
+            new = c("Electricity", "NaturalGas", "FuelOilNo1", "FuelOilNo2")
+        )
+    }
+    # }}}
 
     f <- as.double(as.character(standardize_ver(from)[, 1:2]))
     t <- as.double(as.character(standardize_ver(to)[, 1:2]))
@@ -3718,11 +3894,13 @@ trans_postprocess <- function (idf, from, to) {
         trans_action, idf = idf
     ))
     dt2 <- update_var(dt2, rep_vars, 1L, is_meter = TRUE, idf = idf)
+    dt2 <- reset_meter_resource(dt2, map, 1L, exclude = mtr_custom)
     # }}}
     # 3: Output:Table:TimeBins {{{
     dt3 <- trans_action(idf, "Output:Table:TimeBins")
     dt3 <- reset_key(dt3, 1L)
     dt3 <- update_var(dt3, rep_vars, 2L, idf = idf)
+    dt3 <- reset_meter_resource(dt3, map, 2L, exclude = mtr_custom)
     # }}}
     # 4: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
     dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
@@ -3737,7 +3915,8 @@ trans_postprocess <- function (idf, from, to) {
     # }}}
     # 6: Output:Table:Monthly {{{
     dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
-    dt6 <- update_var(dt6, rep_vars, 3L, step = 2, idf = idf)
+    dt6 <- update_var(dt6, rep_vars, 3L, step = 2L, idf = idf)
+    dt6 <- reset_meter_resource(dt6, map, 3L, step = 2L, exclude = mtr_custom)
     # }}}
     # 7: Meter:Custom {{{
     dt7 <- trans_action(idf, "Meter:Custom")
@@ -3747,8 +3926,17 @@ trans_postprocess <- function (idf, from, to) {
     dt8 <- trans_action(idf, "Meter:CustomDecrement")
     dt8 <- update_var(dt8, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
     # }}}
+    # 9: Output:Table:Annual {{{
+    # Output:Table:Annual was first added in EnergyPlus v8.4
+    dt9 <- data.table()
+    if (from >= 8.4) {
+        dt9 <- trans_action(idf, "Output:Table:Annual", min_fields = 6L)
+        dt9 <- update_var(dt9, rep_vars, 4L, step = 3L, idf = idf)
+        dt9 <- reset_meter_resource(dt9, map, 4L, step = 3L, exclude = mtr_custom)
+    }
+    # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:8)))
+    dt <- rbindlist(mget(paste0("dt", 1:9)))
     if (!nrow(dt)) return(idf)
 
     if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
