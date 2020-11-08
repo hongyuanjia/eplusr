@@ -3142,7 +3142,24 @@ trans_funs$f920t930 <- function (idf) {
     # }}}
     # 7: RoomAir:Node:AirflowNetwork:HVACEquipment {{{
     dt7 <- trans_action(idf, "RoomAir:Node:AirflowNetwork:HVACEquipment")
-    if (nrow(dt2) && nrow(dt7)) dt7 <- replace_node(dt7, nodes, NULL, 1L)
+    # replace object types and names accordingly
+    if (nrow(dt2) && nrow(dt7)) {
+        set(dt7, NULL, "value_lower", stri_trans_tolower(dt7$value))
+        # calculate extensible group
+        dt7[, by = "id", extensible_field_index := (index - 1L) %/% 4L * 4L + (index - 1L) %% 4L]
+        dt7[J(1L), on = "index", extensible_field_index := 0L]
+
+        m <- dt7[J(1L, "airterminal:singleduct:uncontrolled"),
+            on = c("extensible_field_index", "value_lower"),
+            list(id, index)]
+        dt7[m, on = c("id", "index"), value := "ZoneHVAC:AirDistributionUnit"]
+        dt7[m[, index := index + 1L], on = c("id", "index"), value := {
+            value[!is.na(value)] <- paste(value[!is.na(value)], "ADU")
+            value
+        }]
+
+        set(dt7, NULL, c("value_lower", "extensible_field_index"), NULL)
+    }
     # }}}
     # 8: AirflowNetwork:Distribution:Node {{{
     dt8 <- trans_action(idf, "AirflowNetwork:Distribution:Node")
@@ -3902,49 +3919,64 @@ trans_postprocess <- function (idf, from, to) {
     dt3 <- update_var(dt3, rep_vars, 2L, idf = idf)
     dt3 <- reset_meter_resource(dt3, map, 2L, exclude = mtr_custom)
     # }}}
-    # 4: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
-    dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
-    dt4_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable")
-    dt4 <- rbindlist(list(dt4_1, dt4_2))
-    dt4 <- reset_key(dt4, 1L)
-    dt4 <- update_var(dt4, rep_vars, 2L, idf = idf)
+    # 4: Output:Table:Monthly {{{
+    dt4 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
+    dt4 <- update_var(dt4, rep_vars, 3L, step = 2L, idf = idf)
+    dt4 <- reset_meter_resource(dt4, map, 3L, step = 2L, exclude = mtr_custom)
     # }}}
-    # 5: EnergyManagementSystem:Sensor {{{
-    dt5 <- trans_action(idf, "EnergyManagementSystem:Sensor")
-    dt5 <- update_var(dt5, rep_vars, 3L, idf = idf)
-    # }}}
-    # 6: Output:Table:Monthly {{{
-    dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
-    dt6 <- update_var(dt6, rep_vars, 3L, step = 2L, idf = idf)
-    dt6 <- reset_meter_resource(dt6, map, 3L, step = 2L, exclude = mtr_custom)
-    # }}}
-    # 7: Meter:Custom {{{
-    dt7 <- trans_action(idf, "Meter:Custom")
-    dt7 <- update_var(dt7, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
-    # }}}
-    # 8: Meter:CustomDecrement {{{
-    dt8 <- trans_action(idf, "Meter:CustomDecrement")
-    dt8 <- update_var(dt8, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
-    # }}}
-    # 9: Output:Table:Annual {{{
+    # 5: Output:Table:Annual {{{
     # Output:Table:Annual was first added in EnergyPlus v8.4
-    dt9 <- data.table()
+    dt5 <- data.table()
     if (from >= 8.4) {
-        dt9 <- trans_action(idf, "Output:Table:Annual", min_fields = 6L)
-        dt9 <- update_var(dt9, rep_vars, 4L, step = 3L, idf = idf)
-        dt9 <- reset_meter_resource(dt9, map, 4L, step = 3L, exclude = mtr_custom)
+        dt5 <- trans_action(idf, "Output:Table:Annual", min_fields = 6L)
+        dt5 <- update_var(dt5, rep_vars, 4L, step = 3L, idf = idf)
+        dt5 <- reset_meter_resource(dt5, map, 4L, step = 3L, exclude = mtr_custom)
     }
+    # }}}
+    # 6: Meter:Custom {{{
+    dt6 <- trans_action(idf, "Meter:Custom")
+    dt6 <- update_var(dt6, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
+    dt6 <- reset_meter_resource(dt6, map, 4L, step = 2L, exclude = mtr_custom)
+    # }}}
+    # 7: Meter:CustomDecrement {{{
+    dt7 <- trans_action(idf, "Meter:CustomDecrement")
+    dt7 <- update_var(dt7, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
+    dt7 <- reset_meter_resource(dt7, map, 3L, step = 2L, exclude = mtr_custom)
+    # }}}
+    # 8: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
+    dt8_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
+    dt8_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable")
+    dt8 <- rbindlist(list(dt8_1, dt8_2))
+    dt8 <- reset_key(dt8, 1L)
+    dt8 <- update_var(dt8, rep_vars, 2L, idf = idf)
+    # }}}
+    # 9: EnergyManagementSystem:Sensor {{{
+    dt9 <- trans_action(idf, "EnergyManagementSystem:Sensor")
+    dt9 <- update_var(dt9, rep_vars, 3L, idf = idf)
+    dt9 <- reset_meter_resource(dt9, map, 3L, exclude = mtr_custom)
     # }}}
     # 10: DemandManagerAssignmentList {{{
     dt10 <- trans_action(idf, "DemandManagerAssignmentList")
     dt10 <- update_var(dt10, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    dt10 <- reset_meter_resource(dt10, map, 2L, exclude = mtr_custom)
     # }}}
     # 11: UtilityCost:Tariff {{{
     dt11 <- trans_action(idf, "UtilityCost:Tariff")
     dt11 <- update_var(dt11, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    dt11 <- reset_meter_resource(dt11, map, 2L, exclude = mtr_custom)
+    # }}}
+    # 12: ElectricLoadCenter:Transformer {{{
+    dt12 <- trans_action(idf, "ElectricLoadCenter:Transformer")
+    dt12 <- update_var(dt12, rep_vars, 19L, step = 1L, is_meter = TRUE, idf = idf)
+    dt12 <- reset_meter_resource(dt12, map, 19L, step = 1L, exclude = mtr_custom)
+    # }}}
+    # 13: ElectricLoadCenter:Distribution {{{
+    dt13 <- trans_action(idf, "ElectricLoadCenter:Distribution")
+    dt13 <- update_var(dt13, rep_vars, c(6L, 12L), is_meter = TRUE, idf = idf)
+    dt13 <- reset_meter_resource(dt13, map, c(6L, 12L), exclude = mtr_custom)
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:11)))
+    dt <- rbindlist(mget(paste0("dt", 1:13)))
     if (!nrow(dt)) return(idf)
 
     if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
@@ -3997,6 +4029,11 @@ trans_action_dt <- function (dt, ...) {
             if (length(content) == 2L) {
                 dt[J(content[[1L]]), on = "index", `:=`(value = content[[2L]])]
             } else if (length(content) >= 3L) {
+                # step
+                if (length(content) == 4L) {
+                    n_grp <- (nrow(dt) - content[[1L]]) %/% content[[4L]]
+                    content[[1L]] <- content[[1L]] + c(0L, seq_len(n_grp) * content[[4L]])
+                }
                 set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
                 dt[J(content[[1L]], stri_trans_tolower(content[[2L]])), on = c("index", "value_lower"),
                     `:=`(value = content[[3L]])
