@@ -3485,7 +3485,7 @@ trans_funs$f930t940 <- function (idf) {
 
     # Warning for PythonPlugin:Instance {{{
     if (idf$is_valid_class("PythonPlugin:Instance")) {
-        warn(paste0("Objects in class 'PythonPlugin:Instance' found. "
+        warn(paste0("Objects in class 'PythonPlugin:Instance' found. ",
             "Note that the API has been changed from v9.3 and v9.4. ",
             "Please check the docs and update with new state argument."
         ))
