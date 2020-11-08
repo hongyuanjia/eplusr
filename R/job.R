@@ -8,10 +8,7 @@ NULL
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
 #' methods to extract simulation outputs.
 #'
-#' eplusr uses the EnergyPlus SQL output and the CSV output for extracting
-#' simulation outputs. It will use the CSV output if possible, and will fall
-#' back to the SQL output when CSV output does not exist. Underneath,
-#' [data.table::fread()] is used to speed up the process when using CSV output.
+#' eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 #'
 #' `EplusJob` has provide some wrappers that do SQL query to get report data
 #' results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
@@ -27,11 +24,6 @@ NULL
 #' Dictionary) files are created during simulation, an object in
 #' `Output:VariableDictionary` class with `Key Field` value being `IDF` will be
 #' automatically created if it does not exists.
-#'
-#' In order to make sure all output variables and meters are placed in one CSV
-#' output, all objects in class `Output:Meter:MeterFileOnly`and
-#' `Output:Meter:Cumulative:MeterFileOnly` will be converted into `Output:Meter`
-#' and `Output:Meter:Cumulative`, respectively.
 #'
 #' @docType class
 #' @name EplusJob
@@ -784,7 +776,7 @@ job_initialize <- function (self, private, idf, epw) {
 
     # log if the input idf has been changed
     private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-    private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict") || attr(private$m_idf, "csv")
+    private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
 
     # save uuid
     private$log_seed_uuid()
@@ -1049,25 +1041,6 @@ job_sql_path <- function (self, private) {
     path_sql
 }
 # }}}
-# job_csv_path {{{
-job_csv_path <- function (self, private) {
-    # check if meter file only is set
-    cls <- c("Output:Meter:MeterFileOnly", "Output:Meeter:Cumulative:MeterFileOnly")
-    if (any(i <- private$m_idf$is_valid_class(cls))) {
-        verbose_info(collapse(cls[i]), " found in IDF. Fall back to use SQL for data extraction")
-        return(NULL)
-    }
-
-    path_csv <- job_locate_output(self, private, ".csv", must_exist = FALSE)
-
-    if (!file.exists(path_csv)) {
-        verbose_info("No CSV output found. Fall back to use SQL for data extraction.")
-        return(NULL)
-    }
-
-    path_csv
-}
-# }}}
 # job_rdd_path {{{
 job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
     type <- match.arg(type)
@@ -1114,7 +1087,7 @@ job_report_data <- function (self, private, key_value = NULL, name = NULL, year 
                              interval = NULL, simulation_days = NULL, day_type = NULL,
                              environment_name = NULL) {
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(job_sql_path(self, private)))
-    get_sql_report_data(job_sql_path(self, private), job_csv_path(self, private),
+    get_sql_report_data(job_sql_path(self, private),
         key_value = key_value, name = name, year = year,
         tz = tz, case = case, all = all, wide = wide,
         period = period, month = month, day = day, hour = hour, minute = minute,
@@ -1206,7 +1179,7 @@ format.EplusSql <- function (x, ...) {
 
 # helper
 # get_init_idf {{{
-get_init_idf <- function (idf, sql = TRUE, dict = TRUE, csv = TRUE) {
+get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
     idf <- if (!is_idf(idf)) read_idf(idf) else idf$clone(deep = TRUE)
 
     if (is.null(idf$path())) {
@@ -1231,10 +1204,6 @@ get_init_idf <- function (idf, sql = TRUE, dict = TRUE, csv = TRUE) {
     # add Output:VariableDictionary if necessary
     if (dict) dict <- idf_add_output_vardict(idf)
     setattr(idf, "dict", dict)
-
-    # change Output:Meter*:MeterFileOnly if necessary
-    if (csv) csv <- idf_set_output_meter(idf)
-    setattr(idf, "csv", csv)
 
     idf
 }

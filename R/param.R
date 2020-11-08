@@ -58,13 +58,13 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         initialize = function (idf, epw) {
             # add Output:SQLite and Output:VariableDictionary if necessary
-            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE, csv = TRUE)
+            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE)
 
             private$m_seed <- idf
 
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict") || attr(idf, "csv")
+            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
 
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 

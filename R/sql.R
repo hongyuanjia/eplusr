@@ -591,7 +591,7 @@ sql_report_data <- function (self, private, key_value = NULL, name = NULL, year 
                              interval = NULL, simulation_days = NULL, day_type = NULL,
                              environment_name = NULL) {
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_sql))
-    get_sql_report_data(private$m_path_sql, NULL,
+    get_sql_report_data(private$m_path_sql,
         key_value = key_value, name = name, year = year,
         tz = tz, case = case, all = all, wide = wide,
         period = period, month = month, day = day, hour = hour, minute = minute,
