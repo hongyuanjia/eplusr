@@ -7,6 +7,12 @@
 * Add EnergyPlus v9.3 support (#343).
 * Add EnergyPlus v9.4 support (#347).
 
+## Minor changes
+
+* Now rgl and decido package has beem moved from *Imports* to *Suggests*, since
+  they are only used in the `IdfViewer` class for 3D visualization which is not
+  the main focus of this package (368).
+
 ## Bug fixes
 
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
