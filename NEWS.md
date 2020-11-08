@@ -16,6 +16,12 @@
   `Output:Control:Files` which can be set to disable CSV output, it becomes
   very cumbersome to continuously support the CSV for data extraction (#307).
 
+## Minor changes
+
+* Now rgl and decido package has beem moved from *Imports* to *Suggests*, since
+  they are only used in the `IdfViewer` class for 3D visualization which is not
+  the main focus of this package (368).
+
 ## Bug fixes
 
 * When `.empty` is `FALSE`, `Idf$set()` and `Idf$update()` will keep fields if
