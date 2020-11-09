@@ -2947,9 +2947,6 @@ trans_funs$f920t930 <- function (idf) {
 
     new_idf <- trans_preprocess(idf, 9.3, target_cls)
 
-    idd_env <- get_priv_env(idf)$idd_env()
-    idf_env <- get_priv_env(idf)$idf_env()
-
     # fix_fuel_types {{{
     fix_fuel_types <- function (dt, idx) {
         if (!nrow(dt)) return(dt)
@@ -3000,21 +2997,6 @@ trans_funs$f920t930 <- function (idf) {
 
         input[map, on = c("value" = "old"), value := i.new]
         dt[input, on = "index", value := i.value]
-    }
-    # }}}
-    # add_ref_cols {{{
-    add_ref_cols <- function (idd_env, idf_env, ref, clean = TRUE) {
-        if (clean) set(ref, NULL, setdiff(names(ref), c("object_id", "value_id")), NULL)
-
-        # add field index and field id
-        add_joined_cols(idf_env$value, ref, "value_id", "field_id")
-        add_joined_cols(idd_env$field, ref, "field_id", "field_index")
-
-        # add class name
-        add_joined_cols(idf_env$object, ref, "object_id", "class_id")
-        add_joined_cols(idd_env$class, ref, "class_id", "class_name")
-
-        ref
     }
     # }}}
 
@@ -3414,9 +3396,6 @@ trans_funs$f930t940 <- function (idf) {
     )
 
     new_idf <- trans_preprocess(idf, 9.4, target_cls)
-
-    idd_env <- get_priv_env(idf)$idd_env()
-    idf_env <- get_priv_env(idf)$idf_env()
 
     # 1: Construction:InternalSource {{{
     dt1 <- trans_action(idf, "Construction:InternalSource", insert = list(6, "0.0"))
