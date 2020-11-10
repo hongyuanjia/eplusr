@@ -1736,3 +1736,196 @@ test_that("Transition v9.1 --> v9.2", {
     )
 })
 # }}}
+# v9.2 --> v9.3 {{{
+test_that("Transition v9.2 --> v9.3", {
+    skip_on_cran()
+    from <- 9.2
+    to <- 9.3
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "AirConditioner:VariableRefrigerantFlow" = list("VRF", ..67 = "propanegas"),
+            "AirTerminal:SingleDuct:Uncontrolled" := list(
+                c("ATDUC1", "ATDUC2"), NULL, c("Node1", "Node2"), "Autosize"
+            ),
+            "ZoneHVAC:EquipmentList" := list(
+                c("EquipList1", "EquipList2"), NULL,
+                "AirTerminal:SingleDuct:Uncontrolled",
+                c("ATDUC1", "ATDUC2"), 1, 1
+            ),
+            "AirLoopHVAC:ZoneSplitter" = list("ZS", "ZS Node", "Node1"),
+            "AirLoopHVAC:SupplyPlenum" = list("SP", "Zone", "Zone Node", ..5 = "NodeList"),
+            "NodeList" = list("NodeList", "Node2"),
+            "AirLoopHVAC" := list(c("Loop1", "Loop2"), ..9 = c("Node1", "NodeList")),
+            # VersionUpdater cannot handle
+            # 'RoomAir:Node:AirflowNetwork:HVACEquipment' correctly
+            # See: https://github.com/NREL/EnergyPlus/issues/8372
+            # "RoomAir:Node:AirflowNetwork:HVACEquipment" := list(
+            #     "AN",
+            #     ..2 = "AirTerminal:SingleDuct:Uncontrolled",
+            #     ..3 = "ATDUC1",
+            #     ..6 = "AirTerminal:SingleDuct:Uncontrolled",
+            #     ..7 = "ATDUC2"
+            # ),
+            "AirflowNetwork:Distribution:Node" := list(
+                c("ANDN1", "ANDN2"), c("Node1", "Node2")
+            ),
+            "AirflowNetwork:Distribution:Linkage" := list(
+                c("ANDL1", "ANDL2"), ..3 = c("ANDN1", "ANDN2"),
+                ..4 = c("ANDCD1", "ANDCD2")
+            ),
+            "AirflowNetwork:Distribution:Component:Duct" = list("ANDCD1"),
+            "Boiler:HotWater" = list("Boiler", "FuelOil#1"),
+            "GlobalGeometryRules" = list(..3 = "Absolute"),
+            "HeatPump:WaterToWater:EIR:Heating" = list("HPH"),
+            "HeatPump:WaterToWater:EIR:Cooling" = list("HPC"),
+            "ShadowCalculation" = list(
+                "averageoverdaysinfrequency",
+                ..6 = "scheduledshading"
+            ),
+            .all = TRUE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(idfTR <- transition(idfOri, to), "ANDCD2")
+
+    expect_equal(
+        idfVU$"AirConditioner:VariableRefrigerantFlow"$VRF$value(),
+        idfTR$"AirConditioner:VariableRefrigerantFlow"$VRF$value()
+    )
+
+    expect_equal(
+        idfVU$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC1$value(1:5),
+        idfTR$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC1$value()
+    )
+    expect_equal(
+        idfVU$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC2$value(1:5),
+        idfTR$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC2$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:AirDistributionUnit"$"ATDUC1 ADU"$value(),
+        idfTR$"ZoneHVAC:AirDistributionUnit"$"ATDUC1 ADU"$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:AirDistributionUnit"$"ATDUC2 ADU"$value(),
+        idfTR$"ZoneHVAC:AirDistributionUnit"$"ATDUC2 ADU"$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:EquipmentList"$EquipList1$value(1:8),
+        idfTR$"ZoneHVAC:EquipmentList"$EquipList1$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:EquipmentList"$EquipList2$value(1:8),
+        idfTR$"ZoneHVAC:EquipmentList"$EquipList2$value()
+    )
+
+    expect_equal(
+        idfVU$"AirLoopHVAC:ZoneSplitter"$ZS$value(1:3),
+        idfTR$"AirLoopHVAC:ZoneSplitter"$ZS$value()
+    )
+
+    expect_equal(
+        idfVU$"AirLoopHVAC:SupplyPlenum"$SP$value(1:5),
+        idfTR$"AirLoopHVAC:SupplyPlenum"$SP$value()
+    )
+
+    expect_equal(
+        idfVU$NodeList$NodeList$value(1:2),
+        idfTR$NodeList$NodeList$value(1:2)
+    )
+    expect_equal(
+        idfVU$NodeList$"NodeList ATInlet"$value(1:2),
+        idfTR$NodeList$"NodeList ATInlet"$value(1:2)
+    )
+
+    expect_equal(
+        idfVU$AirLoopHVAC$Loop1$value(),
+        idfTR$AirLoopHVAC$Loop1$value()
+    )
+    expect_equal(
+        idfVU$AirLoopHVAC$Loop2$value(),
+        idfTR$AirLoopHVAC$Loop2$value()
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$ANDN1$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$ANDN1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$ANDN2$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$ANDN2$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$"ANDN1 ATInlet"$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$"ANDN1 ATInlet"$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$"ANDN2 ATInlet"$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$"ANDN2 ATInlet"$value()
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$ANDL1$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$ANDL1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$ANDL2$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$ANDL2$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$"ANDL1 ATInlet"$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$"ANDL1 ATInlet"$value()
+    )
+    # NOTE: VersionUpdater always creates a new duct even the original one
+    # references an non-existing distribution duct
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$"ANDL2 ATInlet"$value(1:3),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$"ANDL2 ATInlet"$value(1:3)
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Component:Duct"$ANDCD1$value(),
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$ANDCD1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Component:Duct"$"ANDL1 ATInlet Duct"$value(1:8),
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$"ANDL1 ATInlet Duct"$value()
+    )
+    # NOTE: VersionUpdater always creates a new duct even the original one
+    # references an non-existing distribution duct
+    expect_equal(
+        # idfVU$"AirflowNetwork:Distribution:Component:Duct"$"ANDL2 ATInlet Duct",
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$"ANDL2 ATInlet Duct",
+        NULL
+    )
+
+    expect_equal(
+        idfVU$"Boiler:HotWater"$Boiler$value(),
+        idfTR$"Boiler:HotWater"$Boiler$value()
+    )
+
+    expect_equal(
+        idfVU$GlobalGeometryRules$value(),
+        idfTR$GlobalGeometryRules$value()
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:PlantLoop:EIR:Heating"$HPH$value(),
+        idfTR$"HeatPump:PlantLoop:EIR:Heating"$HPH$value()
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:PlantLoop:EIR:Cooling"$HPC$value(),
+        idfTR$"HeatPump:PlantLoop:EIR:Cooling"$HPC$value()
+    )
+
+    expect_equal(
+        idfVU$ShadowCalculation$value(1:10),
+        idfTR$ShadowCalculation$value()
+    )
+
+})
+# }}}

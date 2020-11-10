@@ -3010,9 +3010,6 @@ trans_funs$f920t930 <- function (idf) {
         insert = list(3L, " ATInlet")
     )
     if (nrow(dt2)) {
-        # only keep the first 7 fields
-        dt2 <- dt2[index <= 7L]
-
         # create a nwe inlet node name using the original zone supply air node
         dt2[J(c(3L, 4L)), on = "index", by = "id", value := {
             pre <- if (is.na(value[2L])) "" else value[2L]
@@ -3033,11 +3030,12 @@ trans_funs$f920t930 <- function (idf) {
         dt2_adu[J(3L), on = "index", value := "AirTerminal:SingleDuct:ConstantVolume:NoReheat"]
         dt2_adu[J(4L), on = "index", value := dt2[J(1L), on = "index", value]]
         dt2_adu[J(5:6), on = "index", value := NA_character_]
-        dt2_adu[J(7L), on = "index", value := dt2[J(7L), on = "index", value]]
+        dt2_adu[J(7L), on = "index", value := dt2[J(8L), on = "index", value]]
 
         # after creating ADU, remove the 7th field, i.e. design specification
         # sizing object
-        dt2 <- dt2[!J(7L), on = "index"]
+        dt2 <- dt2[index < 7L]
+        dt2 <- rbindlist(list(dt2, dt2_adu))
 
         # all outlet nodes
         nodes <- dt2[J(4L), on = "index"]
@@ -3046,6 +3044,7 @@ trans_funs$f920t930 <- function (idf) {
         # all nodelists
         nodelists <- idf$to_table(class = "NodeList")
         set(nodelists, NULL, "value_lower", stri_trans_tolower(nodelists$value))
+        set(nodelists, NULL, "matched", FALSE)
     }
     # }}}
     # 3: ZoneHVAC:EquipmentList {{{
@@ -3090,18 +3089,18 @@ trans_funs$f920t930 <- function (idf) {
             # exclude specified fields
             dt[J(index_exclude), on = "index", id_list := NA_integer_]
             # exclude empty fields
-            dt[J(NA_character_), on = "value_lower", id_list := FALSE]
+            dt[J(NA_character_), on = "value_lower", id_list := NA_integer_]
 
             # extract all matched node lists that contain target nodes
             nl <- nodelists[J(dt[!is.na(id_list), id_list]), on = "id"][
                 nodes, on = "value_lower", matched := TRUE]
+            nl <- nl[J(TRUE), on = "matched", nomatch = NULL]
 
             # tag matched field in the whole nodelist table
-            nodelists[nl, on = "id", matched := i.matched]
+            nodelists[nl, on = c("id", "index"), matched := TRUE]
 
             # append name suffix
-            id_m <- nl[J(TRUE), on = "matched", nomatch = NULL, unique(id)]
-            dt[J(id_m), on = "id_list", value := paste(value, "ATInlet")]
+            dt[J(unique(nl$id)), on = "id_list", value := paste(value, "ATInlet")]
 
             set(dt, NULL, "id_list", NULL)
         }
@@ -3116,11 +3115,11 @@ trans_funs$f920t930 <- function (idf) {
     # }}}
     # 5: AirLoopHVAC:SupplyPlenum {{{
     dt5 <- trans_action(idf, "AirLoopHVAC:SupplyPlenum")
-    if (nrow(dt2) && nrow(dt5)) dt5 <- replace_node(dt5, nodes, nodelists, 1:2)
+    if (nrow(dt2) && nrow(dt5)) dt5 <- replace_node(dt5, nodes, nodelists, 1:4)
     # }}}
     # 6: AirLoopHVAC {{{
     dt6 <- trans_action(idf, "AirLoopHVAC")
-    if (nrow(dt2) && nrow(dt6)) dt6 <- replace_node(dt6, nodes, nodelists, setdiff(1:11, 7L)) # 7
+    if (nrow(dt2) && nrow(dt6)) dt6 <- replace_node(dt6, nodes, nodelists, setdiff(1:11, 9L)) # 9
     # }}}
     # 7: RoomAir:Node:AirflowNetwork:HVACEquipment {{{
     dt7 <- trans_action(idf, "RoomAir:Node:AirflowNetwork:HVACEquipment")
@@ -3147,24 +3146,44 @@ trans_funs$f920t930 <- function (idf) {
     dt8 <- trans_action(idf, "AirflowNetwork:Distribution:Node")
     if (nrow(dt2) && nrow(dt8)) {
         # store original node name
-        ori <- dt8[J(2L), on = "index", nomatch = NULL, value]
+        val <- dt8[J(2L), on = "index", nomatch = NULL, value]
+        # store original data
+        ori <- copy(dt8)
+
         dt8 <- replace_node(dt8, nodes, NULL, setdiff(1:4, 2L))
+
         # get matched object id
-        id_m <- dt8[J(2L), on = "index", nomatch = NULL, id[which(value != ori)]]
-        dt8[id %in% id_m & index %in% 1:2, value := {
-            value[is.na(value)] <- ""
-            paste(value, "ATInlet")
-        }]
+        id_m <- dt8[J(2L), on = "index", nomatch = NULL, id[which(value != val)]]
+
+        if (length(id_m)) {
+            dt8 <- dt8[id %in% id_m]
+            dt8[J(1L), on = "index", value := {
+                value[is.na(value)] <- ""
+                paste(value, "ATInlet")
+            }]
+            set(dt8, NULL, "id", -dt8$id)
+            dt8 <- rbindlist(list(ori, dt8))
+        }
     }
     # }}}
     # 9: AirflowNetwork:Distribution:Linkage {{{
     dt9 <- trans_action(idf, "AirflowNetwork:Distribution:Linkage")
-    if (nrow(dt2) && nrow(dt9)) {
+    if (nrow(dt2) && nrow(dt8) && any(dt8$id < 0)&& nrow(dt9)) {
         # store original node name
-        ori <- dt9[J(3L), on = "index", nomatch = NULL, value]
-        dt9 <- replace_node(dt9, nodes, NULL, setdiff(1:5, 3L))
+        val <- dt9[J(3L), on = "index", nomatch = NULL, value]
+        # store original data
+        ori <- copy(dt9)
+
+        # get matched nodes
+        dt9 <- replace_node(dt9,
+            # use the original matched node names
+            nodes = dt8[id %in% dt8[id < 0, -id] & index == 1L,
+                list(value_lower = stri_trans_tolower(value))],
+            NULL, setdiff(1:5, 3L)
+        )
+
         # get matched object id
-        m <- dt9[J(3L), on = "index", nomatch = NULL, value != ori]
+        m <- dt9[J(3L), on = "index", nomatch = NULL, value != val]
 
         if (any(m)) {
             # create new linkage
@@ -3180,15 +3199,18 @@ trans_funs$f920t930 <- function (idf) {
             # update data for linkage
             dt9_1[, by = "id", value := {
                 val <- value
-                val[c(1L, 2L)] <- paste(value[c(1L, 3L)], " ATInlet")
+                val[1L] <- paste(value[1L], "ATInlet")
+                val[2L] <- value[3L]
+                # remove suffix
+                val[3L] <- stri_sub(value[3L], to = -9L)
                 # give a warning if the referenced duct is not found
                 if (.BY$id %in% id_m) {
-                    val[4L] <- paste(value[1L], "Duct")
+                    val[4L] <- paste(val[1L], "Duct")
                 } else {
                     warn(sprintf(paste0(
                         "Linkage component '%s' in '%s'[id:%s] in class 'AirflowNetwork:Distribution:Linkage' ",
                         "is not an 'AirflowNetwork:Distribution:Component:Duct' object. ",
-                        "Diffs may result from duplicate linkage component."),
+                        "No new duct will be added."),
                         value[4L], name[1L], .BY$id
                     ))
                 }
@@ -3196,13 +3218,15 @@ trans_funs$f920t930 <- function (idf) {
             }]
 
             # create a matching new duct for the new linkage
-            dt9_2 <- idf$to_table(class = rep("AirflowNetwork:Distribution:Component:Duct", length(id_m)), init = TRUE)
+            dt9_2 <- idf$to_table(rel$src_object_id)
             dt9_2[J(1L), on = "index", value := dt9_1[J(id_m, 4L), on = c("id", "index"), value]]
             dt9_2[J(2L), on = "index", value := "0.0001"]
             dt9_2[J(6L), on = "index", value := "0.0"]
             dt9_2[J(7L), on = "index", value := "0.0000001"]
             dt9_2[J(8L), on = "index", value := "0.0000001"]
 
+            # update object id
+            set(dt9_1, NULL, "id", -dt9_1$id)
             dt9 <- rbindlist(list(dt9, dt9_1, dt9_2))
         }
     }
@@ -3298,10 +3322,16 @@ trans_funs$f920t930 <- function (idf) {
     )
     # }}}
     # 27: HeatPump:WaterToWater:EIR:Heating {{{
-    dt27 <- trans_action(idf, "HeatPump:WaterToWater:EIR:Heating", insert = list(4L))
+    dt27 <- trans_action(idf,
+        c("HeatPump:PlantLoop:EIR:Heating" = "HeatPump:WaterToWater:EIR:Heating"),
+        insert = list(4L)
+    )
     # }}}
     # 28: HeatPump:WaterToWater:EIR:Cooling {{{
-    dt28 <- trans_action(idf, "HeatPump:WaterToWater:EIR:Cooling", insert = list(4L))
+    dt28 <- trans_action(idf,
+        c("HeatPump:PlantLoop:EIR:Cooling" = "HeatPump:WaterToWater:EIR:Cooling"),
+        insert = list(4L)
+    )
     # }}}
     # 29: HVACTemplate:System:VRF {{{
     dt29 <- trans_action(idf, "HVACTemplate:System:VRF")
@@ -3369,6 +3399,17 @@ trans_funs$f920t930 <- function (idf) {
     # 38: ZoneHVAC:HybridUnitaryHVAC {{{
     dt38 <- trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC")
     dt38 <- fix_fuel_types(dt37, 18:20)
+    # }}}
+
+    # create new NodeList if necessary {{{
+    if (nrow(dt2) && any(nodelists$matched)) {
+        m <- nodelists[J(TRUE), on = "matched"]
+        nodelists[m, on = c("id", "index"), value := paste(value, "ATInlet")]
+        nodelists <- nodelists[J(unique(m$id)), on = "id"]
+        nodelists[J(1L), on = "index", value := paste(value, "ATInlet")]
+        set(nodelists, NULL, c("matched", "value_lower"), NULL)
+        dt2 <- rbindlist(list(dt2, nodelists))
+    }
     # }}}
 
     trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:38))))
