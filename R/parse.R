@@ -151,12 +151,22 @@ parse_idd_file <- function(path, epw = FALSE) {
     if (idd_version < 9.1) {
         id_conlst <- dt_class[J("ConnectorList"), on = "class_name", class_id]
         dt_field[J(id_conlst, c(3L, 5L)), on = c("class_id", "field_index"), `:=`(
-            object_list = list(list("plantconnectors"))
+            object_list = list("plantconnectors")
         )]
 
         id_con <- dt_class[J(c("Connector:Mixer", "Connector:Splitter")), on = "class_name", class_id]
         dt_field[J(id_con, c(1L)), on = c("class_id", "field_index"), `:=`(
-            reference = list(list("plantconnectors"))
+            reference = list("plantconnectors")
+        )]
+    }
+    # Object-list property missing in HeatPump:PlantLoop:EIR:Cooling A9 since
+    # v9.3
+    # See https://github.com/NREL/EnergyPlus/issues/7837
+    if (idd_version >= 9.3) {
+        id_clg <- dt_class[J("HeatPump:PlantLoop:EIR:Cooling"), on = "class_name", class_id]
+        dt_field[J(id_clg, 7L), on = c("class_id", "field_index"), `:=`(
+            object_list = list("plhpheatingnames"),
+            is_name = FALSE, reference = list(NULL)
         )]
     }
 
