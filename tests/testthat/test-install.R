@@ -5,8 +5,6 @@ test_that("Install", {
     else install_eplus(8.8, local = TRUE)
 
     # test if patch on EnergyPlus v9.1 and above works
-    if (!is_avail_eplus(9.1)) install_eplus(9.1, local = TRUE)
-    if (!is_avail_eplus(9.2)) install_eplus(9.2, local = TRUE)
-    expect_true(is_avail_eplus(9.1))
-    expect_true(is_avail_eplus(9.2))
+    if (!is_avail_eplus(9.4)) install_eplus(9.4, local = TRUE)
+    expect_true(is_avail_eplus(9.4))
 })
