@@ -3453,6 +3453,7 @@ trans_funs$f930t940 <- function (idf) {
     if (nrow(dt3)) {
         # convert 1 & 0 to Yes and No and warning if non-numeric values found
         set(dt3, NULL, "value_num", suppressWarnings(as.numeric(dt3$value)))
+        set(dt3, NULL, "value", "No")
 
         dt3[is.na(value_num), by = c("id", "index"), c("value", "value_num") := {
             warn(sprintf(paste0(
@@ -3516,8 +3517,10 @@ trans_funs$f930t940 <- function (idf) {
     dt9 <- trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC",
         insert = list(15L, "Yes"),
         insert = list(16L),
-        insert = list(17L)
+        insert = list(17L),
+        delete = list(19L)
     )
+    if (nrow(dt9)) dt9[, by = "id", index := seq_len(.N)]
     # }}}
 
     # Warning for PythonPlugin:Instance {{{
