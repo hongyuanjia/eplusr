@@ -54,6 +54,7 @@
 * Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
 * Fix false positive warnings when resolving IDF external file dependencies
   (#366).
+* Now empty comments are kept in `IdfObject$comment()` (#372).
 
 # eplusr 0.13.0
 
