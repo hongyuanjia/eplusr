@@ -55,13 +55,15 @@ test_that("Transition Helper", {
             name = rep(NA_character_, 13),
             class = rep("RunPeriod", 13),
             index = 1:13,
-            field = c("Name", "Begin Month", "Begin Day of Month", "Start Year",
-                      "End Month", "End Day of Month", "End Year",
-                      "Day of Week for Start Day", "Use Weather File Holidays and Special Days",
-                      "Use Weather File Daylight Saving Period", "Apply Weekend Holiday Rule",
-                      "Use Weather File Rain Indicators", "Use Weather File Snow Indicators"
+            field = c(
+                "Name", "Begin Month", "Begin Day of Month", "Start Year",
+                "End Month", "End Day of Month", "End Year",
+                "Day of Week for Start Day", "Use Weather File Holidays and Special Days",
+                "Use Weather File Daylight Saving Period", "Apply Weekend Holiday Rule",
+                "Use Weather File Rain Indicators", "Use Weather File Snow Indicators"
             ),
-            value = c(NA_character_, "1", "1", NA_character_, "12", "31", NA_character_,
+            value = c(
+                NA_character_, "1", "1", NA_character_, "12", "31", NA_character_,
                 "Tuesday", "Yes", "Yes", "No", "Yes", "Yes"
             )
         )
@@ -76,10 +78,12 @@ test_that("Transition Helper", {
     # }}}
 
     # versions {{{
-    expect_equivalent(trans_upper_versions(idf, 9.1, patch = TRUE),
+    expect_equivalent(
+        trans_upper_versions(idf, 9.1, patch = TRUE),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.0.1", "9.1.0"))
     )
-    expect_equivalent(trans_upper_versions(idf, 9.1),
+    expect_equivalent(
+        trans_upper_versions(idf, 9.1),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.1.0"))
     )
     # }}}
@@ -96,8 +100,10 @@ test_that("Transition Helper", {
 # v7.2 --> v8.0 {{{
 test_that("Transition v7.2 --> v8.0", {
     skip_on_cran()
-    from <- 7.2; to <- 8.0
-    expect_is(class = "Idf",
+    from <- 7.2
+    to <- 8.0
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(7.2,
             ShadowCalculation = list(),
             "Coil:Heating:DX:MultiSpeed" = list("Coil"),
@@ -178,7 +184,7 @@ test_that("Transition v7.2 --> v8.0", {
     )
     expect_equal(
         idfVU$"SetpointManager:Scheduled"$HE2$value()[-1],
-        idfTR$"SetpointManager:Scheduled"$'HE2 Setpoint Manager'$value()[-1]
+        idfTR$"SetpointManager:Scheduled"$"HE2 Setpoint Manager"$value()[-1]
     )
 
     expect_equal(
@@ -298,20 +304,27 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     # can handle forkeq variables
-    expect_is(class = "Idf",
-        idfOri <- temp_idf(7.2,
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(
+            7.2,
             "Chiller:Electric:EIR" := list(paste0("Chiller", 1:2)),
             "ChillerHeater:Absorption:DirectFired" := list(paste0("Heater", 1:2)),
-            "Output:Variable" := list("*",
-                c("Chiller Diesel Consumption",
-                  "CondFD Nodal Temperature")
+            "Output:Variable" := list(
+                "*",
+                c(
+                    "Chiller Diesel Consumption",
+                    "CondFD Nodal Temperature"
+                )
             )
         )
     )
 
     # can handle forkeq variables
-    expect_is(class = "Idf",
-        idfOri <- temp_idf(7.2,
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(
+            7.2,
             "Chiller:Electric:EIR" := list(paste0("Chiller", 1:2)),
             "ChillerHeater:Absorption:DirectFired" := list(paste0("Heater", 1:2)),
             "Output:Variable" := list("*", c(
@@ -326,23 +339,25 @@ test_that("Transition v7.2 --> v8.0", {
     # VersionUpdater does not create "Diesel" output variables for both Chiller
     # and ChillerHeater
     expect_warning(idfTR <- transition(idfOri, 8), "Default values")
-    expect_equal(idfTR$to_table(class = "Output:Variable")[index == 2, sort(value)],
-        c("Chiller Diesel Energy",
-          "Chiller Diesel Rate",
-          "Chiller Heater Diesel Energy",
-          "Chiller Heater Diesel Rate",
-          "CondFD Surface Temperature Node 1",
-          "CondFD Surface Temperature Node 10",
-          "CondFD Surface Temperature Node 2",
-          "CondFD Surface Temperature Node 3",
-          "CondFD Surface Temperature Node 4",
-          "CondFD Surface Temperature Node 5",
-          "CondFD Surface Temperature Node 6",
-          "CondFD Surface Temperature Node 7",
-          "CondFD Surface Temperature Node 8",
-          "CondFD Surface Temperature Node 9",
-          "EMPD Surface Inside Face Relative Humidity",
-          "HAMT Surface Inside Face Relative Humidity"
+    expect_equal(
+        idfTR$to_table(class = "Output:Variable")[index == 2, sort(value)],
+        c(
+            "Chiller Diesel Energy",
+            "Chiller Diesel Rate",
+            "Chiller Heater Diesel Energy",
+            "Chiller Heater Diesel Rate",
+            "CondFD Surface Temperature Node 1",
+            "CondFD Surface Temperature Node 10",
+            "CondFD Surface Temperature Node 2",
+            "CondFD Surface Temperature Node 3",
+            "CondFD Surface Temperature Node 4",
+            "CondFD Surface Temperature Node 5",
+            "CondFD Surface Temperature Node 6",
+            "CondFD Surface Temperature Node 7",
+            "CondFD Surface Temperature Node 8",
+            "CondFD Surface Temperature Node 9",
+            "EMPD Surface Inside Face Relative Humidity",
+            "HAMT Surface Inside Face Relative Humidity"
         )
     )
 })
@@ -350,8 +365,10 @@ test_that("Transition v7.2 --> v8.0", {
 # v8.0 --> v8.1 {{{
 test_that("Transition v8.0 --> v8.1", {
     skip_on_cran()
-    from <- 8.0; to <- 8.1
-    expect_is(class = "Idf",
+    from <- 8.0
+    to <- 8.1
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "People" = list("People"),
             "CoolingTower:SingleSpeed" = list("CT1", ..8 = "autosize", ..9 = "autosize"),
@@ -386,7 +403,7 @@ test_that("Transition v8.0 --> v8.1", {
     )
 
     # VersionUpdater gives "autocalculate" instead of "Autocalculate"
-    lower_autocal <- function (l) lapply(l, function (x) if (identical(x, "Autocalculate")) "autocalculate" else x)
+    lower_autocal <- function(l) lapply(l, function(x) if (identical(x, "Autocalculate")) "autocalculate" else x)
 
     expect_equal(
         idfVU$"CoolingTower:SingleSpeed"$CT1$value(),
@@ -485,8 +502,10 @@ test_that("Transition v8.0 --> v8.1", {
 # v8.1 --> v8.2 {{{
 test_that("Transition v8.1 --> v8.2", {
     skip_on_cran()
-    from <- 8.1; to <- 8.2
-    expect_is(class = "Idf",
+    from <- 8.1
+    to <- 8.2
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "ZoneHVAC:UnitVentilator" = list("UV"),
             "ZoneHVAC:UnitHeater" := list(paste0("UH", 1:2), ..8 = c("onoff", "continuous")),
@@ -611,8 +630,10 @@ test_that("Transition v8.1 --> v8.2", {
 # v8.2 --> v8.3 {{{
 test_that("Transition v8.2 --> v8.3", {
     skip_on_cran()
-    from <- 8.2; to <- 8.3
-    expect_is(class = "Idf",
+    from <- 8.2
+    to <- 8.3
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Chiller:Electric:ReformulatedEIR" = list(),
             "Site:GroundDomain" = list(),
@@ -655,8 +676,10 @@ test_that("Transition v8.2 --> v8.3", {
 # v8.3 --> v8.4 {{{
 test_that("Transition v8.3 --> v8.4", {
     skip_on_cran()
-    from <- 8.3; to <- 8.4
-    expect_is(class = "Idf",
+    from <- 8.3
+    to <- 8.4
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Coil:WaterHeating:AirToWaterHeatPump" = list(),
             "WaterHeater:Stratified" := list(paste0("Stratified", 1:2)),
@@ -834,8 +857,10 @@ test_that("Transition v8.3 --> v8.4", {
 # v8.4 --> v8.5 {{{
 test_that("Transition v8.4 --> v8.5", {
     skip_on_cran()
-    from <- 8.4; to <- 8.5
-    expect_is(class = "Idf",
+    from <- 8.4
+    to <- 8.5
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "EnergyManagementSystem:Actuator" := list(
                 ..4 = sprintf("outdoor air %sblub temperature", c("dry", "wet"))
@@ -860,8 +885,10 @@ test_that("Transition v8.4 --> v8.5", {
 # v8.5 --> v8.6 {{{
 test_that("Transition v8.5 --> v8.6", {
     skip_on_cran()
-    from <- 8.5; to <- 8.6
-    expect_is(class = "Idf",
+    from <- 8.5
+    to <- 8.6
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Building" = list(),
             "GlobalGeometryRules" = list("UpperLeftCorner", "Counterclockwise", "Relative", "Relative", "Relative"),
@@ -870,7 +897,8 @@ test_that("Transition v8.5 --> v8.6", {
             "HVACTemplate:System:Unitary" = list("Sys", "On", "Zone1", ..16 = "Gas"),
             "ChillerHeater:Absorption:DirectFired" = list("Chiller", "Autosize",
                 ..8 = "In", ..9 = "Out", ..10 = "CInlet", ..11 = "COut",
-                ..12 = "HIn", ..13 = "Hout", ..20 = "Autosize"),
+                ..12 = "HIn", ..13 = "Hout", ..20 = "Autosize"
+            ),
             "SetpointManager:SingleZone:Humidity:Minimum" = list("SP1", ..4 = "Node", ..5 = "Zone1"),
             "SetpointManager:SingleZone:Humidity:Maximum" = list("SP2", ..4 = "Node", ..5 = "Zone1"),
             "AirTerminal:SingleDuct:VAV:Reheat" = list("VAV",
@@ -886,7 +914,8 @@ test_that("Transition v8.5 --> v8.6", {
             "Coil:Heating:Gas" = list("Coil", ..5 = "Inlet", ..6 = "Outlet"),
             "Zone" := list(paste0("Zone", 1:2)),
             "Daylighting:Controls" := list(paste0("Zone", 1:3),
-                c(1:2, 2), 1:3, 1:3, 4:6, 4:6, 4:6, ..11 = 300, ..12 = 500, ..13 = 1:3, ..14 = 90
+                c(1:2, 2), 1:3, 1:3, 4:6, 4:6, 4:6,
+                ..11 = 300, ..12 = 500, ..13 = 1:3, ..14 = 90
             ),
             "Daylighting:DELight:Controls" := list(
                 paste0("DELight", 1:3), paste0("Zone", 1:3),
@@ -1061,14 +1090,16 @@ test_that("Transition v8.5 --> v8.6", {
         idfTR$"EnergyManagementSystem:Actuator"[[1]]$value()
     )
 
-    expect_equal(tolerance = 1e-4,
+    expect_equal(
+        tolerance = 1e-4,
         idfVU$"MaterialProperty:MoisturePenetrationDepth:Settings"[[1]]$value(),
         idfTR$"MaterialProperty:MoisturePenetrationDepth:Settings"[[1]]$value()
     )
 
     # NOTE: VersionUpdater will crash if no matched material found for
     # "MaterialProperty:MoisturePenetrationDepth:Settings"
-    expect_is(class = "Idf",
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "MaterialProperty:MoisturePenetrationDepth:Settings" := list(
                 paste0("Mat", 1:2), 0.004, 0.07, 0.40, 0.07, 10.0
@@ -1083,8 +1114,10 @@ test_that("Transition v8.5 --> v8.6", {
 # v8.6 --> v8.7 {{{
 test_that("Transition v8.6 --> v8.7", {
     skip_on_cran()
-    from <- 8.6; to <- 8.7
-    expect_is(class = "Idf",
+    from <- 8.6
+    to <- 8.7
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Coil:Cooling:DX:MultiSpeed" = list("ClgCoil1", ..16 = NULL),
             "Coil:Cooling:DX:MultiSpeed" = list("ClgCoil2", ..16 = "PropaneGas"),
@@ -1161,27 +1194,30 @@ test_that("Transition v8.6 --> v8.7", {
 # v8.7 --> v8.8 {{{
 test_that("Transition v8.7 --> v8.8", {
     skip_on_cran()
-    from <- 8.7; to <- 8.8
-    expect_is(class = "Idf",
+    from <- 8.7
+    to <- 8.8
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Output:Surfaces:List" = list("DecayCurvesfromZoneComponentLoads"),
             "Table:TwoIndependentVariables" = list("Table"),
-            "BuildingSurface:Detailed" = list("Surf1", "Floor", "Const", "Zone",
+            "BuildingSurface:Detailed" = list(
+                "Surf1", "Floor", "Const", "Zone",
                 "Foundation", "Slab Foundation", "NoSun", "NoWind", "AutoCalculate",
                 4,
                 45, 28, 0,
-                45,  4, 0,
-                4,   4, 0,
-                4,  28, 0
+                45, 4, 0,
+                4, 4, 0,
+                4, 28, 0
             ),
-            "Floor:Detailed" = list("Surf2", "Const", "Zone",
+            "Floor:Detailed" = list(
+                "Surf2", "Const", "Zone",
                 "Foundation", "Slab Foundation", "NoSun", "NoWind", "AutoCalculate",
                 4,
                 45, 28, 0,
-                45,  4, 0,
-                 4,  4, 0,
-                 4, 28, 0
-
+                45, 4, 0,
+                4, 4, 0,
+                4, 28, 0
             ),
             "UnitarySystemPerformance:Multispeed" = list("Unitary"),
             "Coil:Cooling:DX:SingleSpeed" = list("Coil1"),
@@ -1283,15 +1319,19 @@ test_that("Transition v8.7 --> v8.8", {
 # v8.8 --> v8.9 {{{
 test_that("Transition v8.8 --> v8.9", {
     skip_on_cran()
-    from <- 8.8; to <- 8.9
-    expect_is(class = "Idf",
+    from <- 8.8
+    to <- 8.9
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "ZoneHVAC:EquipmentList" = list("Equip"),
-            "GroundHeatExchanger:Vertical" = list("GHP", "Inlet", "Outlet",
+            "GroundHeatExchanger:Vertical" = list(
+                "GHP", "Inlet", "Outlet",
                 3.3e-4, 24,
                 76.2, 0.06, 0.70, 2.34e6, 13.40, 0.70,
                 0.39, 0.03, 0.02, 0.002, 2, 0.0005,
-                3, -15.2996, -0.348322, -14.201, 0.022208, -13.2202, 0.412345),
+                3, -15.2996, -0.348322, -14.201, 0.022208, -13.2202, 0.412345
+            ),
             "Branch" = list("Branch", NULL, "GroundHeatExchanger:Vertical", "GHP", "Inlet", "Outlet"),
             "CondenserEquipmentList" = list("CondEquip", "GroundHeatExchanger:Vertical", "GHP"),
             "ElectricEquipment:ITE:AirCooled" = list(),
@@ -1315,11 +1355,13 @@ test_that("Transition v8.8 --> v8.9", {
         idfTR$"GroundHeatExchanger:System"[[1]]$value()
     )
 
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"GroundHeatExchanger:Vertical:Properties"[[1]]$value(),
         idfTR$"GroundHeatExchanger:Vertical:Properties"[[1]]$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"GroundHeatExchanger:ResponseFactors"[[1]]$value(1:74),
         idfTR$"GroundHeatExchanger:ResponseFactors"[[1]]$value(1:74)
     )
@@ -1358,8 +1400,10 @@ test_that("Transition v8.8 --> v8.9", {
 # v8.9 --> v9.0 {{{
 test_that("Transition v8.9 --> v9.0", {
     skip_on_cran()
-    from <- 8.9; to <- 9.0
-    expect_is(class = "Idf",
+    from <- 8.9
+    to <- 9.0
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "OutdoorAir:Mixer" = list("OAMixer"),
             "AirflowNetwork:Distribution:Component:OutdoorAirFlow" = list("OA"),
@@ -1376,7 +1420,8 @@ test_that("Transition v8.9 --> v9.0", {
             "BuildingSurface:Detailed" = list("Surf", "Wall", "Wall", "Zone", "Outdoors"),
             "Zone" = list("Zone"),
             "Window" = list("Win"),
-            "WindowProperty:ShadingControl" = list("Ctrl", "ExteriorScreen",
+            "WindowProperty:ShadingControl" = list(
+                "Ctrl", "ExteriorScreen",
                 "Const", "OnIfScheduleAllows", "ScreenSchedule", 20, "Yes", "No"
             ),
             .all = TRUE
@@ -1452,12 +1497,13 @@ test_that("Transition v8.9 --> v9.0", {
 # v9.0 --> v9.1 {{{
 test_that("Transition v9.0 --> v9.1", {
     skip_on_cran()
-    from <- 9.0; to <- 9.1
-    expect_is(class = "Idf",
+    from <- 9.0
+    to <- 9.1
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "HybridModel:Zone" = list("HM", "Zone", "no", "no", "sch", 1, 1, 12, 31),
-            "ZoneHVAC:EquipmentList" = list("EquipList", NULL, "ZoneHVAC:IdealLoadsAirSystem", "Ideal", 1, 1
-                ),
+            "ZoneHVAC:EquipmentList" = list("EquipList", NULL, "ZoneHVAC:IdealLoadsAirSystem", "Ideal", 1, 1),
             .all = TRUE
         )
     )
@@ -1479,10 +1525,12 @@ test_that("Transition v9.0 --> v9.1", {
 # v9.1 --> v9.2 {{{
 test_that("Transition v9.1 --> v9.2", {
     skip_on_cran()
-    from <- 9.1; to <- 9.2
+    from <- 9.1
+    to <- 9.2
     unlink(file.path(tempdir(), "test.csv"))
     writeLines("", file.path(tempdir(), "test.csv"))
-    expect_is(class = "Idf",
+    expect_is(
+        class = "Idf",
         idfOri <- temp_idf(from,
             "Foundation:Kiva" = list(),
             "RunPeriod" := list(c(paste0("runperiod", c("", 1:5), "rp"))),
@@ -1595,20 +1643,23 @@ test_that("Transition v9.1 --> v9.2", {
                 NULL, NULL, "Dimensionless", 1, 3, 0.0, 1.0, 1.5, 0.8, 1.0, 1.1
             ),
             "Table:MultiVariableLookup" = list(
-                "Multi2", "EvaluateCurveToLimits", 3, 'Quadratic',
+                "Multi2", "EvaluateCurveToLimits", 3, "Quadratic",
                 "SingleLineIndependentVariableWithMatrix", NULL, "ASCENDING",
                 NULL, NULL, 0.5, 1.5, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                 NULL, NULL, NULL, 0.0, 1.5, "Dimensionless", NULL, NULL, NULL,
                 NULL, NULL, "Dimensionless", 1, 4, 0.0, 0.5, 1.0, 1.5, 1.1552,
                 1.0712, 1.0, 0.9416
             ),
-            "Coil:Cooling:DX:SingleSpeed" = list("Coil", "Sch", "autosize",
+            "Coil:Cooling:DX:SingleSpeed" = list(
+                "Coil", "Sch", "autosize",
                 "autosize", 3.0, "autosize", NULL, "Inlet", "Outlet",
-                "Two1", "Multi1", "Two2", "Multi2", "One"),
+                "Two1", "Multi1", "Two2", "Multi2", "One"
+            ),
             "ThermalStorage:Ice:Detailed" := list(c("Ice1", "Ice2"), ..6 = c("quadraticlinear", "cubiclinear"), ..8 = c("quadraticlinear", "cubiclinear")),
             "ZoneHVAC:EquipmentList" = list("Equip1"),
             "ZoneHVAC:EquipmentList" = list("Equip2", NULL, "ZoneHVAC:PackagedTerminalHeatPump", "HP", 1, 1),
-            "ZoneHVAC:EquipmentList" = list("Equip3", NULL,
+            "ZoneHVAC:EquipmentList" = list(
+                "Equip3", NULL,
                 "ZoneHVAC:PackagedTerminalHeatPump", "HP1", 1, 1, 1, 1,
                 "ZoneHVAC:PackagedTerminalHeatPump", "HP2", 1, 1, 1, 1,
                 "ZoneHVAC:PackagedTerminalHeatPump", "HP3", 1, 1, 1, 1
@@ -1640,27 +1691,33 @@ test_that("Transition v9.1 --> v9.2", {
         idfTR$"Table:IndependentVariable"$One_IndependentVariable1$value()
     )
 
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Two1_IndependentVariable1$value(),
         idfTR$"Table:IndependentVariable"$Two1_IndependentVariable1$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Two1_IndependentVariable2$value(),
         idfTR$"Table:IndependentVariable"$Two1_IndependentVariable2$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Two2_IndependentVariable1$value(),
         idfTR$"Table:IndependentVariable"$Two2_IndependentVariable1$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Two2_IndependentVariable2$value(),
         idfTR$"Table:IndependentVariable"$Two2_IndependentVariable2$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Multi1_IndependentVariable1$value(),
         idfTR$"Table:IndependentVariable"$Multi1_IndependentVariable1$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:IndependentVariable"$Multi2_IndependentVariable1$value(),
         idfTR$"Table:IndependentVariable"$Multi2_IndependentVariable1$value()
     )
@@ -1686,23 +1743,28 @@ test_that("Transition v9.1 --> v9.2", {
         idfTR$"Table:IndependentVariableList"$Multi2_IndependentVariableList$value()
     )
 
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:Lookup"$One$value(),
         idfTR$"Table:Lookup"$One$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:Lookup"$Two1$value(),
         idfTR$"Table:Lookup"$Two1$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:Lookup"$Two2$value(),
         idfTR$"Table:Lookup"$Two2$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:Lookup"$Multi1$value(),
         idfTR$"Table:Lookup"$Multi1$value()
     )
-    expect_equal(tolerance = 1e-5,
+    expect_equal(
+        tolerance = 1e-5,
         idfVU$"Table:Lookup"$Multi2$value(),
         idfTR$"Table:Lookup"$Multi2$value()
     )
@@ -1733,6 +1795,284 @@ test_that("Transition v9.1 --> v9.2", {
             dt_tr <- idfTR$to_table(class = "Schedule:Constant", wide = TRUE, string_value = FALSE)[, -"id"]
             dt_tr[J(unique(dt_vu$name)), on = "name"][, `Schedule Type Limits Name` := gsub("Limits", "Limts", `Schedule Type Limits Name`)]
         }
+    )
+})
+# }}}
+# v9.2 --> v9.3 {{{
+test_that("Transition v9.2 --> v9.3", {
+    skip_on_cran()
+    from <- 9.2
+    to <- 9.3
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "AirConditioner:VariableRefrigerantFlow" = list("VRF", ..67 = "propanegas"),
+            "AirTerminal:SingleDuct:Uncontrolled" := list(
+                c("ATDUC1", "ATDUC2"), NULL, c("Node1", "Node2"), "Autosize"
+            ),
+            "ZoneHVAC:EquipmentList" := list(
+                c("EquipList1", "EquipList2"), NULL,
+                "AirTerminal:SingleDuct:Uncontrolled",
+                c("ATDUC1", "ATDUC2"), 1, 1
+            ),
+            "AirLoopHVAC:ZoneSplitter" = list("ZS", "ZS Node", "Node1"),
+            "AirLoopHVAC:SupplyPlenum" = list("SP", "Zone", "Zone Node", ..5 = "NodeList"),
+            "NodeList" = list("NodeList", "Node2"),
+            "AirLoopHVAC" := list(c("Loop1", "Loop2"), ..9 = c("Node1", "NodeList")),
+            # VersionUpdater cannot handle
+            # 'RoomAir:Node:AirflowNetwork:HVACEquipment' correctly
+            # See: https://github.com/NREL/EnergyPlus/issues/8372
+            # "RoomAir:Node:AirflowNetwork:HVACEquipment" := list(
+            #     "AN",
+            #     ..2 = "AirTerminal:SingleDuct:Uncontrolled",
+            #     ..3 = "ATDUC1",
+            #     ..6 = "AirTerminal:SingleDuct:Uncontrolled",
+            #     ..7 = "ATDUC2"
+            # ),
+            "AirflowNetwork:Distribution:Node" := list(
+                c("ANDN1", "ANDN2"), c("Node1", "Node2")
+            ),
+            "AirflowNetwork:Distribution:Linkage" := list(
+                c("ANDL1", "ANDL2"), ..3 = c("ANDN1", "ANDN2"),
+                ..4 = c("ANDCD1", "ANDCD2")
+            ),
+            "AirflowNetwork:Distribution:Component:Duct" = list("ANDCD1"),
+            "Boiler:HotWater" = list("Boiler", "FuelOil#1"),
+            "GlobalGeometryRules" = list(..3 = "Absolute"),
+            "HeatPump:WaterToWater:EIR:Heating" = list("HPH"),
+            "HeatPump:WaterToWater:EIR:Cooling" = list("HPC"),
+            "ShadowCalculation" = list(
+                "averageoverdaysinfrequency",
+                ..6 = "scheduledshading"
+            ),
+            .all = TRUE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(idfTR <- transition(idfOri, to), "ANDCD2")
+
+    expect_equal(
+        idfVU$"AirConditioner:VariableRefrigerantFlow"$VRF$value(),
+        idfTR$"AirConditioner:VariableRefrigerantFlow"$VRF$value()
+    )
+
+    expect_equal(
+        idfVU$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC1$value(1:5),
+        idfTR$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC1$value()
+    )
+    expect_equal(
+        idfVU$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC2$value(1:5),
+        idfTR$"AirTerminal:SingleDuct:ConstantVolume:NoReheat"$ATDUC2$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:AirDistributionUnit"$"ATDUC1 ADU"$value(),
+        idfTR$"ZoneHVAC:AirDistributionUnit"$"ATDUC1 ADU"$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:AirDistributionUnit"$"ATDUC2 ADU"$value(),
+        idfTR$"ZoneHVAC:AirDistributionUnit"$"ATDUC2 ADU"$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:EquipmentList"$EquipList1$value(1:8),
+        idfTR$"ZoneHVAC:EquipmentList"$EquipList1$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:EquipmentList"$EquipList2$value(1:8),
+        idfTR$"ZoneHVAC:EquipmentList"$EquipList2$value()
+    )
+
+    expect_equal(
+        idfVU$"AirLoopHVAC:ZoneSplitter"$ZS$value(1:3),
+        idfTR$"AirLoopHVAC:ZoneSplitter"$ZS$value()
+    )
+
+    expect_equal(
+        idfVU$"AirLoopHVAC:SupplyPlenum"$SP$value(1:5),
+        idfTR$"AirLoopHVAC:SupplyPlenum"$SP$value()
+    )
+
+    expect_equal(
+        idfVU$NodeList$NodeList$value(1:2),
+        idfTR$NodeList$NodeList$value(1:2)
+    )
+    expect_equal(
+        idfVU$NodeList$"NodeList ATInlet"$value(1:2),
+        idfTR$NodeList$"NodeList ATInlet"$value(1:2)
+    )
+
+    expect_equal(
+        idfVU$AirLoopHVAC$Loop1$value(),
+        idfTR$AirLoopHVAC$Loop1$value()
+    )
+    expect_equal(
+        idfVU$AirLoopHVAC$Loop2$value(),
+        idfTR$AirLoopHVAC$Loop2$value()
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$ANDN1$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$ANDN1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$ANDN2$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$ANDN2$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$"ANDN1 ATInlet"$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$"ANDN1 ATInlet"$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Node"$"ANDN2 ATInlet"$value(),
+        idfTR$"AirflowNetwork:Distribution:Node"$"ANDN2 ATInlet"$value()
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$ANDL1$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$ANDL1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$ANDL2$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$ANDL2$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$"ANDL1 ATInlet"$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$"ANDL1 ATInlet"$value()
+    )
+    # NOTE: VersionUpdater always creates a new duct even the original one
+    # references an non-existing distribution duct
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Linkage"$"ANDL2 ATInlet"$value(1:3),
+        idfTR$"AirflowNetwork:Distribution:Linkage"$"ANDL2 ATInlet"$value(1:3)
+    )
+
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Component:Duct"$ANDCD1$value(),
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$ANDCD1$value()
+    )
+    expect_equal(
+        idfVU$"AirflowNetwork:Distribution:Component:Duct"$"ANDL1 ATInlet Duct"$value(1:8),
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$"ANDL1 ATInlet Duct"$value()
+    )
+    # NOTE: VersionUpdater always creates a new duct even the original one
+    # references an non-existing distribution duct
+    expect_equal(
+        # idfVU$"AirflowNetwork:Distribution:Component:Duct"$"ANDL2 ATInlet Duct",
+        idfTR$"AirflowNetwork:Distribution:Component:Duct"$"ANDL2 ATInlet Duct",
+        NULL
+    )
+
+    expect_equal(
+        idfVU$"Boiler:HotWater"$Boiler$value(),
+        idfTR$"Boiler:HotWater"$Boiler$value()
+    )
+
+    expect_equal(
+        idfVU$GlobalGeometryRules$value(),
+        idfTR$GlobalGeometryRules$value()
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:PlantLoop:EIR:Heating"$HPH$value(),
+        idfTR$"HeatPump:PlantLoop:EIR:Heating"$HPH$value()
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:PlantLoop:EIR:Cooling"$HPC$value(),
+        idfTR$"HeatPump:PlantLoop:EIR:Cooling"$HPC$value()
+    )
+
+    expect_equal(
+        idfVU$ShadowCalculation$value(1:10),
+        idfTR$ShadowCalculation$value()
+    )
+
+})
+# }}}
+# v9.3 --> v9.4 {{{
+test_that("Transition v9.3 --> v9.4", {
+    skip_on_cran()
+    from <- 9.3
+    to <- 9.4
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "Construction:InternalSource" = list("IS", ..6 = "Mat"),
+            "EnergyManagementSystem:Actuator" := list(
+                c("Act1", "Act2"),
+                ..4 = c("Electric Power Level", "Gas Power Level")
+            ),
+            "Output:DebuggingData" = list(-1, 1),
+            "Output:Diagnostics" := list(
+                c("DisplayAllWarnings", "DisplayExtraWarnings"),
+                "DisplayUnusedObjects"
+            ),
+            "PerformancePrecisionTradeoffs" = list(..3 = "Mode05"),
+            "ZoneHVAC:LowTemperatureRadiant:VariableFlow" = list(
+                "VF", ..5 = 0.013, ..8 = "HeatingDesignCapacity",
+                ..10 = 30, ..12 = 1.0),
+            "ZoneHVAC:LowTemperatureRadiant:Electric" = list("Elec", ..10 = 2),
+            "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" = list(
+                "CF", ..5 = 0.013, ..8 = 1.0, ..10 = 170000, ..12 = 0.9),
+            "ZoneHVAC:HybridUnitaryHVAC" = list("HU", ..17 = 10),
+            "PythonPlugin:Instance" = list("Py"),
+            .all = FALSE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(idfTR <- transition(idfOri, to), "Python")
+
+    expect_equal(
+        idfVU$"Construction:InternalSource"$IS$value(),
+        idfTR$"Construction:InternalSource"$IS$value()
+    )
+
+    expect_equal(
+        idfVU$"EnergyManagementSystem:Actuator"$Act1$value(),
+        idfTR$"EnergyManagementSystem:Actuator"$Act1$value()
+    )
+    expect_equal(
+        idfVU$"EnergyManagementSystem:Actuator"$Act2$value(),
+        idfTR$"EnergyManagementSystem:Actuator"$Act2$value()
+    )
+
+    expect_equal(
+        idfVU$"Output:DebuggingData"$value(),
+        idfTR$"Output:DebuggingData"$value()
+    )
+
+    # NOTE: VersionUpdater converted all options to upper case
+    expect_equal(
+        lapply(idfVU$"Output:Diagnostics"$value(), tolower),
+        lapply(idfTR$"Output:Diagnostics"$value(), tolower)
+    )
+
+    expect_equal(
+        idfVU$"PerformancePrecisionTradeoffs"$value(),
+        idfTR$"PerformancePrecisionTradeoffs"$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$VF$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$VF$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:Electric"$Elec$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:Electric"$Elec$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$CF$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$CF$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:HybridUnitaryHVAC"$HU$value(),
+        idfTR$"ZoneHVAC:HybridUnitaryHVAC"$HU$value()
     )
 })
 # }}}

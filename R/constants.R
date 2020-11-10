@@ -136,7 +136,8 @@ utils::globalVariables(c(
     "right_tilt_angle", "subtype", "trans", "window_or_door_name", "x0", "z0",
     "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
     "area", "dt", "interval_type", "new_rleid", "time_index", "i.time_index",
-    "i.environment_name", "i.environment_type", "i.simulation_index"
+    "i.environment_name", "i.environment_type", "i.simulation_index", "i.new",
+    "value_lower_start"
 ))
 # }}}
 # nocov end

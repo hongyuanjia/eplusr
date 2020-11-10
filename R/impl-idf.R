@@ -3834,12 +3834,15 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     if (!is.null(object)) {
         obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
     }
-    if (!is.null(obj_id)) {
+    if (depth == 0L && !is.null(obj_id)) {
         cur_nodes <- cur_nodes[J(obj_id), on = col_ref, nomatch = 0L]
     }
 
     # no matched objects found for specified classes or groups
-    if (!is.null(obj_id) && !length(obj_id)) all_nodes <- all_nodes[0L]
+    if (!is.null(obj_id) && !length(obj_id)) {
+        all_nodes <- all_nodes[0L]
+        cur_nodes <- cur_nodes[0L]
+    }
 
     # store classes or objects needed to be removed later
     del <- list()
