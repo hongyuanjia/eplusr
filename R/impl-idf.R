@@ -3839,7 +3839,10 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     }
 
     # no matched objects found for specified classes or groups
-    if (!is.null(obj_id) && !length(obj_id)) all_nodes <- all_nodes[0L]
+    if (!is.null(obj_id) && !length(obj_id)) {
+        all_nodes <- all_nodes[0L]
+        cur_nodes <- cur_nodes[0L]
+    }
 
     # store classes or objects needed to be removed later
     del <- list()
