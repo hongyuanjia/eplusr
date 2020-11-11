@@ -226,7 +226,7 @@ set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = T
         comment <- as.character(comment)
         assert_count(width)
 
-        cmt <- unlist(strsplit(comment, "\n", fixed = TRUE), use.names = FALSE)
+        cmt <- unlist(stri_split_fixed(comment, "\n", omit_empty = FALSE), use.names = FALSE)
 
         if (width != 0L) {
             cmt <- strwrap(cmt, width = width)
