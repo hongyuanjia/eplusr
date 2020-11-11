@@ -54,6 +54,8 @@
 * Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
 * Fix false positive warnings when resolving IDF external file dependencies
   (#366).
+* Empty string input, e.g. `"  "` in `Idf$add()` and `Idf$set()` are now
+  correctly converted to `NA`s (#370).
 * Now empty comments are kept in `IdfObject$comment()` (#372).
 
 # eplusr 0.13.0

@@ -1234,6 +1234,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     num <- rep(NA_real_, len)
                 } else if (l == 1L) {
                     if (is.character(v)) {
+                        v <- stri_trim_both(v)
+                        v[stri_isempty(v)] <- NA_character_
                         chr <- rep(v, len)
                         num <- rep(NA_real_, len)
                     } else {
@@ -1242,6 +1244,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     }
                 } else if (l == len) {
                     if (is.character(v)) {
+                        v <- stri_trim_both(v)
+                        v[stri_isempty(v)] <- NA_character_
                         chr <- v
                         num <- rep(NA_real_, len)
                     } else {
