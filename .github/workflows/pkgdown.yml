@@ -9,6 +9,7 @@ jobs:
     runs-on: macOS-latest
 
     env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: true
       DISPLAY: 99 # for rgl
 
