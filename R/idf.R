@@ -3414,6 +3414,36 @@ idf_add_output_vardict <- function (idf) {
     added
 }
 # }}}
+# idf_set_output_files {{{
+idf_set_output_files <- function (idf, sql = FALSE, dict = FALSE) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+    modified <- FALSE
+    cls <- "Output:Control:Files"
+    if (idf$version() < 9.4 || !idf$is_valid_class(cls)) return(modified)
+
+    obj <- idf$object_unique(cls)
+    val <- obj$value(all = TRUE)
+    if (sql && is.na(val[["Output SQLite"]]) || tolower(val[["Output SQLite"]]) == "no") {
+        verbose_info("Setting 'Output SQLite' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output SQLite"]] <- "Yes"
+        modified <- TRUE
+    }
+    if (dict && is.na(val[["Output RDD"]]) || tolower(val[["Output RDD"]]) == "no") {
+        verbose_info("Setting 'Output RDD' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output RDD"]] <- "Yes"
+        modified <- TRUE
+    }
+    if (dict && is.na(val[["Output MDD"]]) || tolower(val[["Output MDD"]]) == "no") {
+        verbose_info("Setting 'Output MDD' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output MDD"]] <- "Yes"
+        modified <- TRUE
+    }
+
+    if (modified) obj$set(val[sprintf("Output %s", c("SQLite", "RDD", "MDD"))])
+
+    modified
+}
+# }}}
 # idf_has_hvactemplate {{{
 idf_has_hvactemplate <- function (idf) {
     if (!is_idf(idf)) idf <- read_idf(idf)
