@@ -27,7 +27,9 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - name: Install system dependencies
-        run: brew install harfbuzz fribidi
+        run: |
+          brew install harfbuzz fribidi
+          brew cask install xquartz
 
       - name: Query dependencies
         run: |
