@@ -869,7 +869,8 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
 
     private$m_job <- run_idf(path_idf, path_epw,
         output_dir = NULL, echo = echo, wait = wait, eplus = private$m_idf$version(),
-        design_day = is.null(private$m_epw_path)
+        design_day = is.null(private$m_epw_path),
+        expand_obj = idf_has_hvactemplate(private$m_idf)
     )
 
     if (wait) private$m_log$end_time <- Sys.time()

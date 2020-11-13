@@ -833,6 +833,8 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         design_day <- is.na(path_epw)
     }
 
+    expand_obj <- vlapply(private$m_idfs, idf_has_hvactemplate)
+
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
     else if (length(output_dir) == 1L) {
@@ -893,7 +895,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
 
     ver <- vcapply(private$m_idfs, function (idf) as.character(idf$version()))
     tbl <- run_multi(path_group, path_epw, NULL, design_day = design_day,
-        wait = wait, echo = echo, eplus = ver
+        expand_obj = expand_obj, wait = wait, echo = echo, eplus = ver
     )
 
     private$m_job <- tbl
