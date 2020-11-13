@@ -45,6 +45,8 @@ jobs:
           install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("pkgdown")
+          remotes::install_cran("dplyr")
+          remotes::install_cran("ggplot2")
         shell: Rscript {0}
 
       - name: Install package
