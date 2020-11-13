@@ -5,6 +5,8 @@
 * `Epw$save()` gets a new option `format_digit`. If `TRUE`, the trailing digits
   in EPW data will be formatted in the same way as Weather Converter (#323).
 * Add EnergyPlus v9.3 and v9.4 support (#343, #347, #369).
+* Now `ParametricJob$apply_measure()` will give a nice progress bar when
+  parametric models are creating (#378).
 
 ## Major changes
 
