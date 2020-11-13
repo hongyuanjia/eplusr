@@ -26,7 +26,7 @@
   (https://github.com/NREL/EnergyPlus/issues/8376), here we want to avoid
   unnecessary calls of `ExpandObjects` as possible. Also, `EplusJob$run()` and
   `EplusGroupJob$run()` now will detect if there are any `HVACTemplate:*`
-  objects and set the `expand_obj` flag properly (#376).
+  objects and set the `expand_obj` flag properly (#377).
 
 ## Bug fixes
 
