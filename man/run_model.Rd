@@ -23,6 +23,7 @@ run_multi(
   output_dir,
   design_day = FALSE,
   annual = FALSE,
+  expand_obj = TRUE,
   wait = TRUE,
   echo = TRUE,
   eplus = NULL
