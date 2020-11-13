@@ -15,7 +15,7 @@ jobs:
     env:
       RGL_USE_NULL: true
       DISPLAY: 99 # for rgl
-      NOT_CRAN: false
+      NOT_CRAN: true
 
     steps:
       - uses: actions/checkout@v2
