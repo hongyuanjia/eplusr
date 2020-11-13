@@ -15,7 +15,7 @@ jobs:
     env:
       RGL_USE_NULL: true
       DISPLAY: 99 # for rgl
-      NOT_CRAN: false
+      NOT_CRAN: true
 
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +27,9 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@master
 
       - name: Install system dependencies
-        run: brew install harfbuzz fribidi
+        run: |
+          brew install harfbuzz fribidi
+          brew cask install xquartz
 
       - name: Query dependencies
         run: |
@@ -50,5 +52,5 @@ jobs:
         shell: Rscript {0}
 
       - name: Test coverage
-        run: covr::codecov()
+        run: covr::codecov(quiet = FALSE)
         shell: Rscript {0}
