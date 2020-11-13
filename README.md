@@ -3,16 +3,17 @@
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build
-Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+<!-- badges: start -->
+
+[![R build
+status](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)](https://github.com/hongyuanjia/eplusr/actions)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN
 Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
 [![CRAN Download
 Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
+<!-- badges: end -->
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -36,9 +37,9 @@ citation("eplusr")
 #> 
 #> To cite eplusr in publications use:
 #> 
-#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A framework
-#>   for integrating building energy simulation and
-#>   data-driven analytics. doi: 10.13140/RG.2.2.34326.16966
+#>   Hongyuan Jia, Adrian Chong (2020). eplusr: A framework for
+#>   integrating building energy simulation and data-driven analytics.
+#>   doi: 10.13140/RG.2.2.34326.16966
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 

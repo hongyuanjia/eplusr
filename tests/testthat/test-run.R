@@ -47,12 +47,6 @@ test_that("run_idf()", {
         file.copy(path_idf, f, overwrite = TRUE)
         res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
     })
-    # can create output directory if not exists
-    expect_equal({
-        d <- tempfile()
-        res <- run_idf(path_idf, NULL, output_dir = d, echo = FALSE)
-        res$output_dir
-    }, normalizePath(d, mustWork = FALSE))
 
     # can run simulation with weather
     expect_silent(res <- run_idf(path_idf, path_epw, output_dir = tempdir(), echo = FALSE))
@@ -148,7 +142,6 @@ test_that("run_multi()", {
     expect_equal(res$exit_status > 0, rep(TRUE, 2))
     expect_is(res$start_time, "POSIXct")
     expect_is(res$end_time, "POSIXct")
-    expect_equal(res$output_dir, normalizePath(c(file.path(tempdir(), "a"), file.path(tempdir(), "b")), mustWork = FALSE))
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
     checkmate::expect_list(res$stderr, "character")
