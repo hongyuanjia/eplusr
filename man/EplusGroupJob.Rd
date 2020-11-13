@@ -340,7 +340,8 @@ Run grouped simulations
   wait = TRUE,
   force = FALSE,
   copy_external = FALSE,
-  echo = wait
+  echo = wait,
+  separate = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -369,6 +370,11 @@ will have all files needed for the model to run. Default is
 
 \item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to
 simulation status. Default: same as \code{wait}.}
+
+\item{\code{separate}}{If \code{TRUE}, all models are saved in a separate folder
+with each model's name under \code{dir} when simulation. If \code{FALSE},
+all models are saved in \code{dir} when simulation. Default:
+\code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
