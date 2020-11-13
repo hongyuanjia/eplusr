@@ -406,10 +406,11 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         stop("'measure' function must have at least two argument")
     }
 
-    measure_wrapper <- function (idf, ...) {
+    measure_wrapper <- function (idf, ..., .__PROGRESS_BAR__) {
         if (!is_idf(idf)) {
             stop("Measure should take an 'Idf' object as input, not '", class(idf)[[1]], "'")
         }
+        .__PROGRESS_BAR__$tick()
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
         if (!is_idf(idf)) {
@@ -427,8 +428,15 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     }
     private$m_log$measure_name <- mea_nm
 
+    # progress bar
+    progress_bar <- progress::progress_bar$new(
+        total = max(viapply(list(...), length)), clear = TRUE,
+        format = "[:current/:total | :percent] :bar [Elapsed: :elapsedfull]"
+    )
+
     out <- mapply(measure_wrapper, ...,
-        MoreArgs = list(idf = private$m_seed), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+        MoreArgs = list(idf = private$m_seed, .__PROGRESS_BAR__ = progress_bar),
+        SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     if (is.null(.names)) {
         nms <- paste0(mea_nm, "_", seq_along(out))
