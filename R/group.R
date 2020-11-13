@@ -100,6 +100,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to
         #'        simulation status. Default: same as `wait`.
+        #' @param separate If `TRUE`, all models are saved in a separate folder
+        #'        with each model's name under `dir` when simulation. If `FALSE`,
+        #'        all models are saved in `dir` when simulation. Default:
+        #'        `TRUE`.
         #'
         #' @return The `EplusGroupJob` object itself, invisibly.
         #'
@@ -126,8 +130,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-            epgroup_run(self, private, dir, wait, force, copy_external, echo),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
+            epgroup_run(self, private, dir, wait, force, copy_external, echo, separate),
         # }}}
 
         # kill {{{
@@ -793,7 +797,9 @@ group_job <- function (idfs, epws) {
 # }}}
 
 # epgroup_run {{{
-epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
+                         force = FALSE, copy_external = FALSE, echo = wait,
+                         separate = TRUE) {
     # check if generated models have been modified outside
     uuid <- private$idf_uuid()
     if (any(i <- uuid != private$cached_idf_uuid())) {
@@ -807,12 +813,16 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 
     private$log_new_uuid()
 
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
 }
 # }}}
 # epgroup_run_models {{{
 #' @importFrom checkmate test_names
-epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
+                                force = FALSE, copy_external = FALSE, echo = wait,
+                                separate = TRUE) {
+    checkmate::assert_flag(separate)
+
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
     if (checkmate::test_names(names(private$m_idfs))) {
@@ -874,7 +884,11 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         }
     }
 
-    path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
+    if (separate) {
+        path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
+    } else {
+        path_group <- normalizePath(file.path(output_dir, nms), mustWork = FALSE)
+    }
 
     if (any(to_save <- path_group != path_idf | private$is_unsaved())) {
         # remove duplications

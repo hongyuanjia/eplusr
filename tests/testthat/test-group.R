@@ -43,6 +43,17 @@ test_that("Group methods", {
     )
 
     # Run and Status {{{
+    # can run in the same folder
+    expect_equal({
+        grp$run(dir = file.path(tempdir(), "test"), separate = FALSE)
+        basename(grp$status()$job_status$output_dir)
+    }, rep("test", 5L))
+    # can run in different folders
+    expect_equal({
+        grp$run(dir = file.path(tempdir(), "test"), separate = TRUE)
+        basename(grp$status()$job_status$output_dir)
+    }, tools::file_path_sans_ext(basename(path_idfs)))
+
     # can run the simulation and get status of simulation
     expect_equal({grp$run(dir = file.path(tempdir(), "test"), echo = FALSE); status <- grp$status(); names(status)},
         c("run_before", "alive", "terminated", "successful", "changed_after", "job_status")
