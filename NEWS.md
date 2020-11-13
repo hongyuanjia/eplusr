@@ -22,6 +22,13 @@
 * Now rgl and decido package has beem moved from *Imports* to *Suggests*, since
   they are only used in the `IdfViewer` class for 3D visualization which is not
   the main focus of this package (368).
+* `run_multi()` now gets a new argument `expand_obj` to control whether
+  `ExpandObjects` should be called before simulation or not. Because there is a
+  known issue of `ExpandObjects` on Linux system
+  (https://github.com/NREL/EnergyPlus/issues/8376), here we want to avoid
+  unnecessary calls of `ExpandObjects` as possible. Also, `EplusJob$run()` and
+  `EplusGroupJob$run()` now will detect if there are any `HVACTemplate:*`
+  objects and set the `expand_obj` flag properly (#377).
 
 ## Bug fixes
 
