@@ -278,11 +278,12 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 #' @rdname run_model
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
-                       annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
+                       annual = FALSE, expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL) {
     assert_flag(wait)
     assert_flag(echo)
     assert_logical(design_day, any.missing = FALSE)
     assert_logical(annual, any.missing = FALSE)
+    assert_logical(expand_obj, any.missing = FALSE)
 
     if (length(model) != 1L) {
         if (!is.null(weather) && length(weather) != 1L) {
@@ -296,6 +297,9 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         }
         if (length(annual) != 1L) {
             assert_same_len(model, annual)
+        }
+        if (length(expand_obj) != 1L) {
+            assert_same_len(model, expand_obj)
         }
     }
 
@@ -368,7 +372,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     jobs[, `:=`(
         energyplus = energyplus_exe,
         model = copy_run_files(model, output_dir), version = ver,
-        index = .I, annual = annual, design_day = design_day
+        index = .I, annual = annual, design_day = design_day, expand_obj = expand_obj
     )]
 
     if (is.null(weather)) {
@@ -505,7 +509,8 @@ run_job <- function(jobs, options, progress_bar) {
 
         process <- energyplus(eplus = energyplus, model = model,
             weather = unlist(weather), output_dir = output_dir, annual = annual,
-            design_day = design_day, wait = FALSE, echo = FALSE)$process
+            design_day = design_day, wait = FALSE, echo = FALSE,
+            expand_obj = expand_obj)$process
 
         if (options$echo) {
             run <- sim_status("run", index_str, model, weather)

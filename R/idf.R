@@ -3414,6 +3414,48 @@ idf_add_output_vardict <- function (idf) {
     added
 }
 # }}}
+# idf_has_hvactemplate {{{
+idf_has_hvactemplate <- function (idf) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+
+    cls <- c(
+        "HVACTemplate:Thermostat",
+        "HVACTemplate:Zone:IdealLoadsAirSystem",
+        "HVACTemplate:Zone:BaseboardHeat",
+        "HVACTemplate:Zone:FanCoil",
+        "HVACTemplate:Zone:PTAC",
+        "HVACTemplate:Zone:PTHP",
+        "HVACTemplate:Zone:WaterToAirHeatPump",
+        "HVACTemplate:Zone:VRF",
+        "HVACTemplate:Zone:Unitary",
+        "HVACTemplate:Zone:VAV",
+        "HVACTemplate:Zone:VAV:FanPowered",
+        "HVACTemplate:Zone:VAV:HeatAndCool",
+        "HVACTemplate:Zone:ConstantVolume",
+        "HVACTemplate:Zone:DualDuct",
+        "HVACTemplate:System:VRF",
+        "HVACTemplate:System:Unitary",
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+        "HVACTemplate:System:UnitarySystem",
+        "HVACTemplate:System:VAV",
+        "HVACTemplate:System:PackagedVAV",
+        "HVACTemplate:System:ConstantVolume",
+        "HVACTemplate:System:DualDuct",
+        "HVACTemplate:System:DedicatedOutdoorAir",
+        "HVACTemplate:Plant:ChilledWaterLoop",
+        "HVACTemplate:Plant:Chiller",
+        "HVACTemplate:Plant:Chiller:ObjectReference",
+        "HVACTemplate:Plant:Tower",
+        "HVACTemplate:Plant:Tower:ObjectReference",
+        "HVACTemplate:Plant:HotWaterLoop",
+        "HVACTemplate:Plant:Boiler",
+        "HVACTemplate:Plant:Boiler:ObjectReference",
+        "HVACTemplate:Plant:MixedWaterLoop"
+    )
+
+    any(idf$is_valid_class(cls))
+}
+# }}}
 
 #' Read an EnergyPlus Input Data File (IDF)
 #'

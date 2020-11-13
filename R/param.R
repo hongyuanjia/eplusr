@@ -219,8 +219,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' )
         #' }
         #'
-        apply_measure = function (measure, ..., .names = NULL)
-            param_apply_measure(self, private, measure, ..., .names = .names),
+        apply_measure = function (measure, ..., .names = NULL, parallel = FALSE)
+            param_apply_measure(self, private, measure, ..., .names = .names, parallel),
         # }}}
 
         # save {{{
@@ -307,8 +307,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' print(param)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-            param_run(self, private, dir, wait, force, copy_external, echo),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
+            param_run(self, private, dir, wait, force, copy_external, echo, separate),
         # }}}
 
         # print {{{
@@ -395,7 +395,7 @@ param_weather <- function (self, private) {
 # }}}
 # param_apply_measure {{{
 #' @importFrom checkmate assert_function
-param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame()) {
+param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame(), parallel = FALSE) {
     checkmate::assert_function(measure)
 
     if (length(formals(measure)) < 2L) {
@@ -423,8 +423,10 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     }
     private$m_log$measure_name <- mea_nm
 
-    out <- mapply(measure_wrapper, ...,
-        MoreArgs = list(idf = private$m_seed), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+    if (!parallel) {
+        out <- mapply(measure_wrapper, ...,
+            MoreArgs = list(idf = private$m_seed), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+    }
 
     if (is.null(.names)) {
         nms <- paste0(mea_nm, "_", seq_along(out))
@@ -460,7 +462,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE) {
     if (is.null(private$m_idfs)) {
         abort("No measure has been applied.")
     }
@@ -481,7 +483,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     }
 
     private$log_new_uuid()
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
 }
 # }}}
 # param_save {{{
