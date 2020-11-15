@@ -1,15 +1,23 @@
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
 name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: macOS-latest
+    runs-on: ubuntu-20.04
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
+      NOT_CRAN: true
       RGL_USE_NULL: true
       DISPLAY: 99 # for rgl
 
@@ -26,20 +34,25 @@ jobs:
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
       - name: Cache R packages
         uses: actions/cache@v1
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: macOS-r-4.0-2-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: macOS-r-4.0-2-
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
-      - name: Install system dependencies
-        run: brew install harfbuzz fribidi
-
-      - name: Install rgl system dependencies
-        run: brew cask install xquartz
+        if: runner.os == 'Linux'
+        run: |
+          while read -r cmd
+          do
+            eval sudo $cmd
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+          sudo apt-get install xvfb
+          export DISPLAY=:99.0
+          Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
 
       - name: Install dependencies
         run: |
@@ -58,3 +71,10 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: check
