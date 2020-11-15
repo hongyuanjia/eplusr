@@ -211,7 +211,7 @@ running EnergyPlus models using <code><a href='run_idf.html'>run_idf()</a></code
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># run a test simulation</span>
 <span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span>
 <span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>,
@@ -219,186 +219,14 @@ running EnergyPlus models using <code><a href='run_idf.html'>run_idf()</a></code
 <span class='op'>)</span>
 <span class='va'>dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"test"</span><span class='op'>)</span>
 <span class='fu'><a href='run_idf.html'>run_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span>, output_dir <span class='op'>=</span> <span class='va'>dir</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $idf
-#&gt; [1] "/tmp/Rtmpa73RLC/temp_libpath50a7953f9d7/eplusr/extdata/1ZoneUncontrolled.idf"
-#&gt; 
-#&gt; $epw
-#&gt; [1] "/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-#&gt; 
-#&gt; $version
-#&gt; [1] "8.8.0"
-#&gt; 
-#&gt; $exit_status
-#&gt; [1] 0
-#&gt; 
-#&gt; $start_time
-#&gt; [1] "2020-11-11 02:04:44 UTC"
-#&gt; 
-#&gt; $end_time
-#&gt; [1] "2020-11-11 02:04:49 UTC"
-#&gt; 
-#&gt; $output_dir
-#&gt; [1] "/tmp/RtmpbSS17E/test"
-#&gt; 
-#&gt; $energyplus
-#&gt; [1] "/usr/local/EnergyPlus-8-8-0/energyplus-8.8.0"
-#&gt; 
-#&gt; $stdout
-#&gt;   [1] "EnergyPlus Starting"                                                                     
-#&gt;   [2] "EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:04"                              
-#&gt;   [3] "Processing Data Dictionary"                                                              
-#&gt;   [4] "Processing Input File"                                                                   
-#&gt;   [5] "Initializing Simulation"                                                                 
-#&gt;   [6] "Reporting Surfaces"                                                                      
-#&gt;   [7] "Beginning Primary Simulation"                                                            
-#&gt;   [8] "Initializing New Environment Parameters"                                                 
-#&gt;   [9] "Warming up {1}"                                                                          
-#&gt;  [10] "Warming up {2}"                                                                          
-#&gt;  [11] "Warming up {3}"                                                                          
-#&gt;  [12] "Warming up {4}"                                                                          
-#&gt;  [13] "Warming up {5}"                                                                          
-#&gt;  [14] "Warming up {6}"                                                                          
-#&gt;  [15] "Warming up {7}"                                                                          
-#&gt;  [16] "Warming up {8}"                                                                          
-#&gt;  [17] "Warming up {9}"                                                                          
-#&gt;  [18] "Warming up {10}"                                                                         
-#&gt;  [19] "Warming up {11}"                                                                         
-#&gt;  [20] "Warming up {12}"                                                                         
-#&gt;  [21] "Warming up {13}"                                                                         
-#&gt;  [22] "Warming up {14}"                                                                         
-#&gt;  [23] "Warming up {15}"                                                                         
-#&gt;  [24] "Warming up {16}"                                                                         
-#&gt;  [25] "Warming up {17}"                                                                         
-#&gt;  [26] "Warming up {18}"                                                                         
-#&gt;  [27] "Warming up {19}"                                                                         
-#&gt;  [28] "Warming up {20}"                                                                         
-#&gt;  [29] "Warming up {21}"                                                                         
-#&gt;  [30] "Warming up {22}"                                                                         
-#&gt;  [31] "Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB"    
-#&gt;  [32] "Initializing New Environment Parameters"                                                 
-#&gt;  [33] "Warming up {1}"                                                                          
-#&gt;  [34] "Warming up {2}"                                                                          
-#&gt;  [35] "Warming up {3}"                                                                          
-#&gt;  [36] "Warming up {4}"                                                                          
-#&gt;  [37] "Warming up {5}"                                                                          
-#&gt;  [38] "Warming up {6}"                                                                          
-#&gt;  [39] "Warming up {7}"                                                                          
-#&gt;  [40] "Warming up {8}"                                                                          
-#&gt;  [41] "Warming up {9}"                                                                          
-#&gt;  [42] "Warming up {10}"                                                                         
-#&gt;  [43] "Warming up {11}"                                                                         
-#&gt;  [44] "Warming up {12}"                                                                         
-#&gt;  [45] "Warming up {13}"                                                                         
-#&gt;  [46] "Warming up {14}"                                                                         
-#&gt;  [47] "Warming up {15}"                                                                         
-#&gt;  [48] "Warming up {16}"                                                                         
-#&gt;  [49] "Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB"
-#&gt;  [50] "Initializing New Environment Parameters"                                                 
-#&gt;  [51] "Warming up {1}"                                                                          
-#&gt;  [52] "Warming up {2}"                                                                          
-#&gt;  [53] "Warming up {3}"                                                                          
-#&gt;  [54] "Warming up {4}"                                                                          
-#&gt;  [55] "Warming up {5}"                                                                          
-#&gt;  [56] "Warming up {6}"                                                                          
-#&gt;  [57] "Warming up {7}"                                                                          
-#&gt;  [58] "Warming up {8}"                                                                          
-#&gt;  [59] "Warming up {9}"                                                                          
-#&gt;  [60] "Warming up {10}"                                                                         
-#&gt;  [61] "Warming up {11}"                                                                         
-#&gt;  [62] "Warming up {12}"                                                                         
-#&gt;  [63] "Warming up {13}"                                                                         
-#&gt;  [64] "Warming up {14}"                                                                         
-#&gt;  [65] "Warming up {15}"                                                                         
-#&gt;  [66] "Warming up {16}"                                                                         
-#&gt;  [67] "Warming up {17}"                                                                         
-#&gt;  [68] "Warming up {18}"                                                                         
-#&gt;  [69] "Starting Simulation at 01/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"          
-#&gt;  [70] "Updating Shadowing Calculations, Start Date=01/21"                                       
-#&gt;  [71] "Continuing Simulation at 01/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [72] "Updating Shadowing Calculations, Start Date=02/10"                                       
-#&gt;  [73] "Continuing Simulation at 02/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [74] "Updating Shadowing Calculations, Start Date=03/02"                                       
-#&gt;  [75] "Continuing Simulation at 03/02 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [76] "Updating Shadowing Calculations, Start Date=03/22"                                       
-#&gt;  [77] "Continuing Simulation at 03/22 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [78] "Updating Shadowing Calculations, Start Date=04/11"                                       
-#&gt;  [79] "Continuing Simulation at 04/11 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [80] "Updating Shadowing Calculations, Start Date=05/01"                                       
-#&gt;  [81] "Continuing Simulation at 05/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [82] "Updating Shadowing Calculations, Start Date=05/21"                                       
-#&gt;  [83] "Continuing Simulation at 05/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [84] "Updating Shadowing Calculations, Start Date=06/10"                                       
-#&gt;  [85] "Continuing Simulation at 06/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [86] "Updating Shadowing Calculations, Start Date=06/30"                                       
-#&gt;  [87] "Continuing Simulation at 06/30 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [88] "Updating Shadowing Calculations, Start Date=07/20"                                       
-#&gt;  [89] "Continuing Simulation at 07/20 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [90] "Updating Shadowing Calculations, Start Date=08/09"                                       
-#&gt;  [91] "Continuing Simulation at 08/09 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [92] "Updating Shadowing Calculations, Start Date=08/29"                                       
-#&gt;  [93] "Continuing Simulation at 08/29 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [94] "Updating Shadowing Calculations, Start Date=09/18"                                       
-#&gt;  [95] "Continuing Simulation at 09/18 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [96] "Updating Shadowing Calculations, Start Date=10/08"                                       
-#&gt;  [97] "Continuing Simulation at 10/08 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt;  [98] "Updating Shadowing Calculations, Start Date=10/28"                                       
-#&gt;  [99] "Continuing Simulation at 10/28 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt; [100] "Updating Shadowing Calculations, Start Date=11/17"                                       
-#&gt; [101] "Continuing Simulation at 11/17 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt; [102] "Updating Shadowing Calculations, Start Date=12/07"                                       
-#&gt; [103] "Continuing Simulation at 12/07 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt; [104] "Updating Shadowing Calculations, Start Date=12/27"                                       
-#&gt; [105] "Continuing Simulation at 12/27 for San Francisco Intl Ap CA USA TMY3 WMO#=724940"        
-#&gt; [106] "Writing tabular output file results using comma format."                                 
-#&gt; [107] "Writing tabular output file results using tab format."                                   
-#&gt; [108] "Writing tabular output file results using text format."                                  
-#&gt; [109] "Writing tabular output file results using HTML format."                                  
-#&gt; [110] "Writing tabular output file results using XML format."                                   
-#&gt; [111] "Writing final SQL reports"                                                               
-#&gt; [112] " ReadVarsESO program starting."                                                          
-#&gt; [113] " ReadVars Run Time=00hr 00min  0.38sec"                                                  
-#&gt; [114] " ReadVarsESO program completed successfully."                                            
-#&gt; [115] " ReadVarsESO program starting."                                                          
-#&gt; [116] " ReadVars Run Time=00hr 00min  0.17sec"                                                  
-#&gt; [117] " ReadVarsESO program completed successfully."                                            
-#&gt; [118] "EnergyPlus Run Time=00hr 00min  5.77sec"                                                 
-#&gt; 
-#&gt; $stderr
-#&gt; NULL
-#&gt; 
-#&gt; $process
-#&gt; PROCESS 'energyplus-8.8.0', finished.
-#&gt; </div><div class='input'>
+
 <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "1ZoneUncontrolled.audit"                     
-#&gt;  [2] "1ZoneUncontrolled.bnd"                       
-#&gt;  [3] "1ZoneUncontrolled.csv"                       
-#&gt;  [4] "1ZoneUncontrolled.dxf"                       
-#&gt;  [5] "1ZoneUncontrolled.eio"                       
-#&gt;  [6] "1ZoneUncontrolled.end"                       
-#&gt;  [7] "1ZoneUncontrolled.err"                       
-#&gt;  [8] "1ZoneUncontrolled.eso"                       
-#&gt;  [9] "1ZoneUncontrolled.idf"                       
-#&gt; [10] "1ZoneUncontrolled.mdd"                       
-#&gt; [11] "1ZoneUncontrolled.mtd"                       
-#&gt; [12] "1ZoneUncontrolled.mtr"                       
-#&gt; [13] "1ZoneUncontrolled.rdd"                       
-#&gt; [14] "1ZoneUncontrolled.rvaudit"                   
-#&gt; [15] "1ZoneUncontrolled.shd"                       
-#&gt; [16] "1ZoneUncontrolledMeter.csv"                  
-#&gt; [17] "1ZoneUncontrolledSqlite.err"                 
-#&gt; [18] "1ZoneUncontrolledTable.csv"                  
-#&gt; [19] "1ZoneUncontrolledTable.htm"                  
-#&gt; [20] "1ZoneUncontrolledTable.tab"                  
-#&gt; [21] "1ZoneUncontrolledTable.txt"                  
-#&gt; [22] "1ZoneUncontrolledTable.xml"                  
-#&gt; [23] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</div><div class='input'>
+
 <span class='co'># remove all output files</span>
 <span class='fu'>clean_wd</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='fu'><a href='https://rdrr.io/r/base/basename.html'>basename</a></span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>dir</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "1ZoneUncontrolled.idf"                       
-#&gt; [2] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

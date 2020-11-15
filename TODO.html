@@ -180,7 +180,8 @@
     </div>
 
 <ul>
-<li>Object reference:
+<li>
+<p>Object reference:</p>
 <ul>
 <li>Classes like <code>Branch</code> and <code>ZoneHVAC:EquipmentList</code> reference other objects in fields “Component X Object Type” and “Zone Equipment 1 Object Type”, but they do not have <code>\object-list</code> attributes. This makes it impossible to detect invalid field references.</li>
 <li>One possible way is to use <code>$search_value()</code> to detect if the values in those fields could be targeted or not.</li>
@@ -194,13 +195,13 @@
 <li><p>Remove crayon dep</p></li>
 <li>
 <p>Add functionality to check location differences between epw and idf.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> ( <span class="bu">std::</span>abs( Latitude - WeatherFileLatitude ) &gt; <span class="fl">1.0</span> || <span class="bu">std::</span>abs( Longitude - WeatherFileLongitude ) &gt; <span class="fl">1.0</span> || <span class="bu">std::</span>abs( TimeZoneNumber - WeatherFileTimeZone ) &gt; <span class="fl">0.0</span> || <span class="bu">std::</span>abs( Elevation - WeatherFileElevation ) / max( Elevation, <span class="fl">1.0</span> ) &gt; <span class="fl">0.10</span> ) {</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">    ShowWarningError( <span class="st">"Weather file location will be used rather than entered (IDF) Location object."</span> );</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">    ShowContinueError( <span class="st">"..Location object="</span> + LocationTitle );</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">    ShowContinueError( <span class="st">"..Weather File Location="</span> + WeatherFileLocationTitle );</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">    ShowContinueError( <span class="st">"..due to location differences, Latitude difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Latitude - WeatherFileLatitude ), <span class="dv">2</span> ) + <span class="st">"] degrees, Longitude difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Longitude - WeatherFileLongitude ), <span class="dv">2</span> ) + <span class="st">"] degrees."</span> );</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">    ShowContinueError( <span class="st">"..Time Zone difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( TimeZoneNumber - WeatherFileTimeZone ), <span class="dv">1</span> ) + <span class="st">"] hour(s), Elevation difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( ( Elevation - WeatherFileElevation ) / max( Elevation, <span class="fl">1.0</span> ) ) * <span class="fl">100.0</span>, <span class="dv">2</span> ) + <span class="st">"] percent, ["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Elevation - WeatherFileElevation ), <span class="dv">2</span> ) + <span class="st">"] meters."</span> );</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> ( <span class="bu">std::</span>abs( Latitude - WeatherFileLatitude ) &gt; <span class="fl">1.0</span> || <span class="bu">std::</span>abs( Longitude - WeatherFileLongitude ) &gt; <span class="fl">1.0</span> || <span class="bu">std::</span>abs( TimeZoneNumber - WeatherFileTimeZone ) &gt; <span class="fl">0.0</span> || <span class="bu">std::</span>abs( Elevation - WeatherFileElevation ) / max( Elevation, <span class="fl">1.0</span> ) &gt; <span class="fl">0.10</span> ) {</span>
+<span id="cb1-2"><a href="#cb1-2"></a>    ShowWarningError( <span class="st">"Weather file location will be used rather than entered (IDF) Location object."</span> );</span>
+<span id="cb1-3"><a href="#cb1-3"></a>    ShowContinueError( <span class="st">"..Location object="</span> + LocationTitle );</span>
+<span id="cb1-4"><a href="#cb1-4"></a>    ShowContinueError( <span class="st">"..Weather File Location="</span> + WeatherFileLocationTitle );</span>
+<span id="cb1-5"><a href="#cb1-5"></a>    ShowContinueError( <span class="st">"..due to location differences, Latitude difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Latitude - WeatherFileLatitude ), <span class="dv">2</span> ) + <span class="st">"] degrees, Longitude difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Longitude - WeatherFileLongitude ), <span class="dv">2</span> ) + <span class="st">"] degrees."</span> );</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    ShowContinueError( <span class="st">"..Time Zone difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( TimeZoneNumber - WeatherFileTimeZone ), <span class="dv">1</span> ) + <span class="st">"] hour(s), Elevation difference=["</span> + RoundSigDigits( <span class="bu">std::</span>abs( ( Elevation - WeatherFileElevation ) / max( Elevation, <span class="fl">1.0</span> ) ) * <span class="fl">100.0</span>, <span class="dv">2</span> ) + <span class="st">"] percent, ["</span> + RoundSigDigits( <span class="bu">std::</span>abs( Elevation - WeatherFileElevation ), <span class="dv">2</span> ) + <span class="st">"] meters."</span> );</span>
+<span id="cb1-7"><a href="#cb1-7"></a>}</span></code></pre></div>
 </li>
 <li><p>Add a vignette about simulation data extraction and modifying models using functions.</p></li>
 <li><p>Use Rcpp to unlock environment. Reference: <a href="https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051" class="uri">https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051</a></p></li>

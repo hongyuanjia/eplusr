@@ -124,14 +124,14 @@
 
       
 
-      </header><link href="transition_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+      </header><script src="transition_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="transition_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
 <script src="transition_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Update IDF version</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2020-11-11</h4>
+            <h4 class="date">2020-11-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/transition.Rmd"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -164,90 +164,90 @@
 <span class="co">#&gt; IDD v8.2.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.2.0 installation folder '/usr/local/EnergyPlus-8-2-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.2.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt; [1] '8.2.0'</span>
 
 <span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; IDFVersionUpdater: /home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span>
+<span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span>
 <span class="co">#&gt;  From  Ver: 8.2.0</span>
 <span class="co">#&gt; Toward Ver: 8.3.0</span>
 <span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.3.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.3.0 installation folder '/usr/local/EnergyPlus-8-3-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.3.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV830.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV830.idf</span>
 <span class="co">#&gt;  From  Ver: 8.3.0</span>
 <span class="co">#&gt; Toward Ver: 8.4.0</span>
 <span class="co">#&gt; [8.3.0 --&gt; 8.4.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.4.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.4.0 installation folder '/usr/local/EnergyPlus-8-4-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.4.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV840.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV840.idf</span>
 <span class="co">#&gt;  From  Ver: 8.4.0</span>
 <span class="co">#&gt; Toward Ver: 8.5.0</span>
 <span class="co">#&gt; [8.4.0 --&gt; 8.5.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.5.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.5.0 installation folder '/usr/local/EnergyPlus-8-5-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.5.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV850.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV850.idf</span>
 <span class="co">#&gt;  From  Ver: 8.5.0</span>
 <span class="co">#&gt; Toward Ver: 8.6.0</span>
 <span class="co">#&gt; [8.5.0 --&gt; 8.6.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.6.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.6.0 installation folder '/usr/local/EnergyPlus-8-6-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.6.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV860.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV860.idf</span>
 <span class="co">#&gt;  From  Ver: 8.6.0</span>
 <span class="co">#&gt; Toward Ver: 8.7.0</span>
 <span class="co">#&gt; [8.6.0 --&gt; 8.7.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.7.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.7.0 installation folder '/usr/local/EnergyPlus-8-7-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.7.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV870.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV870.idf</span>
 <span class="co">#&gt;  From  Ver: 8.7.0</span>
 <span class="co">#&gt; Toward Ver: 8.8.0</span>
 <span class="co">#&gt; [8.7.0 --&gt; 8.8.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-8-8-0/Energy+.idd'.</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV880.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV880.idf</span>
 <span class="co">#&gt;  From  Ver: 8.8.0</span>
 <span class="co">#&gt; Toward Ver: 8.9.0</span>
 <span class="co">#&gt; [8.8.0 --&gt; 8.9.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v8.9.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.9.0 installation folder '/usr/local/EnergyPlus-8-9-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.9.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV890.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV890.idf</span>
 <span class="co">#&gt;  From  Ver: 8.9.0</span>
 <span class="co">#&gt; Toward Ver: 9.0.0</span>
 <span class="co">#&gt; [8.9.0 --&gt; 9.0.0] SUCCEEDED.</span>
@@ -255,22 +255,22 @@
 <span class="co">#&gt; IDD v9.0.1 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.0.1 installation folder '/usr/local/EnergyPlus-9-0-1'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.0.1 is not available.</span>
-<span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV900.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV900.idf</span>
 <span class="co">#&gt;  From  Ver: 9.0.1</span>
 <span class="co">#&gt; Toward Ver: 9.1.0</span>
 <span class="co">#&gt; [9.0.1 --&gt; 9.1.0] SUCCEEDED.</span>
 <span class="co">#&gt; IDD v9.1.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.1.0 installation folder '/usr/local/EnergyPlus-9-1-0'.</span>
 <span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.1.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v9.4.0 IDFVersionUpdater folder '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-9-4-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span>
+<span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/travis/build/hongyuanjia/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV910.idf</span>
+<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV910.idf</span>
 <span class="co">#&gt;  From  Ver: 9.1.0</span>
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
@@ -280,7 +280,7 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 288.742   3.005 290.467</span></code></pre></div>
+<span class="co">#&gt;  89.246   1.999  90.863</span></code></pre></div>
 </div>
 <div id="introduce-transition" class="section level1">
 <h1 class="hasAnchor">
@@ -321,8 +321,8 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   5.006   0.023   5.032</span></code></pre></div>
-<p>It is about 57.7 times faster.</p>
+<span class="co">#&gt;   5.060   0.008   5.068</span></code></pre></div>
+<p>It is about 17.9 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
@@ -349,48 +349,48 @@
 <ul>
 <li>
 <p>Insert: Insert a new field. The code block below means that if input class is <code>OtherEquipment</code>, get the definition of it from IDD, fill new objects with all old field values except insert a new field #2 with value <code>"None"</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode fortran"><code class="sourceCode fortran"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">CASE</span>(<span class="st">'OTHEREQUIPMENT'</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">  nodiff <span class="kw">=</span> <span class="cn">.false.</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  OutArgs(<span class="dv">1</span>) <span class="kw">=</span> InArgs(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">  OutArgs(<span class="dv">2</span>) <span class="kw">=</span> <span class="st">'None'</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">  OutArgs(<span class="dv">3</span>:<span class="dv">11</span>) <span class="kw">=</span> InArgs(<span class="dv">2</span>:<span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">  CurArgs <span class="kw">=</span> CurArgs<span class="kw">+</span><span class="dv">1</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode fortran"><code class="sourceCode fortran"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">CASE</span>(<span class="st">'OTHEREQUIPMENT'</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  nodiff <span class="kw">=</span> <span class="cn">.false.</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  OutArgs(<span class="dv">1</span>) <span class="kw">=</span> InArgs(<span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  OutArgs(<span class="dv">2</span>) <span class="kw">=</span> <span class="st">'None'</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  OutArgs(<span class="dv">3</span>:<span class="dv">11</span>) <span class="kw">=</span> InArgs(<span class="dv">2</span>:<span class="dv">10</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  CurArgs <span class="kw">=</span> CurArgs<span class="kw">+</span><span class="dv">1</span></span></code></pre></div>
 </li>
 <li>
 <p>Reset: Replace old value with new value. The code block below means that if input class is <code>Exterior:FuelEquipment</code>, get the definition of it from IDD, fill new objects with all old field values except replace field #2 with <code>"NaturalGas"</code> if old value is <code>"Gas"</code> and <code>PropaneGas</code> if <code>LPG</code>. Conversion for other classes looks similar.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode fortran"><code class="sourceCode fortran"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">CASE</span>(<span class="st">'EXTERIOR:FUELEQUIPMENT'</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">    ObjectName<span class="kw">=</span><span class="st">'Exterior:FuelEquipment'</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">    nodiff<span class="kw">=</span><span class="cn">.false.</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">    OutArgs(<span class="dv">1</span>:CurArgs)<span class="kw">=</span>InArgs(<span class="dv">1</span>:CurArgs)</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">    <span class="kw">if</span> (samestring(<span class="st">'Gas'</span>,InArgs(<span class="dv">2</span>))) <span class="kw">then</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">      OutArgs(<span class="dv">2</span>)<span class="kw">=</span><span class="st">'NaturalGas'</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">    <span class="kw">endif</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">    <span class="kw">if</span> (samestring(<span class="st">'LPG'</span>,InArgs(<span class="dv">2</span>))) <span class="kw">then</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">      OutArgs(<span class="dv">2</span>)<span class="kw">=</span><span class="st">'PropaneGas'</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">    <span class="kw">endif</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode fortran"><code class="sourceCode fortran"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">CASE</span>(<span class="st">'EXTERIOR:FUELEQUIPMENT'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>    ObjectName<span class="kw">=</span><span class="st">'Exterior:FuelEquipment'</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>    nodiff<span class="kw">=</span><span class="cn">.false.</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    OutArgs(<span class="dv">1</span>:CurArgs)<span class="kw">=</span>InArgs(<span class="dv">1</span>:CurArgs)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>    <span class="kw">if</span> (samestring(<span class="st">'Gas'</span>,InArgs(<span class="dv">2</span>))) <span class="kw">then</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>      OutArgs(<span class="dv">2</span>)<span class="kw">=</span><span class="st">'NaturalGas'</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="kw">endif</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="kw">if</span> (samestring(<span class="st">'LPG'</span>,InArgs(<span class="dv">2</span>))) <span class="kw">then</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>      OutArgs(<span class="dv">2</span>)<span class="kw">=</span><span class="st">'PropaneGas'</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a>    <span class="kw">endif</span></span></code></pre></div>
 </li>
 <li>
 <p>Delete: Delete the old field, offset indices of all other field by the number of fields deleted. The code block below means that if input class is <code>HVACTemplate:System:Unitary</code>, get the definition of it from IDD, fill new objects with all old field values except removing #40.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode fortran"><code class="sourceCode fortran"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">CASE</span>(<span class="st">'HVACTEMPLATE:SYSTEM:UNITARY'</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">    ObjectName<span class="kw">=</span><span class="st">'HVACTemplate:System:Unitary'</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">    nodiff<span class="kw">=</span><span class="cn">.false.</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">    OutArgs(<span class="dv">1</span>:<span class="dv">39</span>)<span class="kw">=</span>InArgs(<span class="dv">1</span>:<span class="dv">39</span>) <span class="co">! No change</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">    OutArgs(<span class="dv">40</span>:CurArgs<span class="kw">-</span><span class="dv">1</span>)<span class="kw">=</span>InArgs(<span class="dv">41</span>:CurArgs) <span class="co">! Remove Dehumidification Control Zone Name</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">    CurArgs <span class="kw">=</span> CurArgs<span class="kw">-</span><span class="dv">1</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode fortran"><code class="sourceCode fortran"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">CASE</span>(<span class="st">'HVACTEMPLATE:SYSTEM:UNITARY'</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>    ObjectName<span class="kw">=</span><span class="st">'HVACTemplate:System:Unitary'</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>    nodiff<span class="kw">=</span><span class="cn">.false.</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    OutArgs(<span class="dv">1</span>:<span class="dv">39</span>)<span class="kw">=</span>InArgs(<span class="dv">1</span>:<span class="dv">39</span>) <span class="co">! No change</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>    OutArgs(<span class="dv">40</span>:CurArgs<span class="kw">-</span><span class="dv">1</span>)<span class="kw">=</span>InArgs(<span class="dv">41</span>:CurArgs) <span class="co">! Remove Dehumidification Control Zone Name</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>    CurArgs <span class="kw">=</span> CurArgs<span class="kw">-</span><span class="dv">1</span></span></code></pre></div>
 </li>
 <li>
 <p>Offset: Set the new value of field #N as the old value of field #M. The code block means that if input class is <code>Daylight:Controls</code>, get the definition of it from IDD, add a suffix <code>_DaylCtrl</code> to old #1 as new #1, use old #1 as new #2, set new #3 as <code>"SplitFlux"</code> and use #20 as new #4.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode fortran"><code class="sourceCode fortran"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">CASE</span>(<span class="st">'DAYLIGHTING:CONTROLS'</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  nodiff<span class="kw">=</span><span class="cn">.false.</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">  OutArgs(<span class="dv">1</span>) <span class="kw">=</span> <span class="fu">TRIM</span>(InArgs(<span class="dv">1</span>)) <span class="kw">//</span> <span class="st">'_DaylCtrl'</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">  OutArgs(<span class="dv">2</span>) <span class="kw">=</span> InArgs(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">  OutArgs(<span class="dv">3</span>) <span class="kw">=</span> <span class="st">'SplitFlux'</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">  OutArgs(<span class="dv">4</span>) <span class="kw">=</span> InArgs(<span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">......</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode fortran"><code class="sourceCode fortran"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">CASE</span>(<span class="st">'DAYLIGHTING:CONTROLS'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  nodiff<span class="kw">=</span><span class="cn">.false.</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  OutArgs(<span class="dv">1</span>) <span class="kw">=</span> <span class="fu">TRIM</span>(InArgs(<span class="dv">1</span>)) <span class="kw">//</span> <span class="st">'_DaylCtrl'</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>  OutArgs(<span class="dv">2</span>) <span class="kw">=</span> InArgs(<span class="dv">1</span>)</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  OutArgs(<span class="dv">3</span>) <span class="kw">=</span> <span class="st">'SplitFlux'</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>  OutArgs(<span class="dv">4</span>) <span class="kw">=</span> InArgs(<span class="dv">20</span>)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>......</span></code></pre></div>
 </li>
 </ul>
 <p>The combinations of those four actions together builds a skeleton of an EnergyPlus transition program, together with some pre-processes and post-processes.</p>

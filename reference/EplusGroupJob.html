@@ -293,7 +293,8 @@ if (is_avail_eplus(8.8)) {
   wait <span class='op'>=</span> <span class='cn'>TRUE</span>,
   force <span class='op'>=</span> <span class='cn'>FALSE</span>,
   copy_external <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  echo <span class='op'>=</span> <span class='va'>wait</span>
+  echo <span class='op'>=</span> <span class='va'>wait</span>,
+  separate <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
@@ -320,6 +321,11 @@ will have all files needed for the model to run. Default is
 
 <dt><code>echo</code></dt><dd><p>Only applicable when <code>wait</code> is <code>TRUE</code>. Whether to
 simulation status. Default: same as <code>wait</code>.</p></dd>
+
+<dt><code>separate</code></dt><dd><p>If <code>TRUE</code>, all models are saved in a separate folder
+with each model's name under <code>dir</code> when simulation. If <code>FALSE</code>,
+all models are saved in <code>dir</code> when simulation. Default:
+<code>TRUE</code>.</p></dd>
 
 </dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
@@ -1001,7 +1007,7 @@ group$print()
 <span class='co'>## Method `EplusGroupJob$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>
     <span class='va'>path_idfs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles"</span><span class='op'>)</span>, <span class='st'>"\\.idf"</span>,
@@ -1015,1180 +1021,179 @@ group$print()
     <span class='co'># create from Idfs and Epws object</span>
     <span class='fu'>group_job</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>path_idfs</span>, <span class='va'>read_idf</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>path_epws</span>, <span class='va'>read_epw</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>IDD v8.8.0 has not been parsed before.</span>
-#&gt; <span class='message'>Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></div><div class='output co'>#&gt; <span class='message'>IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></div><div class='output co'>#&gt; <span class='message'>Start parsing...</span></div><div class='output co'>#&gt; <span class='message'>Parsing completed.</span></div><div class='output co'>#&gt; <span class='message'>Setting 'Option Type' in 'Output:SQLite' to from 'SIMPLE' to 'SimpleAndTabular'.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Setting 'Option Type' in 'Output:SQLite' to from 'SIMPLE' to 'SimpleAndTabular'.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [EPW] 'USA_CA_S...
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [EPW] 'USA_CO_G...
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW] 'USA_FL_T...
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [EPW] 'USA_IL_C...
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [EPW] 'USA_VA_S...
-#&gt; </span><span style='color: #BBBBBB;background-color: #0000BB;'>&lt;&lt; Job has not been run before &gt;&gt;</span><span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$run`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># only run design day</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>1|RUNNING    --&gt; [IDF]'1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [EPW...</span></div><div class='output co'>#&gt; <span class='message'>2|RUNNING    --&gt; [IDF]'1ZoneEvapCooler.idf' + [EPW]'USA_CO_Golden-NREL.7246...</span></div><div class='output co'>#&gt; <span class='message'>1|COMPLETED  --&gt; [IDF]'1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [EPW...</span></div><div class='output co'>#&gt; <span class='message'>3|RUNNING    --&gt; [IDF]'1ZoneParameterAspect.idf' + [EPW]'USA_FL_Tampa.Intl....</span></div><div class='output co'>#&gt; <span class='message'>3|FAILED     --&gt; [IDF]'1ZoneParameterAspect.idf' + [EPW]'USA_FL_Tampa.Intl....</span></div><div class='output co'>#&gt; <span class='message'>4|RUNNING    --&gt; [IDF]'1ZoneUncontrolled_DD2009.idf' + [EPW]'USA_IL_Chicago...</span></div><div class='output co'>#&gt; <span class='message'>4|COMPLETED  --&gt; [IDF]'1ZoneUncontrolled_DD2009.idf' + [EPW]'USA_IL_Chicago...</span></div><div class='output co'>#&gt; <span class='message'>5|RUNNING    --&gt; [IDF]'1ZoneUncontrolled_DDChanges.idf' + [EPW]'USA_VA_Ster...</span></div><div class='output co'>#&gt; <span class='message'>5|COMPLETED  --&gt; [IDF]'1ZoneUncontrolled_DDChanges.idf' + [EPW]'USA_VA_Ster...</span></div><div class='output co'>#&gt; <span class='message'>2|COMPLETED  --&gt; [IDF]'1ZoneEvapCooler.idf' + [EPW]'USA_CO_Golden-NREL.7246...</span></div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:13' and ended unsuccessfully...</span><span></div><div class='input'>
+
 <span class='co'># do not show anything in the console</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:20' and ended unsuccessfully...</span><span></div><div class='input'>
+
 <span class='co'># specify output directory</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:27' and ended unsuccessfully...</span><span></div><div class='input'>
+
 <span class='co'># run in the background</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>wait <span class='op'>=</span> <span class='cn'>TRUE</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:34' and ended unsuccessfully...</span><span></div><div class='input'><span class='co'># see group job status</span>
+<span class='co'># see group job status</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $run_before
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $alive
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $terminated
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $successful
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $changed_after
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $job_status
-#&gt;    index    status
-#&gt; 1:     1 completed
-#&gt; 2:     2 completed
-#&gt; 3:     3    failed
-#&gt; 4:     4 completed
-#&gt; 5:     5 completed
-#&gt;                                                                                                                                               idf
-#&gt; 1: /tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf
-#&gt; 2:                                                                            /tmp/RtmpbSS17E/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler.idf
-#&gt; 3:                                                             /tmp/RtmpbSS17E/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect.idf
-#&gt; 4:                                                 /tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009.idf
-#&gt; 5:                                        /tmp/RtmpbSS17E/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges.idf
-#&gt;                                                                                                  epw
-#&gt; 1:              /usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
-#&gt; 2:                        /usr/local/EnergyPlus-8-8-0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw
-#&gt; 3:                      /usr/local/EnergyPlus-8-8-0/WeatherData/USA_FL_Tampa.Intl.AP.722110_TMY3.epw
-#&gt; 4:              /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
-#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw
-#&gt;    version exit_status          start_time            end_time
-#&gt; 1:   8.8.0           0 2020-11-11 02:02:34 2020-11-11 02:02:36
-#&gt; 2:   8.8.0           0 2020-11-11 02:02:34 2020-11-11 02:02:41
-#&gt; 3:   8.8.0           1 2020-11-11 02:02:36 2020-11-11 02:02:37
-#&gt; 4:   8.8.0           0 2020-11-11 02:02:37 2020-11-11 02:02:38
-#&gt; 5:   8.8.0           0 2020-11-11 02:02:38 2020-11-11 02:02:40
-#&gt;                                                                                           output_dir
-#&gt; 1: /tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil
-#&gt; 2:                                                   /tmp/RtmpbSS17E/1ZoneEvapCooler/1ZoneEvapCooler
-#&gt; 3:                                         /tmp/RtmpbSS17E/1ZoneParameterAspect/1ZoneParameterAspect
-#&gt; 4:                                 /tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009
-#&gt; 5:                           /tmp/RtmpbSS17E/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges
-#&gt;                                      energyplus
-#&gt; 1: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 2: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 3: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 4: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 5: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt;                                                                                                                                                                                                                                                      stdout
-#&gt; 1:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 2:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 3: EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,**FATAL:Program Terminates: The ParametricPreprocessor program has not been run.,EnergyPlus Run Time=00hr 00min  0.34sec
-#&gt; 4:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 5:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt;                                                           stderr
-#&gt; 1:                            EnergyPlus Completed Successfully.
-#&gt; 2:                            EnergyPlus Completed Successfully.
-#&gt; 3: Program terminated: EnergyPlus Terminated--Error(s) Detected.
-#&gt; 4:                            EnergyPlus Completed Successfully.
-#&gt; 5:                            EnergyPlus Completed Successfully.
-#&gt; </div><div class='input'>
+
 <span class='co'># force to kill background group job before running the new one</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>force <span class='op'>=</span> <span class='cn'>TRUE</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:41' and ended unsuccessfully...</span><span></div><div class='input'>
+
 <span class='co'># copy external files used in the model to simulation output directory</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>copy_external <span class='op'>=</span> <span class='cn'>TRUE</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:48' and ended unsuccessfully...</span><span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$kill`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>kill</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>The parametric job is not running.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$status`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $run_before
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $alive
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $terminated
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $successful
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $changed_after
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $job_status
-#&gt;    index    status
-#&gt; 1:     1 completed
-#&gt; 2:     2 completed
-#&gt; 3:     3    failed
-#&gt; 4:     4 completed
-#&gt; 5:     5 completed
-#&gt;                                                                                                                                                                                                                                 idf
-#&gt; 1: /tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf
-#&gt; 2:                                                                                                                              /tmp/RtmpbSS17E/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler.idf
-#&gt; 3:                                                                                                     /tmp/RtmpbSS17E/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect.idf
-#&gt; 4:                                                                                 /tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009.idf
-#&gt; 5:                                                                  /tmp/RtmpbSS17E/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges.idf
-#&gt;                                                                                                  epw
-#&gt; 1:              /usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
-#&gt; 2:                        /usr/local/EnergyPlus-8-8-0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw
-#&gt; 3:                      /usr/local/EnergyPlus-8-8-0/WeatherData/USA_FL_Tampa.Intl.AP.722110_TMY3.epw
-#&gt; 4:              /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
-#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw
-#&gt;    version exit_status          start_time            end_time
-#&gt; 1:   8.8.0           0 2020-11-11 02:02:48 2020-11-11 02:02:50
-#&gt; 2:   8.8.0           0 2020-11-11 02:02:48 2020-11-11 02:02:55
-#&gt; 3:   8.8.0           1 2020-11-11 02:02:50 2020-11-11 02:02:50
-#&gt; 4:   8.8.0           0 2020-11-11 02:02:50 2020-11-11 02:02:52
-#&gt; 5:   8.8.0           0 2020-11-11 02:02:52 2020-11-11 02:02:54
-#&gt;                                                                                                                                                                             output_dir
-#&gt; 1: /tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil
-#&gt; 2:                                                                                                     /tmp/RtmpbSS17E/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler
-#&gt; 3:                                                                                 /tmp/RtmpbSS17E/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect
-#&gt; 4:                                                                 /tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009
-#&gt; 5:                                                     /tmp/RtmpbSS17E/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges
-#&gt;                                      energyplus
-#&gt; 1: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 2: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 3: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 4: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt; 5: /usr/local/EnergyPlus-8-8-0/energyplus-8.8.0
-#&gt;                                                                                                                                                                                                                                                      stdout
-#&gt; 1:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 2:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 3: EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,**FATAL:Program Terminates: The ParametricPreprocessor program has not been run.,EnergyPlus Run Time=00hr 00min  0.24sec
-#&gt; 4:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt; 5:                                                                           EnergyPlus Starting,EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02,Processing Data Dictionary,Processing Input File,Initializing Simulation,Reporting Surfaces,...
-#&gt;                                                           stderr
-#&gt; 1:                            EnergyPlus Completed Successfully.
-#&gt; 2:                            EnergyPlus Completed Successfully.
-#&gt; 3: Program terminated: EnergyPlus Terminated--Error(s) Detected.
-#&gt; 4:                            EnergyPlus Completed Successfully.
-#&gt; 5:                            EnergyPlus Completed Successfully.
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$errors`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Some of jobs failed to complete. Simulation results may not be correct:</span>
-#&gt; <span class='warning'>3|FAILED --&gt; [IDF]'1ZoneParameterAspect.idf' + [EPW]'USA_FL_Tampa.Intl.AP.722110_TMY3.epw'</span></div><div class='output co'>#&gt; $`1ZoneDataCenterCRAC_wPumpedDXCoolingCoil`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 5
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/5] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=DENVER CENTENNIAL CO USA WMO=724666
-#&gt;         ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;         ..due to location differences, Latitude difference=[2.12] degrees,
-#&gt;         Longitude difference=[17.22] degrees.
-#&gt;         ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]
-#&gt;         percent, [1791.00] meters.
-#&gt; [W 2/5] SetUpDesignDay: Entered DesignDay Barometric Pressure=81560 differs by
-#&gt;         more than 10% from Standard Barometric Pressure=101301.
-#&gt;         ...occurs in DesignDay=DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB,
-#&gt;         Standard Pressure (based on elevation) will be used.
-#&gt; [W 3/5] SetUpDesignDay: Entered DesignDay Barometric Pressure=81560 differs by
-#&gt;         more than 10% from Standard Barometric Pressure=101301.
-#&gt;         ...occurs in DesignDay=DENVER CENTENNIAL ANN CLG 1% CONDNS DB=&gt;MWB,
-#&gt;         Standard Pressure (based on elevation) will be used.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [W 4/5] CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed "MAIN COOLING COIL 1" - Air-
-#&gt;         cooled condenser inlet dry-bulb temperature below 0 C. Outdoor
-#&gt;         dry-bulb temperature = -18.80
-#&gt;         ... Occurrence info = DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB, 12/21
-#&gt;         00:00 - 00:10
-#&gt;         ... Operation at low ambient temperatures may require special
-#&gt;         performance curves.
-#&gt; 
-#&gt; ── Recurring Errors ────────────────────────────────────────────────────────────
-#&gt; [W 5/5 (143)] CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed="MAIN COOLING COIL 1" - Low
-#&gt;         condenser dry-bulb temperature error continues...
-#&gt;         This error occurred 143 total times;
-#&gt;         during Warmup 0 times;
-#&gt;         during Sizing 0 times.
-#&gt;         Max=-18.8 [C] Min=-18.8 [C]
-#&gt; 
-#&gt; $`1ZoneEvapCooler`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] GetAirPathData: AirLoopHVAC="EVAP COOLER SYSTEM" has no Controllers.
-#&gt; 
-#&gt; $`1ZoneParameterAspect`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: TRUE
-#&gt;   * Successful: FALSE
-#&gt;   * Severe[S]: 1
-#&gt;   * Fatal[F]:  1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [S 1/1] Parametric objects are found in the IDF File.
-#&gt; [F 1/1] Program Terminates: The ParametricPreprocessor program has not been run.
-#&gt;         ...Summary of Errors that led to program termination:
-#&gt;         ..... Reference severe error count=1
-#&gt;         ..... Last severe error=Parametric objects are found in the IDF File.
-#&gt; 
-#&gt; $`1ZoneUncontrolled_DD2009`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=ATLANTA
-#&gt;         ..Weather File Location=Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300
-#&gt;         ..due to location differences, Latitude difference=[8.34] degrees,
-#&gt;         Longitude difference=[3.49] degrees.
-#&gt;         ..Time Zone difference=[1.0] hour(s), Elevation difference=[35.78]
-#&gt;         percent, [112.00] meters.
-#&gt; 
-#&gt; $`1ZoneUncontrolled_DDChanges`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA DESIGN_CONDITIONS
-#&gt;         ..Weather File Location=Washington Dc Dulles IntL Ar VA USA TMY3
-#&gt;         WMO#=724030
-#&gt;         ..due to location differences, Latitude difference=[0.76] degrees,
-#&gt;         Longitude difference=[27.71] degrees.
-#&gt;         ..Time Zone difference=[2.0] hour(s), Elevation difference=[95.52]
-#&gt;         percent, [1747.00] meters.
-#&gt; </div><div class='input'>
+
 <span class='co'># show all information</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span>info <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Some of jobs failed to complete. Simulation results may not be correct:</span>
-#&gt; <span class='warning'>3|FAILED --&gt; [IDF]'1ZoneParameterAspect.idf' + [EPW]'USA_FL_Tampa.Intl.AP.722110_TMY3.epw'</span></div><div class='output co'>#&gt; $`1ZoneDataCenterCRAC_wPumpedDXCoolingCoil`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 5
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/5] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=DENVER CENTENNIAL CO USA WMO=724666
-#&gt;         ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;         ..due to location differences, Latitude difference=[2.12] degrees,
-#&gt;         Longitude difference=[17.22] degrees.
-#&gt;         ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]
-#&gt;         percent, [1791.00] meters.
-#&gt; [W 2/5] SetUpDesignDay: Entered DesignDay Barometric Pressure=81560 differs by
-#&gt;         more than 10% from Standard Barometric Pressure=101301.
-#&gt;         ...occurs in DesignDay=DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB,
-#&gt;         Standard Pressure (based on elevation) will be used.
-#&gt; [W 3/5] SetUpDesignDay: Entered DesignDay Barometric Pressure=81560 differs by
-#&gt;         more than 10% from Standard Barometric Pressure=101301.
-#&gt;         ...occurs in DesignDay=DENVER CENTENNIAL ANN CLG 1% CONDNS DB=&gt;MWB,
-#&gt;         Standard Pressure (based on elevation) will be used.
-#&gt; [I 1/11] Testing Individual Branch Integrity
-#&gt; [I 2/11] All Branches passed integrity testing
-#&gt; [I 3/11] Testing Individual Supply Air Path Integrity
-#&gt; [I 4/11] All Supply Air Paths passed integrity testing
-#&gt; [I 5/11] Testing Individual Return Air Path Integrity
-#&gt; [I 6/11] All Return Air Paths passed integrity testing
-#&gt; [I 7/11] No node connection errors were found.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [W 4/5] CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed "MAIN COOLING COIL 1" - Air-
-#&gt;         cooled condenser inlet dry-bulb temperature below 0 C. Outdoor
-#&gt;         dry-bulb temperature = -18.80
-#&gt;         ... Occurrence info = DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB, 12/21
-#&gt;         00:00 - 00:10
-#&gt;         ... Operation at low ambient temperatures may require special
-#&gt;         performance curves.
-#&gt; [I 8/11] Simulation Error Summary *************
-#&gt; [I 9/11] There are 1 unused schedules in input.
-#&gt; [I 10/11] Use Output:Diagnostics,DisplayUnusedSchedules; to see them.
-#&gt; 
-#&gt; ── Recurring Errors ────────────────────────────────────────────────────────────
-#&gt; [I 11/11] The following recurring error messages occurred.
-#&gt; [W 5/5 (143)] CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed="MAIN COOLING COIL 1" - Low
-#&gt;         condenser dry-bulb temperature error continues...
-#&gt;         This error occurred 143 total times;
-#&gt;         during Warmup 0 times;
-#&gt;         during Sizing 0 times.
-#&gt;         Max=-18.8 [C] Min=-18.8 [C]
-#&gt; 
-#&gt; $`1ZoneEvapCooler`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] GetAirPathData: AirLoopHVAC="EVAP COOLER SYSTEM" has no Controllers.
-#&gt; [I 1/8] Testing Individual Branch Integrity
-#&gt; [I 2/8] All Branches passed integrity testing
-#&gt; [I 3/8] Testing Individual Supply Air Path Integrity
-#&gt; [I 4/8] All Supply Air Paths passed integrity testing
-#&gt; [I 5/8] Testing Individual Return Air Path Integrity
-#&gt; [I 6/8] All Return Air Paths passed integrity testing
-#&gt; [I 7/8] No node connection errors were found.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [I 8/8] Simulation Error Summary *************
-#&gt; 
-#&gt; $`1ZoneParameterAspect`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: TRUE
-#&gt;   * Successful: FALSE
-#&gt;   * Severe[S]: 1
-#&gt;   * Fatal[F]:  1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [S 1/1] Parametric objects are found in the IDF File.
-#&gt; [F 1/1] Program Terminates: The ParametricPreprocessor program has not been run.
-#&gt;         ...Summary of Errors that led to program termination:
-#&gt;         ..... Reference severe error count=1
-#&gt;         ..... Last severe error=Parametric objects are found in the IDF File.
-#&gt; [I 1/2] Warning: Node connection errors not checked - most system input has not
-#&gt;         been read (see previous warning).
-#&gt; [I 2/2] Fatal error -- final processing. Program exited before simulations
-#&gt;         began. See previous error messages.
-#&gt; 
-#&gt; $`1ZoneUncontrolled_DD2009`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=ATLANTA
-#&gt;         ..Weather File Location=Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300
-#&gt;         ..due to location differences, Latitude difference=[8.34] degrees,
-#&gt;         Longitude difference=[3.49] degrees.
-#&gt;         ..Time Zone difference=[1.0] hour(s), Elevation difference=[35.78]
-#&gt;         percent, [112.00] meters.
-#&gt; [I 1/8] Testing Individual Branch Integrity
-#&gt; [I 2/8] All Branches passed integrity testing
-#&gt; [I 3/8] Testing Individual Supply Air Path Integrity
-#&gt; [I 4/8] All Supply Air Paths passed integrity testing
-#&gt; [I 5/8] Testing Individual Return Air Path Integrity
-#&gt; [I 6/8] All Return Air Paths passed integrity testing
-#&gt; [I 7/8] No node connection errors were found.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [I 8/8] Simulation Error Summary *************
-#&gt; 
-#&gt; $`1ZoneUncontrolled_DDChanges`
-#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:02:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt;   * Warning[W]: 1
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location
-#&gt;         object.
-#&gt;         ..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA DESIGN_CONDITIONS
-#&gt;         ..Weather File Location=Washington Dc Dulles IntL Ar VA USA TMY3
-#&gt;         WMO#=724030
-#&gt;         ..due to location differences, Latitude difference=[0.76] degrees,
-#&gt;         Longitude difference=[27.71] degrees.
-#&gt;         ..Time Zone difference=[2.0] hour(s), Elevation difference=[95.52]
-#&gt;         percent, [1747.00] meters.
-#&gt; [I 1/10] Testing Individual Branch Integrity
-#&gt; [I 2/10] All Branches passed integrity testing
-#&gt; [I 3/10] Testing Individual Supply Air Path Integrity
-#&gt; [I 4/10] All Supply Air Paths passed integrity testing
-#&gt; [I 5/10] Testing Individual Return Air Path Integrity
-#&gt; [I 6/10] All Return Air Paths passed integrity testing
-#&gt; [I 7/10] No node connection errors were found.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [I 8/10] Simulation Error Summary *************
-#&gt; [I 9/10] There are 2 unused day schedules in input.
-#&gt; [I 10/10] Use Output:Diagnostics,DisplayUnusedSchedules; to see them.
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$output_dir`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get output directories of all simulations</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>output_dir</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Some of jobs failed to complete. Simulation results may not be correct:</span>
-#&gt; <span class='warning'>3|FAILED --&gt; [IDF]'1ZoneParameterAspect.idf' + [EPW]'USA_FL_Tampa.Intl.AP.722110_TMY3.epw'</span></div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil"
-#&gt; [2] "/tmp/RtmpbSS17E/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler/1ZoneEvapCooler"                                                                                                    
-#&gt; [3] "/tmp/RtmpbSS17E/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect/1ZoneParameterAspect"                                                                                
-#&gt; [4] "/tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009"                                                                
-#&gt; [5] "/tmp/RtmpbSS17E/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges/1ZoneUncontrolled_DDChanges"                                                    </div><div class='input'>
+
 <span class='co'># get output directories of specified simulations</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>output_dir</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil"
-#&gt; [2] "/tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009"                                                                </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$locate_output`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get the file path of the error file</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='st'>".err"</span>, strict <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil/1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.err"
-#&gt; [2] "/tmp/RtmpbSS17E/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009/1ZoneUncontrolled_DD2009.err"                                                                                </div><div class='input'>
+
 <span class='co'># can detect if certain output file exists</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='st'>".expidf"</span>, strict <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error: Path does not exist for job:</span>
-#&gt; <span class='error'>1|MISSING --&gt; [IDF]'1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [EPW]'USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw'</span>
-#&gt; <span class='error'>4|MISSING --&gt; [IDF]'1ZoneUncontrolled_DD2009.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$list_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>list_table</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $`1ZoneDataCenterCRAC_wPumpedDXCoolingCoil`
-#&gt;  [1] "ComponentSizes"               "ConstructionLayers"          
-#&gt;  [3] "Constructions"                "DaylightMapHourlyData"       
-#&gt;  [5] "DaylightMapHourlyReports"     "DaylightMaps"                
-#&gt;  [7] "EnvironmentPeriods"           "Errors"                      
-#&gt;  [9] "Materials"                    "NominalBaseboardHeaters"     
-#&gt; [11] "NominalElectricEquipment"     "NominalGasEquipment"         
-#&gt; [13] "NominalHotWaterEquipment"     "NominalInfiltration"         
-#&gt; [15] "NominalLighting"              "NominalOtherEquipment"       
-#&gt; [17] "NominalPeople"                "NominalSteamEquipment"       
-#&gt; [19] "NominalVentilation"           "ReportData"                  
-#&gt; [21] "ReportDataDictionary"         "ReportExtendedData"          
-#&gt; [23] "ReportMeterData"              "ReportMeterDataDictionary"   
-#&gt; [25] "ReportMeterExtendedData"      "ReportVariableData"          
-#&gt; [27] "ReportVariableDataDictionary" "ReportVariableExtendedData"  
-#&gt; [29] "ReportVariableWithTime"       "RoomAirModels"               
-#&gt; [31] "Schedules"                    "Simulations"                 
-#&gt; [33] "StringTypes"                  "Strings"                     
-#&gt; [35] "Surfaces"                     "SystemSizes"                 
-#&gt; [37] "TabularData"                  "TabularDataWithStrings"      
-#&gt; [39] "Time"                         "ZoneGroups"                  
-#&gt; [41] "ZoneInfoZoneLists"            "ZoneLists"                   
-#&gt; [43] "ZoneSizes"                    "Zones"                       
-#&gt; 
-#&gt; $`1ZoneUncontrolled_DD2009`
-#&gt;  [1] "ComponentSizes"               "ConstructionLayers"          
-#&gt;  [3] "Constructions"                "DaylightMapHourlyData"       
-#&gt;  [5] "DaylightMapHourlyReports"     "DaylightMaps"                
-#&gt;  [7] "EnvironmentPeriods"           "Errors"                      
-#&gt;  [9] "Materials"                    "NominalBaseboardHeaters"     
-#&gt; [11] "NominalElectricEquipment"     "NominalGasEquipment"         
-#&gt; [13] "NominalHotWaterEquipment"     "NominalInfiltration"         
-#&gt; [15] "NominalLighting"              "NominalOtherEquipment"       
-#&gt; [17] "NominalPeople"                "NominalSteamEquipment"       
-#&gt; [19] "NominalVentilation"           "ReportData"                  
-#&gt; [21] "ReportDataDictionary"         "ReportExtendedData"          
-#&gt; [23] "ReportMeterData"              "ReportMeterDataDictionary"   
-#&gt; [25] "ReportMeterExtendedData"      "ReportVariableData"          
-#&gt; [27] "ReportVariableDataDictionary" "ReportVariableExtendedData"  
-#&gt; [29] "ReportVariableWithTime"       "RoomAirModels"               
-#&gt; [31] "Schedules"                    "Simulations"                 
-#&gt; [33] "StringTypes"                  "Strings"                     
-#&gt; [35] "Surfaces"                     "SystemSizes"                 
-#&gt; [37] "TabularData"                  "TabularDataWithStrings"      
-#&gt; [39] "Time"                         "ZoneGroups"                  
-#&gt; [41] "ZoneInfoZoneLists"            "ZoneLists"                   
-#&gt; [43] "ZoneSizes"                    "Zones"                       
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$read_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read a specific table</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='st'>"Zones"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                        case zone_index zone_name rel_north
-#&gt; 1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil          1 MAIN ZONE         0
-#&gt; 2:                 1ZoneUncontrolled_DD2009          1  ZONE ONE         0
-#&gt;    origin_x origin_y origin_z centroid_x centroid_y centroid_z of_type
-#&gt; 1:        0        0        0       7.62       7.62      2.286       1
-#&gt; 2:        0        0        0       7.62       7.62      2.286       1
-#&gt;    multiplier list_multiplier minimum_x maximum_x minimum_y maximum_y minimum_z
-#&gt; 1:          1               1         0     15.24         0     15.24         0
-#&gt; 2:          1               1         0     15.24         0     15.24         0
-#&gt;    maximum_z ceiling_height   volume inside_convection_algo
-#&gt; 1:     4.572          4.572 1061.882                      2
-#&gt; 2:     4.572          4.572 1061.882                      2
-#&gt;    outside_convection_algo floor_area ext_gross_wall_area ext_net_wall_area
-#&gt; 1:                       7   232.2576            278.7091          278.7091
-#&gt; 2:                       7   232.2600            278.7091          278.7091
-#&gt;    ext_window_area is_part_of_total_area
-#&gt; 1:               0                     1
-#&gt; 2:               0                     1</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$read_rdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>read_rdd</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                          case index reported_time_step
-#&gt;   1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     1               Zone
-#&gt;   2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     2               Zone
-#&gt;   3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     3               Zone
-#&gt;   4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     4               Zone
-#&gt;   5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     5               Zone
-#&gt;  ---                                                                  
-#&gt; 603:                 1ZoneUncontrolled_DD2009   211               Zone
-#&gt; 604:                 1ZoneUncontrolled_DD2009   212               Zone
-#&gt; 605:                 1ZoneUncontrolled_DD2009   213               HVAC
-#&gt; 606:                 1ZoneUncontrolled_DD2009   214               HVAC
-#&gt; 607:                 1ZoneUncontrolled_DD2009   215               HVAC
-#&gt;      report_type
-#&gt;   1:     Average
-#&gt;   2:     Average
-#&gt;   3:     Average
-#&gt;   4:     Average
-#&gt;   5:     Average
-#&gt;  ---            
-#&gt; 603:         Sum
-#&gt; 604:         Sum
-#&gt; 605:         Sum
-#&gt; 606:         Sum
-#&gt; 607:         Sum
-#&gt;                                                             variable
-#&gt;   1:                            Site Outdoor Air Drybulb Temperature
-#&gt;   2:                           Site Outdoor Air Dewpoint Temperature
-#&gt;   3:                            Site Outdoor Air Wetbulb Temperature
-#&gt;   4:                                 Site Outdoor Air Humidity Ratio
-#&gt;   5:                              Site Outdoor Air Relative Humidity
-#&gt;  ---                                                                
-#&gt; 603:           Facility Heating Setpoint Not Met While Occupied Time
-#&gt; 604:           Facility Cooling Setpoint Not Met While Occupied Time
-#&gt; 605: Environmental Impact Total N2O Emissions Carbon Equivalent Mass
-#&gt; 606: Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
-#&gt; 607: Environmental Impact Total CO2 Emissions Carbon Equivalent Mass
-#&gt;                 units
-#&gt;   1:                C
-#&gt;   2:                C
-#&gt;   3:                C
-#&gt;   4: kgWater/kgDryAir
-#&gt;   5:                %
-#&gt;  ---                 
-#&gt; 603:               hr
-#&gt; 604:               hr
-#&gt; 605:               kg
-#&gt; 606:               kg
-#&gt; 607:               kg</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$read_mdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>read_mdd</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                         case index reported_time_step
-#&gt;  1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     1               Zone
-#&gt;  2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     2               Zone
-#&gt;  3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     3               Zone
-#&gt;  4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     4               Zone
-#&gt;  5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     5               Zone
-#&gt;  6: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     6               Zone
-#&gt;  7: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     7               Zone
-#&gt;  8: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     8               Zone
-#&gt;  9: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     9               Zone
-#&gt; 10: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    10               Zone
-#&gt; 11: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    11               Zone
-#&gt; 12: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    12               Zone
-#&gt; 13: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    13               Zone
-#&gt; 14: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    14               Zone
-#&gt; 15: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    15               Zone
-#&gt; 16: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    16               Zone
-#&gt; 17: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    17               Zone
-#&gt; 18: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    18               Zone
-#&gt; 19: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    19               Zone
-#&gt; 20: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    20               Zone
-#&gt; 21: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    21               Zone
-#&gt; 22: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    22               Zone
-#&gt; 23: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    23               Zone
-#&gt; 24: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    24               Zone
-#&gt; 25: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    25               Zone
-#&gt; 26: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    26               Zone
-#&gt; 27: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    27               Zone
-#&gt; 28: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    28               Zone
-#&gt; 29: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    29               Zone
-#&gt; 30: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    30               Zone
-#&gt; 31: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    31               Zone
-#&gt; 32: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    32               Zone
-#&gt; 33: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    33               Zone
-#&gt; 34: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    34               Zone
-#&gt; 35: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil    35               Zone
-#&gt; 36:                 1ZoneUncontrolled_DD2009     1               Zone
-#&gt; 37:                 1ZoneUncontrolled_DD2009     2               Zone
-#&gt; 38:                 1ZoneUncontrolled_DD2009     3               Zone
-#&gt; 39:                 1ZoneUncontrolled_DD2009     4               Zone
-#&gt; 40:                 1ZoneUncontrolled_DD2009     5               Zone
-#&gt; 41:                 1ZoneUncontrolled_DD2009     6               Zone
-#&gt; 42:                 1ZoneUncontrolled_DD2009     7               Zone
-#&gt; 43:                 1ZoneUncontrolled_DD2009     8               Zone
-#&gt; 44:                 1ZoneUncontrolled_DD2009     9               Zone
-#&gt;                                         case index reported_time_step
-#&gt;     report_type                                     variable units
-#&gt;  1:       Meter                         Electricity:Facility     J
-#&gt;  2:       Meter                         Electricity:Building     J
-#&gt;  3:       Meter                   Electricity:Zone:MAIN ZONE     J
-#&gt;  4:       Meter                InteriorEquipment:Electricity     J
-#&gt;  5:       Meter InteriorEquipment:Electricity:Zone:MAIN ZONE     J
-#&gt;  6:       Meter        ITE-CPU:InteriorEquipment:Electricity     J
-#&gt;  7:       Meter       ITE-Fans:InteriorEquipment:Electricity     J
-#&gt;  8:       Meter        ITE-UPS:InteriorEquipment:Electricity     J
-#&gt;  9:       Meter                      EnergyTransfer:Facility     J
-#&gt; 10:       Meter                      EnergyTransfer:Building     J
-#&gt; 11:       Meter                EnergyTransfer:Zone:MAIN ZONE     J
-#&gt; 12:       Meter                       Heating:EnergyTransfer     J
-#&gt; 13:       Meter        Heating:EnergyTransfer:Zone:MAIN ZONE     J
-#&gt; 14:       Meter                       Cooling:EnergyTransfer     J
-#&gt; 15:       Meter        Cooling:EnergyTransfer:Zone:MAIN ZONE     J
-#&gt; 16:       Meter                          EnergyTransfer:HVAC     J
-#&gt; 17:       Meter                     Baseboard:EnergyTransfer     J
-#&gt; 18:       Meter                             Electricity:HVAC     J
-#&gt; 19:       Meter                          Heating:Electricity     J
-#&gt; 20:       Meter                             Fans:Electricity     J
-#&gt; 21:       Meter                     General:Fans:Electricity     J
-#&gt; 22:       Meter                  CoolingCoils:EnergyTransfer     J
-#&gt; 23:       Meter                          Cooling:Electricity     J
-#&gt; 24:       Meter                ElectricityPurchased:Facility     J
-#&gt; 25:       Meter                   ElectricityPurchased:Plant     J
-#&gt; 26:       Meter            Cogeneration:ElectricityPurchased     J
-#&gt; 27:       Meter              ElectricitySurplusSold:Facility     J
-#&gt; 28:       Meter                 ElectricitySurplusSold:Plant     J
-#&gt; 29:       Meter          Cogeneration:ElectricitySurplusSold     J
-#&gt; 30:       Meter                      ElectricityNet:Facility     J
-#&gt; 31:       Meter                         ElectricityNet:Plant     J
-#&gt; 32:       Meter                  Cogeneration:ElectricityNet     J
-#&gt; 33:       Meter                            Electricity:Plant     J
-#&gt; 34:       Meter                   Carbon Equivalent:Facility    kg
-#&gt; 35:       Meter  CarbonEquivalentEmissions:Carbon Equivalent    kg
-#&gt; 36:       Meter                      EnergyTransfer:Facility     J
-#&gt; 37:       Meter                      EnergyTransfer:Building     J
-#&gt; 38:       Meter                 EnergyTransfer:Zone:ZONE ONE     J
-#&gt; 39:       Meter                       Heating:EnergyTransfer     J
-#&gt; 40:       Meter         Heating:EnergyTransfer:Zone:ZONE ONE     J
-#&gt; 41:       Meter                       Cooling:EnergyTransfer     J
-#&gt; 42:       Meter         Cooling:EnergyTransfer:Zone:ZONE ONE     J
-#&gt; 43:       Meter                   Carbon Equivalent:Facility    kg
-#&gt; 44:       Meter  CarbonEquivalentEmissions:Carbon Equivalent    kg
-#&gt;     report_type                                     variable units</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$report_data_dict`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                          case report_data_dictionary_index
-#&gt;   1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                            6
-#&gt;   2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                            7
-#&gt;   3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                            8
-#&gt;   4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                            9
-#&gt;   5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                           10
-#&gt;  ---                                                                      
-#&gt; 172:                 1ZoneUncontrolled_DD2009                           31
-#&gt; 173:                 1ZoneUncontrolled_DD2009                           32
-#&gt; 174:                 1ZoneUncontrolled_DD2009                           33
-#&gt; 175:                 1ZoneUncontrolled_DD2009                           36
-#&gt; 176:                 1ZoneUncontrolled_DD2009                           46
-#&gt;      is_meter type             index_group timestep_type     key_value
-#&gt;   1:        0  Avg                    Zone   HVAC System   Environment
-#&gt;   2:        0  Avg                    Zone   HVAC System   Environment
-#&gt;   3:        0  Avg                    Zone   HVAC System   Environment
-#&gt;   4:        0  Avg                    Zone   HVAC System   Environment
-#&gt;   5:        0  Avg                    Zone   HVAC System   Environment
-#&gt;  ---                                                                  
-#&gt; 172:        0  Avg                    Zone   HVAC System ZN001:CEILING
-#&gt; 173:        0  Avg                    Zone   HVAC System ZN001:CEILING
-#&gt; 174:        0  Avg                    Zone   HVAC System      ZONE ONE
-#&gt; 175:        1  Sum Facility:EnergyTransfer   HVAC System              
-#&gt; 176:        1  Sum Building:EnergyTransfer   HVAC System              
-#&gt;                                                           name
-#&gt;   1:                      Site Outdoor Air Drybulb Temperature
-#&gt;   2:                     Site Outdoor Air Dewpoint Temperature
-#&gt;   3:                      Site Outdoor Air Wetbulb Temperature
-#&gt;   4:                           Site Outdoor Air Humidity Ratio
-#&gt;   5:                        Site Outdoor Air Relative Humidity
-#&gt;  ---                                                          
-#&gt; 172:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 173: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 174:                                 Zone Mean Air Temperature
-#&gt; 175:                                   EnergyTransfer:Facility
-#&gt; 176:                                   EnergyTransfer:Building
-#&gt;      reporting_frequency schedule_name            units
-#&gt;   1:              Hourly          &lt;NA&gt;                C
-#&gt;   2:              Hourly          &lt;NA&gt;                C
-#&gt;   3:              Hourly          &lt;NA&gt;                C
-#&gt;   4:              Hourly          &lt;NA&gt; kgWater/kgDryAir
-#&gt;   5:              Hourly          &lt;NA&gt;                %
-#&gt;  ---                                                   
-#&gt; 172:              Hourly          &lt;NA&gt;           W/m2-K
-#&gt; 173:              Hourly          &lt;NA&gt;           W/m2-K
-#&gt; 174:              Hourly          &lt;NA&gt;                C
-#&gt; 175:              Hourly          &lt;NA&gt;                J
-#&gt; 176:              Hourly          &lt;NA&gt;                J</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$report_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read report data</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                            case            datetime   key_value
-#&gt;     1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 01:00:00 Environment
-#&gt;     2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 02:00:00 Environment
-#&gt;     3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 03:00:00 Environment
-#&gt;     4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 04:00:00 Environment
-#&gt;     5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 05:00:00 Environment
-#&gt;    ---                                                                         
-#&gt; 27340:                 1ZoneUncontrolled_DD2009 2020-12-21 20:00:00            
-#&gt; 27341:                 1ZoneUncontrolled_DD2009 2020-12-21 21:00:00            
-#&gt; 27342:                 1ZoneUncontrolled_DD2009 2020-12-21 22:00:00            
-#&gt; 27343:                 1ZoneUncontrolled_DD2009 2020-12-21 23:00:00            
-#&gt; 27344:                 1ZoneUncontrolled_DD2009 2020-12-22 00:00:00            
-#&gt;                                        name units value
-#&gt;     1: Site Outdoor Air Drybulb Temperature     C -18.8
-#&gt;     2: Site Outdoor Air Drybulb Temperature     C -18.8
-#&gt;     3: Site Outdoor Air Drybulb Temperature     C -18.8
-#&gt;     4: Site Outdoor Air Drybulb Temperature     C -18.8
-#&gt;     5: Site Outdoor Air Drybulb Temperature     C -18.8
-#&gt;    ---                                                 
-#&gt; 27340:              EnergyTransfer:Building     J   0.0
-#&gt; 27341:              EnergyTransfer:Building     J   0.0
-#&gt; 27342:              EnergyTransfer:Building     J   0.0
-#&gt; 27343:              EnergyTransfer:Building     J   0.0
-#&gt; 27344:              EnergyTransfer:Building     J   0.0</div><div class='input'>
+
 <span class='co'># specify output variables using report data dictionary</span>
 <span class='va'>dict</span> <span class='op'>&lt;-</span> <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='va'>units</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case            datetime   key_value
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 01:00:00 Environment
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 02:00:00 Environment
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 03:00:00 Environment
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 04:00:00 Environment
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 05:00:00 Environment
-#&gt;   ---                                                                         
-#&gt; 5660:                 1ZoneUncontrolled_DD2009 2020-12-21 23:00:00 Environment
-#&gt; 5661:                 1ZoneUncontrolled_DD2009 2020-12-21 23:15:00 Environment
-#&gt; 5662:                 1ZoneUncontrolled_DD2009 2020-12-21 23:30:00 Environment
-#&gt; 5663:                 1ZoneUncontrolled_DD2009 2020-12-21 23:45:00 Environment
-#&gt; 5664:                 1ZoneUncontrolled_DD2009 2020-12-22 00:00:00 Environment
-#&gt;                                       name units      value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -18.800000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -18.800000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -18.800000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -18.800000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -18.800000
-#&gt;   ---                                                      
-#&gt; 5660: Site Outdoor Air Wetbulb Temperature     C   9.249998
-#&gt; 5661: Site Outdoor Air Wetbulb Temperature     C   9.120497
-#&gt; 5662: Site Outdoor Air Wetbulb Temperature     C   8.990999
-#&gt; 5663: Site Outdoor Air Wetbulb Temperature     C   8.861498
-#&gt; 5664: Site Outdoor Air Wetbulb Temperature     C   8.731996</div><div class='input'>
+
 <span class='co'># specify output variables using 'key_value' and 'name'</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='st'>"environment"</span>, <span class='st'>"site outdoor air drybulb temperature"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case            datetime   key_value
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 01:00:00 Environment
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 02:00:00 Environment
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 03:00:00 Environment
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 04:00:00 Environment
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 05:00:00 Environment
-#&gt;   ---                                                                         
-#&gt; 1484:                 1ZoneUncontrolled_DD2009 2020-12-21 23:00:00 Environment
-#&gt; 1485:                 1ZoneUncontrolled_DD2009 2020-12-21 23:15:00 Environment
-#&gt; 1486:                 1ZoneUncontrolled_DD2009 2020-12-21 23:30:00 Environment
-#&gt; 1487:                 1ZoneUncontrolled_DD2009 2020-12-21 23:45:00 Environment
-#&gt; 1488:                 1ZoneUncontrolled_DD2009 2020-12-22 00:00:00 Environment
-#&gt;                                       name units     value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;   ---                                                     
-#&gt; 1484: Site Outdoor Air Drybulb Temperature     C   9.72500
-#&gt; 1485: Site Outdoor Air Drybulb Temperature     C   9.53425
-#&gt; 1486: Site Outdoor Air Drybulb Temperature     C   9.34350
-#&gt; 1487: Site Outdoor Air Drybulb Temperature     C   9.15275
-#&gt; 1488: Site Outdoor Air Drybulb Temperature     C   8.96200</div><div class='input'>
+
 <span class='co'># explicitly specify year value and time zone</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, year <span class='op'>=</span> <span class='fl'>2020</span>, tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case            datetime   key_value
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 01:00:00 Environment
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 02:00:00 Environment
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 03:00:00 Environment
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 04:00:00 Environment
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 05:00:00 Environment
-#&gt;   ---                                                                         
-#&gt; 1484:                 1ZoneUncontrolled_DD2009 2020-12-21 23:00:00 Environment
-#&gt; 1485:                 1ZoneUncontrolled_DD2009 2020-12-21 23:15:00 Environment
-#&gt; 1486:                 1ZoneUncontrolled_DD2009 2020-12-21 23:30:00 Environment
-#&gt; 1487:                 1ZoneUncontrolled_DD2009 2020-12-21 23:45:00 Environment
-#&gt; 1488:                 1ZoneUncontrolled_DD2009 2020-12-22 00:00:00 Environment
-#&gt;                                       name units     value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -18.80000
-#&gt;   ---                                                     
-#&gt; 1484: Site Outdoor Air Drybulb Temperature     C   9.72500
-#&gt; 1485: Site Outdoor Air Drybulb Temperature     C   9.53425
-#&gt; 1486: Site Outdoor Air Drybulb Temperature     C   9.34350
-#&gt; 1487: Site Outdoor Air Drybulb Temperature     C   9.15275
-#&gt; 1488: Site Outdoor Air Drybulb Temperature     C   8.96200</div><div class='input'>
+
 <span class='co'># get all possible columns</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case            datetime month day
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 01:00:00    12  21
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 02:00:00    12  21
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 03:00:00    12  21
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 04:00:00    12  21
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 2020-12-21 05:00:00    12  21
-#&gt;   ---                                                                       
-#&gt; 1484:                 1ZoneUncontrolled_DD2009 2020-12-21 23:00:00    12  21
-#&gt; 1485:                 1ZoneUncontrolled_DD2009 2020-12-21 23:15:00    12  21
-#&gt; 1486:                 1ZoneUncontrolled_DD2009 2020-12-21 23:30:00    12  21
-#&gt; 1487:                 1ZoneUncontrolled_DD2009 2020-12-21 23:45:00    12  21
-#&gt; 1488:                 1ZoneUncontrolled_DD2009 2020-12-22 00:00:00    12  21
-#&gt;       hour minute dst interval simulation_days        day_type
-#&gt;    1:    1      0   0       60               1 WinterDesignDay
-#&gt;    2:    2      0   0       60               1 WinterDesignDay
-#&gt;    3:    3      0   0       60               1 WinterDesignDay
-#&gt;    4:    4      0   0       60               1 WinterDesignDay
-#&gt;    5:    5      0   0       60               1 WinterDesignDay
-#&gt;   ---                                                         
-#&gt; 1484:   23      0   0       15               1 SummerDesignDay
-#&gt; 1485:   23     15   0       15               1 SummerDesignDay
-#&gt; 1486:   23     30   0       15               1 SummerDesignDay
-#&gt; 1487:   23     45   0       15               1 SummerDesignDay
-#&gt; 1488:   24      0   0       15               1 SummerDesignDay
-#&gt;                                environment_name environment_period_index
-#&gt;    1: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB                        1
-#&gt;    2: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB                        1
-#&gt;    3: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB                        1
-#&gt;    4: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB                        1
-#&gt;    5: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB                        1
-#&gt;   ---                                                                   
-#&gt; 1484:                    ATLANTA DEC 21 COOLING                       15
-#&gt; 1485:                    ATLANTA DEC 21 COOLING                       15
-#&gt; 1486:                    ATLANTA DEC 21 COOLING                       15
-#&gt; 1487:                    ATLANTA DEC 21 COOLING                       15
-#&gt; 1488:                    ATLANTA DEC 21 COOLING                       15
-#&gt;       is_meter type index_group timestep_type   key_value
-#&gt;    1:        0  Avg        Zone   HVAC System Environment
-#&gt;    2:        0  Avg        Zone   HVAC System Environment
-#&gt;    3:        0  Avg        Zone   HVAC System Environment
-#&gt;    4:        0  Avg        Zone   HVAC System Environment
-#&gt;    5:        0  Avg        Zone   HVAC System Environment
-#&gt;   ---                                                    
-#&gt; 1484:        0  Avg        Zone   HVAC System Environment
-#&gt; 1485:        0  Avg        Zone   HVAC System Environment
-#&gt; 1486:        0  Avg        Zone   HVAC System Environment
-#&gt; 1487:        0  Avg        Zone   HVAC System Environment
-#&gt; 1488:        0  Avg        Zone   HVAC System Environment
-#&gt;                                       name reporting_frequency schedule_name
-#&gt;    1: Site Outdoor Air Drybulb Temperature              Hourly          &lt;NA&gt;
-#&gt;    2: Site Outdoor Air Drybulb Temperature              Hourly          &lt;NA&gt;
-#&gt;    3: Site Outdoor Air Drybulb Temperature              Hourly          &lt;NA&gt;
-#&gt;    4: Site Outdoor Air Drybulb Temperature              Hourly          &lt;NA&gt;
-#&gt;    5: Site Outdoor Air Drybulb Temperature              Hourly          &lt;NA&gt;
-#&gt;   ---                                                                       
-#&gt; 1484: Site Outdoor Air Drybulb Temperature       Zone Timestep          &lt;NA&gt;
-#&gt; 1485: Site Outdoor Air Drybulb Temperature       Zone Timestep          &lt;NA&gt;
-#&gt; 1486: Site Outdoor Air Drybulb Temperature       Zone Timestep          &lt;NA&gt;
-#&gt; 1487: Site Outdoor Air Drybulb Temperature       Zone Timestep          &lt;NA&gt;
-#&gt; 1488: Site Outdoor Air Drybulb Temperature       Zone Timestep          &lt;NA&gt;
-#&gt;       units     value
-#&gt;    1:     C -18.80000
-#&gt;    2:     C -18.80000
-#&gt;    3:     C -18.80000
-#&gt;    4:     C -18.80000
-#&gt;    5:     C -18.80000
-#&gt;   ---                
-#&gt; 1484:     C   9.72500
-#&gt; 1485:     C   9.53425
-#&gt; 1486:     C   9.34350
-#&gt; 1487:     C   9.15275
-#&gt; 1488:     C   8.96200</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case       Date/Time
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 12/21  01:00:00
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 12/21  02:00:00
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 12/21  03:00:00
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 12/21  04:00:00
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil 12/21  05:00:00
-#&gt;   ---                                                         
-#&gt; 1484:                 1ZoneUncontrolled_DD2009 12/21  23:00:00
-#&gt; 1485:                 1ZoneUncontrolled_DD2009 12/21  23:15:00
-#&gt; 1486:                 1ZoneUncontrolled_DD2009 12/21  23:30:00
-#&gt; 1487:                 1ZoneUncontrolled_DD2009 12/21  23:45:00
-#&gt; 1488:                 1ZoneUncontrolled_DD2009 12/21  24:00:00
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;    1:                                                        -18.8
-#&gt;    2:                                                        -18.8
-#&gt;    3:                                                        -18.8
-#&gt;    4:                                                        -18.8
-#&gt;    5:                                                        -18.8
-#&gt;   ---                                                             
-#&gt; 1484:                                                           NA
-#&gt; 1485:                                                           NA
-#&gt; 1486:                                                           NA
-#&gt; 1487:                                                           NA
-#&gt; 1488:                                                           NA
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](TimeStep)
-#&gt;    1:                                                             NA
-#&gt;    2:                                                             NA
-#&gt;    3:                                                             NA
-#&gt;    4:                                                             NA
-#&gt;    5:                                                             NA
-#&gt;   ---                                                               
-#&gt; 1484:                                                        9.72500
-#&gt; 1485:                                                        9.53425
-#&gt; 1486:                                                        9.34350
-#&gt; 1487:                                                        9.15275
-#&gt; 1488:                                                        8.96200</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output with</span>
 <span class='co'># extra columns</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case environment_period_index
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                        1
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                        1
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                        1
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                        1
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil                        1
-#&gt;   ---                                                                  
-#&gt; 1484:                 1ZoneUncontrolled_DD2009                       15
-#&gt; 1485:                 1ZoneUncontrolled_DD2009                       15
-#&gt; 1486:                 1ZoneUncontrolled_DD2009                       15
-#&gt; 1487:                 1ZoneUncontrolled_DD2009                       15
-#&gt; 1488:                 1ZoneUncontrolled_DD2009                       15
-#&gt;                                environment_name simulation_days
-#&gt;    1: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB               1
-#&gt;    2: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB               1
-#&gt;    3: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB               1
-#&gt;    4: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB               1
-#&gt;    5: DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB               1
-#&gt;   ---                                                          
-#&gt; 1484:                    ATLANTA DEC 21 COOLING               1
-#&gt; 1485:                    ATLANTA DEC 21 COOLING               1
-#&gt; 1486:                    ATLANTA DEC 21 COOLING               1
-#&gt; 1487:                    ATLANTA DEC 21 COOLING               1
-#&gt; 1488:                    ATLANTA DEC 21 COOLING               1
-#&gt;                  datetime month day hour minute        day_type       Date/Time
-#&gt;    1: 2020-12-21 01:00:00    12  21    1      0 WinterDesignDay 12/21  01:00:00
-#&gt;    2: 2020-12-21 02:00:00    12  21    2      0 WinterDesignDay 12/21  02:00:00
-#&gt;    3: 2020-12-21 03:00:00    12  21    3      0 WinterDesignDay 12/21  03:00:00
-#&gt;    4: 2020-12-21 04:00:00    12  21    4      0 WinterDesignDay 12/21  04:00:00
-#&gt;    5: 2020-12-21 05:00:00    12  21    5      0 WinterDesignDay 12/21  05:00:00
-#&gt;   ---                                                                          
-#&gt; 1484: 2020-12-21 23:00:00    12  21   23      0 SummerDesignDay 12/21  23:00:00
-#&gt; 1485: 2020-12-21 23:15:00    12  21   23     15 SummerDesignDay 12/21  23:15:00
-#&gt; 1486: 2020-12-21 23:30:00    12  21   23     30 SummerDesignDay 12/21  23:30:00
-#&gt; 1487: 2020-12-21 23:45:00    12  21   23     45 SummerDesignDay 12/21  23:45:00
-#&gt; 1488: 2020-12-22 00:00:00    12  21   24      0 SummerDesignDay 12/21  24:00:00
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;    1:                                                        -18.8
-#&gt;    2:                                                        -18.8
-#&gt;    3:                                                        -18.8
-#&gt;    4:                                                        -18.8
-#&gt;    5:                                                        -18.8
-#&gt;   ---                                                             
-#&gt; 1484:                                                           NA
-#&gt; 1485:                                                           NA
-#&gt; 1486:                                                           NA
-#&gt; 1487:                                                           NA
-#&gt; 1488:                                                           NA
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](TimeStep)
-#&gt;    1:                                                             NA
-#&gt;    2:                                                             NA
-#&gt;    3:                                                             NA
-#&gt;    4:                                                             NA
-#&gt;    5:                                                             NA
-#&gt;   ---                                                               
-#&gt; 1484:                                                        9.72500
-#&gt; 1485:                                                        9.53425
-#&gt; 1486:                                                        9.34350
-#&gt; 1487:                                                        9.15275
-#&gt; 1488:                                                        8.96200</div><div class='input'>
+
 <span class='co'># only get data at the working hour on the first Monday</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, <span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, hour <span class='op'>=</span> <span class='fl'>8</span><span class='op'>:</span><span class='fl'>18</span>, day_type <span class='op'>=</span> <span class='st'>"monday"</span>, simulation_days <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Empty data.table (0 rows and 6 cols): case,datetime,key_value,name,units,value</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$tabular_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read all tabular data</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                           case index
-#&gt;    1: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     1
-#&gt;    2: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     2
-#&gt;    3: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     3
-#&gt;    4: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     4
-#&gt;    5: 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil     5
-#&gt;   ---                                               
-#&gt; 5562:                 1ZoneUncontrolled_DD2009  3201
-#&gt; 5563:                 1ZoneUncontrolled_DD2009  3202
-#&gt; 5564:                 1ZoneUncontrolled_DD2009  3203
-#&gt; 5565:                 1ZoneUncontrolled_DD2009  3204
-#&gt; 5566:                 1ZoneUncontrolled_DD2009  3205
-#&gt;                                   report_name      report_for
-#&gt;    1: AnnualBuildingUtilityPerformanceSummary Entire Facility
-#&gt;    2: AnnualBuildingUtilityPerformanceSummary Entire Facility
-#&gt;    3: AnnualBuildingUtilityPerformanceSummary Entire Facility
-#&gt;    4: AnnualBuildingUtilityPerformanceSummary Entire Facility
-#&gt;    5: AnnualBuildingUtilityPerformanceSummary Entire Facility
-#&gt;   ---                                                        
-#&gt; 5562:                  Initialization Summary Entire Facility
-#&gt; 5563:                  Initialization Summary Entire Facility
-#&gt; 5564:                  Initialization Summary Entire Facility
-#&gt; 5565:                  Initialization Summary Entire Facility
-#&gt; 5566:                  Initialization Summary Entire Facility
-#&gt;                           table_name                        column_name
-#&gt;    1:         Site and Source Energy                       Total Energy
-#&gt;    2:         Site and Source Energy                       Total Energy
-#&gt;    3:         Site and Source Energy                       Total Energy
-#&gt;    4:         Site and Source Energy                       Total Energy
-#&gt;    5:         Site and Source Energy     Energy Per Total Building Area
-#&gt;   ---                                                                  
-#&gt; 5562: Warmup Convergence Information Cooling Load Pass/Fail Convergence
-#&gt; 5563: Warmup Convergence Information Cooling Load Pass/Fail Convergence
-#&gt; 5564: Warmup Convergence Information Cooling Load Pass/Fail Convergence
-#&gt; 5565: Warmup Convergence Information Cooling Load Pass/Fail Convergence
-#&gt; 5566: Warmup Convergence Information Cooling Load Pass/Fail Convergence
-#&gt;                  row_name units        value
-#&gt;    1:   Total Site Energy    GJ         0.00
-#&gt;    2:     Net Site Energy    GJ         0.00
-#&gt;    3: Total Source Energy    GJ         0.00
-#&gt;    4:   Net Source Energy    GJ         0.00
-#&gt;    5:   Total Site Energy MJ/m2         0.00
-#&gt;   ---                                       
-#&gt; 5562:                  11               Pass
-#&gt; 5563:                  12               Pass
-#&gt; 5564:                  13               Pass
-#&gt; 5565:                  14               Pass
-#&gt; 5566:                  15               Pass</div><div class='input'>
+
 <span class='co'># explicitly specify data you want</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>group</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>,
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -2196,17 +1201,7 @@ group$print()
     column_name <span class='op'>=</span> <span class='st'>"Total Energy"</span>,
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	2 obs. of  9 variables:
-#&gt;  $ case       : chr  "1ZoneDataCenterCRAC_wPumpedDXCoolingCoil" "1ZoneUncontrolled_DD2009"
-#&gt;  $ index      : int  1 1
-#&gt;  $ report_name: chr  "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary"
-#&gt;  $ report_for : chr  "Entire Facility" "Entire Facility"
-#&gt;  $ table_name : chr  "Site and Source Energy" "Site and Source Energy"
-#&gt;  $ column_name: chr  "Total Energy" "Total Energy"
-#&gt;  $ row_name   : chr  "Total Site Energy" "Total Site Energy"
-#&gt;  $ units      : chr  "GJ" "GJ"
-#&gt;  $ value      : chr  "        0.00" "        0.00"
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get tabular data in wide format and coerce numeric values</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>group</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>,
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -2215,33 +1210,18 @@ group$print()
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>,
     wide <span class='op'>=</span> <span class='cn'>TRUE</span>, string_value <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 1
-#&gt;  $ AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy:Classes ‘data.table’ and 'data.frame':	2 obs. of  6 variables:
-#&gt;   ..$ case             : chr [1:2] "1ZoneDataCenterCRAC_wPumpedDXCoolingCoil" "1ZoneUncontrolled_DD2009"
-#&gt;   ..$ report_name      : chr [1:2] "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary"
-#&gt;   ..$ report_for       : chr [1:2] "Entire Facility" "Entire Facility"
-#&gt;   ..$ table_name       : chr [1:2] "Site and Source Energy" "Site and Source Energy"
-#&gt;   ..$ row_name         : chr [1:2] "Total Site Energy" "Total Site Energy"
-#&gt;   ..$ Total Energy [GJ]: num [1:2] 0 0
-#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusGroupJob$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>group</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Group Simulation Job</span><span> </span><span style='color: #00BB00;'>──────────────────────────────────────────────</span><span>
-#&gt; Grouped Jobs [5]: 
-#&gt; [1]: [IDF] '1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf' + [... &lt;-- SUCCEEDED
-#&gt; [2]: [IDF] '1ZoneEvapCooler.idf'                          + [... &lt;-- SUCCEEDED
-#&gt; [3]: [IDF] '1ZoneParameterAspect.idf'                     + [EPW... &lt;-- FAILED
-#&gt; [4]: [IDF] '1ZoneUncontrolled_DD2009.idf'                 + [... &lt;-- SUCCEEDED
-#&gt; [5]: [IDF] '1ZoneUncontrolled_DDChanges.idf'              + [... &lt;-- SUCCEEDED
-#&gt; </span><span style='color: #BBBBBB;background-color: #BB0000;'> Job started at '2020-11-11 02:02:48' and ended unsuccessfully...</span><span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

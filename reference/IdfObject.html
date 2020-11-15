@@ -1659,7 +1659,7 @@ mat$print(auto_sep = TRUE)
 <span class='co'>## Method `IdfObject$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span>
 <span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span>
 <span class='va'>idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span>
@@ -1668,1092 +1668,358 @@ mat$print(auto_sep = TRUE)
 
 <span class='co'># get the IdfObject of material named "C5 - 4 IN HW CONCRETE"</span>
 <span class='va'>mat</span> <span class='op'>&lt;-</span> <span class='va'>idf</span><span class='op'>$</span><span class='va'>Material</span><span class='op'>[[</span><span class='st'>"C5 - 4 IN HW CONCRETE"</span><span class='op'>]</span><span class='op'>]</span>
-<span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$version`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get version</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>version</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] ‘8.8.0’</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$parent`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>parent</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpa73RLC/temp_libpath50a7953f9d7/eplusr/extdata/1ZoneUncon...
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
-#&gt; 
-#&gt; Group: &lt;Location and Climate&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
-#&gt; 
-#&gt; Group: &lt;Schedules&gt;
-#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
-#&gt; 
-#&gt; Group: &lt;Surface Construction Elements&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
-#&gt; 
-#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
-#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; 
-#&gt; Group: &lt;Internal Gains&gt;
-#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
-#&gt; 
-#&gt; Group: &lt;Exterior Equipment&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
-#&gt; 
-#&gt; Group: &lt;Output Reporting&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
-#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$id`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>id</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 26</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$name`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>name</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "Zn001:Roof001"</div><div class='input'>
+
 <span class='co'># NA will be returned if the class does not have name attribute. For example,</span>
 <span class='co'># "Version" class</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='va'>Version</span><span class='op'>$</span><span class='fu'>name</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] NA</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$group_name`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>group_name</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "Thermal Zones and Surfaces"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$class_name`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>class_name</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "BuildingSurface:Detailed"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$definition`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>definition</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IddObject: 'BuildingSurface:Detailed'&gt;
-#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────
-#&gt;   "Allows for detailed entry of building heat transfer surfaces.  Does not include subsurfaces such as windows or doors."
-#&gt; 
-#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────
-#&gt;   * Group: 'Thermal Zones and Surfaces'
-#&gt;   * Unique: FALSE
-#&gt;   * Required: FALSE
-#&gt;   * Total fields: 370
-#&gt; 
-#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────
-#&gt;   01*: Name
-#&gt;   02*: Surface Type
-#&gt;   03*: Construction Name
-#&gt;   04*: Zone Name
-#&gt;   05*: Outside Boundary Condition
-#&gt;   06 : Outside Boundary Condition Object
-#&gt;   07 : Sun Exposure
-#&gt;   08 : Wind Exposure
-#&gt;   09 : View Factor to Ground
-#&gt;   10 : Number of Vertices
-#&gt;   11*: Vertex 1 X-coordinate &lt;↓&gt;
-#&gt;   12*: Vertex 1 Y-coordinate &lt;↓&gt;
-#&gt;   13*: Vertex 1 Z-coordinate &lt;↓&gt;
-#&gt;   14*: Vertex 2 X-coordinate &lt;↓&gt;
-#&gt;   15*: Vertex 2 Y-coordinate &lt;↓&gt;
-#&gt;   16*: Vertex 2 Z-coordinate &lt;↓&gt;
-#&gt;   17*: Vertex 3 X-coordinate &lt;↓&gt;
-#&gt;   18*: Vertex 3 Y-coordinate &lt;↓&gt;
-#&gt;   19*: Vertex 3 Z-coordinate &lt;↓&gt;
-#&gt;    ......</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$comment`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get object comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; NULL</div><div class='input'>
+
 <span class='co'># add new object comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"This is a material named `WD01`"</span>, <span class='st'>"This object has an ID of 47"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────
-#&gt; !This is a material named `WD01`
-#&gt; !This object has an ID of 47
-#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    </div><div class='input'>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># append new comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='st'>"This is an appended comment"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────
-#&gt; !This is a material named `WD01`
-#&gt; !This object has an ID of 47
-#&gt; !This is an appended comment
-#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    
-#&gt; [3] "This is an appended comment"    </div><div class='input'>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># prepend new comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='st'>"This is a prepended comment"</span>, append <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────
-#&gt; !This is a prepended comment
-#&gt; !This is a material named `WD01`
-#&gt; !This object has an ID of 47
-#&gt; !This is an appended comment
-#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "This is a prepended comment"     "This is a material named `WD01`"
-#&gt; [3] "This object has an ID of 47"     "This is an appended comment"    </div><div class='input'>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># wrap long comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='st'>"This is a very long comment that is needed to be wrapped."</span>, width <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────
-#&gt; !This is a prepended comment
-#&gt; !This is a material named `WD01`
-#&gt; !This object has an ID of 47
-#&gt; !This is an appended comment
-#&gt; !This is a very long comment
-#&gt; !that is needed to be wrapped.
-#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "This is a prepended comment"     "This is a material named `WD01`"
-#&gt; [3] "This object has an ID of 47"     "This is an appended comment"    
-#&gt; [5] "This is a very long comment"     "that is needed to be wrapped."  </div><div class='input'>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># delete old comments and add new one</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='st'>"This is the only comment"</span>, append <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────
-#&gt; !This is the only comment
-#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "This is the only comment"</div><div class='input'>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># delete all comments</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`
-#&gt; Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; ├─ 01*: "Zn001:Roof001", !- Name
-#&gt; │─ 02*: "Roof",          !- Surface Type
-#&gt; │─ 03*: "ROOF31",        !- Construction Name
-#&gt; │─ 04*: "ZONE ONE",      !- Zone Name
-#&gt; │─ 05*: "Outdoors",      !- Outside Boundary Condition
-#&gt; │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object
-#&gt; │─ 07 : "SunExposed",    !- Sun Exposure
-#&gt; │─ 08 : "WindExposed",   !- Wind Exposure
-#&gt; │─ 09 : 0,               !- View Factor to Ground
-#&gt; │─ 10 : 4,               !- Number of Vertices
-#&gt; │─ 11*: 0,               !- Vertex 1 X-coordinate {m}
-#&gt; │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}
-#&gt; │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}
-#&gt; │─ 14*: 0,               !- Vertex 2 X-coordinate {m}
-#&gt; │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}
-#&gt; │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}
-#&gt; │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}
-#&gt; │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}
-#&gt; │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}
-#&gt; │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}
-#&gt; │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}
-#&gt; └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</div><div class='input'><span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; NULL</div><div class='input'><span class='co'># }</span>
+<span class='va'>roof</span><span class='op'>$</span><span class='fu'>comment</span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$value`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get all existing field values</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 9
-#&gt;  $ Name               : chr "C5 - 4 IN HW CONCRETE"
-#&gt;  $ Roughness          : chr "MediumRough"
-#&gt;  $ Thickness          : num 0.101
-#&gt;  $ Conductivity       : num 1.73
-#&gt;  $ Density            : num 2243
-#&gt;  $ Specific Heat      : num 837
-#&gt;  $ Thermal Absorptance: num 0.9
-#&gt;  $ Solar Absorptance  : num 0.65
-#&gt;  $ Visible Absorptance: num 0.65</div><div class='input'>
+
 <span class='co'># get values of field 1, 3, 5</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 3
-#&gt;  $ Name     : chr "C5 - 4 IN HW CONCRETE"
-#&gt;  $ Thickness: num 0.101
-#&gt;  $ Density  : num 2243</div><div class='input'>
+
 <span class='co'># get character format values instead of a named list</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>5</span><span class='op'>)</span>, simplify <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "C5 - 4 IN HW CONCRETE" "0.1014984"             "2242.585"             </div><div class='input'>
+
 <span class='co'># get values of all field even those that are not set</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>roof</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 22
-#&gt;  $ Name                             : chr "Zn001:Roof001"
-#&gt;  $ Surface Type                     : chr "Roof"
-#&gt;  $ Construction Name                : chr "ROOF31"
-#&gt;  $ Zone Name                        : chr "ZONE ONE"
-#&gt;  $ Outside Boundary Condition       : chr "Outdoors"
-#&gt;  $ Outside Boundary Condition Object: chr NA
-#&gt;  $ Sun Exposure                     : chr "SunExposed"
-#&gt;  $ Wind Exposure                    : chr "WindExposed"
-#&gt;  $ View Factor to Ground            : num 0
-#&gt;  $ Number of Vertices               : num 4
-#&gt;  $ Vertex 1 X-coordinate            : num 0
-#&gt;  $ Vertex 1 Y-coordinate            : num 15.2
-#&gt;  $ Vertex 1 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 2 X-coordinate            : num 0
-#&gt;  $ Vertex 2 Y-coordinate            : num 0
-#&gt;  $ Vertex 2 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 3 X-coordinate            : num 15.2
-#&gt;  $ Vertex 3 Y-coordinate            : num 0
-#&gt;  $ Vertex 3 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 4 X-coordinate            : num 15.2
-#&gt;  $ Vertex 4 Y-coordinate            : num 15.2
-#&gt;  $ Vertex 4 Z-coordinate            : num 4.57</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>roof</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span>all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 370
-#&gt;  $ Name                             : chr "Zn001:Roof001"
-#&gt;  $ Surface Type                     : chr "Roof"
-#&gt;  $ Construction Name                : chr "ROOF31"
-#&gt;  $ Zone Name                        : chr "ZONE ONE"
-#&gt;  $ Outside Boundary Condition       : chr "Outdoors"
-#&gt;  $ Outside Boundary Condition Object: chr NA
-#&gt;  $ Sun Exposure                     : chr "SunExposed"
-#&gt;  $ Wind Exposure                    : chr "WindExposed"
-#&gt;  $ View Factor to Ground            : num 0
-#&gt;  $ Number of Vertices               : num 4
-#&gt;  $ Vertex 1 X-coordinate            : num 0
-#&gt;  $ Vertex 1 Y-coordinate            : num 15.2
-#&gt;  $ Vertex 1 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 2 X-coordinate            : num 0
-#&gt;  $ Vertex 2 Y-coordinate            : num 0
-#&gt;  $ Vertex 2 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 3 X-coordinate            : num 15.2
-#&gt;  $ Vertex 3 Y-coordinate            : num 0
-#&gt;  $ Vertex 3 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 4 X-coordinate            : num 15.2
-#&gt;  $ Vertex 4 Y-coordinate            : num 15.2
-#&gt;  $ Vertex 4 Z-coordinate            : num 4.57
-#&gt;  $ Vertex 5 X-coordinate            : num NA
-#&gt;  $ Vertex 5 Y-coordinate            : num NA
-#&gt;  $ Vertex 5 Z-coordinate            : num NA
-#&gt;  $ Vertex 6 X-coordinate            : num NA
-#&gt;  $ Vertex 6 Y-coordinate            : num NA
-#&gt;  $ Vertex 6 Z-coordinate            : num NA
-#&gt;  $ Vertex 7 X-coordinate            : num NA
-#&gt;  $ Vertex 7 Y-coordinate            : num NA
-#&gt;  $ Vertex 7 Z-coordinate            : num NA
-#&gt;  $ Vertex 8 X-coordinate            : num NA
-#&gt;  $ Vertex 8 Y-coordinate            : num NA
-#&gt;  $ Vertex 8 Z-coordinate            : num NA
-#&gt;  $ Vertex 9 X-coordinate            : num NA
-#&gt;  $ Vertex 9 Y-coordinate            : num NA
-#&gt;  $ Vertex 9 Z-coordinate            : num NA
-#&gt;  $ Vertex 10 X-coordinate           : num NA
-#&gt;  $ Vertex 10 Y-coordinate           : num NA
-#&gt;  $ Vertex 10 Z-coordinate           : num NA
-#&gt;  $ Vertex 11 X-coordinate           : num NA
-#&gt;  $ Vertex 11 Y-coordinate           : num NA
-#&gt;  $ Vertex 11 Z-coordinate           : num NA
-#&gt;  $ Vertex 12 X-coordinate           : num NA
-#&gt;  $ Vertex 12 Y-coordinate           : num NA
-#&gt;  $ Vertex 12 Z-coordinate           : num NA
-#&gt;  $ Vertex 13 X-coordinate           : num NA
-#&gt;  $ Vertex 13 Y-coordinate           : num NA
-#&gt;  $ Vertex 13 Z-coordinate           : num NA
-#&gt;  $ Vertex 14 X-coordinate           : num NA
-#&gt;  $ Vertex 14 Y-coordinate           : num NA
-#&gt;  $ Vertex 14 Z-coordinate           : num NA
-#&gt;  $ Vertex 15 X-coordinate           : num NA
-#&gt;  $ Vertex 15 Y-coordinate           : num NA
-#&gt;  $ Vertex 15 Z-coordinate           : num NA
-#&gt;  $ Vertex 16 X-coordinate           : num NA
-#&gt;  $ Vertex 16 Y-coordinate           : num NA
-#&gt;  $ Vertex 16 Z-coordinate           : num NA
-#&gt;  $ Vertex 17 X-coordinate           : num NA
-#&gt;  $ Vertex 17 Y-coordinate           : num NA
-#&gt;  $ Vertex 17 Z-coordinate           : num NA
-#&gt;  $ Vertex 18 X-coordinate           : num NA
-#&gt;  $ Vertex 18 Y-coordinate           : num NA
-#&gt;  $ Vertex 18 Z-coordinate           : num NA
-#&gt;  $ Vertex 19 X-coordinate           : num NA
-#&gt;  $ Vertex 19 Y-coordinate           : num NA
-#&gt;  $ Vertex 19 Z-coordinate           : num NA
-#&gt;  $ Vertex 20 X-coordinate           : num NA
-#&gt;  $ Vertex 20 Y-coordinate           : num NA
-#&gt;  $ Vertex 20 Z-coordinate           : num NA
-#&gt;  $ Vertex 21 X-coordinate           : num NA
-#&gt;  $ Vertex 21 Y-coordinate           : num NA
-#&gt;  $ Vertex 21 Z-coordinate           : num NA
-#&gt;  $ Vertex 22 X-coordinate           : num NA
-#&gt;  $ Vertex 22 Y-coordinate           : num NA
-#&gt;  $ Vertex 22 Z-coordinate           : num NA
-#&gt;  $ Vertex 23 X-coordinate           : num NA
-#&gt;  $ Vertex 23 Y-coordinate           : num NA
-#&gt;  $ Vertex 23 Z-coordinate           : num NA
-#&gt;  $ Vertex 24 X-coordinate           : num NA
-#&gt;  $ Vertex 24 Y-coordinate           : num NA
-#&gt;  $ Vertex 24 Z-coordinate           : num NA
-#&gt;  $ Vertex 25 X-coordinate           : num NA
-#&gt;  $ Vertex 25 Y-coordinate           : num NA
-#&gt;  $ Vertex 25 Z-coordinate           : num NA
-#&gt;  $ Vertex 26 X-coordinate           : num NA
-#&gt;  $ Vertex 26 Y-coordinate           : num NA
-#&gt;  $ Vertex 26 Z-coordinate           : num NA
-#&gt;  $ Vertex 27 X-coordinate           : num NA
-#&gt;  $ Vertex 27 Y-coordinate           : num NA
-#&gt;  $ Vertex 27 Z-coordinate           : num NA
-#&gt;  $ Vertex 28 X-coordinate           : num NA
-#&gt;  $ Vertex 28 Y-coordinate           : num NA
-#&gt;  $ Vertex 28 Z-coordinate           : num NA
-#&gt;  $ Vertex 29 X-coordinate           : num NA
-#&gt;  $ Vertex 29 Y-coordinate           : num NA
-#&gt;  $ Vertex 29 Z-coordinate           : num NA
-#&gt;  $ Vertex 30 X-coordinate           : num NA
-#&gt;  $ Vertex 30 Y-coordinate           : num NA
-#&gt;   [list output truncated]</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>roof</span><span class='op'>$</span><span class='fu'>value</span><span class='op'>(</span>all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+
 <span class='co'># get field values using shortcuts</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='va'>Roughness</span>
-</div><div class='output co'>#&gt; [1] "MediumRough"</div><div class='input'><span class='va'>mat</span><span class='op'>[[</span><span class='st'>"Specific_Heat"</span><span class='op'>]</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; NULL</div><div class='input'><span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $Name
-#&gt; [1] "C5 - 4 IN HW CONCRETE"
-#&gt; 
-#&gt; $Roughness
-#&gt; [1] "MediumRough"
-#&gt; </div><div class='input'><span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Name"</span>, <span class='st'>"Density"</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $Name
-#&gt; [1] "C5 - 4 IN HW CONCRETE"
-#&gt; 
-#&gt; $Density
-#&gt; [1] 2242.585
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='va'>mat</span><span class='op'>[[</span><span class='st'>"Specific_Heat"</span><span class='op'>]</span><span class='op'>]</span>
+<span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Name"</span>, <span class='st'>"Density"</span><span class='op'>)</span><span class='op'>]</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$set`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># set field values</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>set</span><span class='op'>(</span>name <span class='op'>=</span> <span class='st'>"new_name"</span>, Thickness <span class='op'>=</span> <span class='fl'>0.02</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'Material'&gt; [ID:14] `new_name`
-#&gt; Class: &lt;Material&gt;
-#&gt; ├─ 1*: "new_name",    !- Name
-#&gt; │─ 2*: "MediumRough", !- Roughness
-#&gt; │─ 3*: 0.02,          !- Thickness {m}
-#&gt; │─ 4*: 1.729577,      !- Conductivity {W/m-K}
-#&gt; │─ 5*: 2242.585,      !- Density {kg/m3}
-#&gt; │─ 6*: 836.8,         !- Specific Heat {J/kg-K}
-#&gt; │─ 7 : 0.9,           !- Thermal Absorptance
-#&gt; │─ 8 : 0.65,          !- Solar Absorptance
-#&gt; └─ 9 : 0.65;          !- Visible Absorptance</div><div class='input'><span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Name"</span>, <span class='st'>"Thickness"</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $Name
-#&gt; [1] "new_name"
-#&gt; 
-#&gt; $Thickness
-#&gt; [1] 0.02
-#&gt; </div><div class='input'>
+<span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Name"</span>, <span class='st'>"Thickness"</span><span class='op'>)</span><span class='op'>]</span>
+
 <span class='co'># When `default` argument is set to TRUE and input field values are empty, i.e.</span>
 <span class='co'># NULL, the field values will be reset to defaults.</span>
 <span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Thermal Absorptance"</span>, <span class='st'>"Solar Absorptance"</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $`Thermal Absorptance`
-#&gt; [1] 0.9
-#&gt; 
-#&gt; $`Solar Absorptance`
-#&gt; [1] 0.65
-#&gt; </div><div class='input'>
+
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>set</span><span class='op'>(</span>visible_absorptance <span class='op'>=</span> <span class='cn'>NULL</span>, Solar_Absorptance <span class='op'>=</span> <span class='cn'>NULL</span>, .default <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'Material'&gt; [ID:14] `new_name`
-#&gt; Class: &lt;Material&gt;
-#&gt; ├─ 1*: "new_name",    !- Name
-#&gt; │─ 2*: "MediumRough", !- Roughness
-#&gt; │─ 3*: 0.02,          !- Thickness {m}
-#&gt; │─ 4*: 1.729577,      !- Conductivity {W/m-K}
-#&gt; │─ 5*: 2242.585,      !- Density {kg/m3}
-#&gt; │─ 6*: 836.8,         !- Specific Heat {J/kg-K}
-#&gt; │─ 7 : 0.9,           !- Thermal Absorptance
-#&gt; │─ 8 : 0.7,           !- Solar Absorptance
-#&gt; └─ 9 : 0.7;           !- Visible Absorptance</div><div class='input'><span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Visible Absorptance"</span>, <span class='st'>"Solar Absorptance"</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $`Visible Absorptance`
-#&gt; [1] 0.7
-#&gt; 
-#&gt; $`Solar Absorptance`
-#&gt; [1] 0.7
-#&gt; </div><div class='input'>
+<span class='va'>mat</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Visible Absorptance"</span>, <span class='st'>"Solar Absorptance"</span><span class='op'>)</span><span class='op'>]</span>
+
 <span class='co'># set field values using shortcuts</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='va'>Name</span> <span class='op'>&lt;-</span> <span class='st'>"another_name"</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='va'>Name</span>
-</div><div class='output co'>#&gt; [1] "another_name"</div><div class='input'><span class='va'>mat</span><span class='op'>[[</span><span class='st'>"Thickness"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>0.019</span>
+<span class='va'>mat</span><span class='op'>[[</span><span class='st'>"Thickness"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>0.019</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='va'>Thickness</span>
-</div><div class='output co'>#&gt; [1] 0.019</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$value_possible`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>value_possible</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── 1: Name ─────────────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: &lt;NA&gt;
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: &lt;NA&gt;
-#&gt; * Choice:
-#&gt;   - "VeryRough"
-#&gt;   - "Rough"
-#&gt;   - "MediumRough"
-#&gt;   - "MediumSmooth"
-#&gt;   - "Smooth"
-#&gt;   - "......"
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 3: Thickness ────────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: NA
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 4: Conductivity ─────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: NA
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 5: Density ──────────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: NA
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 6: Specific Heat ────────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: NA
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 7: Thermal Absorptance ──────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: 0.9
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 8: Solar Absorptance ────────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: 0.7
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; 
-#&gt; ── 9: Visible Absorptance ──────────────────────────────────────────────────────
-#&gt; * Auto value: &lt;NA&gt;
-#&gt; * Default: 0.7
-#&gt; * Choice: &lt;NA&gt;
-#&gt; * Source: &lt;NA&gt;
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$validate`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'>
+
 <span class='co'># check at predefined validate level</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"none"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'>
+<span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span>
+<span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span>
+
 <span class='co'># custom validate checking components</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='fu'><a href='custom_validate.html'>custom_validate</a></span><span class='op'>(</span>auto_field <span class='op'>=</span> <span class='cn'>TRUE</span>, choice <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$is_valid`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>definition</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='fu'>field_range</span><span class='op'>(</span><span class='st'>"Density"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; (0, Inf) 
-#&gt; </div><div class='input'><span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span><span class='op'>(</span>validate_level <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span> <span class='co'># have to set validate to "none" to do so</span>
-</div><div class='output co'>#&gt; $validate_level
-#&gt; [1] "none"
-#&gt; </div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='va'>Density</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>1</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span><span class='op'>(</span>validate_level <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span> <span class='co'># have to set validate to "none" to do so</span>
+<span class='va'>mat</span><span class='op'>$</span><span class='va'>Density</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>1</span>
 <span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span><span class='op'>(</span>validate_level <span class='op'>=</span> <span class='st'>"final"</span><span class='op'>)</span> <span class='co'># change back to "final" validate level</span>
-</div><div class='output co'>#&gt; $validate_level
-#&gt; [1] "final"
-#&gt; </div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span>
+
 <span class='co'># check at predefined validate level</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='st'>"none"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span>
+<span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span>
+
 <span class='co'># custom validate checking components</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='fu'><a href='custom_validate.html'>custom_validate</a></span><span class='op'>(</span>auto_field <span class='op'>=</span> <span class='cn'>TRUE</span>, choice <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$value_relation`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># check each layer's reference of a construction named FLOOR</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>value_relation</span><span class='op'>(</span><span class='st'>"zone name"</span>, <span class='st'>"ref_to"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────
-#&gt;  Class: &lt;BuildingSurface:Detailed&gt;
-#&gt;  └─ Object [ID:26] &lt;Zn001:Roof001&gt;
-#&gt;      └─ 4: "ZONE ONE";    !- Zone Name
-#&gt;         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#&gt;         └─ Class: &lt;Zone&gt;
-#&gt;            └─ Object [ID:18] &lt;ZONE ONE&gt;
-#&gt;               └─ 1: "ZONE ONE";    !- Name
-#&gt;     
-#&gt; </div><div class='input'>
+
 <span class='co'># check where is this construction being used</span>
 <span class='va'>roof</span><span class='op'>$</span><span class='fu'>value_relation</span><span class='op'>(</span><span class='st'>"name"</span>, direction <span class='op'>=</span> <span class='st'>"ref_by"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── Referred by Others ──────────────────────────────────────────────────────────
-#&gt; Target(s) is not referred by any other field.
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$ref_to_object`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get other objects that this object refereces</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>ref_to_object</span><span class='op'>(</span><span class='op'>)</span> <span class='co'># not referencing other objects</span>
-</div><div class='output co'>#&gt; <span class='message'>Target object does not refer to any objects.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$ref_by_object`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get other objects that reference this object</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>ref_by_object</span><span class='op'>(</span><span class='op'>)</span> <span class='co'># referenced by construction "FLOOR"</span>
-</div><div class='output co'>#&gt; $FLOOR
-#&gt; &lt;IdfObject: 'Construction'&gt; [ID:16] `FLOOR`
-#&gt; Class: &lt;Construction&gt;
-#&gt; ├─ 1*: "FLOOR",        !- Name
-#&gt; └─ 2*: "another_name"; !- Outside Layer
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$ref_to_node`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles/5Zone_Transformer.idf"</span><span class='op'>)</span>
     <span class='va'>idf_5z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span>
     <span class='va'>idf_5z</span><span class='op'>$</span><span class='va'>NodeList</span><span class='op'>$</span><span class='va'>OutsideAirInletNodes</span><span class='op'>$</span><span class='fu'>ref_to_node</span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; $&lt;NA&gt;
-#&gt; &lt;IdfObject: 'OutdoorAir:NodeList'&gt; [ID:260]
-#&gt; Class: &lt;OutdoorAir:NodeList&gt;
-#&gt; └─ 1*: "OutsideAirInletNodes";  !- Node or NodeList Name 1
-#&gt; 
-#&gt; $`OA Heating Coil 1`
-#&gt; &lt;IdfObject: 'Coil:Heating:Water'&gt; [ID:200] `OA Heating Coil 1`
-#&gt; Class: &lt;Coil:Heating:Water&gt;
-#&gt; ├─ 01*: "OA Heating Coil 1",!- Name
-#&gt; │─ 02 : "CoolingCoilAvailSched",  !- Availability Schedule Name
-#&gt; │─ 03 : autosize,           !- U-Factor Times Area Value {W/K}
-#&gt; │─ 04 : autosize,           !- Maximum Water Flow Rate {m3/s}
-#&gt; │─ 05*: "OA Heating Coil 1 Water Inlet Node",  !- Water Inlet Node Name
-#&gt; │─ 06*: "OA Heating Coil 1 Water Outlet Node",  !- Water Outlet Node Name
-#&gt; │─ 07*: "Outside Air Inlet Node 1",  !- Air Inlet Node Name
-#&gt; │─ 08*: "OA Heating Coil 1 Air Outlet Node",  !- Air Outlet Node Name
-#&gt; │─ 09 : "UFactorTimesAreaAndDesignWaterFlowRate",  !- Performance Input Met...
-#&gt; │─ 10 : autosize,           !- Rated Capacity {W}
-#&gt; │─ 11 : 82.2,               !- Rated Inlet Water Temperature {C}
-#&gt; │─ 12 : 16.6,               !- Rated Inlet Air Temperature {C}
-#&gt; │─ 13 : 71.1,               !- Rated Outlet Water Temperature {C}
-#&gt; │─ 14 : 32.2,               !- Rated Outlet Air Temperature {C}
-#&gt; └─ 15 : &lt;Blank&gt;;            !- Rated Ratio for Air and Water Convection
-#&gt; 
-#&gt; $`OA Controller 1`
-#&gt; &lt;IdfObject: 'Controller:OutdoorAir'&gt; [ID:206] `OA Controller 1`
-#&gt; Class: &lt;Controller:OutdoorAir&gt;
-#&gt; ├─ 01*: "OA Controller 1",  !- Name
-#&gt; │─ 02*: "Relief Air Outlet Node 1",  !- Relief Air Outlet Node Name
-#&gt; │─ 03*: "VAV Sys 1 Inlet Node",  !- Return Air Node Name
-#&gt; │─ 04*: "Mixed Air Node 1", !- Mixed Air Node Name
-#&gt; │─ 05*: "Outside Air Inlet Node 1",  !- Actuator Node Name
-#&gt; │─ 06*: autosize,           !- Minimum Outdoor Air Flow Rate {m3/s}
-#&gt; │─ 07*: autosize,           !- Maximum Outdoor Air Flow Rate {m3/s}
-#&gt; │─ 08 : "NoEconomizer",     !- Economizer Control Type
-#&gt; │─ 09 : "ModulateFlow",     !- Economizer Control Action Type
-#&gt; │─ 10 : 19,                 !- Economizer Maximum Limit Dry-Bulb Temperatur...
-#&gt; │─ 11 : &lt;Blank&gt;,            !- Economizer Maximum Limit Enthalpy {J/kg}
-#&gt; │─ 12 : &lt;Blank&gt;,            !- Economizer Maximum Limit Dewpoint Temperatur...
-#&gt; │─ 13 : &lt;"Blank"&gt;,          !- Electronic Enthalpy Limit Curve Name
-#&gt; │─ 14 : 4.6,                !- Economizer Minimum Limit Dry-Bulb Temperatur...
-#&gt; │─ 15 : "NoLockout",        !- Lockout Type
-#&gt; │─ 16 : "FixedMinimum",     !- Minimum Limit Type
-#&gt; └─ 17 : "Min OA Sched";     !- Minimum Outdoor Air Schedule Name
-#&gt; 
-#&gt; $`CW Low Temp Limit`
-#&gt; &lt;IdfObject: 'AvailabilityManager:LowTemperatureTurnOff'&gt; [ID:286] `CW Low Temp Limit`
-#&gt; Class: &lt;AvailabilityManager:LowTemperatureTurnOff&gt;
-#&gt; ├─ 1*: "CW Low Temp Limit",!- Name
-#&gt; │─ 2*: "Outside Air Inlet Node 1",  !- Sensor Node Name
-#&gt; │─ 3*: 2,                  !- Temperature {C}
-#&gt; └─ 4 : "CoolingPumpAvailSched";  !- Applicability Schedule Name
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$has_ref_to`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>has_ref_to</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$has_ref_by`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>has_ref_by</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$has_ref_node`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>has_ref_node</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$has_ref`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># check if having any referenced objects or is referenced by other objects</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>has_ref</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$to_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get all object data in a data.table format without field units</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>unit <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	9 obs. of  6 variables:
-#&gt;  $ id   : int  14 14 14 14 14 14 14 14 14
-#&gt;  $ name : chr  "another_name" "another_name" "another_name" "another_name" ...
-#&gt;  $ class: chr  "Material" "Material" "Material" "Material" ...
-#&gt;  $ index: int  1 2 3 4 5 6 7 8 9
-#&gt;  $ field: chr  "Name" "Roughness" "Thickness" "Conductivity" ...
-#&gt;  $ value: chr  "another_name" "MediumRough" "0.019" "1.729577" ...
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get all object data in a data.table format where all field values are put in a</span>
 <span class='co'># list column and field names without unit</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>string_value <span class='op'>=</span> <span class='cn'>FALSE</span>, unit <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	9 obs. of  6 variables:
-#&gt;  $ id   : int  14 14 14 14 14 14 14 14 14
-#&gt;  $ name : chr  "another_name" "another_name" "another_name" "another_name" ...
-#&gt;  $ class: chr  "Material" "Material" "Material" "Material" ...
-#&gt;  $ index: int  1 2 3 4 5 6 7 8 9
-#&gt;  $ field: chr  "Name" "Roughness" "Thickness" "Conductivity" ...
-#&gt;  $ value:List of 9
-#&gt;   ..$ : chr "another_name"
-#&gt;   ..$ : chr "MediumRough"
-#&gt;   ..$ : num 0.019
-#&gt;   ..$ : num 1.73
-#&gt;   ..$ : num -1
-#&gt;   ..$ : num 837
-#&gt;   ..$ : num 0.9
-#&gt;   ..$ : num 0.7
-#&gt;   ..$ : num 0.7
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get all object data in a data.table format, including tailing empty fields</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>idf</span><span class='op'>$</span><span class='va'>Zone</span><span class='op'>$</span><span class='va'>`ZONE ONE`</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	13 obs. of  6 variables:
-#&gt;  $ id   : int  18 18 18 18 18 18 18 18 18 18 ...
-#&gt;  $ name : chr  "ZONE ONE" "ZONE ONE" "ZONE ONE" "ZONE ONE" ...
-#&gt;  $ class: chr  "Zone" "Zone" "Zone" "Zone" ...
-#&gt;  $ index: int  1 2 3 4 5 6 7 8 9 10 ...
-#&gt;  $ field: chr  "Name" "Direction of Relative North" "X Origin" "Y Origin" ...
-#&gt;  $ value: chr  "ZONE ONE" "0" "0" "0" ...
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get all object data in a data.table format where each field becomes a column</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	1 obs. of  12 variables:
-#&gt;  $ id                 : int 14
-#&gt;  $ name               : chr "another_name"
-#&gt;  $ class              : chr "Material"
-#&gt;  $ Name               : chr "another_name"
-#&gt;  $ Roughness          : chr "MediumRough"
-#&gt;  $ Thickness          : chr "0.019"
-#&gt;  $ Conductivity       : chr "1.729577"
-#&gt;  $ Density            : chr "-1"
-#&gt;  $ Specific Heat      : chr "836.8"
-#&gt;  $ Thermal Absorptance: chr "0.9"
-#&gt;  $ Solar Absorptance  : chr ".7"
-#&gt;  $ Visible Absorptance: chr ".7"
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># group extensible by extensible group number</span>
 <span class='va'>surf</span> <span class='op'>&lt;-</span> <span class='va'>idf</span><span class='op'>$</span><span class='va'>BuildingSurface_Detailed</span><span class='op'>[[</span><span class='st'>"Zn001:Roof001"</span><span class='op'>]</span><span class='op'>]</span>
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>group_ext <span class='op'>=</span> <span class='st'>"group"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     id          name                    class index
-#&gt;  1: 26 Zn001:Roof001 BuildingSurface:Detailed     1
-#&gt;  2: 26 Zn001:Roof001 BuildingSurface:Detailed     2
-#&gt;  3: 26 Zn001:Roof001 BuildingSurface:Detailed     3
-#&gt;  4: 26 Zn001:Roof001 BuildingSurface:Detailed     4
-#&gt;  5: 26 Zn001:Roof001 BuildingSurface:Detailed     5
-#&gt;  6: 26 Zn001:Roof001 BuildingSurface:Detailed     6
-#&gt;  7: 26 Zn001:Roof001 BuildingSurface:Detailed     7
-#&gt;  8: 26 Zn001:Roof001 BuildingSurface:Detailed     8
-#&gt;  9: 26 Zn001:Roof001 BuildingSurface:Detailed     9
-#&gt; 10: 26 Zn001:Roof001 BuildingSurface:Detailed    10
-#&gt; 11: 26 Zn001:Roof001 BuildingSurface:Detailed    11
-#&gt; 12: 26 Zn001:Roof001 BuildingSurface:Detailed    12
-#&gt; 13: 26 Zn001:Roof001 BuildingSurface:Detailed    13
-#&gt; 14: 26 Zn001:Roof001 BuildingSurface:Detailed    14
-#&gt;                                 field             value
-#&gt;  1:                              Name     Zn001:Roof001
-#&gt;  2:                      Surface Type              Roof
-#&gt;  3:                 Construction Name            ROOF31
-#&gt;  4:                         Zone Name          ZONE ONE
-#&gt;  5:        Outside Boundary Condition          Outdoors
-#&gt;  6: Outside Boundary Condition Object                NA
-#&gt;  7:                      Sun Exposure        SunExposed
-#&gt;  8:                     Wind Exposure       WindExposed
-#&gt;  9:             View Factor to Ground                 0
-#&gt; 10:                Number of Vertices                 4
-#&gt; 11:  Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd     0,15.24,4.572
-#&gt; 12:  Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd         0,0,4.572
-#&gt; 13:  Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd     15.24,0,4.572
-#&gt; 14:  Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd 15.24,15.24,4.572</div><div class='input'>
+
 <span class='co'># group extensible by extensible group number and convert into a wide table</span>
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>group_ext <span class='op'>=</span> <span class='st'>"group"</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    id          name                    class          Name Surface Type
-#&gt; 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof
-#&gt;    Construction Name Zone Name Outside Boundary Condition
-#&gt; 1:            ROOF31  ZONE ONE                   Outdoors
-#&gt;    Outside Boundary Condition Object Sun Exposure Wind Exposure
-#&gt; 1:                                NA   SunExposed   WindExposed
-#&gt;    View Factor to Ground Number of Vertices Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd
-#&gt; 1:                     0                  4                    0,15.24,4.572
-#&gt;    Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd
-#&gt; 1:                        0,0,4.572                    15.24,0,4.572
-#&gt;    Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd
-#&gt; 1:                15.24,15.24,4.572</div><div class='input'>
+
 <span class='co'># group extensible by extensible field index</span>
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>group_ext <span class='op'>=</span> <span class='st'>"index"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     id          name                    class index
-#&gt;  1: 26 Zn001:Roof001 BuildingSurface:Detailed     1
-#&gt;  2: 26 Zn001:Roof001 BuildingSurface:Detailed     2
-#&gt;  3: 26 Zn001:Roof001 BuildingSurface:Detailed     3
-#&gt;  4: 26 Zn001:Roof001 BuildingSurface:Detailed     4
-#&gt;  5: 26 Zn001:Roof001 BuildingSurface:Detailed     5
-#&gt;  6: 26 Zn001:Roof001 BuildingSurface:Detailed     6
-#&gt;  7: 26 Zn001:Roof001 BuildingSurface:Detailed     7
-#&gt;  8: 26 Zn001:Roof001 BuildingSurface:Detailed     8
-#&gt;  9: 26 Zn001:Roof001 BuildingSurface:Detailed     9
-#&gt; 10: 26 Zn001:Roof001 BuildingSurface:Detailed    10
-#&gt; 11: 26 Zn001:Roof001 BuildingSurface:Detailed    11
-#&gt; 12: 26 Zn001:Roof001 BuildingSurface:Detailed    12
-#&gt; 13: 26 Zn001:Roof001 BuildingSurface:Detailed    13
-#&gt;                                 field                   value
-#&gt;  1:                              Name           Zn001:Roof001
-#&gt;  2:                      Surface Type                    Roof
-#&gt;  3:                 Construction Name                  ROOF31
-#&gt;  4:                         Zone Name                ZONE ONE
-#&gt;  5:        Outside Boundary Condition                Outdoors
-#&gt;  6: Outside Boundary Condition Object                      NA
-#&gt;  7:                      Sun Exposure              SunExposed
-#&gt;  8:                     Wind Exposure             WindExposed
-#&gt;  9:             View Factor to Ground                       0
-#&gt; 10:                Number of Vertices                       4
-#&gt; 11:               Vertex X-coordinate         0,0,15.24,15.24
-#&gt; 12:               Vertex Y-coordinate         15.24,0,0,15.24
-#&gt; 13:               Vertex Z-coordinate 4.572,4.572,4.572,4.572</div><div class='input'>
+
 <span class='co'># group extensible by extensible field index and convert into a wide table</span>
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>group_ext <span class='op'>=</span> <span class='st'>"index"</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    id          name                    class          Name Surface Type
-#&gt; 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof
-#&gt;    Construction Name Zone Name Outside Boundary Condition
-#&gt; 1:            ROOF31  ZONE ONE                   Outdoors
-#&gt;    Outside Boundary Condition Object Sun Exposure Wind Exposure
-#&gt; 1:                                NA   SunExposed   WindExposed
-#&gt;    View Factor to Ground Number of Vertices Vertex X-coordinate
-#&gt; 1:                     0                  4     0,0,15.24,15.24
-#&gt;    Vertex Y-coordinate     Vertex Z-coordinate
-#&gt; 1:     15.24,0,0,15.24 4.572,4.572,4.572,4.572</div><div class='input'>
+
 <span class='co'># when grouping extensible, 'string_value' and 'unit' still take effect</span>
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>group_ext <span class='op'>=</span> <span class='st'>"index"</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span>, string_value <span class='op'>=</span> <span class='cn'>FALSE</span>, unit <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    id          name                    class          Name Surface Type
-#&gt; 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof
-#&gt;    Construction Name Zone Name Outside Boundary Condition
-#&gt; 1:            ROOF31  ZONE ONE                   Outdoors
-#&gt;    Outside Boundary Condition Object Sun Exposure Wind Exposure
-#&gt; 1:                              &lt;NA&gt;   SunExposed   WindExposed
-#&gt;    View Factor to Ground Number of Vertices
-#&gt; 1:                     0                  4
-#&gt;                        Vertex X-coordinate
-#&gt; 1:  0.00 [m], 0.00 [m],15.24 [m],15.24 [m]
-#&gt;                        Vertex Y-coordinate
-#&gt; 1: 15.24 [m], 0.00 [m], 0.00 [m],15.24 [m]
-#&gt;                        Vertex Z-coordinate
-#&gt; 1: 4.572 [m],4.572 [m],4.572 [m],4.572 [m]</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$to_string`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get string format object</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_string</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "Material,"                                             
-#&gt;  [2] "    another_name,            !- Name"                  
-#&gt;  [3] "    MediumRough,             !- Roughness"             
-#&gt;  [4] "    0.019,                   !- Thickness {m}"         
-#&gt;  [5] "    1.729577,                !- Conductivity {W/m-K}"  
-#&gt;  [6] "    -1,                      !- Density {kg/m3}"       
-#&gt;  [7] "    836.8,                   !- Specific Heat {J/kg-K}"
-#&gt;  [8] "    0.9,                     !- Thermal Absorptance"   
-#&gt;  [9] "    0.7,                     !- Solar Absorptance"     
-#&gt; [10] "    0.7;                     !- Visible Absorptance"   </div><div class='input'>
+
 <span class='co'># get string format of object, and decrease the space between field values and</span>
 <span class='co'># field names</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_string</span><span class='op'>(</span>sep_at <span class='op'>=</span> <span class='fl'>15</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "Material,"                               
-#&gt;  [2] "    another_name,  !- Name"              
-#&gt;  [3] "    MediumRough,  !- Roughness"          
-#&gt;  [4] "    0.019,     !- Thickness {m}"         
-#&gt;  [5] "    1.729577,  !- Conductivity {W/m-K}"  
-#&gt;  [6] "    -1,        !- Density {kg/m3}"       
-#&gt;  [7] "    836.8,     !- Specific Heat {J/kg-K}"
-#&gt;  [8] "    0.9,       !- Thermal Absorptance"   
-#&gt;  [9] "    0.7,       !- Solar Absorptance"     
-#&gt; [10] "    0.7;       !- Visible Absorptance"   </div><div class='input'>
+
 <span class='co'># get string format of object, and decrease the leading space of field values</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>to_string</span><span class='op'>(</span>leading <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "Material,"                                             
-#&gt;  [2] "another_name,                !- Name"                  
-#&gt;  [3] "MediumRough,                 !- Roughness"             
-#&gt;  [4] "0.019,                       !- Thickness {m}"         
-#&gt;  [5] "1.729577,                    !- Conductivity {W/m-K}"  
-#&gt;  [6] "-1,                          !- Density {kg/m3}"       
-#&gt;  [7] "836.8,                       !- Specific Heat {J/kg-K}"
-#&gt;  [8] "0.9,                         !- Thermal Absorptance"   
-#&gt;  [9] "0.7,                         !- Solar Absorptance"     
-#&gt; [10] "0.7;                         !- Visible Absorptance"   </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfObject$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># print the object without comment</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span>comment <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'Material'&gt; [ID:14] `another_name`
-#&gt; Class: &lt;Material&gt;
-#&gt; ├─ 1*: "another_name", !- Name
-#&gt; │─ 2*: "MediumRough",  !- Roughness
-#&gt; │─ 3*: 0.019,          !- Thickness {m}
-#&gt; │─ 4*: 1.729577,       !- Conductivity {W/m-K}
-#&gt; │─ 5*: -1,             !- Density {kg/m3}
-#&gt; │─ 6*: 836.8,          !- Specific Heat {J/kg-K}
-#&gt; │─ 7 : 0.9,            !- Thermal Absorptance
-#&gt; │─ 8 : 0.7,            !- Solar Absorptance
-#&gt; └─ 9 : 0.7;            !- Visible Absorptance</div><div class='input'>
+
 <span class='co'># print the object, and auto separate field values and field names at the</span>
 <span class='co'># largetst character length of field values</span>
 <span class='va'>mat</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span>auto_sep <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'Material'&gt; [ID:14] `another_name`
-#&gt; Class: &lt;Material&gt;
-#&gt; ├─ 1*: "another_name", !- Name
-#&gt; │─ 2*: "MediumRough",  !- Roughness
-#&gt; │─ 3*: 0.019,          !- Thickness {m}
-#&gt; │─ 4*: 1.729577,       !- Conductivity {W/m-K}
-#&gt; │─ 5*: -1,             !- Density {kg/m3}
-#&gt; │─ 6*: 836.8,          !- Specific Heat {J/kg-K}
-#&gt; │─ 7 : 0.9,            !- Thermal Absorptance
-#&gt; │─ 8 : 0.7,            !- Solar Absorptance
-#&gt; └─ 9 : 0.7;            !- Visible Absorptance</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>

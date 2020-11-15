@@ -985,7 +985,7 @@ job$print()
 <span class='co'>## Method `EplusJob$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
     <span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
@@ -999,1860 +999,206 @@ job$print()
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>epw_path</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$version`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>version</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] ‘8.8.0’</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$path`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                                                                                    idf 
-#&gt;                       "/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf" 
-#&gt;                                                                                    epw 
-#&gt; "/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw" </div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"idf"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf"</div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"epw"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</div><div class='input'><span class='co'># }</span>
+<span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"idf"</span><span class='op'>)</span>
+<span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"epw"</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$run`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># only run design day</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf.</span></div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:02
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  Requested ESO file=eplusout.eso
-#&gt;  does not exist.  ReadVarsESO program terminated.
-#&gt;  ReadVarsESO program terminated.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  0.30sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:02:59' and completed successfully after 0.35 secs.</span><span></div><div class='input'>
+
 <span class='co'># specify output directory</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:03
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  0.32sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:00' and completed successfully after 0.37 secs.</span><span></div><div class='input'>
+
 <span class='co'># run in the background</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>wait <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:03
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  0.32sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:00' and completed successfully after 0.37 secs.</span><span></div><div class='input'><span class='co'># see job status</span>
+<span class='co'># see job status</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $run_before
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $alive
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $terminated
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $successful
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $changed_after
-#&gt; [1] FALSE
-#&gt; </div><div class='input'>
+
 <span class='co'># force to kill background job before running the new one</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>force <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:03
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  0.33sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:00' and completed successfully after 0.37 secs.</span><span></div><div class='input'>
+
 <span class='co'># do not show anything in the console</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:01' and completed successfully after 0.37 secs.</span><span></div><div class='input'>
+
 <span class='co'># copy external files used in the model to simulation output directory</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>copy_external <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.11.11 02:03
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.02sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  0.32sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:01' and completed successfully after 0.37 secs.</span><span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$kill`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>kill</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>The job is not running.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$status`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $run_before
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $alive
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $terminated
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $successful
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $changed_after
-#&gt; [1] FALSE
-#&gt; </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$errors`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:03:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt; 
-#&gt;   [EnergyPlus did not generate any message...]</div><div class='input'>
+
 <span class='co'># show all information</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span>info <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:03:00
-#&gt;   * Terminated: FALSE
-#&gt;   * Successful: TRUE
-#&gt; 
-#&gt; ── During Simulation Initiation ────────────────────────────────────────────────
-#&gt; [I 1/8] Testing Individual Branch Integrity
-#&gt; [I 2/8] All Branches passed integrity testing
-#&gt; [I 3/8] Testing Individual Supply Air Path Integrity
-#&gt; [I 4/8] All Supply Air Paths passed integrity testing
-#&gt; [I 5/8] Testing Individual Return Air Path Integrity
-#&gt; [I 6/8] All Return Air Paths passed integrity testing
-#&gt; [I 7/8] No node connection errors were found.
-#&gt; 
-#&gt; ── During Simulation ───────────────────────────────────────────────────────────
-#&gt; [I 8/8] Simulation Error Summary *************</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$output_dir`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>output_dir</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E"</div><div class='input'>
+
 <span class='co'># Below will open output directory</span>
 <span class='co'># job$output_dir(open = TRUE)</span>
-<span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$locate_output`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get the file path of the error file</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".err"</span>, strict <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneUncontrolled.err"</div><div class='input'>
+
 <span class='co'># can use to detect if certain output file exists</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".expidf"</span>, strict <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in job_locate_output(self, private, suffix, strict, must_exist = strict): Assertion on 'output file' failed: File does not exist: '/tmp/RtmpbSS17E/1ZoneUncontrolled.expidf'.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_rdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_rdd</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Report Data Dictionary File ══════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:03:00
-#&gt; 
-#&gt; ── Details ─────────────────────────────────────────────────────────────────────
-#&gt;      index reported_time_step report_type
-#&gt;   1:     1               Zone     Average
-#&gt;   2:     2               Zone     Average
-#&gt;   3:     3               Zone     Average
-#&gt;   4:     4               Zone     Average
-#&gt;   5:     5               Zone     Average
-#&gt;  ---                                     
-#&gt; 244:   244               Zone         Sum
-#&gt; 245:   245               Zone     Average
-#&gt; 246:   246               HVAC         Sum
-#&gt; 247:   247               HVAC         Sum
-#&gt; 248:   248               HVAC         Sum
-#&gt;                                                             variable
-#&gt;   1:                            Site Outdoor Air Drybulb Temperature
-#&gt;   2:                           Site Outdoor Air Dewpoint Temperature
-#&gt;   3:                            Site Outdoor Air Wetbulb Temperature
-#&gt;   4:                                 Site Outdoor Air Humidity Ratio
-#&gt;   5:                              Site Outdoor Air Relative Humidity
-#&gt;  ---                                                                
-#&gt; 244:           Facility Cooling Setpoint Not Met While Occupied Time
-#&gt; 245:                                                  Schedule Value
-#&gt; 246: Environmental Impact Total N2O Emissions Carbon Equivalent Mass
-#&gt; 247: Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
-#&gt; 248: Environmental Impact Total CO2 Emissions Carbon Equivalent Mass
-#&gt;                 units
-#&gt;   1:                C
-#&gt;   2:                C
-#&gt;   3:                C
-#&gt;   4: kgWater/kgDryAir
-#&gt;   5:                %
-#&gt;  ---                 
-#&gt; 244:               hr
-#&gt; 245:             &lt;NA&gt;
-#&gt; 246:               kg
-#&gt; 247:               kg
-#&gt; 248:               kg</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_mdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_mdd</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Meter Data Dictionary File ═══════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2020-11-11 02:03:00
-#&gt; 
-#&gt; ── Details ─────────────────────────────────────────────────────────────────────
-#&gt;     index reported_time_step report_type
-#&gt;  1:     1               Zone       Meter
-#&gt;  2:     2               Zone       Meter
-#&gt;  3:     3               Zone       Meter
-#&gt;  4:     4               Zone       Meter
-#&gt;  5:     5               Zone       Meter
-#&gt;  6:     6               Zone       Meter
-#&gt;  7:     7               Zone       Meter
-#&gt;  8:     8               Zone       Meter
-#&gt;  9:     9               Zone       Meter
-#&gt; 10:    10               Zone       Meter
-#&gt; 11:    11               Zone       Meter
-#&gt; 12:    12               Zone       Meter
-#&gt; 13:    13               Zone       Meter
-#&gt; 14:    14               Zone       Meter
-#&gt; 15:    15               Zone       Meter
-#&gt; 16:    16               Zone       Meter
-#&gt; 17:    17               Zone       Meter
-#&gt; 18:    18               Zone       Meter
-#&gt; 19:    19               Zone       Meter
-#&gt; 20:    20               Zone       Meter
-#&gt; 21:    21               Zone       Meter
-#&gt;     index reported_time_step report_type
-#&gt;                                        variable units
-#&gt;  1:                        Electricity:Facility     J
-#&gt;  2:                  ExteriorLights:Electricity     J
-#&gt;  3:   Grounds Lights:ExteriorLights:Electricity     J
-#&gt;  4:                     EnergyTransfer:Facility     J
-#&gt;  5:                     EnergyTransfer:Building     J
-#&gt;  6:                EnergyTransfer:Zone:ZONE ONE     J
-#&gt;  7:                      Heating:EnergyTransfer     J
-#&gt;  8:        Heating:EnergyTransfer:Zone:ZONE ONE     J
-#&gt;  9:                      Cooling:EnergyTransfer     J
-#&gt; 10:        Cooling:EnergyTransfer:Zone:ZONE ONE     J
-#&gt; 11:               ElectricityPurchased:Facility     J
-#&gt; 12:                  ElectricityPurchased:Plant     J
-#&gt; 13:           Cogeneration:ElectricityPurchased     J
-#&gt; 14:             ElectricitySurplusSold:Facility     J
-#&gt; 15:                ElectricitySurplusSold:Plant     J
-#&gt; 16:         Cogeneration:ElectricitySurplusSold     J
-#&gt; 17:                     ElectricityNet:Facility     J
-#&gt; 18:                        ElectricityNet:Plant     J
-#&gt; 19:                 Cogeneration:ElectricityNet     J
-#&gt; 20:                  Carbon Equivalent:Facility    kg
-#&gt; 21: CarbonEquivalentEmissions:Carbon Equivalent    kg
-#&gt;                                        variable units</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$list_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>list_table</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "ComponentSizes"               "ConstructionLayers"          
-#&gt;  [3] "Constructions"                "DaylightMapHourlyData"       
-#&gt;  [5] "DaylightMapHourlyReports"     "DaylightMaps"                
-#&gt;  [7] "EnvironmentPeriods"           "Errors"                      
-#&gt;  [9] "Materials"                    "NominalBaseboardHeaters"     
-#&gt; [11] "NominalElectricEquipment"     "NominalGasEquipment"         
-#&gt; [13] "NominalHotWaterEquipment"     "NominalInfiltration"         
-#&gt; [15] "NominalLighting"              "NominalOtherEquipment"       
-#&gt; [17] "NominalPeople"                "NominalSteamEquipment"       
-#&gt; [19] "NominalVentilation"           "ReportData"                  
-#&gt; [21] "ReportDataDictionary"         "ReportExtendedData"          
-#&gt; [23] "ReportMeterData"              "ReportMeterDataDictionary"   
-#&gt; [25] "ReportMeterExtendedData"      "ReportVariableData"          
-#&gt; [27] "ReportVariableDataDictionary" "ReportVariableExtendedData"  
-#&gt; [29] "ReportVariableWithTime"       "RoomAirModels"               
-#&gt; [31] "Schedules"                    "Simulations"                 
-#&gt; [33] "StringTypes"                  "Strings"                     
-#&gt; [35] "Surfaces"                     "SystemSizes"                 
-#&gt; [37] "TabularData"                  "TabularDataWithStrings"      
-#&gt; [39] "Time"                         "ZoneGroups"                  
-#&gt; [41] "ZoneInfoZoneLists"            "ZoneLists"                   
-#&gt; [43] "ZoneSizes"                    "Zones"                       </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read a specific table</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"Zones"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    zone_index zone_name rel_north origin_x origin_y origin_z centroid_x
-#&gt; 1:          1  ZONE ONE         0        0        0        0       7.62
-#&gt;    centroid_y centroid_z of_type multiplier list_multiplier minimum_x maximum_x
-#&gt; 1:       7.62      2.286       1          1               1         0     15.24
-#&gt;    minimum_y maximum_y minimum_z maximum_z ceiling_height   volume
-#&gt; 1:         0     15.24         0     4.572          4.572 1061.882
-#&gt;    inside_convection_algo outside_convection_algo floor_area
-#&gt; 1:                      2                       7   232.2576
-#&gt;    ext_gross_wall_area ext_net_wall_area ext_window_area is_part_of_total_area
-#&gt; 1:            278.7091          278.7091               0                     1</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$report_data_dict`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     report_data_dictionary_index is_meter type
-#&gt;  1:                            6        0  Avg
-#&gt;  2:                            7        0  Avg
-#&gt;  3:                            8        0  Avg
-#&gt;  4:                           21        1  Sum
-#&gt;  5:                           40        0  Sum
-#&gt;  6:                           41        0  Sum
-#&gt;  7:                           42        0  Sum
-#&gt;  8:                           43        0  Sum
-#&gt;  9:                           44        0  Avg
-#&gt; 10:                           45        0  Avg
-#&gt; 11:                           46        0  Avg
-#&gt; 12:                           47        0  Avg
-#&gt; 13:                           48        0  Avg
-#&gt; 14:                           49        0  Avg
-#&gt; 15:                           50        0  Avg
-#&gt; 16:                           51        0  Avg
-#&gt; 17:                           52        0  Avg
-#&gt; 18:                           53        0  Avg
-#&gt; 19:                           54        0  Avg
-#&gt; 20:                           55        0  Avg
-#&gt; 21:                           56        0  Avg
-#&gt; 22:                           57        0  Avg
-#&gt; 23:                           58        0  Avg
-#&gt; 24:                           59        0  Avg
-#&gt; 25:                           60        0  Avg
-#&gt; 26:                           61        0  Avg
-#&gt; 27:                           62        0  Avg
-#&gt; 28:                           63        0  Avg
-#&gt; 29:                           64        0  Avg
-#&gt; 30:                           65        0  Avg
-#&gt; 31:                           66        0  Avg
-#&gt; 32:                           67        0  Avg
-#&gt; 33:                           68        0  Avg
-#&gt; 34:                           69        0  Avg
-#&gt; 35:                           70        0  Avg
-#&gt; 36:                           73        1  Sum
-#&gt; 37:                           83        1  Sum
-#&gt;     report_data_dictionary_index is_meter type
-#&gt;                             index_group timestep_type      key_value
-#&gt;  1:                                Zone   HVAC System    Environment
-#&gt;  2:                                Zone   HVAC System    Environment
-#&gt;  3:                                Zone   HVAC System    Environment
-#&gt;  4: Facility:Electricity:ExteriorLights   HVAC System               
-#&gt;  5:                                Zone   HVAC System       ZONE ONE
-#&gt;  6:                                Zone   HVAC System      TEST 352A
-#&gt;  7:                                Zone   HVAC System       ZONE ONE
-#&gt;  8:                                Zone   HVAC System TEST 352 MINUS
-#&gt;  9:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 10:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 11:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 12:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 13:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 14:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 15:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 16:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 17:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 18:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 19:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 20:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 21:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 22:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 23:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 24:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 25:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 26:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 27:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 28:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 29:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 30:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 31:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 32:                                Zone   HVAC System       ZONE ONE
-#&gt; 33:                                Zone   HVAC System       ZONE ONE
-#&gt; 34:                              System          Zone       ZONE ONE
-#&gt; 35:                              System          Zone       ZONE ONE
-#&gt; 36:             Facility:EnergyTransfer   HVAC System               
-#&gt; 37:             Building:EnergyTransfer   HVAC System               
-#&gt;                             index_group timestep_type      key_value
-#&gt;                                                          name
-#&gt;  1:                      Site Outdoor Air Drybulb Temperature
-#&gt;  2:                          Site Daylight Saving Time Status
-#&gt;  3:                                       Site Day Type Index
-#&gt;  4:                                ExteriorLights:Electricity
-#&gt;  5:                    Zone Total Internal Latent Gain Energy
-#&gt;  6:                      Other Equipment Total Heating Energy
-#&gt;  7:                 Zone Other Equipment Total Heating Energy
-#&gt;  8:                      Other Equipment Total Heating Energy
-#&gt;  9:                           Surface Inside Face Temperature
-#&gt; 10:                          Surface Outside Face Temperature
-#&gt; 11:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 12: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 13:                           Surface Inside Face Temperature
-#&gt; 14:                          Surface Outside Face Temperature
-#&gt; 15:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 16: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 17:                           Surface Inside Face Temperature
-#&gt; 18:                          Surface Outside Face Temperature
-#&gt; 19:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 20: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 21:                           Surface Inside Face Temperature
-#&gt; 22:                          Surface Outside Face Temperature
-#&gt; 23:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 24: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 25:                           Surface Inside Face Temperature
-#&gt; 26:                          Surface Outside Face Temperature
-#&gt; 27:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 28:                           Surface Inside Face Temperature
-#&gt; 29:                          Surface Outside Face Temperature
-#&gt; 30:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 31: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 32:                             Zone Mean Radiant Temperature
-#&gt; 33:                                 Zone Mean Air Temperature
-#&gt; 34:             Zone Air Heat Balance Surface Convection Rate
-#&gt; 35:             Zone Air Heat Balance Air Energy Storage Rate
-#&gt; 36:                                   EnergyTransfer:Facility
-#&gt; 37:                                   EnergyTransfer:Building
-#&gt;                                                          name
-#&gt;     reporting_frequency schedule_name  units
-#&gt;  1:              Hourly          &lt;NA&gt;      C
-#&gt;  2:               Daily          &lt;NA&gt;       
-#&gt;  3:               Daily          &lt;NA&gt;       
-#&gt;  4:              Hourly          &lt;NA&gt;      J
-#&gt;  5:              Hourly          &lt;NA&gt;      J
-#&gt;  6:             Monthly          &lt;NA&gt;      J
-#&gt;  7:             Monthly          &lt;NA&gt;      J
-#&gt;  8:             Monthly          &lt;NA&gt;      J
-#&gt;  9:               Daily          &lt;NA&gt;      C
-#&gt; 10:               Daily          &lt;NA&gt;      C
-#&gt; 11:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 12:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 13:               Daily          &lt;NA&gt;      C
-#&gt; 14:               Daily          &lt;NA&gt;      C
-#&gt; 15:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 16:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 17:               Daily          &lt;NA&gt;      C
-#&gt; 18:               Daily          &lt;NA&gt;      C
-#&gt; 19:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 20:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 21:               Daily          &lt;NA&gt;      C
-#&gt; 22:               Daily          &lt;NA&gt;      C
-#&gt; 23:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 24:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 25:               Daily          &lt;NA&gt;      C
-#&gt; 26:               Daily          &lt;NA&gt;      C
-#&gt; 27:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 28:               Daily          &lt;NA&gt;      C
-#&gt; 29:               Daily          &lt;NA&gt;      C
-#&gt; 30:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 31:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 32:              Hourly          &lt;NA&gt;      C
-#&gt; 33:              Hourly          &lt;NA&gt;      C
-#&gt; 34:              Hourly          &lt;NA&gt;      W
-#&gt; 35:              Hourly          &lt;NA&gt;      W
-#&gt; 36:              Hourly          &lt;NA&gt;      J
-#&gt; 37:              Hourly          &lt;NA&gt;      J
-#&gt;     reporting_frequency schedule_name  units</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$report_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read all report data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                   case            datetime   key_value
-#&gt;   1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;   2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;   3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;   4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;   5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;  ---                                                  
-#&gt; 484: 1ZoneUncontrolled 2020-07-21 20:00:00            
-#&gt; 485: 1ZoneUncontrolled 2020-07-21 21:00:00            
-#&gt; 486: 1ZoneUncontrolled 2020-07-21 22:00:00            
-#&gt; 487: 1ZoneUncontrolled 2020-07-21 23:00:00            
-#&gt; 488: 1ZoneUncontrolled 2020-07-22 00:00:00            
-#&gt;                                      name units value
-#&gt;   1: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;   2: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;   3: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;   4: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;   5: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;  ---                                                 
-#&gt; 484:              EnergyTransfer:Building     J   0.0
-#&gt; 485:              EnergyTransfer:Building     J   0.0
-#&gt; 486:              EnergyTransfer:Building     J   0.0
-#&gt; 487:              EnergyTransfer:Building     J   0.0
-#&gt; 488:              EnergyTransfer:Building     J   0.0</div><div class='input'>
+
 <span class='co'># specify output variables using report data dictionary</span>
 <span class='va'>dict</span> <span class='op'>&lt;-</span> <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='va'>units</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                   case            datetime   key_value
-#&gt;   1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;   2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;   3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;   4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;   5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;  ---                                                  
-#&gt; 164: 1ZoneUncontrolled 2020-07-21 20:00:00    ZONE ONE
-#&gt; 165: 1ZoneUncontrolled 2020-07-21 21:00:00    ZONE ONE
-#&gt; 166: 1ZoneUncontrolled 2020-07-21 22:00:00    ZONE ONE
-#&gt; 167: 1ZoneUncontrolled 2020-07-21 23:00:00    ZONE ONE
-#&gt; 168: 1ZoneUncontrolled 2020-07-22 00:00:00    ZONE ONE
-#&gt;                                      name units     value
-#&gt;   1: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;   2: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;   3: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;   4: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;   5: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;  ---                                                     
-#&gt; 164:            Zone Mean Air Temperature     C  30.52040
-#&gt; 165:            Zone Mean Air Temperature     C  30.18302
-#&gt; 166:            Zone Mean Air Temperature     C  29.91590
-#&gt; 167:            Zone Mean Air Temperature     C  29.64215
-#&gt; 168:            Zone Mean Air Temperature     C  29.36457</div><div class='input'>
+
 <span class='co'># specify output variables using 'key_value' and 'name'</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='st'>"environment"</span>, <span class='st'>"site outdoor air drybulb temperature"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case            datetime   key_value
-#&gt;  1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;  2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;  3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;  4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;  5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;  6: 1ZoneUncontrolled 2020-12-21 06:00:00 Environment
-#&gt;  7: 1ZoneUncontrolled 2020-12-21 07:00:00 Environment
-#&gt;  8: 1ZoneUncontrolled 2020-12-21 08:00:00 Environment
-#&gt;  9: 1ZoneUncontrolled 2020-12-21 09:00:00 Environment
-#&gt; 10: 1ZoneUncontrolled 2020-12-21 10:00:00 Environment
-#&gt; 11: 1ZoneUncontrolled 2020-12-21 11:00:00 Environment
-#&gt; 12: 1ZoneUncontrolled 2020-12-21 12:00:00 Environment
-#&gt; 13: 1ZoneUncontrolled 2020-12-21 13:00:00 Environment
-#&gt; 14: 1ZoneUncontrolled 2020-12-21 14:00:00 Environment
-#&gt; 15: 1ZoneUncontrolled 2020-12-21 15:00:00 Environment
-#&gt; 16: 1ZoneUncontrolled 2020-12-21 16:00:00 Environment
-#&gt; 17: 1ZoneUncontrolled 2020-12-21 17:00:00 Environment
-#&gt; 18: 1ZoneUncontrolled 2020-12-21 18:00:00 Environment
-#&gt; 19: 1ZoneUncontrolled 2020-12-21 19:00:00 Environment
-#&gt; 20: 1ZoneUncontrolled 2020-12-21 20:00:00 Environment
-#&gt; 21: 1ZoneUncontrolled 2020-12-21 21:00:00 Environment
-#&gt; 22: 1ZoneUncontrolled 2020-12-21 22:00:00 Environment
-#&gt; 23: 1ZoneUncontrolled 2020-12-21 23:00:00 Environment
-#&gt; 24: 1ZoneUncontrolled 2020-12-22 00:00:00 Environment
-#&gt; 25: 1ZoneUncontrolled 2020-07-21 01:00:00 Environment
-#&gt; 26: 1ZoneUncontrolled 2020-07-21 02:00:00 Environment
-#&gt; 27: 1ZoneUncontrolled 2020-07-21 03:00:00 Environment
-#&gt; 28: 1ZoneUncontrolled 2020-07-21 04:00:00 Environment
-#&gt; 29: 1ZoneUncontrolled 2020-07-21 05:00:00 Environment
-#&gt; 30: 1ZoneUncontrolled 2020-07-21 06:00:00 Environment
-#&gt; 31: 1ZoneUncontrolled 2020-07-21 07:00:00 Environment
-#&gt; 32: 1ZoneUncontrolled 2020-07-21 08:00:00 Environment
-#&gt; 33: 1ZoneUncontrolled 2020-07-21 09:00:00 Environment
-#&gt; 34: 1ZoneUncontrolled 2020-07-21 10:00:00 Environment
-#&gt; 35: 1ZoneUncontrolled 2020-07-21 11:00:00 Environment
-#&gt; 36: 1ZoneUncontrolled 2020-07-21 12:00:00 Environment
-#&gt; 37: 1ZoneUncontrolled 2020-07-21 13:00:00 Environment
-#&gt; 38: 1ZoneUncontrolled 2020-07-21 14:00:00 Environment
-#&gt; 39: 1ZoneUncontrolled 2020-07-21 15:00:00 Environment
-#&gt; 40: 1ZoneUncontrolled 2020-07-21 16:00:00 Environment
-#&gt; 41: 1ZoneUncontrolled 2020-07-21 17:00:00 Environment
-#&gt; 42: 1ZoneUncontrolled 2020-07-21 18:00:00 Environment
-#&gt; 43: 1ZoneUncontrolled 2020-07-21 19:00:00 Environment
-#&gt; 44: 1ZoneUncontrolled 2020-07-21 20:00:00 Environment
-#&gt; 45: 1ZoneUncontrolled 2020-07-21 21:00:00 Environment
-#&gt; 46: 1ZoneUncontrolled 2020-07-21 22:00:00 Environment
-#&gt; 47: 1ZoneUncontrolled 2020-07-21 23:00:00 Environment
-#&gt; 48: 1ZoneUncontrolled 2020-07-22 00:00:00 Environment
-#&gt;                  case            datetime   key_value
-#&gt;                                     name units   value
-#&gt;  1: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  2: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  3: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  4: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  5: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  6: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  7: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  8: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  9: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 10: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 11: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 12: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 13: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 14: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 15: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 16: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 17: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 18: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 19: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 20: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 21: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 22: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 23: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 24: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 25: Site Outdoor Air Drybulb Temperature     C  18.966
-#&gt; 26: Site Outdoor Air Drybulb Temperature     C  18.244
-#&gt; 27: Site Outdoor Air Drybulb Temperature     C  17.731
-#&gt; 28: Site Outdoor Air Drybulb Temperature     C  17.275
-#&gt; 29: Site Outdoor Air Drybulb Temperature     C  16.914
-#&gt; 30: Site Outdoor Air Drybulb Temperature     C  16.990
-#&gt; 31: Site Outdoor Air Drybulb Temperature     C  17.769
-#&gt; 32: Site Outdoor Air Drybulb Temperature     C  19.783
-#&gt; 33: Site Outdoor Air Drybulb Temperature     C  22.557
-#&gt; 34: Site Outdoor Air Drybulb Temperature     C  25.255
-#&gt; 35: Site Outdoor Air Drybulb Temperature     C  27.649
-#&gt; 36: Site Outdoor Air Drybulb Temperature     C  29.454
-#&gt; 37: Site Outdoor Air Drybulb Temperature     C  30.784
-#&gt; 38: Site Outdoor Air Drybulb Temperature     C  31.715
-#&gt; 39: Site Outdoor Air Drybulb Temperature     C  32.000
-#&gt; 40: Site Outdoor Air Drybulb Temperature     C  31.430
-#&gt; 41: Site Outdoor Air Drybulb Temperature     C  30.328
-#&gt; 42: Site Outdoor Air Drybulb Temperature     C  28.922
-#&gt; 43: Site Outdoor Air Drybulb Temperature     C  26.927
-#&gt; 44: Site Outdoor Air Drybulb Temperature     C  25.027
-#&gt; 45: Site Outdoor Air Drybulb Temperature     C  23.545
-#&gt; 46: Site Outdoor Air Drybulb Temperature     C  22.177
-#&gt; 47: Site Outdoor Air Drybulb Temperature     C  20.999
-#&gt; 48: Site Outdoor Air Drybulb Temperature     C  19.935
-#&gt;                                     name units   value</div><div class='input'>
+
 <span class='co'># explicitly specify year value and time zone</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, year <span class='op'>=</span> <span class='fl'>2020</span>, tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case            datetime   key_value
-#&gt;  1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;  2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;  3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;  4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;  5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;  6: 1ZoneUncontrolled 2020-12-21 06:00:00 Environment
-#&gt;  7: 1ZoneUncontrolled 2020-12-21 07:00:00 Environment
-#&gt;  8: 1ZoneUncontrolled 2020-12-21 08:00:00 Environment
-#&gt;  9: 1ZoneUncontrolled 2020-12-21 09:00:00 Environment
-#&gt; 10: 1ZoneUncontrolled 2020-12-21 10:00:00 Environment
-#&gt; 11: 1ZoneUncontrolled 2020-12-21 11:00:00 Environment
-#&gt; 12: 1ZoneUncontrolled 2020-12-21 12:00:00 Environment
-#&gt; 13: 1ZoneUncontrolled 2020-12-21 13:00:00 Environment
-#&gt; 14: 1ZoneUncontrolled 2020-12-21 14:00:00 Environment
-#&gt; 15: 1ZoneUncontrolled 2020-12-21 15:00:00 Environment
-#&gt; 16: 1ZoneUncontrolled 2020-12-21 16:00:00 Environment
-#&gt; 17: 1ZoneUncontrolled 2020-12-21 17:00:00 Environment
-#&gt; 18: 1ZoneUncontrolled 2020-12-21 18:00:00 Environment
-#&gt; 19: 1ZoneUncontrolled 2020-12-21 19:00:00 Environment
-#&gt; 20: 1ZoneUncontrolled 2020-12-21 20:00:00 Environment
-#&gt; 21: 1ZoneUncontrolled 2020-12-21 21:00:00 Environment
-#&gt; 22: 1ZoneUncontrolled 2020-12-21 22:00:00 Environment
-#&gt; 23: 1ZoneUncontrolled 2020-12-21 23:00:00 Environment
-#&gt; 24: 1ZoneUncontrolled 2020-12-22 00:00:00 Environment
-#&gt; 25: 1ZoneUncontrolled 2020-07-21 01:00:00 Environment
-#&gt; 26: 1ZoneUncontrolled 2020-07-21 02:00:00 Environment
-#&gt; 27: 1ZoneUncontrolled 2020-07-21 03:00:00 Environment
-#&gt; 28: 1ZoneUncontrolled 2020-07-21 04:00:00 Environment
-#&gt; 29: 1ZoneUncontrolled 2020-07-21 05:00:00 Environment
-#&gt; 30: 1ZoneUncontrolled 2020-07-21 06:00:00 Environment
-#&gt; 31: 1ZoneUncontrolled 2020-07-21 07:00:00 Environment
-#&gt; 32: 1ZoneUncontrolled 2020-07-21 08:00:00 Environment
-#&gt; 33: 1ZoneUncontrolled 2020-07-21 09:00:00 Environment
-#&gt; 34: 1ZoneUncontrolled 2020-07-21 10:00:00 Environment
-#&gt; 35: 1ZoneUncontrolled 2020-07-21 11:00:00 Environment
-#&gt; 36: 1ZoneUncontrolled 2020-07-21 12:00:00 Environment
-#&gt; 37: 1ZoneUncontrolled 2020-07-21 13:00:00 Environment
-#&gt; 38: 1ZoneUncontrolled 2020-07-21 14:00:00 Environment
-#&gt; 39: 1ZoneUncontrolled 2020-07-21 15:00:00 Environment
-#&gt; 40: 1ZoneUncontrolled 2020-07-21 16:00:00 Environment
-#&gt; 41: 1ZoneUncontrolled 2020-07-21 17:00:00 Environment
-#&gt; 42: 1ZoneUncontrolled 2020-07-21 18:00:00 Environment
-#&gt; 43: 1ZoneUncontrolled 2020-07-21 19:00:00 Environment
-#&gt; 44: 1ZoneUncontrolled 2020-07-21 20:00:00 Environment
-#&gt; 45: 1ZoneUncontrolled 2020-07-21 21:00:00 Environment
-#&gt; 46: 1ZoneUncontrolled 2020-07-21 22:00:00 Environment
-#&gt; 47: 1ZoneUncontrolled 2020-07-21 23:00:00 Environment
-#&gt; 48: 1ZoneUncontrolled 2020-07-22 00:00:00 Environment
-#&gt;                  case            datetime   key_value
-#&gt;                                     name units   value
-#&gt;  1: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  2: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  3: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  4: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  5: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  6: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  7: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  8: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  9: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 10: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 11: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 12: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 13: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 14: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 15: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 16: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 17: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 18: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 19: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 20: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 21: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 22: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 23: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 24: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 25: Site Outdoor Air Drybulb Temperature     C  18.966
-#&gt; 26: Site Outdoor Air Drybulb Temperature     C  18.244
-#&gt; 27: Site Outdoor Air Drybulb Temperature     C  17.731
-#&gt; 28: Site Outdoor Air Drybulb Temperature     C  17.275
-#&gt; 29: Site Outdoor Air Drybulb Temperature     C  16.914
-#&gt; 30: Site Outdoor Air Drybulb Temperature     C  16.990
-#&gt; 31: Site Outdoor Air Drybulb Temperature     C  17.769
-#&gt; 32: Site Outdoor Air Drybulb Temperature     C  19.783
-#&gt; 33: Site Outdoor Air Drybulb Temperature     C  22.557
-#&gt; 34: Site Outdoor Air Drybulb Temperature     C  25.255
-#&gt; 35: Site Outdoor Air Drybulb Temperature     C  27.649
-#&gt; 36: Site Outdoor Air Drybulb Temperature     C  29.454
-#&gt; 37: Site Outdoor Air Drybulb Temperature     C  30.784
-#&gt; 38: Site Outdoor Air Drybulb Temperature     C  31.715
-#&gt; 39: Site Outdoor Air Drybulb Temperature     C  32.000
-#&gt; 40: Site Outdoor Air Drybulb Temperature     C  31.430
-#&gt; 41: Site Outdoor Air Drybulb Temperature     C  30.328
-#&gt; 42: Site Outdoor Air Drybulb Temperature     C  28.922
-#&gt; 43: Site Outdoor Air Drybulb Temperature     C  26.927
-#&gt; 44: Site Outdoor Air Drybulb Temperature     C  25.027
-#&gt; 45: Site Outdoor Air Drybulb Temperature     C  23.545
-#&gt; 46: Site Outdoor Air Drybulb Temperature     C  22.177
-#&gt; 47: Site Outdoor Air Drybulb Temperature     C  20.999
-#&gt; 48: Site Outdoor Air Drybulb Temperature     C  19.935
-#&gt;                                     name units   value</div><div class='input'>
+
 <span class='co'># explicitly specify case name</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, case <span class='op'>=</span> <span class='st'>"example"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;        case            datetime   key_value
-#&gt;  1: example 2020-12-21 01:00:00 Environment
-#&gt;  2: example 2020-12-21 02:00:00 Environment
-#&gt;  3: example 2020-12-21 03:00:00 Environment
-#&gt;  4: example 2020-12-21 04:00:00 Environment
-#&gt;  5: example 2020-12-21 05:00:00 Environment
-#&gt;  6: example 2020-12-21 06:00:00 Environment
-#&gt;  7: example 2020-12-21 07:00:00 Environment
-#&gt;  8: example 2020-12-21 08:00:00 Environment
-#&gt;  9: example 2020-12-21 09:00:00 Environment
-#&gt; 10: example 2020-12-21 10:00:00 Environment
-#&gt; 11: example 2020-12-21 11:00:00 Environment
-#&gt; 12: example 2020-12-21 12:00:00 Environment
-#&gt; 13: example 2020-12-21 13:00:00 Environment
-#&gt; 14: example 2020-12-21 14:00:00 Environment
-#&gt; 15: example 2020-12-21 15:00:00 Environment
-#&gt; 16: example 2020-12-21 16:00:00 Environment
-#&gt; 17: example 2020-12-21 17:00:00 Environment
-#&gt; 18: example 2020-12-21 18:00:00 Environment
-#&gt; 19: example 2020-12-21 19:00:00 Environment
-#&gt; 20: example 2020-12-21 20:00:00 Environment
-#&gt; 21: example 2020-12-21 21:00:00 Environment
-#&gt; 22: example 2020-12-21 22:00:00 Environment
-#&gt; 23: example 2020-12-21 23:00:00 Environment
-#&gt; 24: example 2020-12-22 00:00:00 Environment
-#&gt; 25: example 2020-07-21 01:00:00 Environment
-#&gt; 26: example 2020-07-21 02:00:00 Environment
-#&gt; 27: example 2020-07-21 03:00:00 Environment
-#&gt; 28: example 2020-07-21 04:00:00 Environment
-#&gt; 29: example 2020-07-21 05:00:00 Environment
-#&gt; 30: example 2020-07-21 06:00:00 Environment
-#&gt; 31: example 2020-07-21 07:00:00 Environment
-#&gt; 32: example 2020-07-21 08:00:00 Environment
-#&gt; 33: example 2020-07-21 09:00:00 Environment
-#&gt; 34: example 2020-07-21 10:00:00 Environment
-#&gt; 35: example 2020-07-21 11:00:00 Environment
-#&gt; 36: example 2020-07-21 12:00:00 Environment
-#&gt; 37: example 2020-07-21 13:00:00 Environment
-#&gt; 38: example 2020-07-21 14:00:00 Environment
-#&gt; 39: example 2020-07-21 15:00:00 Environment
-#&gt; 40: example 2020-07-21 16:00:00 Environment
-#&gt; 41: example 2020-07-21 17:00:00 Environment
-#&gt; 42: example 2020-07-21 18:00:00 Environment
-#&gt; 43: example 2020-07-21 19:00:00 Environment
-#&gt; 44: example 2020-07-21 20:00:00 Environment
-#&gt; 45: example 2020-07-21 21:00:00 Environment
-#&gt; 46: example 2020-07-21 22:00:00 Environment
-#&gt; 47: example 2020-07-21 23:00:00 Environment
-#&gt; 48: example 2020-07-22 00:00:00 Environment
-#&gt;        case            datetime   key_value
-#&gt;                                     name units   value
-#&gt;  1: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  2: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  3: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  4: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  5: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  6: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  7: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  8: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt;  9: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 10: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 11: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 12: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 13: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 14: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 15: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 16: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 17: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 18: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 19: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 20: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 21: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 22: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 23: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 24: Site Outdoor Air Drybulb Temperature     C -15.500
-#&gt; 25: Site Outdoor Air Drybulb Temperature     C  18.966
-#&gt; 26: Site Outdoor Air Drybulb Temperature     C  18.244
-#&gt; 27: Site Outdoor Air Drybulb Temperature     C  17.731
-#&gt; 28: Site Outdoor Air Drybulb Temperature     C  17.275
-#&gt; 29: Site Outdoor Air Drybulb Temperature     C  16.914
-#&gt; 30: Site Outdoor Air Drybulb Temperature     C  16.990
-#&gt; 31: Site Outdoor Air Drybulb Temperature     C  17.769
-#&gt; 32: Site Outdoor Air Drybulb Temperature     C  19.783
-#&gt; 33: Site Outdoor Air Drybulb Temperature     C  22.557
-#&gt; 34: Site Outdoor Air Drybulb Temperature     C  25.255
-#&gt; 35: Site Outdoor Air Drybulb Temperature     C  27.649
-#&gt; 36: Site Outdoor Air Drybulb Temperature     C  29.454
-#&gt; 37: Site Outdoor Air Drybulb Temperature     C  30.784
-#&gt; 38: Site Outdoor Air Drybulb Temperature     C  31.715
-#&gt; 39: Site Outdoor Air Drybulb Temperature     C  32.000
-#&gt; 40: Site Outdoor Air Drybulb Temperature     C  31.430
-#&gt; 41: Site Outdoor Air Drybulb Temperature     C  30.328
-#&gt; 42: Site Outdoor Air Drybulb Temperature     C  28.922
-#&gt; 43: Site Outdoor Air Drybulb Temperature     C  26.927
-#&gt; 44: Site Outdoor Air Drybulb Temperature     C  25.027
-#&gt; 45: Site Outdoor Air Drybulb Temperature     C  23.545
-#&gt; 46: Site Outdoor Air Drybulb Temperature     C  22.177
-#&gt; 47: Site Outdoor Air Drybulb Temperature     C  20.999
-#&gt; 48: Site Outdoor Air Drybulb Temperature     C  19.935
-#&gt;                                     name units   value</div><div class='input'>
+
 <span class='co'># get all possible columns</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case            datetime month day hour minute dst interval
-#&gt;  1: 1ZoneUncontrolled 2020-12-21 01:00:00    12  21    1      0   0       60
-#&gt;  2: 1ZoneUncontrolled 2020-12-21 02:00:00    12  21    2      0   0       60
-#&gt;  3: 1ZoneUncontrolled 2020-12-21 03:00:00    12  21    3      0   0       60
-#&gt;  4: 1ZoneUncontrolled 2020-12-21 04:00:00    12  21    4      0   0       60
-#&gt;  5: 1ZoneUncontrolled 2020-12-21 05:00:00    12  21    5      0   0       60
-#&gt;  6: 1ZoneUncontrolled 2020-12-21 06:00:00    12  21    6      0   0       60
-#&gt;  7: 1ZoneUncontrolled 2020-12-21 07:00:00    12  21    7      0   0       60
-#&gt;  8: 1ZoneUncontrolled 2020-12-21 08:00:00    12  21    8      0   0       60
-#&gt;  9: 1ZoneUncontrolled 2020-12-21 09:00:00    12  21    9      0   0       60
-#&gt; 10: 1ZoneUncontrolled 2020-12-21 10:00:00    12  21   10      0   0       60
-#&gt; 11: 1ZoneUncontrolled 2020-12-21 11:00:00    12  21   11      0   0       60
-#&gt; 12: 1ZoneUncontrolled 2020-12-21 12:00:00    12  21   12      0   0       60
-#&gt; 13: 1ZoneUncontrolled 2020-12-21 13:00:00    12  21   13      0   0       60
-#&gt; 14: 1ZoneUncontrolled 2020-12-21 14:00:00    12  21   14      0   0       60
-#&gt; 15: 1ZoneUncontrolled 2020-12-21 15:00:00    12  21   15      0   0       60
-#&gt; 16: 1ZoneUncontrolled 2020-12-21 16:00:00    12  21   16      0   0       60
-#&gt; 17: 1ZoneUncontrolled 2020-12-21 17:00:00    12  21   17      0   0       60
-#&gt; 18: 1ZoneUncontrolled 2020-12-21 18:00:00    12  21   18      0   0       60
-#&gt; 19: 1ZoneUncontrolled 2020-12-21 19:00:00    12  21   19      0   0       60
-#&gt; 20: 1ZoneUncontrolled 2020-12-21 20:00:00    12  21   20      0   0       60
-#&gt; 21: 1ZoneUncontrolled 2020-12-21 21:00:00    12  21   21      0   0       60
-#&gt; 22: 1ZoneUncontrolled 2020-12-21 22:00:00    12  21   22      0   0       60
-#&gt; 23: 1ZoneUncontrolled 2020-12-21 23:00:00    12  21   23      0   0       60
-#&gt; 24: 1ZoneUncontrolled 2020-12-22 00:00:00    12  21   24      0   0       60
-#&gt; 25: 1ZoneUncontrolled 2020-07-21 01:00:00     7  21    1      0   0       60
-#&gt; 26: 1ZoneUncontrolled 2020-07-21 02:00:00     7  21    2      0   0       60
-#&gt; 27: 1ZoneUncontrolled 2020-07-21 03:00:00     7  21    3      0   0       60
-#&gt; 28: 1ZoneUncontrolled 2020-07-21 04:00:00     7  21    4      0   0       60
-#&gt; 29: 1ZoneUncontrolled 2020-07-21 05:00:00     7  21    5      0   0       60
-#&gt; 30: 1ZoneUncontrolled 2020-07-21 06:00:00     7  21    6      0   0       60
-#&gt; 31: 1ZoneUncontrolled 2020-07-21 07:00:00     7  21    7      0   0       60
-#&gt; 32: 1ZoneUncontrolled 2020-07-21 08:00:00     7  21    8      0   0       60
-#&gt; 33: 1ZoneUncontrolled 2020-07-21 09:00:00     7  21    9      0   0       60
-#&gt; 34: 1ZoneUncontrolled 2020-07-21 10:00:00     7  21   10      0   0       60
-#&gt; 35: 1ZoneUncontrolled 2020-07-21 11:00:00     7  21   11      0   0       60
-#&gt; 36: 1ZoneUncontrolled 2020-07-21 12:00:00     7  21   12      0   0       60
-#&gt; 37: 1ZoneUncontrolled 2020-07-21 13:00:00     7  21   13      0   0       60
-#&gt; 38: 1ZoneUncontrolled 2020-07-21 14:00:00     7  21   14      0   0       60
-#&gt; 39: 1ZoneUncontrolled 2020-07-21 15:00:00     7  21   15      0   0       60
-#&gt; 40: 1ZoneUncontrolled 2020-07-21 16:00:00     7  21   16      0   0       60
-#&gt; 41: 1ZoneUncontrolled 2020-07-21 17:00:00     7  21   17      0   0       60
-#&gt; 42: 1ZoneUncontrolled 2020-07-21 18:00:00     7  21   18      0   0       60
-#&gt; 43: 1ZoneUncontrolled 2020-07-21 19:00:00     7  21   19      0   0       60
-#&gt; 44: 1ZoneUncontrolled 2020-07-21 20:00:00     7  21   20      0   0       60
-#&gt; 45: 1ZoneUncontrolled 2020-07-21 21:00:00     7  21   21      0   0       60
-#&gt; 46: 1ZoneUncontrolled 2020-07-21 22:00:00     7  21   22      0   0       60
-#&gt; 47: 1ZoneUncontrolled 2020-07-21 23:00:00     7  21   23      0   0       60
-#&gt; 48: 1ZoneUncontrolled 2020-07-22 00:00:00     7  21   24      0   0       60
-#&gt;                  case            datetime month day hour minute dst interval
-#&gt;     simulation_days        day_type
-#&gt;  1:               1 WinterDesignDay
-#&gt;  2:               1 WinterDesignDay
-#&gt;  3:               1 WinterDesignDay
-#&gt;  4:               1 WinterDesignDay
-#&gt;  5:               1 WinterDesignDay
-#&gt;  6:               1 WinterDesignDay
-#&gt;  7:               1 WinterDesignDay
-#&gt;  8:               1 WinterDesignDay
-#&gt;  9:               1 WinterDesignDay
-#&gt; 10:               1 WinterDesignDay
-#&gt; 11:               1 WinterDesignDay
-#&gt; 12:               1 WinterDesignDay
-#&gt; 13:               1 WinterDesignDay
-#&gt; 14:               1 WinterDesignDay
-#&gt; 15:               1 WinterDesignDay
-#&gt; 16:               1 WinterDesignDay
-#&gt; 17:               1 WinterDesignDay
-#&gt; 18:               1 WinterDesignDay
-#&gt; 19:               1 WinterDesignDay
-#&gt; 20:               1 WinterDesignDay
-#&gt; 21:               1 WinterDesignDay
-#&gt; 22:               1 WinterDesignDay
-#&gt; 23:               1 WinterDesignDay
-#&gt; 24:               1 WinterDesignDay
-#&gt; 25:               1 SummerDesignDay
-#&gt; 26:               1 SummerDesignDay
-#&gt; 27:               1 SummerDesignDay
-#&gt; 28:               1 SummerDesignDay
-#&gt; 29:               1 SummerDesignDay
-#&gt; 30:               1 SummerDesignDay
-#&gt; 31:               1 SummerDesignDay
-#&gt; 32:               1 SummerDesignDay
-#&gt; 33:               1 SummerDesignDay
-#&gt; 34:               1 SummerDesignDay
-#&gt; 35:               1 SummerDesignDay
-#&gt; 36:               1 SummerDesignDay
-#&gt; 37:               1 SummerDesignDay
-#&gt; 38:               1 SummerDesignDay
-#&gt; 39:               1 SummerDesignDay
-#&gt; 40:               1 SummerDesignDay
-#&gt; 41:               1 SummerDesignDay
-#&gt; 42:               1 SummerDesignDay
-#&gt; 43:               1 SummerDesignDay
-#&gt; 44:               1 SummerDesignDay
-#&gt; 45:               1 SummerDesignDay
-#&gt; 46:               1 SummerDesignDay
-#&gt; 47:               1 SummerDesignDay
-#&gt; 48:               1 SummerDesignDay
-#&gt;     simulation_days        day_type
-#&gt;                                            environment_name
-#&gt;  1:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  2:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  3:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  4:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  5:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  6:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  7:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  8:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;  9:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 10:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 11:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 12:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 13:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 14:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 15:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 16:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 17:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 18:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 19:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 20:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 21:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 22:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 23:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 24:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; 25: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 26: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 27: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 28: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 29: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 30: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 31: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 32: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 33: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 34: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 35: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 36: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 37: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 38: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 39: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 40: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 41: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 42: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 43: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 44: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 45: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 46: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 47: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; 48: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt;                                            environment_name
-#&gt;     environment_period_index is_meter type index_group timestep_type
-#&gt;  1:                        1        0  Avg        Zone   HVAC System
-#&gt;  2:                        1        0  Avg        Zone   HVAC System
-#&gt;  3:                        1        0  Avg        Zone   HVAC System
-#&gt;  4:                        1        0  Avg        Zone   HVAC System
-#&gt;  5:                        1        0  Avg        Zone   HVAC System
-#&gt;  6:                        1        0  Avg        Zone   HVAC System
-#&gt;  7:                        1        0  Avg        Zone   HVAC System
-#&gt;  8:                        1        0  Avg        Zone   HVAC System
-#&gt;  9:                        1        0  Avg        Zone   HVAC System
-#&gt; 10:                        1        0  Avg        Zone   HVAC System
-#&gt; 11:                        1        0  Avg        Zone   HVAC System
-#&gt; 12:                        1        0  Avg        Zone   HVAC System
-#&gt; 13:                        1        0  Avg        Zone   HVAC System
-#&gt; 14:                        1        0  Avg        Zone   HVAC System
-#&gt; 15:                        1        0  Avg        Zone   HVAC System
-#&gt; 16:                        1        0  Avg        Zone   HVAC System
-#&gt; 17:                        1        0  Avg        Zone   HVAC System
-#&gt; 18:                        1        0  Avg        Zone   HVAC System
-#&gt; 19:                        1        0  Avg        Zone   HVAC System
-#&gt; 20:                        1        0  Avg        Zone   HVAC System
-#&gt; 21:                        1        0  Avg        Zone   HVAC System
-#&gt; 22:                        1        0  Avg        Zone   HVAC System
-#&gt; 23:                        1        0  Avg        Zone   HVAC System
-#&gt; 24:                        1        0  Avg        Zone   HVAC System
-#&gt; 25:                        2        0  Avg        Zone   HVAC System
-#&gt; 26:                        2        0  Avg        Zone   HVAC System
-#&gt; 27:                        2        0  Avg        Zone   HVAC System
-#&gt; 28:                        2        0  Avg        Zone   HVAC System
-#&gt; 29:                        2        0  Avg        Zone   HVAC System
-#&gt; 30:                        2        0  Avg        Zone   HVAC System
-#&gt; 31:                        2        0  Avg        Zone   HVAC System
-#&gt; 32:                        2        0  Avg        Zone   HVAC System
-#&gt; 33:                        2        0  Avg        Zone   HVAC System
-#&gt; 34:                        2        0  Avg        Zone   HVAC System
-#&gt; 35:                        2        0  Avg        Zone   HVAC System
-#&gt; 36:                        2        0  Avg        Zone   HVAC System
-#&gt; 37:                        2        0  Avg        Zone   HVAC System
-#&gt; 38:                        2        0  Avg        Zone   HVAC System
-#&gt; 39:                        2        0  Avg        Zone   HVAC System
-#&gt; 40:                        2        0  Avg        Zone   HVAC System
-#&gt; 41:                        2        0  Avg        Zone   HVAC System
-#&gt; 42:                        2        0  Avg        Zone   HVAC System
-#&gt; 43:                        2        0  Avg        Zone   HVAC System
-#&gt; 44:                        2        0  Avg        Zone   HVAC System
-#&gt; 45:                        2        0  Avg        Zone   HVAC System
-#&gt; 46:                        2        0  Avg        Zone   HVAC System
-#&gt; 47:                        2        0  Avg        Zone   HVAC System
-#&gt; 48:                        2        0  Avg        Zone   HVAC System
-#&gt;     environment_period_index is_meter type index_group timestep_type
-#&gt;       key_value                                 name reporting_frequency
-#&gt;  1: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  2: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  3: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  4: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  5: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  6: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  7: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  8: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;  9: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 10: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 11: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 12: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 13: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 14: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 15: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 16: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 17: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 18: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 19: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 20: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 21: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 22: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 23: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 24: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 25: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 26: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 27: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 28: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 29: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 30: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 31: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 32: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 33: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 34: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 35: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 36: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 37: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 38: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 39: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 40: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 41: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 42: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 43: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 44: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 45: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 46: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 47: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 48: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;       key_value                                 name reporting_frequency
-#&gt;     schedule_name units   value
-#&gt;  1:          &lt;NA&gt;     C -15.500
-#&gt;  2:          &lt;NA&gt;     C -15.500
-#&gt;  3:          &lt;NA&gt;     C -15.500
-#&gt;  4:          &lt;NA&gt;     C -15.500
-#&gt;  5:          &lt;NA&gt;     C -15.500
-#&gt;  6:          &lt;NA&gt;     C -15.500
-#&gt;  7:          &lt;NA&gt;     C -15.500
-#&gt;  8:          &lt;NA&gt;     C -15.500
-#&gt;  9:          &lt;NA&gt;     C -15.500
-#&gt; 10:          &lt;NA&gt;     C -15.500
-#&gt; 11:          &lt;NA&gt;     C -15.500
-#&gt; 12:          &lt;NA&gt;     C -15.500
-#&gt; 13:          &lt;NA&gt;     C -15.500
-#&gt; 14:          &lt;NA&gt;     C -15.500
-#&gt; 15:          &lt;NA&gt;     C -15.500
-#&gt; 16:          &lt;NA&gt;     C -15.500
-#&gt; 17:          &lt;NA&gt;     C -15.500
-#&gt; 18:          &lt;NA&gt;     C -15.500
-#&gt; 19:          &lt;NA&gt;     C -15.500
-#&gt; 20:          &lt;NA&gt;     C -15.500
-#&gt; 21:          &lt;NA&gt;     C -15.500
-#&gt; 22:          &lt;NA&gt;     C -15.500
-#&gt; 23:          &lt;NA&gt;     C -15.500
-#&gt; 24:          &lt;NA&gt;     C -15.500
-#&gt; 25:          &lt;NA&gt;     C  18.966
-#&gt; 26:          &lt;NA&gt;     C  18.244
-#&gt; 27:          &lt;NA&gt;     C  17.731
-#&gt; 28:          &lt;NA&gt;     C  17.275
-#&gt; 29:          &lt;NA&gt;     C  16.914
-#&gt; 30:          &lt;NA&gt;     C  16.990
-#&gt; 31:          &lt;NA&gt;     C  17.769
-#&gt; 32:          &lt;NA&gt;     C  19.783
-#&gt; 33:          &lt;NA&gt;     C  22.557
-#&gt; 34:          &lt;NA&gt;     C  25.255
-#&gt; 35:          &lt;NA&gt;     C  27.649
-#&gt; 36:          &lt;NA&gt;     C  29.454
-#&gt; 37:          &lt;NA&gt;     C  30.784
-#&gt; 38:          &lt;NA&gt;     C  31.715
-#&gt; 39:          &lt;NA&gt;     C  32.000
-#&gt; 40:          &lt;NA&gt;     C  31.430
-#&gt; 41:          &lt;NA&gt;     C  30.328
-#&gt; 42:          &lt;NA&gt;     C  28.922
-#&gt; 43:          &lt;NA&gt;     C  26.927
-#&gt; 44:          &lt;NA&gt;     C  25.027
-#&gt; 45:          &lt;NA&gt;     C  23.545
-#&gt; 46:          &lt;NA&gt;     C  22.177
-#&gt; 47:          &lt;NA&gt;     C  20.999
-#&gt; 48:          &lt;NA&gt;     C  19.935
-#&gt;     schedule_name units   value</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case       Date/Time
-#&gt;  1: 1ZoneUncontrolled 12/21  01:00:00
-#&gt;  2: 1ZoneUncontrolled 12/21  02:00:00
-#&gt;  3: 1ZoneUncontrolled 12/21  03:00:00
-#&gt;  4: 1ZoneUncontrolled 12/21  04:00:00
-#&gt;  5: 1ZoneUncontrolled 12/21  05:00:00
-#&gt;  6: 1ZoneUncontrolled 12/21  06:00:00
-#&gt;  7: 1ZoneUncontrolled 12/21  07:00:00
-#&gt;  8: 1ZoneUncontrolled 12/21  08:00:00
-#&gt;  9: 1ZoneUncontrolled 12/21  09:00:00
-#&gt; 10: 1ZoneUncontrolled 12/21  10:00:00
-#&gt; 11: 1ZoneUncontrolled 12/21  11:00:00
-#&gt; 12: 1ZoneUncontrolled 12/21  12:00:00
-#&gt; 13: 1ZoneUncontrolled 12/21  13:00:00
-#&gt; 14: 1ZoneUncontrolled 12/21  14:00:00
-#&gt; 15: 1ZoneUncontrolled 12/21  15:00:00
-#&gt; 16: 1ZoneUncontrolled 12/21  16:00:00
-#&gt; 17: 1ZoneUncontrolled 12/21  17:00:00
-#&gt; 18: 1ZoneUncontrolled 12/21  18:00:00
-#&gt; 19: 1ZoneUncontrolled 12/21  19:00:00
-#&gt; 20: 1ZoneUncontrolled 12/21  20:00:00
-#&gt; 21: 1ZoneUncontrolled 12/21  21:00:00
-#&gt; 22: 1ZoneUncontrolled 12/21  22:00:00
-#&gt; 23: 1ZoneUncontrolled 12/21  23:00:00
-#&gt; 24: 1ZoneUncontrolled 12/21  24:00:00
-#&gt; 25: 1ZoneUncontrolled 07/21  01:00:00
-#&gt; 26: 1ZoneUncontrolled 07/21  02:00:00
-#&gt; 27: 1ZoneUncontrolled 07/21  03:00:00
-#&gt; 28: 1ZoneUncontrolled 07/21  04:00:00
-#&gt; 29: 1ZoneUncontrolled 07/21  05:00:00
-#&gt; 30: 1ZoneUncontrolled 07/21  06:00:00
-#&gt; 31: 1ZoneUncontrolled 07/21  07:00:00
-#&gt; 32: 1ZoneUncontrolled 07/21  08:00:00
-#&gt; 33: 1ZoneUncontrolled 07/21  09:00:00
-#&gt; 34: 1ZoneUncontrolled 07/21  10:00:00
-#&gt; 35: 1ZoneUncontrolled 07/21  11:00:00
-#&gt; 36: 1ZoneUncontrolled 07/21  12:00:00
-#&gt; 37: 1ZoneUncontrolled 07/21  13:00:00
-#&gt; 38: 1ZoneUncontrolled 07/21  14:00:00
-#&gt; 39: 1ZoneUncontrolled 07/21  15:00:00
-#&gt; 40: 1ZoneUncontrolled 07/21  16:00:00
-#&gt; 41: 1ZoneUncontrolled 07/21  17:00:00
-#&gt; 42: 1ZoneUncontrolled 07/21  18:00:00
-#&gt; 43: 1ZoneUncontrolled 07/21  19:00:00
-#&gt; 44: 1ZoneUncontrolled 07/21  20:00:00
-#&gt; 45: 1ZoneUncontrolled 07/21  21:00:00
-#&gt; 46: 1ZoneUncontrolled 07/21  22:00:00
-#&gt; 47: 1ZoneUncontrolled 07/21  23:00:00
-#&gt; 48: 1ZoneUncontrolled 07/21  24:00:00
-#&gt;                  case       Date/Time
-#&gt;     Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;  1:                                                      -15.500
-#&gt;  2:                                                      -15.500
-#&gt;  3:                                                      -15.500
-#&gt;  4:                                                      -15.500
-#&gt;  5:                                                      -15.500
-#&gt;  6:                                                      -15.500
-#&gt;  7:                                                      -15.500
-#&gt;  8:                                                      -15.500
-#&gt;  9:                                                      -15.500
-#&gt; 10:                                                      -15.500
-#&gt; 11:                                                      -15.500
-#&gt; 12:                                                      -15.500
-#&gt; 13:                                                      -15.500
-#&gt; 14:                                                      -15.500
-#&gt; 15:                                                      -15.500
-#&gt; 16:                                                      -15.500
-#&gt; 17:                                                      -15.500
-#&gt; 18:                                                      -15.500
-#&gt; 19:                                                      -15.500
-#&gt; 20:                                                      -15.500
-#&gt; 21:                                                      -15.500
-#&gt; 22:                                                      -15.500
-#&gt; 23:                                                      -15.500
-#&gt; 24:                                                      -15.500
-#&gt; 25:                                                       18.966
-#&gt; 26:                                                       18.244
-#&gt; 27:                                                       17.731
-#&gt; 28:                                                       17.275
-#&gt; 29:                                                       16.914
-#&gt; 30:                                                       16.990
-#&gt; 31:                                                       17.769
-#&gt; 32:                                                       19.783
-#&gt; 33:                                                       22.557
-#&gt; 34:                                                       25.255
-#&gt; 35:                                                       27.649
-#&gt; 36:                                                       29.454
-#&gt; 37:                                                       30.784
-#&gt; 38:                                                       31.715
-#&gt; 39:                                                       32.000
-#&gt; 40:                                                       31.430
-#&gt; 41:                                                       30.328
-#&gt; 42:                                                       28.922
-#&gt; 43:                                                       26.927
-#&gt; 44:                                                       25.027
-#&gt; 45:                                                       23.545
-#&gt; 46:                                                       22.177
-#&gt; 47:                                                       20.999
-#&gt; 48:                                                       19.935
-#&gt;     Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output with</span>
 <span class='co'># extra columns</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case environment_period_index
-#&gt;  1: 1ZoneUncontrolled                        1
-#&gt;  2: 1ZoneUncontrolled                        1
-#&gt;  3: 1ZoneUncontrolled                        1
-#&gt;  4: 1ZoneUncontrolled                        1
-#&gt;  5: 1ZoneUncontrolled                        1
-#&gt;  6: 1ZoneUncontrolled                        1
-#&gt;  7: 1ZoneUncontrolled                        1
-#&gt;  8: 1ZoneUncontrolled                        1
-#&gt;  9: 1ZoneUncontrolled                        1
-#&gt; 10: 1ZoneUncontrolled                        1
-#&gt; 11: 1ZoneUncontrolled                        1
-#&gt; 12: 1ZoneUncontrolled                        1
-#&gt; 13: 1ZoneUncontrolled                        1
-#&gt; 14: 1ZoneUncontrolled                        1
-#&gt; 15: 1ZoneUncontrolled                        1
-#&gt; 16: 1ZoneUncontrolled                        1
-#&gt; 17: 1ZoneUncontrolled                        1
-#&gt; 18: 1ZoneUncontrolled                        1
-#&gt; 19: 1ZoneUncontrolled                        1
-#&gt; 20: 1ZoneUncontrolled                        1
-#&gt; 21: 1ZoneUncontrolled                        1
-#&gt; 22: 1ZoneUncontrolled                        1
-#&gt; 23: 1ZoneUncontrolled                        1
-#&gt; 24: 1ZoneUncontrolled                        1
-#&gt; 25: 1ZoneUncontrolled                        2
-#&gt; 26: 1ZoneUncontrolled                        2
-#&gt; 27: 1ZoneUncontrolled                        2
-#&gt; 28: 1ZoneUncontrolled                        2
-#&gt; 29: 1ZoneUncontrolled                        2
-#&gt; 30: 1ZoneUncontrolled                        2
-#&gt; 31: 1ZoneUncontrolled                        2
-#&gt; 32: 1ZoneUncontrolled                        2
-#&gt; 33: 1ZoneUncontrolled                        2
-#&gt; 34: 1ZoneUncontrolled                        2
-#&gt; 35: 1ZoneUncontrolled                        2
-#&gt; 36: 1ZoneUncontrolled                        2
-#&gt; 37: 1ZoneUncontrolled                        2
-#&gt; 38: 1ZoneUncontrolled                        2
-#&gt; 39: 1ZoneUncontrolled                        2
-#&gt; 40: 1ZoneUncontrolled                        2
-#&gt; 41: 1ZoneUncontrolled                        2
-#&gt; 42: 1ZoneUncontrolled                        2
-#&gt; 43: 1ZoneUncontrolled                        2
-#&gt; 44: 1ZoneUncontrolled                        2
-#&gt; 45: 1ZoneUncontrolled                        2
-#&gt; 46: 1ZoneUncontrolled                        2
-#&gt; 47: 1ZoneUncontrolled                        2
-#&gt; 48: 1ZoneUncontrolled                        2
-#&gt;                  case environment_period_index
-#&gt;                                            environment_name simulation_days
-#&gt;  1:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  2:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  3:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  4:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  5:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  6:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  7:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  8:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;  9:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 10:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 11:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 12:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 13:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 14:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 15:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 16:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 17:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 18:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 19:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 20:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 21:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 22:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 23:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 24:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt; 25: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 26: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 27: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 28: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 29: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 30: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 31: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 32: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 33: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 34: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 35: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 36: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 37: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 38: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 39: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 40: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 41: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 42: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 43: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 44: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 45: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 46: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 47: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt; 48: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB               1
-#&gt;                                            environment_name simulation_days
-#&gt;                datetime month day hour minute        day_type       Date/Time
-#&gt;  1: 2020-12-21 01:00:00    12  21    1      0 WinterDesignDay 12/21  01:00:00
-#&gt;  2: 2020-12-21 02:00:00    12  21    2      0 WinterDesignDay 12/21  02:00:00
-#&gt;  3: 2020-12-21 03:00:00    12  21    3      0 WinterDesignDay 12/21  03:00:00
-#&gt;  4: 2020-12-21 04:00:00    12  21    4      0 WinterDesignDay 12/21  04:00:00
-#&gt;  5: 2020-12-21 05:00:00    12  21    5      0 WinterDesignDay 12/21  05:00:00
-#&gt;  6: 2020-12-21 06:00:00    12  21    6      0 WinterDesignDay 12/21  06:00:00
-#&gt;  7: 2020-12-21 07:00:00    12  21    7      0 WinterDesignDay 12/21  07:00:00
-#&gt;  8: 2020-12-21 08:00:00    12  21    8      0 WinterDesignDay 12/21  08:00:00
-#&gt;  9: 2020-12-21 09:00:00    12  21    9      0 WinterDesignDay 12/21  09:00:00
-#&gt; 10: 2020-12-21 10:00:00    12  21   10      0 WinterDesignDay 12/21  10:00:00
-#&gt; 11: 2020-12-21 11:00:00    12  21   11      0 WinterDesignDay 12/21  11:00:00
-#&gt; 12: 2020-12-21 12:00:00    12  21   12      0 WinterDesignDay 12/21  12:00:00
-#&gt; 13: 2020-12-21 13:00:00    12  21   13      0 WinterDesignDay 12/21  13:00:00
-#&gt; 14: 2020-12-21 14:00:00    12  21   14      0 WinterDesignDay 12/21  14:00:00
-#&gt; 15: 2020-12-21 15:00:00    12  21   15      0 WinterDesignDay 12/21  15:00:00
-#&gt; 16: 2020-12-21 16:00:00    12  21   16      0 WinterDesignDay 12/21  16:00:00
-#&gt; 17: 2020-12-21 17:00:00    12  21   17      0 WinterDesignDay 12/21  17:00:00
-#&gt; 18: 2020-12-21 18:00:00    12  21   18      0 WinterDesignDay 12/21  18:00:00
-#&gt; 19: 2020-12-21 19:00:00    12  21   19      0 WinterDesignDay 12/21  19:00:00
-#&gt; 20: 2020-12-21 20:00:00    12  21   20      0 WinterDesignDay 12/21  20:00:00
-#&gt; 21: 2020-12-21 21:00:00    12  21   21      0 WinterDesignDay 12/21  21:00:00
-#&gt; 22: 2020-12-21 22:00:00    12  21   22      0 WinterDesignDay 12/21  22:00:00
-#&gt; 23: 2020-12-21 23:00:00    12  21   23      0 WinterDesignDay 12/21  23:00:00
-#&gt; 24: 2020-12-22 00:00:00    12  21   24      0 WinterDesignDay 12/21  24:00:00
-#&gt; 25: 2020-07-21 01:00:00     7  21    1      0 SummerDesignDay 07/21  01:00:00
-#&gt; 26: 2020-07-21 02:00:00     7  21    2      0 SummerDesignDay 07/21  02:00:00
-#&gt; 27: 2020-07-21 03:00:00     7  21    3      0 SummerDesignDay 07/21  03:00:00
-#&gt; 28: 2020-07-21 04:00:00     7  21    4      0 SummerDesignDay 07/21  04:00:00
-#&gt; 29: 2020-07-21 05:00:00     7  21    5      0 SummerDesignDay 07/21  05:00:00
-#&gt; 30: 2020-07-21 06:00:00     7  21    6      0 SummerDesignDay 07/21  06:00:00
-#&gt; 31: 2020-07-21 07:00:00     7  21    7      0 SummerDesignDay 07/21  07:00:00
-#&gt; 32: 2020-07-21 08:00:00     7  21    8      0 SummerDesignDay 07/21  08:00:00
-#&gt; 33: 2020-07-21 09:00:00     7  21    9      0 SummerDesignDay 07/21  09:00:00
-#&gt; 34: 2020-07-21 10:00:00     7  21   10      0 SummerDesignDay 07/21  10:00:00
-#&gt; 35: 2020-07-21 11:00:00     7  21   11      0 SummerDesignDay 07/21  11:00:00
-#&gt; 36: 2020-07-21 12:00:00     7  21   12      0 SummerDesignDay 07/21  12:00:00
-#&gt; 37: 2020-07-21 13:00:00     7  21   13      0 SummerDesignDay 07/21  13:00:00
-#&gt; 38: 2020-07-21 14:00:00     7  21   14      0 SummerDesignDay 07/21  14:00:00
-#&gt; 39: 2020-07-21 15:00:00     7  21   15      0 SummerDesignDay 07/21  15:00:00
-#&gt; 40: 2020-07-21 16:00:00     7  21   16      0 SummerDesignDay 07/21  16:00:00
-#&gt; 41: 2020-07-21 17:00:00     7  21   17      0 SummerDesignDay 07/21  17:00:00
-#&gt; 42: 2020-07-21 18:00:00     7  21   18      0 SummerDesignDay 07/21  18:00:00
-#&gt; 43: 2020-07-21 19:00:00     7  21   19      0 SummerDesignDay 07/21  19:00:00
-#&gt; 44: 2020-07-21 20:00:00     7  21   20      0 SummerDesignDay 07/21  20:00:00
-#&gt; 45: 2020-07-21 21:00:00     7  21   21      0 SummerDesignDay 07/21  21:00:00
-#&gt; 46: 2020-07-21 22:00:00     7  21   22      0 SummerDesignDay 07/21  22:00:00
-#&gt; 47: 2020-07-21 23:00:00     7  21   23      0 SummerDesignDay 07/21  23:00:00
-#&gt; 48: 2020-07-22 00:00:00     7  21   24      0 SummerDesignDay 07/21  24:00:00
-#&gt;                datetime month day hour minute        day_type       Date/Time
-#&gt;     Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;  1:                                                      -15.500
-#&gt;  2:                                                      -15.500
-#&gt;  3:                                                      -15.500
-#&gt;  4:                                                      -15.500
-#&gt;  5:                                                      -15.500
-#&gt;  6:                                                      -15.500
-#&gt;  7:                                                      -15.500
-#&gt;  8:                                                      -15.500
-#&gt;  9:                                                      -15.500
-#&gt; 10:                                                      -15.500
-#&gt; 11:                                                      -15.500
-#&gt; 12:                                                      -15.500
-#&gt; 13:                                                      -15.500
-#&gt; 14:                                                      -15.500
-#&gt; 15:                                                      -15.500
-#&gt; 16:                                                      -15.500
-#&gt; 17:                                                      -15.500
-#&gt; 18:                                                      -15.500
-#&gt; 19:                                                      -15.500
-#&gt; 20:                                                      -15.500
-#&gt; 21:                                                      -15.500
-#&gt; 22:                                                      -15.500
-#&gt; 23:                                                      -15.500
-#&gt; 24:                                                      -15.500
-#&gt; 25:                                                       18.966
-#&gt; 26:                                                       18.244
-#&gt; 27:                                                       17.731
-#&gt; 28:                                                       17.275
-#&gt; 29:                                                       16.914
-#&gt; 30:                                                       16.990
-#&gt; 31:                                                       17.769
-#&gt; 32:                                                       19.783
-#&gt; 33:                                                       22.557
-#&gt; 34:                                                       25.255
-#&gt; 35:                                                       27.649
-#&gt; 36:                                                       29.454
-#&gt; 37:                                                       30.784
-#&gt; 38:                                                       31.715
-#&gt; 39:                                                       32.000
-#&gt; 40:                                                       31.430
-#&gt; 41:                                                       30.328
-#&gt; 42:                                                       28.922
-#&gt; 43:                                                       26.927
-#&gt; 44:                                                       25.027
-#&gt; 45:                                                       23.545
-#&gt; 46:                                                       22.177
-#&gt; 47:                                                       20.999
-#&gt; 48:                                                       19.935
-#&gt;     Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)</div><div class='input'>
+
 <span class='co'># only get data at the working hour on the first Monday</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, hour <span class='op'>=</span> <span class='fl'>8</span><span class='op'>:</span><span class='fl'>18</span>, day_type <span class='op'>=</span> <span class='st'>"monday"</span>, simulation_days <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Empty data.table (0 rows and 6 cols): case,datetime,key_value,name,units,value</div><div class='input'>
+
 <span class='co'># only get specified run period data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"EnvironmentPeriods"</span><span class='op'>)</span> <span class='co'># possible environment name</span>
-</div><div class='output co'>#&gt;    environment_period_index simulation_index
-#&gt; 1:                        1                1
-#&gt; 2:                        2                1
-#&gt;                                           environment_name environment_type
-#&gt; 1:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB                1
-#&gt; 2: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB                1</div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Empty data.table (0 rows and 6 cols): case,datetime,key_value,name,units,value</div><div class='input'><span class='co'># can also be done using 'environment_period_index' column</span>
+<span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
+<span class='co'># can also be done using 'environment_period_index' column</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='va'>environment_period_index</span> <span class='op'>==</span> <span class='fl'>3L</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; Empty data.table (0 rows and 22 cols): case,datetime,month,day,hour,minute...</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$tabular_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read all tabular data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case index                             report_name
-#&gt;    1: 1ZoneUncontrolled     1 AnnualBuildingUtilityPerformanceSummary
-#&gt;    2: 1ZoneUncontrolled     2 AnnualBuildingUtilityPerformanceSummary
-#&gt;    3: 1ZoneUncontrolled     3 AnnualBuildingUtilityPerformanceSummary
-#&gt;    4: 1ZoneUncontrolled     4 AnnualBuildingUtilityPerformanceSummary
-#&gt;    5: 1ZoneUncontrolled     5 AnnualBuildingUtilityPerformanceSummary
-#&gt;   ---                                                                
-#&gt; 2109: 1ZoneUncontrolled  2109                  Initialization Summary
-#&gt; 2110: 1ZoneUncontrolled  2110                  Initialization Summary
-#&gt; 2111: 1ZoneUncontrolled  2111                  Initialization Summary
-#&gt; 2112: 1ZoneUncontrolled  2112                  Initialization Summary
-#&gt; 2113: 1ZoneUncontrolled  2113                  Initialization Summary
-#&gt;            report_for                     table_name
-#&gt;    1: Entire Facility         Site and Source Energy
-#&gt;    2: Entire Facility         Site and Source Energy
-#&gt;    3: Entire Facility         Site and Source Energy
-#&gt;    4: Entire Facility         Site and Source Energy
-#&gt;    5: Entire Facility         Site and Source Energy
-#&gt;   ---                                               
-#&gt; 2109: Entire Facility Warmup Convergence Information
-#&gt; 2110: Entire Facility Warmup Convergence Information
-#&gt; 2111: Entire Facility Warmup Convergence Information
-#&gt; 2112: Entire Facility Warmup Convergence Information
-#&gt; 2113: Entire Facility Warmup Convergence Information
-#&gt;                              column_name            row_name units        value
-#&gt;    1:                       Total Energy   Total Site Energy    GJ         0.00
-#&gt;    2:                       Total Energy     Net Site Energy    GJ         0.00
-#&gt;    3:                       Total Energy Total Source Energy    GJ         0.00
-#&gt;    4:                       Total Energy   Net Source Energy    GJ         0.00
-#&gt;    5:     Energy Per Total Building Area   Total Site Energy MJ/m2         0.00
-#&gt;   ---                                                                          
-#&gt; 2109: Std Dev Warmup Load Difference {W}                   2       0.0000000000
-#&gt; 2110: Heating Load Pass/Fail Convergence                   1               Pass
-#&gt; 2111: Heating Load Pass/Fail Convergence                   2               Pass
-#&gt; 2112: Cooling Load Pass/Fail Convergence                   1               Pass
-#&gt; 2113: Cooling Load Pass/Fail Convergence                   2               Pass</div><div class='input'>
+
 <span class='co'># explicitly specify data you want</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -2860,17 +1206,7 @@ job$print()
     column_name <span class='op'>=</span> <span class='st'>"Total Energy"</span>,
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	1 obs. of  9 variables:
-#&gt;  $ case       : chr "1ZoneUncontrolled"
-#&gt;  $ index      : int 1
-#&gt;  $ report_name: chr "AnnualBuildingUtilityPerformanceSummary"
-#&gt;  $ report_for : chr "Entire Facility"
-#&gt;  $ table_name : chr "Site and Source Energy"
-#&gt;  $ column_name: chr "Total Energy"
-#&gt;  $ row_name   : chr "Total Site Energy"
-#&gt;  $ units      : chr "GJ"
-#&gt;  $ value      : chr "        0.00"
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get tabular data in wide format and coerce numeric values</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -2879,32 +1215,18 @@ job$print()
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>,
     wide <span class='op'>=</span> <span class='cn'>TRUE</span>, string_value <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 1
-#&gt;  $ AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy:Classes ‘data.table’ and 'data.frame':	1 obs. of  6 variables:
-#&gt;   ..$ case             : chr "1ZoneUncontrolled"
-#&gt;   ..$ report_name      : chr "AnnualBuildingUtilityPerformanceSummary"
-#&gt;   ..$ report_for       : chr "Entire Facility"
-#&gt;   ..$ table_name       : chr "Site and Source Energy"
-#&gt;   ..$ row_name         : chr "Total Site Energy"
-#&gt;   ..$ Total Energy [GJ]: num 0
-#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; 
-#&gt;   ..- attr(*, "sorted")= chr [1:4] "case" "report_name" "report_for" "table_name"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>EnergPlus Simulation Job</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────</span><span>
-#&gt; * Model: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'
-#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'
-#&gt; </span><span style='color: #000000;background-color: #00BB00;'> Simulation started at '2020-11-11 02:03:01' and completed successfully after 0.37 secs.</span><span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

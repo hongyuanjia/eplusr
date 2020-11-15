@@ -191,6 +191,8 @@
 <li>
 <code>Epw$save()</code> gets a new option <code>format_digit</code>. If <code>TRUE</code>, the trailing digits in EPW data will be formatted in the same way as Weather Converter (<a href='https://github.com/hongyuanjia/eplusr/issues/323'>#323</a>).</li>
 <li>Add EnergyPlus v9.3 and v9.4 support (<a href='https://github.com/hongyuanjia/eplusr/issues/343'>#343</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/347'>#347</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/369'>#369</a>).</li>
+<li>Now <code>ParametricJob$apply_measure()</code> will give a nice progress bar when parametric models are creating (<a href='https://github.com/hongyuanjia/eplusr/issues/378'>#378</a>).</li>
+<li>A new argument <code>separate</code> is added in <code>EplusGroupJob$run()</code> and <code>ParametricJob$run()</code> with default value being <code>TRUE</code>. If set to <code>FALSE</code>, all models are saved in <code>dir</code> when simulation, instead of creating a folder for each model and running simulation there (<a href='https://github.com/hongyuanjia/eplusr/issues/381'>#381</a>).</li>
 </ul>
 </div>
 <div id="major-changes" class="section level2">
@@ -205,6 +207,8 @@
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Now rgl and decido package has beem moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
+<li>
+<code><a href="../reference/run_idf.html">run_multi()</a></code> now gets a new argument <code>expand_obj</code> to control whether <code>ExpandObjects</code> should be called before simulation or not. Because there is a known issue of <code>ExpandObjects</code> on Linux system (<a href="https://github.com/NREL/EnergyPlus/issues/8376" class="uri">https://github.com/NREL/EnergyPlus/issues/8376</a>), here we want to avoid unnecessary calls of <code>ExpandObjects</code> as possible. Also, <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code> now will detect if there are any <code>HVACTemplate:*</code> objects and set the <code>expand_obj</code> flag properly (<a href='https://github.com/hongyuanjia/eplusr/issues/377'>#377</a>).</li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
@@ -233,13 +237,14 @@
 <li>Fix invalid references introduced by setting field values to empty (<a href='https://github.com/hongyuanjia/eplusr/issues/355'>#355</a>).</li>
 <li>Fix the error message in <code>EplusGroupJob</code> when no CSV output was found (<a href='https://github.com/hongyuanjia/eplusr/issues/357'>#357</a>).</li>
 <li>Fix false positive warnings when resolving IDF external file dependencies (<a href='https://github.com/hongyuanjia/eplusr/issues/366'>#366</a>).</li>
-<li>Empty string input, e.g. <code>"  "</code> in <code>Idf$add()</code> and <code>Idf$set()</code> are now correctly converted to <code>NA</code>s (<a href='https://github.com/hongyuanjia/eplusr/issues/370'>#370</a>).</li>
+<li>Empty string input, e.g. <code>"  "</code> in <code>Idf$add()</code> and <code>Idf$set()</code> are now correctly converted to <code>NA</code>s (<a href='https://github.com/hongyuanjia/eplusr/issues/370'>#370</a>).</li>
+<li>Now empty comments are kept in <code>IdfObject$comment()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/372'>#372</a>).</li>
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-13-0" class="section level1">
+    <div id="eplusr-0130" class="section level1">
 <h1 class="page-header" data-toc-text="0.13.0">
-<a href="#eplusr-0-13-0" class="anchor"></a>eplusr 0.13.0<small> 2020-08-28 </small>
+<a href="#eplusr-0130" class="anchor"></a>eplusr 0.13.0<small> 2020-08-28 </small>
 </h1>
 <div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
@@ -257,23 +262,23 @@
 <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </li>
-<li>
-<code>Idf$to_table()</code> gains a new parameter <code>force</code>. The default value is <code>FALSE</code>. If <code>TRUE</code>, you can convert object data from any classes into a wide data.table. This may be useful when you know that target classes have the exact same fields, e.g. <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/202'>#202</a>).</li>
+<li><p><code>Idf$to_table()</code> gains a new parameter <code>force</code>. The default value is <code>FALSE</code>. If <code>TRUE</code>, you can convert object data from any classes into a wide data.table. This may be useful when you know that target classes have the exact same fields, e.g. <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/202'>#202</a>).</p></li>
 <li>
 <p>A new method <code>Idf$purge()</code> has been added (<a href='https://github.com/hongyuanjia/eplusr/issues/223'>#223</a>). It can be used to delete any resource objects that are not referenced by other objects. Here resource objects indicate all objects that can be referenced by other objects, e.g. all schedules. <code>$purge()</code> will ignore any inputs that are not resources. If inputs contain objects from multiple classes, references among them are also taken into account, which means purging is performed hierarchically. If both materials and constructions are specified, the latter will be purged first, because it is possible that input constructions reference input materials. <code>Idf$purge()</code> makes it quite straightforward to perform IDF cleaning. Actions like removing all materials, constructions and schedules can be easily achieved via</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">Idf</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></code></pre></div>
 </li>
-<li>New methods <code>Idf$duplicatd()</code> and <code>Idf$unique()</code> have been added. They can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning (<a href='https://github.com/hongyuanjia/eplusr/issues/227'>#227</a>).</li>
-<li>Now if <code>class</code> is set to <code>NULL</code> in <code>Idf$definition()</code>, the underlying <code>Idd</code> object is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/237'>#237</a>).</li>
-<li>Internal helper functions <code><a href="../reference/with_option.html">with_option()</a></code>, <code><a href="../reference/with_option.html">with_silent()</a></code>, <code><a href="../reference/with_option.html">with_verbose()</a></code>, <code><a href="../reference/with_option.html">with_speed()</a></code> and <code><a href="../reference/with_option.html">without_checking()</a></code> have been exported. They can be used to evaluate an expression with temporary eplusr options (<a href='https://github.com/hongyuanjia/eplusr/issues/240'>#240</a>).</li>
-<li>Now <code>Idf$insert()</code> can directly take an <code>Idf</code> object or a list of <code>Idf</code> objects as input. And also <code>Version</code> objects in input will be directly skipped instead of giving an error (<a href='https://github.com/hongyuanjia/eplusr/issues/245'>#245</a>).</li>
-<li>A new option <code>all</code> has been added in <code>IdfObject$print()</code> with default being <code>FALSE</code>. If <code>TRUE</code>, all fields defined in [Idd] are printed even they do not exist in current object (<a href='https://github.com/hongyuanjia/eplusr/issues/247'>#247</a>).</li>
-<li>New S3 methods of <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code> for all classes are added, i.e. <code>==.Idf</code>, <code>==.IdfObject</code>, <code>==.Idd</code>, <code>==.IddObject</code>, <code>==.Epw</code>, <code>==.EplusJob</code>, <code>==.EplusSql</code>, <code>==.EplusGroupJob</code>, <code>==.ParametricJob</code>. The negate methods are also added. This makes it quite easy to check the equality of R6 objects of these types (<a href='https://github.com/hongyuanjia/eplusr/issues/250'>#250</a>).</li>
-<li>A new Generic function <code><a href="../reference/reload.html">reload()</a></code> is added. eplusr relies heavily on the <code>data.table</code> package. The core data of all main classes in eplusr are saved as <code>data.table</code>s. This introduces a problem when loading saved <code>Idf</code> objects or other class objects via an <code>*.RDS</code> and <code>*.RData</code> file on disk: the stored <code>data.table</code>s lose their column over-allocation. <code><a href="../reference/reload.html">reload()</a></code> is a helper function that calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setDT.html">data.table::setDT()</a></code> on all internal <code>data.table</code>s to make sure they are initialized properly. It is recommended to call <code><a href="../reference/reload.html">reload()</a></code> on each <code>Idd</code>, <code>Idf</code> and other class object in eplusr loaded with <code><a href="https://rdrr.io/r/base/readRDS.html">readRDS()</a></code> or <code><a href="https://rdrr.io/r/base/load.html">load()</a></code>, to make sure all eplusr’s functionaries works properly (<a href='https://github.com/hongyuanjia/eplusr/issues/251'>#251</a>).</li>
-<li>The implementation of <code>EplusSql$report_data()</code> has been refactored, resulting in a ~200% speed-up (<a href='https://github.com/hongyuanjia/eplusr/issues/259'>#259</a>).</li>
-<li>Now <code>day_type</code> in <code>EplusSql$report_data()</code> has a few new options (<a href='https://github.com/hongyuanjia/eplusr/issues/259'>#259</a>):
+<li><p>New methods <code>Idf$duplicatd()</code> and <code>Idf$unique()</code> have been added. They can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning (<a href='https://github.com/hongyuanjia/eplusr/issues/227'>#227</a>).</p></li>
+<li><p>Now if <code>class</code> is set to <code>NULL</code> in <code>Idf$definition()</code>, the underlying <code>Idd</code> object is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/237'>#237</a>).</p></li>
+<li><p>Internal helper functions <code><a href="../reference/with_option.html">with_option()</a></code>, <code><a href="../reference/with_option.html">with_silent()</a></code>, <code><a href="../reference/with_option.html">with_verbose()</a></code>, <code><a href="../reference/with_option.html">with_speed()</a></code> and <code><a href="../reference/with_option.html">without_checking()</a></code> have been exported. They can be used to evaluate an expression with temporary eplusr options (<a href='https://github.com/hongyuanjia/eplusr/issues/240'>#240</a>).</p></li>
+<li><p>Now <code>Idf$insert()</code> can directly take an <code>Idf</code> object or a list of <code>Idf</code> objects as input. And also <code>Version</code> objects in input will be directly skipped instead of giving an error (<a href='https://github.com/hongyuanjia/eplusr/issues/245'>#245</a>).</p></li>
+<li><p>A new option <code>all</code> has been added in <code>IdfObject$print()</code> with default being <code>FALSE</code>. If <code>TRUE</code>, all fields defined in [Idd] are printed even they do not exist in current object (<a href='https://github.com/hongyuanjia/eplusr/issues/247'>#247</a>).</p></li>
+<li><p>New S3 methods of <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code> for all classes are added, i.e. <code>==.Idf</code>, <code>==.IdfObject</code>, <code>==.Idd</code>, <code>==.IddObject</code>, <code>==.Epw</code>, <code>==.EplusJob</code>, <code>==.EplusSql</code>, <code>==.EplusGroupJob</code>, <code>==.ParametricJob</code>. The negate methods are also added. This makes it quite easy to check the equality of R6 objects of these types (<a href='https://github.com/hongyuanjia/eplusr/issues/250'>#250</a>).</p></li>
+<li><p>A new Generic function <code><a href="../reference/reload.html">reload()</a></code> is added. eplusr relies heavily on the <code>data.table</code> package. The core data of all main classes in eplusr are saved as <code>data.table</code>s. This introduces a problem when loading saved <code>Idf</code> objects or other class objects via an <code>*.RDS</code> and <code>*.RData</code> file on disk: the stored <code>data.table</code>s lose their column over-allocation. <code><a href="../reference/reload.html">reload()</a></code> is a helper function that calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setDT.html">data.table::setDT()</a></code> on all internal <code>data.table</code>s to make sure they are initialized properly. It is recommended to call <code><a href="../reference/reload.html">reload()</a></code> on each <code>Idd</code>, <code>Idf</code> and other class object in eplusr loaded with <code><a href="https://rdrr.io/r/base/readRDS.html">readRDS()</a></code> or <code><a href="https://rdrr.io/r/base/load.html">load()</a></code>, to make sure all eplusr’s functionaries works properly (<a href='https://github.com/hongyuanjia/eplusr/issues/251'>#251</a>).</p></li>
+<li><p>The implementation of <code>EplusSql$report_data()</code> has been refactored, resulting in a ~200% speed-up (<a href='https://github.com/hongyuanjia/eplusr/issues/259'>#259</a>).</p></li>
+<li>
+<p>Now <code>day_type</code> in <code>EplusSql$report_data()</code> has a few new options (<a href='https://github.com/hongyuanjia/eplusr/issues/259'>#259</a>):</p>
 <ul>
 <li>
 <code>"Weekday"</code>: All working days, i.e. from Monday to Friday</li>
@@ -292,10 +297,10 @@
 </li>
 </ul>
 </li>
-<li>Some internal functions have been exported. They are mainly useful for developers to handle internal IDD and IDF data more efficiently (<a href='https://github.com/hongyuanjia/eplusr/issues/260'>#260</a>).</li>
-<li>A new <code>IdfScheduleCompact</code> class is introduced. A constructor function <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> is added. <code>IdfScheduleCompact</code> class provides more detailed methods to add, modify and extract schedule values. For more details, see <code><a href="../articles/schedule.html">vignette("schedule")</a></code> (<a href='https://github.com/hongyuanjia/eplusr/issues/256'>#256</a>).</li>
-<li>New <code>IdfGeometry</code> and <code>IdfViewer</code> classes are introduced. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the rgl package in a similar way as OpenStudio SketchUp Plugin. <code>Idf$geometry()</code> and <code>Idf$view()</code> methods are added to directly create an <code>IdfGeometry</code> and <code>IdfViewer</code> object based on current <code>Idf</code> object, respectively (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</li>
-<li>A <code>plot.Idf</code> method is added which is basically a wrappper of <code>Idf$view()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</li>
+<li><p>Some internal functions have been exported. They are mainly useful for developers to handle internal IDD and IDF data more efficiently (<a href='https://github.com/hongyuanjia/eplusr/issues/260'>#260</a>).</p></li>
+<li><p>A new <code>IdfScheduleCompact</code> class is introduced. A constructor function <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> is added. <code>IdfScheduleCompact</code> class provides more detailed methods to add, modify and extract schedule values. For more details, see <code><a href="../articles/schedule.html">vignette("schedule")</a></code> (<a href='https://github.com/hongyuanjia/eplusr/issues/256'>#256</a>).</p></li>
+<li><p>New <code>IdfGeometry</code> and <code>IdfViewer</code> classes are introduced. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the rgl package in a similar way as OpenStudio SketchUp Plugin. <code>Idf$geometry()</code> and <code>Idf$view()</code> methods are added to directly create an <code>IdfGeometry</code> and <code>IdfViewer</code> object based on current <code>Idf</code> object, respectively (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</p></li>
+<li><p>A <code>plot.Idf</code> method is added which is basically a wrappper of <code>Idf$view()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</p></li>
 <li><p>Now eplusr can utilize the CSV output for report data extraction. Benifiting from the fantastic <code><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">data.table::fread</a></code>, this approach can be as 3~10X faster compared to the SQLite approach. eplusr will still use the SQLite if the CSV output is not available.</p></li>
 </ul>
 </div>
@@ -309,10 +314,10 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">X</span><span class="op">$</span><span class="fu">method</span><span class="op">(</span><span class="va">which</span>, <span class="va">direction</span>, object <span class="op">=</span> <span class="cn">NULL</span>, class <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
+<p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
 <p>A new <code>keep</code> parameter with default value <code>FALSE</code> has been added. If <code>TRUE</code>, all input fields will be returned, even they may not have any relations. This is the default behavior of v0.12.0 and before. In this version, only fields that have relation with other objects will be returned.</p>
 <p>With this update, it is possible, for example, to directly know the structure of an air loop by using <code>idf$object_relation("AnAirLoop", depth = NULL)</code></p>
-<p>Moreover, a new argument <code>class_ref</code> can be specified in methods of value-relation extraction. It can be used to specify how to handle class-name-references. Class name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other many class names of objects, instaed of refering to specific field values. There are 3 options in total, i.e. <code>"none"</code>, <code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.</p>
+<p>Moreover, a new argument <code>class_ref</code> can be specified in methods of value-relation extraction. It can be used to specify how to handle class-name-references. Class name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other many class names of objects, instaed of refering to specific field values. There are 3 options in total, i.e. <code>"none"</code>, <code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.</p>
 <ul>
 <li>
 <code>"none"</code>: just ignore class-name-references. It is a reasonable option, as for most cases, class-name-references always come along with field value references. Ignoring class-name-references will not impact the most part of the relation structure.</li>
@@ -322,13 +327,11 @@
 <code>"all"</code>: include all class-name-references. For example, if the value of field <code>Component 1 Object Type</code> is <code>Coil:Heating:Water</code>, all objects in <code>Coil:Heating:Water</code> will be treated as referenced by that field. This is the most aggressive option.</li>
 </ul>
 </li>
-<li>
-<code><a href="../reference/read_epw.html">read_epw()</a></code> will proceed parsing for non-standard EPW header format (<a href='https://github.com/hongyuanjia/eplusr/issues/236'>#236</a>).</li>
-<li>Now <code>EplusSql$report_data()</code> will set the year values of day type <code>SummerDesignDay</code> and <code>WinterDesignDay</code> to current year and the <code>day_type</code> value will be left unchanged (<a href='https://github.com/hongyuanjia/eplusr/issues/258'>#258</a>).</li>
-<li>Now <code><a href="../reference/read_idf.html">read_idf()</a></code> will always make sure all necessary fields are added during parsing (<a href='https://github.com/hongyuanjia/eplusr/issues/267'>#267</a>).</li>
-<li>
-<code>[[.IdfObject</code> now only accept standard field names. No underscore-style names are allowed.</li>
-<li>The suffix of automatcially created names in <code>Idf$dup()</code> has been changed from <code>_X</code> to <code>X</code>.</li>
+<li><p><code><a href="../reference/read_epw.html">read_epw()</a></code> will proceed parsing for non-standard EPW header format (<a href='https://github.com/hongyuanjia/eplusr/issues/236'>#236</a>).</p></li>
+<li><p>Now <code>EplusSql$report_data()</code> will set the year values of day type <code>SummerDesignDay</code> and <code>WinterDesignDay</code> to current year and the <code>day_type</code> value will be left unchanged (<a href='https://github.com/hongyuanjia/eplusr/issues/258'>#258</a>).</p></li>
+<li><p>Now <code><a href="../reference/read_idf.html">read_idf()</a></code> will always make sure all necessary fields are added during parsing (<a href='https://github.com/hongyuanjia/eplusr/issues/267'>#267</a>).</p></li>
+<li><p><code>[[.IdfObject</code> now only accept standard field names. No underscore-style names are allowed.</p></li>
+<li><p>The suffix of automatcially created names in <code>Idf$dup()</code> has been changed from <code>_X</code> to <code>X</code>.</p></li>
 <li><p>The <code>warning</code> parameter in <code><a href="../reference/read_epw.html">read_epw()</a></code>, <code>Epw$add()</code> and <code>Epw$set()</code> has been deprecated (<a href='https://github.com/hongyuanjia/eplusr/issues/298'>#298</a>).</p></li>
 </ul>
 </div>
@@ -366,9 +369,9 @@
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-12-0" class="section level1">
+    <div id="eplusr-0120" class="section level1">
 <h1 class="page-header" data-toc-text="0.12.0">
-<a href="#eplusr-0-12-0" class="anchor"></a>eplusr 0.12.0<small> 2020-02-20 </small>
+<a href="#eplusr-0120" class="anchor"></a>eplusr 0.12.0<small> 2020-02-20 </small>
 </h1>
 <div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
@@ -394,41 +397,40 @@
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-11-0" class="section level1">
+    <div id="eplusr-0110" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.0">
-<a href="#eplusr-0-11-0" class="anchor"></a>eplusr 0.11.0<small> 2020-01-20 </small>
+<a href="#eplusr-0110" class="anchor"></a>eplusr 0.11.0<small> 2020-01-20 </small>
 </h1>
 <div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
-<li>A new method <code>$models()</code> has been added in <code>ParametricJob</code> class. It returns a list of all parametric models generated after a measure has been applied. If no measure is applied, <code>NULL</code> is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/59'>#59</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</li>
-<li>A new method <code>$save()</code> has been added in <code>ParametricJob</code> class. It saves all generated parametric models and weather file into specified directory. You can use <code>separate</code> argument to determine whether each model is to be saved in a separate folder (<a href='https://github.com/hongyuanjia/eplusr/issues/58'>#58</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</li>
-<li>New arguments <code>align</code> and <code>all</code> have been added to <code>$to_table()</code> method in <code>Idf</code> class. Setting <code>align</code> to <code>TRUE</code> will make sure that all returned object data per class have the same field number. The number of fields is the same as the object that have the most fields among those you specified. Setting <code>all</code> to <code>TRUE</code> will return all available fields in that class definition in IDD.</li>
-<li>Now the <code>weather</code> argument in <code>$run()</code> method in <code>Idf</code> class can be set to <code>NULL</code>. If so, design-day-only simulation is performed. Note that this needs at least one <code>Sizing:DesignDay</code> object exists in the <code>Idf</code> object (<a href='https://github.com/hongyuanjia/eplusr/issues/80'>#80</a>).</li>
-<li>Similar as above, the <code>epw</code> argument in <code><a href="../reference/EplusJob.html">eplus_job()</a></code> and <code><a href="../reference/ParametricJob.html">param_job()</a></code> can also be <code>NULL</code> to force a design-day-only simulation.</li>
-<li>Now <code>$status()</code> in <code>ParametricJob</code> class includes a new member named <code>job_status</code> which is data.table containing detailed information on each simulation job (<a href='https://github.com/hongyuanjia/eplusr/issues/70'>#70</a>).</li>
-<li>Now <code>$print()</code> in <code>ParametricJob</code> will give you more informative details on each simulation job status, especially when <code>wait</code> is set to <code>FALSE</code> in <code>$run()</code>.</li>
-<li>A new column <code>index</code> is added in the returned <code>RddFile</code> and <code>MddFile</code>. It contains index of each variable.</li>
-<li>Two new methods <code>$read_rdd()</code> and <code>$read_mdd()</code> have been added in <code>EplusJob</code> class. <code>$read_rdd()</code> and <code>$read_mdd()</code> which parse the simulation RDD and MDD file (<a href='https://github.com/hongyuanjia/eplusr/issues/84'>#84</a>).</li>
-<li>Two new function <code><a href="../reference/rdd_to_load.html">rdd_to_load()</a></code> and <code><a href="../reference/rdd_to_load.html">mdd_to_load()</a></code> have been added, which format <code>RddFile</code> and <code>MddFile</code> into a data.table in acceptable format for <code>$load()</code> method in <code>Idf</code> class.</li>
-<li>Similar as <code>Output:SQLite</code>, when <code>$run()</code> in <code>Idf</code> object is called, an object in class <code>Output:VariableDictionary</code> is automatically created with <code>Key Field</code> being <code>IDF</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/85'>#85</a>).</li>
-<li>A new argument <code>echo</code> has been added in <code>$run()</code> in <code>Idf</code>, <code>EplusJob</code> and <code>ParametricJob</code> class. It is only applicable when <code>wait</code> is <code>TRUE</code>. If <code>FALSE</code>, the simulation will be run silently without echoing any message from EnergyPlus.</li>
-<li>A new function <code><a href="../reference/transition.html">transition()</a></code> has been added. Basically it is an R implementation of IDFVersionUpdater. Currently the lowest version of IDF is v7.2. It should be much faster than IDFVersionUpdater.</li>
-<li>Now the way of find IDD file has been changed to take advantage of IDD files distributed along with IDFVersionUpdater. This update makes it possible to directly read IDF of most versions without downloading corresponding IDD.</li>
-<li>A new option <code>autocomplete</code> with default value being <code><a href="https://rdrr.io/r/base/interactive.html">interactive()</a></code> has been added. It is used to control whether to turn on autocompletion on class and field names. Underneath, <code><a href="https://rdrr.io/r/base/bindenv.html">makeActiveBinding()</a></code> is used to add or move active bindings in <code>Idf</code> and <code>IdfObject</code>s to directly return objects in class or field values. This will make it possible to dynamically show current class and field names in both RStudio and in the terminal. However, this process does come in with a penalty on the performance. It can make adding or modifying large mounts of [Idf] and [IdfObject]s extremely slow. Default value make sure autocompletion works in interactive mode.</li>
-<li>A new syntax <code>class := list(field = value)</code> in <code>$set()</code> has been added. Note the use of <code>:=</code> instead of <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code>. The main difference is that, unlike <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code>, the left hand side of <code>:=</code> should be a valid class name in current <code>Idf</code> object. It will set the field of all objects in specified class to specified value.</li>
-<li>A new function <code><a href="../reference/dt_to_load.html">dt_to_load()</a></code> has been added, which formats a data.table from <code>Idf$to_table()</code> and <code>IdfObject$to_table()</code> with <code>wide</code> being to <code>TRUE</code> into a data.table in acceptable format for <code>Idf$load()</code> method and <code>Idf$update()</code> method.</li>
-<li>Now <code><a href="../reference/read_epw.html">read_epw()</a></code> support EPW files with non-integer timezones fail to load (<a href='https://github.com/hongyuanjia/eplusr/issues/113'>#113</a>). <code>$location()</code> in <code>Epw</code> class also support setting the timezone to non-integer one.</li>
-<li>A new method <code>$parent()</code> has been added in <code>IddObject</code> and <code>IdfObject</code> class to get parent <code>Idd</code> and <code>Idf</code> object, respectively (<a href='https://github.com/hongyuanjia/eplusr/issues/76'>#76</a>).</li>
-<li>Simulation status will be updated in the progress message in <code><a href="../reference/run_idf.html">run_multi()</a></code> and <code>$run()</code> method in <code>ParametricJob</code> class, instead of only showing <code>COMPLETED</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/124'>#124</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/125'>#125</a>).</li>
-<li>
-<code>EplusJob</code> class now will parse and store input IDF and EPW. It will also add <code>Output:SQLite</code> and <code>Output:VariableDictionary</code> object if necessary. This change makes sure using <code>EplusJob</code> can always have the ability to extract simulation results instead of totally relying on the input IDF (<a href='https://github.com/hongyuanjia/eplusr/issues/118'>#118</a>).</li>
-<li>As a result of previous change, the <code>$run()</code> method in <code>EplusJob</code> now takes the same parameters as <code>$run()</code> method in <code>Idf</code>, i.e. you can also change the EPW file to use and output directory using <code>epw</code> and <code>dir</code> argument (<a href='https://github.com/hongyuanjia/eplusr/issues/118'>#118</a>).</li>
-<li>A new class <code>EplusGroupJob</code> is added. It can be created using <code><a href="../reference/EplusGroupJob.html">group_job()</a></code>. <code>EplusGroupJob</code> provides a wrapper of <code><a href="../reference/run_idf.html">run_multi()</a></code> to group multiple EnergyPlus simulations together for running and collecting different EnergyPlus outputs (<a href='https://github.com/hongyuanjia/eplusr/issues/117'>#117</a>).</li>
-<li>A new parameter named <code>.empty</code> has been added in <code>$set()</code>, <code>$insert()</code>, <code>$load()</code>, <code>$update()</code>, <code>$paste()</code> methods in <code>Idf</code> class and <code>$set()</code> method in <code>IdfObject</code> class (<a href='https://github.com/hongyuanjia/eplusr/issues/133'>#133</a>).</li>
-<li>EnergyPlus v9.2 support has been added (<a href='https://github.com/hongyuanjia/eplusr/issues/138'>#138</a>).</li>
-<li>Now required objects and unique objects can be deleted in <code>$del()</code> when <code>.force</code> is set to <code>TRUE</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/149'>#149</a>).</li>
+<li><p>A new method <code>$models()</code> has been added in <code>ParametricJob</code> class. It returns a list of all parametric models generated after a measure has been applied. If no measure is applied, <code>NULL</code> is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/59'>#59</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</p></li>
+<li><p>A new method <code>$save()</code> has been added in <code>ParametricJob</code> class. It saves all generated parametric models and weather file into specified directory. You can use <code>separate</code> argument to determine whether each model is to be saved in a separate folder (<a href='https://github.com/hongyuanjia/eplusr/issues/58'>#58</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</p></li>
+<li><p>New arguments <code>align</code> and <code>all</code> have been added to <code>$to_table()</code> method in <code>Idf</code> class. Setting <code>align</code> to <code>TRUE</code> will make sure that all returned object data per class have the same field number. The number of fields is the same as the object that have the most fields among those you specified. Setting <code>all</code> to <code>TRUE</code> will return all available fields in that class definition in IDD.</p></li>
+<li><p>Now the <code>weather</code> argument in <code>$run()</code> method in <code>Idf</code> class can be set to <code>NULL</code>. If so, design-day-only simulation is performed. Note that this needs at least one <code>Sizing:DesignDay</code> object exists in the <code>Idf</code> object (<a href='https://github.com/hongyuanjia/eplusr/issues/80'>#80</a>).</p></li>
+<li><p>Similar as above, the <code>epw</code> argument in <code><a href="../reference/EplusJob.html">eplus_job()</a></code> and <code><a href="../reference/ParametricJob.html">param_job()</a></code> can also be <code>NULL</code> to force a design-day-only simulation.</p></li>
+<li><p>Now <code>$status()</code> in <code>ParametricJob</code> class includes a new member named <code>job_status</code> which is data.table containing detailed information on each simulation job (<a href='https://github.com/hongyuanjia/eplusr/issues/70'>#70</a>).</p></li>
+<li><p>Now <code>$print()</code> in <code>ParametricJob</code> will give you more informative details on each simulation job status, especially when <code>wait</code> is set to <code>FALSE</code> in <code>$run()</code>.</p></li>
+<li><p>A new column <code>index</code> is added in the returned <code>RddFile</code> and <code>MddFile</code>. It contains index of each variable.</p></li>
+<li><p>Two new methods <code>$read_rdd()</code> and <code>$read_mdd()</code> have been added in <code>EplusJob</code> class. <code>$read_rdd()</code> and <code>$read_mdd()</code> which parse the simulation RDD and MDD file (<a href='https://github.com/hongyuanjia/eplusr/issues/84'>#84</a>).</p></li>
+<li><p>Two new function <code><a href="../reference/rdd_to_load.html">rdd_to_load()</a></code> and <code><a href="../reference/rdd_to_load.html">mdd_to_load()</a></code> have been added, which format <code>RddFile</code> and <code>MddFile</code> into a data.table in acceptable format for <code>$load()</code> method in <code>Idf</code> class.</p></li>
+<li><p>Similar as <code>Output:SQLite</code>, when <code>$run()</code> in <code>Idf</code> object is called, an object in class <code>Output:VariableDictionary</code> is automatically created with <code>Key Field</code> being <code>IDF</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/85'>#85</a>).</p></li>
+<li><p>A new argument <code>echo</code> has been added in <code>$run()</code> in <code>Idf</code>, <code>EplusJob</code> and <code>ParametricJob</code> class. It is only applicable when <code>wait</code> is <code>TRUE</code>. If <code>FALSE</code>, the simulation will be run silently without echoing any message from EnergyPlus.</p></li>
+<li><p>A new function <code><a href="../reference/transition.html">transition()</a></code> has been added. Basically it is an R implementation of IDFVersionUpdater. Currently the lowest version of IDF is v7.2. It should be much faster than IDFVersionUpdater.</p></li>
+<li><p>Now the way of find IDD file has been changed to take advantage of IDD files distributed along with IDFVersionUpdater. This update makes it possible to directly read IDF of most versions without downloading corresponding IDD.</p></li>
+<li><p>A new option <code>autocomplete</code> with default value being <code><a href="https://rdrr.io/r/base/interactive.html">interactive()</a></code> has been added. It is used to control whether to turn on autocompletion on class and field names. Underneath, <code><a href="https://rdrr.io/r/base/bindenv.html">makeActiveBinding()</a></code> is used to add or move active bindings in <code>Idf</code> and <code>IdfObject</code>s to directly return objects in class or field values. This will make it possible to dynamically show current class and field names in both RStudio and in the terminal. However, this process does come in with a penalty on the performance. It can make adding or modifying large mounts of [Idf] and [IdfObject]s extremely slow. Default value make sure autocompletion works in interactive mode.</p></li>
+<li><p>A new syntax <code>class := list(field = value)</code> in <code>$set()</code> has been added. Note the use of <code>:=</code> instead of <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code>. The main difference is that, unlike <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code>, the left hand side of <code>:=</code> should be a valid class name in current <code>Idf</code> object. It will set the field of all objects in specified class to specified value.</p></li>
+<li><p>A new function <code><a href="../reference/dt_to_load.html">dt_to_load()</a></code> has been added, which formats a data.table from <code>Idf$to_table()</code> and <code>IdfObject$to_table()</code> with <code>wide</code> being to <code>TRUE</code> into a data.table in acceptable format for <code>Idf$load()</code> method and <code>Idf$update()</code> method.</p></li>
+<li><p>Now <code><a href="../reference/read_epw.html">read_epw()</a></code> support EPW files with non-integer timezones fail to load (<a href='https://github.com/hongyuanjia/eplusr/issues/113'>#113</a>). <code>$location()</code> in <code>Epw</code> class also support setting the timezone to non-integer one.</p></li>
+<li><p>A new method <code>$parent()</code> has been added in <code>IddObject</code> and <code>IdfObject</code> class to get parent <code>Idd</code> and <code>Idf</code> object, respectively (<a href='https://github.com/hongyuanjia/eplusr/issues/76'>#76</a>).</p></li>
+<li><p>Simulation status will be updated in the progress message in <code><a href="../reference/run_idf.html">run_multi()</a></code> and <code>$run()</code> method in <code>ParametricJob</code> class, instead of only showing <code>COMPLETED</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/124'>#124</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/125'>#125</a>).</p></li>
+<li><p><code>EplusJob</code> class now will parse and store input IDF and EPW. It will also add <code>Output:SQLite</code> and <code>Output:VariableDictionary</code> object if necessary. This change makes sure using <code>EplusJob</code> can always have the ability to extract simulation results instead of totally relying on the input IDF (<a href='https://github.com/hongyuanjia/eplusr/issues/118'>#118</a>).</p></li>
+<li><p>As a result of previous change, the <code>$run()</code> method in <code>EplusJob</code> now takes the same parameters as <code>$run()</code> method in <code>Idf</code>, i.e. you can also change the EPW file to use and output directory using <code>epw</code> and <code>dir</code> argument (<a href='https://github.com/hongyuanjia/eplusr/issues/118'>#118</a>).</p></li>
+<li><p>A new class <code>EplusGroupJob</code> is added. It can be created using <code><a href="../reference/EplusGroupJob.html">group_job()</a></code>. <code>EplusGroupJob</code> provides a wrapper of <code><a href="../reference/run_idf.html">run_multi()</a></code> to group multiple EnergyPlus simulations together for running and collecting different EnergyPlus outputs (<a href='https://github.com/hongyuanjia/eplusr/issues/117'>#117</a>).</p></li>
+<li><p>A new parameter named <code>.empty</code> has been added in <code>$set()</code>, <code>$insert()</code>, <code>$load()</code>, <code>$update()</code>, <code>$paste()</code> methods in <code>Idf</code> class and <code>$set()</code> method in <code>IdfObject</code> class (<a href='https://github.com/hongyuanjia/eplusr/issues/133'>#133</a>).</p></li>
+<li><p>EnergyPlus v9.2 support has been added (<a href='https://github.com/hongyuanjia/eplusr/issues/138'>#138</a>).</p></li>
+<li><p>Now required objects and unique objects can be deleted in <code>$del()</code> when <code>.force</code> is set to <code>TRUE</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/149'>#149</a>).</p></li>
 <li>
 <p>Now for Windows and Linux, <code><a href="../reference/install_eplus.html">install_eplus()</a></code> supports to install EnergyPlus to your home directory or your customized directory without requiring administrator privileges (<a href='https://github.com/hongyuanjia/eplusr/issues/167'>#167</a>).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -437,10 +439,11 @@
 <span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co"># install to custom directory</span>
 <span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span><span class="op">)</span></code></pre></div>
-Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></code> for details.</li>
-<li>All documentation in R6 classes have been update thanks to roxyten2 R6 support (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</li>
-<li>Deprecated methods in each class have all been remove (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</li>
-<li>New parameter <code>case</code> has been added in <code>EplusSql$tabular_data()</code>. Similar like <code>case</code> parameter in <code>EplusSql$report_data()</code>, it lets you to add a <code>case</code> column to indicate the case of simulation. This brings some changes in the returned results of <code>EplusSql$tabular_data()</code>. Compared to previous version, there will always be a <code>case</code> column, unless <code>case</code> parameter is set to <code>NULL</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</li>
+<p>Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></code> for details.</p>
+</li>
+<li><p>All documentation in R6 classes have been update thanks to roxyten2 R6 support (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</p></li>
+<li><p>Deprecated methods in each class have all been remove (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</p></li>
+<li><p>New parameter <code>case</code> has been added in <code>EplusSql$tabular_data()</code>. Similar like <code>case</code> parameter in <code>EplusSql$report_data()</code>, it lets you to add a <code>case</code> column to indicate the case of simulation. This brings some changes in the returned results of <code>EplusSql$tabular_data()</code>. Compared to previous version, there will always be a <code>case</code> column, unless <code>case</code> parameter is set to <code>NULL</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</p></li>
 <li><p>New parameter <code>wide</code> and <code>string_value</code> have been added in <code>EplusSql$tabular_data()</code> and <code>EplusGroupJob$tabular_data()</code>. When <code>wide</code> is <code>TRUE</code>, each table will be converted into the similar format as it is shown in EnergyPlus HTML output file. And when <code>string_value</code> is <code>FALSE</code>, values in possible numeric columns are converted into numbers (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</p></li>
 </ul>
 </div>
@@ -453,7 +456,7 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 <li>Now <code>$ref_to_object()</code> and <code>$ref_by_object()</code> can give correct results when <code>class</code> argument is specified.</li>
 <li>Now IDD version lower than 8.3 can successfully be downloaded and parsed.</li>
 <li>Now <code>ErrFile</code> objects returned from <code>$errors()</code> in <code>ParametricJob</code> can be successfully printed.</li>
-<li>Now one-line empty objects, e.g. <code>"Output:Surfaces:List,,;\n"</code>, can be successfully parsed (<a href='https://github.com/hongyuanjia/eplusr/issues/88'>#88</a>).</li>
+<li>Now one-line empty objects, e.g. <code>"Output:Surfaces:List,,;\n"</code>, can be successfully parsed (<a href='https://github.com/hongyuanjia/eplusr/issues/88'>#88</a>).</li>
 <li>Fix the error of <code>$to_table()</code> when no arguments were provided (<a href='https://github.com/hongyuanjia/eplusr/issues/103'>#103</a>).</li>
 <li>The references of newly added extensible fields are now correctly handled (<a href='https://github.com/hongyuanjia/eplusr/issues/109'>#109</a>).</li>
 <li>
@@ -461,7 +464,7 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 <li>Fix the error in <code>$ref_to_node()</code> when no objects in specified class is found (<a href='https://github.com/hongyuanjia/eplusr/issues/110'>#110</a>).</li>
 <li>Now <code>leading</code> and <code>sep_at</code> argument work as expected in <code>Idf$to_string()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/160'>#160</a>).</li>
 <li>Now <code>Idf$to_table()</code> matches object names case-insensitively (<a href='https://github.com/hongyuanjia/eplusr/issues/157'>#157</a>).</li>
-<li>One-line-formatted <code>Version</code> object with trailing comments can be successfully parsed, e.g. <code>Version, 8.6; !- ABC</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/170'>#170</a>).</li>
+<li>One-line-formatted <code>Version</code> object with trailing comments can be successfully parsed, e.g. <code>Version, 8.6; !- ABC</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/170'>#170</a>).</li>
 <li>Better support for old IDD (<a href='https://github.com/hongyuanjia/eplusr/issues/183'>#183</a>).</li>
 </ul>
 </div>
@@ -485,15 +488,15 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-10-4" class="section level1">
+    <div id="eplusr-0104" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.4">
-<a href="#eplusr-0-10-4" class="anchor"></a>eplusr 0.10.4<small> 2019-11-05 </small>
+<a href="#eplusr-0104" class="anchor"></a>eplusr 0.10.4<small> 2019-11-05 </small>
 </h1>
 <p>This is a bug fix release which make sure eplusr is compatible with new version of R6 <a href="https://github.com/hongyuanjia/eplusr/issues/164"><a href='https://github.com/hongyuanjia/eplusr/issues/164'>#164</a></a>. No new feature is included.</p>
 </div>
-    <div id="eplusr-0-10-3" class="section level1">
+    <div id="eplusr-0103" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.3">
-<a href="#eplusr-0-10-3" class="anchor"></a>eplusr 0.10.3<small> 2019-07-08 </small>
+<a href="#eplusr-0103" class="anchor"></a>eplusr 0.10.3<small> 2019-07-08 </small>
 </h1>
 <div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
@@ -559,9 +562,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-10-2" class="section level1">
+    <div id="eplusr-0102" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.2">
-<a href="#eplusr-0-10-2" class="anchor"></a>eplusr 0.10.2<small> 2019-05-13 </small>
+<a href="#eplusr-0102" class="anchor"></a>eplusr 0.10.2<small> 2019-05-13 </small>
 </h1>
 <p>This is a patch update mainly to fix CRAN check errors on a strict Latin locale, with a bug fix.</p>
 <div id="bug-fixes-5" class="section level2">
@@ -573,9 +576,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-10-1" class="section level1">
+    <div id="eplusr-0101" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.1">
-<a href="#eplusr-0-10-1" class="anchor"></a>eplusr 0.10.1<small> 2019-05-09 </small>
+<a href="#eplusr-0101" class="anchor"></a>eplusr 0.10.1<small> 2019-05-09 </small>
 </h1>
 <p>This is a patch update mainly to fix CRAN check errors, with few bug fixes.</p>
 <div id="bug-fixes-6" class="section level2">
@@ -594,9 +597,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-10-0" class="section level1">
+    <div id="eplusr-0100" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.0">
-<a href="#eplusr-0-10-0" class="anchor"></a>eplusr 0.10.0<small> 2019-05-03 </small>
+<a href="#eplusr-0100" class="anchor"></a>eplusr 0.10.0<small> 2019-05-03 </small>
 </h1>
 <p>eplusr v0.10.0 introduces dozens of improvements, unfortunately also has some break changes. Detailed updates per class are as follow:</p>
 <div id="idd-class" class="section level2">
@@ -616,7 +619,7 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 <h2 class="hasAnchor">
 <a href="#iddobject-class" class="anchor"></a><code>IddObject</code> Class</h2>
 <ul>
-<li><p>A constructor <code><a href="../reference/idd_object.html">idd_object()</a></code> has been added to help directly create <code>IddObject</code>. It takes a parent IDD version or an <code>Idd</code> object and a valid class name or class index, e.g. <code><a href="../reference/idd_object.html">idd_object(8.8, "Material")</a></code>, <code><a href="../reference/idd_object.html">idd_object(use_idd(8.8), "Construction")</a></code></p></li>
+<li><p>A constructor <code><a href="../reference/idd_object.html">idd_object()</a></code> has been added to help directly create <code>IddObject</code>. It takes a parent IDD version or an <code>Idd</code> object and a valid class name or class index, e.g. <code><a href="../reference/idd_object.html">idd_object(8.8, "Material")</a></code>, <code><a href="../reference/idd_object.html">idd_object(use_idd(8.8), "Construction")</a></code></p></li>
 <li><p>New method <code>$version()</code> is added to extract the version of parent IDD.</p></li>
 <li><p>New method <code>$field_relation()</code> is added to extract the field relation in current class with other class fields.</p></li>
 <li><p>New method <code>$has_ref()</code>, <code>$has_ref_to()</code>, and <code>$has_ref_by()</code> are added to help to detect field relations</p></li>
@@ -639,7 +642,7 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 <li><p><code>$definition()</code> now only accepts one class name and returns a single <code>IddObject</code>, not a list of <code>IddObject</code>.</p></li>
 <li><p><code>$object()</code> now takes a single object ID or name and returns an <code>IdfObject</code>.</p></li>
 <li><p>New method <code>$objects()</code> is added as the successor of <code>$object()</code> in previous versions.</p></li>
-<li><p>New method <code>$object_unique()</code> is added which returns an <code>IdfObject</code> in unique-object class, e.g. <code>SimulaSimulationContrl</code>. This makes it easy to directly extract and modify those objects, e.g. <code>model$object_unique("SimulationContrl")$set(...)</code>.</p></li>
+<li><p>New method <code>$object_unique()</code> is added which returns an <code>IdfObject</code> in unique-object class, e.g. <code>SimulaSimulationContrl</code>. This makes it easy to directly extract and modify those objects, e.g. <code>model$object_unique("SimulationContrl")$set(...)</code>.</p></li>
 <li><p><code>$object_in_class()</code> now is deprecated in flavor of <code>$objects_in_class()</code>.</p></li>
 <li><p>New method <code>$objects_in_group()</code> is added to get all objects in specified group.</p></li>
 <li><p><code>$search_object()</code>, <code>$search_value()</code> and <code>$replace_value()</code> now can take same arguments as <code><a href="https://rdrr.io/r/base/grep.html">base::grepl()</a></code> to further control the way it searches objects.</p></li>
@@ -728,9 +731,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-9-4" class="section level1">
+    <div id="eplusr-094" class="section level1">
 <h1 class="page-header" data-toc-text="0.9.4">
-<a href="#eplusr-0-9-4" class="anchor"></a>eplusr 0.9.4<small> 2018-12-05 </small>
+<a href="#eplusr-094" class="anchor"></a>eplusr 0.9.4<small> 2018-12-05 </small>
 </h1>
 <div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
@@ -777,9 +780,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-9-3" class="section level1">
+    <div id="eplusr-093" class="section level1">
 <h1 class="page-header" data-toc-text="0.9.3">
-<a href="#eplusr-0-9-3" class="anchor"></a>eplusr 0.9.3<small> 2018-10-11 </small>
+<a href="#eplusr-093" class="anchor"></a>eplusr 0.9.3<small> 2018-10-11 </small>
 </h1>
 <div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
@@ -796,9 +799,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-9-2" class="section level1">
+    <div id="eplusr-092" class="section level1">
 <h1 class="page-header" data-toc-text="0.9.2">
-<a href="#eplusr-0-9-2" class="anchor"></a>eplusr 0.9.2<small> 2018-09-30 </small>
+<a href="#eplusr-092" class="anchor"></a>eplusr 0.9.2<small> 2018-09-30 </small>
 </h1>
 <div id="break-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -831,9 +834,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-9-1" class="section level1">
+    <div id="eplusr-091" class="section level1">
 <h1 class="page-header" data-toc-text="0.9.1">
-<a href="#eplusr-0-9-1" class="anchor"></a>eplusr 0.9.1<small> 2018-08-29 </small>
+<a href="#eplusr-091" class="anchor"></a>eplusr 0.9.1<small> 2018-08-29 </small>
 </h1>
 <div id="minor-changes-6" class="section level2">
 <h2 class="hasAnchor">
@@ -851,9 +854,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-9-0" class="section level1">
+    <div id="eplusr-090" class="section level1">
 <h1 class="page-header" data-toc-text="0.9.0">
-<a href="#eplusr-0-9-0" class="anchor"></a>eplusr 0.9.0<small> 2018-08-27 </small>
+<a href="#eplusr-090" class="anchor"></a>eplusr 0.9.0<small> 2018-08-27 </small>
 </h1>
 <div id="break-changes-1" class="section level2">
 <h2 class="hasAnchor">
@@ -908,9 +911,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-8-3" class="section level1">
+    <div id="eplusr-083" class="section level1">
 <h1 class="page-header" data-toc-text="0.8.3">
-<a href="#eplusr-0-8-3" class="anchor"></a>eplusr 0.8.3<small> 2018-08-08 </small>
+<a href="#eplusr-083" class="anchor"></a>eplusr 0.8.3<small> 2018-08-08 </small>
 </h1>
 <div id="new-features-9" class="section level2">
 <h2 class="hasAnchor">
@@ -946,9 +949,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-8-2" class="section level1">
+    <div id="eplusr-082" class="section level1">
 <h1 class="page-header" data-toc-text="0.8.2">
-<a href="#eplusr-0-8-2" class="anchor"></a>eplusr 0.8.2<small> 2018-07-22 </small>
+<a href="#eplusr-082" class="anchor"></a>eplusr 0.8.2<small> 2018-07-22 </small>
 </h1>
 <div id="new-feature" class="section level2">
 <h2 class="hasAnchor">
@@ -974,9 +977,9 @@ Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></c
 </ul>
 </div>
 </div>
-    <div id="eplusr-0-8-1" class="section level1">
+    <div id="eplusr-081" class="section level1">
 <h1 class="page-header" data-toc-text="0.8.1">
-<a href="#eplusr-0-8-1" class="anchor"></a>eplusr 0.8.1<small> Unreleased </small>
+<a href="#eplusr-081" class="anchor"></a>eplusr 0.8.1<small> Unreleased </small>
 </h1>
 <div id="major-changes-2" class="section level2">
 <h2 class="hasAnchor">

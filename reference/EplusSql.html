@@ -718,7 +718,7 @@ sql$print()
 <span class='co'>## Method `EplusSql$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
     <span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
@@ -733,672 +733,107 @@ sql$print()
     <span class='co'># create from local file</span>
     <span class='va'>sql</span> <span class='op'>&lt;-</span> <span class='fu'><a href='eplus_sql.html'>eplus_sql</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"1ZoneUncontrolled.sql"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmpbSS17E/1ZoneUncontrolled.idf.</span></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$path`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get path</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneUncontrolled.sql"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$path_idf`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># get path</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>path_idf</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/tmp/RtmpbSS17E/1ZoneUncontrolled.idf"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$list_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>list_table</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "ComponentSizes"               "ConstructionLayers"          
-#&gt;  [3] "Constructions"                "DaylightMapHourlyData"       
-#&gt;  [5] "DaylightMapHourlyReports"     "DaylightMaps"                
-#&gt;  [7] "EnvironmentPeriods"           "Errors"                      
-#&gt;  [9] "Materials"                    "NominalBaseboardHeaters"     
-#&gt; [11] "NominalElectricEquipment"     "NominalGasEquipment"         
-#&gt; [13] "NominalHotWaterEquipment"     "NominalInfiltration"         
-#&gt; [15] "NominalLighting"              "NominalOtherEquipment"       
-#&gt; [17] "NominalPeople"                "NominalSteamEquipment"       
-#&gt; [19] "NominalVentilation"           "ReportData"                  
-#&gt; [21] "ReportDataDictionary"         "ReportExtendedData"          
-#&gt; [23] "ReportMeterData"              "ReportMeterDataDictionary"   
-#&gt; [25] "ReportMeterExtendedData"      "ReportVariableData"          
-#&gt; [27] "ReportVariableDataDictionary" "ReportVariableExtendedData"  
-#&gt; [29] "ReportVariableWithTime"       "RoomAirModels"               
-#&gt; [31] "Schedules"                    "Simulations"                 
-#&gt; [33] "StringTypes"                  "Strings"                     
-#&gt; [35] "Surfaces"                     "SystemSizes"                 
-#&gt; [37] "TabularData"                  "TabularDataWithStrings"      
-#&gt; [39] "Time"                         "ZoneGroups"                  
-#&gt; [41] "ZoneInfoZoneLists"            "ZoneLists"                   
-#&gt; [43] "ZoneSizes"                    "Zones"                       </div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$read_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read a specific table</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"Zones"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    zone_index zone_name rel_north origin_x origin_y origin_z centroid_x
-#&gt; 1:          1  ZONE ONE         0        0        0        0       7.62
-#&gt;    centroid_y centroid_z of_type multiplier list_multiplier minimum_x maximum_x
-#&gt; 1:       7.62      2.286       1          1               1         0     15.24
-#&gt;    minimum_y maximum_y minimum_z maximum_z ceiling_height   volume
-#&gt; 1:         0     15.24         0     4.572          4.572 1061.882
-#&gt;    inside_convection_algo outside_convection_algo floor_area
-#&gt; 1:                      2                       7   232.2576
-#&gt;    ext_gross_wall_area ext_net_wall_area ext_window_area is_part_of_total_area
-#&gt; 1:            278.7091          278.7091               0                     1</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$report_data_dict`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     report_data_dictionary_index is_meter type
-#&gt;  1:                            6        0  Avg
-#&gt;  2:                            7        0  Avg
-#&gt;  3:                            8        0  Avg
-#&gt;  4:                           21        1  Sum
-#&gt;  5:                           40        0  Sum
-#&gt;  6:                           41        0  Sum
-#&gt;  7:                           42        0  Sum
-#&gt;  8:                           43        0  Sum
-#&gt;  9:                           44        0  Avg
-#&gt; 10:                           45        0  Avg
-#&gt; 11:                           46        0  Avg
-#&gt; 12:                           47        0  Avg
-#&gt; 13:                           48        0  Avg
-#&gt; 14:                           49        0  Avg
-#&gt; 15:                           50        0  Avg
-#&gt; 16:                           51        0  Avg
-#&gt; 17:                           52        0  Avg
-#&gt; 18:                           53        0  Avg
-#&gt; 19:                           54        0  Avg
-#&gt; 20:                           55        0  Avg
-#&gt; 21:                           56        0  Avg
-#&gt; 22:                           57        0  Avg
-#&gt; 23:                           58        0  Avg
-#&gt; 24:                           59        0  Avg
-#&gt; 25:                           60        0  Avg
-#&gt; 26:                           61        0  Avg
-#&gt; 27:                           62        0  Avg
-#&gt; 28:                           63        0  Avg
-#&gt; 29:                           64        0  Avg
-#&gt; 30:                           65        0  Avg
-#&gt; 31:                           66        0  Avg
-#&gt; 32:                           67        0  Avg
-#&gt; 33:                           68        0  Avg
-#&gt; 34:                           69        0  Avg
-#&gt; 35:                           70        0  Avg
-#&gt; 36:                           73        1  Sum
-#&gt; 37:                           83        1  Sum
-#&gt;     report_data_dictionary_index is_meter type
-#&gt;                             index_group timestep_type      key_value
-#&gt;  1:                                Zone   HVAC System    Environment
-#&gt;  2:                                Zone   HVAC System    Environment
-#&gt;  3:                                Zone   HVAC System    Environment
-#&gt;  4: Facility:Electricity:ExteriorLights   HVAC System               
-#&gt;  5:                                Zone   HVAC System       ZONE ONE
-#&gt;  6:                                Zone   HVAC System      TEST 352A
-#&gt;  7:                                Zone   HVAC System       ZONE ONE
-#&gt;  8:                                Zone   HVAC System TEST 352 MINUS
-#&gt;  9:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 10:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 11:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 12:                                Zone   HVAC System  ZN001:WALL001
-#&gt; 13:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 14:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 15:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 16:                                Zone   HVAC System  ZN001:WALL002
-#&gt; 17:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 18:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 19:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 20:                                Zone   HVAC System  ZN001:WALL003
-#&gt; 21:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 22:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 23:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 24:                                Zone   HVAC System  ZN001:WALL004
-#&gt; 25:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 26:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 27:                                Zone   HVAC System   ZN001:FLR001
-#&gt; 28:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 29:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 30:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 31:                                Zone   HVAC System  ZN001:ROOF001
-#&gt; 32:                                Zone   HVAC System       ZONE ONE
-#&gt; 33:                                Zone   HVAC System       ZONE ONE
-#&gt; 34:                              System          Zone       ZONE ONE
-#&gt; 35:                              System          Zone       ZONE ONE
-#&gt; 36:             Facility:EnergyTransfer   HVAC System               
-#&gt; 37:             Building:EnergyTransfer   HVAC System               
-#&gt;                             index_group timestep_type      key_value
-#&gt;                                                          name
-#&gt;  1:                      Site Outdoor Air Drybulb Temperature
-#&gt;  2:                          Site Daylight Saving Time Status
-#&gt;  3:                                       Site Day Type Index
-#&gt;  4:                                ExteriorLights:Electricity
-#&gt;  5:                    Zone Total Internal Latent Gain Energy
-#&gt;  6:                      Other Equipment Total Heating Energy
-#&gt;  7:                 Zone Other Equipment Total Heating Energy
-#&gt;  8:                      Other Equipment Total Heating Energy
-#&gt;  9:                           Surface Inside Face Temperature
-#&gt; 10:                          Surface Outside Face Temperature
-#&gt; 11:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 12: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 13:                           Surface Inside Face Temperature
-#&gt; 14:                          Surface Outside Face Temperature
-#&gt; 15:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 16: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 17:                           Surface Inside Face Temperature
-#&gt; 18:                          Surface Outside Face Temperature
-#&gt; 19:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 20: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 21:                           Surface Inside Face Temperature
-#&gt; 22:                          Surface Outside Face Temperature
-#&gt; 23:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 24: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 25:                           Surface Inside Face Temperature
-#&gt; 26:                          Surface Outside Face Temperature
-#&gt; 27:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 28:                           Surface Inside Face Temperature
-#&gt; 29:                          Surface Outside Face Temperature
-#&gt; 30:  Surface Inside Face Convection Heat Transfer Coefficient
-#&gt; 31: Surface Outside Face Convection Heat Transfer Coefficient
-#&gt; 32:                             Zone Mean Radiant Temperature
-#&gt; 33:                                 Zone Mean Air Temperature
-#&gt; 34:             Zone Air Heat Balance Surface Convection Rate
-#&gt; 35:             Zone Air Heat Balance Air Energy Storage Rate
-#&gt; 36:                                   EnergyTransfer:Facility
-#&gt; 37:                                   EnergyTransfer:Building
-#&gt;                                                          name
-#&gt;     reporting_frequency schedule_name  units
-#&gt;  1:              Hourly          &lt;NA&gt;      C
-#&gt;  2:               Daily          &lt;NA&gt;       
-#&gt;  3:               Daily          &lt;NA&gt;       
-#&gt;  4:              Hourly          &lt;NA&gt;      J
-#&gt;  5:              Hourly          &lt;NA&gt;      J
-#&gt;  6:             Monthly          &lt;NA&gt;      J
-#&gt;  7:             Monthly          &lt;NA&gt;      J
-#&gt;  8:             Monthly          &lt;NA&gt;      J
-#&gt;  9:               Daily          &lt;NA&gt;      C
-#&gt; 10:               Daily          &lt;NA&gt;      C
-#&gt; 11:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 12:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 13:               Daily          &lt;NA&gt;      C
-#&gt; 14:               Daily          &lt;NA&gt;      C
-#&gt; 15:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 16:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 17:               Daily          &lt;NA&gt;      C
-#&gt; 18:               Daily          &lt;NA&gt;      C
-#&gt; 19:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 20:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 21:               Daily          &lt;NA&gt;      C
-#&gt; 22:               Daily          &lt;NA&gt;      C
-#&gt; 23:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 24:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 25:               Daily          &lt;NA&gt;      C
-#&gt; 26:               Daily          &lt;NA&gt;      C
-#&gt; 27:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 28:               Daily          &lt;NA&gt;      C
-#&gt; 29:               Daily          &lt;NA&gt;      C
-#&gt; 30:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 31:               Daily          &lt;NA&gt; W/m2-K
-#&gt; 32:              Hourly          &lt;NA&gt;      C
-#&gt; 33:              Hourly          &lt;NA&gt;      C
-#&gt; 34:              Hourly          &lt;NA&gt;      W
-#&gt; 35:              Hourly          &lt;NA&gt;      W
-#&gt; 36:              Hourly          &lt;NA&gt;      J
-#&gt; 37:              Hourly          &lt;NA&gt;      J
-#&gt;     reporting_frequency schedule_name  units</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$report_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read all report data</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                     case            datetime   key_value
-#&gt;     1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;     2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;     3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;     4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;     5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;    ---                                                  
-#&gt; 88485: 1ZoneUncontrolled 2019-12-31 20:00:00            
-#&gt; 88486: 1ZoneUncontrolled 2019-12-31 21:00:00            
-#&gt; 88487: 1ZoneUncontrolled 2019-12-31 22:00:00            
-#&gt; 88488: 1ZoneUncontrolled 2019-12-31 23:00:00            
-#&gt; 88489: 1ZoneUncontrolled 2020-01-01 00:00:00            
-#&gt;                                        name units value
-#&gt;     1: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;     2: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;     3: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;     4: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;     5: Site Outdoor Air Drybulb Temperature     C -15.5
-#&gt;    ---                                                 
-#&gt; 88485:              EnergyTransfer:Building     J   0.0
-#&gt; 88486:              EnergyTransfer:Building     J   0.0
-#&gt; 88487:              EnergyTransfer:Building     J   0.0
-#&gt; 88488:              EnergyTransfer:Building     J   0.0
-#&gt; 88489:              EnergyTransfer:Building     J   0.0</div><div class='input'>
+
 <span class='co'># specify output variables using report data dictionary</span>
 <span class='va'>dict</span> <span class='op'>&lt;-</span> <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='va'>units</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                     case            datetime   key_value
-#&gt;     1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;     2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;     3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;     4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;     5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;    ---                                                  
-#&gt; 30824: 1ZoneUncontrolled 2019-12-31 20:00:00    ZONE ONE
-#&gt; 30825: 1ZoneUncontrolled 2019-12-31 21:00:00    ZONE ONE
-#&gt; 30826: 1ZoneUncontrolled 2019-12-31 22:00:00    ZONE ONE
-#&gt; 30827: 1ZoneUncontrolled 2019-12-31 23:00:00    ZONE ONE
-#&gt; 30828: 1ZoneUncontrolled 2020-01-01 00:00:00    ZONE ONE
-#&gt;                                        name units     value
-#&gt;     1: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;     2: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;     3: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;     4: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;     5: Site Outdoor Air Drybulb Temperature     C -15.50000
-#&gt;    ---                                                     
-#&gt; 30824:            Zone Mean Air Temperature     C  12.88119
-#&gt; 30825:            Zone Mean Air Temperature     C  12.83337
-#&gt; 30826:            Zone Mean Air Temperature     C  12.67600
-#&gt; 30827:            Zone Mean Air Temperature     C  12.54648
-#&gt; 30828:            Zone Mean Air Temperature     C  12.51757</div><div class='input'>
+
 <span class='co'># specify output variables using 'key_value' and 'name'</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='st'>"environment"</span>, <span class='st'>"site outdoor air drybulb temperature"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case            datetime   key_value
-#&gt;    1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;    2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;    3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;    4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;    5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;   ---                                                  
-#&gt; 8804: 1ZoneUncontrolled 2019-12-31 20:00:00 Environment
-#&gt; 8805: 1ZoneUncontrolled 2019-12-31 21:00:00 Environment
-#&gt; 8806: 1ZoneUncontrolled 2019-12-31 22:00:00 Environment
-#&gt; 8807: 1ZoneUncontrolled 2019-12-31 23:00:00 Environment
-#&gt; 8808: 1ZoneUncontrolled 2020-01-01 00:00:00 Environment
-#&gt;                                       name units    value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;   ---                                                    
-#&gt; 8804: Site Outdoor Air Drybulb Temperature     C  13.1125
-#&gt; 8805: Site Outdoor Air Drybulb Temperature     C  12.6125
-#&gt; 8806: Site Outdoor Air Drybulb Temperature     C  11.2000
-#&gt; 8807: Site Outdoor Air Drybulb Temperature     C  10.6000
-#&gt; 8808: Site Outdoor Air Drybulb Temperature     C  10.9125</div><div class='input'>
+
 <span class='co'># explicitly specify year value and time zone</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, year <span class='op'>=</span> <span class='fl'>2020</span>, tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case            datetime   key_value
-#&gt;    1: 1ZoneUncontrolled 2020-12-21 01:00:00 Environment
-#&gt;    2: 1ZoneUncontrolled 2020-12-21 02:00:00 Environment
-#&gt;    3: 1ZoneUncontrolled 2020-12-21 03:00:00 Environment
-#&gt;    4: 1ZoneUncontrolled 2020-12-21 04:00:00 Environment
-#&gt;    5: 1ZoneUncontrolled 2020-12-21 05:00:00 Environment
-#&gt;   ---                                                  
-#&gt; 8804: 1ZoneUncontrolled 2020-12-31 20:00:00 Environment
-#&gt; 8805: 1ZoneUncontrolled 2020-12-31 21:00:00 Environment
-#&gt; 8806: 1ZoneUncontrolled 2020-12-31 22:00:00 Environment
-#&gt; 8807: 1ZoneUncontrolled 2020-12-31 23:00:00 Environment
-#&gt; 8808: 1ZoneUncontrolled 2021-01-01 00:00:00 Environment
-#&gt;                                       name units    value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;   ---                                                    
-#&gt; 8804: Site Outdoor Air Drybulb Temperature     C  13.1125
-#&gt; 8805: Site Outdoor Air Drybulb Temperature     C  12.6125
-#&gt; 8806: Site Outdoor Air Drybulb Temperature     C  11.2000
-#&gt; 8807: Site Outdoor Air Drybulb Temperature     C  10.6000
-#&gt; 8808: Site Outdoor Air Drybulb Temperature     C  10.9125</div><div class='input'>
+
 <span class='co'># explicitly specify case name</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, case <span class='op'>=</span> <span class='st'>"example"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;          case            datetime   key_value
-#&gt;    1: example 2020-12-21 01:00:00 Environment
-#&gt;    2: example 2020-12-21 02:00:00 Environment
-#&gt;    3: example 2020-12-21 03:00:00 Environment
-#&gt;    4: example 2020-12-21 04:00:00 Environment
-#&gt;    5: example 2020-12-21 05:00:00 Environment
-#&gt;   ---                                        
-#&gt; 8804: example 2019-12-31 20:00:00 Environment
-#&gt; 8805: example 2019-12-31 21:00:00 Environment
-#&gt; 8806: example 2019-12-31 22:00:00 Environment
-#&gt; 8807: example 2019-12-31 23:00:00 Environment
-#&gt; 8808: example 2020-01-01 00:00:00 Environment
-#&gt;                                       name units    value
-#&gt;    1: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    2: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    3: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    4: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;    5: Site Outdoor Air Drybulb Temperature     C -15.5000
-#&gt;   ---                                                    
-#&gt; 8804: Site Outdoor Air Drybulb Temperature     C  13.1125
-#&gt; 8805: Site Outdoor Air Drybulb Temperature     C  12.6125
-#&gt; 8806: Site Outdoor Air Drybulb Temperature     C  11.2000
-#&gt; 8807: Site Outdoor Air Drybulb Temperature     C  10.6000
-#&gt; 8808: Site Outdoor Air Drybulb Temperature     C  10.9125</div><div class='input'>
+
 <span class='co'># get all possible columns</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case            datetime month day hour minute dst interval
-#&gt;    1: 1ZoneUncontrolled 2020-12-21 01:00:00    12  21    1      0   0       60
-#&gt;    2: 1ZoneUncontrolled 2020-12-21 02:00:00    12  21    2      0   0       60
-#&gt;    3: 1ZoneUncontrolled 2020-12-21 03:00:00    12  21    3      0   0       60
-#&gt;    4: 1ZoneUncontrolled 2020-12-21 04:00:00    12  21    4      0   0       60
-#&gt;    5: 1ZoneUncontrolled 2020-12-21 05:00:00    12  21    5      0   0       60
-#&gt;   ---                                                                         
-#&gt; 8804: 1ZoneUncontrolled 2019-12-31 20:00:00    12  31   20      0   0       60
-#&gt; 8805: 1ZoneUncontrolled 2019-12-31 21:00:00    12  31   21      0   0       60
-#&gt; 8806: 1ZoneUncontrolled 2019-12-31 22:00:00    12  31   22      0   0       60
-#&gt; 8807: 1ZoneUncontrolled 2019-12-31 23:00:00    12  31   23      0   0       60
-#&gt; 8808: 1ZoneUncontrolled 2020-01-01 00:00:00    12  31   24      0   0       60
-#&gt;       simulation_days        day_type
-#&gt;    1:               1 WinterDesignDay
-#&gt;    2:               1 WinterDesignDay
-#&gt;    3:               1 WinterDesignDay
-#&gt;    4:               1 WinterDesignDay
-#&gt;    5:               1 WinterDesignDay
-#&gt;   ---                                
-#&gt; 8804:             365         Tuesday
-#&gt; 8805:             365         Tuesday
-#&gt; 8806:             365         Tuesday
-#&gt; 8807:             365         Tuesday
-#&gt; 8808:             365         Tuesday
-#&gt;                                          environment_name
-#&gt;    1: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;    2: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;    3: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;    4: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;    5: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt;   ---                                                    
-#&gt; 8804:       San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8805:       San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8806:       San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8807:       San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8808:       San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;       environment_period_index is_meter type index_group timestep_type
-#&gt;    1:                        1        0  Avg        Zone   HVAC System
-#&gt;    2:                        1        0  Avg        Zone   HVAC System
-#&gt;    3:                        1        0  Avg        Zone   HVAC System
-#&gt;    4:                        1        0  Avg        Zone   HVAC System
-#&gt;    5:                        1        0  Avg        Zone   HVAC System
-#&gt;   ---                                                                 
-#&gt; 8804:                        3        0  Avg        Zone   HVAC System
-#&gt; 8805:                        3        0  Avg        Zone   HVAC System
-#&gt; 8806:                        3        0  Avg        Zone   HVAC System
-#&gt; 8807:                        3        0  Avg        Zone   HVAC System
-#&gt; 8808:                        3        0  Avg        Zone   HVAC System
-#&gt;         key_value                                 name reporting_frequency
-#&gt;    1: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    2: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    3: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    4: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    5: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;   ---                                                                     
-#&gt; 8804: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8805: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8806: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8807: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8808: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;       schedule_name units    value
-#&gt;    1:          &lt;NA&gt;     C -15.5000
-#&gt;    2:          &lt;NA&gt;     C -15.5000
-#&gt;    3:          &lt;NA&gt;     C -15.5000
-#&gt;    4:          &lt;NA&gt;     C -15.5000
-#&gt;    5:          &lt;NA&gt;     C -15.5000
-#&gt;   ---                             
-#&gt; 8804:          &lt;NA&gt;     C  13.1125
-#&gt; 8805:          &lt;NA&gt;     C  12.6125
-#&gt; 8806:          &lt;NA&gt;     C  11.2000
-#&gt; 8807:          &lt;NA&gt;     C  10.6000
-#&gt; 8808:          &lt;NA&gt;     C  10.9125</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case       Date/Time
-#&gt;    1: 1ZoneUncontrolled 12/21  01:00:00
-#&gt;    2: 1ZoneUncontrolled 12/21  02:00:00
-#&gt;    3: 1ZoneUncontrolled 12/21  03:00:00
-#&gt;    4: 1ZoneUncontrolled 12/21  04:00:00
-#&gt;    5: 1ZoneUncontrolled 12/21  05:00:00
-#&gt;   ---                                  
-#&gt; 8804: 1ZoneUncontrolled 12/31  20:00:00
-#&gt; 8805: 1ZoneUncontrolled 12/31  21:00:00
-#&gt; 8806: 1ZoneUncontrolled 12/31  22:00:00
-#&gt; 8807: 1ZoneUncontrolled 12/31  23:00:00
-#&gt; 8808: 1ZoneUncontrolled 12/31  24:00:00
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;    1:                                                     -15.5000
-#&gt;    2:                                                     -15.5000
-#&gt;    3:                                                     -15.5000
-#&gt;    4:                                                     -15.5000
-#&gt;    5:                                                     -15.5000
-#&gt;   ---                                                             
-#&gt; 8804:                                                      13.1125
-#&gt; 8805:                                                      12.6125
-#&gt; 8806:                                                      11.2000
-#&gt; 8807:                                                      10.6000
-#&gt; 8808:                                                      10.9125</div><div class='input'>
+
 <span class='co'># return in a format that is similar as EnergyPlus CSV output with</span>
 <span class='co'># extra columns</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case environment_period_index
-#&gt;    1: 1ZoneUncontrolled                        1
-#&gt;    2: 1ZoneUncontrolled                        1
-#&gt;    3: 1ZoneUncontrolled                        1
-#&gt;    4: 1ZoneUncontrolled                        1
-#&gt;    5: 1ZoneUncontrolled                        1
-#&gt;   ---                                           
-#&gt; 8804: 1ZoneUncontrolled                        3
-#&gt; 8805: 1ZoneUncontrolled                        3
-#&gt; 8806: 1ZoneUncontrolled                        3
-#&gt; 8807: 1ZoneUncontrolled                        3
-#&gt; 8808: 1ZoneUncontrolled                        3
-#&gt;                                          environment_name simulation_days
-#&gt;    1: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;    2: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;    3: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;    4: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;    5: DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB               1
-#&gt;   ---                                                                    
-#&gt; 8804:       San Francisco Intl Ap CA USA TMY3 WMO#=724940             365
-#&gt; 8805:       San Francisco Intl Ap CA USA TMY3 WMO#=724940             365
-#&gt; 8806:       San Francisco Intl Ap CA USA TMY3 WMO#=724940             365
-#&gt; 8807:       San Francisco Intl Ap CA USA TMY3 WMO#=724940             365
-#&gt; 8808:       San Francisco Intl Ap CA USA TMY3 WMO#=724940             365
-#&gt;                  datetime month day hour minute        day_type       Date/Time
-#&gt;    1: 2020-12-21 01:00:00    12  21    1      0 WinterDesignDay 12/21  01:00:00
-#&gt;    2: 2020-12-21 02:00:00    12  21    2      0 WinterDesignDay 12/21  02:00:00
-#&gt;    3: 2020-12-21 03:00:00    12  21    3      0 WinterDesignDay 12/21  03:00:00
-#&gt;    4: 2020-12-21 04:00:00    12  21    4      0 WinterDesignDay 12/21  04:00:00
-#&gt;    5: 2020-12-21 05:00:00    12  21    5      0 WinterDesignDay 12/21  05:00:00
-#&gt;   ---                                                                          
-#&gt; 8804: 2019-12-31 20:00:00    12  31   20      0         Tuesday 12/31  20:00:00
-#&gt; 8805: 2019-12-31 21:00:00    12  31   21      0         Tuesday 12/31  21:00:00
-#&gt; 8806: 2019-12-31 22:00:00    12  31   22      0         Tuesday 12/31  22:00:00
-#&gt; 8807: 2019-12-31 23:00:00    12  31   23      0         Tuesday 12/31  23:00:00
-#&gt; 8808: 2020-01-01 00:00:00    12  31   24      0         Tuesday 12/31  24:00:00
-#&gt;       Environment:Site Outdoor Air Drybulb Temperature [C](Hourly)
-#&gt;    1:                                                     -15.5000
-#&gt;    2:                                                     -15.5000
-#&gt;    3:                                                     -15.5000
-#&gt;    4:                                                     -15.5000
-#&gt;    5:                                                     -15.5000
-#&gt;   ---                                                             
-#&gt; 8804:                                                      13.1125
-#&gt; 8805:                                                      12.6125
-#&gt; 8806:                                                      11.2000
-#&gt; 8807:                                                      10.6000
-#&gt; 8808:                                                      10.9125</div><div class='input'>
+
 <span class='co'># only get data at the working hour on the first Monday</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, hour <span class='op'>=</span> <span class='fl'>8</span><span class='op'>:</span><span class='fl'>18</span>, day_type <span class='op'>=</span> <span class='st'>"monday"</span>, simulation_days <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                  case            datetime   key_value
-#&gt;  1: 1ZoneUncontrolled 2019-01-07 08:00:00 Environment
-#&gt;  2: 1ZoneUncontrolled 2019-01-07 09:00:00 Environment
-#&gt;  3: 1ZoneUncontrolled 2019-01-07 10:00:00 Environment
-#&gt;  4: 1ZoneUncontrolled 2019-01-07 11:00:00 Environment
-#&gt;  5: 1ZoneUncontrolled 2019-01-07 12:00:00 Environment
-#&gt;  6: 1ZoneUncontrolled 2019-01-07 13:00:00 Environment
-#&gt;  7: 1ZoneUncontrolled 2019-01-07 14:00:00 Environment
-#&gt;  8: 1ZoneUncontrolled 2019-01-07 15:00:00 Environment
-#&gt;  9: 1ZoneUncontrolled 2019-01-07 16:00:00 Environment
-#&gt; 10: 1ZoneUncontrolled 2019-01-07 17:00:00 Environment
-#&gt; 11: 1ZoneUncontrolled 2019-01-07 18:00:00 Environment
-#&gt;                                     name units  value
-#&gt;  1: Site Outdoor Air Drybulb Temperature     C 8.4875
-#&gt;  2: Site Outdoor Air Drybulb Temperature     C 8.9000
-#&gt;  3: Site Outdoor Air Drybulb Temperature     C 9.5875
-#&gt;  4: Site Outdoor Air Drybulb Temperature     C 8.6250
-#&gt;  5: Site Outdoor Air Drybulb Temperature     C 7.8000
-#&gt;  6: Site Outdoor Air Drybulb Temperature     C 8.4875
-#&gt;  7: Site Outdoor Air Drybulb Temperature     C 8.9000
-#&gt;  8: Site Outdoor Air Drybulb Temperature     C 9.5875
-#&gt;  9: Site Outdoor Air Drybulb Temperature     C 9.6250
-#&gt; 10: Site Outdoor Air Drybulb Temperature     C 9.0875
-#&gt; 11: Site Outdoor Air Drybulb Temperature     C 8.5250</div><div class='input'>
+
 <span class='co'># only get specified run period data</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"EnvironmentPeriods"</span><span class='op'>)</span> <span class='co'># possible environment name</span>
-</div><div class='output co'>#&gt;    environment_period_index simulation_index
-#&gt; 1:                        1                1
-#&gt; 2:                        2                1
-#&gt; 3:                        3                1
-#&gt;                                           environment_name environment_type
-#&gt; 1:     DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB                1
-#&gt; 2: DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB                1
-#&gt; 3:           San Francisco Intl Ap CA USA TMY3 WMO#=724940                3</div><div class='input'><span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Empty data.table (0 rows and 6 cols): case,datetime,key_value,name,units,value</div><div class='input'><span class='co'># can also be done using 'environment_period_index' column</span>
+<span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
+<span class='co'># can also be done using 'environment_period_index' column</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='va'>environment_period_index</span> <span class='op'>==</span> <span class='fl'>3L</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;                    case            datetime month day hour minute dst interval
-#&gt;    1: 1ZoneUncontrolled 2019-01-01 01:00:00     1   1    1      0   0       60
-#&gt;    2: 1ZoneUncontrolled 2019-01-01 02:00:00     1   1    2      0   0       60
-#&gt;    3: 1ZoneUncontrolled 2019-01-01 03:00:00     1   1    3      0   0       60
-#&gt;    4: 1ZoneUncontrolled 2019-01-01 04:00:00     1   1    4      0   0       60
-#&gt;    5: 1ZoneUncontrolled 2019-01-01 05:00:00     1   1    5      0   0       60
-#&gt;   ---                                                                         
-#&gt; 8756: 1ZoneUncontrolled 2019-12-31 20:00:00    12  31   20      0   0       60
-#&gt; 8757: 1ZoneUncontrolled 2019-12-31 21:00:00    12  31   21      0   0       60
-#&gt; 8758: 1ZoneUncontrolled 2019-12-31 22:00:00    12  31   22      0   0       60
-#&gt; 8759: 1ZoneUncontrolled 2019-12-31 23:00:00    12  31   23      0   0       60
-#&gt; 8760: 1ZoneUncontrolled 2020-01-01 00:00:00    12  31   24      0   0       60
-#&gt;       simulation_days day_type                              environment_name
-#&gt;    1:               1  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;    2:               1  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;    3:               1  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;    4:               1  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;    5:               1  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;   ---                                                                       
-#&gt; 8756:             365  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8757:             365  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8758:             365  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8759:             365  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; 8760:             365  Tuesday San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt;       environment_period_index is_meter type index_group timestep_type
-#&gt;    1:                        3        0  Avg        Zone   HVAC System
-#&gt;    2:                        3        0  Avg        Zone   HVAC System
-#&gt;    3:                        3        0  Avg        Zone   HVAC System
-#&gt;    4:                        3        0  Avg        Zone   HVAC System
-#&gt;    5:                        3        0  Avg        Zone   HVAC System
-#&gt;   ---                                                                 
-#&gt; 8756:                        3        0  Avg        Zone   HVAC System
-#&gt; 8757:                        3        0  Avg        Zone   HVAC System
-#&gt; 8758:                        3        0  Avg        Zone   HVAC System
-#&gt; 8759:                        3        0  Avg        Zone   HVAC System
-#&gt; 8760:                        3        0  Avg        Zone   HVAC System
-#&gt;         key_value                                 name reporting_frequency
-#&gt;    1: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    2: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    3: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    4: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;    5: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;   ---                                                                     
-#&gt; 8756: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8757: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8758: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8759: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt; 8760: Environment Site Outdoor Air Drybulb Temperature              Hourly
-#&gt;       schedule_name units   value
-#&gt;    1:          &lt;NA&gt;     C  7.0125
-#&gt;    2:          &lt;NA&gt;     C  7.2000
-#&gt;    3:          &lt;NA&gt;     C  6.8875
-#&gt;    4:          &lt;NA&gt;     C  6.3250
-#&gt;    5:          &lt;NA&gt;     C  5.0375
-#&gt;   ---                            
-#&gt; 8756:          &lt;NA&gt;     C 13.1125
-#&gt; 8757:          &lt;NA&gt;     C 12.6125
-#&gt; 8758:          &lt;NA&gt;     C 11.2000
-#&gt; 8759:          &lt;NA&gt;     C 10.6000
-#&gt; 8760:          &lt;NA&gt;     C 10.9125</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$tabular_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># read all tabular data</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;                    case index                             report_name
-#&gt;    1: 1ZoneUncontrolled     1 AnnualBuildingUtilityPerformanceSummary
-#&gt;    2: 1ZoneUncontrolled     2 AnnualBuildingUtilityPerformanceSummary
-#&gt;    3: 1ZoneUncontrolled     3 AnnualBuildingUtilityPerformanceSummary
-#&gt;    4: 1ZoneUncontrolled     4 AnnualBuildingUtilityPerformanceSummary
-#&gt;    5: 1ZoneUncontrolled     5 AnnualBuildingUtilityPerformanceSummary
-#&gt;   ---                                                                
-#&gt; 2189: 1ZoneUncontrolled  2189                  Initialization Summary
-#&gt; 2190: 1ZoneUncontrolled  2190                  Initialization Summary
-#&gt; 2191: 1ZoneUncontrolled  2191                  Initialization Summary
-#&gt; 2192: 1ZoneUncontrolled  2192                  Initialization Summary
-#&gt; 2193: 1ZoneUncontrolled  2193                  Initialization Summary
-#&gt;            report_for                     table_name
-#&gt;    1: Entire Facility         Site and Source Energy
-#&gt;    2: Entire Facility         Site and Source Energy
-#&gt;    3: Entire Facility         Site and Source Energy
-#&gt;    4: Entire Facility         Site and Source Energy
-#&gt;    5: Entire Facility         Site and Source Energy
-#&gt;   ---                                               
-#&gt; 2189: Entire Facility Warmup Convergence Information
-#&gt; 2190: Entire Facility Warmup Convergence Information
-#&gt; 2191: Entire Facility Warmup Convergence Information
-#&gt; 2192: Entire Facility Warmup Convergence Information
-#&gt; 2193: Entire Facility Warmup Convergence Information
-#&gt;                              column_name            row_name units        value
-#&gt;    1:                       Total Energy   Total Site Energy    GJ        82.43
-#&gt;    2:                       Total Energy     Net Site Energy    GJ        82.43
-#&gt;    3:                       Total Energy Total Source Energy    GJ       261.06
-#&gt;    4:                       Total Energy   Net Source Energy    GJ       261.06
-#&gt;    5:     Energy Per Total Building Area   Total Site Energy MJ/m2       354.92
-#&gt;   ---                                                                          
-#&gt; 2189: Heating Load Pass/Fail Convergence                   2               Pass
-#&gt; 2190: Heating Load Pass/Fail Convergence                   3               Pass
-#&gt; 2191: Cooling Load Pass/Fail Convergence                   1               Pass
-#&gt; 2192: Cooling Load Pass/Fail Convergence                   2               Pass
-#&gt; 2193: Cooling Load Pass/Fail Convergence                   3               Pass</div><div class='input'>
+
 <span class='co'># explicitly specify data you want</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>sql</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -1406,17 +841,7 @@ sql$print()
     column_name <span class='op'>=</span> <span class='st'>"Total Energy"</span>,
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	1 obs. of  9 variables:
-#&gt;  $ case       : chr "1ZoneUncontrolled"
-#&gt;  $ index      : int 1
-#&gt;  $ report_name: chr "AnnualBuildingUtilityPerformanceSummary"
-#&gt;  $ report_for : chr "Entire Facility"
-#&gt;  $ table_name : chr "Site and Source Energy"
-#&gt;  $ column_name: chr "Total Energy"
-#&gt;  $ row_name   : chr "Total Site Energy"
-#&gt;  $ units      : chr "GJ"
-#&gt;  $ value      : chr "       82.43"
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+
 <span class='co'># get tabular data in wide format and coerce numeric values</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>sql</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -1425,28 +850,16 @@ sql$print()
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>,
     wide <span class='op'>=</span> <span class='cn'>TRUE</span>, string_value <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; List of 1
-#&gt;  $ AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy:Classes ‘data.table’ and 'data.frame':	1 obs. of  6 variables:
-#&gt;   ..$ case             : chr "1ZoneUncontrolled"
-#&gt;   ..$ report_name      : chr "AnnualBuildingUtilityPerformanceSummary"
-#&gt;   ..$ report_for       : chr "Entire Facility"
-#&gt;   ..$ table_name       : chr "Site and Source Energy"
-#&gt;   ..$ row_name         : chr "Total Site Energy"
-#&gt;   ..$ Total Energy [GJ]: num 82.4
-#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; 
-#&gt;   ..- attr(*, "sorted")= chr [1:4] "case" "report_name" "report_for" "table_name"</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusSql$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>sql</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergyPlus SQLite Output ────────────────────────────────────────────────────
-#&gt; * File: '/tmp/RtmpbSS17E/1ZoneUncontrolled.sql'
-#&gt; * Last Modified: 2020-11-11 02:03:05
-#&gt; * Parent Idf: '/tmp/RtmpbSS17E/1ZoneUncontrolled.idf'</div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>

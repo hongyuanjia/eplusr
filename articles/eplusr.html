@@ -124,14 +124,14 @@
 
       
 
-      </header><link href="eplusr_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+      </header><script src="eplusr_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="eplusr_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
 <script src="eplusr_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to eplusr</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2020-11-11</h4>
+            <h4 class="date">2020-11-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -147,7 +147,7 @@
 <a href="#class-structure" class="anchor"></a>Class structure</h1>
 <p>Below shows the class structure in eplusr.</p>
 <p><img src="class_structure.png" style="display: block; margin: auto;"></p>
-<p>Basically, eplusr uses <code>Idf</code> class to present the whole IDF file and <code>IdfObject</code> class to present a single object in an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain member functions for helping modify the data in IDF so it complies with the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is wrapped into two classes, i.e. <code>Idd</code> and <code>IddObject</code>.</p>
+<p>Basically, eplusr uses <code>Idf</code> class to present the whole IDF file and <code>IdfObject</code> class to present a single object in an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain member functions for helping modify the data in IDF so it complies with the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is wrapped into two classes, i.e. <code>Idd</code> and <code>IddObject</code>.</p>
 <p>Besides, <code>Epw</code> class is used to present EnergyPlus Weather files; <code>EplusJob</code> and <code>GroupEplusJob</code> to run single and multiple EnergyPlus simulations and collect outputs, <code>ParametricJob</code> to run parametric EnergyPlus simulations and collect all outputs.</p>
 <p>It is highly recommended to read the documentation to get a thorough understanding on each class.</p>
 </div>
@@ -162,14 +162,14 @@
 <p>You can get all detected EnergyPlus versions using <code><a href="../reference/use_eplus.html">avail_eplus()</a></code> and meta data of EnergyPlus configuration using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] '8.8.0' '9.4.0'</span>
+<span class="co">#&gt; [1] '8.8.0'</span>
 
 <span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
 <span class="co">#&gt; $version</span>
 <span class="co">#&gt; [1] '8.8.0'</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $dir</span>
-<span class="co">#&gt; [1] "/home/travis/.local/EnergyPlus-8-8-0"</span>
+<span class="co">#&gt; [1] "/usr/local/EnergyPlus-8-8-0"</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $exe</span>
 <span class="co">#&gt; [1] "energyplus"</span></code></pre></div>
@@ -203,13 +203,13 @@
 <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/home/travis/.local/EnergyPlus-8-8-0/Energy+.idd'.</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 
 <span class="va">model</span>
 <span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class="co">#&gt;  * Path: '/home/travis/.local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transform...</span>
+<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transformer.idf'</span>
 <span class="co">#&gt;  * Version: '8.8.0'</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span>
@@ -905,7 +905,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2020-11-11</span>
+<span class="co">#&gt; !2020-11-15</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -959,7 +959,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2020-11-11</span>
+<span class="co">#&gt; !2020-11-15</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -993,7 +993,7 @@
 <span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
 <span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></code></pre></div>
 <blockquote>
-<p>If the target class is store as a variable, e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside <code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
+<p>If the target class is store as a variable, e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside <code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
 </blockquote>
 <p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
@@ -1318,7 +1318,7 @@
 <div id="purge-unused-resource-objects-idfpurge" class="section level2">
 <h2 class="hasAnchor">
 <a href="#purge-unused-resource-objects-idfpurge" class="anchor"></a>Purge unused resource objects (<code>Idf$purge()</code>)</h2>
-<p><code>$purge()</code> will delete resource objects specified that are not used by any objects. Resource objects refer to objects that can be referenced by other objects, e.g. <code>Material</code>, <code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
+<p><code>$purge()</code> will delete resource objects specified that are not used by any objects. Resource objects refer to objects that can be referenced by other objects, e.g. <code>Material</code>, <code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
 <p>Below we remove all schedules that are not currently used.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span>
@@ -1380,7 +1380,7 @@
 <h1 class="hasAnchor">
 <a href="#check-possible-field-errors-idfvalidate" class="anchor"></a>Check possible field errors (<code>Idf$validate()</code>)</h1>
 <p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code><a href="../reference/eplusr_option.html">eplusr_option("validate_level")</a></code>.</p>
-<p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
+<p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span>
 <span class="co">#&gt; [1] "final"</span>
@@ -1446,10 +1446,10 @@
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmpDjp1tp/file54091b06251a.idf"</span>
+<span class="co">#&gt; [1] "/tmp/RtmpoXF3O3/file4172587a1102.idf"</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpDjp1tp/file54091b06251a.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpoXF3O3/file4172587a1102.idf.</span></code></pre></div>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">
