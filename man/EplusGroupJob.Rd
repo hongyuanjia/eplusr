@@ -699,8 +699,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 those from
 \href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
 and returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -740,8 +742,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 \subsection{Details}{
 \verb{$read_rdd()} return the core data of Report Data Dictionary (RDD)
 files. For details, please see \code{\link[=read_rdd]{read_rdd()}}.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -780,8 +784,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 \subsection{Details}{
 \verb{$read_mdd()} return the core data of Meter Data Dictionary (MDD)
 files. For details, please see \code{\link[=read_mdd]{read_mdd()}}.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -829,8 +835,10 @@ Examples" documentation.
 \subsection{Returns}{
 A \code{\link[data.table:data.table]{data.table::data.table()}} of 10 columns:
 \itemize{
-\item \code{case}: The model name. This column can be used to distinguish
-output from different simulations
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
+\item \code{case}: The model name without extension. This column can be used
+to distinguish output from different simulations
 \item \code{report_data_dictionary_index}: The integer used to link the
 dictionary data to the variable data. Mainly useful when joining
 different tables
@@ -987,6 +995,8 @@ The returned column numbers varies depending on \code{all} argument.
 \itemize{
 \item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
 \itemize{
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
 \item \code{case}: The model name. This column can be used to distinguish
 output from different simulations
 \item \code{datetime}: The date time of simulation result
@@ -1146,6 +1156,8 @@ numeric columns indicate column that:
 specifications. The returned \code{\link[data.table:data.table]{data.table::data.table()}} has
 9 columns:
 \itemize{
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
 \item \code{case}: The model name. This column can be used to distinguish
 output from different simulations
 \item \code{index}: Tabular data index

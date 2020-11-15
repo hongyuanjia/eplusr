@@ -11,6 +11,11 @@
   `ParametricJob$run()` with default value being `TRUE`. If set to `FALSE`, all
   models are saved in `dir` when simulation, instead of creating a folder for
   each model and running simulation there (#381).
+* When extracting grouped simulation results using `$report_data_dict()`,
+  `$report_data()` and etc in `EplusGroupJob` and `ParametricJob` class, a new
+  column `index` is added which contains the indices of simulated models (#388).
+  This is because when the same model runs with different weather files, the
+  original `case` column cannot be used as an identifier.
 
 ## Major changes
 

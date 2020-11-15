@@ -89,7 +89,7 @@ test_that("Group methods", {
 
     expect_error(grp$read_table())
     expect_silent(tables <- grp$read_table(c(1, 2, 4), "Zones"))
-    expect_equal(names(tables)[1], "case")
+    expect_equal(names(tables)[1:2], c("index", "case"))
     # }}}
 
     # RDD & MDD {{{

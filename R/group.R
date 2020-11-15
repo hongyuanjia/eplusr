@@ -312,8 +312,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' those from
         #' \href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
         #' and returns that table data in a [data.table::data.table()] format.
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -339,8 +341,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @details
         #' `$read_rdd()` return the core data of Report Data Dictionary (RDD)
         #' files. For details, please see [read_rdd()].
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -364,8 +368,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @details
         #' `$read_mdd()` return the core data of Meter Data Dictionary (MDD)
         #' files. For details, please see [read_mdd()].
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -400,8 +406,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'
         #' @return A [data.table::data.table()] of 10 columns:
         #'
-        #' * `case`: The model name. This column can be used to distinguish
-        #'   output from different simulations
+        #' * `index`: The index of simulated model. This column can be used
+        #'   to distinguish output from different simulations
+        #' * `case`: The model name without extension. This column can be used
+        #'   to distinguish output from different simulations
         #' * `report_data_dictionary_index`: The integer used to link the
         #'   dictionary data to the variable data. Mainly useful when joining
         #'   different tables
@@ -440,6 +448,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' The returned column numbers varies depending on `all` argument.
         #'
         #' * `all` is `FALSE`, the returned [data.table::data.table()] has 6 columns:
+        #'   * `index`: The index of simulated model. This column can be used
+        #'     to distinguish output from different simulations
         #'   * `case`: The model name. This column can be used to distinguish
         #'     output from different simulations
         #'   * `datetime`: The date time of simulation result
@@ -645,6 +655,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' specifications. The returned [data.table::data.table()] has
         #' 9 columns:
         #'
+        #' * `index`: The index of simulated model. This column can be used
+        #'   to distinguish output from different simulations
         #' * `case`: The model name. This column can be used to distinguish
         #'   output from different simulations
         #' * `index`: Tabular data index
@@ -1348,12 +1360,14 @@ epgroup_rdd_path <- function (self, private, which, type = c("rdd", "mdd")) {
 # }}}
 # epgroup_combine_data {{{
 epgroup_combine_data <- function (self, private, which, data, fill = TRUE) {
+    index <- epgroup_case_from_which(self, private, which, name = FALSE)
     cases <- epgroup_case_from_which(self, private, which, name = TRUE)
 
     # add case
     for (idx in seq_along(cases)) {
-        set(data[[idx]], j = "case", value = cases[idx])
-        setcolorder(data[[idx]], c("case", setdiff(names(data[[idx]]), "case")))
+        set(data[[idx]], NULL, "index", index[idx])
+        set(data[[idx]], NULL, "case", cases[idx])
+        setcolorder(data[[idx]], c("index", "case"))
     }
 
     rbindlist(data, fill = fill)
