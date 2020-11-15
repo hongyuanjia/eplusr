@@ -1199,11 +1199,11 @@ get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
     }
 
     # add Output:SQLite if necessary
-    if (sql) sql <- idf_add_output_sqlite(idf)
+    if (sql) sql <- idf_add_output_sqlite(idf) || idf_set_output_files(idf, sql = TRUE)
     setattr(idf, "sql", sql)
 
     # add Output:VariableDictionary if necessary
-    if (dict) dict <- idf_add_output_vardict(idf)
+    if (dict) dict <- idf_add_output_vardict(idf) || idf_set_output_files(idf, dict = TRUE)
     setattr(idf, "dict", dict)
 
     idf
