@@ -95,7 +95,7 @@ reference:
     desc: Classes for IDF geometry
     contents:
       - IdfGeometry
-      - IdfViwer
+      - IdfViewer
       - idf_geometry
       - idf_viewer
 
