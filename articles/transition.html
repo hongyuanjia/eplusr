@@ -280,7 +280,7 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  90.514   2.018  92.201</span></code></pre></div>
+<span class="co">#&gt;  82.673   1.861  84.183</span></code></pre></div>
 </div>
 <div id="introduce-transition" class="section level1">
 <h1 class="hasAnchor">
@@ -321,8 +321,8 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   5.014   0.016   5.029</span></code></pre></div>
-<p>It is about 18.3 times faster.</p>
+<span class="co">#&gt;   4.624   0.032   4.657</span></code></pre></div>
+<p>It is about 18.1 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>

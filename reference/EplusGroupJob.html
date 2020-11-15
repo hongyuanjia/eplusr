@@ -561,8 +561,10 @@ parametric simulations are returned. Default: <code>NULL</code>.</p></dd>
 those from
 <a href='../../eplusr/html/EplusGroupJob.html#method-list_table'><code>$list_table()</code></a>
 and returns that table data in a <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> format.
-The first column will always be <code>case</code> which can be used to
-distinguish output from different simulations.</p>
+The two column will always be <code>index</code> and <code>case</code> which can be used to
+distinguish output from different simulations. <code>index</code> contains the
+indices of simulated models and <code>case</code> contains the model names
+without extensions.</p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p>A <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code>.</p>
@@ -589,8 +591,10 @@ parametric simulations are returned. Default: <code>NULL</code>.</p></dd>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
 <p><code>$read_rdd()</code> return the core data of Report Data Dictionary (RDD)
 files. For details, please see <code><a href='read_rdd.html'>read_rdd()</a></code>.
-The first column will always be <code>case</code> which can be used to
-distinguish output from different simulations.</p>
+The two column will always be <code>index</code> and <code>case</code> which can be used to
+distinguish output from different simulations. <code>index</code> contains the
+indices of simulated models and <code>case</code> contains the model names
+without extensions.</p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p>A <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code>.</p>
@@ -616,8 +620,10 @@ parametric simulations are returned. Default: <code>NULL</code>.</p></dd>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
 <p><code>$read_mdd()</code> return the core data of Meter Data Dictionary (MDD)
 files. For details, please see <code><a href='read_rdd.html'>read_mdd()</a></code>.
-The first column will always be <code>case</code> which can be used to
-distinguish output from different simulations.</p>
+The two column will always be <code>index</code> and <code>case</code> which can be used to
+distinguish output from different simulations. <code>index</code> contains the
+indices of simulated models and <code>case</code> contains the model names
+without extensions.</p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p>A <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code>.</p>
@@ -649,8 +655,10 @@ Examples" documentation.</p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p>A <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> of 10 columns:</p><ul>
-<li><p><code>case</code>: The model name. This column can be used to distinguish
-output from different simulations</p></li>
+<li><p><code>index</code>: The index of simulated model. This column can be used
+to distinguish output from different simulations</p></li>
+<li><p><code>case</code>: The model name without extension. This column can be used
+to distinguish output from different simulations</p></li>
 <li><p><code>report_data_dictionary_index</code>: The integer used to link the
 dictionary data to the variable data. Mainly useful when joining
 different tables</p></li>
@@ -792,6 +800,8 @@ specifications.</p>
 <code>$report_data_dict()</code> as input, and extract all data specified.</p>
 <p>The returned column numbers varies depending on <code>all</code> argument.</p><ul>
 <li><p><code>all</code> is <code>FALSE</code>, the returned <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> has 6 columns:</p><ul>
+<li><p><code>index</code>: The index of simulated model. This column can be used
+to distinguish output from different simulations</p></li>
 <li><p><code>case</code>: The model name. This column can be used to distinguish
 output from different simulations</p></li>
 <li><p><code>datetime</code>: The date time of simulation result</p></li>
@@ -932,6 +942,8 @@ numeric columns indicate column that:
 <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> using report, table, column and row name
 specifications. The returned <code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> has
 9 columns:</p><ul>
+<li><p><code>index</code>: The index of simulated model. This column can be used
+to distinguish output from different simulations</p></li>
 <li><p><code>case</code>: The model name. This column can be used to distinguish
 output from different simulations</p></li>
 <li><p><code>index</code>: Tabular data index</p></li>

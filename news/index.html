@@ -193,6 +193,7 @@
 <li>Add EnergyPlus v9.3 and v9.4 support (<a href='https://github.com/hongyuanjia/eplusr/issues/343'>#343</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/347'>#347</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/369'>#369</a>).</li>
 <li>Now <code>ParametricJob$apply_measure()</code> will give a nice progress bar when parametric models are creating (<a href='https://github.com/hongyuanjia/eplusr/issues/378'>#378</a>).</li>
 <li>A new argument <code>separate</code> is added in <code>EplusGroupJob$run()</code> and <code>ParametricJob$run()</code> with default value being <code>TRUE</code>. If set to <code>FALSE</code>, all models are saved in <code>dir</code> when simulation, instead of creating a folder for each model and running simulation there (<a href='https://github.com/hongyuanjia/eplusr/issues/381'>#381</a>).</li>
+<li>When extracting grouped simulation results using <code>$report_data_dict()</code>, <code>$report_data()</code> and etc in <code>EplusGroupJob</code> and <code>ParametricJob</code> class, a new column <code>index</code> is added which contains the indices of simulated models (<a href='https://github.com/hongyuanjia/eplusr/issues/388'>#388</a>). This is because when the same model runs with different weather files, the original <code>case</code> column cannot be used as an identifier.</li>
 </ul>
 </div>
 <div id="major-changes" class="section level2">
