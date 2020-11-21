@@ -114,7 +114,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
                                  tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
-                                 environment_name = NULL) {
+                                 environment_name = NULL, index = NULL) {
     dict <- read_sql_table(sql, "ReportDataDictionary")
     env <- read_sql_table(sql, "EnvironmentPeriods")
     time <- read_sql_table(sql, "Time")
@@ -131,7 +131,12 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         assert_scalar(case)
         case_name <- as.character(case)
         set(res, NULL, "case", case_name)
-        setcolorder(res, c("case", setdiff(names(res), "case")))
+        setcolorder(res, "case")
+    }
+    if (!is.null(index)) {
+        assert_int(index)
+        set(res, NULL, "index", index)
+        setcolorder(res, "index")
     }
 
     res
@@ -141,7 +146,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 #' @importFrom checkmate assert_scalar
 get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
-                                  case = "auto", wide = FALSE, string_value = !wide) {
+                                  case = "auto", wide = FALSE, string_value = !wide, index = NULL) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
     dt <- setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
 
@@ -149,7 +154,12 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
         assert_scalar(case)
         case_name <- as.character(case)
         set(dt, NULL, "case", case_name)
-        setcolorder(dt, c("case", setdiff(names(dt), "case")))
+        setcolorder(dt, "case")
+    }
+    if (!is.null(index)) {
+        assert_int(index)
+        set(dt, NULL, "index", index)
+        setcolorder(dt, "index")
     }
 
     if (!wide) return(dt)
