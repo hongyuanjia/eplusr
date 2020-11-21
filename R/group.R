@@ -1117,15 +1117,17 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
                                  environment_name = NULL) {
-    sqls <- epgroup_sql_path(self, private, which)
-    cases <- epgroup_case_from_which(self, private, which, name = TRUE)
-
-    rbindlist(mapply(get_sql_report_data, sql = sqls, case = cases,
-        MoreArgs = list(key_value = key_value, name = name, all = all, wide = wide, year = year,
+    rbindlist(Map(get_sql_report_data,
+        sql = epgroup_sql_path(self, private, which),
+        index = epgroup_case_from_which(self, private, which, name = FALSE),
+        case = epgroup_case_from_which(self, private, which, name = TRUE),
+        MoreArgs = list(
+            key_value = key_value, name = name, all = all, wide = wide, year = year,
             tz = tz, period = period, month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days, day_type = day_type,
-            environment_name = environment_name),
-        SIMPLIFY = FALSE, USE.NAMES = FALSE
+            environment_name = environment_name
+        ),
+        USE.NAMES = FALSE
     ), fill = TRUE)
 }
 # }}}
@@ -1133,10 +1135,9 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
 epgroup_tabular_data <- function (self, private, which = NULL, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   wide = FALSE, string_value = !wide) {
-    cases <- epgroup_case_from_which(self, private, which, name = TRUE)
-
     l <- Map(get_sql_tabular_data,
         sql = epgroup_sql_path(self, private, which),
+        index = epgroup_case_from_which(self, private, which, name = FALSE),
         case = epgroup_case_from_which(self, private, which, name = TRUE),
         MoreArgs = list(
             report_name = report_name, report_for = report_for,
