@@ -1427,10 +1427,14 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
 
     # only works for detailed geometry classes
     map <- data.table(
-        class = c("BuildingSurface:Detailed", "FenestrationSurface:Detailed",
+        class = c(
+            "Zone",
+            "BuildingSurface:Detailed", "FenestrationSurface:Detailed",
             "Shading:Site:Detailed", "Shading:Building:Detailed",
             "Shading:Zone:Detailed"),
-        first_vertex = c(11L, if (idf$version() < 9.0) 11L else 10L,
+        first_vertex = c(
+            3L,
+            11L, if (idf$version() < 9.0) 11L else 10L,
             4L, 4L, 5L
         )
     )

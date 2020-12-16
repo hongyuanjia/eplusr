@@ -561,10 +561,19 @@ idfgeom_convert <- function (self, private, type = c("surface", "subsurface", "s
 # }}}
 # idfgeom_round_digits {{{
 idfgeom_round_digits <- function (self, private, digits = 4L) {
-    meta <- rbindlist(list(
-        fast_subset(private$m_geoms$surface, c("id", "class")),
-        fast_subset(private$m_geoms$subsurface, c("id", "class")),
-        fast_subset(private$m_geoms$shading, c("id", "class"))
+    zone <- data.table()
+    origin <- data.table()
+    if (nrow(private$m_geoms$zone)) {
+        zone <- data.table(id = private$m_geoms$zone$id, class = "Zone")
+        origin <- private$m_geoms$zone[, .SD, .SDcols = c("id", "x", "y", "z")]
+        set(origin, NULL, "index", 1L)
+    }
+
+    check_empty <- function (dt) if (!nrow(dt)) data.table() else dt
+    meta <- rbindlist(list(zone,
+        check_empty(fast_subset(private$m_geoms$surface, c("id", "class"))),
+        check_empty(fast_subset(private$m_geoms$subsurface, c("id", "class"))),
+        check_empty(fast_subset(private$m_geoms$shading, c("id", "class")))
     ))
 
     # add a uuid
@@ -574,7 +583,8 @@ idfgeom_round_digits <- function (self, private, digits = 4L) {
     private$log_parent_uuid()
     private$log_parent_order()
 
-    set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
+    vert <- rbindlist(list(private$m_geoms$vertices, origin), use.names = TRUE)
+    set_geom_vertices(private$m_parent, list(meta = meta, vertices = vert), digits = digits)
 
     invisible(private$m_parent)
 }
