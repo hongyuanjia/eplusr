@@ -2530,10 +2530,11 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
         abort("Class should not contain any duplication.")
     }
 
-    val <- get_idf_value(idd_env, idf_env, class)[
-        grepl(pattern, value_chr, ignore.case = ignore.case, perl = perl,
+    val <- get_idf_value(idd_env, idf_env, class, property = "type_enum")[,
+        matched := grepl(pattern, value_chr, ignore.case = ignore.case, perl = perl,
             fixed = fixed, useBytes = useBytes)
     ]
+    val <- val[J(val[matched == TRUE, unique(object_id)]), on = "object_id"]
 
     # add object rleid
     set(val, NULL, "rleid", rleid(val$object_id))
@@ -2554,6 +2555,7 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
             )
         )
         set(val, NULL, "value_num", suppressWarnings(as.double(val$value_chr)))
+        val[type_enum > IDDFIELD_TYPE$real, value_num := NA_real_]
     }
 
     # keep column order
