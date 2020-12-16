@@ -359,12 +359,6 @@ parse_epw_header_typical <- function (header, strict = FALSE, transform = TRUE) 
         issue_epw_header_parse_error_single(obj, invld, i)
     }
 
-    if (any(rewind <- as_date(start_day) > as_date(align_epwdate_type(end_day, start_day)))) {
-        i <- which(rewind)
-        invld <- val[J(i), on = "extensible_group"]
-        issue_epw_header_parse_error_conn(obj, invld, i, 4L, 3L, ". Should be equal as or later than %s ('%s').")
-    }
-
     if (!transform) return(header)
 
     data.table(
