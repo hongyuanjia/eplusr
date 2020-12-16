@@ -115,21 +115,6 @@ test_that("Epw Header", {
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
-            TYPICAL/EXTREME PERIODS,1,period,typical,1/2,1/1
-            GROUND TEMPERATURES
-            HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0
-            COMMENTS 1
-            COMMENTS 2
-            DATA PERIODS,1,1,Data,Friday,2016/01/01,2016/12/31
-            "
-        )),
-        class = "eplusr_error_parse_epw"
-    )
-    expect_error(
-        parse_epw_header(paste0(
-            "
-            LOCATION,city,state,country,type,wmo,1,2,3,4
-            DESIGN CONDITIONS
             TYPICAL/EXTREME PERIODS
             GROUND TEMPERATURES
             HOLIDAYS/DAYLIGHT SAVINGS,yes,1/1,0,0

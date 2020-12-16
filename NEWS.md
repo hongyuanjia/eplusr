@@ -77,6 +77,8 @@
 * Now empty comments are kept in `IdfObject$comment()` (#372).
 * Fix `IdfGeometry$print()` when no building object exists (#395).
 * Now `IdfGeometry$round_digits()` also applies to `Zone` class (#397).
+* `read_epw()` now accepts date rewind in `TYPICAL/EXTREME PERIODS` header
+  (#401).
 
 # eplusr 0.13.0
 
