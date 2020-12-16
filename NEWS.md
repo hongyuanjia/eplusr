@@ -75,6 +75,8 @@
 * Empty string input, e.g. `"  "` in `Idf$add()` and `Idf$set()` are now
   correctly converted to `NA`s (#370).
 * Now empty comments are kept in `IdfObject$comment()` (#372).
+* Fix `IdfGeometry$print()` when no building object exists (#395).
+* Now `IdfGeometry$round_digits()` also applies to `Zone` class (#397).
 
 # eplusr 0.13.0
 

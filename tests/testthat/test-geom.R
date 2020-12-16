@@ -7,7 +7,9 @@ test_that("IdfGeometry", {
 
     # simple shading
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    geom <- idf_geometry(idf$path())
     geom <- idf_geometry(idf)
+    expect_warning(idf_geometry(empty_idf(8.8)))
 
     idf$GlobalGeometryRules$Coordinate_System <- "Relative"
     idf$Output_Meter <- NULL
