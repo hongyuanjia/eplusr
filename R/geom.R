@@ -701,10 +701,10 @@ idfgeom_print <- function (self, private) {
     cli::cat_line(sprintf(" * Building: '%s'", geoms$building$name))
     cli::cat_line(sprintf(" * North Axis: %s\u00B0", geoms$building$north_axis))
     cli::cat_line(sprintf(" * Zone Num: %s", NROW(geoms$zone)))
-    cli::cat_line(sprintf(" * Surface Num: %s", NROW(geoms$surface$meta)))
-    cli::cat_line(sprintf(" * SubSurface Num: %s", NROW(geoms$subsurface$meta)))
-    cli::cat_line(sprintf(" * Shading Num: %s", NROW(geoms$shading$meta)))
-    cli::cat_line(sprintf(" * Dayl Ref Pnt Num: %s", NROW(geoms$daylighting_point$meta)))
+    cli::cat_line(sprintf(" * Surface Num: %s", NROW(geoms$surface)))
+    cli::cat_line(sprintf(" * SubSurface Num: %s", NROW(geoms$subsurface)))
+    cli::cat_line(sprintf(" * Shading Num: %s", NROW(geoms$shading)))
+    cli::cat_line(sprintf(" * Dayl Ref Pnt Num: %s", NROW(geoms$daylighting_point)))
     cli::cat_line(" * Coordinate System:")
     cli::cat_line(c(
         sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "absolute", "Absolute", "Relative")),
