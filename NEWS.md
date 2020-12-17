@@ -80,6 +80,8 @@
 * `read_epw()` now accepts date rewind in `TYPICAL/EXTREME PERIODS` header
   (#401).
 * Fix `c.EpwDate()` error (#403).
+* Fix `IdfScheduleCompact$set()` evaluate issue when called in nested
+  environment (#405).
 
 # eplusr 0.13.0
 

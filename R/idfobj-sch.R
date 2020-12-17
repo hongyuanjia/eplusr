@@ -121,7 +121,7 @@ IdfScheduleCompact <- R6::R6Class(classname = "IdfScheduleCompact", lock_objects
         #' )
         #' }
         set = function (..., .check_range = TRUE)
-            idfsch_cmpt_set(super, self, private, ..., .check_range = .check_range),
+            idfsch_cmpt_set(super, self, private, ..., .check_range = .check_range, .env = parent.frame()),
         # }}}
 
         # update {{{
@@ -398,8 +398,8 @@ idfsch_cmpt_type_limits <- function (super, self, private, name) {
 }
 # }}}
 # idfsch_cmpt_set {{{
-idfsch_cmpt_set <- function (super, self, private, ..., .default = "min", .check_range = TRUE) {
-    dots <- parse_dots_value(..., .scalar = TRUE, .unique = TRUE)
+idfsch_cmpt_set <- function (super, self, private, ..., .default = "min", .check_range = TRUE, .env = parent.frame()) {
+    dots <- parse_dots_value(..., .scalar = TRUE, .unique = TRUE, .env = .env)
 
     # group
     val <- dots$value
