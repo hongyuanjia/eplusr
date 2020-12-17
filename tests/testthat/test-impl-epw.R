@@ -481,6 +481,8 @@ test_that("EpwDate Class", {
     expect_output(print(epw_date("6 Mon in Jan")), "NA")
 
     expect_equal(c(epw_date("1/3"), epw_date("3")), epw_date(c("1/3", "3")))
+    d <- epw_date(c("1/3", "4"))
+    expect_equal(c(d[2], d[1], epw_date(1.1)), epw_date(c("4", "1/3", "1.1")))
 
     expect_true(is_EpwDate(epw_date("1")))
     expect_false(is_EpwDate(Sys.Date()))

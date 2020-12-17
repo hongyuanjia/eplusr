@@ -79,6 +79,7 @@
 * Now `IdfGeometry$round_digits()` also applies to `Zone` class (#397).
 * `read_epw()` now accepts date rewind in `TYPICAL/EXTREME PERIODS` header
   (#401).
+* Fix `c.EpwDate()` error (#403).
 
 # eplusr 0.13.0
 

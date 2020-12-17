@@ -1175,8 +1175,7 @@ print.EpwDate <- function (x, ...) {
 #' @export
 # c.EpwDate {{{
 c.EpwDate <- function (...) {
-    res <- assign_epwdate(NextMethod(...))
-    res
+    assign_epwdate(c.Date(...))
 }
 # }}}
 #' @export
