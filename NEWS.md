@@ -82,6 +82,8 @@
 * Fix `c.EpwDate()` error (#403).
 * Fix `IdfScheduleCompact$set()` evaluate issue when called in nested
   environment (#405).
+* Now `IdfScheduleCompact$type_limits()` works properly when setting new type
+  limits (#407).
 
 # eplusr 0.13.0
 

@@ -392,6 +392,9 @@ idfsch_cmpt_type_limits <- function (super, self, private, name) {
         setcolorder(type_limits, cols)
         set(type_limits, NULL, "type_limits", lim$name)
         private$m_data$type_limits <- type_limits
+
+        idfobj_set(self, private, list(Schedule_Type_Limits_Name = type_limits$type_limits),
+            .default = FALSE, .empty = TRUE)
     }
 
     lim
