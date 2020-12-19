@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.0</span>
       </span>
     </div>
 
@@ -180,9 +180,9 @@
       <small>Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="eplusr-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#eplusr-development-version" class="anchor"></a>eplusr (development version)<small> Unreleased </small>
+    <div id="eplusr-0140" class="section level1">
+<h1 class="page-header" data-toc-text="0.14.0">
+<a href="#eplusr-0140" class="anchor"></a>eplusr 0.14.0<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
@@ -207,7 +207,7 @@
 <h2 class="hasAnchor">
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
-<li>Now rgl and decido package has beem moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
+<li>Now rgl and decido package has been moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
 <li>
 <code><a href="../reference/run_idf.html">run_multi()</a></code> now gets a new argument <code>expand_obj</code> to control whether <code>ExpandObjects</code> should be called before simulation or not. Because there is a known issue of <code>ExpandObjects</code> on Linux system (<a href="https://github.com/NREL/EnergyPlus/issues/8376" class="uri">https://github.com/NREL/EnergyPlus/issues/8376</a>), here we want to avoid unnecessary calls of <code>ExpandObjects</code> as possible. Also, <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code> now will detect if there are any <code>HVACTemplate:*</code> objects and set the <code>expand_obj</code> flag properly (<a href='https://github.com/hongyuanjia/eplusr/issues/377'>#377</a>).</li>
 </ul>
@@ -232,7 +232,7 @@
 <li>Fix the error in <code>EplusJob$report_data()</code> caused by incomplete <code>EnvironmentPeriods</code> table in EnergyPlus SQL output (<a href='https://github.com/hongyuanjia/eplusr/issues/336'>#336</a>).</li>
 <li>Make sure <code>Day of Week for Start Day</code> is reset to empty if <code>UseWeatherFile</code> was used in transition from v8.9 to v9.0 (<a href='https://github.com/hongyuanjia/eplusr/issues/338'>#338</a>).</li>
 <li>Fix the error in <code>EplusJob$report_data()</code> when multiple reporting frequencies exist in the CSV output (<a href='https://github.com/hongyuanjia/eplusr/issues/340'>#340</a>).</li>
-<li>Fix simulation error when FMU files are given in relative paths (<a href='https://github.com/hongyuanjia/eplusr/issues/344'>#344</a>). Now all objects that reference to external files can be correctly copied iinto output directory when <code>copy_external</code> is set to <code>TRUE</code>.</li>
+<li>Fix simulation error when FMU files are given in relative paths (<a href='https://github.com/hongyuanjia/eplusr/issues/344'>#344</a>). Now all objects that reference to external files can be correctly copied into output directory when <code>copy_external</code> is set to <code>TRUE</code>.</li>
 <li>Fix the error when using an <code>Idf</code> as input in <code>Idf$insert()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/348'>#348</a>).</li>
 <li>Sub-hourly EPW files are supported (<a href='https://github.com/hongyuanjia/eplusr/issues/351'>#351</a>).</li>
 <li>Fix invalid references introduced by setting field values to empty (<a href='https://github.com/hongyuanjia/eplusr/issues/355'>#355</a>).</li>
@@ -308,8 +308,8 @@
 <li><p>Some internal functions have been exported. They are mainly useful for developers to handle internal IDD and IDF data more efficiently (<a href='https://github.com/hongyuanjia/eplusr/issues/260'>#260</a>).</p></li>
 <li><p>A new <code>IdfScheduleCompact</code> class is introduced. A constructor function <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> is added. <code>IdfScheduleCompact</code> class provides more detailed methods to add, modify and extract schedule values. For more details, see <code><a href="../articles/schedule.html">vignette("schedule")</a></code> (<a href='https://github.com/hongyuanjia/eplusr/issues/256'>#256</a>).</p></li>
 <li><p>New <code>IdfGeometry</code> and <code>IdfViewer</code> classes are introduced. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the rgl package in a similar way as OpenStudio SketchUp Plugin. <code>Idf$geometry()</code> and <code>Idf$view()</code> methods are added to directly create an <code>IdfGeometry</code> and <code>IdfViewer</code> object based on current <code>Idf</code> object, respectively (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</p></li>
-<li><p>A <code>plot.Idf</code> method is added which is basically a wrappper of <code>Idf$view()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</p></li>
-<li><p>Now eplusr can utilize the CSV output for report data extraction. Benifiting from the fantastic <code><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">data.table::fread</a></code>, this approach can be as 3~10X faster compared to the SQLite approach. eplusr will still use the SQLite if the CSV output is not available.</p></li>
+<li><p>A <code>plot.Idf</code> method is added which is basically a wrapper of <code>Idf$view()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/296'>#296</a>).</p></li>
+<li><p>Now eplusr can utilize the CSV output for report data extraction. Benefiting from the fantastic <code><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">data.table::fread</a></code>, this approach can be as 3~10X faster compared to the SQLite approach. eplusr will still use the SQLite if the CSV output is not available.</p></li>
 </ul>
 </div>
 <div id="major-changes-1" class="section level2">
@@ -325,7 +325,7 @@
 <p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
 <p>A new <code>keep</code> parameter with default value <code>FALSE</code> has been added. If <code>TRUE</code>, all input fields will be returned, even they may not have any relations. This is the default behavior of v0.12.0 and before. In this version, only fields that have relation with other objects will be returned.</p>
 <p>With this update, it is possible, for example, to directly know the structure of an air loop by using <code>idf$object_relation("AnAirLoop", depth = NULL)</code></p>
-<p>Moreover, a new argument <code>class_ref</code> can be specified in methods of value-relation extraction. It can be used to specify how to handle class-name-references. Class name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other many class names of objects, instaed of refering to specific field values. There are 3 options in total, i.e. <code>"none"</code>, <code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.</p>
+<p>Moreover, a new argument <code>class_ref</code> can be specified in methods of value-relation extraction. It can be used to specify how to handle class-name-references. Class name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other many class names of objects, instaed of referring to specific field values. There are 3 options in total, i.e. <code>"none"</code>, <code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.</p>
 <ul>
 <li>
 <code>"none"</code>: just ignore class-name-references. It is a reasonable option, as for most cases, class-name-references always come along with field value references. Ignoring class-name-references will not impact the most part of the relation structure.</li>
@@ -364,7 +364,7 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li>Fix the bug caused by <code>ExpandObjects</code> exectuable that causes <code>run_idf</code> fails when running in parallel (<a href='https://github.com/hongyuanjia/eplusr/issues/130'>#130</a>)</li>
+<li>Fix the bug caused by <code>ExpandObjects</code> executable that causes <code>run_idf</code> fails when running in parallel (<a href='https://github.com/hongyuanjia/eplusr/issues/130'>#130</a>)</li>
 <li>
 <code>Idf$insert()</code> now will remove all duplicated objects in input (<a href='https://github.com/hongyuanjia/eplusr/issues/219'>#219</a>).</li>
 <li>Fix the bug in <code><a href="../reference/install_eplus.html">install_eplus()</a></code> on Windows (<a href='https://github.com/hongyuanjia/eplusr/issues/230'>#230</a>)</li>
@@ -449,7 +449,7 @@
 <span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span><span class="op">)</span></code></pre></div>
 <p>Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></code> for details.</p>
 </li>
-<li><p>All documentation in R6 classes have been update thanks to roxyten2 R6 support (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</p></li>
+<li><p>All documentation in R6 classes have been update thanks to roxygen2 R6 support (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</p></li>
 <li><p>Deprecated methods in each class have all been remove (<a href='https://github.com/hongyuanjia/eplusr/issues/156'>#156</a>).</p></li>
 <li><p>New parameter <code>case</code> has been added in <code>EplusSql$tabular_data()</code>. Similar like <code>case</code> parameter in <code>EplusSql$report_data()</code>, it lets you to add a <code>case</code> column to indicate the case of simulation. This brings some changes in the returned results of <code>EplusSql$tabular_data()</code>. Compared to previous version, there will always be a <code>case</code> column, unless <code>case</code> parameter is set to <code>NULL</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</p></li>
 <li><p>New parameter <code>wide</code> and <code>string_value</code> have been added in <code>EplusSql$tabular_data()</code> and <code>EplusGroupJob$tabular_data()</code>. When <code>wide</code> is <code>TRUE</code>, each table will be converted into the similar format as it is shown in EnergyPlus HTML output file. And when <code>string_value</code> is <code>FALSE</code>, values in possible numeric columns are converted into numbers (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</p></li>

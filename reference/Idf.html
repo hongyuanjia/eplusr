@@ -99,7 +99,7 @@ but with total different data structure under the hook." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.0</span>
       </span>
     </div>
 
@@ -996,7 +996,7 @@ relations with other objects are returned. Default: <code>FALSE</code>.</p></dd>
 
 <dt><code>class_ref</code></dt><dd><p>Specify how to handle class-name-references. Class
 name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. <code>"none"</code>,
 <code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.
 * <code>"none"</code>: just ignore class-name-references. It is a reasonable
@@ -1375,7 +1375,7 @@ element are treated as field names.</p>
 <code><a href='https://rdrr.io/r/base/assignOps.html'>=</a></code>. The main difference is that, unlike <code><a href='https://rdrr.io/r/base/assignOps.html'>=</a></code>, the left hand side of
 <code>:=</code> should be a valid class name in current <code>Idf</code> object. It will
 set the field of all objects in specified class to specified value.</p></li>
-<li><p><code>.(object, object) := list(field = value)</code>: Simimar like above, but
+<li><p><code>.(object, object) := list(field = value)</code>: Similar like above, but
 note the use of <code>.()</code> in the left hand side. You can put multiple
 object ID or names in <code>.()</code>. It will set the field of all specified
 objects to specified value.</p></li>
@@ -2830,7 +2830,7 @@ geometry. Possible values are:
 <ul>
 <li><p><code>"surface_type"</code>: Default. Render the model by surface type
 model. Walls, roofs, windows, doors, floors, and shading
-surfaces will have unqiue colors.</p></li>
+surfaces will have unique colors.</p></li>
 <li><p><code>"boundary"</code>: Render the model by outside boundary condition.
 Only surfaces that have boundary conditions will be rendered
 with a color. All other surfaces will be white.</p></li>
@@ -2844,7 +2844,7 @@ inside face will be rendered as red.</p></li>
 <dt><code>wireframe</code></dt><dd><p>If <code>TRUE</code>, the wireframe of each surface will be
 shown. Default: <code>TRUE</code>.</p></dd>
 
-<dt><code>x_ray</code></dt><dd><p>If <code>TRUE</code>, all surfaces wll be rendered translucently.
+<dt><code>x_ray</code></dt><dd><p>If <code>TRUE</code>, all surfaces will be rendered translucently.
 Default: <code>FALSE</code>.</p></dd>
 
 <dt><code>axis</code></dt><dd><p>If <code>TRUE</code>, the X, Y and Z axes will be drawn at the
