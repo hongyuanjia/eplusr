@@ -778,7 +778,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -852,7 +852,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -917,7 +917,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -1026,7 +1026,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -1089,7 +1089,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable

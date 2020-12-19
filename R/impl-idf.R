@@ -1970,7 +1970,7 @@ match_idd_field <- function (idd_env, dt_field) {
 #'        Default: `FALSE`.
 #'
 #' @param .strict If `TRUE`, make sure all input objects come from the same
-#'        verion as that from `idf_env`. Default: `TRUE`.
+#'        version as that from `idf_env`. Default: `TRUE`.
 #'
 #' @return A named list of 3 [data.table::data.table()]: `meta`, `object` and
 #' `value`.

@@ -99,7 +99,7 @@ making it possible to leverage other modules in the framework and apply
 statistical methods and libraries existing in R to generate design options.
 
 `set_lpd()` blow is a simple measure that modifies the LPD (Lighting Power
-Densitiy), and `set_nightplug()` is a measure that modifies the off-work
+Density), and `set_nightplug()` is a measure that modifies the off-work
 schedule values of plug loads by multiplying a specified reduction faction
 value.
 

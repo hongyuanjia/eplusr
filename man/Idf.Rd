@@ -1869,7 +1869,7 @@ relations with other objects are returned. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -2323,7 +2323,7 @@ There is two special syntax in \verb{$set()}, which is inspired by the
 \code{=}. The main difference is that, unlike \code{=}, the left hand side of
 \verb{:=} should be a valid class name in current \code{Idf} object. It will
 set the field of all objects in specified class to specified value.
-\item \code{.(object, object) := list(field = value)}: Simimar like above, but
+\item \code{.(object, object) := list(field = value)}: Similar like above, but
 note the use of \code{.()} in the left hand side. You can put multiple
 object ID or names in \code{.()}. It will set the field of all specified
 objects to specified value.
@@ -4090,7 +4090,7 @@ geometry. Possible values are:
 \itemize{
 \item \code{"surface_type"}: Default. Render the model by surface type
 model. Walls, roofs, windows, doors, floors, and shading
-surfaces will have unqiue colors.
+surfaces will have unique colors.
 \item \code{"boundary"}: Render the model by outside boundary condition.
 Only surfaces that have boundary conditions will be rendered
 with a color. All other surfaces will be white.
@@ -4104,7 +4104,7 @@ inside face will be rendered as red.
 \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
 shown. Default: \code{TRUE}.}
 
-\item{\code{x_ray}}{If \code{TRUE}, all surfaces wll be rendered translucently.
+\item{\code{x_ray}}{If \code{TRUE}, all surfaces will be rendered translucently.
 Default: \code{FALSE}.}
 
 \item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the

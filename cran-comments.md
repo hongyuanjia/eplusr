@@ -1,13 +1,12 @@
-# Version 0.13.0
+# Version 0.14.0
 
 ## Resubmission
 
 ### Test environments
 
-* local Manjaro Linux 18.0.4 install, R 3.6.1
-* Windows (on appveyor-ci), R release
-* Ubuntu 14.04 (on travis-ci), R release and devel
-* OS X (on travis-ci), R release
+* Windows (on local and GitHub Actions), R release
+* Ubuntu 20.04 (on GitHub Actions), R release
+* macOS (on GitHub Actions), R release
 
 ### R CMD check results
 

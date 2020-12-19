@@ -1308,7 +1308,7 @@ returned. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -1423,7 +1423,7 @@ all possible recursive relations are returned. Default: \code{0}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -1509,7 +1509,7 @@ all possible recursive relations are returned. Default: \code{0}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -1660,7 +1660,7 @@ is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -1744,7 +1744,7 @@ is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable

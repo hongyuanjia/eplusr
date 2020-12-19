@@ -785,7 +785,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -1108,7 +1108,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'   `=`. The main difference is that, unlike `=`, the left hand side of
         #'   `:=` should be a valid class name in current `Idf` object. It will
         #'   set the field of all objects in specified class to specified value.
-        #' * `.(object, object) := list(field = value)`: Simimar like above, but
+        #' * `.(object, object) := list(field = value)`: Similar like above, but
         #'   note the use of `.()` in the left hand side. You can put multiple
         #'   object ID or names in `.()`. It will set the field of all specified
         #'   objects to specified value.
@@ -2517,7 +2517,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' * `"surface_type"`: Default. Render the model by surface type
         #'   model. Walls, roofs, windows, doors, floors, and shading
-        #'   surfaces will have unqiue colors.
+        #'   surfaces will have unique colors.
         #' * `"boundary"`: Render the model by outside boundary condition.
         #'   Only surfaces that have boundary conditions will be rendered
         #'   with a color. All other surfaces will be white.
@@ -2533,7 +2533,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param wireframe If `TRUE`, the wireframe of each surface will be
         #'        shown. Default: `TRUE`.
         #'
-        #' @param x_ray If `TRUE`, all surfaces wll be rendered translucently.
+        #' @param x_ray If `TRUE`, all surfaces will be rendered translucently.
         #'        Default: `FALSE`.
         #'
         #' @return An [IdfViewer] object

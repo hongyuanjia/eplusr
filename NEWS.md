@@ -1,4 +1,4 @@
-# eplusr (development version)
+# eplusr 0.14.0
 
 ## New features
 
@@ -28,7 +28,7 @@
 
 ## Minor changes
 
-* Now rgl and decido package has beem moved from *Imports* to *Suggests*, since
+* Now rgl and decido package has been moved from *Imports* to *Suggests*, since
   they are only used in the `IdfViewer` class for 3D visualization which is not
   the main focus of this package (368).
 * `run_multi()` now gets a new argument `expand_obj` to control whether
@@ -64,7 +64,7 @@
 * Fix the error in `EplusJob$report_data()` when multiple reporting frequencies
   exist in the CSV output (#340).
 * Fix simulation error when FMU files are given in relative paths (#344). Now
-  all objects that reference to external files can be correctly copied iinto
+  all objects that reference to external files can be correctly copied into
   output directory when `copy_external` is set to `TRUE`.
 * Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
 * Sub-hourly EPW files are supported (#351).
@@ -170,9 +170,9 @@
   rgl package in a similar way as OpenStudio SketchUp Plugin. `Idf$geometry()`
   and `Idf$view()` methods are added to directly create an `IdfGeometry` and
   `IdfViewer` object based on current `Idf` object, respectively (#296).
-* A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`
+* A `plot.Idf` method is added which is basically a wrapper of `Idf$view()`
   (#296).
-* Now eplusr can utilize the CSV output for report data extraction. Benifiting
+* Now eplusr can utilize the CSV output for report data extraction. Benefiting
   from the fantastic `data.table::fread`, this approach can be as 3~10X faster
   compared to the SQLite approach. eplusr will still use the SQLite if the CSV
   output is not available.
@@ -209,7 +209,7 @@
   value-relation extraction. It can be used to specify how to handle
   class-name-references. Class name references refer to references in like
   field `Component 1 Object Type` in `Branch` objects. Their value refers to
-  other many class names of objects, instaed of refering to specific field
+  other many class names of objects, instaed of referring to specific field
   values. There are 3 options in total, i.e. `"none"`, `"both"` and `"all"`,
   with `"both"` being the default.
 
@@ -254,7 +254,7 @@
 
 ## Bug fixes
 
-* Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails
+* Fix the bug caused by `ExpandObjects` executable that causes `run_idf` fails
   when running in parallel (#130)
 * `Idf$insert()` now will remove all duplicated objects in input (#219).
 * Fix the bug in `install_eplus()` on Windows (#230)
@@ -405,7 +405,7 @@
   install_eplus(8.8, local = TRUE, dir = "~/MyPrograms")
   ```
   Please see `?install_eplus` for details.
-* All documentation in R6 classes have been update thanks to roxyten2 R6 support (#156).
+* All documentation in R6 classes have been update thanks to roxygen2 R6 support (#156).
 * Deprecated methods in each class have all been remove (#156).
 * New parameter `case` has been added in
   `EplusSql$tabular_data()`. Similar like `case` parameter in

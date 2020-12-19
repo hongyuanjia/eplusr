@@ -164,7 +164,7 @@ clean_wd <- function (path) {
 #'
 #'   | No.  | Column        | Type        | Description                                                      |
 #'   | ---: | -----         | -----       | -----                                                            |
-#'   | 1    | `index`       | `integer`   | Index of simuation                                               |
+#'   | 1    | `index`       | `integer`   | Index of simulation                                              |
 #'   | 2    | `status`      | `character` | Simulation status                                                |
 #'   | 3    | `idf`         | `character` | Full path of input IDF file                                      |
 #'   | 4    | `epw`         | `character` | Full path of input EPW file. `NA` for design-day-only simulation |

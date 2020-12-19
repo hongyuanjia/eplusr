@@ -163,7 +163,7 @@ Please see these vignettes and articles about {eplusr}
 
 * [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/eplusr.html)
 * [Run simulation and data exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
-* [Rarametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
+* [Parametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
 * [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
 * [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
 * [Work with `Schedule:Compact` objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)

@@ -305,7 +305,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' Get the indices of specified classes
         #'
         #' @details
-        #' `$class_index()` returns the indices of specifed classes in
+        #' `$class_index()` returns the indices of specified classes in
         #' current `Idd`. A class index is just an integer indicating its
         #' appearance order in the `Idd`.
         #'

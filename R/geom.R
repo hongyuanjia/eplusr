@@ -334,7 +334,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #'
         #' * `"surface_type"`: Default. Render the model by surface type model.
         #'   Walls, roofs, windows, doors, floors, and shading surfaces will
-        #'   have unqiue colors.
+        #'   have unique colors.
         #' * `"boundary"`: Render the model by outside boundary condition. Only
         #'   surfaces that have boundary conditions will be rendered with a
         #'   color. All other surfaces will be white.

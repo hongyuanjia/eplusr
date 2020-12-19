@@ -145,7 +145,7 @@ Please see these vignettes and articles about {eplusr}
     eplusr](https://hongyuanjia.github.io/eplusr/articles/eplusr.html)
   - [Run simulation and data
     exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
-  - [Rarametric
+  - [Parametric
     simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
   - [Update IDF
     version](https://hongyuanjia.github.io/eplusr/articles/transition.html)

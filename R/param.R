@@ -161,7 +161,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @details
         #' `$apply_measure()` allows to apply a measure to an [Idf] and creates
         #' parametric models for analysis. Basically, a measure is just a
-        #' function that takes an [Idf] object and other arguments as input, and
+        #' function that takes an [Idf] object and other arguements as input, and
         #' returns a modified [Idf] object as output. Use `...` to supply
         #' different arguments, **except for the first `Idf` argument**, to that
         #' measure. Under the hook, [base::mapply()] is used to create multiple
