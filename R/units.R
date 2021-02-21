@@ -6,11 +6,19 @@ NULL
 reg_custom_units <- function () {
     tryCatch(
         {
-            install_symbolic_unit("person")
-            install_symbolic_unit("dollar")
-            install_symbolic_unit("thousandths")
-            install_conversion_constant("Wh", "J", 3.6E3)
-            install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+            if (packageVersion("units") < 0.7) {
+                install_symbolic_unit("person")
+                install_symbolic_unit("dollar")
+                install_symbolic_unit("thousandths")
+                install_conversion_constant("Wh", "J", 3.6E3)
+                install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+            } else {
+                install_unit("person")
+                install_unit("dollar")
+                install_unit("thousandths")
+                install_unit("Wh", "3.6E3 J")
+                install_unit("inH2O", "1 inch_H2O_39F")
+            }
             TRUE
         },
         warning = function (w) NULL,
