@@ -818,7 +818,7 @@ the \code{IdfObject} belongs to are returned. Default: \code{FALSE}}
 characters and the converted character vector is returned.}
 
 \item{\code{unit}}{If \code{TRUE}, values of numeric fields are assigned with
-units using \code{\link[units:set_units]{units::set_units()}} if applicable. Default:
+units using \code{\link[units:units]{units::set_units()}} if applicable. Default:
 \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
@@ -1943,7 +1943,7 @@ type being a string instead of a number. Default: \code{TRUE}.}
 
 \item{\code{unit}}{Only applicable when \code{string_value} is \code{FALSE}. If
 \code{TRUE}, values of numeric fields are assigned with units using
-\code{\link[units:set_units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
+\code{\link[units:units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
 
 \item{\code{wide}}{Only applicable if target objects belong to a same class.
 If \code{TRUE}, a wide table will be returned, i.e. first three
