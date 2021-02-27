@@ -98,7 +98,7 @@ as [EnergyPlus/WeatherManager.cc] in EnergyPlus, with some simplifications." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1</span>
       </span>
     </div>
 
@@ -1132,7 +1132,7 @@ summary(epw$data()$liquid_precip_rate)
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
 <p><code>$add_unit()</code> assigns units to numeric weather data using
-<code><a href='https://rdrr.io/pkg/units/man/set_units.html'>units::set_units()</a></code> if applicable.</p>
+<code><a href='https://rdrr.io/pkg/units/man/units.html'>units::set_units()</a></code> if applicable.</p>
 <p><code>$add_unit()</code>
 and
 <a href='../../eplusr/html/Epw.html#method-drop_unit'><code>$drop_unit()</code></a>
@@ -1749,7 +1749,7 @@ epw$print()
 <span class='co'># with units specified, you can easily perform unit conversion using units</span>
 <span class='co'># package</span>
 <span class='va'>t_dry_bulb</span> <span class='op'>&lt;-</span> <span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dry_bulb_temperature</span>
-<span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>units</a></span><span class='op'>(</span><span class='va'>t_dry_bulb</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='fu'>units</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/units/man/ud_units.html'>ud_units</a></span>, <span class='st'>"kelvin"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>units</a></span><span class='op'>(</span><span class='va'>t_dry_bulb</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='fu'>units</span><span class='fu'>::</span><span class='va'>ud_units</span>, <span class='st'>"kelvin"</span><span class='op'>)</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>t_dry_bulb</span><span class='op'>)</span>
 <span class='op'>}</span>

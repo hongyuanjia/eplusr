@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Introduction to eplusr</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-02-21</h4>
+            <h4 class="date">2021-02-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -904,7 +904,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-02-21</span>
+<span class="co">#&gt; !2021-02-27</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -958,7 +958,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-02-21</span>
+<span class="co">#&gt; !2021-02-27</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -1445,10 +1445,10 @@
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmp55ejNb/file417441bbfbfa.idf"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmp9k4HCP/file3fbb1ed67cd0.idf"</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmp55ejNb/file417441bbfbfa.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmp9k4HCP/file3fbb1ed67cd0.idf.</span></code></pre></div>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">
