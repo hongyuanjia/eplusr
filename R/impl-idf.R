@@ -115,11 +115,11 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
 
             # add an indicator column to check if bad key is found
             set(idf_env$object, NULL, "ind", 0L)
-            on.exit(set(idf_env$object, NULL, "ind", NULL))
+            on.exit(set(idf_env$object, NULL, "ind", NULL), add = TRUE)
 
             obj <- idf_env$object[obj_in, on = c("class_id", col_on), allow.cartesian = TRUE]
 
-            check_bad_key(obj, "ind", col_on)
+            check_bad_key(obj, "ind", col_on, sprintf("in Class '%s'", cls_in$class_name))
             set(obj, NULL, "ind", NULL)
         }
 

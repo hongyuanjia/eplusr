@@ -61,7 +61,7 @@ join_from_input <- function (dt, input, check = "group_id", allow.cartesian = TR
 }
 # }}}
 # check_bad_key {{{
-check_bad_key <- function (res, col_check, col_on) {
+check_bad_key <- function (res, col_check, col_on, in_type = NULL) {
     if (anyNA(res[[col_check]])) {
         if (has_names(res, "original")) {
             invld_cls <- res[is.na(get(col_check))][["original"]]
@@ -77,7 +77,7 @@ check_bad_key <- function (res, col_check, col_on) {
         } else {
             col_key <- "name"
         }
-        col_key <- paste(stri_replace_first_regex(col_on, "_.*", ""), col_key)
+        col_key <- paste(stri_replace_first_regex(col_on, "_.*", ""), col_key, in_type)
         abort_bad_key(col_key, invld_cls)
     }
     res
