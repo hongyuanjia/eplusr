@@ -163,4 +163,3 @@ reference:
       - with_option
       - with_silent
       - without_checking
-      - with_speed

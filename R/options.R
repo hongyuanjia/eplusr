@@ -167,9 +167,6 @@ eplusr_option <- function (...) {
 #'
 #' `without_checking` evaluates an expression with no checkings.
 #'
-#' `with_speed` evaluates an expression with no checkings and autocompletion
-#' functionality.
-#'
 #' @param opts A list of valid input for `eplusr::eplusr_option()`.
 #' @param expr An expression to be evaluated.
 #' @name with_option
@@ -220,16 +217,21 @@ with_verbose <- function (expr) {
 
 #' @name with_option
 #' @export
-# with_speed {{{
-with_speed <- function (expr) {
-    with_option(list(validate_level = "none", autocomplete = FALSE), expr)
-}
-# }}}
-
-#' @name with_option
-#' @export
 # without_checking {{{
 without_checking <- function (expr) {
     with_option(list(validate_level = "none"), expr)
+}
+# }}}
+
+#' Deprecated functions since eplusr v0.15.0
+#'
+#' @name eplusr-deprecated
+#' @export
+# with_speed {{{
+with_speed <- function (expr) {
+    .Deprecated("without_checking", "eplusr",
+        "Now autocompletion is enable all the time no speed penalty.",
+    )
+    without_checking(expr)
 }
 # }}}
