@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9002</span>
       </span>
     </div>
 
@@ -191,6 +191,13 @@
 <li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/eplusr-deprecated.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href='https://github.com/hongyuanjia/eplusr/issues/417'>#417</a>).</li>
 </ul>
 </div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>Fixed wrong transition of <code>FuelFactors</code> from v9.2 to v9.3 (<a href='https://github.com/hongyuanjia/eplusr/issues/420'>#420</a>).</li>
+</ul>
+</div>
 </div>
     <div id="eplusr-0141" class="section level1">
 <h1 class="page-header" data-toc-text="0.14.1">
@@ -236,9 +243,9 @@
 <code><a href="../reference/run_idf.html">run_multi()</a></code> now gets a new argument <code>expand_obj</code> to control whether <code>ExpandObjects</code> should be called before simulation or not. Because there is a known issue of <code>ExpandObjects</code> on Linux system (<a href="https://github.com/NREL/EnergyPlus/issues/8376" class="uri">https://github.com/NREL/EnergyPlus/issues/8376</a>), here we want to avoid unnecessary calls of <code>ExpandObjects</code> as possible. Also, <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code> now will detect if there are any <code>HVACTemplate:*</code> objects and set the <code>expand_obj</code> flag properly (<a href='https://github.com/hongyuanjia/eplusr/issues/377'>#377</a>).</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>When <code>.empty</code> is <code>FALSE</code>, <code>Idf$set()</code> and <code>Idf$update()</code> will keep fields if there are not the last fields (<a href='https://github.com/hongyuanjia/eplusr/issues/310'>#310</a>).</li>
 <li>Year fields are correctly calculated for EnergyPlus v9.1 and above (<a href='https://github.com/hongyuanjia/eplusr/issues/312'>#312</a>).</li>
@@ -384,9 +391,9 @@
 <li>The column <code>datasource</code> returned in <code>Epw$data()</code> has been renamed to <code>data_source</code>.</li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Fix the bug caused by <code>ExpandObjects</code> executable that causes <code>run_idf</code> fails when running in parallel (<a href='https://github.com/hongyuanjia/eplusr/issues/130'>#130</a>)</li>
 <li>
@@ -415,9 +422,9 @@
 <li>A new parameter <code>group_ext</code> has been added in <code>Idf$to_table()</code> and <code>IdfObject$to_table()</code>, with default value being <code>"none"</code>. If <code>"group"</code>, values from extensible fields will be grouped by the extensible group they belong to. For example, coordinate values of each vertex in class <code>BuildingSurface:Detailed</code> will be put into a list. If <code>"index"</code>, values from extensible fields will be grouped by the extensible field indices they belong to. For example, coordinate values of all x coordinates will be put into a list (<a href='https://github.com/hongyuanjia/eplusr/issues/74'>#74</a>).</li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>The algorithm of detecting numeric columns in <code>EplusSql$tabular_data()</code> has been improved (<a href='https://github.com/hongyuanjia/eplusr/issues/190'>#190</a>).</li>
 <li>Now <code>EplusSql$tabular_data()</code> keeps the original column order when <code>wide</code> is <code>TRUE</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/186'>#186</a>).</li>
@@ -479,9 +486,9 @@
 <li><p>New parameter <code>wide</code> and <code>string_value</code> have been added in <code>EplusSql$tabular_data()</code> and <code>EplusGroupJob$tabular_data()</code>. When <code>wide</code> is <code>TRUE</code>, each table will be converted into the similar format as it is shown in EnergyPlus HTML output file. And when <code>string_value</code> is <code>FALSE</code>, values in possible numeric columns are converted into numbers (<a href='https://github.com/hongyuanjia/eplusr/issues/182'>#182</a>).</p></li>
 </ul>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Fix the error in <code>$set()</code> when <code>$add_unit()</code> is performed in Epw class (<a href='https://github.com/hongyuanjia/eplusr/issues/56'>#56</a>).</li>
 <li>Now IDF file located in a folder whose name contains spaces can be successfully simulated (<a href='https://github.com/hongyuanjia/eplusr/issues/60'>#60</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for reporting this bug.</li>
@@ -548,9 +555,9 @@
 <li>Now component node references support has been added. A new option <code>"node"</code> has been added to the <code>direction</code> argument in <code>$object_relation</code>, <code>$objects_in_relation()</code> in <code>Idf</code> class and <code>$value_relation()</code> in <code>IdfObject</code> class. New methods <code>$ref_to_node()</code> and <code>$has_ref_node()</code> have been added in <code>IdfObject</code> class. Now <code>$has_ref()</code> in <code>IdfObject</code> class will return <code>FALSE</code> only when all <code>$has_ref_to()</code>, <code>$has_ref_by()</code> and <code>$has_ref_node()</code> are all <code>FALSE</code>.</li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Now all internal data, specifically all <code>data.table</code>s are correctly copied when calling <code>$clone()</code> in <code>Idf</code> and <code>Epw</code> class.</li>
 <li>
@@ -599,9 +606,9 @@
 <a href="#eplusr-0102" class="anchor"></a>eplusr 0.10.2<small> 2019-05-13 </small>
 </h1>
 <p>This is a patch update mainly to fix CRAN check errors on a strict Latin locale, with a bug fix.</p>
-<div id="bug-fixes-5" class="section level2">
+<div id="bug-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-5" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-6" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>
 <code>$report_data()</code> method in <code>EplusSql</code> class now correctly returns data if even if <code>key_value</code> is not given (<a href='https://github.com/hongyuanjia/eplusr/issues/37'>#37</a>)</li>
@@ -613,9 +620,9 @@
 <a href="#eplusr-0101" class="anchor"></a>eplusr 0.10.1<small> 2019-05-09 </small>
 </h1>
 <p>This is a patch update mainly to fix CRAN check errors, with few bug fixes.</p>
-<div id="bug-fixes-6" class="section level2">
+<div id="bug-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-6" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-7" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>
 <code>$set()</code> method in <code>Idf</code> class now does not try to convert all input strings into numbers (<a href='https://github.com/hongyuanjia/eplusr/issues/32'>#32</a>)</li>
@@ -802,9 +809,9 @@
 <li>Now <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is run before every call to EnergyPlus.</li>
 </ul>
 </div>
-<div id="bug-fixes-7" class="section level2">
+<div id="bug-fixes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-7" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-8" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code>$clone()</code> method has been refactored for <code>Idf</code> and <code>Idd</code> class. This fix the issue that internal shared environments were not cloned in version 0.9.3.</p></li>
 <li><p>Fix the error that <code>$save()</code> and <code>$string()</code> in <code>Idf</code> class did not respect <code>format</code> argument.</p></li>
@@ -823,9 +830,9 @@
 <li>Add support for EnergyPlus v9.0.0.</li>
 </ul>
 </div>
-<div id="bug-fixes-8" class="section level2">
+<div id="bug-fixes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-8" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-9" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Remove duplicates when update value references (<a href='https://github.com/hongyuanjia/eplusr/issues/20'>#20</a>).</li>
 </ul>
@@ -858,9 +865,9 @@
 <li><p>A new method <code>$is_double_field()</code> is added to <code>IddObject</code> class to check if specified fields should be double numbers</p></li>
 </ul>
 </div>
-<div id="bug-fixes-9" class="section level2">
+<div id="bug-fixes-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-9" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-10" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Fix the error of missing Idf file when <code>dir</code> is not <code>NULL</code> in <code>$run()</code> in <code>Idf</code> class.</li>
 </ul>
@@ -877,9 +884,9 @@
 <li>Long lines in err files now will be wrapped when printed.</li>
 </ul>
 </div>
-<div id="bug-fixes-10" class="section level2">
+<div id="bug-fixes-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-10" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-11" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix the error when checking invalid extensible fields in value validation.</p></li>
 <li><p>Fix the error that value references did not get updated when setting values to <code>NA</code> in <code>$set_value()</code> in <code>IdfObject</code> and <code>$set_object()</code> in <code>Idf</code>.</p></li>
@@ -929,9 +936,9 @@
 <li><p><code><a href="../reference/run_idf.html">run_idf()</a></code> and <code><a href="../reference/run_idf.html">run_multi()</a></code> now does not call <code><a href="../reference/clean_wd.html">clean_wd()</a></code> as this is automatically handled by EnergyPlus itself.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-11" class="section level2">
+<div id="bug-fixes-12" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-11" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-12" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix errors when try to get units <code>$field_name()</code>, <code>$field_unit()</code> and <code>$field_default()</code> in <code>IddObject</code> class.</p></li>
 <li><p>Fix the error that <code>$get_value()</code> and <code>$table()</code> in <code>IdfObject</code> class did not return all field values even <code>all</code> was set to <code>TRUE</code>.</p></li>
@@ -968,9 +975,9 @@
 <li><p><code>$dup_object()</code> will give an error if given <code>new_name</code> is the an existing object name.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-12" class="section level2">
+<div id="bug-fixes-13" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-12" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-13" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (<a href='https://github.com/hongyuanjia/eplusr/issues/12'>#12</a>).</p></li>
 <li><p>Fix idf input version parsing in <code>param_job</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/13'>#13</a>).</p></li>
@@ -1000,9 +1007,9 @@
 <li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li>
 </ul>
 </div>
-<div id="bug-fixes-13" class="section level2">
+<div id="bug-fixes-14" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-13" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-14" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix warning messages of column type coercion from data.table in <code>Idf</code> and <code>IdfObject</code>.</p></li>
 <li><p><code>$set_value()</code> in <code>IdfObject</code> and <code>$set_object()</code> in <code>Idf</code> now will delete empty fields with empty value. This fix the error when trying to reassign only some empty fields which have been deleted before.</p></li>
