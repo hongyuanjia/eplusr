@@ -61,7 +61,7 @@ join_from_input <- function (dt, input, check = "group_id", allow.cartesian = TR
 }
 # }}}
 # check_bad_key {{{
-check_bad_key <- function (res, col_check, col_on) {
+check_bad_key <- function (res, col_check, col_on, context = NULL) {
     if (anyNA(res[[col_check]])) {
         if (has_names(res, "original")) {
             invld_cls <- res[is.na(get(col_check))][["original"]]
@@ -78,7 +78,7 @@ check_bad_key <- function (res, col_check, col_on) {
             col_key <- "name"
         }
         col_key <- paste(stri_replace_first_regex(col_on, "_.*", ""), col_key)
-        abort_bad_key(col_key, invld_cls)
+        abort_bad_key(col_key, invld_cls, context = context)
     }
     res
 }
@@ -180,8 +180,9 @@ fast_subset <- function (dt, cols) {
 # }}}
 
 # abort_bad_key {{{
-abort_bad_key <- function (key, value) {
+abort_bad_key <- function (key, value, context = NULL) {
     mes <- paste0("Invalid ", key, " found: ", collapse(value))
+    if (!is.null(context)) mes <- paste(mes, context)
     abort(mes, value = value, class = paste0("invalid_", gsub(" ", "_", tolower(key))))
 }
 # }}}
