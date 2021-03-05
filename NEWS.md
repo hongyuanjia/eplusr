@@ -7,6 +7,10 @@
   `eplusr_option()`. Also, `with_speed()` is deprecated and falls back to
   `without_checking()` when called (#417).
 
+## Bug fixes
+
+* Fixed wrong transition of `FuelFactors` from v9.2 to v9.3 (#420).
+
 ## Minor changes
 
 * Better error and verbose messages (#422, #423).
