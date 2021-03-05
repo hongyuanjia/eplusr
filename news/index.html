@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9003</span>
       </span>
     </div>
 
@@ -198,14 +198,21 @@
 <li>Fixed wrong transition of <code>FuelFactors</code> from v9.2 to v9.3 (<a href='https://github.com/hongyuanjia/eplusr/issues/420'>#420</a>).</li>
 </ul>
 </div>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>Better error and verbose messages (<a href='https://github.com/hongyuanjia/eplusr/issues/422'>#422</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/423'>#423</a>).</li>
+</ul>
+</div>
 </div>
     <div id="eplusr-0141" class="section level1">
 <h1 class="page-header" data-toc-text="0.14.1">
 <a href="#eplusr-0141" class="anchor"></a>eplusr 0.14.1<small> 2021-02-25 </small>
 </h1>
-<div id="minor-changes" class="section level2">
+<div id="minor-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Compatible changes for <a href="https://github.com/r-quantities/units">units</a> v0.7-0 (<a href='https://github.com/hongyuanjia/eplusr/issues/410'>#410</a>).</li>
 </ul>
@@ -234,9 +241,9 @@
 <li>Now eplusr will always use the SQLite output for data extraction instead of using the CSV output. In EnergyPlus v9.3 and above, ReadVarsESO is deprecated and EnergyPlus itself will generate CSV directly. CSVs for variables and meters are always separated in this way. Together with the newly introduced <code>Output:Control:Files</code> which can be set to disable CSV output, it becomes very cumbersome to continuously support the CSV for data extraction (<a href='https://github.com/hongyuanjia/eplusr/issues/307'>#307</a>).</li>
 </ul>
 </div>
-<div id="minor-changes-1" class="section level2">
+<div id="minor-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Now rgl and decido package has been moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
 <li>
@@ -374,9 +381,9 @@
 <li><p>The <code>warning</code> parameter in <code><a href="../reference/read_epw.html">read_epw()</a></code>, <code>Epw$add()</code> and <code>Epw$set()</code> has been deprecated (<a href='https://github.com/hongyuanjia/eplusr/issues/298'>#298</a>).</p></li>
 </ul>
 </div>
-<div id="minor-changes-2" class="section level2">
+<div id="minor-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-3" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>
 <code>EplusJob</code>, <code>EplusGroupJob</code> and <code>ParametricJob</code> will not parse input EPW files, but only validate their existences and store the paths (<a href='https://github.com/hongyuanjia/eplusr/issues/215'>#215</a>)</li>
@@ -507,9 +514,9 @@
 <li>Better support for old IDD (<a href='https://github.com/hongyuanjia/eplusr/issues/183'>#183</a>).</li>
 </ul>
 </div>
-<div id="minor-changes-3" class="section level2">
+<div id="minor-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-3" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-4" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Describe on how the arguments are matched in <code>$apply_measure()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/57'>#57</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for pointing this out.</li>
 <li>Now the <code>echo</code> argument in <code><a href="../reference/run_idf.html">run_idf()</a></code> and <code><a href="../reference/run_idf.html">run_multi()</a></code> will only take effect when <code>wait</code> is <code>TRUE</code>. This makes it possible to remove the dependency on the later package.</li>
@@ -590,9 +597,9 @@
 <li>Now <code>$run()</code> method in <code>Idf</code> will use the correct model path to run simulation.</li>
 </ul>
 </div>
-<div id="minor-changes-4" class="section level2">
+<div id="minor-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-4" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-5" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Change message types in <code>$ref_to_object()</code> and <code>$ref_by_object()</code> in <code>IdfObject</code>.</li>
 <li>Now <code>ErrFile</code> is stored as a <code>data.table</code> with additional attributes instead of a list.</li>
@@ -802,9 +809,9 @@
 </li>
 </ul>
 </div>
-<div id="minor-changes-5" class="section level2">
+<div id="minor-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-5" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-6" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Now <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is run before every call to EnergyPlus.</li>
 </ul>
@@ -849,9 +856,9 @@
 <li>Clean up the dirty code that manually modifies <code>$clone()</code> method in R6 in order to be compatible with (<a href='https://github.com/hongyuanjia/eplusr/issues/19'>#19</a>). After this, <code>deep</code> has to be set to <code>TRUE</code> if a completed cloned copy is desired. Also, documentations on <code>$clone()</code> method in <code>Epw</code>, <code>EplusJob</code>, <code>ParametricJob</code> have been added.</li>
 </ul>
 </div>
-<div id="minor-changes-6" class="section level2">
+<div id="minor-changes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-6" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-7" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>
 <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is called internally when running EnergyPlus models. This guarantees that the old output file from last simulation is cleaned up before the new simulation starts.</li>
@@ -877,9 +884,9 @@
 <h1 class="page-header" data-toc-text="0.9.1">
 <a href="#eplusr-091" class="anchor"></a>eplusr 0.9.1<small> 2018-08-29 </small>
 </h1>
-<div id="minor-changes-7" class="section level2">
+<div id="minor-changes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-7" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-8" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Long lines in err files now will be wrapped when printed.</li>
 </ul>
@@ -921,9 +928,9 @@
 <li><p>New methods <code>$field_reference()</code> and <code>$field_possible()</code> have been added into <code>IddObject</code> class. <code>$field_possible()</code> is basically the same as the <code>$possible_value()</code> in <code>IdfObject</code> class. This makes it possible to show all available references for a class that does not have any object yet. <code>$field_reference()</code> only returns all available reference values for specified fields. <strong>NOTE</strong>: <code>$field_reference()</code> and <code>$field_possible()</code> can only be used in <code>IddObject</code>s that are created using <code>$definition()</code> in <code>Idf</code> class and <code>IdfObject</code> class, and cannot be used in <code>IddObject</code>s that are created using <code>$object()</code> or equivalent in <code>Idd</code> class. This is because both methods need shared Idf value data to collect all reference values.</p></li>
 </ul>
 </div>
-<div id="minor-changes-8" class="section level2">
+<div id="minor-changes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-8" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-9" class="anchor"></a>Minor changes</h2>
 <ul>
 <li><p><code><a href="../reference/use_eplus.html">use_eplus()</a></code> now returns an invisible list of EnergyPlus configure data instead of <code>NULL</code>.</p></li>
 <li><p>The default value of <code>dir</code> argument in <code><a href="../reference/install_eplus.html">download_eplus()</a></code> has been removed, which enforce the user to explicitly specify the directory to save EnergyPlus installer file, as per CRAN reviewer comment.</p></li>
@@ -963,9 +970,9 @@
 <li><p><code>$dup_object()</code> in <code>Idf</code> class now can duplicate one object multiple times.</p></li>
 </ul>
 </div>
-<div id="minor-changes-9" class="section level2">
+<div id="minor-changes-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-9" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-10" class="anchor"></a>Minor changes</h2>
 <ul>
 <li><p>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</p></li>
 <li><p>When <code>wait</code> is <code>FALSE</code>, <code>$run()</code> in <code>EplusJob</code> and <code>ParametricJob</code> will return itself instead of the time when simulation started.</p></li>
@@ -1000,9 +1007,9 @@
 <code>$get_value()</code> in <code>IdfObject</code> class new has a new argument <code>simplify</code>. If <code>TRUE</code>, a character vector will be returned instead of a named list. Default is <code>FALSE</code>.</li>
 </ul>
 </div>
-<div id="minor-changes-10" class="section level2">
+<div id="minor-changes-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-10" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-11" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li>
 </ul>
