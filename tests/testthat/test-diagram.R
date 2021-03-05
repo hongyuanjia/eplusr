@@ -1,5 +1,3 @@
-context("HVAC Diagram")
-
 test_that("HVAC Diagram", {
     eplusr_option(verbose_info = FALSE)
     skip_on_cran()

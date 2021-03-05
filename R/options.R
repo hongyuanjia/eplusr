@@ -19,7 +19,6 @@ NULL
 .options$view_in_ip <- FALSE
 .options$save_format <- "asis"
 .options$num_parallel <- parallel::detectCores()
-.options$autocomplete <- interactive()
 # }}}
 
 #' Get and Set eplusr options
@@ -55,13 +54,8 @@ NULL
 #'
 #' * `verbose_info`: Whether to show information messages. Default: `TRUE`.
 #'
-#' * `autocomplete`: Whether to turn on autocompletion on class and field names.
-#'   Underneath, [makeActiveBinding()] is used to add or move active bindings in
-#'   [Idf] and [IdfObject]s to directly return objects in class or field values.
-#'   This will make it possible to dynamically show current class and field
-#'   names in both RStudio and in the terminal. However, this process does have
-#'   a penalty on the performance. It can make adding or modifying large mounts
-#'   of [Idf] and [IdfObject]s extremely slower. Default: `interactive()`.
+#' * `autocomplete`: **Deprecated**. Whether to turn on autocompletion on class
+#'   and field names. Now autocompletion is enabled all the time.
 #'
 #' @return If called directly, a named list of input option values. If input is
 #'     a single option name, a length-one vector whose type is determined by
@@ -92,14 +86,22 @@ eplusr_option <- function (...) {
         return(.options[[nm]])
     }
 
-    assert_subset(nm, names(.options), FALSE, .var.name = "option")
+    ori_nm <- nm
+    if ("autocomplete" %chin% ori_nm) {
+        warn("Option 'autocomplete' is deprecated. Autocompletion is enabled all the time.",
+            "deprecated_option"
+        )
+        nm <- setdiff(nm, "autocomplete")
+    }
+
+    assert_subset(nm, names(.options), .var.name = "option")
 
     choice_opt <- c("save_format")
     choice_list <- list(
         save_format = c("asis", "sorted", "new_top", "new_bot")
     )
 
-    onoff_opt <- c("view_in_ip", "verbose_info", "autocomplete")
+    onoff_opt <- c("view_in_ip", "verbose_info")
 
     count_opt <- c("num_parallel")
 
@@ -142,7 +144,14 @@ eplusr_option <- function (...) {
         }
     }
 
-    as.list.environment(.options)[nm]
+    res <- as.list.environment(.options)[nm]
+
+    if ("autocomplete" %chin% ori_nm) {
+        res$autocomplete <- TRUE
+        res <- res[ori_nm]
+    }
+
+    res
 }
 # }}}
 
@@ -157,9 +166,6 @@ eplusr_option <- function (...) {
 #' `with_verbose` evaluates an expression with verbose messages.
 #'
 #' `without_checking` evaluates an expression with no checkings.
-#'
-#' `with_speed` evaluates an expression with no checkings and autocompletion
-#' functionality.
 #'
 #' @param opts A list of valid input for `eplusr::eplusr_option()`.
 #' @param expr An expression to be evaluated.
@@ -211,16 +217,20 @@ with_verbose <- function (expr) {
 
 #' @name with_option
 #' @export
-# with_speed {{{
-with_speed <- function (expr) {
-    with_option(list(validate_level = "none", autocomplete = FALSE), expr)
-}
-# }}}
-
-#' @name with_option
-#' @export
 # without_checking {{{
 without_checking <- function (expr) {
     with_option(list(validate_level = "none"), expr)
+}
+# }}}
+
+#' Deprecated functions since eplusr v0.15.0
+#'
+#' @param expr An expression to be evaluated.
+#' @name eplusr-deprecated
+#' @export
+# with_speed {{{
+with_speed <- function (expr) {
+    .Deprecated("without_checking", "eplusr")
+    without_checking(expr)
 }
 # }}}

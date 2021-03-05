@@ -1,5 +1,12 @@
 # eplusr (development version)
 
+## Break changes
+
+* Autocompletion is enabled by registering a S3 `.DollarNames` method. Option
+  `autocomplete` is deprecated. A warning is issued if you try to set it in
+  `eplusr_option()`. Also, `with_speed()` is deprecated and falls back to
+  `without_checking()` when called (#417).
+
 ## Bug fixes
 
 * Fixed wrong transition of `FuelFactors` from v9.2 to v9.3 (#420).

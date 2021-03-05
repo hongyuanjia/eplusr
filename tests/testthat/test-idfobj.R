@@ -1,10 +1,8 @@
-context("IdfObject")
-
 use_idd(8.8, "auto")
 
 # NEW {{{
 test_that("$new()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
 
     expect_error(IdfObject$new(1))
     expect_error(IdfObject$new(1, class = "Material", parent = idf))
@@ -21,7 +19,7 @@ test_that("$new()", {
 
 # VERSION {{{
 test_that("$version()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_equal(obj$version(), numeric_version("8.8.0"))
 })
@@ -29,7 +27,7 @@ test_that("$version()", {
 
 # PARENT {{{
 test_that("$parent()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_is(obj$parent(), "Idf")
 })
@@ -37,7 +35,7 @@ test_that("$parent()", {
 
 # ID {{{
 test_that("$id()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(obj$id(), 1L)
 })
@@ -45,7 +43,7 @@ test_that("$id()", {
 
 # NAME {{{
 test_that("$name()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(obj$name(), "WD01")
 })
@@ -53,7 +51,7 @@ test_that("$name()", {
 
 # GROUP_NAME {{{
 test_that("$group_name()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_equal(obj$group_name(), "Surface Construction Elements")
 })
@@ -61,7 +59,7 @@ test_that("$group_name()", {
 
 # CLASS_NAME {{{
 test_that("$class_name()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_equal(obj$class_name(), "Construction")
 })
@@ -69,7 +67,7 @@ test_that("$class_name()", {
 
 # DEFINITION {{{
 test_that("$definition()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_is(obj$definition(), "IddObject")
 })
@@ -77,7 +75,7 @@ test_that("$definition()", {
 
 # COMMENT {{{
 test_that("$comment()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_equal(mat$comment(), " this is a test comment for WD01")
@@ -113,7 +111,7 @@ test_that("$comment()", {
 
 # VALUE {{{
 test_that("$value()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     # can handle cases when both `index` and `name` are NULL
@@ -171,7 +169,7 @@ test_that("$value()", {
 
 # SET {{{
 test_that("$set()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_is(surf <- IdfObject$new(3, parent = idf), "IdfObject")
@@ -228,7 +226,7 @@ test_that("$set()", {
 
 # VALUE_POSSIBLE {{{
 test_that("$value_possible()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equivalent(con$value_possible(),
@@ -256,7 +254,7 @@ test_that("$value_possible()", {
 
 # VALIDATE {{{
 test_that("$validate()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equal(con$validate()$invalid_reference,
@@ -280,7 +278,7 @@ test_that("$validate()", {
 
 # IS_VALID {{{
 test_that("$is_valid()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_is(surf <- IdfObject$new(3, parent = idf), "IdfObject")
@@ -295,7 +293,7 @@ test_that("$is_valid()", {
 
 # VALUE_RELATION {{{
 test_that("$value_relation()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equivalent(con$value_relation(1),
@@ -377,7 +375,7 @@ test_that("$value_relation()", {
 
 # REF {{{
 test_that("$ref_to_object()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
 
@@ -412,7 +410,7 @@ test_that("$ref_to_object()", {
 
 # TO_TABLE {{{
 test_that("$to_table()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
@@ -473,7 +471,7 @@ test_that("$to_table()", {
 
 # TO_STRING {{{
 test_that("$to_string()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equal(con$to_string(leading = 0, sep_at = 10),
@@ -504,7 +502,7 @@ test_that("$to_string()", {
 
 # PRINT {{{
 test_that("$print()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
@@ -524,7 +522,7 @@ test_that("$print()", {
 
 # S3 FORMAT {{{
 test_that("format.IdfObject, as.character.IdfObject, etc", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_is(format(con), "character")
@@ -536,7 +534,7 @@ test_that("format.IdfObject, as.character.IdfObject, etc", {
 
 # S3 SUBSET {{{
 test_that("$.IdfObject and [[.IdfObject", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_error(mat[1, 2])
@@ -555,7 +553,7 @@ test_that("$.IdfObject and [[.IdfObject", {
 
 # S3 ASSIGN {{{
 test_that("$<-.IdfObject and [[<-.IdfObject", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_error(mat$name <- "Smooth")
@@ -582,7 +580,7 @@ test_that("$<-.IdfObject and [[<-.IdfObject", {
 
 # S3 EQUITY {{{
 test_that("==.IdfObject and !=.IdfObject", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
@@ -598,7 +596,7 @@ test_that("==.IdfObject and !=.IdfObject", {
 test_that("idf_object()", {
     expect_error(idf_object())
 
-    idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto"))
+    idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto"))
 
     expect_error(idf_object(parent = idf))
 
@@ -610,21 +608,9 @@ test_that("idf_object()", {
 })
 # }}}
 
-# ACTIVE BINDING {{{
-test_that("add_idfobj_field_bindings()", {
-    expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-
-    expect_is(ver <- with_option(list(autocomplete = FALSE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
-    expect_false("Version Identifier" %in% ls(ver))
-
-    expect_is(ver <- with_option(list(autocomplete = TRUE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
-    expect_true("Version Identifier" %in% ls(ver))
-
-    expect_is(mat <- with_option(list(autocomplete = TRUE), add_idfobj_field_bindings(IdfObject$new(1, parent = idf))), "IdfObject")
-    expect_true(all(mat$definition()$field_name() %in% ls(mat)))
-    expect_silent(mat$Visible_Absorptance <- NULL)
-    expect_silent(mat <- add_idfobj_field_bindings(mat, update = TRUE))
-    expect_equal(length(mat$value()), 8)
-    expect_false("Visual Absorptance" %in% ls(mat))
+# AUTOCOMPLETE {{{
+test_that(".DollarNames.Idf", {
+    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_equal(.DollarNames.Idf(idf, "Ma"), "Material")
 })
 # }}}

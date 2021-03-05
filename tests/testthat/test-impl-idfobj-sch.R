@@ -1,5 +1,3 @@
-context("IdfSchedule Implementation")
-
 eplusr_option(verbose_info = FALSE)
 
 # PARSE_SCH_CMPT {{{
