@@ -14,8 +14,7 @@ test_that("eplusr_option()", {
     expect_equal(opt, list(autocomplete = TRUE))
 
     expect_equal(eplusr_option(),
-        list(autocomplete = TRUE,
-             num_parallel = 8L,
+        list(num_parallel = 8L,
              save_format = "asis",
              validate_level = "final",
              verbose_info = TRUE,
