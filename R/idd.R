@@ -58,7 +58,7 @@ NULL
 
 #' @export
 # Idd {{{
-Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
+Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 
     public = list(
         # INITIALIZE {{{
@@ -700,41 +700,6 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
 )
 # }}}
 
-# add_idd_class_bindings {{{
-add_idd_class_bindings <- function (idd) {
-    if (!.options$autocomplete) return(idd)
-
-    # get all classes in current version IDD
-    env <- .subset2(idd, ".__enclos_env__")
-    self <- .subset2(env, "self")
-    private <- .subset2(env, "private")
-
-    # see https://github.com/r-lib/covr/issues/398
-    b <- quote({
-        if (missing(value)) {
-            if (self$is_valid_class(class)) {
-                self$object(class)
-            } else {
-                NULL
-            }
-        } else {
-            stop("cannot add bindings to a locked environment")
-        }
-    })
-    for (i in private$m_idd_env$class$class_name) {
-        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
-        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
-        makeActiveBinding(i, fun, idd)
-    }
-
-    # lock environment after adding active bindings
-    lockEnvironment(self)
-    lockEnvironment(private)
-
-    idd
-}
-# }}}
-
 # idd_version {{{
 idd_version <- function (self, private) {
     private$m_version
@@ -982,9 +947,16 @@ format.Idd <- function (x, ...) {
 }
 # }}}
 
+#' @export
+# .DollarNames.Idd {{{
+.DollarNames.Idd <- function(x, pattern = "") {
+    grep(pattern, c(x$class_name(), names(x)), value = TRUE)
+}
+# }}}
+
 # read_idd {{{
 read_idd <- function (path) {
-    add_idd_class_bindings(Idd$new(path))
+    Idd$new(path)
 }
 # }}}
 

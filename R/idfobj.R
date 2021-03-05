@@ -18,7 +18,7 @@ NULL
 
 #' @export
 # IdfObject {{{
-IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
+IdfObject <- R6::R6Class(classname = "IdfObject",
     public = list(
         # INITIALIZE {{{
         #' @description
@@ -1490,51 +1490,6 @@ idf_object <- function (parent, object = NULL, class = NULL) {
         obj <- IdfObject$new(object, class, parent)
     }
 
-    add_idfobj_field_bindings(obj)
-}
-# }}}
-
-# add_idfobj_field_bindings {{{
-add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) {
-    if (!.options$autocomplete) return(obj)
-
-    # create active bindings
-    # get first 30 field names in current IDD class
-    env <- .subset2(obj, ".__enclos_env__")
-    self <- .subset2(env, "self")
-    private <- .subset2(env, "private")
-
-    fld_id <- private$idf_env()$value[J(private$m_object_id), on = "object_id", field_id]
-    if (!is.null(field_index)) {
-        fld_id <- fld_id[field_index]
-    }
-    fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
-
-    # move deleted field bindings
-    if (update && length(setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm))) {
-        rm(list = setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm), envir = obj)
-    }
-
-    # skip if nothing to add
-    if (!length(setdiff(fld_nm, ls(obj)))) return(obj)
-
-    # see https://github.com/r-lib/covr/issues/398
-    b <- quote({
-        if (missing(value)) {
-            self$value(field)[[1L]]
-        } else {
-            lst <- list(value)
-            names(value) <- field
-            do.call(self$set, lst)
-            invisible(self)
-        }
-    })
-    for (i in setdiff(fld_nm, ls(obj))) {
-        b_ <- as.call(c(list(b[[1]], substitute(field <- nm, list(nm = i))), as.list(b[-1])))
-        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
-        makeActiveBinding(i, fun, obj)
-    }
-
     obj
 }
 # }}}
@@ -1684,7 +1639,6 @@ idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL,
             private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id],
             IdfObject$new, list(parent = private$m_parent)
         )
-        res <- lapply(res, add_idfobj_field_bindings)
         setattr(res, "names", private$idf_env()$object[J(rel$src_object_id), on = "object_id", object_name])
         res
     }
@@ -1722,7 +1676,6 @@ idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL,
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
             IdfObject$new, list(parent = private$m_parent)
         )
-        res <- lapply(res, add_idfobj_field_bindings)
         setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
         res
     }
@@ -1757,7 +1710,6 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
             IdfObject$new, list(parent = private$m_parent)
         )
-        res <- lapply(res, add_idfobj_field_bindings)
         setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
         res
     }
@@ -1941,7 +1893,6 @@ str.IdfObject <- function (object, ...) {
 #' @export
 # print.IdfObject {{{
 print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE, ...) {
-    add_idfobj_field_bindings(x, update = TRUE)
     x$print(comment = comment, auto_sep = auto_sep, brief = brief, all = all)
 }
 # }}}
@@ -1951,6 +1902,16 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 '[.IdfObject' <- function(x, i, j, ...) {
     if (!missing(j)) stop("incorrect number of dimensions")
     .subset2(x, "value")(i)
+}
+# }}}
+
+#' @export
+# .DollarNames.IdfObject {{{
+.DollarNames.IdfObject <- function(x, pattern = "") {
+    private <- get_priv_env(x)
+    fld_id <- private$idf_env()$value[J(private$m_object_id), on = "object_id", field_id]
+    fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
+    grep(pattern, c(fld_nm, names(x)), value = TRUE)
 }
 # }}}
 
@@ -2025,12 +1986,9 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
             eplusr_error_invalid_field_name = function (e) NextMethod())
 
-        # add bindings
-        add_idfobj_field_bindings(x, fld_idx)
-
         invisible(x)
     } else {
-        stop("cannot add bindings to a locked environment")
+        NextMethod()
     }
 }
 # }}}
@@ -2060,12 +2018,9 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
             eplusr_error_invalid_field_name = function (e) NextMethod())
 
-        # add bindings
-        add_idfobj_field_bindings(x, fld_idx)
-
         invisible(x)
     } else {
-        stop("cannot add bindings to a locked environment")
+        NextMethod()
     }
 }
 # }}}

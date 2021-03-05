@@ -1,5 +1,3 @@
-context("IdfViwer")
-
 # IdfViewer {{{
 test_that("IdfViewer class", {
     skip_on_cran()

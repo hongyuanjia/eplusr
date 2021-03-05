@@ -1,5 +1,5 @@
 # text used for testing {{{
-text <- function(type = c("idf", "idd"), ver = NULL) {
+idftext <- function(type = c("idf", "idd"), ver = NULL) {
     type <- match.arg(type)
     # idd_text {{{
     idd_text <- c(

@@ -1,5 +1,3 @@
-context("Transition")
-
 # HELPER {{{
 test_that("Transition Helper", {
     eplusr_option(verbose_info = FALSE)

@@ -1,7 +1,5 @@
-context("Idd Implementation")
-
 test_that("Idd implementation", {
-    expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))
+    expect_silent(idd_parsed <- parse_idd_file(idftext("idd", "9.9.9")))
 
     # GROUP {{{
     expect_equal(get_idd_group_index(idd_parsed), 1L:2L)

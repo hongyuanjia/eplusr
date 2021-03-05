@@ -1910,3 +1910,10 @@ str.IddObject <- function (object, brief = FALSE, ...) {
     Negate(`==.IddObject`)(e1, e2)
 }
 # }}}
+
+#' @export
+# .DollarNames.IddObject {{{
+.DollarNames.IddObject <- function (x, pattern = "") {
+    grep(pattern, c(x$field_name(), names(x)), value = TRUE)
+}
+# }}}

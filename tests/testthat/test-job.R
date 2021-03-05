@@ -1,5 +1,3 @@
-context("Job methods")
-
 test_that("Job methods", {
     eplusr_option(verbose_info = FALSE)
     skip_on_cran()

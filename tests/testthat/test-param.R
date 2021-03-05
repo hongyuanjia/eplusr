@@ -1,5 +1,3 @@
-context("Parametric metiods")
-
 test_that("Parametric methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)
