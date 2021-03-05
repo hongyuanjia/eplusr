@@ -3,7 +3,7 @@ use_idd(8.8, "auto")
 
 # TABLE {{{
 test_that("table", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     # OBJECT {{{

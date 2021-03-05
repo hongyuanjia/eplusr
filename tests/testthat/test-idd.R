@@ -80,7 +80,7 @@ test_that("can read IDD", {
     expect_true(is_avail_idd("8.8.0"))
 
     # can use custom IDD
-    expect_silent(use_idd(text("idd", "9.9.9")))
+    expect_silent(use_idd(idftext("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))
 
     # recover EnergyPlus config
@@ -111,9 +111,8 @@ test_that("can read IDD", {
 
 # Idd class {{{
 test_that("Idd class", {
-    .options$autocomplete <- FALSE
     # can create an Idd object from string
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
 
     # can get Idd version
     expect_equal(idd$version(), as.numeric_version("9.9.9"))
@@ -253,7 +252,7 @@ test_that("Idd class", {
 
 # Idd S3 methods {{{
 test_that("Idd S3 methods", {
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
     expect_equal(idd$TestSlash, idd$object("TestSlash"))
     expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
     expect_null(idd$Missing)
@@ -261,7 +260,7 @@ test_that("Idd S3 methods", {
     expect_error(idd$Missing <- "a", "cannot add bindings to a locked environment")
     expect_error(idd[["Missing"]] <- "a", "cannot add bindings to a locked environment")
 
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
     expect_equal(idd$TestSlash, idd$object("TestSlash"))
     expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
     expect_null(idd$Missing)

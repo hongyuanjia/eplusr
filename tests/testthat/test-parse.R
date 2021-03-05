@@ -1,6 +1,6 @@
 # parse_idd_file() {{{
 test_that("parse_idd_file()", {
-    expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))
+    expect_silent(idd_parsed <- parse_idd_file(idftext("idd", "9.9.9")))
 
     # can parse Idd from string
     expect_equal(
@@ -412,7 +412,7 @@ test_that("parse_idf_file()", {
     )
     # }}}
 
-    expect_warning(idf_parsed <- parse_idf_file(text("idf"), 8.8), "Missing version field in input IDF")
+    expect_warning(idf_parsed <- parse_idf_file(idftext("idf"), 8.8), "Missing version field in input IDF")
 
     # can parse Idf stored in strings
     expect_equal(names(idf_parsed),
@@ -550,7 +550,7 @@ test_that("parse_idf_file()", {
     expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_field")
 
     # can optional discard reference parsing
-    expect_equal(nrow(parse_idf_file(text(ver = 8.8), 8.8, ref = FALSE)$reference), 0L)
+    expect_equal(nrow(parse_idf_file(idftext(ver = 8.8), 8.8, ref = FALSE)$reference), 0L)
 
     # can handle DDY without giving unnecessary warning
     ddy <- tempfile(fileext = ".ddy")
