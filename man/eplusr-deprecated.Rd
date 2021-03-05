@@ -7,6 +7,9 @@
 \usage{
 with_speed(expr)
 }
+\arguments{
+\item{expr}{An expression to be evaluated.}
+}
 \description{
 Deprecated functions since eplusr v0.15.0
 }
