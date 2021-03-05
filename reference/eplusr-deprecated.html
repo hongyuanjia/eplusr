@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse object field values given in list format — parse_dots_value • eplusr</title>
+<title>Deprecated functions since eplusr v0.15.0 — eplusr-deprecated • eplusr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -52,8 +52,8 @@
 
 
 
-<meta property="og:title" content="Parse object field values given in list format — parse_dots_value" />
-<meta property="og:description" content="Parse object field values given in list format" />
+<meta property="og:title" content="Deprecated functions since eplusr v0.15.0 — eplusr-deprecated" />
+<meta property="og:description" content="Deprecated functions since eplusr v0.15.0" />
 <meta property="og:image" content="https://hongyuanjia.github.io/eplusr/logo.svg" />
 
 
@@ -177,82 +177,26 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Parse object field values given in list format</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/impl-idf.R'><code>R/impl-idf.R</code></a></small>
-    <div class="hidden name"><code>parse_dots_value.Rd</code></div>
+    <h1>Deprecated functions since eplusr v0.15.0</h1>
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/options.R'><code>R/options.R</code></a></small>
+    <div class="hidden name"><code>eplusr-deprecated.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Parse object field values given in list format</p>
+    <p>Deprecated functions since eplusr v0.15.0</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_dots_value</span><span class='op'>(</span>
-  <span class='va'>...</span>,
-  .scalar <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  .pair <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  .ref_assign <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  .unique <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  .empty <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  .env <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>with_speed</span><span class='op'>(</span><span class='va'>expr</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>Lists of object definitions. Each list should be named
-with a valid class/object id/name. ID should be denoted in style
-<code>..ID</code>. There is a special element <code>.comment</code> in each list, which will
-be used as new comments of the object. If <code>.ref_assign</code> is <code>TRUE</code>,
-<code>:=</code> can be used to group ids/names:</p><ul>
-<li><p>When <code>.type</code> equals <code>"class"</code>, LHS multiple class indices/names should be
-wrapped by <code>.()</code>, <code><a href='https://rdrr.io/r/base/c.html'>c()</a></code>.</p></li>
-<li><p>When <code>.type</code> equals <code>"object"</code>, LHS multiple object ids/names should be
-wrapped by <code>.()</code> or <code><a href='https://rdrr.io/r/base/c.html'>c()</a></code>. LHS <strong>SINGLE</strong> class name should be
-wrapped by <code>..()</code>.</p></li>
-</ul></td>
-    </tr>
-    <tr>
-      <th>.scalar</th>
-      <td><p>If <code>TRUE</code>, make sure the value of each field in the object is a
-scalar value. If <code>FALSE</code>, <code>value_chr</code> and <code>value_num</code> column will be
-list type. Default: <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>.pair</th>
-      <td><p>Only works when <code>.scalar</code> is <code>FALSE</code>. If <code>.pair</code> is <code>TRUE</code>,
-vector field values will be paired to each id/name on the LHS. In this
-case, <code>value_chr</code> and <code>value_num</code> will be character type and double
-type, respectively. When there is only one id/name on the LHS, it will
-be replicated to match the length of the value vector. Default: <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>.ref_assign</th>
-      <td><p>If <code>TRUE</code>, allow using <code>:=</code> to gather multiple
-classes/objects on the LHS when defining the objects. Default: <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>.unique</th>
-      <td><p>If <code>TRUE</code>, make sure there are no duplicated classes/objects in
-the input. Default: <code>FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>.empty</th>
-      <td><p>If <code>TRUE</code>, allow using an empty list, i.e. <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code> to define an
-object with all default values. Default: <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>.env</th>
-      <td><p>An environment specifying the environment to evaluate the <code>...</code>.
-Default: <code><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame()</a></code>.</p></td>
+      <th>expr</th>
+      <td><p>An expression to be evaluated.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A named list of 2 element <code>object</code> and <code>value</code> which is a
-<code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table::data.table()</a></code> with object data and value data respectively.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

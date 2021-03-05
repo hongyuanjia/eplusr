@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9001</span>
       </span>
     </div>
 
@@ -139,19 +139,11 @@
 
     
     
-<div id="how-to-get-auto-completion-in-rstudio" class="section level1">
-<h1 class="hasAnchor">
-<a href="#how-to-get-auto-completion-in-rstudio" class="anchor"></a>How to get auto-completion in RStudio?</h1>
-<p>Use the <code>autocomplete</code> option:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span>autocomplete <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>Underneath, [makeActiveBinding()] is used to add or move active bindings in [Idf] and [IdfObject]s to directly return objects in class or field values. This will make it possible to dynamically show current class and field names in both RStudio and in the terminal. However, this process does have a penalty on the performance. It can make adding or modifying large mounts of [Idf] and [IdfObject]s slower.</p>
-</div>
 <div id="how-to-control-the-maximum-number-of-parallel-simulations" class="section level1">
 <h1 class="hasAnchor">
 <a href="#how-to-control-the-maximum-number-of-parallel-simulations" class="anchor"></a>How to control the maximum number of parallel simulations?</h1>
 <p>Use the <code>num_parallel</code> option:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span>num_parallel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 </div>
   </div>

@@ -97,7 +97,7 @@ displays its results." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9001</span>
       </span>
     </div>
 
@@ -228,13 +228,8 @@ will be set according to the header of IDF file. If no header found,
 <li><p><code>num_parallel</code>: Maximum number of parallel simulations to run. Default:
 <code><a href='https://rdrr.io/r/parallel/detectCores.html'>parallel::detectCores()</a></code>.</p></li>
 <li><p><code>verbose_info</code>: Whether to show information messages. Default: <code>TRUE</code>.</p></li>
-<li><p><code>autocomplete</code>: Whether to turn on autocompletion on class and field names.
-Underneath, <code><a href='https://rdrr.io/r/base/bindenv.html'>makeActiveBinding()</a></code> is used to add or move active bindings in
-<a href='Idf.html'>Idf</a> and <a href='IdfObject.html'>IdfObject</a>s to directly return objects in class or field values.
-This will make it possible to dynamically show current class and field
-names in both RStudio and in the terminal. However, this process does have
-a penalty on the performance. It can make adding or modifying large mounts
-of <a href='Idf.html'>Idf</a> and <a href='IdfObject.html'>IdfObject</a>s extremely slower. Default: <code><a href='https://rdrr.io/r/base/interactive.html'>interactive()</a></code>.</p></li>
+<li><p><code>autocomplete</code>: <strong>Deprecated</strong>. Whether to turn on autocompletion on class
+and field names. Now autocompletion is enabled all the time.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
@@ -244,10 +239,7 @@ of <a href='Idf.html'>Idf</a> and <a href='IdfObject.html'>IdfObject</a>s extrem
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># list all current options</span>
 <span class='fu'>eplusr_option</span><span class='op'>(</span><span class='op'>)</span> <span class='co'># a named list</span>
-</div><div class='output co'>#&gt; $autocomplete
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $num_parallel
+</div><div class='output co'>#&gt; $num_parallel
 #&gt; [1] 2
 #&gt; 
 #&gt; $save_format
