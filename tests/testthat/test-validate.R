@@ -1,5 +1,3 @@
-context("Validate")
-
 # VALIDTATE {{{
 test_that("Validate method", {
     idf <- read_idf(example(), use_idd(8.8, "auto"))
@@ -31,7 +29,7 @@ test_that("Validate method", {
     expect_output(print.EpwValidity(empty_validity()))
 
     # MISSING OBJECT {{{
-    env_in <- parse_idf_file(text("idf", 8.8))
+    env_in <- parse_idf_file(idftext("idf", 8.8))
     expect_equal(
         check_missing_object(idd_env, idf_env, env_in)$validity$missing_object,
         c("Building", "GlobalGeometryRules")
@@ -44,7 +42,7 @@ test_that("Validate method", {
     # }}}
 
     # DUPLICATE OBJECT {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     expect_equal(nrow(check_duplicate_object(idd_env, idf_env, env_in)$validity$duplicate_object), 0L)
     env_in$object <- rbindlist(list(
@@ -80,7 +78,7 @@ test_that("Validate method", {
     # }}}
 
     # CONFLICT NAME {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     env_in$check_whole <- TRUE
     expect_equal(nrow(check_conflict_name(idd_env, idf_env, env_in)$validity$conflict_name), 0L)
@@ -117,7 +115,7 @@ test_that("Validate method", {
     # }}}
 
     # INCOMPLETE EXTENSIBLE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -131,7 +129,7 @@ test_that("Validate method", {
     # }}}
 
     # MISSING VALUE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -144,7 +142,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID AUTOSIZE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -159,7 +157,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID AUTOCALCULATE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -174,7 +172,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID CHARACTER {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -188,7 +186,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID NUMERIC {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -201,7 +199,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID INTEGER {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -214,7 +212,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID CHOICE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -228,7 +226,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID RANGE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -244,7 +242,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID REFERENCE {{{
-    env_in <- list2env(parse_idf_file(text("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
     env_in$validity <- empty_validity()
     env_in$check_whole <- TRUE
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))

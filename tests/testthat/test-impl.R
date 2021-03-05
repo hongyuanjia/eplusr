@@ -1,5 +1,3 @@
-context("Basic Implementation")
-
 # Basic Impl {{{
 test_that("Basic Table Implementation", {
     expect_equal(assert_valid_type("a"), "a")

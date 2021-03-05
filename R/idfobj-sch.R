@@ -20,8 +20,7 @@
 #' @name IdfSchedule
 # schedule_compact {{{
 schedule_compact <- function (parent, name, new = FALSE) {
-    obj <- IdfScheduleCompact$new(name, parent, new)
-    add_idfobj_field_bindings(obj)
+    IdfScheduleCompact$new(name, parent, new)
 }
 # }}}
 

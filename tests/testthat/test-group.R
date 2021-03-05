@@ -1,5 +1,3 @@
-context("Group metiods")
-
 test_that("Group methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)

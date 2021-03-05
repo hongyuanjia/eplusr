@@ -1,5 +1,3 @@
-context("Epw Implementation")
-
 # Epw Header {{{
 test_that("Epw Header", {
     # IDD

@@ -1,5 +1,3 @@
-context("IdfGeometry class")
-
 # IdfGeometry {{{
 test_that("IdfGeometry", {
     skip_on_cran()

@@ -1,8 +1,6 @@
-context("IddObject Implementation")
-
 # IddObject {{{
 test_that("IddObject implementation", {
-    expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))
+    expect_silent(idd_parsed <- parse_idd_file(idftext("idd", "9.9.9")))
 
     # RELATION {{{
     expect_silent(rel <- get_iddobj_relation(idd_parsed, 2L, direction = "ref_to", name = TRUE, keep_all = TRUE))
