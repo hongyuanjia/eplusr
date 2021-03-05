@@ -1,5 +1,9 @@
 # eplusr (development version)
 
+## Minor changes
+
+* Better error and verbose messages (#422, #423).
+
 # eplusr 0.14.1
 
 ## Minor changes
