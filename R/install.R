@@ -673,9 +673,9 @@ eplus_default_path <- function (ver, local = FALSE) {
         if (local) {
             d <- get_win_user_path()
             if (d == "") return(NA_character_)
-            d <- normalizePath(file.path(d, paste0("EnergyPlusV", ver_dash)), "/", FALSE)
+            d <- normalizePath(file.path(d, paste0("EnergyPlusV", ver_dash)), mustWork = FALSE)
         } else {
-            d <- paste0("C:/EnergyPlusV", ver_dash)
+            d <- paste0("C:\\EnergyPlusV", ver_dash)
         }
     } else if (is_linux()) {
         if (local) {
