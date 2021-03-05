@@ -1079,8 +1079,11 @@ test_that("$geometry()", {
 # VIEW {{{
 test_that("$view()", {
     skip_on_cran()
-    expect_warning(empty_idf(8.8)$view())
-    expect_is(read_idf(example())$view(), "IdfViewer")
+    expect_warning(v <- empty_idf(8.8)$view())
+    v$close()
+
+    expect_is(v <- read_idf(example())$view(), "IdfViewer")
+    v$close()
 
     expect_is(v <- plot(read_idf(example())), "IdfViewer")
     v$close()
@@ -1137,20 +1140,6 @@ test_that("idf_add_output_*", {
     expect_true(idf_add_output_vardict(idf))
     expect_null(idf$Output_VariableDictionary <- NULL)
     expect_true(idf_add_output_vardict(idf))
-})
-# }}}
-
-# ACTIVE BINDING {{{
-test_that("add_idd_class_bindings", {
-    expect_is(with_option(list(autocomplete = FALSE), idf <- read_idf(example())), "Idf")
-    expect_false("Version" %in% ls(idf))
-
-    expect_is(with_option(list(autocomplete = TRUE), idf <- read_idf(example())), "Idf")
-    expect_true(all(idf$class_name() %in% ls(idf)))
-
-    expect_null(without_checking(with_option(list(autocomplete = TRUE), idf$Timestep <- NULL)))
-    expect_output(with_option(list(autocomplete = TRUE), print(idf)))
-    expect_false("Timestep" %in% ls(idf))
 })
 # }}}
 
@@ -1228,15 +1217,13 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- NULL))
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- idf_2[["BuildingSurface:Detailed"]]))
 
-    expect_is(with_option(list(autocomplete = TRUE), idf <- read_idf(example())), "Idf")
+    expect_is(idf <- read_idf(example()), "Idf")
 
     expect_error(idf$SimulationControl <- idf$Timestep)
     expect_error(idf$SimulationControl <- "Timestep, 6;\n")
     expect_error(idf$SimulationControl <- FALSE)
 
     # UNIQUE-OBJECT CLASS {{{
-    expect_true("SimulationControl" %in% names(idf))
-
     expect_silent(idf$Material_NoMass$R13LAYER$Thermal_Absorptance <- 0.5)
     expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Absorptance, 0.5)
     expect_silent(idf$Material_NoMass$R13LAYER[["Thermal Absorptance"]] <- 0.6)
@@ -1264,18 +1251,15 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_null(without_checking(idf$SimulationControl <- NULL))
     expect_false(idf$is_valid_class("SimulationControl"))
     expect_null(idf$SimulationControl)
-    expect_false({capture.output(with_option(list(autocomplete = TRUE), print(idf))); "SimulationControl" %in% names(idf)})
 
     # can insert unique-object class
-    expect_silent(with_option(list(autocomplete = TRUE), idf$SimulationControl <- tbl))
+    expect_silent(idf$SimulationControl <- tbl)
     expect_true(idf$is_valid_class("SimulationControl"))
-    expect_silent(with_option(list(autocomplete = TRUE), idf$SimulationControl <- str))
-    expect_true("SimulationControl" %in% names(idf))
+    expect_silent(idf$SimulationControl <- str)
+    expect_true(idf$is_valid_class("SimulationControl"))
     # }}}
 
     # NORMAL CLASS {{{
-    expect_true("Material" %in% names(idf))
-
     # get data.frame input
     tbl <- idf$to_table(class = "Material")
     tbl[3, value := "0.2"]
@@ -1294,16 +1278,12 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_silent(idf$Material <- NULL)
     expect_false(idf$is_valid_class("Material"))
     expect_null(idf$Material)
-    # TODO: dynamically modify active bindings
-    # expect_false("Material" %in% names(idf))
 
     # can insert class
     expect_silent(idf$Material <- tbl)
     expect_true(idf$is_valid_class("Material"))
     expect_silent(idf$Material <- NULL)
     expect_silent(idf$Material <- str)
-    # TODO: dynamically modify active bindings
-    # expect_true("Material" %in% names(idf))
     eplusr_option(validate_level = "final")
 
     # can directly insert objects from other idf

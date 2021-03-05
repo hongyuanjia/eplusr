@@ -982,6 +982,13 @@ format.Idd <- function (x, ...) {
 }
 # }}}
 
+#' @export
+# .DollarNames.Idd {{{
+.DollarNames.Idd <- function(x, pattern = "") {
+    grep(pattern, c(x$class_name(), names(x)), value = TRUE)
+}
+# }}}
+
 # read_idd {{{
 read_idd <- function (path) {
     add_idd_class_bindings(Idd$new(path))

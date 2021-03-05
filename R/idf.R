@@ -3733,6 +3733,13 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 # }}}
 
 #' @export
+# .DollarNames.Idf {{{
+.DollarNames.Idf <- function(x, pattern = "") {
+    grep(pattern, c(x$class_name(), names(x)), value = TRUE)
+}
+# }}}
+
+#' @export
 # $.Idf {{{
 `$.Idf` <- function (x, i) {
     if (i %chin% ls(x)) return(NextMethod())

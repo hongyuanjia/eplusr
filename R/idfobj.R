@@ -1955,6 +1955,16 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 # }}}
 
 #' @export
+# .DollarNames.IdfObject {{{
+.DollarNames.IdfObject <- function(x, pattern = "") {
+    private <- get_priv_env(x)
+    fld_id <- private$idf_env()$value[J(private$m_object_id), on = "object_id", field_id]
+    fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
+    grep(pattern, c(fld_nm, names(x)), value = TRUE)
+}
+# }}}
+
+#' @export
 # $.IdfObject {{{
 '$.IdfObject' <- function (x, name) {
     if (name %chin% ls(x)) return(NextMethod())

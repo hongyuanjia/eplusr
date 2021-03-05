@@ -610,21 +610,9 @@ test_that("idf_object()", {
 })
 # }}}
 
-# ACTIVE BINDING {{{
-test_that("add_idfobj_field_bindings()", {
+# AUTOCOMPLETE {{{
+test_that(".DollarNames.Idf", {
     expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-
-    expect_is(ver <- with_option(list(autocomplete = FALSE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
-    expect_false("Version Identifier" %in% ls(ver))
-
-    expect_is(ver <- with_option(list(autocomplete = TRUE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
-    expect_true("Version Identifier" %in% ls(ver))
-
-    expect_is(mat <- with_option(list(autocomplete = TRUE), add_idfobj_field_bindings(IdfObject$new(1, parent = idf))), "IdfObject")
-    expect_true(all(mat$definition()$field_name() %in% ls(mat)))
-    expect_silent(mat$Visible_Absorptance <- NULL)
-    expect_silent(mat <- add_idfobj_field_bindings(mat, update = TRUE))
-    expect_equal(length(mat$value()), 8)
-    expect_false("Visual Absorptance" %in% ls(mat))
+    expect_equal(.DollarNames.Idf(idf, "Ma"), "Material")
 })
 # }}}
