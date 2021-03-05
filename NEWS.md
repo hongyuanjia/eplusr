@@ -4,6 +4,10 @@
 
 * Compatible changes for [units](https://github.com/r-quantities/units) v0.7-0
   (#410).
+* Autocompletion is enabled by registering a S3 `.DollarNames` method. Option
+  `autocomplete` is deprecated. A warning is issued if you try to set it in
+  `eplusr_option()`. Also, `with_speed()` is deprecated and falls back to
+  `without_checking()` when called. (#417).
 
 # eplusr 0.14.0
 
