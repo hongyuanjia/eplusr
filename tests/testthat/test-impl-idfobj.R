@@ -1,5 +1,3 @@
-context("IdfObject Implementation")
-
 use_idd(8.8, "auto")
 
 # VALUE {{{

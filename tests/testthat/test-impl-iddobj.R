@@ -1,5 +1,3 @@
-context("IddObject Implementation")
-
 # IddObject {{{
 test_that("IddObject implementation", {
     expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))

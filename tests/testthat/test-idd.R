@@ -1,5 +1,3 @@
-context("Idd")
-
 eplusr_option(verbose_info = FALSE)
 
 # download_idd() {{{

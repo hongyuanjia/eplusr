@@ -1,5 +1,3 @@
-context("IDF Implementation")
-
 eplusr_option(validate_level = "final", verbose_info = FALSE)
 use_idd(8.8, "auto")
 

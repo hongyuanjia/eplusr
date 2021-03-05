@@ -1,10 +1,8 @@
-context("IdfObject")
-
 use_idd(8.8, "auto")
 
 # NEW {{{
 test_that("$new()", {
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
 
     expect_error(IdfObject$new(1))
     expect_error(IdfObject$new(1, class = "Material", parent = idf))

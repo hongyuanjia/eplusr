@@ -1,5 +1,3 @@
-context("IdfSchedule")
-
 eplusr_option(verbose_info = FALSE)
 
 # NEW {{{

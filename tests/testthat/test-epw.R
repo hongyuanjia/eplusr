@@ -1,5 +1,3 @@
-context("Epw Class")
-
 eplusr_option(verbose_info = FALSE)
 
 # IDD {{{

@@ -1,5 +1,3 @@
-context("Format methods")
-
 test_that("Formatting", {
     # only test on UTF-8 supported platform
     skip_if_not(cli::is_utf8_output())

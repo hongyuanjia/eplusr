@@ -1,5 +1,3 @@
-context("Validate")
-
 # VALIDTATE {{{
 test_that("Validate method", {
     idf <- read_idf(example(), use_idd(8.8, "auto"))

@@ -1,5 +1,3 @@
-context("Run simulation")
-
 test_that("clean_wd()", {
     expect_true(file.create(f <- tempfile()))
     expect_true({clean_wd(f); file.exists(f)})

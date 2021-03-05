@@ -1,12 +1,10 @@
-context("Idf class")
-
 eplusr_option(verbose_info = FALSE)
 use_idd(8.8, "auto")
 
 # NEW {{{
 test_that("$new()", {
     # can create new Idf object from string
-    expect_is(idf <- read_idf(text("idf", 8.8)), "Idf")
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
 
     priv <- get_priv_env(idf)
 

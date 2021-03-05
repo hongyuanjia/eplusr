@@ -1,5 +1,3 @@
-context("Reload")
-
 # Reload {{{
 test_that("Reload", {
     skip_on_cran()
