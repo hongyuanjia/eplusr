@@ -86,11 +86,11 @@ eplusr_option <- function (...) {
         return(.options[[nm]])
     }
 
-    if ("autocomplete" %chin% nm) {
+    ori_nm <- nm
+    if ("autocomplete" %chin% ori_nm) {
         warn("Option 'autocomplete' is deprecated. Autocompletion is enabled all the time.",
             "deprecated_option"
         )
-        ori_nm <- nm
         nm <- setdiff(nm, "autocomplete")
     }
 
@@ -146,7 +146,7 @@ eplusr_option <- function (...) {
 
     res <- as.list.environment(.options)[nm]
 
-    if (autocomplete) {
+    if ("autocomplete" %chin% ori_nm) {
         res$autocomplete <- TRUE
         res <- res[ori_nm]
     }
