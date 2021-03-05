@@ -94,7 +94,7 @@ eplusr_option <- function (...) {
         nm <- setdiff(nm, "autocomplete")
     }
 
-    assert_subset(nm, names(.options), FALSE, .var.name = "option")
+    assert_subset(nm, names(.options), .var.name = "option")
 
     choice_opt <- c("save_format")
     choice_list <- list(
@@ -229,9 +229,7 @@ without_checking <- function (expr) {
 #' @export
 # with_speed {{{
 with_speed <- function (expr) {
-    .Deprecated("without_checking", "eplusr",
-        "Now autocompletion is enable all the time no speed penalty.",
-    )
+    .Deprecated("without_checking", "eplusr")
     without_checking(expr)
 }
 # }}}
