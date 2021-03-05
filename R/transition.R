@@ -2958,10 +2958,13 @@ trans_funs$f920t930 <- function (idf) {
 
         map <- data.table(
             old = c(
+                "electricity",
                 "electric",
                 "elec",
                 "gas",
+                "naturalgas",
                 "natural gas",
+                "propane",
                 "propanegas",
                 "lpg",
                 "propane gas",
@@ -2978,8 +2981,11 @@ trans_funs$f920t930 <- function (idf) {
             new = c(
                 "Electricity",
                 "Electricity",
+                "Electricity",
                 "NaturalGas",
                 "NaturalGas",
+                "NaturalGas",
+                "Propane",
                 "Propane",
                 "Propane",
                 "Propane",
@@ -2996,7 +3002,7 @@ trans_funs$f920t930 <- function (idf) {
         )
 
         input[map, on = c("value" = "old"), value := i.new]
-        dt[input, on = "index", value := i.value]
+        dt[input, on = c("id", "index"), value := i.value]
     }
     # }}}
 

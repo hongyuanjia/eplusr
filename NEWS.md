@@ -1,5 +1,9 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Fixed wrong transition of `FuelFactors` from v9.2 to v9.3 (#420).
+
 # eplusr 0.14.1
 
 ## Minor changes
