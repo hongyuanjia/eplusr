@@ -144,6 +144,9 @@ WEATHER_DB <- parse_weather_geojson(download_geojson(), download_countrycode())
 
 REPORTVAR_RULES <- extract_reportvar_rules()
 
-OUTPUT_VARS <- source("extract_outputs.R")
+source(here::here("tools/extract_outputs.R"))
+# EnergyPlus sorce file directory
+eplus_src <- file.path(Sys.getenv("USERPROFILE"), "Dropbox/github_repo/EnergyPlus")
+OUTPUT_VARS <- extract_all_eplus_outputs(eplus_src)
 
 usethis::use_data(WEATHER_DB, REPORTVAR_RULES, OUTPUT_VARS, internal = TRUE, overwrite = TRUE, compress = "xz")
