@@ -11,6 +11,14 @@ get_tex_paths <- function (dir_src) {
 }
 # }}}
 
+# comment_out_lines {{{
+comment_out_lines <- function(path, lines) {
+    l <- readLines(path, warn = FALSE)
+    l[lines] <- paste("%", l[lines])
+    writeLines(l, path)
+}
+# }}}
+
 # get_md_paths {{{
 # get paths of Markdown files converted from TeX files using Pandoc
 get_md_paths <- function (dir_src, dir = tempdir()) {
@@ -29,13 +37,35 @@ convert_to_md <- function(path, dir = tempdir()) {
     md <- sprintf("%s.markdown", tools::file_path_sans_ext(file))
 
     # use pandoc to convert EnergyPlus raw doc in tex to markdown
-    tryCatch(rmarkdown::pandoc_convert(file, "markdown", output = md, options = "--wrap=none", verbose = TRUE),
-        error = function (e) {
-            stop(sprintf("Failed to convert '%s' to Markdown:\n %s",
-                path, conditionMessage(e)
-            ))
+    status <- -1L
+    while (status != 1L) {
+        # use system() in order to capture the error message
+        log <- suppressWarnings(system(sprintf("pandoc -f latex -t markdown %s -o %s --wrap=preserve",
+            shQuote(file), shQuote(md)), intern = TRUE
+        ))
+
+        status <- attr(log, "status")
+
+        if (!length(status)) break
+
+        if (status != 1L) {
+            # try to comment out invalid LaTeX lines in the source file
+            invld <- stringi::stri_match_first_regex(log, '^Error at "source" \\(line (\\d+), column \\d+\\)')[, 2L]
+            invld <- invld[!is.na(invld)]
+
+            if (length(invld)) {
+                invld <- as.integer(invld)
+                # comment out invald lines
+                comment_out_lines(file, invld)
+            # unknown error
+            } else {
+                stop(sprintf("Failed to convert '%s' to Markdown:\n %s",
+                    path, paste0(log, collapse = "\n")
+                ))
+            }
         }
-    )
+    }
+
     md
 }
 # }}}
