@@ -29,7 +29,7 @@ download_countrycode <- function () {
     )
 
     path <- normalizePath(file.path(tempdir(), "country_codes.csv"), mustWork = FALSE)
-    fwrite(codes, path)
+    data.table::fwrite(codes, path)
     path
 }
 # }}}
@@ -84,7 +84,7 @@ parse_weather_geojson <- function (path_json, path_codes) {
     m <- m[, list(title, location, state_province, country, wmo_region, wmo_number,
         source_type, longitude, latitude, epw_url, ddy_url)]
 
-    fwrite(m, file.path(tempdir(), "weather_db.csv"))
+    data.table::fwrite(m, file.path(tempdir(), "weather_db.csv"))
     m
 }
 # }}}
@@ -93,7 +93,7 @@ parse_weather_geojson <- function (path_json, path_codes) {
 # extract report variable transition rules from latested IDFVersionUpdater
 # folder
 extract_reportvar_rules <- function () {
-    dir <- file.path(eplus_config(max(avail_eplus()))$dir, "PreProcess/IDFVersionUpdater")
+    dir <- file.path(eplusr::eplus_config(max(eplusr::avail_eplus()))$dir, "PreProcess/IDFVersionUpdater")
 
     re <- "Report Variables (\\d-\\d)-\\d(?:-\\d+){0,1} to (\\d-\\d)-\\d(?:-\\d+){0,1}"
     paths <- list.files(dir, re, full.names = TRUE)
@@ -103,8 +103,8 @@ extract_reportvar_rules <- function () {
 
     # store meta data
     report_vars <- data.table::data.table(path = paths,
-        from = as.double(as.character(standardize_ver(m[, 2L])[, 1L:2L])),
-        to = as.double(as.character(standardize_ver(m[, 3L])[, 1L:2L]))
+        from = as.double(as.character(eplusr:::standardize_ver(m[, 2L])[, 1L:2L])),
+        to = as.double(as.character(eplusr:::standardize_ver(m[, 3L])[, 1L:2L]))
     )
 
     # read tables
@@ -113,7 +113,7 @@ extract_reportvar_rules <- function () {
     )]
 
     # add version info and comine into one
-    report_vars <- rbindlist(mapply(
+    report_vars <- data.table::rbindlist(mapply(
         function (from, to, dt) {
             # add from and to
             dt <- data.table::set(data.table::copy(dt), NULL, c("from", "to"), list(from, to))
@@ -131,7 +131,7 @@ extract_reportvar_rules <- function () {
     # change empty special comments to NA
     report_vars[stringi::stri_isempty(stringi::stri_trim_both(special)), special := NA_character_]
 
-    fwrite(report_vars, file.path(tempdir(), "report_vars.csv"))
+    data.table::fwrite(report_vars, file.path(tempdir(), "report_vars.csv"))
 
     # set index
     data.table::setindexv(report_vars, c("from", "to"))
