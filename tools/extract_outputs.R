@@ -240,7 +240,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         cls <- eplusr::use_idd(ver)$class_name(by_group = TRUE)[["Surface Construction Elements"]]
         cls <- grep("MaterialProperty:HeatAndMoistureTransfer:", cls, value = TRUE)
         post <- out[class_name == "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity", list(
-            group_name = group_name[[1]],
+            group_name = group_name[1],
             class_name = rep(cls, each = .N),
             output = rep(output, length(cls)),
             string = rep(string, length(cls))
@@ -267,7 +267,7 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Surface Output Variables \\(all heat transfer surfaces\\)")
         cls_ht <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|FenestrationSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door|GlazedDoor)($|:.+(?<!Adiabatic)$)")
-        post2 <- post2[, list(group_name = group_name[[1L]],
+        post2 <- post2[, list(group_name = group_name[1L],
             class_name = rep(cls_ht, each = .N),
             output = rep(output, length(cls_ht)),
             string = rep(string, length(cls_ht))
@@ -279,7 +279,7 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Surface Output Variables \\(exterior heat transfer surfaces\\)")
         cls_ext <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|FenestrationSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door|GlazedDoor)($|:.+(?<!(Adiabatic|Underground|Interzone|GroundContact))$)")
-        post3 <- post3[, list(group_name = group_name[[1L]],
+        post3 <- post3[, list(group_name = group_name[1L],
             class_name = rep(cls_ext, each = .N),
             output = rep(output, length(cls_ext)),
             string = rep(string, length(cls_ext))
@@ -290,7 +290,7 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Opaque Surface Output Variables")
         cls_opa <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door)($|:.+(?<!Adiabatic)$)")
-        post4 <- post4[, list(group_name = group_name[[1L]],
+        post4 <- post4[, list(group_name = group_name[1L],
             class_name = rep(cls_opa, each = .N),
             output = rep(output, length(cls_opa)),
             string = rep(string, length(cls_opa))
@@ -300,7 +300,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         post5 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Window Output Variables")
         cls_win <- stringi::stri_subset_regex(cls, "^(Window|GlazedDoor)($|:.+$)")
-        post5 <- post5[, list(group_name = group_name[[1L]],
+        post5 <- post5[, list(group_name = group_name[1L],
             class_name = rep(cls_win, each = .N),
             output = rep(output, length(cls_win)),
             string = rep(string, length(cls_win))
@@ -310,7 +310,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # WindowMaterial:GlazingGroup:Thermochromic
         post6 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Thermochromic Window Outputs")[!J("Switchable Window Outputs"), on = "output"]
-        post6 <- post6[, list(group_name = group_name[[1L]],
+        post6 <- post6[, list(group_name = group_name[1L],
             class_name = rep(cls_win, .N),
             output = rep(output, length(cls_win)),
             string = rep(string, length(cls_win))
@@ -535,3 +535,22 @@ post_process_outputs <- function(file, doc, out, ver) {
     out
 }
 # }}}
+
+# EnergyPlus sorce file directory
+eplus_src <- file.path(Sys.getenv("USERPROFILE"), "Dropbox/github_repo/EnergyPlus")
+
+# get all possible released tags
+# LaTeX doc was added since v8.5.0
+eplus_ver <- numeric_version(eplusr:::ALL_EPLUS_VER)
+eplus_ver <- paste0("v", eplus_ver[eplus_ver >= 8.5])
+tags <- git2r::tags(eplus_src)
+tags <- names(tags[names(tags) %in% eplus_ver])
+
+outputs <- vector("list", length(tags))
+for (tag in tags) {
+    git2r::checkout(eplus_src, tag)
+    unlink("doc_md", recursive = TRUE, force = TRUE)
+    paths <- get_md_paths(eplus_src, "doc_md")
+    outputs[[tag]] <- data.table::rbindlist(lapply(paths, extract_outputs, ver = substring(tag, 2)))
+    unlink("doc_md", recursive = TRUE, force = TRUE)
+}
