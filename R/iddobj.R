@@ -1329,7 +1329,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' Also, some outputs are only available if certain fields
         #' are set. Even they are listed in the results, it does not mean that
         #' the [Idf] can report all of them.
-        #' It is strongly suggested to check the [rdd] and [mdd] file for
+        #' It is strongly suggested to check the RDD and MDD file for
         #' correctness.
         #'
         #' @return A [data.table][data.table::data.table()] with 6 columns.

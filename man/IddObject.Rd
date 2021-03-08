@@ -42,7 +42,7 @@ extracting the output variables.
 Also, some outputs are only available if certain fields
 are set. Even they are listed in the results, it does not mean that
 the \link{Idf} can report all of them.
-It is strongly suggested to check the \link{rdd} and \link{mdd} file for
+It is strongly suggested to check the RDD and MDD file for
 correctness.
 }
 \examples{
