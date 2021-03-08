@@ -144,4 +144,11 @@ WEATHER_DB <- parse_weather_geojson(download_geojson(), download_countrycode())
 
 REPORTVAR_RULES <- extract_reportvar_rules()
 
-usethis::use_data(WEATHER_DB, REPORTVAR_RULES, internal = TRUE, overwrite = TRUE, compress = "xz")
+source("extract_outputs.R")
+# EnergyPlus sorce directory
+dir_src <- file.path(Sys.getenv("USERPROFILE"), "Dropbox/github_repo/EnergyPlus")
+paths <- get_md_paths(dir_src, "doc_md")
+OUTPUT_VARS <- data.table::rbindlist(lapply(paths, extract_outputs))
+unlink("doc_md", recursive = TRUE)
+
+usethis::use_data(WEATHER_DB, REPORTVAR_RULES, OUTPUT_VARS, internal = TRUE, overwrite = TRUE, compress = "xz")
