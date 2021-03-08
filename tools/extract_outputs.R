@@ -128,7 +128,7 @@ extract_outputs <- function (path, ver = 9.4) {
     data.table::set(out, NULL, "index", seq_len(nrow(out)))
 
     # split variable name and unit
-    out <- out[, c("timestep", "type", "name", "unit") := {
+    out <- out[, c("reported_time_step", "report_type", "variable", "units") := {
         m1 <- stringi::stri_match_first_regex(string, "(\\S+?)\\s*,\\s*(.+?)\\s*,")
 
         m2 <- stringi::stri_match_first_regex(output, "(.+?)\\s*\\\\\\[(.*)\\\\\\]")
@@ -140,17 +140,18 @@ extract_outputs <- function (path, ver = 9.4) {
     }]
 
     # make sure bullet points are kept since they have the information about
-    # output timestep
-    data.table::setorderv(out, c("timestep", "type"), na.last = TRUE)
+    # output reported_time_step
+    data.table::setorderv(out, c("reported_time_step", "report_type"), na.last = TRUE)
 
-    cols <- c("timestep", "type", "unit", "name")
+    cols <- c("reported_time_step", "report_type", "units", "variable")
     out[, c(cols) := lapply(.SD, stringi::stri_trim_both), .SDcols = cols]
-    out <- unique(out, by = c("class_name", "name"))
+    out <- unique(out, by = c("class_name", "variable"))
 
     data.table::setorderv(out, "index")
 
     # clean
-    data.table::set(out, NULL, c("string", "index", "output"), NULL)
+    data.table::set(out, NULL, c("string", "index", "output", "group_name"), NULL)
+    data.table::setcolorder(out, c("reported_time_step", "report_type", "variable", "units"))
 }
 # }}}
 
@@ -561,23 +562,35 @@ post_process_outputs <- function(file, doc, out, ver) {
 }
 # }}}
 
-# EnergyPlus sorce file directory
-eplus_src <- file.path(Sys.getenv("USERPROFILE"), "Dropbox/github_repo/EnergyPlus")
+# extract_all_eplus_outputs {{{
+extract_all_eplus_outputs <- function (eplus_src) {
+    # get all possible released tags
+    tags <- git2r::tags(eplus_src)
 
-# get all possible released tags
-# LaTeX doc was added since v8.5.0
-eplus_ver <- numeric_version(eplusr:::ALL_EPLUS_VER)
-eplus_ver <- paste0("v", eplus_ver[eplus_ver >= 8.5])
-tags <- git2r::tags(eplus_src)
-tags <- names(tags[names(tags) %in% eplus_ver])
+    # LaTeX doc was added since v8.5.0
+    eplus_ver <- numeric_version(eplusr:::ALL_EPLUS_VER)
+    eplus_ver <- paste0("v", eplus_ver[eplus_ver >= 8.5])
+    tags <- names(tags[names(tags) %in% eplus_ver])
 
-outputs <- vector("list", length(tags))
+    outputs <- list()
 
-for (tag in tags) {
-    cat("Extracting output variables from EnergyPlus", tag, "\n")
-    git2r::checkout(eplus_src, tag)
-    unlink("doc_md", recursive = TRUE, force = TRUE)
-    paths <- get_md_paths(eplus_src, "doc_md", ver = substring(tag, 2))
-    outputs[[tag]] <- data.table::rbindlist(lapply(paths, extract_outputs, ver = substring(tag, 2)))
-    unlink("doc_md", recursive = TRUE, force = TRUE)
+    for (tag in tags) {
+        cat("Extracting output variables from EnergyPlus", tag, "\n")
+
+        git2r::checkout(eplus_src, tag)
+
+        unlink("doc_md", recursive = TRUE, force = TRUE)
+
+        paths <- get_md_paths(eplus_src, "doc_md", ver = substring(tag, 2))
+        outputs[[tag]] <- data.table::rbindlist(lapply(paths, extract_outputs, ver = substring(tag, 2)))
+
+        unlink("doc_md", recursive = TRUE, force = TRUE)
+    }
+
+    git2r::checkout(eplus_src, "develop")
+
+    names(outputs) <- substring(names(outputs), 2)
+
+    outputs
 }
+# }}}
