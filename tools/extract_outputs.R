@@ -21,16 +21,16 @@ comment_out_lines <- function(path, lines) {
 
 # get_md_paths {{{
 # get paths of Markdown files converted from TeX files using Pandoc
-get_md_paths <- function (dir_src, dir = tempdir()) {
+get_md_paths <- function (dir_src, dir = tempdir(), ver = 9.4) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     paths <- get_tex_paths(dir_src)
-    vapply(paths, convert_to_md, character(1), dir = dir)
+    vapply(paths, convert_to_md, character(1), dir = dir, ver = ver)
 }
 # }}}
 
 # convert_to_md {{{
 # Convert TeX to Markdown using Pandoc
-convert_to_md <- function(path, dir = tempdir()) {
+convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
     stopifnot(file.copy(path, dir, overwrite = TRUE))
 
     file <- normalizePath(file.path(dir, basename(path)), mustWork = FALSE)
@@ -55,8 +55,20 @@ convert_to_md <- function(path, dir = tempdir()) {
 
             if (length(invld)) {
                 invld <- as.integer(invld)
-                # comment out invald lines
-                comment_out_lines(file, invld)
+
+                # NOTE: there is a LaTeX error in one \paragraph in
+                # "group-exterior-energy-use-equipment.tex" in EnergyPlus v9.0.0
+                # have to fix it manually
+                if (numeric_version(ver) >= 9.0 && numeric_version(ver) < 9.1 &&
+                    basename(file) == "group-exterior-energy-use-equipment.tex") {
+                    l <- readLines(file, warn = FALSE)
+                    l[185] <- gsub(")", "}", l[185], fixed = TRUE)
+                    writeLines(l, file)
+                } else {
+                    # comment out invald lines
+                    comment_out_lines(file, invld)
+                }
+                cat(sprintf(" --> Attempting to fix LaTeX error in file '%s'...\n", file))
             # unknown error
             } else {
                 stop(sprintf("Failed to convert '%s' to Markdown:\n %s",
@@ -95,7 +107,7 @@ get_md_h_levels <- function(doc) {
 # extract_outputs {{{
 # extract all output variables from Markdown file
 extract_outputs <- function (path, ver = 9.4) {
-    print(path)
+    cat(sprintf(" --> Processing file '%s'...\n", path))
     doc <- read_md_dt(path)[!J("rmd_yaml"), on = "type"]
     data.table::set(doc, NULL, "label", NULL)
 
@@ -240,7 +252,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         cls <- eplusr::use_idd(ver)$class_name(by_group = TRUE)[["Surface Construction Elements"]]
         cls <- grep("MaterialProperty:HeatAndMoistureTransfer:", cls, value = TRUE)
         post <- out[class_name == "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity", list(
-            group_name = group_name[1],
+            group_name = rep(group_name, length(cls)),
             class_name = rep(cls, each = .N),
             output = rep(output, length(cls)),
             string = rep(string, length(cls))
@@ -267,7 +279,7 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Surface Output Variables \\(all heat transfer surfaces\\)")
         cls_ht <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|FenestrationSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door|GlazedDoor)($|:.+(?<!Adiabatic)$)")
-        post2 <- post2[, list(group_name = group_name[1L],
+        post2 <- post2[, list(group_name = rep(group_name, length(cls_ht)),
             class_name = rep(cls_ht, each = .N),
             output = rep(output, length(cls_ht)),
             string = rep(string, length(cls_ht))
@@ -279,7 +291,8 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Surface Output Variables \\(exterior heat transfer surfaces\\)")
         cls_ext <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|FenestrationSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door|GlazedDoor)($|:.+(?<!(Adiabatic|Underground|Interzone|GroundContact))$)")
-        post3 <- post3[, list(group_name = group_name[1L],
+        post3 <- post3[, list(
+            group_name = rep(group_name, length(cls_ext)),
             class_name = rep(cls_ext, each = .N),
             output = rep(output, length(cls_ext)),
             string = rep(string, length(cls_ext))
@@ -290,7 +303,8 @@ post_process_outputs <- function(file, doc, out, ver) {
             "Opaque Surface Output Variables")
         cls_opa <- stringi::stri_subset_regex(cls,
             "^(BuildingSurface|Wall|RoofCeiling|Ceiling|Floor|Window|Door)($|:.+(?<!Adiabatic)$)")
-        post4 <- post4[, list(group_name = group_name[1L],
+        post4 <- post4[, list(
+            group_name = rep(group_name, length(cls_opa)),
             class_name = rep(cls_opa, each = .N),
             output = rep(output, length(cls_opa)),
             string = rep(string, length(cls_opa))
@@ -300,7 +314,8 @@ post_process_outputs <- function(file, doc, out, ver) {
         post5 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Window Output Variables")
         cls_win <- stringi::stri_subset_regex(cls, "^(Window|GlazedDoor)($|:.+$)")
-        post5 <- post5[, list(group_name = group_name[1L],
+        post5 <- post5[, list(
+            group_name = rep(group_name, length(cls_win)),
             class_name = rep(cls_win, each = .N),
             output = rep(output, length(cls_win)),
             string = rep(string, length(cls_win))
@@ -310,7 +325,8 @@ post_process_outputs <- function(file, doc, out, ver) {
         # WindowMaterial:GlazingGroup:Thermochromic
         post6 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Thermochromic Window Outputs")[!J("Switchable Window Outputs"), on = "output"]
-        post6 <- post6[, list(group_name = group_name[1L],
+        post6 <- post6[, list(
+            group_name = rep(group_name, length(cls_win)),
             class_name = rep(cls_win, .N),
             output = rep(output, length(cls_win)),
             string = rep(string, length(cls_win))
@@ -330,22 +346,30 @@ post_process_outputs <- function(file, doc, out, ver) {
         # Outputs for ElectricEquipment:ITE:AirCooled are placed after
         # "### Field: Return Temperature Difference Schedule"
         d <- doc[sec_h2 == "ElectricEquipment:ITE:AirCooled" & type == "rmd_heading" & !is.na(sec_h3)]
-        post1 <- data.table::data.table(
-            group_name = out$group_name[1],
-            class_name = "ElectricEquipment:ITE:AirCooled",
-            output = d[(max(grep("^Field:", sec_h4)) + 1L):.N, sec_h4]
-        )
-        post1[, string := output]
+        if (!nrow(d)) {
+            post1 <- out[0]
+        } else {
+            post1 <- data.table::data.table(
+                group_name = out$group_name[1],
+                class_name = "ElectricEquipment:ITE:AirCooled",
+                output = d[(max(grep("^Field:", sec_h4)) + 1L):.N, sec_h4]
+            )
+            post1[, string := output]
+        }
         d <- doc[sec_h2 == "ElectricEquipment:ITE:AirCooled" & type == "rmd_markdown" & !is.na(sec_h3)]
-        s <- d[max(grep("^Field:", sec_h4)), ast[[1]]]
-        output <- stringi::stri_match_first_regex(s, "^(?:(?:\\s*-\\s{1,})|\\s{4}).+?,.+?,(.+)")[, 2L]
-        string <- output
-        string[!is.na(output)] <- s[!is.na(output)]
-        post2 <- data.table::data.table(
-            group_name = out$group_name[1],
-            class_name = "ElectricEquipment:ITE:AirCooled",
-            output = output, string = string
-        )[!is.na(output)]
+        if (!nrow(d)) {
+            post2 <- out[0]
+        } else {
+            s <- d[max(grep("^Field:", sec_h4)), ast[[1]]]
+            output <- stringi::stri_match_first_regex(s, "^(?:(?:\\s*-\\s{1,})|\\s{4}).+?,.+?,(.+)")[, 2L]
+            string <- output
+            string[!is.na(output)] <- s[!is.na(output)]
+            post2 <- data.table::data.table(
+                group_name = out$group_name[1],
+                class_name = "ElectricEquipment:ITE:AirCooled",
+                output = output, string = string
+            )[!is.na(output)]
+        }
 
         out <- data.table::rbindlist(list(out, post1, post2))
     }
@@ -372,7 +396,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # ZoneInfiltration:*
         cls_infil <- grep("ZoneInfiltration:", cls, value = TRUE)
         post1 <- out[class_name == "ZoneInfiltration:FlowCoefficient",
-            list(group_name = group_name[1],
+            list(group_name = rep(group_name, length(cls_infil)),
                  class_name = rep(cls_infil, each = .N),
                  output = rep(output, length(cls_infil)),
                  string = rep(string, length(cls_infil))
@@ -384,7 +408,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # ZoneVentilation:*
         cls_vent <- grep("ZoneVentilation:", cls, value = TRUE)
         post2 <- out[class_name == "ZoneVentilation:WindandStackOpenArea",
-            list(group_name = group_name[1],
+            list(group_name = rep(group_name, length(cls_infil)),
                  class_name = rep(cls_infil, each = .N),
                  output = rep(output, length(cls_infil)),
                  string = rep(string, length(cls_infil))
@@ -434,7 +458,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # * Refrigeration:Walkin
         post1 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Refrigeration Case and WalkIn Outputs")[, list(
-            group_name = group_name[1L],
+            group_name = rep(group_name, 2L),
             class_name = rep(c("Refrigeration:Case", "Refrigeration:Walkin"), each = .N),
             output = rep(output, 2L), string = rep(string, 2L)
         )]
@@ -444,7 +468,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # * Refrigeration:Walkin
         post2 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Additional Refrigeration Outputs for Each Zone")[, list(
-            group_name = group_name[1L],
+            group_name = rep(group_name, 2L),
             class_name = rep(c("Refrigeration:Case", "Refrigeration:Walkin"), each = .N),
             output = rep(output, 2L), string = rep(string, 2L)
         )]
@@ -460,7 +484,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         # * Coil:Heating:Steam
         post1 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Heating Coil \\(Steam\\) Outputs:")[!grepl("Steam", output),
-            list(group_name = group_name[1L], class_name = "Coil:Heating:Water", output, string)
+            list(group_name, class_name = "Coil:Heating:Water", output, string)
         ]
 
         # Outputs under Coil:Cooling:DX:MultiSpeed apply to all cooling coil
@@ -480,7 +504,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         post4[, class_name := "Coil:Cooling:DX:MultiSpeed"]
 
         post2 <- post2[, list(
-            group_name = group_name[1L],
+            group_name = rep(group_name, length(cls_clgdx)),
             class_name = rep(cls_clgdx, each = .N),
             output = rep(output, length(cls_clgdx)),
             string = rep(string, length(cls_clgdx))
@@ -498,7 +522,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         cls_dx <- grep("DX:(Single|Two|Multi)Speed$", cls, value = TRUE)
         post6 <- extract_outputs_from_heading_level(doc, 2, parent = FALSE,
             "Secondary DX Coil Output")[,
-            list(group_name = group_name[1L],
+            list(group_name = rep(group_name, length(cls_dx)),
                  class_name = rep(cls_dx, each = .N),
                  output = rep(output, length(cls_dx)),
                  string = rep(string, length(cls_dx)))
@@ -506,10 +530,11 @@ post_process_outputs <- function(file, doc, out, ver) {
 
         # Coil:Cooling:DX:CurveFit:Speed applies to Coil:Cooling:DX:CurveFix:*
         cls_dxcurve <- grep("Cooling:DX:CurveFit", cls, value = TRUE)
-        post7 <- out[, list(group_name = group_name[1L],
-                 class_name = rep(cls_dxcurve, each = .N),
-                 output = rep(output, length(cls_dxcurve)),
-                 string = rep(string, length(cls_dxcurve)))
+        post7 <- out[, list(
+            group_name = rep(group_name, length(cls_dxcurve)),
+            class_name = rep(cls_dxcurve, each = .N),
+            output = rep(output, length(cls_dxcurve)),
+            string = rep(string, length(cls_dxcurve)))
         ]
         out <- out[class_name != "Coil:Cooling:DX:CurveFit:Speed"]
 
@@ -547,10 +572,12 @@ tags <- git2r::tags(eplus_src)
 tags <- names(tags[names(tags) %in% eplus_ver])
 
 outputs <- vector("list", length(tags))
+
 for (tag in tags) {
+    cat("Extracting output variables from EnergyPlus", tag, "\n")
     git2r::checkout(eplus_src, tag)
     unlink("doc_md", recursive = TRUE, force = TRUE)
-    paths <- get_md_paths(eplus_src, "doc_md")
+    paths <- get_md_paths(eplus_src, "doc_md", ver = substring(tag, 2))
     outputs[[tag]] <- data.table::rbindlist(lapply(paths, extract_outputs, ver = substring(tag, 2)))
     unlink("doc_md", recursive = TRUE, force = TRUE)
 }
