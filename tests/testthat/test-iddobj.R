@@ -259,11 +259,10 @@ test_that("IddObject class", {
     # }}}
 
     # Outputs {{{
-    idd <- use_idd(8.8, "auto")
-    expect_equal(nrow(res <- idd$Lights$outputs()), 25L)
+    expect_equal(nrow(res <- use_idd(8.8, "auto")$Lights$outputs()), 25L)
     expect_equal(names(res), c("index", "class", "reported_time_step",
         "report_type", "variable", "units"))
-    expect_equivalent(idd$Version$outputs(),
+    expect_equivalent(use_idd(8.8, "auto")$Version$outputs(),
         data.table(index = integer(),
             class = character(),
             reported_time_step = character(),
