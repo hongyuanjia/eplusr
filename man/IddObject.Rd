@@ -2413,9 +2413,10 @@ Get possible output variables for current class
 \subsection{Details}{
 \verb{$outputs()} returns a \link[data.table:data.table]{data.table} that
 gives all possible outputs for current class.
-The returned \link[data.table:data.table]{data.table} has 5 columns:
+The returned \link[data.table:data.table]{data.table} has 6 columns:
 
 *\code{index}: Integer. Index of each variable.
+*\code{class}: Character. Name of current class.
 \itemize{
 \item \code{reported_time_step}: Character. Reported time step for the variables.
 Possible value: \code{Zone} and \code{HVAC}.
@@ -2428,7 +2429,7 @@ have units.
 }
 
 \subsection{Returns}{
-A \link[data.table:data.table]{data.table} with 5 columns.
+A \link[data.table:data.table]{data.table} with 6 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
