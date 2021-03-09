@@ -258,6 +258,28 @@ test_that("IddObject class", {
     expect_equal(as.character(slash), slash$to_string())
     # }}}
 
+    # Outputs {{{
+    expect_equal(nrow(res <- use_idd(8.8, "auto")$Lights$outputs()), 25L)
+    expect_equal(names(res), c("index", "class", "reported_time_step",
+        "report_type", "variable", "units"))
+    expect_equivalent(use_idd(8.8, "auto")$Version$outputs(),
+        data.table(index = integer(),
+            class = character(),
+            reported_time_step = character(),
+            report_type = character(), variable = character(),
+            units = character()
+        )
+    )
+    expect_equivalent(idd$TestSlash$outputs(),
+        data.table(index = integer(),
+            class = character(),
+            reported_time_step = character(),
+            report_type = character(), variable = character(),
+            units = character()
+        )
+    )
+    # }}}
+
     # can check equality
     expect_true(slash == slash)
     expect_false(slash == "a")

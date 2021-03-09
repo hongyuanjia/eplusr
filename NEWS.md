@@ -1,5 +1,22 @@
 # eplusr (development version)
 
+## New features
+
+* `IddObject$output()` is added to extract all possible outputs of current
+  class. All outputs are extracted from the LaTeX source file of "Input
+  Output Reference" for EnergyPlus v9.5.0 and later. So empty result will
+  always be returned for `Idd` version lower than v9.5. It is possible that
+  there are some mistakes introduced when extracting the output variables.
+  Also, some outputs are only available if certain fields are set. Even they
+  are listed in the results, it does not mean that the `Idf` can report all
+  of them. It is strongly suggested to check the RDD and MDD file for
+  correctness (#427). Example:
+
+  ```r
+  idd <- use_idd(8.8)
+  idd$Lights$outputs()
+  ```
+
 ## Break changes
 
 * Autocompletion is enabled by registering a S3 `.DollarNames` method. Option
