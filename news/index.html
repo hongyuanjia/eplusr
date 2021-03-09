@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9004</span>
       </span>
     </div>
 
@@ -184,6 +184,19 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#eplusr-development-version" class="anchor"></a>eplusr (development version)<small> Unreleased </small>
 </h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li>
+<p><code>IddObject$output()</code> is added to extract all possible outputs of current class. All outputs are extracted from the LaTeX source file of “Input Output Reference” for EnergyPlus v9.5.0 and later. So empty result will always be returned for <code>Idd</code> version lower than v9.5. It is possible that there are some mistakes introduced when extracting the output variables. Also, some outputs are only available if certain fields are set. Even they are listed in the results, it does not mean that the <code>Idf</code> can report all of them. It is strongly suggested to check the RDD and MDD file for correctness (<a href='https://github.com/hongyuanjia/eplusr/issues/427'>#427</a>). Example:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
+<span class="va">idd</span><span class="op">$</span><span class="va">Lights</span><span class="op">$</span><span class="fu">outputs</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+</li>
+</ul>
+</div>
 <div id="break-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#break-changes" class="anchor"></a>Break changes</h2>
@@ -222,9 +235,9 @@
 <h1 class="page-header" data-toc-text="0.14.0">
 <a href="#eplusr-0140" class="anchor"></a>eplusr 0.14.0<small> 2021-01-07 </small>
 </h1>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>New features</h2>
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <code>Epw$save()</code> gets a new option <code>format_digit</code>. If <code>TRUE</code>, the trailing digits in EPW data will be formatted in the same way as Weather Converter (<a href='https://github.com/hongyuanjia/eplusr/issues/323'>#323</a>).</li>
@@ -292,13 +305,13 @@
 <h1 class="page-header" data-toc-text="0.13.0">
 <a href="#eplusr-0130" class="anchor"></a>eplusr 0.13.0<small> 2020-08-28 </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>New features</h2>
+<a href="#new-features-2" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <p><code>Idf$add()</code> and <code>Idf$set()</code> have new features:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># refer to field using '..'</span>
 <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Material <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="st">"mat"</span>, ..7 <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span>
@@ -311,7 +324,7 @@
 <li><p><code>Idf$to_table()</code> gains a new parameter <code>force</code>. The default value is <code>FALSE</code>. If <code>TRUE</code>, you can convert object data from any classes into a wide data.table. This may be useful when you know that target classes have the exact same fields, e.g. <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/202'>#202</a>).</p></li>
 <li>
 <p>A new method <code>Idf$purge()</code> has been added (<a href='https://github.com/hongyuanjia/eplusr/issues/223'>#223</a>). It can be used to delete any resource objects that are not referenced by other objects. Here resource objects indicate all objects that can be referenced by other objects, e.g. all schedules. <code>$purge()</code> will ignore any inputs that are not resources. If inputs contain objects from multiple classes, references among them are also taken into account, which means purging is performed hierarchically. If both materials and constructions are specified, the latter will be purged first, because it is possible that input constructions reference input materials. <code>Idf$purge()</code> makes it quite straightforward to perform IDF cleaning. Actions like removing all materials, constructions and schedules can be easily achieved via</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">Idf</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></code></pre></div>
 </li>
@@ -357,7 +370,7 @@
 <li>
 <p>The algorithm of object/field/value relation extraction has been completed refactored. Now it can correctly detect object recursive-reference and it’s faster (<a href='https://github.com/hongyuanjia/eplusr/issues/222'>#222</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/223'>#223</a>).</p>
 <p>All relation-related methods now have an unified interface:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">X</span><span class="op">$</span><span class="fu">method</span><span class="op">(</span><span class="va">which</span>, <span class="va">direction</span>, object <span class="op">=</span> <span class="cn">NULL</span>, class <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
@@ -419,9 +432,9 @@
 <h1 class="page-header" data-toc-text="0.12.0">
 <a href="#eplusr-0120" class="anchor"></a>eplusr 0.12.0<small> 2020-02-20 </small>
 </h1>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>New features</h2>
+<a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
 <li>Now <code><a href="../reference/EplusGroupJob.html">group_job()</a></code> supports single IDF input with multiple EPW inputs (<a href='https://github.com/hongyuanjia/eplusr/issues/185'>#185</a>).</li>
 <li>A new method <code>Idf$last_job()</code> has been added to enable getting the last simulation job created using <code>Idf$run()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/187'>#187</a>).</li>
@@ -447,9 +460,9 @@
 <h1 class="page-header" data-toc-text="0.11.0">
 <a href="#eplusr-0110" class="anchor"></a>eplusr 0.11.0<small> 2020-01-20 </small>
 </h1>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>New features</h2>
+<a href="#new-features-4" class="anchor"></a>New features</h2>
 <ul>
 <li><p>A new method <code>$models()</code> has been added in <code>ParametricJob</code> class. It returns a list of all parametric models generated after a measure has been applied. If no measure is applied, <code>NULL</code> is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/59'>#59</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</p></li>
 <li><p>A new method <code>$save()</code> has been added in <code>ParametricJob</code> class. It saves all generated parametric models and weather file into specified directory. You can use <code>separate</code> argument to determine whether each model is to be saved in a separate folder (<a href='https://github.com/hongyuanjia/eplusr/issues/58'>#58</a>). Thanks <a href='https://github.com/yidan1214'>@yidan1214</a> for this feature request.</p></li>
@@ -479,7 +492,7 @@
 <li><p>Now required objects and unique objects can be deleted in <code>$del()</code> when <code>.force</code> is set to <code>TRUE</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/149'>#149</a>).</p></li>
 <li>
 <p>Now for Windows and Linux, <code><a href="../reference/install_eplus.html">install_eplus()</a></code> supports to install EnergyPlus to your home directory or your customized directory without requiring administrator privileges (<a href='https://github.com/hongyuanjia/eplusr/issues/167'>#167</a>).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># install to your home directory</span>
 <span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
@@ -544,9 +557,9 @@
 <h1 class="page-header" data-toc-text="0.10.3">
 <a href="#eplusr-0103" class="anchor"></a>eplusr 0.10.3<small> 2019-07-08 </small>
 </h1>
-<div id="new-features-4" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>New features</h2>
+<a href="#new-features-5" class="anchor"></a>New features</h2>
 <ul>
 <li>Now you can get autocompletion of class names of <code>Idd</code> and <code>Idf</code> objects, and field names of <code>IdfObject</code> class in RStudio.</li>
 <li>
@@ -781,27 +794,27 @@
 <h1 class="page-header" data-toc-text="0.9.4">
 <a href="#eplusr-094" class="anchor"></a>eplusr 0.9.4<small> 2018-12-05 </small>
 </h1>
-<div id="new-features-5" class="section level2">
+<div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-5" class="anchor"></a>New features</h2>
+<a href="#new-features-6" class="anchor"></a>New features</h2>
 <ul>
 <li>Now you can directly download EnergyPlus Weather File (.epw) and Design Day File (.ddy) using new function <code><a href="../reference/download_weather.html">download_weather()</a></code>. It takes a regular expression as input, searches through EnergyPlus weather data base (stored in this package), download corresponding files and return the saved paths. Below are some examples:
 <ul>
 <li>
 <p>Search locations that contains string <code>"los angeles"</code> and <code>"tmy"</code>, return a menu to select which one(s) to download. Once selected, download both corresponding weather file(s) and design day file(s):</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </li>
 <li>
 <p>Same as above, expect that all files will be renamed to <code>la.epw(ddy)</code>, <code>la_1.epw(ddy)</code>, <code>la_2.epw(ddy)</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, filename <span class="op">=</span> <span class="st">"la"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </li>
 <li>
 <p>Search locations that contains string <code>"beijing"</code> and <code>"cswd"</code>. If no more than 3 results found, directly download all weather files and save them to temporary directory.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"beijing.*cswd"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"epw"</span>, ask <span class="op">=</span> <span class="cn">FALSE</span>, max_match <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 </li>
@@ -830,9 +843,9 @@
 <h1 class="page-header" data-toc-text="0.9.3">
 <a href="#eplusr-093" class="anchor"></a>eplusr 0.9.3<small> 2018-10-11 </small>
 </h1>
-<div id="new-features-6" class="section level2">
+<div id="new-features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-6" class="anchor"></a>New features</h2>
+<a href="#new-features-7" class="anchor"></a>New features</h2>
 <ul>
 <li>Add support for EnergyPlus v9.0.0.</li>
 </ul>
@@ -864,9 +877,9 @@
 <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is called internally when running EnergyPlus models. This guarantees that the old output file from last simulation is cleaned up before the new simulation starts.</li>
 </ul>
 </div>
-<div id="new-features-7" class="section level2">
+<div id="new-features-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-7" class="anchor"></a>New features</h2>
+<a href="#new-features-8" class="anchor"></a>New features</h2>
 <ul>
 <li><p>A new class <code>EplusSql</code> has been added. This makes it possible to directly retrieve simulation results without creating an <code>EplusJob</code> object which can only get simulation outputs after the job was successfully run before. It can be easily created using <code><a href="../reference/eplus_sql.html">eplus_sql()</a></code> function. However, it should be noted that, unlike <code>EplusJob</code>, there is no checking on whether the simulation is terminated or completed unsuccessfully, or the parent Idf has been changed since last simulation. This means that you may encounter some problems when retrieve data from an unsuccessful simulation. It is suggested to carefully go through the <code>.err</code> file to make sure the output data in the SQLite is correct and reliable. Currently, there are only few methods in <code>EplusSql</code> class which have some overlaps with theses in <code>EplusJob</code>, but more methods may be added in the future. For more details, please see the documentation of <code>EplusSql</code>.</p></li>
 <li><p>A new method <code>$is_double_field()</code> is added to <code>IddObject</code> class to check if specified fields should be double numbers</p></li>
@@ -916,9 +929,9 @@
 <li><p>Both argument <code>echo</code> and <code>wait</code> have been added to <code><a href="../reference/run_idf.html">run_idf()</a></code> and <code><a href="../reference/run_idf.html">run_multi()</a></code>. Unlike the behavior in eplusr 0.8.3 when <code>echo</code> is <code>TRUE</code> in <code><a href="../reference/run_idf.html">run_idf()</a></code>, right now <code>echo</code> only control whether to show the output from EnergyPlus command line interface. Please use <code>wait</code> to control whether to wait until the simulation is complete or not.</p></li>
 </ul>
 </div>
-<div id="new-features-8" class="section level2">
+<div id="new-features-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-8" class="anchor"></a>New features</h2>
+<a href="#new-features-9" class="anchor"></a>New features</h2>
 <ul>
 <li><p>Package documentation has been heavily updated. Examples of every exported class and most functions have been added. Also, an example IDF file <code>"1ZoneUncontrolled.idf"</code> from EnergyPlus v8.8.0 is included in the package, which makes it possible to run most examples without installing EnergyPlus. Of cause, for examples in <code>EplusJob</code> and <code>ParametricJob</code> class, EnergyPlus installation is needed to run them successfully.</p></li>
 <li><p>The brilliant package <a href="https://CRAN.R-project.org/package=crayon">crayon</a> is used to support colorful printing of <code>Idd</code>, <code>Idf</code>, <code>IddObject</code>, <code>IdfObject</code>, <code>Epw</code>, <code>EplusJob</code> and <code>ParametricJob</code> classes.</p></li>
@@ -961,9 +974,9 @@
 <h1 class="page-header" data-toc-text="0.8.3">
 <a href="#eplusr-083" class="anchor"></a>eplusr 0.8.3<small> 2018-08-08 </small>
 </h1>
-<div id="new-features-9" class="section level2">
+<div id="new-features-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-9" class="anchor"></a>New features</h2>
+<a href="#new-features-10" class="anchor"></a>New features</h2>
 <ul>
 <li><p>A new method <code>$possible_value()</code> has been added into <code>IdfObject</code> class, which will return all possible values for selected fields, including auto-value (autosize or autocalculate), default, range, choices and references.</p></li>
 <li><p>New parameter <code>dir</code> has been added to <code><a href="../reference/install_eplus.html">install_eplus()</a></code>, which makes it possible for keeping the downloaded EnergyPlus installation file.</p></li>

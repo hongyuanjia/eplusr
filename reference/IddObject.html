@@ -101,7 +101,7 @@ object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9004</span>
       </span>
     </div>
 
@@ -217,6 +217,16 @@ standard way.</p>
 definition. However, for numeric fields with default values being
 <code>"autosize"</code> or <code>"autocalculate"</code>, the type of returned values will
 be character.</p>
+<p>All outputs are extracted from the LaTeX source file of "Input Output
+Reference" for EnergyPlus v9.5.0 and later. So empty result will
+always be returned for <a href='Idd.html'>Idd</a> version lower than v9.5.</p>
+<p>It is possible that there are some mistakes introduced when
+extracting the output variables.
+Also, some outputs are only available if certain fields
+are set. Even they are listed in the results, it does not mean that
+the <a href='Idf.html'>Idf</a> can report all of them.
+It is strongly suggested to check the RDD and MDD file for
+correctness.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='Idd.html'>Idd</a> Class</p></div>
@@ -272,6 +282,7 @@ be character.</p>
 <li><p><a href='#method-has_ref'><code>IddObject$has_ref()</code></a></p></li>
 <li><p><a href='#method-has_ref_to'><code>IddObject$has_ref_to()</code></a></p></li>
 <li><p><a href='#method-has_ref_by'><code>IddObject$has_ref_by()</code></a></p></li>
+<li><p><a href='#method-outputs'><code>IddObject$outputs()</code></a></p></li>
 <li><p><a href='#method-to_table'><code>IddObject$to_table()</code></a></p></li>
 <li><p><a href='#method-to_string'><code>IddObject$to_string()</code></a></p></li>
 <li><p><a href='#method-print'><code>IddObject$print()</code></a></p></li>
@@ -1508,6 +1519,36 @@ surf$has_ref_by(c("name", "zone name"))
 </pre><p></div></p>
 
 <p><hr>
+<a id="method-outputs"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>outputs()</code></h3>
+<p>Get possible output variables for current class</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>IddObject</span><span class='op'>$</span><span class='fu'>outputs</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
+<p><code>$outputs()</code> returns a <a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a> that
+gives all possible outputs for current class.
+The returned <a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a> has 6 columns:</p>
+<p>*<code>index</code>: Integer. Index of each variable.
+*<code>class</code>: Character. Name of current class.</p><ul>
+<li><p><code>reported_time_step</code>: Character. Reported time step for the variables.
+Possible value: <code>Zone</code> and <code>HVAC</code>.</p></li>
+<li><p><code>report_type</code>: Character. Report types. Possible value: <code>Average</code>,
+<code>Sum</code>.</p></li>
+<li><p><code>variable</code>: Character. Report variable names.</p></li>
+<li><p><code>units</code>: Character. Units of reported values. <code>NA</code> if report values do not
+have units.</p></li>
+</ul>
+
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p>A <a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a> with 6 columns.</p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
+<p><div class="r example copy"></p><pre>\dontrun{
+surf$outputs()
+}
+
+</pre><p></div></p>
+
+<p><hr>
 <a id="method-to_table"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>to_table()</code></h3>
 <p>Format an <code>IddObject</code> as a data.frame</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
 <p><div class="r"></p><pre><span class='va'>IddObject</span><span class='op'>$</span><span class='fu'>to_table</span><span class='op'>(</span>all <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre><p></div></p>
@@ -2094,6 +2135,15 @@ surf$print(brief = TRUE)
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>has_ref_by</span><span class='op'>(</span><span class='op'>)</span>
 
 <span class='va'>surf</span><span class='op'>$</span><span class='fu'>has_ref_by</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"name"</span>, <span class='st'>"zone name"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+
+<span class='co'>## ------------------------------------------------</span>
+<span class='co'>## Method `IddObject$outputs`</span>
+<span class='co'>## ------------------------------------------------</span>
+
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>surf</span><span class='op'>$</span><span class='fu'>outputs</span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 
