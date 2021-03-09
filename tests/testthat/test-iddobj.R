@@ -270,6 +270,14 @@ test_that("IddObject class", {
             units = character()
         )
     )
+    expect_equivalent(idd$TestSlash$outputs(),
+        data.table(index = integer(),
+            class = character(),
+            reported_time_step = character(),
+            report_type = character(), variable = character(),
+            units = character()
+        )
+    )
     # }}}
 
     # can check equality
