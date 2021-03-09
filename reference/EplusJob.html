@@ -985,7 +985,7 @@ job$print()
 <span class='co'>## Method `EplusJob$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
     <span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
@@ -999,206 +999,206 @@ job$print()
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>epw_path</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$version`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>version</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$path`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"idf"</span><span class='op'>)</span>
-<span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"epw"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"idf"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='st'>"epw"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$run`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># only run design day</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># specify output directory</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># run in the background</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>wait <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='co'># see job status</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># see job status</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># force to kill background job before running the new one</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>force <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># do not show anything in the console</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># copy external files used in the model to simulation output directory</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>copy_external <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$kill`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>kill</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$status`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>status</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$errors`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># show all information</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>errors</span><span class='op'>(</span>info <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$output_dir`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>output_dir</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># Below will open output directory</span>
 <span class='co'># job$output_dir(open = TRUE)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$locate_output`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># get the file path of the error file</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".err"</span>, strict <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># can use to detect if certain output file exists</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".expidf"</span>, strict <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_rdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_rdd</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_mdd`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_mdd</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$list_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>list_table</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$read_table`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># read a specific table</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"Zones"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$report_data_dict`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$report_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># read all report data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># specify output variables using report data dictionary</span>
 <span class='va'>dict</span> <span class='op'>&lt;-</span> <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data_dict</span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='va'>units</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>]</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='va'>units</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># specify output variables using 'key_value' and 'name'</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='st'>"environment"</span>, <span class='st'>"site outdoor air drybulb temperature"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># explicitly specify year value and time zone</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, year <span class='op'>=</span> <span class='fl'>2020</span>, tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># explicitly specify case name</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, case <span class='op'>=</span> <span class='st'>"example"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># get all possible columns</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># return in a format that is similar as EnergyPlus CSV output</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># return in a format that is similar as EnergyPlus CSV output with</span>
 <span class='co'># extra columns</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, wide <span class='op'>=</span> <span class='cn'>TRUE</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># only get data at the working hour on the first Monday</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, hour <span class='op'>=</span> <span class='fl'>8</span><span class='op'>:</span><span class='fl'>18</span>, day_type <span class='op'>=</span> <span class='st'>"monday"</span>, simulation_days <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># only get specified run period data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_table</span><span class='op'>(</span><span class='st'>"EnvironmentPeriods"</span><span class='op'>)</span> <span class='co'># possible environment name</span>
-<span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
-<span class='co'># can also be done using 'environment_period_index' column</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, environment_name <span class='op'>=</span> <span class='st'>"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># can also be done using 'environment_period_index' column</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>report_data</span><span class='op'>(</span><span class='va'>dict</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='va'>environment_period_index</span> <span class='op'>==</span> <span class='fl'>3L</span><span class='op'>]</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$tabular_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># read all tabular data</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'>
 <span class='co'># explicitly specify data you want</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -1206,7 +1206,7 @@ job$print()
     column_name <span class='op'>=</span> <span class='st'>"Total Energy"</span>,
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>
 <span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in str(job$tabular_data(report_name = "AnnualBuildingUtilityPerformanceSummary",     table_name = "Site and Source Energy", column_name = "Total Energy",     row_name = "Total Site Energy")): object 'job' not found</span></div><div class='input'>
 <span class='co'># get tabular data in wide format and coerce numeric values</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>tabular_data</span><span class='op'>(</span>
     report_name <span class='op'>=</span> <span class='st'>"AnnualBuildingUtilityPerformanceSummary"</span>,
@@ -1215,16 +1215,16 @@ job$print()
     row_name <span class='op'>=</span> <span class='st'>"Total Site Energy"</span>,
     wide <span class='op'>=</span> <span class='cn'>TRUE</span>, string_value <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in str(job$tabular_data(report_name = "AnnualBuildingUtilityPerformanceSummary",     table_name = "Site and Source Energy", column_name = "Total Energy",     row_name = "Total Site Energy", wide = TRUE, string_value = FALSE)): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `EplusJob$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>job</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'job' not found</span></div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

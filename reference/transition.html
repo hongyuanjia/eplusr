@@ -237,7 +237,7 @@ if <code>keep_all</code> is <code>TRUE</code>.</p>
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>avail_eplus</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='fl'>7.2</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='co'># create an empty IDF</span>
     <span class='va'>idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='empty_idf.html'>empty_idf</a></span><span class='op'>(</span><span class='fl'>7.2</span><span class='op'>)</span>
@@ -256,7 +256,7 @@ if <code>keep_all</code> is <code>TRUE</code>.</p>
         save <span class='op'>=</span> <span class='cn'>TRUE</span>, dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>
     <span class='op'>)</span>
 <span class='op'>}</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in Summary.numeric_version(structure(list(c(8L, 8L, 0L), c(9L, 4L, 0L)), class = "numeric_version"), na.rm = FALSE): any not defined for "numeric_version" objects</span></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

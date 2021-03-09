@@ -1464,7 +1464,7 @@ epw$print()
 <span class='co'>## Method `Epw$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># read an EPW file from EnergyPlus website</span>
 <span class='va'>path_base</span> <span class='op'>&lt;-</span> <span class='st'>"https://energyplus.net/weather-download"</span>
 <span class='va'>path_region</span> <span class='op'>&lt;-</span> <span class='st'>"north_and_central_america_wmo_region_4/USA/CA"</span>
@@ -1481,348 +1481,1781 @@ epw$print()
     <span class='op'>)</span>
     <span class='va'>epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span>
 <span class='op'>}</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$path`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># get path</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; NULL</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$definition`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># get path</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>definition</span><span class='op'>(</span><span class='st'>"LOCATION"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; &lt;IddObject: 'LOCATION'&gt;
+#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────
+#&gt;   "The Location header record duplicates the information required for the
+#&gt; Location Object. When only a Run Period object is used (i.e. a weather
+#&gt; file), then the Location Object IS not needed. When a Run Period and
+#&gt; Design Day objects are entered, then the Location on the weather file
+#&gt; (as described previously) is used and overrides any Location Object
+#&gt; entry."
+#&gt; 
+#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────
+#&gt;   * Group: 'Header'
+#&gt;   * Unique: TRUE
+#&gt;   * Required: TRUE
+#&gt;   * Total fields: 9
+#&gt; 
+#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────
+#&gt;   1*: City
+#&gt;   2*: State Province
+#&gt;   3*: Country
+#&gt;   4*: Data Source
+#&gt;   5*: WMO Number
+#&gt;   6*: Latitude
+#&gt;   7*: Longitude
+#&gt;   8*: Time Zone
+#&gt;   9*: Elevation</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$location`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>location</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; $city
+#&gt; [1] "San Francisco Intl Ap"
+#&gt; 
+#&gt; $state_province
+#&gt; [1] "CA"
+#&gt; 
+#&gt; $country
+#&gt; [1] "USA"
+#&gt; 
+#&gt; $data_source
+#&gt; [1] "TMY3"
+#&gt; 
+#&gt; $wmo_number
+#&gt; [1] "724940"
+#&gt; 
+#&gt; $latitude
+#&gt; [1] 37.62
+#&gt; 
+#&gt; $longitude
+#&gt; [1] -122.4
+#&gt; 
+#&gt; $time_zone
+#&gt; [1] -8
+#&gt; 
+#&gt; $elevation
+#&gt; [1] 2
+#&gt; </div><div class='input'>
 <span class='co'># modify location data</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>location</span><span class='op'>(</span>city <span class='op'>=</span> <span class='st'>"MyCity"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $city
+#&gt; [1] "MyCity"
+#&gt; 
+#&gt; $state_province
+#&gt; [1] "CA"
+#&gt; 
+#&gt; $country
+#&gt; [1] "USA"
+#&gt; 
+#&gt; $data_source
+#&gt; [1] "TMY3"
+#&gt; 
+#&gt; $wmo_number
+#&gt; [1] "724940"
+#&gt; 
+#&gt; $latitude
+#&gt; [1] 37.62
+#&gt; 
+#&gt; $longitude
+#&gt; [1] -122.4
+#&gt; 
+#&gt; $time_zone
+#&gt; [1] -8
+#&gt; 
+#&gt; $elevation
+#&gt; [1] 2
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$design_condition`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>design_condition</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $source
+#&gt; [1] "Climate Design Data 2009 ASHRAE Handbook"
+#&gt; 
+#&gt; $heating
+#&gt; $heating$coldest_month
+#&gt; [1] 1
+#&gt; 
+#&gt; $heating$heating_db_99.6
+#&gt; [1] 3.8
+#&gt; 
+#&gt; $heating$heating_db_99.0
+#&gt; [1] 4.9
+#&gt; 
+#&gt; $heating$humidification_dp_99.6
+#&gt; [1] -3.7
+#&gt; 
+#&gt; $heating$humidification_hr_99.6
+#&gt; [1] 2.8
+#&gt; 
+#&gt; $heating$humidification_mcdb_99.6
+#&gt; [1] 10.7
+#&gt; 
+#&gt; $heating$humidification_dp_99.0
+#&gt; [1] -1.2
+#&gt; 
+#&gt; $heating$humidification_hr_99.0
+#&gt; [1] 3.4
+#&gt; 
+#&gt; $heating$humidification_mcdb_99.0
+#&gt; [1] 11.2
+#&gt; 
+#&gt; $heating$coldest_month_ws_0.4
+#&gt; [1] 12.9
+#&gt; 
+#&gt; $heating$coldest_month_mcdb_0.4
+#&gt; [1] 12.1
+#&gt; 
+#&gt; $heating$coldest_month_ws_1.0
+#&gt; [1] 11.6
+#&gt; 
+#&gt; $heating$coldest_month_mcdb_1.0
+#&gt; [1] 12.2
+#&gt; 
+#&gt; $heating$mcws_99.6_db
+#&gt; [1] 2.2
+#&gt; 
+#&gt; $heating$pcwd_99.6_db
+#&gt; [1] 150
+#&gt; 
+#&gt; 
+#&gt; $cooling
+#&gt; $cooling$hotest_month
+#&gt; [1] 8
+#&gt; 
+#&gt; $cooling$hotest_month_db_range
+#&gt; [1] 8.5
+#&gt; 
+#&gt; $cooling$cooling_db_0.4
+#&gt; [1] 28.3
+#&gt; 
+#&gt; $cooling$cooling_mcwb_0.4
+#&gt; [1] 17.2
+#&gt; 
+#&gt; $cooling$cooling_db_1.0
+#&gt; [1] 25.7
+#&gt; 
+#&gt; $cooling$cooling_mcwb_1.0
+#&gt; [1] 16.7
+#&gt; 
+#&gt; $cooling$cooling_db_2.0
+#&gt; [1] 23.6
+#&gt; 
+#&gt; $cooling$cooling_mcwb_2.0
+#&gt; [1] 16.2
+#&gt; 
+#&gt; $cooling$evaporation_wb_0.4
+#&gt; [1] 18.6
+#&gt; 
+#&gt; $cooling$evaporation_mcdb_0.4
+#&gt; [1] 25.7
+#&gt; 
+#&gt; $cooling$evaporation_wb_1.0
+#&gt; [1] 17.8
+#&gt; 
+#&gt; $cooling$evaporation_mcdb_1.0
+#&gt; [1] 23.9
+#&gt; 
+#&gt; $cooling$evaporation_wb_2.0
+#&gt; [1] 17
+#&gt; 
+#&gt; $cooling$evaporation_mcdb_2.0
+#&gt; [1] 22.4
+#&gt; 
+#&gt; $cooling$mcws_0.4_db
+#&gt; [1] 5.9
+#&gt; 
+#&gt; $cooling$pcwd_0.4_db
+#&gt; [1] 310
+#&gt; 
+#&gt; $cooling$dehumification_dp_0.4
+#&gt; [1] 16.1
+#&gt; 
+#&gt; $cooling$dehumification_hr_0.4
+#&gt; [1] 11.5
+#&gt; 
+#&gt; $cooling$dehumification_mcdb_0.4
+#&gt; [1] 19.9
+#&gt; 
+#&gt; $cooling$dehumification_dp_1.0
+#&gt; [1] 15.3
+#&gt; 
+#&gt; $cooling$dehumification_hr_1.0
+#&gt; [1] 10.9
+#&gt; 
+#&gt; $cooling$dehumification_mcdb_1.0
+#&gt; [1] 19.2
+#&gt; 
+#&gt; $cooling$dehumification_dp_2.0
+#&gt; [1] 14.7
+#&gt; 
+#&gt; $cooling$dehumification_hr_2.0
+#&gt; [1] 10.4
+#&gt; 
+#&gt; $cooling$dehumification_mcdb_2.0
+#&gt; [1] 18.7
+#&gt; 
+#&gt; $cooling$enthalpy_0.4
+#&gt; [1] 52.4
+#&gt; 
+#&gt; $cooling$mcdb_0.4
+#&gt; [1] 25.8
+#&gt; 
+#&gt; $cooling$enthalpy_1.0
+#&gt; [1] 49.8
+#&gt; 
+#&gt; $cooling$mcdb_1.0
+#&gt; [1] 23.8
+#&gt; 
+#&gt; $cooling$enthalpy_2.0
+#&gt; [1] 47.6
+#&gt; 
+#&gt; $cooling$mcdb_2.0
+#&gt; [1] 22.4
+#&gt; 
+#&gt; $cooling$hours_8_to_4_12.8_20.6
+#&gt; [1] 2038
+#&gt; 
+#&gt; 
+#&gt; $extremes
+#&gt; $extremes$extremes
+#&gt; [1] "Extremes"
+#&gt; 
+#&gt; $extremes$extreme_annual_ws_1.0
+#&gt; [1] 12.8
+#&gt; 
+#&gt; $extremes$extreme_annual_ws_2.5
+#&gt; [1] 11.5
+#&gt; 
+#&gt; $extremes$extreme_annual_ws_5.0
+#&gt; [1] 10.6
+#&gt; 
+#&gt; $extremes$extreme_max_wb
+#&gt; [1] 22.3
+#&gt; 
+#&gt; $extremes$extreme_annual_db_mean_min
+#&gt; [1] 1.8
+#&gt; 
+#&gt; $extremes$extreme_annual_db_mean_max
+#&gt; [1] 34.6
+#&gt; 
+#&gt; $extremes$extreme_annual_db_sd_min
+#&gt; [1] 1.5
+#&gt; 
+#&gt; $extremes$extreme_annual_db_sd_max
+#&gt; [1] 2.3
+#&gt; 
+#&gt; $extremes$`5_year_return_period_values_of_extreme_db_min`
+#&gt; [1] 0.8
+#&gt; 
+#&gt; $extremes$`5_year_return_period_values_of_extreme_db_max`
+#&gt; [1] 36.2
+#&gt; 
+#&gt; $extremes$`10_year_return_period_values_of_extreme_db_min`
+#&gt; [1] -0.1
+#&gt; 
+#&gt; $extremes$`10_year_return_period_values_of_extreme_db_max`
+#&gt; [1] 37.5
+#&gt; 
+#&gt; $extremes$`20_year_return_period_values_of_extreme_db_min`
+#&gt; [1] -0.9
+#&gt; 
+#&gt; $extremes$`20_year_return_period_values_of_extreme_db_max`
+#&gt; [1] 38.8
+#&gt; 
+#&gt; $extremes$`50_year_return_period_values_of_extreme_db_min`
+#&gt; [1] -1.9
+#&gt; 
+#&gt; $extremes$`50_year_return_period_values_of_extreme_db_max`
+#&gt; [1] 40.5
+#&gt; 
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$typical_extreme_period`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>typical_extreme_period</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    index                                                 name    type start_day
+#&gt; 1:     1     Summer - Week Nearest Max Temperature For Period Extreme      8/ 1
+#&gt; 2:     2 Summer - Week Nearest Average Temperature For Period Typical      9/ 5
+#&gt; 3:     3     Winter - Week Nearest Min Temperature For Period Extreme      2/ 1
+#&gt; 4:     4 Winter - Week Nearest Average Temperature For Period Typical      2/15
+#&gt; 5:     5 Autumn - Week Nearest Average Temperature For Period Typical     12/ 6
+#&gt; 6:     6 Spring - Week Nearest Average Temperature For Period Typical      5/29
+#&gt;    end_day
+#&gt; 1:    8/ 7
+#&gt; 2:    9/11
+#&gt; 3:    2/ 7
+#&gt; 4:    2/21
+#&gt; 5:   12/12
+#&gt; 6:    6/ 4</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$ground_temperature`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>ground_temperature</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    index depth soil_conductivity soil_density soil_specific_heat January
+#&gt; 1:     1   0.5              &lt;NA&gt;         &lt;NA&gt;               &lt;NA&gt;   10.86
+#&gt; 2:     2     2              &lt;NA&gt;         &lt;NA&gt;               &lt;NA&gt;   11.92
+#&gt; 3:     3     4              &lt;NA&gt;         &lt;NA&gt;               &lt;NA&gt;   12.79
+#&gt;    February March April   May  June  July August September October November
+#&gt; 1:    10.57 11.08 11.88 13.97 15.58 16.67     17     16.44   15.19    13.51
+#&gt; 2:    11.41 11.51 11.93 13.33  14.6 15.61  16.15     16.03   15.32    14.17
+#&gt; 3:    12.27 12.15 12.31  13.1 13.96 14.74  15.28     15.41    15.1    14.42
+#&gt;    December
+#&gt; 1:    11.96
+#&gt; 2:    12.95
+#&gt; 3:     13.6</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$holiday`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>holiday</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; $leapyear
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $dst
+#&gt; [1] "0 &lt;empty&gt;" "0 &lt;empty&gt;"
+#&gt; 
+#&gt; $holiday
+#&gt; Null data.table (0 rows and 0 cols)
+#&gt; </div><div class='input'>
 <span class='co'># add daylight saving time</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>holiday</span><span class='op'>(</span>dst <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3.10</span>, <span class='fl'>11.3</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $leapyear
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $dst
+#&gt; [1] "Mar 01" "Nov 03"
+#&gt; 
+#&gt; $holiday
+#&gt; Null data.table (0 rows and 0 cols)
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$comment1`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>comment1</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; [1] "Custom/User Format -- WMO#724940; NREL TMY Data Set (2008); Period of Record 1973-2005 (Generally)"</div><div class='input'>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>comment1</span><span class='op'>(</span><span class='st'>"Comment1"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] "Comment1"</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$comment2`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>comment2</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; [1] " -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m**2/day}"</div><div class='input'>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>comment2</span><span class='op'>(</span><span class='st'>"Comment2"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] "Comment2"</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$num_period`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>num_period</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$interval`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>interval</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$period`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># modify data period name</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>period</span><span class='op'>(</span><span class='fl'>1</span>, name <span class='op'>=</span> <span class='st'>"test"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;    index name start_day_of_week start_day end_day
+#&gt; 1:     1 test            Sunday      1/ 1   12/31</div><div class='input'>
 <span class='co'># change start day of week</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>period</span><span class='op'>(</span><span class='fl'>1</span>, start_day_of_week <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    index name start_day_of_week start_day end_day
+#&gt; 1:     1 test         Wednesday      1/ 1   12/31</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$missing_code`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>missing_code</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $dry_bulb_temperature
+#&gt; [1] 99.9
+#&gt; 
+#&gt; $dew_point_temperature
+#&gt; [1] 99.9
+#&gt; 
+#&gt; $relative_humidity
+#&gt; [1] 999
+#&gt; 
+#&gt; $atmospheric_pressure
+#&gt; [1] 999999
+#&gt; 
+#&gt; $extraterrestrial_horizontal_radiation
+#&gt; [1] 9999
+#&gt; 
+#&gt; $extraterrestrial_direct_normal_radiation
+#&gt; [1] 9999
+#&gt; 
+#&gt; $horizontal_infrared_radiation_intensity_from_sky
+#&gt; [1] 9999
+#&gt; 
+#&gt; $global_horizontal_radiation
+#&gt; [1] 9999
+#&gt; 
+#&gt; $direct_normal_radiation
+#&gt; [1] 9999
+#&gt; 
+#&gt; $diffuse_horizontal_radiation
+#&gt; [1] 9999
+#&gt; 
+#&gt; $global_horizontal_illuminance
+#&gt; [1] 999999
+#&gt; 
+#&gt; $direct_normal_illuminance
+#&gt; [1] 999999
+#&gt; 
+#&gt; $diffuse_horizontal_illuminance
+#&gt; [1] 999999
+#&gt; 
+#&gt; $zenith_luminance
+#&gt; [1] 9999
+#&gt; 
+#&gt; $wind_direction
+#&gt; [1] 999
+#&gt; 
+#&gt; $wind_speed
+#&gt; [1] 999
+#&gt; 
+#&gt; $total_sky_cover
+#&gt; [1] 99
+#&gt; 
+#&gt; $opaque_sky_cover
+#&gt; [1] 99
+#&gt; 
+#&gt; $visibility
+#&gt; [1] 9999
+#&gt; 
+#&gt; $ceiling_height
+#&gt; [1] 99999
+#&gt; 
+#&gt; $present_weather_observation
+#&gt; [1] 9
+#&gt; 
+#&gt; $present_weather_codes
+#&gt; [1] "999999999"
+#&gt; 
+#&gt; $precipitable_water
+#&gt; [1] 999
+#&gt; 
+#&gt; $aerosol_optical_depth
+#&gt; [1] 0.999
+#&gt; 
+#&gt; $snow_depth
+#&gt; [1] 999
+#&gt; 
+#&gt; $days_since_last_snow
+#&gt; [1] 99
+#&gt; 
+#&gt; $albedo
+#&gt; [1] 999
+#&gt; 
+#&gt; $liquid_precip_depth
+#&gt; [1] 999
+#&gt; 
+#&gt; $liquid_precip_rate
+#&gt; [1] 99
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$initial_missing_value`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>initial_missing_value</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $dry_bulb_temperature
+#&gt; [1] 6
+#&gt; 
+#&gt; $dew_point_temperature
+#&gt; [1] 3
+#&gt; 
+#&gt; $relative_humidity
+#&gt; [1] 50
+#&gt; 
+#&gt; $wind_direction
+#&gt; [1] 180
+#&gt; 
+#&gt; $wind_speed
+#&gt; [1] 2.5
+#&gt; 
+#&gt; $total_sky_cover
+#&gt; [1] 5
+#&gt; 
+#&gt; $opaque_sky_cover
+#&gt; [1] 5
+#&gt; 
+#&gt; $visibility
+#&gt; [1] 777.7
+#&gt; 
+#&gt; $ceiling_height
+#&gt; [1] 77777
+#&gt; 
+#&gt; $precipitable_water
+#&gt; [1] 0
+#&gt; 
+#&gt; $aerosol_optical_depth
+#&gt; [1] 0
+#&gt; 
+#&gt; $days_since_last_snow
+#&gt; [1] 88
+#&gt; 
+#&gt; $albedo
+#&gt; [1] 0
+#&gt; 
+#&gt; $liquid_precip_depth
+#&gt; [1] 0
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$range_exist`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>range_exist</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $dry_bulb_temperature
+#&gt; (-Inf, 99.9) 
+#&gt; 
+#&gt; $dew_point_temperature
+#&gt; (-Inf, 99.9) 
+#&gt; 
+#&gt; $relative_humidity
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $atmospheric_pressure
+#&gt; [0, 999999) 
+#&gt; 
+#&gt; $extraterrestrial_horizontal_radiation
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $extraterrestrial_direct_normal_radiation
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $horizontal_infrared_radiation_intensity_from_sky
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $global_horizontal_radiation
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $direct_normal_radiation
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $diffuse_horizontal_radiation
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $global_horizontal_illuminance
+#&gt; [0, 999999) 
+#&gt; 
+#&gt; $direct_normal_illuminance
+#&gt; [0, 999999) 
+#&gt; 
+#&gt; $diffuse_horizontal_illuminance
+#&gt; [0, 999999) 
+#&gt; 
+#&gt; $zenith_luminance
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $wind_direction
+#&gt; [0, 360] 
+#&gt; 
+#&gt; $wind_speed
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $total_sky_cover
+#&gt; [0, 99) 
+#&gt; 
+#&gt; $opaque_sky_cover
+#&gt; [0, 99) 
+#&gt; 
+#&gt; $visibility
+#&gt; [0, 9999) 
+#&gt; 
+#&gt; $ceiling_height
+#&gt; [0, 99999) 
+#&gt; 
+#&gt; $present_weather_observation
+#&gt; [0, 9) 
+#&gt; 
+#&gt; $precipitable_water
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $aerosol_optical_depth
+#&gt; [0, 0.999) 
+#&gt; 
+#&gt; $snow_depth
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $days_since_last_snow
+#&gt; [0, 99) 
+#&gt; 
+#&gt; $albedo
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $liquid_precip_depth
+#&gt; [0, 999) 
+#&gt; 
+#&gt; $liquid_precip_rate
+#&gt; [0, 99) 
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$range_valid`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>range_valid</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $dry_bulb_temperature
+#&gt; (-90, 70) 
+#&gt; 
+#&gt; $dew_point_temperature
+#&gt; (-90, 70) 
+#&gt; 
+#&gt; $relative_humidity
+#&gt; [0, 110] 
+#&gt; 
+#&gt; $atmospheric_pressure
+#&gt; (31000, 120000] 
+#&gt; 
+#&gt; $extraterrestrial_horizontal_radiation
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $extraterrestrial_direct_normal_radiation
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $horizontal_infrared_radiation_intensity_from_sky
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $global_horizontal_radiation
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $direct_normal_radiation
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $diffuse_horizontal_radiation
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $global_horizontal_illuminance
+#&gt; [0, 999900] 
+#&gt; 
+#&gt; $direct_normal_illuminance
+#&gt; [0, 999900] 
+#&gt; 
+#&gt; $diffuse_horizontal_illuminance
+#&gt; [0, 999900] 
+#&gt; 
+#&gt; $zenith_luminance
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $wind_direction
+#&gt; [0, 360] 
+#&gt; 
+#&gt; $wind_speed
+#&gt; [0, 40] 
+#&gt; 
+#&gt; $total_sky_cover
+#&gt; [0, 10] 
+#&gt; 
+#&gt; $opaque_sky_cover
+#&gt; [0, 10] 
+#&gt; 
+#&gt; $visibility
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $ceiling_height
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $present_weather_observation
+#&gt; [0, 9] 
+#&gt; 
+#&gt; $precipitable_water
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $aerosol_optical_depth
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $snow_depth
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $days_since_last_snow
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $albedo
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $liquid_precip_depth
+#&gt; [0, Inf) 
+#&gt; 
+#&gt; $liquid_precip_rate
+#&gt; [0, Inf) 
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$fill_action`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>fill_action</span><span class='op'>(</span><span class='st'>"missing"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; $use_previous
+#&gt;  [1] "dry_bulb_temperature"  "atmospheric_pressure"  "relative_humidity"    
+#&gt;  [4] "dew_point_temperature" "wind_speed"            "wind_direction"       
+#&gt;  [7] "total_sky_cover"       "opaque_sky_cover"      "snow_depth"           
+#&gt; [10] "liquid_precip_depth"  
+#&gt; 
+#&gt; $use_zero
+#&gt; [1] "direct_normal_radiation"      "diffuse_horizontal_radiation"
+#&gt; </div><div class='input'>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>fill_action</span><span class='op'>(</span><span class='st'>"out_of_range"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $do_nothing
+#&gt; [1] "dry_bulb_temperature"  "relative_humidity"     "dew_point_temperature"
+#&gt; [4] "wind_direction"        "wind_speed"           
+#&gt; 
+#&gt; $use_zero
+#&gt; [1] "direct_normal_radiation"      "diffuse_horizontal_radiation"
+#&gt; 
+#&gt; $use_previous
+#&gt; [1] "atmospheric_pressure"
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># get weather data</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	8760 obs. of  36 variables:
+#&gt;  $ datetime                                        : POSIXct, format: "2020-01-01 01:00:00" "2020-01-01 02:00:00" ...
+#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...
+#&gt;  $ month                                           : int  1 1 1 1 1 1 1 1 1 1 ...
+#&gt;  $ day                                             : int  1 1 1 1 1 1 1 1 1 1 ...
+#&gt;  $ hour                                            : int  1 2 3 4 5 6 7 8 9 10 ...
+#&gt;  $ minute                                          : int  0 0 0 0 0 0 0 0 0 0 ...
+#&gt;  $ data_source                                     : chr  "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" ...
+#&gt;  $ dry_bulb_temperature                            : num  7.2 7.2 6.7 6.1 4.4 4.4 6.1 5 7.8 8.9 ...
+#&gt;  $ dew_point_temperature                           : num  5.6 5.6 5 5 3.9 3.9 4.4 2.8 5 6.7 ...
+#&gt;  $ relative_humidity                               : num  90 90 89 93 97 97 89 86 82 86 ...
+#&gt;  $ atmospheric_pressure                            : num  102200 102100 102200 102200 102200 ...
+#&gt;  $ extraterrestrial_horizontal_radiation           : num  0 0 0 0 0 0 0 36 243 443 ...
+#&gt;  $ extraterrestrial_direct_normal_radiation        : num  0 0 0 0 0 ...
+#&gt;  $ horizontal_infrared_radiation_intensity_from_sky: num  290 296 291 276 280 280 287 281 295 299 ...
+#&gt;  $ global_horizontal_radiation                     : num  0 0 0 0 0 0 0 2 121 276 ...
+#&gt;  $ direct_normal_radiation                         : num  0 0 0 0 0 0 0 69 477 651 ...
+#&gt;  $ diffuse_horizontal_radiation                    : num  0 0 0 0 0 0 0 1 39 71 ...
+#&gt;  $ global_horizontal_illuminance                   : num  0 0 0 0 0 ...
+#&gt;  $ direct_normal_illuminance                       : num  0 0 0 0 0 ...
+#&gt;  $ diffuse_horizontal_illuminance                  : num  0 0 0 0 0 ...
+#&gt;  $ zenith_luminance                                : num  0 0 0 0 0 ...
+#&gt;  $ wind_direction                                  : num  0 170 210 200 260 180 0 0 0 0 ...
+#&gt;  $ wind_speed                                      : num  0 2.1 2.1 1.5 3.1 2.1 0 0 0 0 ...
+#&gt;  $ total_sky_cover                                 : int  2 4 3 0 3 3 3 3 3 2 ...
+#&gt;  $ opaque_sky_cover                                : int  2 4 3 0 3 3 3 3 3 2 ...
+#&gt;  $ visibility                                      : num  16 16 16 16 16 16 16 16 16 16 ...
+#&gt;  $ ceiling_height                                  : num  77777 77777 77777 77777 77777 ...
+#&gt;  $ present_weather_observation                     : int  9 9 9 9 9 9 9 9 9 9 ...
+#&gt;  $ present_weather_codes                           : chr  "999999999" "999999999" "999999999" "999999999" ...
+#&gt;  $ precipitable_water                              : num  129 120 120 120 120 120 120 110 110 110 ...
+#&gt;  $ aerosol_optical_depth                           : num  0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 ...
+#&gt;  $ snow_depth                                      : num  0 0 0 0 0 0 0 0 0 0 ...
+#&gt;  $ days_since_last_snow                            : int  88 88 88 88 88 88 88 88 88 88 ...
+#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 ...
+#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0 0 0 0 0 ...
+#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1 1 1 1 1 ...
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
 <span class='co'># get weather data but change the year to 2018</span>
 <span class='co'># the year column is not changed by default, only the returned datetime column</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>start_year <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>)</span><span class='op'>$</span><span class='va'>datetime</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>start_year <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>)</span><span class='op'>$</span><span class='va'>year</span><span class='op'>)</span>
-<span class='co'># you can update the year column too</span>
+</div><div class='output co'>#&gt; [1] "2018-01-01 01:00:00 UTC" "2018-01-01 02:00:00 UTC"
+#&gt; [3] "2018-01-01 03:00:00 UTC" "2018-01-01 04:00:00 UTC"
+#&gt; [5] "2018-01-01 05:00:00 UTC" "2018-01-01 06:00:00 UTC"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>start_year <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>)</span><span class='op'>$</span><span class='va'>year</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  int [1:8760] 1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...</div><div class='input'><span class='co'># you can update the year column too</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>start_year <span class='op'>=</span> <span class='fl'>2018</span>, update <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>$</span><span class='va'>year</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; [1] 2018 2018 2018 2018 2018 2018</div><div class='input'>
 <span class='co'># change the time zone of datetime column in the returned weather data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/attributes.html'>attributes</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>datetime</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/attributes.html'>attributes</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span><span class='op'>$</span><span class='va'>datetime</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $class
+#&gt; [1] "POSIXct" "POSIXt" 
+#&gt; 
+#&gt; $tzone
+#&gt; [1] "UTC"
+#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/attributes.html'>attributes</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span>tz <span class='op'>=</span> <span class='st'>"Etc/GMT+8"</span><span class='op'>)</span><span class='op'>$</span><span class='va'>datetime</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $class
+#&gt; [1] "POSIXct" "POSIXt" 
+#&gt; 
+#&gt; $tzone
+#&gt; [1] "Etc/GMT+8"
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$abnormal_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>abnormal_data</span><span class='op'>(</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;       line            datetime year month day hour minute
+#&gt;    1:    9 1999-01-01 01:00:00 1999     1   1    1      0
+#&gt;    2:   10 1999-01-01 02:00:00 1999     1   1    2      0
+#&gt;    3:   11 1999-01-01 03:00:00 1999     1   1    3      0
+#&gt;    4:   12 1999-01-01 04:00:00 1999     1   1    4      0
+#&gt;    5:   13 1999-01-01 05:00:00 1999     1   1    5      0
+#&gt;   ---                                                    
+#&gt; 8756: 8764 1997-12-31 20:00:00 1997    12  31   20      0
+#&gt; 8757: 8765 1997-12-31 21:00:00 1997    12  31   21      0
+#&gt; 8758: 8766 1997-12-31 22:00:00 1997    12  31   22      0
+#&gt; 8759: 8767 1997-12-31 23:00:00 1997    12  31   23      0
+#&gt; 8760: 8768 1998-01-01 00:00:00 1997    12  31   24      0
+#&gt;                                              data_source dry_bulb_temperature
+#&gt;    1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
+#&gt;    2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
+#&gt;    3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  6.7
+#&gt;    4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  6.1
+#&gt;    5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  4.4
+#&gt;   ---                                                                        
+#&gt; 8756: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 13.3
+#&gt; 8757: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 12.2
+#&gt; 8758: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 10.6
+#&gt; 8759: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 10.6
+#&gt; 8760: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 11.1
+#&gt;       dew_point_temperature relative_humidity atmospheric_pressure
+#&gt;    1:                   5.6                90               102200
+#&gt;    2:                   5.6                90               102100
+#&gt;    3:                   5.0                89               102200
+#&gt;    4:                   5.0                93               102200
+#&gt;    5:                   3.9                97               102200
+#&gt;   ---                                                             
+#&gt; 8756:                  11.7                90               101800
+#&gt; 8757:                  11.1                93               101700
+#&gt; 8758:                  10.0                96               101800
+#&gt; 8759:                  10.6               100               101800
+#&gt; 8760:                  10.6                97               101700
+#&gt;       extraterrestrial_horizontal_radiation
+#&gt;    1:                                     0
+#&gt;    2:                                     0
+#&gt;    3:                                     0
+#&gt;    4:                                     0
+#&gt;    5:                                     0
+#&gt;   ---                                      
+#&gt; 8756:                                     0
+#&gt; 8757:                                     0
+#&gt; 8758:                                     0
+#&gt; 8759:                                     0
+#&gt; 8760:                                     0
+#&gt;       extraterrestrial_direct_normal_radiation
+#&gt;    1:                                        0
+#&gt;    2:                                        0
+#&gt;    3:                                        0
+#&gt;    4:                                        0
+#&gt;    5:                                        0
+#&gt;   ---                                         
+#&gt; 8756:                                        0
+#&gt; 8757:                                        0
+#&gt; 8758:                                        0
+#&gt; 8759:                                        0
+#&gt; 8760:                                        0
+#&gt;       horizontal_infrared_radiation_intensity_from_sky
+#&gt;    1:                                              290
+#&gt;    2:                                              296
+#&gt;    3:                                              291
+#&gt;    4:                                              276
+#&gt;    5:                                              280
+#&gt;   ---                                                 
+#&gt; 8756:                                              338
+#&gt; 8757:                                              326
+#&gt; 8758:                                              317
+#&gt; 8759:                                              337
+#&gt; 8760:                                              349
+#&gt;       global_horizontal_radiation direct_normal_radiation
+#&gt;    1:                           0                       0
+#&gt;    2:                           0                       0
+#&gt;    3:                           0                       0
+#&gt;    4:                           0                       0
+#&gt;    5:                           0                       0
+#&gt;   ---                                                    
+#&gt; 8756:                           0                       0
+#&gt; 8757:                           0                       0
+#&gt; 8758:                           0                       0
+#&gt; 8759:                           0                       0
+#&gt; 8760:                           0                       0
+#&gt;       diffuse_horizontal_radiation global_horizontal_illuminance
+#&gt;    1:                            0                             0
+#&gt;    2:                            0                             0
+#&gt;    3:                            0                             0
+#&gt;    4:                            0                             0
+#&gt;    5:                            0                             0
+#&gt;   ---                                                           
+#&gt; 8756:                            0                             0
+#&gt; 8757:                            0                             0
+#&gt; 8758:                            0                             0
+#&gt; 8759:                            0                             0
+#&gt; 8760:                            0                             0
+#&gt;       direct_normal_illuminance diffuse_horizontal_illuminance zenith_luminance
+#&gt;    1:                         0                              0                0
+#&gt;    2:                         0                              0                0
+#&gt;    3:                         0                              0                0
+#&gt;    4:                         0                              0                0
+#&gt;    5:                         0                              0                0
+#&gt;   ---                                                                          
+#&gt; 8756:                         0                              0                0
+#&gt; 8757:                         0                              0                0
+#&gt; 8758:                         0                              0                0
+#&gt; 8759:                         0                              0                0
+#&gt; 8760:                         0                              0                0
+#&gt;       wind_direction wind_speed total_sky_cover opaque_sky_cover visibility
+#&gt;    1:              0        0.0               2                2       16.0
+#&gt;    2:            170        2.1               4                4       16.0
+#&gt;    3:            210        2.1               3                3       16.0
+#&gt;    4:            200        1.5               0                0       16.0
+#&gt;    5:            260        3.1               3                3       16.0
+#&gt;   ---                                                                      
+#&gt; 8756:            280        3.1               7                7       14.4
+#&gt; 8757:            350        1.5               5                5       16.0
+#&gt; 8758:            180        2.1               5                5       11.2
+#&gt; 8759:            170        2.1               9                9        6.4
+#&gt; 8760:            140        1.5              10               10        9.6
+#&gt;       ceiling_height present_weather_observation present_weather_codes
+#&gt;    1:          77777                           9             999999999
+#&gt;    2:          77777                           9             999999999
+#&gt;    3:          77777                           9             999999999
+#&gt;    4:          77777                           9             999999999
+#&gt;    5:          77777                           9             999999999
+#&gt;   ---                                                                 
+#&gt; 8756:            579                           9             999999999
+#&gt; 8757:          77777                           9             999999999
+#&gt; 8758:          77777                           9             999999999
+#&gt; 8759:            640                           9             999999999
+#&gt; 8760:            640                           9             999999999
+#&gt;       precipitable_water aerosol_optical_depth snow_depth days_since_last_snow
+#&gt;    1:                129                 0.108          0                   88
+#&gt;    2:                120                 0.108          0                   88
+#&gt;    3:                120                 0.108          0                   88
+#&gt;    4:                120                 0.108          0                   88
+#&gt;    5:                120                 0.108          0                   88
+#&gt;   ---                                                                         
+#&gt; 8756:                150                 0.108          0                   88
+#&gt; 8757:                150                 0.108          0                   88
+#&gt; 8758:                150                 0.108          0                   88
+#&gt; 8759:                150                 0.108          0                   88
+#&gt; 8760:                150                 0.108          0                   88
+#&gt;       albedo liquid_precip_depth liquid_precip_rate
+#&gt;    1:   0.16                   0                  1
+#&gt;    2:   0.16                   0                  1
+#&gt;    3:   0.16                   0                  1
+#&gt;    4:   0.16                   0                  1
+#&gt;    5:   0.16                   0                  1
+#&gt;   ---                                              
+#&gt; 8756:   0.21                   0                  1
+#&gt; 8757:   0.21                   0                  1
+#&gt; 8758:   0.21                   0                  1
+#&gt; 8759:   0.21                   0                  1
+#&gt; 8760:   0.21                   0                  1</div><div class='input'>
 <span class='co'># only check if there are any abnormal values in air temperature and</span>
 <span class='co'># liquid precipitation rate</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>abnormal_data</span><span class='op'>(</span>cols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dry_bulb_temperature"</span>, <span class='st'>"liquid_precip_rate"</span><span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;       line            datetime year month day hour minute
+#&gt;    1:  216 1999-01-09 16:00:00 1999     1   9   16      0
+#&gt;    2:  233 1999-01-10 09:00:00 1999     1  10    9      0
+#&gt;    3:  234 1999-01-10 10:00:00 1999     1  10   10      0
+#&gt;    4:  235 1999-01-10 11:00:00 1999     1  10   11      0
+#&gt;    5:  236 1999-01-10 12:00:00 1999     1  10   12      0
+#&gt;   ---                                                    
+#&gt; 2166: 5837 1985-08-31 21:00:00 1985     8  31   21      0
+#&gt; 2167: 5838 1985-08-31 22:00:00 1985     8  31   22      0
+#&gt; 2168: 5839 1985-08-31 23:00:00 1985     8  31   23      0
+#&gt; 2169: 5840 1985-09-01 00:00:00 1985     8  31   24      0
+#&gt; 2170: 7129 1998-10-24 17:00:00 1998    10  24   17      0
+#&gt;                                              data_source dry_bulb_temperature
+#&gt;    1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                 10.7
+#&gt;    2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  6.8
+#&gt;    3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  6.8
+#&gt;    4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  7.1
+#&gt;    5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  7.5
+#&gt;   ---                                                                        
+#&gt; 2166: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 16.7
+#&gt; 2167: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 16.3
+#&gt; 2168: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 15.9
+#&gt; 2169: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 15.5
+#&gt; 2170: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                 16.3
+#&gt;       dew_point_temperature relative_humidity atmospheric_pressure
+#&gt;    1:                   5.0                68               102300
+#&gt;    2:                   3.4                79               102300
+#&gt;    3:                   3.2                78               102200
+#&gt;    4:                   3.3                77               102200
+#&gt;    5:                   4.3                80               102100
+#&gt;   ---                                                             
+#&gt; 2166:                   8.9                60               101400
+#&gt; 2167:                   9.3                65               101400
+#&gt; 2168:                   9.7                67               101400
+#&gt; 2169:                  10.1                67               101400
+#&gt; 2170:                  12.4                78               101700
+#&gt;       extraterrestrial_horizontal_radiation
+#&gt;    1:                                   366
+#&gt;    2:                                   247
+#&gt;    3:                                   451
+#&gt;    4:                                   603
+#&gt;    5:                                   693
+#&gt;   ---                                      
+#&gt; 2166:                                     0
+#&gt; 2167:                                     0
+#&gt; 2168:                                     0
+#&gt; 2169:                                     0
+#&gt; 2170:                                   210
+#&gt;       extraterrestrial_direct_normal_radiation
+#&gt;    1:                                     1415
+#&gt;    2:                                     1415
+#&gt;    3:                                     1415
+#&gt;    4:                                     1415
+#&gt;    5:                                     1415
+#&gt;   ---                                         
+#&gt; 2166:                                        0
+#&gt; 2167:                                        0
+#&gt; 2168:                                        0
+#&gt; 2169:                                        0
+#&gt; 2170:                                     1382
+#&gt;       horizontal_infrared_radiation_intensity_from_sky
+#&gt;    1:                                              300
+#&gt;    2:                                              294
+#&gt;    3:                                              294
+#&gt;    4:                                              293
+#&gt;    5:                                              298
+#&gt;   ---                                                 
+#&gt; 2166:                                              344
+#&gt; 2167:                                              355
+#&gt; 2168:                                              354
+#&gt; 2169:                                              360
+#&gt; 2170:                                              344
+#&gt;       global_horizontal_radiation direct_normal_radiation
+#&gt;    1:                         141                      79
+#&gt;    2:                         118                     418
+#&gt;    3:                         251                     466
+#&gt;    4:                         349                     444
+#&gt;    5:                         411                     470
+#&gt;   ---                                                    
+#&gt; 2166:                           0                       0
+#&gt; 2167:                           0                       0
+#&gt; 2168:                           0                       0
+#&gt; 2169:                           0                       0
+#&gt; 2170:                         121                      91
+#&gt;       diffuse_horizontal_radiation global_horizontal_illuminance
+#&gt;    1:                          120                         15400
+#&gt;    2:                           44                         12100
+#&gt;    3:                          102                         26400
+#&gt;    4:                          159                         36300
+#&gt;    5:                          180                         43000
+#&gt;   ---                                                           
+#&gt; 2166:                            0                             0
+#&gt; 2167:                            0                             0
+#&gt; 2168:                            0                             0
+#&gt; 2169:                            0                             0
+#&gt; 2170:                          107                         13100
+#&gt;       direct_normal_illuminance diffuse_horizontal_illuminance zenith_luminance
+#&gt;    1:                      7000                          13500             2940
+#&gt;    2:                     30300                           6700              790
+#&gt;    3:                     42100                          12900             1910
+#&gt;    4:                     43100                          17900             3210
+#&gt;    5:                     46900                          20000             3800
+#&gt;   ---                                                                          
+#&gt; 2166:                         0                              0                0
+#&gt; 2167:                         0                              0                0
+#&gt; 2168:                         0                              0                0
+#&gt; 2169:                         0                              0                0
+#&gt; 2170:                      7100                          12100             2050
+#&gt;       wind_direction wind_speed total_sky_cover opaque_sky_cover visibility
+#&gt;    1:             40        2.6               2                1        8.0
+#&gt;    2:            230        3.9               5                5        8.0
+#&gt;    3:            260        2.4               6                5        8.0
+#&gt;    4:              0        0.0               5                4        8.0
+#&gt;    5:            160        1.3               5                5        8.0
+#&gt;   ---                                                                      
+#&gt; 2166:            300        6.7               6                5       24.1
+#&gt; 2167:            300        6.6               8                8       24.1
+#&gt; 2168:            320        6.4               8                8       24.1
+#&gt; 2169:            310        6.3               9                9       24.1
+#&gt; 2170:            280        5.7               4                4       16.0
+#&gt;       ceiling_height present_weather_observation present_weather_codes
+#&gt;    1:           7560                           9             999999999
+#&gt;    2:           7466                           9             999999999
+#&gt;    3:           6609                           9             999999999
+#&gt;    4:            753                           9             999999999
+#&gt;    5:              0                           9             999999999
+#&gt;   ---                                                                 
+#&gt; 2166:           3050                           9             999999999
+#&gt; 2167:           3050                           9             999999999
+#&gt; 2168:           3050                           9             999999999
+#&gt; 2169:           3050                           9             999999999
+#&gt; 2170:          77777                           9             999999999
+#&gt;       precipitable_water aerosol_optical_depth snow_depth days_since_last_snow
+#&gt;    1:                 80                 0.109          0                   88
+#&gt;    2:                100                 0.109          0                   88
+#&gt;    3:                110                 0.109          0                   88
+#&gt;    4:                110                 0.109          0                   88
+#&gt;    5:                110                 0.109          0                   88
+#&gt;   ---                                                                         
+#&gt; 2166:                250                 0.140          0                   88
+#&gt; 2167:                250                 0.140          0                   88
+#&gt; 2168:                250                 0.140          0                   88
+#&gt; 2169:                259                 0.140          0                   88
+#&gt; 2170:                179                 0.126          0                   88
+#&gt;       albedo liquid_precip_depth liquid_precip_rate
+#&gt;    1:   0.16                 999                 99
+#&gt;    2:   0.16                 999                 99
+#&gt;    3:   0.16                 999                 99
+#&gt;    4:   0.16                 999                 99
+#&gt;    5:   0.16                 999                 99
+#&gt;   ---                                              
+#&gt; 2166: 999.00                 999                 99
+#&gt; 2167: 999.00                 999                 99
+#&gt; 2168: 999.00                 999                 99
+#&gt; 2169: 999.00                 999                 99
+#&gt; 2170:   0.18                 999                 99</div><div class='input'>
 <span class='co'># save as above, but only return date time columns plus those 2 columns</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>abnormal_data</span><span class='op'>(</span>cols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dry_bulb_temperature"</span>, <span class='st'>"liquid_precip_rate"</span><span class='op'>)</span>,
     keep_all <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt;       line            datetime year month day hour minute dry_bulb_temperature
+#&gt;    1:  216 1999-01-09 16:00:00 1999     1   9   16      0                 10.7
+#&gt;    2:  233 1999-01-10 09:00:00 1999     1  10    9      0                  6.8
+#&gt;    3:  234 1999-01-10 10:00:00 1999     1  10   10      0                  6.8
+#&gt;    4:  235 1999-01-10 11:00:00 1999     1  10   11      0                  7.1
+#&gt;    5:  236 1999-01-10 12:00:00 1999     1  10   12      0                  7.5
+#&gt;   ---                                                                         
+#&gt; 2166: 5837 1985-08-31 21:00:00 1985     8  31   21      0                 16.7
+#&gt; 2167: 5838 1985-08-31 22:00:00 1985     8  31   22      0                 16.3
+#&gt; 2168: 5839 1985-08-31 23:00:00 1985     8  31   23      0                 15.9
+#&gt; 2169: 5840 1985-09-01 00:00:00 1985     8  31   24      0                 15.5
+#&gt; 2170: 7129 1998-10-24 17:00:00 1998    10  24   17      0                 16.3
+#&gt;       liquid_precip_rate
+#&gt;    1:                 99
+#&gt;    2:                 99
+#&gt;    3:                 99
+#&gt;    4:                 99
+#&gt;    5:                 99
+#&gt;   ---                   
+#&gt; 2166:                 99
+#&gt; 2167:                 99
+#&gt; 2168:                 99
+#&gt; 2169:                 99
+#&gt; 2170:                 99</div><div class='input'>
 <span class='co'># same as above, but only check for missing values</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>abnormal_data</span><span class='op'>(</span>cols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dry_bulb_temperature"</span>, <span class='st'>"liquid_precip_rate"</span><span class='op'>)</span>,
     type <span class='op'>=</span> <span class='st'>"missing"</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt;       line            datetime year month day hour minute
+#&gt;    1:  216 1999-01-09 16:00:00 1999     1   9   16      0
+#&gt;    2:  233 1999-01-10 09:00:00 1999     1  10    9      0
+#&gt;    3:  234 1999-01-10 10:00:00 1999     1  10   10      0
+#&gt;    4:  235 1999-01-10 11:00:00 1999     1  10   11      0
+#&gt;    5:  236 1999-01-10 12:00:00 1999     1  10   12      0
+#&gt;   ---                                                    
+#&gt; 2166: 5837 1985-08-31 21:00:00 1985     8  31   21      0
+#&gt; 2167: 5838 1985-08-31 22:00:00 1985     8  31   22      0
+#&gt; 2168: 5839 1985-08-31 23:00:00 1985     8  31   23      0
+#&gt; 2169: 5840 1985-09-01 00:00:00 1985     8  31   24      0
+#&gt; 2170: 7129 1998-10-24 17:00:00 1998    10  24   17      0
+#&gt;                                              data_source dry_bulb_temperature
+#&gt;    1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                 10.7
+#&gt;    2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  6.8
+#&gt;    3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  6.8
+#&gt;    4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  7.1
+#&gt;    5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                  7.5
+#&gt;   ---                                                                        
+#&gt; 2166: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 16.7
+#&gt; 2167: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 16.3
+#&gt; 2168: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 15.9
+#&gt; 2169: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9                 15.5
+#&gt; 2170: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9*9*9?9*9*9                 16.3
+#&gt;       dew_point_temperature relative_humidity atmospheric_pressure
+#&gt;    1:                   5.0                68               102300
+#&gt;    2:                   3.4                79               102300
+#&gt;    3:                   3.2                78               102200
+#&gt;    4:                   3.3                77               102200
+#&gt;    5:                   4.3                80               102100
+#&gt;   ---                                                             
+#&gt; 2166:                   8.9                60               101400
+#&gt; 2167:                   9.3                65               101400
+#&gt; 2168:                   9.7                67               101400
+#&gt; 2169:                  10.1                67               101400
+#&gt; 2170:                  12.4                78               101700
+#&gt;       extraterrestrial_horizontal_radiation
+#&gt;    1:                                   366
+#&gt;    2:                                   247
+#&gt;    3:                                   451
+#&gt;    4:                                   603
+#&gt;    5:                                   693
+#&gt;   ---                                      
+#&gt; 2166:                                     0
+#&gt; 2167:                                     0
+#&gt; 2168:                                     0
+#&gt; 2169:                                     0
+#&gt; 2170:                                   210
+#&gt;       extraterrestrial_direct_normal_radiation
+#&gt;    1:                                     1415
+#&gt;    2:                                     1415
+#&gt;    3:                                     1415
+#&gt;    4:                                     1415
+#&gt;    5:                                     1415
+#&gt;   ---                                         
+#&gt; 2166:                                        0
+#&gt; 2167:                                        0
+#&gt; 2168:                                        0
+#&gt; 2169:                                        0
+#&gt; 2170:                                     1382
+#&gt;       horizontal_infrared_radiation_intensity_from_sky
+#&gt;    1:                                              300
+#&gt;    2:                                              294
+#&gt;    3:                                              294
+#&gt;    4:                                              293
+#&gt;    5:                                              298
+#&gt;   ---                                                 
+#&gt; 2166:                                              344
+#&gt; 2167:                                              355
+#&gt; 2168:                                              354
+#&gt; 2169:                                              360
+#&gt; 2170:                                              344
+#&gt;       global_horizontal_radiation direct_normal_radiation
+#&gt;    1:                         141                      79
+#&gt;    2:                         118                     418
+#&gt;    3:                         251                     466
+#&gt;    4:                         349                     444
+#&gt;    5:                         411                     470
+#&gt;   ---                                                    
+#&gt; 2166:                           0                       0
+#&gt; 2167:                           0                       0
+#&gt; 2168:                           0                       0
+#&gt; 2169:                           0                       0
+#&gt; 2170:                         121                      91
+#&gt;       diffuse_horizontal_radiation global_horizontal_illuminance
+#&gt;    1:                          120                         15400
+#&gt;    2:                           44                         12100
+#&gt;    3:                          102                         26400
+#&gt;    4:                          159                         36300
+#&gt;    5:                          180                         43000
+#&gt;   ---                                                           
+#&gt; 2166:                            0                             0
+#&gt; 2167:                            0                             0
+#&gt; 2168:                            0                             0
+#&gt; 2169:                            0                             0
+#&gt; 2170:                          107                         13100
+#&gt;       direct_normal_illuminance diffuse_horizontal_illuminance zenith_luminance
+#&gt;    1:                      7000                          13500             2940
+#&gt;    2:                     30300                           6700              790
+#&gt;    3:                     42100                          12900             1910
+#&gt;    4:                     43100                          17900             3210
+#&gt;    5:                     46900                          20000             3800
+#&gt;   ---                                                                          
+#&gt; 2166:                         0                              0                0
+#&gt; 2167:                         0                              0                0
+#&gt; 2168:                         0                              0                0
+#&gt; 2169:                         0                              0                0
+#&gt; 2170:                      7100                          12100             2050
+#&gt;       wind_direction wind_speed total_sky_cover opaque_sky_cover visibility
+#&gt;    1:             40        2.6               2                1        8.0
+#&gt;    2:            230        3.9               5                5        8.0
+#&gt;    3:            260        2.4               6                5        8.0
+#&gt;    4:              0        0.0               5                4        8.0
+#&gt;    5:            160        1.3               5                5        8.0
+#&gt;   ---                                                                      
+#&gt; 2166:            300        6.7               6                5       24.1
+#&gt; 2167:            300        6.6               8                8       24.1
+#&gt; 2168:            320        6.4               8                8       24.1
+#&gt; 2169:            310        6.3               9                9       24.1
+#&gt; 2170:            280        5.7               4                4       16.0
+#&gt;       ceiling_height present_weather_observation present_weather_codes
+#&gt;    1:           7560                           9             999999999
+#&gt;    2:           7466                           9             999999999
+#&gt;    3:           6609                           9             999999999
+#&gt;    4:            753                           9             999999999
+#&gt;    5:              0                           9             999999999
+#&gt;   ---                                                                 
+#&gt; 2166:           3050                           9             999999999
+#&gt; 2167:           3050                           9             999999999
+#&gt; 2168:           3050                           9             999999999
+#&gt; 2169:           3050                           9             999999999
+#&gt; 2170:          77777                           9             999999999
+#&gt;       precipitable_water aerosol_optical_depth snow_depth days_since_last_snow
+#&gt;    1:                 80                 0.109          0                   88
+#&gt;    2:                100                 0.109          0                   88
+#&gt;    3:                110                 0.109          0                   88
+#&gt;    4:                110                 0.109          0                   88
+#&gt;    5:                110                 0.109          0                   88
+#&gt;   ---                                                                         
+#&gt; 2166:                250                 0.140          0                   88
+#&gt; 2167:                250                 0.140          0                   88
+#&gt; 2168:                250                 0.140          0                   88
+#&gt; 2169:                259                 0.140          0                   88
+#&gt; 2170:                179                 0.126          0                   88
+#&gt;       albedo liquid_precip_depth liquid_precip_rate
+#&gt;    1:   0.16                 999                 99
+#&gt;    2:   0.16                 999                 99
+#&gt;    3:   0.16                 999                 99
+#&gt;    4:   0.16                 999                 99
+#&gt;    5:   0.16                 999                 99
+#&gt;   ---                                              
+#&gt; 2166: 999.00                 999                 99
+#&gt; 2167: 999.00                 999                 99
+#&gt; 2168: 999.00                 999                 99
+#&gt; 2169: 999.00                 999                 99
+#&gt; 2170:   0.18                 999                 99</div><div class='input'>
 <span class='co'># same as above, but only check for out-of-range values</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>abnormal_data</span><span class='op'>(</span>cols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"dry_bulb_temperature"</span>, <span class='st'>"liquid_precip_rate"</span><span class='op'>)</span>,
     type <span class='op'>=</span> <span class='st'>"out_of_range"</span>
 <span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>No abnormal data found.</span></div><div class='output co'>#&gt; Empty data.table (0 rows and 37 cols): line,datetime,year,month,day,hour...</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$redundant_data`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>redundant_data</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>No redundant data found.</span></div><div class='output co'>#&gt; Empty data.table (0 rows and 37 cols): line,datetime,year,month,day,hour...</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$make_na`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># turn all missing values into NAs</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>liquid_precip_rate</span><span class='op'>)</span>
-<span class='va'>epw</span><span class='op'>$</span><span class='fu'>make_na</span><span class='op'>(</span>missing <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#&gt;    1.00    1.00    1.00   25.28    1.00   99.00 </div><div class='input'><span class='va'>epw</span><span class='op'>$</span><span class='fu'>make_na</span><span class='op'>(</span>missing <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>liquid_precip_rate</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#&gt;       1       1       1       1       1       1    2170 </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$fill_abnormal`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># turn all missing values into NAs</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>liquid_precip_rate</span><span class='op'>)</span>
-<span class='va'>epw</span><span class='op'>$</span><span class='fu'>fill_abnormal</span><span class='op'>(</span>missing <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#&gt;       1       1       1       1       1       1    2170 </div><div class='input'><span class='va'>epw</span><span class='op'>$</span><span class='fu'>fill_abnormal</span><span class='op'>(</span>missing <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>liquid_precip_rate</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#&gt;    1.00    1.00    1.00   25.28    1.00   99.00 </div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$add_unit`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># get weather data with units</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>add_unit</span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;               datetime year month day hour minute
+#&gt; 1: 2020-01-01 01:00:00 1999     1   1    1      0
+#&gt; 2: 2020-01-01 02:00:00 1999     1   1    2      0
+#&gt; 3: 2020-01-01 03:00:00 1999     1   1    3      0
+#&gt; 4: 2020-01-01 04:00:00 1999     1   1    4      0
+#&gt; 5: 2020-01-01 05:00:00 1999     1   1    5      0
+#&gt; 6: 2020-01-01 06:00:00 1999     1   1    6      0
+#&gt;                                           data_source dry_bulb_temperature
+#&gt; 1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             7.2 [°C]
+#&gt; 2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             7.2 [°C]
+#&gt; 3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             6.7 [°C]
+#&gt; 4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             6.1 [°C]
+#&gt; 5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             4.4 [°C]
+#&gt; 6: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9             4.4 [°C]
+#&gt;    dew_point_temperature relative_humidity atmospheric_pressure
+#&gt; 1:              5.6 [°C]            90 [%]          102200 [Pa]
+#&gt; 2:              5.6 [°C]            90 [%]          102100 [Pa]
+#&gt; 3:              5.0 [°C]            89 [%]          102200 [Pa]
+#&gt; 4:              5.0 [°C]            93 [%]          102200 [Pa]
+#&gt; 5:              3.9 [°C]            97 [%]          102200 [Pa]
+#&gt; 6:              3.9 [°C]            97 [%]          102200 [Pa]
+#&gt;    extraterrestrial_horizontal_radiation
+#&gt; 1:                           0 [h*W/m^2]
+#&gt; 2:                           0 [h*W/m^2]
+#&gt; 3:                           0 [h*W/m^2]
+#&gt; 4:                           0 [h*W/m^2]
+#&gt; 5:                           0 [h*W/m^2]
+#&gt; 6:                           0 [h*W/m^2]
+#&gt;    extraterrestrial_direct_normal_radiation
+#&gt; 1:                              0 [h*W/m^2]
+#&gt; 2:                              0 [h*W/m^2]
+#&gt; 3:                              0 [h*W/m^2]
+#&gt; 4:                              0 [h*W/m^2]
+#&gt; 5:                              0 [h*W/m^2]
+#&gt; 6:                              0 [h*W/m^2]
+#&gt;    horizontal_infrared_radiation_intensity_from_sky global_horizontal_radiation
+#&gt; 1:                                    290 [h*W/m^2]                 0 [h*W/m^2]
+#&gt; 2:                                    296 [h*W/m^2]                 0 [h*W/m^2]
+#&gt; 3:                                    291 [h*W/m^2]                 0 [h*W/m^2]
+#&gt; 4:                                    276 [h*W/m^2]                 0 [h*W/m^2]
+#&gt; 5:                                    280 [h*W/m^2]                 0 [h*W/m^2]
+#&gt; 6:                                    280 [h*W/m^2]                 0 [h*W/m^2]
+#&gt;    direct_normal_radiation diffuse_horizontal_radiation
+#&gt; 1:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt; 2:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt; 3:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt; 4:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt; 5:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt; 6:             0 [h*W/m^2]                  0 [h*W/m^2]
+#&gt;    global_horizontal_illuminance direct_normal_illuminance
+#&gt; 1:                        0 [lx]                    0 [lx]
+#&gt; 2:                        0 [lx]                    0 [lx]
+#&gt; 3:                        0 [lx]                    0 [lx]
+#&gt; 4:                        0 [lx]                    0 [lx]
+#&gt; 5:                        0 [lx]                    0 [lx]
+#&gt; 6:                        0 [lx]                    0 [lx]
+#&gt;    diffuse_horizontal_illuminance zenith_luminance wind_direction wind_speed
+#&gt; 1:                         0 [lx]       0 [cd/m^2]          0 [°]  0.0 [m/s]
+#&gt; 2:                         0 [lx]       0 [cd/m^2]        170 [°]  2.1 [m/s]
+#&gt; 3:                         0 [lx]       0 [cd/m^2]        210 [°]  2.1 [m/s]
+#&gt; 4:                         0 [lx]       0 [cd/m^2]        200 [°]  1.5 [m/s]
+#&gt; 5:                         0 [lx]       0 [cd/m^2]        260 [°]  3.1 [m/s]
+#&gt; 6:                         0 [lx]       0 [cd/m^2]        180 [°]  2.1 [m/s]
+#&gt;    total_sky_cover opaque_sky_cover visibility ceiling_height
+#&gt; 1:               2                2    16 [km]      77777 [m]
+#&gt; 2:               4                4    16 [km]      77777 [m]
+#&gt; 3:               3                3    16 [km]      77777 [m]
+#&gt; 4:               0                0    16 [km]      77777 [m]
+#&gt; 5:               3                3    16 [km]      77777 [m]
+#&gt; 6:               3                3    16 [km]      77777 [m]
+#&gt;    present_weather_observation present_weather_codes precipitable_water
+#&gt; 1:                           9             999999999           129 [mm]
+#&gt; 2:                           9             999999999           120 [mm]
+#&gt; 3:                           9             999999999           120 [mm]
+#&gt; 4:                           9             999999999           120 [mm]
+#&gt; 5:                           9             999999999           120 [mm]
+#&gt; 6:                           9             999999999           120 [mm]
+#&gt;    aerosol_optical_depth snow_depth days_since_last_snow albedo
+#&gt; 1:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt; 2:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt; 3:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt; 4:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt; 5:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt; 6:   0.108 [thousandths]     0 [cm]               88 [d]   0.16
+#&gt;    liquid_precip_depth liquid_precip_rate
+#&gt; 1:              0 [mm]              1 [h]
+#&gt; 2:              0 [mm]              1 [h]
+#&gt; 3:              0 [mm]              1 [h]
+#&gt; 4:              0 [mm]              1 [h]
+#&gt; 5:              0 [mm]              1 [h]
+#&gt; 6:              0 [mm]              1 [h]</div><div class='input'>
 <span class='co'># with units specified, you can easily perform unit conversion using units</span>
 <span class='co'># package</span>
 <span class='va'>t_dry_bulb</span> <span class='op'>&lt;-</span> <span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dry_bulb_temperature</span>
 <span class='fu'><a href='https://rdrr.io/r/base/difftime.html'>units</a></span><span class='op'>(</span><span class='va'>t_dry_bulb</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='fu'>units</span><span class='fu'>::</span><span class='va'>ud_units</span>, <span class='st'>"kelvin"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error: 'ud_units' is not an exported object from 'namespace:units'</span></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>t_dry_bulb</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; Units: [°C]
+#&gt; [1] 7.2 7.2 6.7 6.1 4.4 4.4</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$drop_unit`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>drop_unit</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;                  datetime year month day hour minute
+#&gt;    1: 2020-01-01 01:00:00 1999     1   1    1      0
+#&gt;    2: 2020-01-01 02:00:00 1999     1   1    2      0
+#&gt;    3: 2020-01-01 03:00:00 1999     1   1    3      0
+#&gt;    4: 2020-01-01 04:00:00 1999     1   1    4      0
+#&gt;    5: 2020-01-01 05:00:00 1999     1   1    5      0
+#&gt;   ---                                               
+#&gt; 8756: 2020-12-31 20:00:00 1997    12  31   20      0
+#&gt; 8757: 2020-12-31 21:00:00 1997    12  31   21      0
+#&gt; 8758: 2020-12-31 22:00:00 1997    12  31   22      0
+#&gt; 8759: 2020-12-31 23:00:00 1997    12  31   23      0
+#&gt; 8760: 2021-01-01 00:00:00 1997    12  31   24      0
+#&gt;                                              data_source dry_bulb_temperature
+#&gt;    1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
+#&gt;    2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
+#&gt;    3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  6.7
+#&gt;    4: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  6.1
+#&gt;    5: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  4.4
+#&gt;   ---                                                                        
+#&gt; 8756: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 13.3
+#&gt; 8757: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 12.2
+#&gt; 8758: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 10.6
+#&gt; 8759: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 10.6
+#&gt; 8760: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                 11.1
+#&gt;       dew_point_temperature relative_humidity atmospheric_pressure
+#&gt;    1:                   5.6                90               102200
+#&gt;    2:                   5.6                90               102100
+#&gt;    3:                   5.0                89               102200
+#&gt;    4:                   5.0                93               102200
+#&gt;    5:                   3.9                97               102200
+#&gt;   ---                                                             
+#&gt; 8756:                  11.7                90               101800
+#&gt; 8757:                  11.1                93               101700
+#&gt; 8758:                  10.0                96               101800
+#&gt; 8759:                  10.6               100               101800
+#&gt; 8760:                  10.6                97               101700
+#&gt;       extraterrestrial_horizontal_radiation
+#&gt;    1:                                     0
+#&gt;    2:                                     0
+#&gt;    3:                                     0
+#&gt;    4:                                     0
+#&gt;    5:                                     0
+#&gt;   ---                                      
+#&gt; 8756:                                     0
+#&gt; 8757:                                     0
+#&gt; 8758:                                     0
+#&gt; 8759:                                     0
+#&gt; 8760:                                     0
+#&gt;       extraterrestrial_direct_normal_radiation
+#&gt;    1:                                        0
+#&gt;    2:                                        0
+#&gt;    3:                                        0
+#&gt;    4:                                        0
+#&gt;    5:                                        0
+#&gt;   ---                                         
+#&gt; 8756:                                        0
+#&gt; 8757:                                        0
+#&gt; 8758:                                        0
+#&gt; 8759:                                        0
+#&gt; 8760:                                        0
+#&gt;       horizontal_infrared_radiation_intensity_from_sky
+#&gt;    1:                                              290
+#&gt;    2:                                              296
+#&gt;    3:                                              291
+#&gt;    4:                                              276
+#&gt;    5:                                              280
+#&gt;   ---                                                 
+#&gt; 8756:                                              338
+#&gt; 8757:                                              326
+#&gt; 8758:                                              317
+#&gt; 8759:                                              337
+#&gt; 8760:                                              349
+#&gt;       global_horizontal_radiation direct_normal_radiation
+#&gt;    1:                           0                       0
+#&gt;    2:                           0                       0
+#&gt;    3:                           0                       0
+#&gt;    4:                           0                       0
+#&gt;    5:                           0                       0
+#&gt;   ---                                                    
+#&gt; 8756:                           0                       0
+#&gt; 8757:                           0                       0
+#&gt; 8758:                           0                       0
+#&gt; 8759:                           0                       0
+#&gt; 8760:                           0                       0
+#&gt;       diffuse_horizontal_radiation global_horizontal_illuminance
+#&gt;    1:                            0                             0
+#&gt;    2:                            0                             0
+#&gt;    3:                            0                             0
+#&gt;    4:                            0                             0
+#&gt;    5:                            0                             0
+#&gt;   ---                                                           
+#&gt; 8756:                            0                             0
+#&gt; 8757:                            0                             0
+#&gt; 8758:                            0                             0
+#&gt; 8759:                            0                             0
+#&gt; 8760:                            0                             0
+#&gt;       direct_normal_illuminance diffuse_horizontal_illuminance zenith_luminance
+#&gt;    1:                         0                              0                0
+#&gt;    2:                         0                              0                0
+#&gt;    3:                         0                              0                0
+#&gt;    4:                         0                              0                0
+#&gt;    5:                         0                              0                0
+#&gt;   ---                                                                          
+#&gt; 8756:                         0                              0                0
+#&gt; 8757:                         0                              0                0
+#&gt; 8758:                         0                              0                0
+#&gt; 8759:                         0                              0                0
+#&gt; 8760:                         0                              0                0
+#&gt;       wind_direction wind_speed total_sky_cover opaque_sky_cover visibility
+#&gt;    1:              0        0.0               2                2       16.0
+#&gt;    2:            170        2.1               4                4       16.0
+#&gt;    3:            210        2.1               3                3       16.0
+#&gt;    4:            200        1.5               0                0       16.0
+#&gt;    5:            260        3.1               3                3       16.0
+#&gt;   ---                                                                      
+#&gt; 8756:            280        3.1               7                7       14.4
+#&gt; 8757:            350        1.5               5                5       16.0
+#&gt; 8758:            180        2.1               5                5       11.2
+#&gt; 8759:            170        2.1               9                9        6.4
+#&gt; 8760:            140        1.5              10               10        9.6
+#&gt;       ceiling_height present_weather_observation present_weather_codes
+#&gt;    1:          77777                           9             999999999
+#&gt;    2:          77777                           9             999999999
+#&gt;    3:          77777                           9             999999999
+#&gt;    4:          77777                           9             999999999
+#&gt;    5:          77777                           9             999999999
+#&gt;   ---                                                                 
+#&gt; 8756:            579                           9             999999999
+#&gt; 8757:          77777                           9             999999999
+#&gt; 8758:          77777                           9             999999999
+#&gt; 8759:            640                           9             999999999
+#&gt; 8760:            640                           9             999999999
+#&gt;       precipitable_water aerosol_optical_depth snow_depth days_since_last_snow
+#&gt;    1:                129                 0.108          0                   88
+#&gt;    2:                120                 0.108          0                   88
+#&gt;    3:                120                 0.108          0                   88
+#&gt;    4:                120                 0.108          0                   88
+#&gt;    5:                120                 0.108          0                   88
+#&gt;   ---                                                                         
+#&gt; 8756:                150                 0.108          0                   88
+#&gt; 8757:                150                 0.108          0                   88
+#&gt; 8758:                150                 0.108          0                   88
+#&gt; 8759:                150                 0.108          0                   88
+#&gt; 8760:                150                 0.108          0                   88
+#&gt;       albedo liquid_precip_depth liquid_precip_rate
+#&gt;    1:   0.16                   0                  1
+#&gt;    2:   0.16                   0                  1
+#&gt;    3:   0.16                   0                  1
+#&gt;    4:   0.16                   0                  1
+#&gt;    5:   0.16                   0                  1
+#&gt;   ---                                              
+#&gt; 8756:   0.21                   0                  1
+#&gt; 8757:   0.21                   0                  1
+#&gt; 8758:   0.21                   0                  1
+#&gt; 8759:   0.21                   0                  1
+#&gt; 8760:   0.21                   0                  1</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$purge`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>purge</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>No redundant data found. Nothing to purge.</span></div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$add`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># will fail since date time in input data has already been covered by</span>
 <span class='co'># existing data period</span>
 <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>add</span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>, silent <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$set`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># change the weather data</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>set</span><span class='op'>(</span><span class='va'>epw</span><span class='op'>$</span><span class='fu'>data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>Info</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────────────────────────</span><span>
+#&gt; Data period #1 has been replaced with input data.
+#&gt; 
+#&gt;      Name StartDayOfWeek StartDay EndDay
+#&gt;  1:  test      Wednesday     1/ 1  12/31
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$is_unsaved`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>is_unsaved</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$save`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># save the weather file</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"weather.epw"</span><span class='op'>)</span>, overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `Epw$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>epw</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; ══ EnergyPlus Weather File ═════════════════════════════════════════════════════
+#&gt; [Location ]: MyCity, CA, USA
+#&gt;              {N 37°37'}, {W 122°24'}, {UTC-08:00}
+#&gt; [Elevation]: 2m above see level
+#&gt; [Data Src ]: TMY3
+#&gt; [WMO Stat ]: 724940
+#&gt; [Leap Year]: No
+#&gt; [Interval ]: 60 mins
+#&gt; 
+#&gt; ── Data Periods ────────────────────────────────────────────────────────────────
+#&gt;    Name StartDayOfWeek StartDay EndDay
+#&gt; 1: test      Wednesday     1/ 1  12/31
+#&gt; 
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># }</span>
 
-</div></pre>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

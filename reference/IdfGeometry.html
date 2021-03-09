@@ -585,7 +585,7 @@ geom$print()
 <span class='co'>## Method `IdfGeometry$new`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span>
 <span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span>
 
@@ -597,89 +597,179 @@ geom$print()
 <span class='co'># create from an IDF file</span>
 <span class='va'>geom</span> <span class='op'>&lt;-</span> <span class='fu'>idf_geometry</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>
 <span class='va'>geom</span> <span class='op'>&lt;-</span> <span class='va'>IdfGeometry</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$parent`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>parent</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
+#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
+#&gt;  * Version: '8.8.0'
+#&gt; 
+#&gt; Group: &lt;Simulation Parameters&gt;
+#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
+#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
+#&gt; 
+#&gt; Group: &lt;Location and Climate&gt;
+#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
+#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
+#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
+#&gt; 
+#&gt; Group: &lt;Schedules&gt;
+#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
+#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
+#&gt; 
+#&gt; Group: &lt;Surface Construction Elements&gt;
+#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
+#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
+#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
+#&gt; 
+#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
+#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
+#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
+#&gt; 
+#&gt; Group: &lt;Internal Gains&gt;
+#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
+#&gt; 
+#&gt; Group: &lt;Exterior Equipment&gt;
+#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
+#&gt; 
+#&gt; Group: &lt;Output Reporting&gt;
+#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
+#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
+#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
+#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$rules`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>rules</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; $starting_vertex_position
+#&gt; [1] "upperleftcorner"
+#&gt; 
+#&gt; $vertex_entry_direction
+#&gt; [1] "counterclockwise"
+#&gt; 
+#&gt; $coordinate_system
+#&gt; [1] "absolute"
+#&gt; 
+#&gt; $daylighting_reference_point_coordinate_system
+#&gt; [1] "relative"
+#&gt; 
+#&gt; $rectangular_surface_coordinate_system
+#&gt; [1] "relative"
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$convert`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>convert</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$coord_system`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>coord_system</span><span class='op'>(</span><span class='st'>"absolute"</span>, <span class='st'>"absolute"</span>, <span class='st'>"absolute"</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$round_digits`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>round_digits</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$area`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>area</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    id          name                    class     zone  type      area
+#&gt; 1: 21 Zn001:Wall001 BuildingSurface:Detailed ZONE ONE  Wall  69.67728
+#&gt; 2: 22 Zn001:Wall002 BuildingSurface:Detailed ZONE ONE  Wall  69.67728
+#&gt; 3: 23 Zn001:Wall003 BuildingSurface:Detailed ZONE ONE  Wall  69.67728
+#&gt; 4: 24 Zn001:Wall004 BuildingSurface:Detailed ZONE ONE  Wall  69.67728
+#&gt; 5: 25  Zn001:Flr001 BuildingSurface:Detailed ZONE ONE Floor 232.25760
+#&gt; 6: 26 Zn001:Roof001 BuildingSurface:Detailed ZONE ONE  Roof 232.25760</div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$azimuth`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>azimuth</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    id          name                    class     zone  type azimuth
+#&gt; 1: 21 Zn001:Wall001 BuildingSurface:Detailed ZONE ONE  Wall     180
+#&gt; 2: 22 Zn001:Wall002 BuildingSurface:Detailed ZONE ONE  Wall      90
+#&gt; 3: 23 Zn001:Wall003 BuildingSurface:Detailed ZONE ONE  Wall       0
+#&gt; 4: 24 Zn001:Wall004 BuildingSurface:Detailed ZONE ONE  Wall     270
+#&gt; 5: 25  Zn001:Flr001 BuildingSurface:Detailed ZONE ONE Floor      90
+#&gt; 6: 26 Zn001:Roof001 BuildingSurface:Detailed ZONE ONE  Roof      90</div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$tilt`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>tilt</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;    id          name                    class     zone  type tilt
+#&gt; 1: 21 Zn001:Wall001 BuildingSurface:Detailed ZONE ONE  Wall   90
+#&gt; 2: 22 Zn001:Wall002 BuildingSurface:Detailed ZONE ONE  Wall   90
+#&gt; 3: 23 Zn001:Wall003 BuildingSurface:Detailed ZONE ONE  Wall   90
+#&gt; 4: 24 Zn001:Wall004 BuildingSurface:Detailed ZONE ONE  Wall  270
+#&gt; 5: 25  Zn001:Flr001 BuildingSurface:Detailed ZONE ONE Floor  180
+#&gt; 6: 26 Zn001:Roof001 BuildingSurface:Detailed ZONE ONE  Roof    0</div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$view`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>view</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>view</span><span class='op'>(</span>render_by <span class='op'>=</span> <span class='st'>"zone"</span><span class='op'>)</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>view</span><span class='op'>(</span>new <span class='op'>=</span> <span class='cn'>TRUE</span>, render_by <span class='op'>=</span> <span class='st'>"construction"</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
 <span class='co'>## ------------------------------------------------</span>
 <span class='co'>## Method `IdfGeometry$print`</span>
 <span class='co'>## ------------------------------------------------</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># \dontrun{</span>
 <span class='va'>geom</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────
+#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
+#&gt;  * Version: '8.8.0'
+#&gt;  * Building: 'Simple One Zone (Wireframe DXF)'
+#&gt;  * North Axis: 0°
+#&gt;  * Zone Num: 1
+#&gt;  * Surface Num: 6
+#&gt;  * SubSurface Num: 0
+#&gt;  * Shading Num: 0
+#&gt;  * Dayl Ref Pnt Num: 0
+#&gt;  * Coordinate System:
+#&gt;    - Detailed: 'Absolute'
+#&gt;    - Simple:   'Absolute'
+#&gt;    - Daylighting: 'Absolute'</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

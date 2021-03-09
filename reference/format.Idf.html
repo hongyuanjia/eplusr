@@ -240,10 +240,561 @@ Default: <code>29L</code> which is the same as IDF Editor.</p></td>
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
 <span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span>, leading <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; !-Generator eplusr
+#&gt; !-Option OriginalOrderTop
+#&gt; 
+#&gt; !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+#&gt; !-      Use '!' comments if they need to be retained when using the IDFEditor.
+#&gt; 
+#&gt; !1ZoneUncontrolled.idf
+#&gt; ! Basic file description:  Basic test for EnergyPlus.  Resistive Walls.  Regular (no ground contact) floor.
+#&gt; !                          Regular roof.  No Windows.
+#&gt; !
+#&gt; ! Highlights:              Very basic test to see that EnergyPlus "works".
+#&gt; !
+#&gt; !
+#&gt; ! Simulation Location/Run: Denver Centennial  Golden CO USA WMO=724666, 2 design days, 1 run period,
+#&gt; !                          Run Control executes two design days (see RUN PERIOD object)
+#&gt; !
+#&gt; ! Location:                Denver, CO
+#&gt; !
+#&gt; ! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5ü¾Œ†ˆ¼C
+#&gt; !                          Denver Centennial  Golden CO USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32ü¾Œ†ˆ¼C MWB=15.5ü¾Œ†ˆ¼C
+#&gt; !
+#&gt; ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
+#&gt; !
+#&gt; ! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
+#&gt; !
+#&gt; ! Building: Fictional 1 zone building with resistive walls.
+#&gt; !
+#&gt; !           The building is oriented due north.
+#&gt; !
+#&gt; ! Floor Area:        232.25 m2
+#&gt; ! Number of Stories: 1
+#&gt; !
+#&gt; ! Zone Description Details:
+#&gt; !
+#&gt; !       (0,15.24,0)                 (15.24,15.24,0)
+#&gt; !              _____________________________
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |_____________________________|
+#&gt; !
+#&gt; !          (0,0,0)                      (15.24,0,0)
+#&gt; !
+#&gt; ! Internal gains description:     NA
+#&gt; !
+#&gt; ! Interzone Surfaces:             None
+#&gt; ! Internal Mass:                  None
+#&gt; ! People:                         None
+#&gt; ! Lights:                         None
+#&gt; ! Equipment:                      None
+#&gt; ! Windows:                        0
+#&gt; ! Detached Shading:               None
+#&gt; ! Daylight:                       None
+#&gt; ! Natural Ventilation:            None
+#&gt; ! Compact Schedules:              NA (Example of non-Compact Schedules)
+#&gt; ! Solar Distribution:             MinimalShadowing
+#&gt; !
+#&gt; ! HVAC:                           NA
+#&gt; !
+#&gt; ! Zonal Equipment:                NA
+#&gt; ! Central Air Handling Equipment: No
+#&gt; ! System Equipment Autosize:      No
+#&gt; ! Purchased Cooling:              No
+#&gt; ! Purchased Heating:              No
+#&gt; ! Purchased Chilled Water:        No
+#&gt; ! Purchased Hot Water:            No
+#&gt; ! Coils:                          None
+#&gt; ! Pumps:                          None
+#&gt; ! Boilers:                        None
+#&gt; ! Chillers:                       None
+#&gt; ! Towers:                         None
+#&gt; !
+#&gt; ! Results:
+#&gt; ! Standard Reports:               Variable Dictionary, Surfaces (dxf-wireframe), Meter File
+#&gt; ! Timestep or Hourly Variables:   Hourly and Daily
+#&gt; ! Time bins Report:               None
+#&gt; ! HTML Report:                    None
+#&gt; ! Environmental Emissions:        None
+#&gt; ! Utility Tariffs:                None
+#&gt; Version,
+#&gt; 8.8;                         !- Version Identifier
+#&gt; 
+#&gt; Timestep,
+#&gt; 4;                           !- Number of Timesteps per Hour
+#&gt; 
+#&gt; Building,
+#&gt; Simple One Zone (Wireframe DXF),  !- Name
+#&gt; 0,                           !- North Axis {deg}
+#&gt; Suburbs,                     !- Terrain
+#&gt; 0.04,                        !- Loads Convergence Tolerance Value
+#&gt; 0.004,                       !- Temperature Convergence Tolerance Value {deltaC}
+#&gt; MinimalShadowing,            !- Solar Distribution
+#&gt; 30,                          !- Maximum Number of Warmup Days
+#&gt; 6;                           !- Minimum Number of Warmup Days
+#&gt; 
+#&gt; HeatBalanceAlgorithm,
+#&gt; ConductionTransferFunction;  !- Algorithm
+#&gt; 
+#&gt; SurfaceConvectionAlgorithm:Inside,
+#&gt; TARP;                        !- Algorithm
+#&gt; 
+#&gt; SurfaceConvectionAlgorithm:Outside,
+#&gt; DOE-2;                       !- Algorithm
+#&gt; 
+#&gt; SimulationControl,
+#&gt; No,                          !- Do Zone Sizing Calculation
+#&gt; No,                          !- Do System Sizing Calculation
+#&gt; No,                          !- Do Plant Sizing Calculation
+#&gt; Yes,                         !- Run Simulation for Sizing Periods
+#&gt; Yes;                         !- Run Simulation for Weather File Run Periods
+#&gt; 
+#&gt; RunPeriod,
+#&gt; ,                            !- Name
+#&gt; 1,                           !- Begin Month
+#&gt; 1,                           !- Begin Day of Month
+#&gt; 12,                          !- End Month
+#&gt; 31,                          !- End Day of Month
+#&gt; Tuesday,                     !- Day of Week for Start Day
+#&gt; Yes,                         !- Use Weather File Holidays and Special Days
+#&gt; Yes,                         !- Use Weather File Daylight Saving Period
+#&gt; No,                          !- Apply Weekend Holiday Rule
+#&gt; Yes,                         !- Use Weather File Rain Indicators
+#&gt; Yes;                         !- Use Weather File Snow Indicators
+#&gt; 
+#&gt; Site:Location,
+#&gt; Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
+#&gt; 39.74,                       !- Latitude {deg}
+#&gt; -105.18,                     !- Longitude {deg}
+#&gt; -7,                          !- Time Zone {hr}
+#&gt; 1829;                        !- Elevation {m}
+#&gt; 
+#&gt; !  WMO=724666 Time Zone=NAM: (GMT-07:00) Mountain Time (US &amp; Canada)
+#&gt; !  Data Source=ASHRAE 2009 Annual Design Conditions
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+#&gt; ! Coldest Month=DEC
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5ü¾Œ†ˆ¼C
+#&gt; SizingPeriod:DesignDay,
+#&gt; Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
+#&gt; 12,                          !- Month
+#&gt; 21,                          !- Day of Month
+#&gt; WinterDesignDay,             !- Day Type
+#&gt; -15.5,                       !- Maximum Dry-Bulb Temperature {C}
+#&gt; 0,                           !- Daily Dry-Bulb Temperature Range {deltaC}
+#&gt; ,                            !- Dry-Bulb Temperature Range Modifier Type
+#&gt; ,                            !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+#&gt; Wetbulb,                     !- Humidity Condition Type
+#&gt; -15.5,                       !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+#&gt; ,                            !- Humidity Condition Day Schedule Name
+#&gt; ,                            !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+#&gt; ,                            !- Enthalpy at Maximum Dry-Bulb {J/kg}
+#&gt; ,                            !- Daily Wet-Bulb Temperature Range {deltaC}
+#&gt; 81198,                       !- Barometric Pressure {Pa}
+#&gt; 3,                           !- Wind Speed {m/s}
+#&gt; 340,                         !- Wind Direction {deg}
+#&gt; No,                          !- Rain Indicator
+#&gt; No,                          !- Snow Indicator
+#&gt; No,                          !- Daylight Saving Time Indicator
+#&gt; ASHRAEClearSky,              !- Solar Model Indicator
+#&gt; ,                            !- Beam Solar Day Schedule Name
+#&gt; ,                            !- Diffuse Solar Day Schedule Name
+#&gt; ,                            !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+#&gt; ,                            !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+#&gt; 0;                           !- Sky Clearness
+#&gt; 
+#&gt; ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
+#&gt; ! Hottest Month=JUL
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32ü¾Œ†ˆ¼C MWB=15.5ü¾Œ†ˆ¼C
+#&gt; SizingPeriod:DesignDay,
+#&gt; Denver Centennial  Golden   N Ann Clg 1% Condns DB=&gt;MWB,  !- Name
+#&gt; 7,                           !- Month
+#&gt; 21,                          !- Day of Month
+#&gt; SummerDesignDay,             !- Day Type
+#&gt; 32,                          !- Maximum Dry-Bulb Temperature {C}
+#&gt; 15.2,                        !- Daily Dry-Bulb Temperature Range {deltaC}
+#&gt; ,                            !- Dry-Bulb Temperature Range Modifier Type
+#&gt; ,                            !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+#&gt; Wetbulb,                     !- Humidity Condition Type
+#&gt; 15.5,                        !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+#&gt; ,                            !- Humidity Condition Day Schedule Name
+#&gt; ,                            !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+#&gt; ,                            !- Enthalpy at Maximum Dry-Bulb {J/kg}
+#&gt; ,                            !- Daily Wet-Bulb Temperature Range {deltaC}
+#&gt; 81198,                       !- Barometric Pressure {Pa}
+#&gt; 4.9,                         !- Wind Speed {m/s}
+#&gt; 0,                           !- Wind Direction {deg}
+#&gt; No,                          !- Rain Indicator
+#&gt; No,                          !- Snow Indicator
+#&gt; No,                          !- Daylight Saving Time Indicator
+#&gt; ASHRAEClearSky,              !- Solar Model Indicator
+#&gt; ,                            !- Beam Solar Day Schedule Name
+#&gt; ,                            !- Diffuse Solar Day Schedule Name
+#&gt; ,                            !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+#&gt; ,                            !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+#&gt; 1;                           !- Sky Clearness
+#&gt; 
+#&gt; Material:NoMass,
+#&gt; R13LAYER,                    !- Name
+#&gt; Rough,                       !- Roughness
+#&gt; 2.290965,                    !- Thermal Resistance {m2-K/W}
+#&gt; 0.9,                         !- Thermal Absorptance
+#&gt; 0.75,                        !- Solar Absorptance
+#&gt; 0.75;                        !- Visible Absorptance
+#&gt; 
+#&gt; Material:NoMass,
+#&gt; R31LAYER,                    !- Name
+#&gt; Rough,                       !- Roughness
+#&gt; 5.456,                       !- Thermal Resistance {m2-K/W}
+#&gt; 0.9,                         !- Thermal Absorptance
+#&gt; 0.75,                        !- Solar Absorptance
+#&gt; 0.75;                        !- Visible Absorptance
+#&gt; 
+#&gt; Material,
+#&gt; C5 - 4 IN HW CONCRETE,       !- Name
+#&gt; MediumRough,                 !- Roughness
+#&gt; 0.1014984,                   !- Thickness {m}
+#&gt; 1.729577,                    !- Conductivity {W/m-K}
+#&gt; 2242.585,                    !- Density {kg/m3}
+#&gt; 836.8,                       !- Specific Heat {J/kg-K}
+#&gt; 0.9,                         !- Thermal Absorptance
+#&gt; 0.65,                        !- Solar Absorptance
+#&gt; 0.65;                        !- Visible Absorptance
+#&gt; 
+#&gt; Construction,
+#&gt; R13WALL,                     !- Name
+#&gt; R13LAYER;                    !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt; FLOOR,                       !- Name
+#&gt; C5 - 4 IN HW CONCRETE;       !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt; ROOF31,                      !- Name
+#&gt; R31LAYER;                    !- Outside Layer
+#&gt; 
+#&gt; Zone,
+#&gt; ZONE ONE,                    !- Name
+#&gt; 0,                           !- Direction of Relative North {deg}
+#&gt; 0,                           !- X Origin {m}
+#&gt; 0,                           !- Y Origin {m}
+#&gt; 0,                           !- Z Origin {m}
+#&gt; 1,                           !- Type
+#&gt; 1,                           !- Multiplier
+#&gt; autocalculate,               !- Ceiling Height {m}
+#&gt; autocalculate;               !- Volume {m3}
+#&gt; 
+#&gt; ScheduleTypeLimits,
+#&gt; Fraction,                    !- Name
+#&gt; 0,                           !- Lower Limit Value
+#&gt; 1,                           !- Upper Limit Value
+#&gt; CONTINUOUS;                  !- Numeric Type
+#&gt; 
+#&gt; GlobalGeometryRules,
+#&gt; UpperLeftCorner,             !- Starting Vertex Position
+#&gt; CounterClockWise,            !- Vertex Entry Direction
+#&gt; World;                       !- Coordinate System
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Wall001,               !- Name
+#&gt; Wall,                        !- Surface Type
+#&gt; R13WALL,                     !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Outdoors,                    !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; SunExposed,                  !- Sun Exposure
+#&gt; WindExposed,                 !- Wind Exposure
+#&gt; 0.5,                         !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 0,                           !- Vertex 1 X-coordinate {m}
+#&gt; 0,                           !- Vertex 1 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 1 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 2 X-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 X-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 X-coordinate {m}
+#&gt; 0,                           !- Vertex 4 Y-coordinate {m}
+#&gt; 4.572;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Wall002,               !- Name
+#&gt; Wall,                        !- Surface Type
+#&gt; R13WALL,                     !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Outdoors,                    !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; SunExposed,                  !- Sun Exposure
+#&gt; WindExposed,                 !- Wind Exposure
+#&gt; 0.5,                         !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 15.24,                       !- Vertex 1 X-coordinate {m}
+#&gt; 0,                           !- Vertex 1 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 1 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 2 X-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 Y-coordinate {m}
+#&gt; 4.572;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Wall003,               !- Name
+#&gt; Wall,                        !- Surface Type
+#&gt; R13WALL,                     !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Outdoors,                    !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; SunExposed,                  !- Sun Exposure
+#&gt; WindExposed,                 !- Wind Exposure
+#&gt; 0.5,                         !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 15.24,                       !- Vertex 1 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 1 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 1 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 2 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 2 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 3 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 4 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 Y-coordinate {m}
+#&gt; 4.572;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Wall004,               !- Name
+#&gt; Wall,                        !- Surface Type
+#&gt; R13WALL,                     !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Outdoors,                    !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; SunExposed,                  !- Sun Exposure
+#&gt; WindExposed,                 !- Wind Exposure
+#&gt; 0.5,                         !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 0,                           !- Vertex 1 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 1 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 1 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 2 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 2 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 3 X-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 4 X-coordinate {m}
+#&gt; 0,                           !- Vertex 4 Y-coordinate {m}
+#&gt; 4.572;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Flr001,                !- Name
+#&gt; Floor,                       !- Surface Type
+#&gt; FLOOR,                       !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Adiabatic,                   !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; NoSun,                       !- Sun Exposure
+#&gt; NoWind,                      !- Wind Exposure
+#&gt; 1,                           !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 15.24,                       !- Vertex 1 X-coordinate {m}
+#&gt; 0,                           !- Vertex 1 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 1 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 2 X-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 3 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 Y-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 Y-coordinate {m}
+#&gt; 0;                           !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt; Zn001:Roof001,               !- Name
+#&gt; Roof,                        !- Surface Type
+#&gt; ROOF31,                      !- Construction Name
+#&gt; ZONE ONE,                    !- Zone Name
+#&gt; Outdoors,                    !- Outside Boundary Condition
+#&gt; ,                            !- Outside Boundary Condition Object
+#&gt; SunExposed,                  !- Sun Exposure
+#&gt; WindExposed,                 !- Wind Exposure
+#&gt; 0,                           !- View Factor to Ground
+#&gt; 4,                           !- Number of Vertices
+#&gt; 0,                           !- Vertex 1 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 1 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 1 Z-coordinate {m}
+#&gt; 0,                           !- Vertex 2 X-coordinate {m}
+#&gt; 0,                           !- Vertex 2 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 2 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 3 X-coordinate {m}
+#&gt; 0,                           !- Vertex 3 Y-coordinate {m}
+#&gt; 4.572,                       !- Vertex 3 Z-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 X-coordinate {m}
+#&gt; 15.24,                       !- Vertex 4 Y-coordinate {m}
+#&gt; 4.572;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Site Outdoor Air Drybulb Temperature,  !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Site Daylight Saving Time Status,  !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Site Day Type Index,         !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Mean Air Temperature,   !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Total Internal Latent Gain Energy,  !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Mean Radiant Temperature,  !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Air Heat Balance Surface Convection Rate,  !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Air Heat Balance Air Energy Storage Rate,  !- Variable Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Surface Inside Face Temperature,  !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Surface Outside Face Temperature,  !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Surface Inside Face Convection Heat Transfer Coefficient,  !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Surface Outside Face Convection Heat Transfer Coefficient,  !- Variable Name
+#&gt; daily;                       !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Other Equipment Total Heating Energy,  !- Variable Name
+#&gt; monthly;                     !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt; *,                           !- Key Value
+#&gt; Zone Other Equipment Total Heating Energy,  !- Variable Name
+#&gt; monthly;                     !- Reporting Frequency
+#&gt; 
+#&gt; Output:VariableDictionary,
+#&gt; IDF;                         !- Key Field
+#&gt; 
+#&gt; Output:Surfaces:Drawing,
+#&gt; dxf:wireframe;               !- Report Type
+#&gt; 
+#&gt; Output:Constructions,
+#&gt; Constructions;               !- Details Type 1
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt; ExteriorLights:Electricity,  !- Key Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt; EnergyTransfer:Building,     !- Key Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt; EnergyTransfer:Facility,     !- Key Name
+#&gt; hourly;                      !- Reporting Frequency
+#&gt; 
+#&gt; OutputControl:Table:Style,
+#&gt; ALL;                         !- Column Separator
+#&gt; 
+#&gt; Output:Table:SummaryReports,
+#&gt; AllSummary;                  !- Report 1 Name
+#&gt; 
+#&gt; Exterior:Lights,
+#&gt; ExtLights,                   !- Name
+#&gt; AlwaysOn,                    !- Schedule Name
+#&gt; 5250,                        !- Design Level {W}
+#&gt; AstronomicalClock,           !- Control Option
+#&gt; Grounds Lights;              !- End-Use Subcategory
+#&gt; 
+#&gt; ScheduleTypeLimits,
+#&gt; On/Off,                      !- Name
+#&gt; 0,                           !- Lower Limit Value
+#&gt; 1,                           !- Upper Limit Value
+#&gt; DISCRETE;                    !- Numeric Type
+#&gt; 
+#&gt; OtherEquipment,
+#&gt; Test 352a,                   !- Name
+#&gt; None,                        !- Fuel Type
+#&gt; ZONE ONE,                    !- Zone or ZoneList Name
+#&gt; AlwaysOn,                    !- Schedule Name
+#&gt; EquipmentLevel,              !- Design Level Calculation Method
+#&gt; 352,                         !- Design Level {W}
+#&gt; ,                            !- Power per Zone Floor Area {W/m2}
+#&gt; ,                            !- Power per Person {W/person}
+#&gt; 0,                           !- Fraction Latent
+#&gt; 0,                           !- Fraction Radiant
+#&gt; 0;                           !- Fraction Lost
+#&gt; 
+#&gt; OtherEquipment,
+#&gt; Test 352 minus,              !- Name
+#&gt; None,                        !- Fuel Type
+#&gt; ZONE ONE,                    !- Zone or ZoneList Name
+#&gt; AlwaysOn,                    !- Schedule Name
+#&gt; EquipmentLevel,              !- Design Level Calculation Method
+#&gt; -352,                        !- Design Level {W}
+#&gt; ,                            !- Power per Zone Floor Area {W/m2}
+#&gt; ,                            !- Power per Person {W/person}
+#&gt; 0,                           !- Fraction Latent
+#&gt; 0,                           !- Fraction Radiant
+#&gt; 0;                           !- Fraction Lost
+#&gt; 
+#&gt; Schedule:Constant,
+#&gt; AlwaysOn,                    !- Name
+#&gt; On/Off,                      !- Schedule Type Limits Name
+#&gt; 1;                           !- Hourly Value</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

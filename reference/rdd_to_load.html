@@ -246,14 +246,14 @@ attribute named <code>eplus_version</code> extracted from the original <code>Rdd
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
 <span class='co'># read an example distributed with eplusr</span>
 <span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span>
 <span class='va'>idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>
 
 <span class='co'># run Design-Day-Only simulation silently</span>
 <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='va'>idf</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span><span class='cn'>NULL</span>, <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, echo <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmphOAkwt/1ZoneUncontrolled.idf.</span></div><div class='input'>
 <span class='co'># read RDD and MDD</span>
 <span class='va'>rdd</span> <span class='op'>&lt;-</span> <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_rdd</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>mdd</span> <span class='op'>&lt;-</span> <span class='va'>job</span><span class='op'>$</span><span class='fu'>read_mdd</span><span class='op'>(</span><span class='op'>)</span>
@@ -266,31 +266,558 @@ attribute named <code>eplus_version</code> extracted from the original <code>Rdd
 <span class='co'># use newly added helper `rdd_to_load()` and `mdd_to_load()` and `$load()` to</span>
 <span class='co'># add `Output:Variable` and `Output:Meter*`</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>load</span><span class='op'>(</span><span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>idf</span><span class='op'>$</span><span class='fu'>load</span><span class='op'>(</span><span class='fu'>mdd_to_load</span><span class='op'>(</span><span class='va'>mdd_sub</span><span class='op'>)</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:54]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Drybulb Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:55]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Dewpoint Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:56]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Wetbulb Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:57]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Humidity Ratio",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:58]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Relative Humidity",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:59]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Barometric Pressure",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:60]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",               !- Key Value
+#&gt; │─ 2*: "Site Wind Speed", !- Variable Name
+#&gt; └─ 3 : "Timestep";        !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:61]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Wind Direction",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:62]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Sky Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:63]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Horizontal Infrared Radiation Rate per Area",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:64]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Diffuse Solar Radiation Rate per Area",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:65]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Direct Solar Radiation Rate per Area",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:66]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Precipitation Depth",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:67]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Ground Reflected Solar Radiation Rate per Area",  !- Variable ...
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:68]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Ground Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:69]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Surface Ground Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:70]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Deep Ground Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:71]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Simple Factor Model Ground Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:72]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Enthalpy",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:73]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Outdoor Air Density",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:74]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Solar Azimuth Angle",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:75]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Solar Altitude Angle",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:76]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Solar Hour Angle",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:77]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Rain Status", !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:78]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Snow on Ground Status",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:79]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Exterior Horizontal Sky Illuminance",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:80]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Exterior Horizontal Beam Illuminance",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:81]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Exterior Beam Normal Illuminance",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:82]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Sky Diffuse Solar Radiation Luminous Efficacy",  !- Variable N...
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:83]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Beam Solar Radiation Luminous Efficacy",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:84]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Daylighting Model Sky Clearness",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:85]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Daylighting Model Sky Brightness",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:86]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Daylight Saving Time Status",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:87]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Day Type Index",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Variable'&gt; [ID:88]
+#&gt; Class: &lt;Output:Variable&gt;
+#&gt; ├─ 1 : "*",                !- Key Value
+#&gt; │─ 2*: "Site Mains Water Temperature",  !- Variable Name
+#&gt; └─ 3 : "Timestep";         !- Reporting Frequency
+#&gt; </div><div class='input'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>load</span><span class='op'>(</span><span class='fu'>mdd_to_load</span><span class='op'>(</span><span class='va'>mdd_sub</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:89]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "Electricity:Facility",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:90]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ExteriorLights:Electricity",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:91]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "Grounds Lights:ExteriorLights:Electricity",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:92]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricityPurchased:Facility",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:93]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricityPurchased:Plant",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:94]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "Cogeneration:ElectricityPurchased",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:95]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricitySurplusSold:Facility",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:96]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricitySurplusSold:Plant",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:97]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "Cogeneration:ElectricitySurplusSold",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:98]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricityNet:Facility",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:99]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "ElectricityNet:Plant",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; 
+#&gt; $&lt;NA&gt;
+#&gt; &lt;IdfObject: 'Output:Meter'&gt; [ID:100]
+#&gt; Class: &lt;Output:Meter&gt;
+#&gt; ├─ 1*: "Cogeneration:ElectricityNet",  !- Key Name
+#&gt; └─ 2 : "Timestep";         !- Reporting Frequency
+#&gt; </div><div class='input'>
 <span class='co'># default `Key Value` is `"*"` and `Reporting Frequency` is `Timestep`</span>
 <span class='co'># can overwrite using `key_value` and `reporting_freqency` arg</span>
 <span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span>, key_value <span class='op'>=</span> <span class='st'>"Environment"</span>, reporting_frequency <span class='op'>=</span> <span class='st'>"hourly"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                           Environment
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                                Hourly
+#&gt;   4:                           Environment
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                                Hourly
+#&gt; 103:                           Environment
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                                Hourly</div><div class='input'>
 <span class='co'># if input has column `key_value`, default is to use it, unless `key_value` is</span>
 <span class='co'># explicitly specified</span>
 <span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span><span class='op'>)</span>
-<span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span>, key_value <span class='op'>=</span> <span class='st'>"*"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                           Environment
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                              Timestep
+#&gt;   4:                           Environment
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                              Timestep
+#&gt; 103:                           Environment
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                              Timestep</div><div class='input'><span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span>, key_value <span class='op'>=</span> <span class='st'>"*"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                                     *
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                              Timestep
+#&gt;   4:                                     *
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                              Timestep
+#&gt; 103:                                     *
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                              Timestep</div><div class='input'>
 <span class='co'># `reporting_frequency` arg works in the same way as `key_value` arg, i.e.:</span>
 <span class='co'># if input has column `reporting_frequency`, use it, unless</span>
 <span class='co'># `reporting_frequency` is explicitly specified</span>
 <span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>,  <span class='va'>reporting_frequency</span> <span class='op'>:=</span> <span class='st'>"monthly"</span><span class='op'>]</span><span class='op'>)</span>
-<span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>,  <span class='va'>reporting_frequency</span> <span class='op'>:=</span> <span class='st'>"monthly"</span><span class='op'>]</span>, reporting_frequency <span class='op'>=</span> <span class='st'>"detailed"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                           Environment
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                               Monthly
+#&gt;   4:                           Environment
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                               Monthly
+#&gt; 103:                           Environment
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                               Monthly</div><div class='input'><span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>,  <span class='va'>reporting_frequency</span> <span class='op'>:=</span> <span class='st'>"monthly"</span><span class='op'>]</span>, reporting_frequency <span class='op'>=</span> <span class='st'>"detailed"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                           Environment
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                              Detailed
+#&gt;   4:                           Environment
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                              Detailed
+#&gt; 103:                           Environment
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                              Detailed</div><div class='input'>
 <span class='co'># if input has column `key_value`, default is to use it, unless `key_value` is</span>
 <span class='co'># explicitly specified</span>
 <span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span><span class='op'>)</span>
-<span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span>, key_value <span class='op'>=</span> <span class='st'>"*"</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                           Environment
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                               Monthly
+#&gt;   4:                           Environment
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                               Monthly
+#&gt; 103:                           Environment
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                               Monthly</div><div class='input'><span class='fu'>rdd_to_load</span><span class='op'>(</span><span class='va'>rdd_sub</span><span class='op'>[</span>, <span class='va'>key_value</span> <span class='op'>:=</span> <span class='st'>"Environment"</span><span class='op'>]</span>, key_value <span class='op'>=</span> <span class='st'>"*"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      id           class index               field
+#&gt;   1:  1 Output:Variable     1           Key Value
+#&gt;   2:  1 Output:Variable     2       Variable Name
+#&gt;   3:  1 Output:Variable     3 Reporting Frequency
+#&gt;   4:  2 Output:Variable     1           Key Value
+#&gt;   5:  2 Output:Variable     2       Variable Name
+#&gt;  ---                                             
+#&gt; 101: 34 Output:Variable     2       Variable Name
+#&gt; 102: 34 Output:Variable     3 Reporting Frequency
+#&gt; 103: 35 Output:Variable     1           Key Value
+#&gt; 104: 35 Output:Variable     2       Variable Name
+#&gt; 105: 35 Output:Variable     3 Reporting Frequency
+#&gt;                                      value
+#&gt;   1:                                     *
+#&gt;   2:  Site Outdoor Air Drybulb Temperature
+#&gt;   3:                               Monthly
+#&gt;   4:                                     *
+#&gt;   5: Site Outdoor Air Dewpoint Temperature
+#&gt;  ---                                      
+#&gt; 101:                   Site Day Type Index
+#&gt; 102:                               Monthly
+#&gt; 103:                                     *
+#&gt; 104:          Site Mains Water Temperature
+#&gt; 105:                               Monthly</div><div class='input'>
 <span class='co'># meter class can be further specified using `class` arg</span>
 <span class='fu'>mdd_to_load</span><span class='op'>(</span><span class='va'>mdd_sub</span>, class <span class='op'>=</span> <span class='st'>"Output:Meter:MeterFileOnly"</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt;     id                      class index               field
+#&gt;  1:  1 Output:Meter:MeterFileOnly     1            Key Name
+#&gt;  2:  1 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt;  3:  2 Output:Meter:MeterFileOnly     1            Key Name
+#&gt;  4:  2 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt;  5:  3 Output:Meter:MeterFileOnly     1            Key Name
+#&gt;  6:  3 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt;  7:  4 Output:Meter:MeterFileOnly     1            Key Name
+#&gt;  8:  4 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt;  9:  5 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 10:  5 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 11:  6 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 12:  6 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 13:  7 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 14:  7 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 15:  8 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 16:  8 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 17:  9 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 18:  9 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 19: 10 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 20: 10 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 21: 11 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 22: 11 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt; 23: 12 Output:Meter:MeterFileOnly     1            Key Name
+#&gt; 24: 12 Output:Meter:MeterFileOnly     2 Reporting Frequency
+#&gt;     id                      class index               field
+#&gt;                                         value
+#&gt;  1:                      Electricity:Facility
+#&gt;  2:                                  Timestep
+#&gt;  3:                ExteriorLights:Electricity
+#&gt;  4:                                  Timestep
+#&gt;  5: Grounds Lights:ExteriorLights:Electricity
+#&gt;  6:                                  Timestep
+#&gt;  7:             ElectricityPurchased:Facility
+#&gt;  8:                                  Timestep
+#&gt;  9:                ElectricityPurchased:Plant
+#&gt; 10:                                  Timestep
+#&gt; 11:         Cogeneration:ElectricityPurchased
+#&gt; 12:                                  Timestep
+#&gt; 13:           ElectricitySurplusSold:Facility
+#&gt; 14:                                  Timestep
+#&gt; 15:              ElectricitySurplusSold:Plant
+#&gt; 16:                                  Timestep
+#&gt; 17:       Cogeneration:ElectricitySurplusSold
+#&gt; 18:                                  Timestep
+#&gt; 19:                   ElectricityNet:Facility
+#&gt; 20:                                  Timestep
+#&gt; 21:                      ElectricityNet:Plant
+#&gt; 22:                                  Timestep
+#&gt; 23:               Cogeneration:ElectricityNet
+#&gt; 24:                                  Timestep
+#&gt;                                         value</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

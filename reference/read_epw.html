@@ -212,7 +212,7 @@ simplifications. For more details on <code>Epw</code>, please see <a href='Epw.h
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
 <span class='co'># read an EPW file from EnergyPlus v8.8 installation folder</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>path_epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span>
@@ -222,14 +222,40 @@ simplifications. For more details on <code>Epw</code>, please see <a href='Epw.h
    <span class='op'>)</span>
    <span class='fu'>read_epw</span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span>
 <span class='op'>}</span>
-
+</div><div class='output co'>#&gt; ══ EnergyPlus Weather File ═════════════════════════════════════════════════════
+#&gt; [Location ]: San Francisco Intl Ap, CA, USA
+#&gt;              {N 37°37'}, {W 122°24'}, {UTC-08:00}
+#&gt; [Elevation]: 2m above see level
+#&gt; [Data Src ]: TMY3
+#&gt; [WMO Stat ]: 724940
+#&gt; [Leap Year]: No
+#&gt; [Interval ]: 60 mins
+#&gt; 
+#&gt; ── Data Periods ────────────────────────────────────────────────────────────────
+#&gt;    Name StartDayOfWeek StartDay EndDay
+#&gt; 1: Data         Sunday     1/ 1  12/31
+#&gt; 
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
 <span class='co'># read an EPW file from EnergyPlus website</span>
 <span class='va'>path_base</span> <span class='op'>&lt;-</span> <span class='st'>"https://energyplus.net/weather-download"</span>
 <span class='va'>path_region</span> <span class='op'>&lt;-</span> <span class='st'>"north_and_central_america_wmo_region_4/USA/CA"</span>
 <span class='va'>path_file</span> <span class='op'>&lt;-</span> <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
 <span class='va'>path_epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>path_base</span>, <span class='va'>path_region</span>, <span class='va'>path_file</span><span class='op'>)</span>
 <span class='fu'>read_epw</span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; ══ EnergyPlus Weather File ═════════════════════════════════════════════════════
+#&gt; [Location ]: San Francisco Intl Ap, CA, USA
+#&gt;              {N 37°37'}, {W 122°24'}, {UTC-08:00}
+#&gt; [Elevation]: 2m above see level
+#&gt; [Data Src ]: TMY3
+#&gt; [WMO Stat ]: 724940
+#&gt; [Leap Year]: No
+#&gt; [Interval ]: 60 mins
+#&gt; 
+#&gt; ── Data Periods ────────────────────────────────────────────────────────────────
+#&gt;    Name StartDayOfWeek StartDay EndDay
+#&gt; 1: Data         Sunday     1/ 1  12/31
+#&gt; 
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>
