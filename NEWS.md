@@ -27,6 +27,7 @@
 ## Bug fixes
 
 * Fixed wrong transition of `FuelFactors` from v9.2 to v9.3 (#420).
+* Fixed `Idf$del` error when both sources and referees are given (#433).
 
 ## Minor changes
 

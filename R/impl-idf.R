@@ -3038,13 +3038,16 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
         if (chk$reference && !ref_by && !force && nrow(rel$ref_by)) {
             rel$ref_by <- rel$ref_by[!J(id_del), on = "object_id"]
 
-            if (!eplusr_option("verbose_info")) {
+            if (!in_verbose()) {
                 rel$ref_by <- add_idf_relation_format_cols(idd_env, idf_env, rel$ref_by)
             }
-            abort(paste0("Cannot delete object(s) that are referred by others:\n",
-                "\n",
-                paste0("  ", unlist(format_idf_relation(rel$ref_by, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
-            ), "del_referenced")
+
+            if (nrow(rel$ref_by)) {
+                abort(paste0("Cannot delete object(s) that are referred by others:\n",
+                    "\n",
+                    paste0("  ", unlist(format_idf_relation(rel$ref_by, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
+                ), "del_referenced")
+            }
         }
         # }}}
 
