@@ -99,7 +99,7 @@ but with total different data structure under the hook." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.1.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2</span>
       </span>
     </div>
 
@@ -2822,7 +2822,7 @@ idf$geometry()
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
 <dt><code>new</code></dt><dd><p>If <code>TRUE</code>, a new rgl window will be open using
-<code><a href='https://rdrr.io/pkg/rgl/man/rgl.open.html'>rgl::rgl.open()</a></code>. If <code>FALSE</code>, existing rgl window will be
+<code><a href='https://dmurdoch.github.io/rgl/dev/reference/rgl.open.html'>rgl::rgl.open()</a></code>. If <code>FALSE</code>, existing rgl window will be
 reused if possible. Default: <code>FALSE</code>.</p></dd>
 
 <dt><code>render_by</code></dt><dd><p>A single string specifying the way of rendering the
@@ -7278,10 +7278,10 @@ idf$print("field", order = FALSE)
 
 <span class='co'># save and overwrite current file</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span>overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/Rtmpukb68X/file41492172553b.idf.</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmpaqBQ0F/file35495301bab8.idf.</span></div><div class='input'>
 <span class='co'># save the model with newly created and modified objects at the top</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span>overwrite <span class='op'>=</span> <span class='cn'>TRUE</span>, format <span class='op'>=</span> <span class='st'>"new_top"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/Rtmpukb68X/file41492172553b.idf.</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmpaqBQ0F/file35495301bab8.idf.</span></div><div class='input'>
 <span class='co'># save the model to a new file and copy all external csv files used in</span>
 <span class='co'># "Schedule:File" class into the same folder</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span>path <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"test1.idf"</span><span class='op'>)</span>, copy_external <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
@@ -7345,7 +7345,7 @@ idf$print("field", order = FALSE)
 <span class='co'># \dontrun{</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>geometry</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt;  * Building: 'Simple One Zone (Wireframe DXF)'
 #&gt;  * North Axis: 0°
@@ -7378,7 +7378,7 @@ idf$print("field", order = FALSE)
 <span class='co'># \dontrun{</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"group"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; [07&lt;C&gt;] Group: &lt;Simulation Parameters&gt;
@@ -7390,7 +7390,7 @@ idf$print("field", order = FALSE)
 #&gt; [01&lt;C&gt;] Group: &lt;Exterior Equipment&gt;
 #&gt; [22&lt;C&gt;] Group: &lt;Output Reporting&gt;</div><div class='input'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"class"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; Group: &lt;Simulation Parameters&gt;
@@ -7436,7 +7436,7 @@ idf$print("field", order = FALSE)
 #&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
 #&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"object"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; Class: &lt;Version&gt;
@@ -7598,7 +7598,7 @@ idf$print("field", order = FALSE)
 #&gt; Class: &lt;Schedule:Constant&gt;
 #&gt; └─ Object [ID:53] &lt;AlwaysOn&gt;</div><div class='input'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"field"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; Class: &lt;Version&gt;
@@ -8110,7 +8110,7 @@ idf$print("field", order = FALSE)
 <span class='co'># order objects by there classes</span>
 <span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"object"</span>, order <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; Class: &lt;Version&gt;
@@ -8220,7 +8220,7 @@ idf$print("field", order = FALSE)
 #&gt; │─ Object [ID:45]
 #&gt; └─ Object [ID:46]</div><div class='input'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"field"</span>, order <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/tmp/Rtmpukb68X/test_run.idf'
+#&gt;  * Path: '/tmp/RtmpaqBQ0F/test_run.idf'
 #&gt;  * Version: '8.8.0'
 #&gt; 
 #&gt; Class: &lt;Version&gt;
