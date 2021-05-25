@@ -8,10 +8,10 @@ citEntry(
     journal = "Energy and Buildings",
     volume = "237",
     url = "https://CRAN.R-project.org/package=eplusr",
-    doi = "https://doi.org/10.1016/j.enbuild.2021.110757",
-    textVersion = paste("Hongyuan Jia, Adrian Chong (2020).",
+    doi = "10.1016/j.enbuild.2021.110757",
+    textVersion = paste("Hongyuan Jia, Adrian Chong (2021).",
                         "eplusr: A framework for integrating building energy simulation and data-driven analytics.",
-                        "Energy and Buildings 237 (April): 110757.",
+                        "Energy and Buildings 237: 110757.",
                         "https://doi.org/10.1016/j.enbuild.2021.110757")
 
 )
