@@ -448,8 +448,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$comment1()` takes a single string of new comments and replaces the
-        #' old comment with input one. If no input is given, current comment is
-        #' returned.
+        #' old comment with input one. If `NULL` is given, the comment is
+        #' removed. Empty string or a string that contains only spaces will be
+        #' treated as `NULL`. If no input is given, current comment is returned.
+        #' If no comments exist, `NULL` is returned.
         #'
         #' @param comment A string of new comments.
         #'
@@ -472,8 +474,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$comment2()` takes a single string of new comments and replaces the
-        #' old comment with input one. If no input is given, current comment is
-        #' returned.
+        #' old comment with input one. If `NULL` is given, the comment is
+        #' removed. Empty string or a string that contains only spaces will be
+        #' treated as `NULL`. If no input is given, current comment is returned.
+        #' If no comments exist, `NULL` is returned.
         #'
         #' @param comment A string of new comments.
         #'
@@ -1207,6 +1211,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        Default is `FALSE`.
         #' @param purge Whether to remove redundant data when saving. Default:
         #'        `FALSE`.
+        #' @param format_digit Whether to remove trailing digits in weather
+        #'        data. Default: `TRUE`.
         #'
         #' @return A length-one character vector, invisibly.
         #'
@@ -1216,8 +1222,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #' epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
         #' }
         #'
-        save = function (path = NULL, overwrite = FALSE, purge = FALSE)
-            epw_save(self, private, path, overwrite, purge),
+        save = function (path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE)
+            epw_save(self, private, path, overwrite, purge, format_digit),
         # }}}
         # }}}
 
@@ -1566,14 +1572,24 @@ epw_holiday <- function (self, private, leapyear, dst, holiday) {
 epw_comment <- function (self, private, index = 1L, comment) {
     val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS[[paste0("comment", index)]])
 
-    if (missing(comment)) return(val$value_chr)
+    if (missing(comment)) {
+        if (is.na(val$value_chr)) return(NULL) else return(val$value_chr)
+    }
 
-    assert_string(comment)
+    assert_string(comment, null.ok = TRUE)
+    if (is.null(comment)) {
+        comment <- NA_character_
+    } else {
+        comment <- stri_trim_right(comment)
+        if (stri_isempty(comment)) {
+            comment <- NA_character_
+        }
+    }
     private$idf_env()$value[J(val$value_id), on = "value_id", value_chr := comment]
     private$log_unsaved()
     private$log_new_uuid()
 
-    comment
+    if (is.na(comment)) return(NULL) else comment
 }
 # }}}
 # epw_comment1 {{{
@@ -1928,7 +1944,7 @@ epw_is_unsaved <- function (self, private) {
 }
 # }}}
 # epw_save {{{
-epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE) {
+epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
             abort("The Epw object is not created from local file. Please give the path to save.", "epw_not_local")
@@ -1946,7 +1962,7 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
     fill <- if (!private$m_log$miss_filled || !private$m_log$range_filled) TRUE else FALSE
 
     p <- save_epw_file(private$m_data, private$idf_env(), private$m_log$matched,
-        path, overwrite, fmt_digit = TRUE,
+        path, overwrite, fmt_digit = format_digit,
         fill = fill,
         missing = private$m_log$miss_filled,
         out_of_range = private$m_log$range_filled,

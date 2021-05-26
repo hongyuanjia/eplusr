@@ -1,5 +1,3 @@
-context("Epw Implementation")
-
 # Epw Header {{{
 test_that("Epw Header", {
     # IDD
@@ -44,6 +42,8 @@ test_that("Epw Header", {
     )
     expect_equal(h$value[object_id %in% c(2, 3, 4), value_num], rep(0, 3))
     expect_equal(h$value[object_id %in% c(6, 7), value_chr], rep(NA_character_, 2))
+
+    get_idf_value(get_epw_idd_env(), h, EPW_CLASS[[paste0("comment", 1)]])
 
     # can fix mismatched extensible group and value of number field
     expect_warning(
@@ -99,21 +99,6 @@ test_that("Epw Header", {
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
             TYPICAL/EXTREME PERIODS,1,period,typical,1/1,a
-            GROUND TEMPERATURES
-            HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0
-            COMMENTS 1
-            COMMENTS 2
-            DATA PERIODS,1,1,Data,Friday,2016/01/01,2016/12/31
-            "
-        )),
-        class = "eplusr_error_parse_epw"
-    )
-    expect_error(
-        parse_epw_header(paste0(
-            "
-            LOCATION,city,state,country,type,wmo,1,2,3,4
-            DESIGN CONDITIONS
-            TYPICAL/EXTREME PERIODS,1,period,typical,1/2,1/1
             GROUND TEMPERATURES
             HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0
             COMMENTS 1
@@ -357,7 +342,7 @@ test_that("Epw Header", {
     )
 
     expect_equal(format_epw_header(h),
-        c("LOCATION,city,state,country,type,wmo,1,2,3,4",
+        c("LOCATION,city,state,country,type,wmo,1.00,2.00,3.0,4.0",
           "DESIGN CONDITIONS,0",
           "TYPICAL/EXTREME PERIODS,0",
           "GROUND TEMPERATURES,0",
@@ -494,6 +479,8 @@ test_that("EpwDate Class", {
     expect_output(print(epw_date("6 Mon in Jan")), "NA")
 
     expect_equal(c(epw_date("1/3"), epw_date("3")), epw_date(c("1/3", "3")))
+    d <- epw_date(c("1/3", "4"))
+    expect_equal(c(d[2], d[1], epw_date(1.1)), epw_date(c("4", "1/3", "1.1")))
 
     expect_true(is_EpwDate(epw_date("1")))
     expect_false(is_EpwDate(Sys.Date()))

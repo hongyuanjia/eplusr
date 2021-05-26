@@ -1,5 +1,3 @@
-context("Idd")
-
 eplusr_option(verbose_info = FALSE)
 
 # download_idd() {{{
@@ -42,7 +40,7 @@ test_that("can read IDD", {
 
     # can stop if that EnergyPlus is not available and IDD if not found in any
     # existing VersionUpdater folder
-    .globals$eplus['9.2.0'] <- NULL
+    .globals$eplus[['9.2.0']] <- NULL
     expect_error(use_idd(9.2), class = "eplusr_error_locate_idd")
 
     # can direct read if corresponding EnergyPlus is found
@@ -82,7 +80,7 @@ test_that("can read IDD", {
     expect_true(is_avail_idd("8.8.0"))
 
     # can use custom IDD
-    expect_silent(use_idd(text("idd", "9.9.9")))
+    expect_silent(use_idd(idftext("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))
 
     # recover EnergyPlus config
@@ -113,9 +111,8 @@ test_that("can read IDD", {
 
 # Idd class {{{
 test_that("Idd class", {
-    .options$autocomplete <- FALSE
     # can create an Idd object from string
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
 
     # can get Idd version
     expect_equal(idd$version(), as.numeric_version("9.9.9"))
@@ -255,15 +252,7 @@ test_that("Idd class", {
 
 # Idd S3 methods {{{
 test_that("Idd S3 methods", {
-    .options$autocomplete <- FALSE
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
-    expect_false("TestSlash" %in% names(idd))
-
-    # can create active bindings for class names
-    .options$autocomplete <- TRUE
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
-    expect_true("TestSlash" %in% names(idd))
-    expect_true("TestSimple" %in% names(idd))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
     expect_equal(idd$TestSlash, idd$object("TestSlash"))
     expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
     expect_null(idd$Missing)
@@ -271,9 +260,7 @@ test_that("Idd S3 methods", {
     expect_error(idd$Missing <- "a", "cannot add bindings to a locked environment")
     expect_error(idd[["Missing"]] <- "a", "cannot add bindings to a locked environment")
 
-    .options$autocomplete <- FALSE
-    # can still use S3 subsetting without active bindings
-    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(idftext("idd", "9.9.9")))
     expect_equal(idd$TestSlash, idd$object("TestSlash"))
     expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
     expect_null(idd$Missing)

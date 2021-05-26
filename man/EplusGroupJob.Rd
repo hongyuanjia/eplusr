@@ -340,7 +340,8 @@ Run grouped simulations
   wait = TRUE,
   force = FALSE,
   copy_external = FALSE,
-  echo = wait
+  echo = wait,
+  separate = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -363,13 +364,17 @@ start. Default: \code{FALSE}.}
 \item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
 object depends on will also be copied into the simulation
 output directory. The values of file paths in the Idf will be
-changed automatically. Currently, only \code{Schedule:File} class
-is supported.  This ensures that the output directory will
-have all files needed for the model to run. Default is
+changed automatically. This ensures that the output directory
+will have all files needed for the model to run. Default is
 \code{FALSE}.}
 
 \item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to
 simulation status. Default: same as \code{wait}.}
+
+\item{\code{separate}}{If \code{TRUE}, all models are saved in a separate folder
+with each model's name under \code{dir} when simulation. If \code{FALSE},
+all models are saved in \code{dir} when simulation. Default:
+\code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -694,8 +699,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 those from
 \href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
 and returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -735,8 +742,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 \subsection{Details}{
 \verb{$read_rdd()} return the core data of Report Data Dictionary (RDD)
 files. For details, please see \code{\link[=read_rdd]{read_rdd()}}.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -775,8 +784,10 @@ parametric simulations are returned. Default: \code{NULL}.}
 \subsection{Details}{
 \verb{$read_mdd()} return the core data of Meter Data Dictionary (MDD)
 files. For details, please see \code{\link[=read_mdd]{read_mdd()}}.
-The first column will always be \code{case} which can be used to
-distinguish output from different simulations.
+The two column will always be \code{index} and \code{case} which can be used to
+distinguish output from different simulations. \code{index} contains the
+indices of simulated models and \code{case} contains the model names
+without extensions.
 }
 
 \subsection{Returns}{
@@ -824,8 +835,10 @@ Examples" documentation.
 \subsection{Returns}{
 A \code{\link[data.table:data.table]{data.table::data.table()}} of 10 columns:
 \itemize{
-\item \code{case}: The model name. This column can be used to distinguish
-output from different simulations
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
+\item \code{case}: The model name without extension. This column can be used
+to distinguish output from different simulations
 \item \code{report_data_dictionary_index}: The integer used to link the
 dictionary data to the variable data. Mainly useful when joining
 different tables
@@ -982,6 +995,8 @@ The returned column numbers varies depending on \code{all} argument.
 \itemize{
 \item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
 \itemize{
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
 \item \code{case}: The model name. This column can be used to distinguish
 output from different simulations
 \item \code{datetime}: The date time of simulation result
@@ -1141,6 +1156,8 @@ numeric columns indicate column that:
 specifications. The returned \code{\link[data.table:data.table]{data.table::data.table()}} has
 9 columns:
 \itemize{
+\item \code{index}: The index of simulated model. This column can be used
+to distinguish output from different simulations
 \item \code{case}: The model name. This column can be used to distinguish
 output from different simulations
 \item \code{index}: Tabular data index

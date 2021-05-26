@@ -62,7 +62,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_epws_path <- input$epws
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- input$sql | input$dict | input$csv
+            private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
             private$log_idf_uuid()
@@ -95,12 +95,15 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param copy_external If `TRUE`, the external files that current `Idf`
         #'        object depends on will also be copied into the simulation
         #'        output directory. The values of file paths in the Idf will be
-        #'        changed automatically. Currently, only `Schedule:File` class
-        #'        is supported.  This ensures that the output directory will
-        #'        have all files needed for the model to run. Default is
+        #'        changed automatically. This ensures that the output directory
+        #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to
         #'        simulation status. Default: same as `wait`.
+        #' @param separate If `TRUE`, all models are saved in a separate folder
+        #'        with each model's name under `dir` when simulation. If `FALSE`,
+        #'        all models are saved in `dir` when simulation. Default:
+        #'        `TRUE`.
         #'
         #' @return The `EplusGroupJob` object itself, invisibly.
         #'
@@ -127,8 +130,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-            epgroup_run(self, private, dir, wait, force, copy_external, echo),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
+            epgroup_run(self, private, dir, wait, force, copy_external, echo, separate),
         # }}}
 
         # kill {{{
@@ -309,8 +312,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' those from
         #' \href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
         #' and returns that table data in a [data.table::data.table()] format.
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -336,8 +341,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @details
         #' `$read_rdd()` return the core data of Report Data Dictionary (RDD)
         #' files. For details, please see [read_rdd()].
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -361,8 +368,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @details
         #' `$read_mdd()` return the core data of Meter Data Dictionary (MDD)
         #' files. For details, please see [read_mdd()].
-        #' The first column will always be `case` which can be used to
-        #' distinguish output from different simulations.
+        #' The two column will always be `index` and `case` which can be used to
+        #' distinguish output from different simulations. `index` contains the
+        #' indices of simulated models and `case` contains the model names
+        #' without extensions.
         #'
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
@@ -397,8 +406,10 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'
         #' @return A [data.table::data.table()] of 10 columns:
         #'
-        #' * `case`: The model name. This column can be used to distinguish
-        #'   output from different simulations
+        #' * `index`: The index of simulated model. This column can be used
+        #'   to distinguish output from different simulations
+        #' * `case`: The model name without extension. This column can be used
+        #'   to distinguish output from different simulations
         #' * `report_data_dictionary_index`: The integer used to link the
         #'   dictionary data to the variable data. Mainly useful when joining
         #'   different tables
@@ -437,6 +448,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' The returned column numbers varies depending on `all` argument.
         #'
         #' * `all` is `FALSE`, the returned [data.table::data.table()] has 6 columns:
+        #'   * `index`: The index of simulated model. This column can be used
+        #'     to distinguish output from different simulations
         #'   * `case`: The model name. This column can be used to distinguish
         #'     output from different simulations
         #'   * `datetime`: The date time of simulation result
@@ -642,6 +655,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' specifications. The returned [data.table::data.table()] has
         #' 9 columns:
         #'
+        #' * `index`: The index of simulated model. This column can be used
+        #'   to distinguish output from different simulations
         #' * `case`: The model name. This column can be used to distinguish
         #'   output from different simulations
         #' * `index`: Tabular data index
@@ -750,9 +765,18 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         uuid = function () private$m_log$uuid,
         log_new_uuid = function () log_new_uuid(private$m_log),
 
-        idf_uuid = function () vcapply(private$m_idfs, function (idf) get_priv_env(idf)$uuid()),
-        log_idf_uuid = function () private$m_log$idf_uuid <- private$idf_uuid(),
-        cached_idf_uuid = function () private$m_log$idf_uuid,
+        idf_uuid = function (which = NULL) {
+            idfs <- if (is.null(which)) private$m_idfs else private$m_idfs[which]
+            vcapply(idfs, function (idf) get_priv_env(idf)$uuid())
+        },
+        log_idf_uuid = function (which = NULL) {
+            if (is.null(which)) which <- seq_along(private$m_idfs)
+            private$m_log$idf_uuid[which] <- private$idf_uuid(which)
+        },
+        cached_idf_uuid = function (which = NULL) {
+            if (is.null(which)) which <- seq_along(private$m_log$idf_uuid)
+            private$m_log$idf_uuid[which]
+        },
 
         is_unsaved = function () private$m_log$unsaved,
         log_saved = function (which = NULL) log_saved(private$m_log, which),
@@ -785,7 +809,9 @@ group_job <- function (idfs, epws) {
 # }}}
 
 # epgroup_run {{{
-epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
+                         force = FALSE, copy_external = FALSE, echo = wait,
+                         separate = TRUE) {
     # check if generated models have been modified outside
     uuid <- private$idf_uuid()
     if (any(i <- uuid != private$cached_idf_uuid())) {
@@ -799,12 +825,16 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 
     private$log_new_uuid()
 
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
 }
 # }}}
 # epgroup_run_models {{{
 #' @importFrom checkmate test_names
-epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
+                                force = FALSE, copy_external = FALSE, echo = wait,
+                                separate = TRUE) {
+    checkmate::assert_flag(separate)
+
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
     if (checkmate::test_names(names(private$m_idfs))) {
@@ -824,6 +854,8 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         }
         design_day <- is.na(path_epw)
     }
+
+    expand_obj <- vlapply(private$m_idfs, idf_has_hvactemplate)
 
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
@@ -864,7 +896,11 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         }
     }
 
-    path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
+    if (separate) {
+        path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
+    } else {
+        path_group <- normalizePath(file.path(output_dir, nms), mustWork = FALSE)
+    }
 
     if (any(to_save <- path_group != path_idf | private$is_unsaved())) {
         # remove duplications
@@ -872,6 +908,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
             function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
         )
+        private$log_idf_uuid(which(to_save))
         private$log_saved(which(to_save))
     }
 
@@ -884,7 +921,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
 
     ver <- vcapply(private$m_idfs, function (idf) as.character(idf$version()))
     tbl <- run_multi(path_group, path_epw, NULL, design_day = design_day,
-        wait = wait, echo = echo, eplus = ver
+        expand_obj = expand_obj, wait = wait, echo = echo, eplus = ver
     )
 
     private$m_job <- tbl
@@ -1076,20 +1113,21 @@ epgroup_report_data_dict <- function (self, private, which) {
 # }}}
 # epgroup_report_data {{{
 epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
-                               name = NULL, year = NULL, tz = "GMT", all = FALSE, wide = FALSE,
-                               period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                               interval = NULL, simulation_days = NULL, day_type = NULL,
-                               environment_name = NULL) {
-    sqls <- epgroup_sql_path(self, private, which)
-    csvs <- epgroup_csv_path(self, private, which)
-    cases <- epgroup_case_from_which(self, private, which, name = TRUE)
-
-    rbindlist(mapply(get_sql_report_data, sql = sqls, csv = csvs, case = cases,
-        MoreArgs = list(key_value = key_value, name = name, all = all, wide = wide, year = year,
+                                 name = NULL, year = NULL, tz = "GMT", all = FALSE, wide = FALSE,
+                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                                 interval = NULL, simulation_days = NULL, day_type = NULL,
+                                 environment_name = NULL) {
+    rbindlist(Map(get_sql_report_data,
+        sql = epgroup_sql_path(self, private, which),
+        index = epgroup_case_from_which(self, private, which, name = FALSE),
+        case = epgroup_case_from_which(self, private, which, name = TRUE),
+        MoreArgs = list(
+            key_value = key_value, name = name, all = all, wide = wide, year = year,
             tz = tz, period = period, month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days, day_type = day_type,
-            environment_name = environment_name),
-        SIMPLIFY = FALSE, USE.NAMES = FALSE
+            environment_name = environment_name
+        ),
+        USE.NAMES = FALSE
     ), fill = TRUE)
 }
 # }}}
@@ -1097,10 +1135,9 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
 epgroup_tabular_data <- function (self, private, which = NULL, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   wide = FALSE, string_value = !wide) {
-    cases <- epgroup_case_from_which(self, private, which, name = TRUE)
-
     l <- Map(get_sql_tabular_data,
         sql = epgroup_sql_path(self, private, which),
+        index = epgroup_case_from_which(self, private, which, name = FALSE),
         case = epgroup_case_from_which(self, private, which, name = TRUE),
         MoreArgs = list(
             report_name = report_name, report_for = report_for,
@@ -1130,10 +1167,10 @@ epgroup_print <- function (self, private) {
 
 # helper
 # get_epgroup_input {{{
-get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE, csv = TRUE) {
+get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
     # check idf {{{
     if (is_idf(idfs)) {
-        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict, csv = TRUE))
+        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict))
     } else {
         init_idf <- function (...) {
             tryCatch(get_init_idf(...),
@@ -1142,7 +1179,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE, csv = TRUE) 
                 eplusr_error_idf_not_saved = function (e) e
             )
         }
-        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict, csv = csv)
+        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
     }
 
     err <- c("eplusr_error_idf_not_local", "eplusr_error_idf_path_not_exist", "eplusr_error_idf_not_saved")
@@ -1156,7 +1193,6 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE, csv = TRUE) 
 
     sql <- vlapply(idfs, attr, "sql")
     dict <- vlapply(idfs, attr, "sql")
-    csv <- vlapply(idfs, attr, "csv")
     # }}}
 
     # check epw paths {{{
@@ -1194,7 +1230,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE, csv = TRUE) 
         assert_same_len(idfs, epws)
     }
 
-    list(idfs = idfs, epws = epws, sql = sql, dict = dict, csv = csv)
+    list(idfs = idfs, epws = epws, sql = sql, dict = dict)
 }
 # }}}
 # epgroup_retrieve_data {{{
@@ -1317,34 +1353,6 @@ epgroup_sql_path <- function (self, private, which) {
     epgroup_locate_output(self, private, which, ".sql")
 }
 # }}}
-# epgroup_csv_path {{{
-epgroup_csv_path <- function (self, private, which) {
-    idx <- epgroup_case_from_which(self, private, which, name = FALSE)
-
-    path_csv <- epgroup_locate_output(self, private, idx, ".csv", strict = FALSE)
-    exist_csv <- file.exists(path_csv)
-
-    # check if meter file only is set
-    cls <- c("Output:Meter:MeterFileOnly", "Output:Meeter:Cumulative:MeterFileOnly")
-    mtr_only <- vlapply(private$m_idfs[idx], function (idf) any(idf$is_valid_class(cls)))
-
-    lapply(seq_along(idx), function (i) {
-        if (!exist_csv[[i]]) {
-            verbose_info("No CSV output found for job ",
-                surround(epgroup_case_from_which(idx[i])),
-                ". Fall back to use SQL for data extraction.")
-            NULL
-        } else if (mtr_only[[i]]) {
-            verbose_info(collapse(cls, or = TRUE), " found for job ",
-                surround(epgroup_case_from_which(idx[i])),
-                ". Fall back to use SQL for data extraction")
-            NULL
-        } else {
-            path_csv[[i]]
-        }
-    })
-}
-# }}}
 # epgroup_rdd_path {{{
 epgroup_rdd_path <- function (self, private, which, type = c("rdd", "mdd")) {
     type <- match.arg(type)
@@ -1353,12 +1361,14 @@ epgroup_rdd_path <- function (self, private, which, type = c("rdd", "mdd")) {
 # }}}
 # epgroup_combine_data {{{
 epgroup_combine_data <- function (self, private, which, data, fill = TRUE) {
+    index <- epgroup_case_from_which(self, private, which, name = FALSE)
     cases <- epgroup_case_from_which(self, private, which, name = TRUE)
 
     # add case
     for (idx in seq_along(cases)) {
-        set(data[[idx]], j = "case", value = cases[idx])
-        setcolorder(data[[idx]], c("case", setdiff(names(data[[idx]]), "case")))
+        set(data[[idx]], NULL, "index", index[idx])
+        set(data[[idx]], NULL, "case", cases[idx])
+        setcolorder(data[[idx]], c("index", "case"))
     }
 
     rbindlist(data, fill = fill)

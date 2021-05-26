@@ -1,13 +1,15 @@
-# Version 0.13.0
+# Version 0.14.2
 
-## Resubmission
+## Initial submission
+
+Change the maintainer email from 'hoongyuan.jia@bears-berkeley.sg' to
+'hongyuanjia@outlook.com'.
 
 ### Test environments
 
-* local Manjaro Linux 18.0.4 install, R 3.6.1
-* Windows (on appveyor-ci), R release
-* Ubuntu 14.04 (on travis-ci), R release and devel
-* OS X (on travis-ci), R release
+* Windows (on local and GitHub Actions), R release
+* Ubuntu 20.04 (on GitHub Actions), R release
+* macOS (on GitHub Actions), R release
 
 ### R CMD check results
 
@@ -16,5 +18,3 @@
 ### Reverse dependencies
 
 0 errors | 0 warnings | 0 notes
-
-In this resubmission, I skipped tests that should be run locally.

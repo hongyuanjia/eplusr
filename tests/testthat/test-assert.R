@@ -1,5 +1,3 @@
-context("Assertions")
-
 test_that("Assertion functions", {
     expect_equal(convert_to_eplus_ver(8), numeric_version("8.0.0"))
     expect_equal(convert_to_eplus_ver(c(8, 9), max = TRUE), numeric_version(c("8.0.0", "9.0.1")))

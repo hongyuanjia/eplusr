@@ -58,13 +58,13 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         initialize = function (idf, epw) {
             # add Output:SQLite and Output:VariableDictionary if necessary
-            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE, csv = TRUE)
+            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE)
 
             private$m_seed <- idf
 
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict") || attr(idf, "csv")
+            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
 
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 
@@ -161,7 +161,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @details
         #' `$apply_measure()` allows to apply a measure to an [Idf] and creates
         #' parametric models for analysis. Basically, a measure is just a
-        #' function that takes an [Idf] object and other arguments as input, and
+        #' function that takes an [Idf] object and other arguements as input, and
         #' returns a modified [Idf] object as output. Use `...` to supply
         #' different arguments, **except for the first `Idf` argument**, to that
         #' measure. Under the hook, [base::mapply()] is used to create multiple
@@ -242,9 +242,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'        `TRUE`, the external files that every `Idf` object depends on
         #'        will also be copied into the saving directory. The values of
         #'        file paths in the Idf will be changed automatically.
-        #'        Currently, only `Schedule:File` class is supported.  This
-        #'        ensures that the output directory will have all files needed
-        #'        for the model to run. Default: `FALSE`.
+        #         This ensures that the output directory will have all files
+        #         needed for the model to run. Default: `FALSE`.
         #'
         #' @return A [data.table::data.table()] with two columns:
         #'
@@ -294,6 +293,10 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to
         #'        simulation status. Default: same as `wait`.
+        #' @param separate If `TRUE`, all models are saved in a separate folder
+        #'        with each model's name under `dir` when simulation. If `FALSE`,
+        #'        all models are saved in `dir` when simulation. Default:
+        #'        `TRUE`.
         #'
         #' @return The `ParametricJob` object itself, invisibly.
         #'
@@ -308,8 +311,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' print(param)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-            param_run(self, private, dir, wait, force, copy_external, echo),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
+            param_run(self, private, dir, wait, force, copy_external, echo, separate),
         # }}}
 
         # print {{{
@@ -403,10 +406,11 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         stop("'measure' function must have at least two argument")
     }
 
-    measure_wrapper <- function (idf, ...) {
+    measure_wrapper <- function (idf, ..., .__PROGRESS_BAR__) {
         if (!is_idf(idf)) {
             stop("Measure should take an 'Idf' object as input, not '", class(idf)[[1]], "'")
         }
+        .__PROGRESS_BAR__$tick()
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
         if (!is_idf(idf)) {
@@ -424,8 +428,15 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     }
     private$m_log$measure_name <- mea_nm
 
+    # progress bar
+    progress_bar <- progress::progress_bar$new(
+        total = max(viapply(list(...), length)), clear = TRUE,
+        format = "[:current/:total | :percent] :bar [Elapsed: :elapsedfull]"
+    )
+
     out <- mapply(measure_wrapper, ...,
-        MoreArgs = list(idf = private$m_seed), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+        MoreArgs = list(idf = private$m_seed, .__PROGRESS_BAR__ = progress_bar),
+        SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     if (is.null(.names)) {
         nms <- paste0(mea_nm, "_", seq_along(out))
@@ -461,7 +472,9 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
+param_run <- function (self, private, output_dir = NULL, wait = TRUE,
+                       force = FALSE, copy_external = FALSE, echo = wait,
+                       separate = TRUE) {
     if (is.null(private$m_idfs)) {
         abort("No measure has been applied.")
     }
@@ -482,7 +495,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     }
 
     private$log_new_uuid()
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
 }
 # }}}
 # param_save {{{

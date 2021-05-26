@@ -231,11 +231,17 @@ parse_epw_header <- function (path, strict = FALSE) {
     dt <- dt$left
 
     add_class_name(idd_env, dt)
+    # handling comments to make sure they are parsed as a single string.
+    # See #318
+    ln_cmt <- dt[J(c(EPW_CLASS$comment1, EPW_CLASS$comment2)), on = "class_name", nomatch = NULL, which = TRUE]
+    if (length(ln_cmt)) {
+        set(dt, ln_cmt, "body", "[EPLUSRPLACEHOLDER];")
+    }
     # detect invalid lines with multiple semicolon (;)
     # in case there are multiple semicolon in one line
-    if (any(stri_count_fixed(dt$body[!dt$class_name %chin% c("COMMENTS 1", "COMMENTS 2")], ";") > 1L)) {
+    if (any(stri_count_fixed(dt$body, ";") > 1L)) {
         parse_error("epw", "Invalid header line found",
-            dt[stri_count_fixed(body, ";") > 1L & !class_name %chin% c("COMMENTS 1", "COMMENTS 2")],
+            dt[stri_count_fixed(body, ";") > 1L],
             subtype = "header_line"
         )
     }
@@ -253,6 +259,13 @@ parse_epw_header <- function (path, strict = FALSE) {
             parse_error("epw", "Invalid header field number found", d, post = msg, subtype = "header_field")
         }
     )
+    if (length(ln_cmt)) {
+        s <- dt$string[ln_cmt]
+        comma_loc <- stri_locate_first_fixed(s, ",")[, 1L]
+        s <- stri_sub(s, comma_loc + 1L)
+        s[stri_isempty(s)] <- NA_character_
+        dt_value[J(c(EPW_CLASS$comment1, EPW_CLASS$comment2)), on = "class_name", value_chr := s]
+    }
 
     # update object name
     dt_object <- update_object_name(dt_object, dt_value)
@@ -344,12 +357,6 @@ parse_epw_header_typical <- function (header, strict = FALSE, transform = TRUE) 
         i <- which(is.na(end_day))
         invld <- val[J(i, 4L), on = c("extensible_group", "extensible_field_index")]
         issue_epw_header_parse_error_single(obj, invld, i)
-    }
-
-    if (any(rewind <- as_date(start_day) > as_date(align_epwdate_type(end_day, start_day)))) {
-        i <- which(rewind)
-        invld <- val[J(i), on = "extensible_group"]
-        issue_epw_header_parse_error_conn(obj, invld, i, 4L, 3L, ". Should be equal as or later than %s ('%s').")
     }
 
     if (!transform) return(header)
@@ -1168,8 +1175,7 @@ print.EpwDate <- function (x, ...) {
 #' @export
 # c.EpwDate {{{
 c.EpwDate <- function (...) {
-    res <- assign_epwdate(NextMethod(...))
-    res
+    assign_epwdate(c.Date(...))
 }
 # }}}
 #' @export
@@ -1233,7 +1239,7 @@ parse_epw_data <- function (path) {
 }
 # }}}
 # match_epw_data {{{
-match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", check_minute = FALSE) {
+match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
     dp <- parse_epw_header_period(epw_header)
     holiday <- parse_epw_header_holiday(epw_header)
     data_period <- match_epw_data_period(dp$period, period)
@@ -1246,7 +1252,6 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
         get_epw_datetime_range(start_day, end_day, dp$interval, holiday$leapyear)]
 
     col_on <- c("year", "month", "day", "hour")
-    if (check_minute) col_on <- c(col_on, "minute")
 
     # extract date time
     if (!has_names(epw_data, "line")) {
@@ -1316,7 +1321,8 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
     }
 
     # validate_datetime_range {{{
-    validate_datetime_range <- function (datetime, matched, realyear) {
+    validate_datetime_range <- function (dt, matched, realyear) {
+        datetime <- dt$datetime
         if (length(datetime) - matched$line + 1L < matched$num) {
             parse_error("epw", paste("Invalid WEATHER DATA"), subtype = "data",
                 post = sprintf("%i rows of weather data (starting from row %i) are expected for data period #%i '%s', but only '%i' were found.",
@@ -1330,7 +1336,27 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
         if (any(i <- is.na(datetime))) return(which(i)[[1L]])
 
         lubridate::year(datetime) <- get_epw_datetime_year(matched$year, matched$start_day, matched$end_day, matched$num, matched$step)
+
+        # handle sub-hourly
+        if (matched$step != 60) {
+            mins <- seq(matched$step, 60, matched$step)
+            mins <- rep(mins, matched$num / length(mins))
+            datetime <- datetime + lubridate::minutes(mins) - lubridate::hours(1L)
+        }
+
         steps <- as.numeric(difftime(datetime[-1L], datetime[-matched$num], units = "mins"))
+
+        # update corrected datetime in case sub-hourly data
+        if (matched$step != 60) {
+            set(dt, matched$line - 1L + index, "datetime", datetime)
+            set(dt, matched$line - 1L + index,
+                c("month", "day", "hour", "minute"),
+                create_epw_datetime_components(
+                    matched$start_day, matched$end_day,
+                    60 / matched$step, tz, holiday$leapyear
+                )[, -"year"]
+            )
+        }
 
         which(steps != matched$step)
     }
@@ -1338,7 +1364,9 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
 
     # validate time step for each data period
     for (i in seq_len(nrow(matched))) {
-        invld <- validate_datetime_range(dt$datetime, matched[i], realyear)
+        # NOTE: In case of sub-hourly data, datetime in dt will be updated in
+        # this function
+        invld <- validate_datetime_range(dt, matched[i], realyear)
 
         if (length(invld)) {
             # expected time
@@ -1353,6 +1381,14 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC", che
                 format(dtime, "%m/%d %H:XX"), matched$index, matched$name
             ))
             parse_error("epw", paste("Invalid WEATHER DATA"), invld, suffix = invld$suffix, subtype = "data")
+        }
+
+        # if no error found and sub-hourly data found, update input epw_data
+        # with correct datetime
+        if (matched$step[i] != 60) {
+            set(epw_data, NULL, c("datetime", "month", "day", "hour", "minute"),
+                dt[, .SD, .SDcols = c("datetime", "month", "day", "hour", "minute")]
+            )
         }
     }
 
@@ -1494,7 +1530,11 @@ check_epw_data_range <- function (epw_data, range, merge = TRUE) {
     assert_names(names(epw_data), must.include = "line")
     m[, c(names(range)) := lapply(.SD, function (x) {x[x == FALSE] <- NA;x}), .SDcols = names(range)]
     set(m, NULL, "line", epw_data$line)
-    na.omit(m, invert = TRUE)$line
+
+    # store abnormal variables. See #326
+    abnormal <- na.omit(m, invert = TRUE)
+    nm <- names(which(unlist(abnormal[, lapply(.SD, anyNA), .SDcols = -"line"])))
+    setattr(abnormal$line, "variable", nm)
 }
 # }}}
 # check_epw_data_type{{{
@@ -1690,6 +1730,8 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
     set(d, NULL, "line", i + 8L)
     setcolorder(d, "line")
 
+    # for sub-hourly data, correct hour value from 1:24 to 0:23
+    if (as.integer(interval) != 1L) set(d, NULL, "hour", d$hour - 1L)
     d
 }
 # }}}
@@ -1708,6 +1750,11 @@ get_epw_data_abnormal <- function (epw_data, epw_header, matched, period = 1L, c
     if (type == "both") type <- c("missing", "out_of_range")
 
     ln <- locate_epw_data_abnormal(d, cols, "missing" %chin% type, "out_of_range" %chin% type, merge = TRUE)
+    # get abnormal variables. See #326
+    if (is.null(cols)) {
+        cols <- unique(c(attr(ln$missing, "variable"), attr(ln$out_of_range, "variable")))
+        cols <- names(epw_data)[names(epw_data) %chin% cols]
+    }
     ln <- sort(unique(c(ln$missing, ln$out_of_range)))
 
     if (!length(ln)) verbose_info("No abnormal data found.")
@@ -2124,6 +2171,10 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
 
     # coerce input data into a data.table
     data <- as.data.table(data)
+    # remove additional columns
+    if (length(cols_del <- setdiff(names(data), names(epw_data)))) {
+        set(data, NULL, cols_del, NULL)
+    }
 
     # check datetime column type first, then others
     assert_posixct(data$datetime, any.missing = FALSE)
@@ -2248,17 +2299,37 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     # }}}
 
     # match datetime {{{
-    # construct hour values
-    hour <- as.integer(lubridate::hour(data$datetime))
-    hour[hour == 0L] <- 24L
-    set(data, NULL, c("year", "month", "day", "hour", "minute"),
-        list(
-            year = lubridate::year(data$datetime),
-            month = lubridate::month(data$datetime),
-            day = lubridate::mday(data$datetime),
-            hour = hour, minute = if (interval == 1L) 0L else step
+    # preserve input year if not AMY, see #320
+    if (!realyear) year_ori <- data$year
+
+    set(data, NULL, c("year", "month", "day"),
+        list(year = lubridate::year(data$datetime),
+             month = lubridate::month(data$datetime),
+             day = lubridate::mday(data$datetime)
         )
     )
+
+    if (step == 60) {
+        # construct hour values
+        hour <- as.integer(lubridate::hour(data$datetime))
+        hour[hour == 0L] <- 24L
+        set(data, NULL, "hour", hour)
+        set(data, NULL, "minute", 0L)
+    } else {
+        # construct minute values
+        minute <- as.integer(lubridate::minute(data$datetime))
+        minute[minute == 0L] <- 60L
+        set(data, NULL, "hour", lubridate::hour(data$datetime))
+        set(data, NULL, "minute", minute)
+        data[J(60L), on = "minute", c("year", "month", "day", "hour") := {
+            dtime <- datetime - lubridate::minutes(step)
+            list(lubridate::year(dtime), lubridate::month(dtime), lubridate::mday(dtime), lubridate::hour(dtime))
+        }]
+        set(data, NULL, "hour", data$hour + 1L)
+
+        # ignore minute when validation
+        set(data, NULL, "datetime", lubridate::make_datetime(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime)))
+    }
 
     m <- match_epw_data(data, header, target_period)
 
@@ -2266,6 +2337,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     set(data, NULL, c("year", "month", "day", "hour", "minute"),
         create_epw_datetime_components(start, end, interval, leapyear = leapyear)
     )
+    if (!realyear) set(data, NULL, "year", year_ori)
     # }}}
 
     # set column order
@@ -2384,12 +2456,68 @@ format_epw <- function (epw_data, epw_header, fmt_digit = TRUE, fill = FALSE, pu
 # }}}
 # format_epw_header {{{
 format_epw_header <- function (header) {
-    val <- get_idf_value(get_epw_idd_env(), header, property = "choice")
+    val <- get_idf_value(get_epw_idd_env(), header, property = c("choice", "type", "extensible_group"))
     header$value <- standardize_idf_value(get_epw_idd_env(), header, val, type = "choice")
+
+    # store original numeric values
+    val_num <- val$value_num
+
+    # format location header
+    header$value[J(EPW_CLASS$location, c("Latitude", "Longitude")), on = c("class_name", "field_name"),
+        value_chr := fmt_dbl(value_num)]
+    header$value[J(EPW_CLASS$location, c("Time Zone", "Elevation")), on = c("class_name", "field_name"),
+        value_chr := fmt_dbl(value_num, 1L)]
+
+    # format design condition
+    idx_int <- c(2L, 9L, 16L, 18L, 33L, 47L, 49L)
+    header$value[class_name == EPW_CLASS$design & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[!is.na(value_num)] <- round(value_num[!is.na(value_num)], 1L)
+            value_chr[idx_int] <- as.character(value_num[idx_int])
+            value_chr
+        }
+    ]
+
+    # format typical periods
+    header$value[class_name == EPW_CLASS$typical & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[c(3L, 4L)] <- format(epw_date(value_chr[c(3L, 4L)]), m_spc = FALSE)
+            value_chr
+        }
+    ]
+
+    # format ground temp
+    header$value[class_name == EPW_CLASS$ground & extensible_group > 0L & !is.na(value_num), by = "extensible_group",
+        value_chr := {
+            num <- round(value_num, 2L)
+            idx <- c(5L:16L)[!is.na(num[5L:16L])]
+            value_chr[idx] <- fmt_dbl(num[idx])
+            idx <- c(1L:4L)[!is.na(num[1L:4L])]
+            value_chr[idx] <- as.character(num[idx])
+            value_chr
+        }
+    ]
+
+    # format data period
+    header$value[class_name == EPW_CLASS$period & extensible_group > 0L, by = "extensible_group",
+        value_chr := {
+            value_chr[c(3L, 4L)] <- format(epw_date(value_chr[c(3L, 4L)]), m_spc = TRUE)
+            value_chr
+        }
+    ]
+
+    set(header$value, NULL, "value_num", NULL)
+
     fmt <- get_idf_string(get_epw_idd_env(), header, header = FALSE, comment = FALSE,
         format = "new_top", leading = 0, sep_at = -1, flat = FALSE
     )
     fmt <- lapply(fmt$format$fmt, "[[", 2L)
+
+    # assign numeric value back
+    set(header$value, NULL, "value_num", val_num)
+    cols <- c("value_id", "value_chr", "value_num", "object_id", "field_id")
+    set(header$value, NULL, setdiff(names(header$value), cols), NULL)
+    setcolorder(header$value, cols)
 
     vcapply(fmt, function (s) {
         # remove trailing semicolon
@@ -2407,12 +2535,42 @@ format_epw_data <- function (epw_data, epw_header, fmt_digit = FALSE, fill = FAL
 
     if (fill) d <- fill_epw_data_abnormal(d, epw_header, matched, ...)
 
-    # # round digits as WeatherConvertor
-    # if (fmt_digit) {
-    #     for (nm in names(EPW_FORMAT)) {
-    #         set(d, NULL, nm, EPW_FORMAT[[nm]](d[[nm]]))
-    #     }
-    # }
+    # EPW_FORMAT {{{
+    EPW_FORMAT <- list(
+        dry_bulb_temperature = fmt_int,
+        dew_point_temperature = fmt_int,
+        relative_humidity = as.integer,
+        atmospheric_pressure = as.integer,
+        extraterrestrial_horizontal_radiation = as.integer,
+        extraterrestrial_direct_normal_radiation = as.integer,
+        horizontal_infrared_radiation_intensity_from_sky = as.integer,
+        global_horizontal_radiation = as.integer,
+        direct_normal_radiation = as.integer,
+        diffuse_horizontal_radiation = as.integer,
+        global_horizontal_illuminance = as.integer,
+        direct_normal_illuminance = as.integer,
+        diffuse_horizontal_illuminance = as.integer,
+        zenith_luminance = as.integer,
+        wind_direction = as.integer,
+        wind_speed = fmt_int,
+        visibility = fmt_int,
+        ceiling_height = as.integer,
+        precipitable_water = as.integer,
+        aerosol_optical_depth = function (x) fmt_dbl(x, 4L),
+        snow_depth = as.integer,
+        albedo = function (x) fmt_dbl(x, 3L),
+        liquid_precip_depth = fmt_int,
+        liquid_precip_rate = fmt_int
+    )
+    # }}}
+
+    # round digits as WeatherConvertor
+    if (fmt_digit) {
+        for (nm in names(EPW_FORMAT)) {
+            set(d, NULL, nm, EPW_FORMAT[[nm]](d[[nm]]))
+        }
+    }
+
     d
 }
 # }}}

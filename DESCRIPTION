@@ -1,12 +1,12 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.13.0.9000
+Version: 0.14.2
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
            role = c("aut", "cre"),
-           email = "hongyuan.jia@bears-berkeley.sg",
+           email = "hongyuanjia@outlook.com",
            comment = c(ORCID = "0000-0002-0075-8183"))
 Description: A rich toolkit of using the whole building
     simulation program 'EnergyPlus'(<https://energyplus.net>), which
@@ -24,30 +24,26 @@ Imports:
     cli (>= 1.1.0),
     crayon,
     data.table (>= 1.12.4),
-    decido,
     hms,
     lubridate,
     methods,
     processx (>= 3.2.0),
     progress (>= 1.2.0),
     R6,
-    rgl (>= 0.100.26),
     RSQLite,
     stringi,
     units
 Suggests:
     covr,
-    dplyr,
-    dygraphs,
-    ggplot2,
+    decido,
     knitr,
     pkgdown,
+    rgl (>= 0.100.26),
     rmarkdown,
     shiny,
     shinyWidgets,
     testthat (>= 2.1.0)
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
     "collate"))
 RoxygenNote: 7.1.1

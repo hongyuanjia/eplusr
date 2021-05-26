@@ -1,5 +1,3 @@
-context("Epw Class")
-
 eplusr_option(verbose_info = FALSE)
 
 # IDD {{{
@@ -140,6 +138,10 @@ test_that("Header getter and setter", {
     expect_is(epw$comment2(), "character")
     expect_equal(epw$comment2("comment2"), "comment2")
     expect_equal(epw$comment2(), "comment2")
+    expect_null(epw$comment2(""))
+    expect_null(epw$comment2())
+    expect_null(epw$comment1(NULL))
+    expect_null(epw$comment1())
     # }}}
 
     # $num_period {{{
@@ -254,6 +256,7 @@ test_that("Data Getter", {
     expect_equal(nrow(epw$abnormal_data(type = "out_of_range")), 0L)
     expect_true("line" %in% names(epw$abnormal_data()))
     expect_equal(ncol(epw$abnormal_data()), 37L)
+    expect_equal(ncol(epw$abnormal_data(keep_all = FALSE)), 12L)
     expect_equal(nrow(epw$abnormal_data(cols = "albedo")), 2160L)
     expect_equal(ncol(epw$abnormal_data(cols = "albedo", keep_all = FALSE)), 8L)
     expect_equal(nrow(epw$abnormal_data(cols = "albedo", type = "out_of_range")), 0L)
@@ -344,6 +347,11 @@ test_that("Data Setter", {
     )
     expect_equal(nrow(epw$data()), 48L)
 
+    # can remove extra columns
+    set(d, NULL, "extra_column", 1)
+    expect_is(epw$set(d), "Epw")
+    expect_equal(ncol(epw$data()), 36)
+
     expect_error({
         epw <- read_epw(path_epw)
         suppressWarnings(d <- epw$data(start_year = 2020))
@@ -427,6 +435,14 @@ test_that("Data Setter", {
     expect_is(epw$make_na(TRUE, TRUE), "Epw")
     expect_is(epw$add(d, realyear = TRUE), "Epw")
     expect_true(all(is.na(epw$abnormal_data(cols = "albedo", keep_all = FALSE, type = "missing")$albedo)))
+
+    # can remove extra columns
+    expect_is(epw <- Epw$new(path_epw), "Epw")
+    expect_is(d <- epw$data(start_year = 2017), "data.table")
+    set(d, NULL, "extra_column", 1)
+    expect_is(epw$add(d, realyear = TRUE), "Epw")
+    expect_warning(d <- epw$data())
+    expect_equal(ncol(d), 36)
     # }}}
 
     # $del() {{{

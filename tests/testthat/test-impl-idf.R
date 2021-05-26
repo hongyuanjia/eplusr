@@ -1,11 +1,9 @@
-context("IDF Implementation")
-
 eplusr_option(validate_level = "final", verbose_info = FALSE)
 use_idd(8.8, "auto")
 
 # TABLE {{{
 test_that("table", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     # OBJECT {{{
@@ -1580,9 +1578,8 @@ test_that("regex", {
 
     expect_is(l <- expand_idf_regex(idd_env, idf_env, "zn", "Zone", ignore.case = TRUE), "list")
     expect_equal(nrow(l$object), 6)
-    expect_equal(nrow(l$value), 6)
-    expect_equal(l$value$value_id, c(130L, 152L, 174L, 196L, 218L, 240L))
-    expect_equal(substr(l$value$value_chr, 1, 7), rep("Zone001", 6))
+    expect_equal(nrow(l$value), 132)
+    expect_equal(l$value$value_id, 130:261)
 })
 # }}}
 

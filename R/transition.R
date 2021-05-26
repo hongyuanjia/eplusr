@@ -141,7 +141,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            idf <- with_speed(trans_funs[[funs[i]]](idf))
+            idf <- without_checking(trans_funs[[funs[i]]](idf))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         idf
@@ -155,7 +155,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            res[[i + 1L]] <- with_speed(trans_funs[[funs[[i]]]](res[[i]]))
+            res[[i + 1L]] <- without_checking(trans_funs[[funs[[i]]]](res[[i]]))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
@@ -1977,6 +1977,17 @@ trans_funs$f890t900 <- function (idf) {
                         ))
                     }
 
+                    if (!is.na(value[8L]) && tolower(value[8L]) == "useweatherfile") {
+                        warn(paste0(
+                                "For 'RunPeriod' ", surround(name[[1L]]), " [ID:", id[[1L]], "]:\n",
+                                "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
+                                "start week day is set by the input start date."
+                            ),
+                            "warning_trans_890_900"
+                        )
+                        value[8L] <- NA_character_
+                    }
+
                     num_rep <- as.integer(num_rep)
                 } else {
                     num_rep <- 0L
@@ -2888,6 +2899,650 @@ trans_funs$f910t920 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_920_930 {{{
+#' @importFrom checkmate assert_true
+trans_funs$f920t930 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.2)
+
+    target_cls <- c(
+        "AirConditioner:VariableRefrigerantFlow",       # 1
+        "AirTerminal:SingleDuct:Uncontrolled",          # 2
+        "ZoneHVAC:EquipmentList",                       # 3
+        "AirLoopHVAC:ZoneSplitter",                     # 4
+        "AirLoopHVAC:SupplyPlenum",                     # 5
+        "AirLoopHVAC",                                  # 6
+        "RoomAir:Node:AirflowNetwork:HVACEquipment",    # 7
+        "AirflowNetwork:Distribution:Node",             # 8
+        "AirflowNetwork:Distribution:Linkage",          # 9
+        "Boiler:HotWater",                              # 10
+        "Boiler:Steam",                                 # 11
+        "Chiller:EngineDriven",                         # 12
+        "Chiller:CombustionTurbine",                    # 13
+        "ChillerHeater:Absorption:DirectFired",         # 14
+        "Coil:Cooling:DX:MultiSpeed",                   # 15
+        "Coil:Heating:Fuel",                            # 16
+        "Coil:Heating:DX:MultiSpeed",                   # 17
+        "EnergyManagementSystem:Program",               # 18
+        "EnergyManagementSystem:Subroutine",            # 19
+        "EnergyManagementSystem:MeteredOutputVariable", # 20
+        "Exterior:FuelEquipment",                       # 21
+        "FuelFactors",                                  # 22
+        "Generator:CombustionTurbine",                  # 23
+        "Generator:InternalCombustionEngine",           # 24
+        "Generator:MicroTurbine",                       # 25
+        "GlobalGeometryRules",                          # 26
+        "HeatPump:WaterToWater:EIR:Heating",            # 27
+        "HeatPump:WaterToWater:EIR:Cooling",            # 28
+        "HVACTemplate:System:VRF",                      # 29
+        "HVACTemplate:Plant:Boiler",                    # 30
+        "LifeCycleCost:UsePriceEscalation",             # 31
+        "LifeCycleCost:UseAdjustment",                  # 32
+        "OtherEquipment",                               # 33
+        "Output:Table:SummaryReports",                  # 34
+        "ShadowCalculation",                            # 35
+        "WaterHeater:Mixed",                            # 36
+        "WaterHeater:Stratified",                       # 37
+        "ZoneHVAC:HybridUnitaryHVAC"                    # 38
+    )
+
+    new_idf <- trans_preprocess(idf, 9.3, target_cls)
+
+    # fix_fuel_types {{{
+    fix_fuel_types <- function (dt, idx) {
+        if (!nrow(dt)) return(dt)
+
+        input <- dt[J(idx), on = "index", nomatch = NULL]
+        if (!nrow(input)) return(dt)
+
+        set(input, NULL, "value", stri_trans_tolower(input$value))
+
+        map <- data.table(
+            old = c(
+                "electricity",
+                "electric",
+                "elec",
+                "gas",
+                "naturalgas",
+                "natural gas",
+                "propane",
+                "propanegas",
+                "lpg",
+                "propane gas",
+                "fueloil#1",
+                "fuel oil #1",
+                "fuel oil",
+                "distillate oil",
+                "distillateoil",
+                "fueloil#2",
+                "fuel oil #2",
+                "residual oil",
+                "residualoil"
+            ),
+            new = c(
+                "Electricity",
+                "Electricity",
+                "Electricity",
+                "NaturalGas",
+                "NaturalGas",
+                "NaturalGas",
+                "Propane",
+                "Propane",
+                "Propane",
+                "Propane",
+                "FuelOilNo1",
+                "FuelOilNo1",
+                "FuelOilNo1",
+                "FuelOilNo1",
+                "FuelOilNo1",
+                "FuelOilNo2",
+                "FuelOilNo2",
+                "FuelOilNo2",
+                "FuelOilNo2"
+            )
+        )
+
+        input[map, on = c("value" = "old"), value := i.new]
+        dt[input, on = c("id", "index"), value := i.value]
+    }
+    # }}}
+
+    # 1: AirConditioner:VariableRefrigerantFlow {{{
+    dt1 <- trans_action(idf, "AirConditioner:VariableRefrigerantFlow")
+    dt1 <- fix_fuel_types(dt1, 67L)
+    # }}}
+    # 2: AirTerminal:SingleDuct:Uncontrolled {{{
+    dt2 <- trans_action(idf,
+        c("AirTerminal:SingleDuct:ConstantVolume:NoReheat" = "AirTerminal:SingleDuct:Uncontrolled"),
+        insert = list(3L, " ATInlet")
+    )
+    if (nrow(dt2)) {
+        # create a nwe inlet node name using the original zone supply air node
+        dt2[J(c(3L, 4L)), on = "index", by = "id", value := {
+            pre <- if (is.na(value[2L])) "" else value[2L]
+            value[1L] <- paste0(pre, value[1L])
+            value
+        }]
+
+        # create one air distribution unit for each terminal
+        dt2_adu <- new_idf$to_table(init = TRUE, all = TRUE,
+            class = rep("ZoneHVAC:AirDistributionUnit", length(unique(dt2$id)))
+        )
+        dt2_adu[J(1L), on = "index", value := {
+            nm <- dt2[J(1L), on = "index", value]
+            nm[!is.na(nm)] <- paste(nm[!is.na(nm)], "ADU")
+            nm
+        }]
+        dt2_adu[J(2L), on = "index", value := dt2[J(4L), on = "index", value]]
+        dt2_adu[J(3L), on = "index", value := "AirTerminal:SingleDuct:ConstantVolume:NoReheat"]
+        dt2_adu[J(4L), on = "index", value := dt2[J(1L), on = "index", value]]
+        dt2_adu[J(5:6), on = "index", value := NA_character_]
+        dt2_adu[J(7L), on = "index", value := dt2[J(8L), on = "index", value]]
+
+        # after creating ADU, remove the 7th field, i.e. design specification
+        # sizing object
+        dt2 <- dt2[index < 7L]
+        dt2 <- rbindlist(list(dt2, dt2_adu))
+
+        # all outlet nodes
+        nodes <- dt2[J(4L), on = "index"]
+        set(nodes, NULL, "value_lower", stri_trans_tolower(nodes$value))
+
+        # all nodelists
+        nodelists <- idf$to_table(class = "NodeList")
+        set(nodelists, NULL, "value_lower", stri_trans_tolower(nodelists$value))
+        set(nodelists, NULL, "matched", FALSE)
+    }
+    # }}}
+    # 3: ZoneHVAC:EquipmentList {{{
+    dt3 <- trans_action(idf, "ZoneHVAC:EquipmentList")
+    # replace object types and names accordingly
+    if (nrow(dt2) && nrow(dt3)) {
+        set(dt3, NULL, "value_lower", stri_trans_tolower(dt3$value))
+        # calculate extensible group
+        dt3[, by = "id", extensible_field_index := (index - 2L) %/% 6L * 6L + (index - 2L) %% 6L]
+        dt3[J(1:2), on = "index", extensible_field_index := 0L]
+
+        m <- dt3[J(1L, "airterminal:singleduct:uncontrolled"),
+            on = c("extensible_field_index", "value_lower"),
+            list(id, index)]
+        dt3[m, on = c("id", "index"), value := "ZoneHVAC:AirDistributionUnit"]
+        dt3[m[, index := index + 1L], on = c("id", "index"), value := {
+            value[!is.na(value)] <- paste(value[!is.na(value)], "ADU")
+            value
+        }]
+
+        set(dt3, NULL, c("value_lower", "extensible_field_index"), NULL)
+    }
+    # }}}
+
+    # replace_node {{{
+    replace_node <- function (dt, nodes, nodelists = NULL, index_exclude) {
+        set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
+
+        # check if the node is referenced directly
+        set(dt, NULL, "matched", FALSE)
+        dt[nodes, on = "value_lower", matched := TRUE]
+        # exclude specified fields
+        dt[J(index_exclude), on = "index", matched := FALSE]
+        # exclude empty fields
+        dt[J(NA_character_), on = "value_lower", matched := FALSE]
+        dt[J(TRUE), on = "matched", value := paste(value, "ATInlet")]
+
+        # check if the node is referenced by a node list
+        if (!is.null(nodelists)) {
+            # get matched node list id
+            dt[nodelists[J(1L), on = "index"], on = "value_lower", id_list := i.id]
+            # exclude specified fields
+            dt[J(index_exclude), on = "index", id_list := NA_integer_]
+            # exclude empty fields
+            dt[J(NA_character_), on = "value_lower", id_list := NA_integer_]
+
+            # extract all matched node lists that contain target nodes
+            nl <- nodelists[J(dt[!is.na(id_list), id_list]), on = "id"][
+                nodes, on = "value_lower", matched := TRUE]
+            nl <- nl[J(TRUE), on = "matched", nomatch = NULL]
+
+            # tag matched field in the whole nodelist table
+            nodelists[nl, on = c("id", "index"), matched := TRUE]
+
+            # append name suffix
+            dt[J(unique(nl$id)), on = "id_list", value := paste(value, "ATInlet")]
+
+            set(dt, NULL, "id_list", NULL)
+        }
+
+        # clean up columns
+        set(dt, NULL, c("value_lower", "matched"), NULL)
+    }
+    # }}}
+    # 4: AirLoopHVAC:ZoneSplitter {{{
+    dt4 <- trans_action(idf, "AirLoopHVAC:ZoneSplitter")
+    if (nrow(dt2) && nrow(dt4)) dt4 <- replace_node(dt4, nodes, nodelists, 1:2)
+    # }}}
+    # 5: AirLoopHVAC:SupplyPlenum {{{
+    dt5 <- trans_action(idf, "AirLoopHVAC:SupplyPlenum")
+    if (nrow(dt2) && nrow(dt5)) dt5 <- replace_node(dt5, nodes, nodelists, 1:4)
+    # }}}
+    # 6: AirLoopHVAC {{{
+    dt6 <- trans_action(idf, "AirLoopHVAC")
+    if (nrow(dt2) && nrow(dt6)) dt6 <- replace_node(dt6, nodes, nodelists, setdiff(1:11, 9L)) # 9
+    # }}}
+    # 7: RoomAir:Node:AirflowNetwork:HVACEquipment {{{
+    dt7 <- trans_action(idf, "RoomAir:Node:AirflowNetwork:HVACEquipment")
+    # replace object types and names accordingly
+    if (nrow(dt2) && nrow(dt7)) {
+        set(dt7, NULL, "value_lower", stri_trans_tolower(dt7$value))
+        # calculate extensible group
+        dt7[, by = "id", extensible_field_index := (index - 1L) %/% 4L * 4L + (index - 1L) %% 4L]
+        dt7[J(1L), on = "index", extensible_field_index := 0L]
+
+        m <- dt7[J(1L, "airterminal:singleduct:uncontrolled"),
+            on = c("extensible_field_index", "value_lower"),
+            list(id, index)]
+        dt7[m, on = c("id", "index"), value := "ZoneHVAC:AirDistributionUnit"]
+        dt7[m[, index := index + 1L], on = c("id", "index"), value := {
+            value[!is.na(value)] <- paste(value[!is.na(value)], "ADU")
+            value
+        }]
+
+        set(dt7, NULL, c("value_lower", "extensible_field_index"), NULL)
+    }
+    # }}}
+    # 8: AirflowNetwork:Distribution:Node {{{
+    dt8 <- trans_action(idf, "AirflowNetwork:Distribution:Node")
+    if (nrow(dt2) && nrow(dt8)) {
+        # store original node name
+        val <- dt8[J(2L), on = "index", nomatch = NULL, value]
+        # store original data
+        ori <- copy(dt8)
+
+        dt8 <- replace_node(dt8, nodes, NULL, setdiff(1:4, 2L))
+
+        # get matched object id
+        id_m <- dt8[J(2L), on = "index", nomatch = NULL, id[which(value != val)]]
+
+        if (length(id_m)) {
+            dt8 <- dt8[id %in% id_m]
+            dt8[J(1L), on = "index", value := {
+                value[is.na(value)] <- ""
+                paste(value, "ATInlet")
+            }]
+            set(dt8, NULL, "id", -dt8$id)
+            dt8 <- rbindlist(list(ori, dt8))
+        }
+    }
+    # }}}
+    # 9: AirflowNetwork:Distribution:Linkage {{{
+    dt9 <- trans_action(idf, "AirflowNetwork:Distribution:Linkage")
+    if (nrow(dt2) && nrow(dt8) && any(dt8$id < 0)&& nrow(dt9)) {
+        # store original node name
+        val <- dt9[J(3L), on = "index", nomatch = NULL, value]
+        # store original data
+        ori <- copy(dt9)
+
+        # get matched nodes
+        dt9 <- replace_node(dt9,
+            # use the original matched node names
+            nodes = dt8[id %in% dt8[id < 0, -id] & index == 1L,
+                list(value_lower = stri_trans_tolower(value))],
+            NULL, setdiff(1:5, 3L)
+        )
+
+        # get matched object id
+        m <- dt9[J(3L), on = "index", nomatch = NULL, value != val]
+
+        if (any(m)) {
+            # create new linkage
+            dt9_1 <- dt9[id %in% unique(id)[m]]
+
+            # assume component is a duct
+            rel <- idf$object_relation(unique(dt9_1$id), "ref_to",
+                class = "AirflowNetwork:Distribution:Component:Duct")$ref_to
+
+            # get id of objects that reference ducts
+            id_m <- unique(rel$object_id)
+
+            # update data for linkage
+            dt9_1[, by = "id", value := {
+                val <- value
+                val[1L] <- paste(value[1L], "ATInlet")
+                val[2L] <- value[3L]
+                # remove suffix
+                val[3L] <- stri_sub(value[3L], to = -9L)
+                # give a warning if the referenced duct is not found
+                if (.BY$id %in% id_m) {
+                    val[4L] <- paste(val[1L], "Duct")
+                } else {
+                    warn(sprintf(paste0(
+                        "Linkage component '%s' in '%s'[id:%s] in class 'AirflowNetwork:Distribution:Linkage' ",
+                        "is not an 'AirflowNetwork:Distribution:Component:Duct' object. ",
+                        "No new duct will be added."),
+                        value[4L], name[1L], .BY$id
+                    ))
+                }
+                val
+            }]
+
+            # create a matching new duct for the new linkage
+            dt9_2 <- idf$to_table(rel$src_object_id)
+            dt9_2[J(1L), on = "index", value := dt9_1[J(id_m, 4L), on = c("id", "index"), value]]
+            dt9_2[J(2L), on = "index", value := "0.0001"]
+            dt9_2[J(6L), on = "index", value := "0.0"]
+            dt9_2[J(7L), on = "index", value := "0.0000001"]
+            dt9_2[J(8L), on = "index", value := "0.0000001"]
+
+            # update object id
+            set(dt9_1, NULL, "id", -dt9_1$id)
+            dt9 <- rbindlist(list(dt9, dt9_1, dt9_2))
+        }
+    }
+    # }}}
+    # 10: Boiler:HotWater {{{
+    dt10 <- trans_action(idf, "Boiler:HotWater")
+    dt10 <- fix_fuel_types(dt10, 2L)
+    # }}}
+    # 11: Boiler:Steam {{{
+    dt11 <- trans_action(idf, "Boiler:Steam")
+    dt11 <- fix_fuel_types(dt11, 2L)
+    # }}}
+    # 12: Chiller:EngineDriven {{{
+    dt12 <- trans_action(idf, "Chiller:EngineDriven")
+    dt12 <- fix_fuel_types(dt12, 36L)
+    # }}}
+    # 13: Chiller:CombustionTurbine {{{
+    dt13 <- trans_action(idf, "Chiller:CombustionTurbine")
+    dt13 <- fix_fuel_types(dt13, 55L)
+    # }}}
+    # 14: ChillerHeater:Absorption:DirectFired {{{
+    dt14 <- trans_action(idf, "ChillerHeater:Absorption:DirectFired")
+    dt14 <- fix_fuel_types(dt14, 33L)
+    # }}}
+    # 15: Coil:Cooling:DX:MultiSpeed {{{
+    dt15 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed")
+    dt15 <- fix_fuel_types(dt15, 17L)
+    # }}}
+    # 16: Coil:Heating:Fuel {{{
+    dt16 <- trans_action(idf, "Coil:Heating:Fuel")
+    dt16 <- fix_fuel_types(dt16, 3L)
+    # }}}
+    # 17: Coil:Heating:DX:MultiSpeed {{{
+    dt17 <- trans_action(idf, "Coil:Heating:DX:MultiSpeed")
+    dt17 <- fix_fuel_types(dt17, 16L)
+    # }}}
+    # 18: EnergyManagementSystem:Program {{{
+    dt18 <- trans_action(idf, "EnergyManagementSystem:Program", aling = FALSE)
+    # change function '@CpAirFnWTdb' to '@CpAirFnW' and remove the 2nd argument
+    if (nrow(dt18)) {
+        dt18[index > 1L & stri_detect_fixed(value, "@CpAirFnWTdb", case_insensitive = TRUE), value := {
+            stri_replace_first_regex(value, "@CpAirFnWTdb\\s+(.+)\\s+.+", "@CpAirFnW $1", case_insensitive = TRUE)
+        }]
+    }
+    # }}}
+    # 19: EnergyManagementSystem:Subroutine {{{
+    dt19 <- trans_action(idf, "EnergyManagementSystem:Subroutine")
+    # change function '@CpAirFnWTdb' to '@CpAirFnW' and remove the 2nd argument
+    if (nrow(dt19)) {
+        dt19[index > 1L & stri_detect_fixed(value, "@CpAirFnWTdb", case_insensitive = TRUE), value := {
+            stri_replace_first_regex(value, "@CpAirFnWTdb\\s+(.+)\\s+.+", "@CpAirFnW $1", case_insensitive = TRUE)
+        }]
+    }
+    # }}}
+    # 20: EnergyManagementSystem:MeteredOutputVariable {{{
+    dt20 <- trans_action(idf, "EnergyManagementSystem:MeteredOutputVariable")
+    dt20 <- fix_fuel_types(dt20, 5L)
+    # }}}
+    # 21: Exterior:FuelEquipment {{{
+    dt21 <- trans_action(idf, "Exterior:FuelEquipment")
+    dt21 <- fix_fuel_types(dt21, 2L)
+    # }}}
+    # 22: FuelFactors {{{
+    dt22 <- trans_action(idf, "FuelFactors")
+    dt22 <- fix_fuel_types(dt22, 1L)
+    # }}}
+    # 23: Generator:CombustionTurbine {{{
+    dt23 <- trans_action(idf, "Generator:CombustionTurbine")
+    dt23 <- fix_fuel_types(dt23, 22L)
+    # }}}
+    # 24: Generator:InternalCombustionEngine {{{
+    dt24 <- trans_action(idf, "Generator:InternalCombustionEngine")
+    dt24 <- fix_fuel_types(dt24, 20L)
+    # }}}
+    # 25: Generator:MicroTurbine {{{
+    dt25 <- trans_action(idf, "Generator:MicroTurbine")
+    dt25 <- fix_fuel_types(dt25, 12L)
+    # }}}
+    # 26: GlobalGeometryRules {{{
+    dt26 <- trans_action(idf, "GlobalGeometryRules",
+        reset = list(1L, "ULC", "UpperLeftCorner"),
+        reset = list(1L, "LLC", "LowerLeftCorner"),
+        reset = list(1L, "LRC", "LowerRightCorner"),
+        reset = list(1L, "URC", "UpperRightCorner"),
+        reset = list(2L, "CCW", "Counterclockwise"),
+        reset = list(2L, "CW", "Clockwise"),
+        reset = list(3L, c("WCS", "WorldCoordinateSystem", "Absolute"), "World"),
+        reset = list(3L, c("Local", "Rel"), "Relative"),
+        reset = list(4L, c("WCS", "WorldCoordinateSystem", "Absolute"), "World"),
+        reset = list(4L, c("Local", "Rel"), "Relative"),
+        reset = list(5L, c("WCS", "WorldCoordinateSystem", "Absolute"), "World"),
+        reset = list(5L, c("Local", "Rel"), "Relative")
+    )
+    # }}}
+    # 27: HeatPump:WaterToWater:EIR:Heating {{{
+    dt27 <- trans_action(idf,
+        c("HeatPump:PlantLoop:EIR:Heating" = "HeatPump:WaterToWater:EIR:Heating"),
+        insert = list(4L)
+    )
+    # }}}
+    # 28: HeatPump:WaterToWater:EIR:Cooling {{{
+    dt28 <- trans_action(idf,
+        c("HeatPump:PlantLoop:EIR:Cooling" = "HeatPump:WaterToWater:EIR:Cooling"),
+        insert = list(4L)
+    )
+    # }}}
+    # 29: HVACTemplate:System:VRF {{{
+    dt29 <- trans_action(idf, "HVACTemplate:System:VRF")
+    dt29 <- fix_fuel_types(dt29, 37L)
+    # }}}
+    # 30: HVACTemplate:Plant:Boiler {{{
+    dt30 <- trans_action(idf, "HVACTemplate:Plant:Boiler")
+    dt30 <- fix_fuel_types(dt30, 5L)
+    # }}}
+    # 31: LifeCycleCost:UsePriceEscalation {{{
+    dt31 <- trans_action(idf, "LifeCycleCost:UsePriceEscalation")
+    dt31 <- fix_fuel_types(dt31, 2L)
+    # }}}
+    # 32: LifeCycleCost:UseAdjustment {{{
+    dt32 <- trans_action(idf, "LifeCycleCost:UseAdjustment")
+    dt32 <- fix_fuel_types(dt32, 2L)
+    # }}}
+    # 33: OtherEquipment {{{
+    dt33 <- trans_action(idf, "OtherEquipment")
+    dt33 <- fix_fuel_types(dt33, 2L)
+    # }}}
+    # 34: Output:Table:SummaryReports {{{
+    dt34 <- trans_action(idf, "Output:Table:SummaryReports")
+    if (nrow(dt34)) {
+        set(dt34, NULL, "value_lower", stri_trans_tolower(dt34$value))
+        dt34[J(c("abups", "beps")), on = "value_lower", value := "AnnualBuildingUtilityPerformanceSummary"]
+        dt34[J("ivrs"), on = "value_lower", value := "InputVerificationandResultsSummary"]
+        dt34[J("css"), on = "value_lower", value := "ComponentSizingSummary"]
+        dt34[J("shad"), on = "value_lower", value := "SurfaceShadowingSummary"]
+        dt34[J("eio"), on = "value_lower", value := "InitializationSummary"]
+        set(dt34, NULL, "value_lower", NULL)
+    }
+    # }}}
+    # 35: ShadowCalculation {{{
+    dt35 <- trans_action(idf, "ShadowCalculation", all = TRUE, insert = list(7L))
+    if (nrow(dt35)) {
+        dt35[, by = "id", value := {
+            val <- value
+            value_lower <- stri_trans_tolower(value)
+            val[1L] <- switch(value_lower[6L],
+                scheduledshading = "Scheduled",
+                importedshading = "Imported",
+                "PolygonClipping"
+            )
+            val[2L] <- switch(value_lower[1L],
+                averageoverdaysinfrequency = "Periodic",
+                timestepfrequency = "Timestep",
+                ""
+            )
+            val[3:5] <- value[2:4]
+            val[6L] <- ""
+            val[7L] <- value[5L]
+            val
+        }]
+    }
+    # }}}
+    # 36: WaterHeater:Mixed {{{
+    dt36 <- trans_action(idf, "WaterHeater:Mixed")
+    dt36 <- fix_fuel_types(dt36, c(11L, 15L, 18L))
+    # }}}
+    # 37: WaterHeater:Stratified {{{
+    dt37 <- trans_action(idf, "WaterHeater:Stratified")
+    dt37 <- fix_fuel_types(dt37, c(17L, 20L, 24L))
+    # }}}
+    # 38: ZoneHVAC:HybridUnitaryHVAC {{{
+    dt38 <- trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC")
+    dt38 <- fix_fuel_types(dt37, 18:20)
+    # }}}
+
+    # create new NodeList if necessary {{{
+    if (nrow(dt2) && any(nodelists$matched)) {
+        m <- nodelists[J(TRUE), on = "matched"]
+        nodelists[m, on = c("id", "index"), value := paste(value, "ATInlet")]
+        nodelists <- nodelists[J(unique(m$id)), on = "id"]
+        nodelists[J(1L), on = "index", value := paste(value, "ATInlet")]
+        set(nodelists, NULL, c("matched", "value_lower"), NULL)
+        dt2 <- rbindlist(list(dt2, nodelists))
+    }
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:38))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_930_940 {{{
+#' @importFrom checkmate assert_true
+trans_funs$f930t940 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.3)
+
+    target_cls <- c(
+        "Construction:InternalSource",                 # 1
+        "EnergyManagementSystem:Actuator",             # 2
+        "Output:DebuggingData",                        # 3
+        "Output:Diagnostics",                          # 4
+        "PerformancePrecisionTradeoffs",               # 5
+        # only issue warning
+        # "PythonPlugin:Instance",
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow", # 6
+        "ZoneHVAC:LowTemperatureRadiant:Electric",     # 7
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", # 8
+        "ZoneHVAC:HybridUnitaryHVAC"                   # 9
+    )
+
+    new_idf <- trans_preprocess(idf, 9.4, target_cls)
+
+    # 1: Construction:InternalSource {{{
+    dt1 <- trans_action(idf, "Construction:InternalSource", insert = list(6, "0.0"))
+    # }}}
+    # 2: EnergyManagementSystem:Actuator {{{
+    dt2 <- trans_action(idf,
+        "EnergyManagementSystem:Actuator",
+        reset = list(4L, "Electric Power Level", "Electricity Rate"),
+        reset = list(4L, "Gas Power Level", "NaturalGas Rate")
+    )
+    # }}}
+    # 3: Output:DebuggingData {{{
+    dt3 <- trans_action(idf, "Output:DebuggingData")
+    if (nrow(dt3)) {
+        # convert 1 & 0 to Yes and No and warning if non-numeric values found
+        set(dt3, NULL, "value_num", suppressWarnings(as.numeric(dt3$value)))
+        set(dt3, NULL, "value", "No")
+
+        dt3[is.na(value_num), by = c("id", "index"), c("value", "value_num") := {
+            warn(sprintf(paste0(
+                "Field '%s' for object [id:%s] in class 'Output:DebuggingData' ",
+                "is not a number, defaulting to 'No'."),
+                field[1L], .BY$id
+            ))
+            list("No", 0.0)
+        }]
+
+        dt3[as.integer(value_num) == 1L, value := "Yes"]
+        set(dt3, NULL, "value_num", NULL)
+    }
+    # }}}
+    # 4: Output:Diagnostics {{{
+    dt4 <- trans_action(idf, "Output:Diagnostics")
+    if (nrow(dt4)) {
+        if (length(unique(dt4$id)) > 1L) {
+            # consolidate all into one
+            warn(paste0(
+                "'Output:Diagnostics' has become an unique-object class in EnergyPlus v9.4. ",
+                "All other objects except the first one found will be listed as comments and ",
+                "their keys will be all consolidated into the first one."
+            ))
+            id_cmt <- unique(dt4$id)[-1L]
+            id_left <- dt4$id[1L]
+            cmt <- idf$to_string(id_cmt, header = FALSE, format = "new_bot")
+            idf$object(id_left)$comment(cmt)
+
+            dt4 <- unique(dt4, by = "value")
+            set(dt4, NULL, "id", id_left)
+            set(dt4, NULL, "index", seq_len(nrow(dt4)))
+        }
+    }
+    # }}}
+    # 5: PerformancePrecisionTradeoffs {{{
+    dt5 <- trans_action(idf, "PerformancePrecisionTradeoffs", reset = list(3L, "Mode05", "Mode06"))
+    # }}}
+    # 6: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
+    dt6 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "HalfFlowPower")
+    )
+    # }}}
+    # 7: ZoneHVAC:LowTemperatureRadiant:Electric {{{
+    dt7 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:Electric",
+        insert = list(10L, "HalfFlowPower")
+    )
+    # }}}
+    # 8: ZoneHVAC:LowTemperatureRadiant:ConstantFlow {{{
+    dt8 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "0.8")
+    )
+    # }}}
+    # 9: ZoneHVAC:HybridUnitaryHVAC {{{
+    dt9 <- trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC",
+        insert = list(15L, "Yes"),
+        insert = list(16L),
+        insert = list(17L),
+        delete = list(19L)
+    )
+    if (nrow(dt9)) dt9[, by = "id", index := seq_len(.N)]
+    # }}}
+
+    # Warning for PythonPlugin:Instance {{{
+    if (idf$is_valid_class("PythonPlugin:Instance")) {
+        warn(paste0("Objects in class 'PythonPlugin:Instance' found. ",
+            "Note that the API has been changed from v9.3 and v9.4. ",
+            "Please check the docs and update with new state argument."
+        ))
+    }
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:9))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
@@ -3060,13 +3715,13 @@ trans_process <- function (new_idf, old_idf, dt) {
 # }}}
 # trans_postprocess {{{
 trans_postprocess <- function (idf, from, to) {
+    id_del <- NULL
     # reset_key {{{
     reset_key <- function (dt, field_index = 1L) {
         if (!nrow(dt)) return(dt)
         dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
     }
     # }}}
-    id_del <- NULL
     # update_var {{{
     update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
         if (!nrow(dt)) return(dt)
@@ -3108,8 +3763,6 @@ trans_postprocess <- function (idf, from, to) {
 
         # special case from v7.2 to v8.0 {{{
         if (nrow(mapping) && unique(mapping$from) == 7.2) {
-            stopifnot(is_idf(idf))
-
             has_chiller <- any(idf$is_valid_class(c(
                 "Chiller:Electric:EIR",
                 "Chiller:Electric:ReformulatedEIR",
@@ -3208,6 +3861,64 @@ trans_postprocess <- function (idf, from, to) {
         set(dt, NULL, "value_lower", NULL)
     }
     # }}}
+    # reset_meter_resource {{{
+    reset_meter_resource <- function (dt, mapping, field_index, step = NULL, exclude = character(), idf) {
+        if (to != 9.4) return(dt)
+        if (!nrow(dt)) return(dt)
+        if (!nrow(mapping)) return(dt)
+
+        # calculate field index
+        if (!is.null(step)) {
+            n <- (nrow(dt) - field_index) %/% step
+            field_index <- as.integer(c(field_index, seq.int(n) * step + field_index))
+        }
+
+        meters <- dt[J(field_index), on = "index", nomatch = NULL]
+
+        # only consider meters contain ":"
+        set(meters, NULL, "num", stri_count_fixed(meters$value, ":") + 1L)
+        meters <- meters[num > 1L]
+        if (!nrow(meters)) return(dt)
+
+        # exclude custom meters if necessary
+        set(meters, NULL, "value_lower", stri_trans_tolower(meters$value))
+        meters <- meters[!J(exclude), on = "value_lower"]
+        if (!nrow(meters)) return(dt)
+
+        # split by ":"
+        set(meters, NULL, "value_lower", stri_split_fixed(meters$value_lower, ":", meters$num))
+        # since resouce type is never in the middle, only consider the first and
+        # last components
+        set(meters, NULL, "value_lower_start", vcapply(meters$value_lower, .subset2, 1L))
+        set(meters, NULL, "value_lower_end", apply2_chr(meters$value_lower, meters$num, .subset2))
+
+        meters[mapping, on = c("value_lower_start" = "old"), c("value", "value_lower_end") := {
+            list(paste0(i.new, stri_sub(value, stri_length(value_lower_start) + 1L)), NA_character_)
+        }]
+        meters[mapping, on = c("value_lower_end" = "old"), "value" := {
+            paste0(stri_sub(value, to = -stri_length(value_lower_start) - 1L), i.new)
+        }]
+
+        dt[meters, on = c("id", "index"), value := i.value]
+    }
+    # }}}
+    # special case from v9.3 to v9.4 {{{
+    mtr_custom <- character()
+    map <- data.table()
+    if (to == 9.4) {
+        # extract names of Meter:Custom and Meter:CustomDecrement
+        cls <- c("Meter:Custom", "Meter:CustomDecrement")
+        cls <- cls[idf$is_valid_class(cls)]
+        if (length(cls)) {
+            mtr_custom <- stri_trans_tolower(unique(idf$object_name(cls, simplify = TRUE)))
+        }
+
+        map <- data.table(
+            old = c("electric", "gas", "fueloil#1", "fueloil#2"),
+            new = c("Electricity", "NaturalGas", "FuelOilNo1", "FuelOilNo2")
+        )
+    }
+    # }}}
 
     f <- as.double(as.character(standardize_ver(from)[, 1:2]))
     t <- as.double(as.character(standardize_ver(to)[, 1:2]))
@@ -3229,37 +3940,72 @@ trans_postprocess <- function (idf, from, to) {
         trans_action, idf = idf
     ))
     dt2 <- update_var(dt2, rep_vars, 1L, is_meter = TRUE, idf = idf)
+    dt2 <- reset_meter_resource(dt2, map, 1L, exclude = mtr_custom)
     # }}}
     # 3: Output:Table:TimeBins {{{
     dt3 <- trans_action(idf, "Output:Table:TimeBins")
     dt3 <- reset_key(dt3, 1L)
     dt3 <- update_var(dt3, rep_vars, 2L, idf = idf)
+    dt3 <- reset_meter_resource(dt3, map, 2L, exclude = mtr_custom)
     # }}}
-    # 4: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
-    dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
-    dt4_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable")
-    dt4 <- rbindlist(list(dt4_1, dt4_2))
-    dt4 <- reset_key(dt4, 1L)
-    dt4 <- update_var(dt4, rep_vars, 2L, idf = idf)
+    # 4: Output:Table:Monthly {{{
+    dt4 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
+    dt4 <- update_var(dt4, rep_vars, 3L, step = 2L, idf = idf)
+    dt4 <- reset_meter_resource(dt4, map, 3L, step = 2L, exclude = mtr_custom)
     # }}}
-    # 5: EnergyManagementSystem:Sensor {{{
-    dt5 <- trans_action(idf, "EnergyManagementSystem:Sensor")
-    dt5 <- update_var(dt5, rep_vars, 3L, idf = idf)
+    # 5: Output:Table:Annual {{{
+    # Output:Table:Annual was first added in EnergyPlus v8.4
+    dt5 <- data.table()
+    if (from >= 8.4) {
+        dt5 <- trans_action(idf, "Output:Table:Annual", min_fields = 6L)
+        dt5 <- update_var(dt5, rep_vars, 4L, step = 3L, idf = idf)
+        dt5 <- reset_meter_resource(dt5, map, 4L, step = 3L, exclude = mtr_custom)
+    }
     # }}}
-    # 6: Output:Table:Monthly {{{
-    dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
-    dt6 <- update_var(dt6, rep_vars, 3L, step = 2, idf = idf)
+    # 6: Meter:Custom {{{
+    dt6 <- trans_action(idf, "Meter:Custom")
+    dt6 <- update_var(dt6, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
+    dt6 <- reset_meter_resource(dt6, map, 4L, step = 2L, exclude = mtr_custom)
     # }}}
-    # 7: Meter:Custom {{{
-    dt7 <- trans_action(idf, "Meter:Custom")
-    dt7 <- update_var(dt7, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
+    # 7: Meter:CustomDecrement {{{
+    dt7 <- trans_action(idf, "Meter:CustomDecrement")
+    dt7 <- update_var(dt7, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
+    dt7 <- reset_meter_resource(dt7, map, 3L, step = 2L, exclude = mtr_custom)
     # }}}
-    # 8: Meter:CustomDecrement {{{
-    dt8 <- trans_action(idf, "Meter:CustomDecrement")
-    dt8 <- update_var(dt8, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
+    # 8: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
+    dt8_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
+    dt8_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable")
+    dt8 <- rbindlist(list(dt8_1, dt8_2))
+    dt8 <- reset_key(dt8, 1L)
+    dt8 <- update_var(dt8, rep_vars, 2L, idf = idf)
+    # }}}
+    # 9: EnergyManagementSystem:Sensor {{{
+    dt9 <- trans_action(idf, "EnergyManagementSystem:Sensor")
+    dt9 <- update_var(dt9, rep_vars, 3L, idf = idf)
+    dt9 <- reset_meter_resource(dt9, map, 3L, exclude = mtr_custom)
+    # }}}
+    # 10: DemandManagerAssignmentList {{{
+    dt10 <- trans_action(idf, "DemandManagerAssignmentList")
+    dt10 <- update_var(dt10, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    dt10 <- reset_meter_resource(dt10, map, 2L, exclude = mtr_custom)
+    # }}}
+    # 11: UtilityCost:Tariff {{{
+    dt11 <- trans_action(idf, "UtilityCost:Tariff")
+    dt11 <- update_var(dt11, rep_vars, 2L, is_meter = TRUE, idf = idf)
+    dt11 <- reset_meter_resource(dt11, map, 2L, exclude = mtr_custom)
+    # }}}
+    # 12: ElectricLoadCenter:Transformer {{{
+    dt12 <- trans_action(idf, "ElectricLoadCenter:Transformer")
+    dt12 <- update_var(dt12, rep_vars, 19L, step = 1L, is_meter = TRUE, idf = idf)
+    dt12 <- reset_meter_resource(dt12, map, 19L, step = 1L, exclude = mtr_custom)
+    # }}}
+    # 13: ElectricLoadCenter:Distribution {{{
+    dt13 <- trans_action(idf, "ElectricLoadCenter:Distribution")
+    dt13 <- update_var(dt13, rep_vars, c(6L, 12L), is_meter = TRUE, idf = idf)
+    dt13 <- reset_meter_resource(dt13, map, c(6L, 12L), exclude = mtr_custom)
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:8)))
+    dt <- rbindlist(mget(paste0("dt", 1:13)))
     if (!nrow(dt)) return(idf)
 
     if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
@@ -3312,6 +4058,11 @@ trans_action_dt <- function (dt, ...) {
             if (length(content) == 2L) {
                 dt[J(content[[1L]]), on = "index", `:=`(value = content[[2L]])]
             } else if (length(content) >= 3L) {
+                # step
+                if (length(content) == 4L) {
+                    n_grp <- (nrow(dt) - content[[1L]]) %/% content[[4L]]
+                    content[[1L]] <- content[[1L]] + c(0L, seq_len(n_grp) * content[[4L]])
+                }
                 set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
                 dt[J(content[[1L]], stri_trans_tolower(content[[2L]])), on = c("index", "value_lower"),
                     `:=`(value = content[[3L]])

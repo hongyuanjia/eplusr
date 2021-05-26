@@ -37,12 +37,13 @@ invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
-[![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
+<!-- badges: start -->
+[![R build status](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)](https://github.com/hongyuanjia/eplusr/actions)
+[![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
 [![CRAN Download Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
+<!-- badges: end -->
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -57,6 +58,12 @@ A comprehensive introduction to eplusr can be found using
 There is also an online slides here ([Interfacing EnergyPlus Using
 R](https://hongyuanjia.github.io/eplusrIntro/)).  You can learn more about eplusr
 at https://hongyuanjia.github.io/eplusr/, along with full package documentation.
+
+## How to cite
+
+```{r}
+citation("eplusr")
+```
 
 ## Installation
 
@@ -79,10 +86,10 @@ are helper functions in eplusr to download and install it automatically on major
 operating systems (Windows, macOS and Linux):
 
 ```{r eplus-install, eval = FALSE}
-# install the latest version (currently v9.2.0)
+# install the latest version (currently v9.4.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v9.2.0) and run the installer
+# OR download the latest version (currently v9.4.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -156,7 +163,7 @@ Please see these vignettes and articles about {eplusr}
 
 * [Introduction to eplusr](https://hongyuanjia.github.io/eplusr/articles/eplusr.html)
 * [Run simulation and data exploration](https://hongyuanjia.github.io/eplusr/articles/job.html)
-* [Rarametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
+* [Parametric simulations](https://hongyuanjia.github.io/eplusr/articles/param.html)
 * [Update IDF version](https://hongyuanjia.github.io/eplusr/articles/transition.html)
 * [Work with weather files](https://hongyuanjia.github.io/eplusr/articles/epw.html)
 * [Work with `Schedule:Compact` objects](https://hongyuanjia.github.io/eplusr/articles/schedule.html)
@@ -166,12 +173,6 @@ Please see these vignettes and articles about {eplusr}
 ### Slides
 
 * [Slides: Interfacing EnergyPlus using R](https://hongyuanjia.github.io/eplusrIntro/)
-
-## How to cite
-
-```{r}
-citation("eplusr")
-```
 
 ## Additional resources
 

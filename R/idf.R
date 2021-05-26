@@ -1,6 +1,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom cli cat_line cat_rule
 #' @importFrom crayon bold
+#' @importFrom utils .DollarNames
 #' @include impl-idf.R
 NULL
 
@@ -45,7 +46,7 @@ NULL
 
 #' @export
 # Idf {{{
-Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
+Idf <- R6::R6Class(classname = "Idf",
 
     public = list(
 
@@ -785,7 +786,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instaed of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -1108,7 +1109,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'   `=`. The main difference is that, unlike `=`, the left hand side of
         #'   `:=` should be a valid class name in current `Idf` object. It will
         #'   set the field of all objects in specified class to specified value.
-        #' * `.(object, object) := list(field = value)`: Simimar like above, but
+        #' * `.(object, object) := list(field = value)`: Similar like above, but
         #'   note the use of `.()` in the left hand side. You can put multiple
         #'   object ID or names in `.()`. It will set the field of all specified
         #'   objects to specified value.
@@ -2395,9 +2396,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param copy_external If `TRUE`, the external files that current `Idf`
         #'        object depends on will also be copied into the simulation
         #'        output directory. The values of file paths in the Idf will be
-        #'        changed automatically. Currently, only `Schedule:File` class
-        #'        is supported.  This ensures that the output directory will
-        #'        have all files needed for the model to run. Default is
+        #'        changed automatically. This ensures that the output directory
+        #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
         #' @param echo Only applicable when `wait` is `TRUE`. Whether to show
         #'        standard output and error from EnergyPlus. Default: same as
@@ -2518,7 +2518,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' * `"surface_type"`: Default. Render the model by surface type
         #'   model. Walls, roofs, windows, doors, floors, and shading
-        #'   surfaces will have unqiue colors.
+        #'   surfaces will have unique colors.
         #' * `"boundary"`: Render the model by outside boundary condition.
         #'   Only surfaces that have boundary conditions will be rendered
         #'   with a color. All other surfaces will be white.
@@ -2534,7 +2534,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param wireframe If `TRUE`, the wireframe of each surface will be
         #'        shown. Default: `TRUE`.
         #'
-        #' @param x_ray If `TRUE`, all surfaces wll be rendered translucently.
+        #' @param x_ray If `TRUE`, all surfaces will be rendered translucently.
         #'        Default: `FALSE`.
         #'
         #' @return An [IdfViewer] object
@@ -2642,18 +2642,6 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 # set deep default value to `TRUE`
 formals(Idf$clone_method)$deep <- TRUE
 formals(Idf$public_methods$clone)$deep <- TRUE
-
-# Manually remove IDF clss active bindings before cloning. See #164
-b <- as.list(body(Idf$clone_method))
-b <- as.call(c(
-    list(b[[1]],
-         quote(enclosing <- .subset2(self, ".__enclos_env__")),
-         quote(rm(list = grep("^[A-Z]", names(enclosing$self), value = TRUE), envir = enclosing$self))
-    ),
-    b[-1]
-))
-body(Idf$clone_method) <- b
-body(Idf$public_methods$clone) <- b
 # }}}
 
 # idf_version {{{
@@ -2888,7 +2876,6 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
     }
 
     res <- c(obj_self, lapply(id_ref, IdfObject$new, parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
 
     ref_nm <- private$idf_env()$object[J(id_ref), on = "object_id", object_name]
 
@@ -2925,7 +2912,6 @@ idf_return_matched <- function (self, private, matched, object_id) {
     }
 
     res <- apply2(matched$object_id, matched$class_id, IdfObject$new, list(parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", matched$object_name)[]
 }
 # }}}
@@ -3062,19 +3048,28 @@ idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
         .unique = FALSE, .strict = TRUE)
 
     # ignore Version object
-    if (any(l$object$class_id == 1L)) {
+    if (any(is_ver <- l$object$class_id == 1L)) {
         if (in_verbose()) {
-            m <- l$object[class_id == 1L, paste0(" #", rleid, "| Object [", object_id, ", ] --> Class 'Version'", collapse = "\n")]
+            m <- l$object[class_id == 1L, paste0(" #", rleid, "| Object [", object_id, "] --> Class 'Version'", collapse = "\n")]
             verbose_info("'Version' objects in input below have been automatically skipped:\n", m)
         }
+        id <- l$object$object_id[is_ver]
         l$object <- l$object[!J(1L), on = "class_id"]
-        l$value <- l$value[J(l$object$rleid), on = "rleid"]
+        l$value <- l$value[!J(id), on = "object_id"]
 
         if (!nrow(l$object)) {
             verbose_info("After removing Version objects, nothing to add.")
             return(invisible())
         }
     }
+
+    # assign new rleid to make sure it can be used as an identifier
+    l$object[, new_rleid := rleid(rleid, object_id)]
+    l$value[, new_rleid := rleid(rleid, object_id)]
+    set(l$object, NULL, "rleid", NULL)
+    set(l$value, NULL, "rleid", NULL)
+    setnames(l$object, "new_rleid", "rleid")
+    setnames(l$value, "new_rleid", "rleid")
 
     ins <- add_idf_object(private$idd_env(), private$idf_env(), l$object, l$value,
         default = FALSE, unique = .unique, empty = .empty
@@ -3406,23 +3401,76 @@ idf_add_output_vardict <- function (idf) {
     added
 }
 # }}}
-# idf_set_output_meter {{{
-idf_set_output_meter <- function (idf) {
+# idf_set_output_files {{{
+idf_set_output_files <- function (idf, sql = FALSE, dict = FALSE) {
     if (!is_idf(idf)) idf <- read_idf(idf)
     modified <- FALSE
-    cls <- c("Output:Meter:MeterFileOnly", "Output:Meter:Cumulative:MeterFileOnly")
-    if (!any(i <- idf$is_valid_class(cls))) return(modified)
+    cls <- "Output:Control:Files"
+    if (idf$version() < 9.4 || !idf$is_valid_class(cls)) return(modified)
 
-    cls <- cls[i]
-    dt <- idf$to_table(class = cls)
-    set(dt, NULL, "class", stri_replace_all_fixed(dt$class, ":MeterFileOnly", ""))
+    obj <- idf$object_unique(cls)
+    val <- obj$value(all = TRUE)
+    if (sql && is.na(val[["Output SQLite"]]) || tolower(val[["Output SQLite"]]) == "no") {
+        verbose_info("Setting 'Output SQLite' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output SQLite"]] <- "Yes"
+        modified <- TRUE
+    }
+    if (dict && is.na(val[["Output RDD"]]) || tolower(val[["Output RDD"]]) == "no") {
+        verbose_info("Setting 'Output RDD' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output RDD"]] <- "Yes"
+        modified <- TRUE
+    }
+    if (dict && is.na(val[["Output MDD"]]) || tolower(val[["Output MDD"]]) == "no") {
+        verbose_info("Setting 'Output MDD' in ", surround(cls), " from 'No' to 'Yes'")
+        val[["Output MDD"]] <- "Yes"
+        modified <- TRUE
+    }
 
-    idf$del(unique(dt$id))
-    idf$load(dt)
-    verbose_info("Moving all objects in class ", collapse(cls), " to ",
-        collapse(unique(dt$class)), " in order to use csv for data extraction.")
+    if (modified) obj$set(val[sprintf("Output %s", c("SQLite", "RDD", "MDD"))])
 
-    TRUE
+    modified
+}
+# }}}
+# idf_has_hvactemplate {{{
+idf_has_hvactemplate <- function (idf) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+
+    cls <- c(
+        "HVACTemplate:Thermostat",
+        "HVACTemplate:Zone:IdealLoadsAirSystem",
+        "HVACTemplate:Zone:BaseboardHeat",
+        "HVACTemplate:Zone:FanCoil",
+        "HVACTemplate:Zone:PTAC",
+        "HVACTemplate:Zone:PTHP",
+        "HVACTemplate:Zone:WaterToAirHeatPump",
+        "HVACTemplate:Zone:VRF",
+        "HVACTemplate:Zone:Unitary",
+        "HVACTemplate:Zone:VAV",
+        "HVACTemplate:Zone:VAV:FanPowered",
+        "HVACTemplate:Zone:VAV:HeatAndCool",
+        "HVACTemplate:Zone:ConstantVolume",
+        "HVACTemplate:Zone:DualDuct",
+        "HVACTemplate:System:VRF",
+        "HVACTemplate:System:Unitary",
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+        "HVACTemplate:System:UnitarySystem",
+        "HVACTemplate:System:VAV",
+        "HVACTemplate:System:PackagedVAV",
+        "HVACTemplate:System:ConstantVolume",
+        "HVACTemplate:System:DualDuct",
+        "HVACTemplate:System:DedicatedOutdoorAir",
+        "HVACTemplate:Plant:ChilledWaterLoop",
+        "HVACTemplate:Plant:Chiller",
+        "HVACTemplate:Plant:Chiller:ObjectReference",
+        "HVACTemplate:Plant:Tower",
+        "HVACTemplate:Plant:Tower:ObjectReference",
+        "HVACTemplate:Plant:HotWaterLoop",
+        "HVACTemplate:Plant:Boiler",
+        "HVACTemplate:Plant:Boiler:ObjectReference",
+        "HVACTemplate:Plant:MixedWaterLoop"
+    )
+
+    any(idf$is_valid_class(cls))
 }
 # }}}
 
@@ -3486,76 +3534,7 @@ idf_set_output_meter <- function (idf) {
 #' @author Hongyuan Jia
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {
-    add_idf_class_bindings(Idf$new(path, idd))
-}
-# }}}
-
-# add_idf_class_bindings {{{
-add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
-    if (!.options$autocomplete) return(idf)
-
-    # get all classes in current version IDD
-    env <- .subset2(idf, ".__enclos_env__")
-    self <- .subset2(env, "self")
-    private <- .subset2(env, "private")
-
-    if (is.null(class_id)) {
-        ext <- unique(private$idf_env()$object$class_id)
-    } else {
-        ext <- class_id
-    }
-    cls <- private$idd_env()$class$class_name[ext]
-    flg <- private$idd_env()$class$unique_object[ext]
-
-    # move deleted class bindings
-    if (update && length(setdiff(ls(idf, pattern = "^[A-Z]"), cls))) {
-        rm(list = setdiff(ls(idf, pattern = "^[A-Z]"), cls), envir = idf)
-    }
-
-    # skip if nothing to add
-    if (!length(setdiff(cls, ls(idf)))) return(idf)
-
-    # see https://github.com/r-lib/covr/issues/398
-    # unique classes
-    b <- quote({
-        if (missing(value)) {
-            if (self$is_valid_class(class)) {
-                return(self$object_unique(class))
-            } else {
-                return(NULL)
-            }
-        }
-
-        if (is_idfobject(value)) value <- list(value)
-        replace_objects_in_class(self, private, class, value, TRUE)
-    })
-    for (i in setdiff(cls[flg], ls(idf))) {
-        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
-        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
-        makeActiveBinding(i, fun, idf)
-    }
-
-    # see https://github.com/r-lib/covr/issues/398
-    # other classes
-    b <- quote({
-        if (missing(value)) {
-            if (self$is_valid_class(class)) {
-                return(self$objects_in_class(class))
-            } else {
-                return(NULL)
-            }
-        }
-
-        if (is_idfobject(value)) value <- list(value)
-        replace_objects_in_class(self, private, class, value, TRUE)
-    })
-    for (i in setdiff(cls[!flg], ls(idf))) {
-        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
-        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
-        makeActiveBinding(i, fun, idf)
-    }
-
-    idf
+    Idf$new(path, idd)
 }
 # }}}
 
@@ -3672,6 +3651,13 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 # }}}
 
 #' @export
+# .DollarNames.Idf {{{
+.DollarNames.Idf <- function(x, pattern = "") {
+    grep(pattern, c(x$class_name(), names(x)), value = TRUE)
+}
+# }}}
+
+#' @export
 # $.Idf {{{
 `$.Idf` <- function (x, i) {
     if (i %chin% ls(x)) return(NextMethod())
@@ -3736,19 +3722,13 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
     if (is.na(cls_id)) cls_id <- chmatch(name, private$idd_env()$class$class_name_us)
 
     # skip if not a valid IDD class name
-    # imitate error message of a locked environment
-    if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
+    if (is.na(cls_id)) return(NextMethod())
 
     cls_nm <- private$idd_env()$class$class_name[cls_id]
     uni <- private$idd_env()$class$unique_object[cls_id]
 
     if (uni && is_idfobject(value)) value <- list(value)
     replace_objects_in_class(self, private, cls_nm, value, uni)
-
-    # if not an existing IDF class name, add active bindings
-    if (!cls_id %in% ls(x)) {
-        add_idf_class_bindings(x, cls_id)
-    }
 
     invisible(x)
 }
@@ -3769,17 +3749,12 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
     cls_id <- chmatch(name, private$idd_env()$class$class_name)
 
     # skip if not a valid IDD class name
-    # imitate error message of a locked environment
-    if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
+    if (is.na(cls_id)) return(NextMethod())
 
     cls_nm <- private$idd_env()$class$class_name[cls_id]
     uni <- private$idd_env()$class$unique_object[cls_id]
 
     replace_objects_in_class(self, private, cls_nm, value, uni)
-    # if not an existing IDF class name, add active bindings
-    if (!cls_id %in% private$idf_env()$object$class_id) {
-        add_idf_class_bindings(x, cls_id)
-    }
 
     invisible(x)
 }
@@ -3788,7 +3763,6 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # print.Idf {{{
 print.Idf <- function (x, zoom = "class", order = TRUE, ...) {
-    add_idf_class_bindings(x, update = TRUE)
     x$print(zoom = zoom, order = order)
     invisible(x)
 }

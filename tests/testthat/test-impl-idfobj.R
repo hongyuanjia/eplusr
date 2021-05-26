@@ -1,10 +1,8 @@
-context("IdfObject Implementation")
-
 use_idd(8.8, "auto")
 
 # VALUE {{{
 test_that("get_idfobj_value()", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_equivalent(get_idfobj_value(idd_env, idf_env, 1), tolerance = 1e-5,
@@ -52,7 +50,7 @@ test_that("get_idfobj_value()", {
 
 # VALUE_POSSIBLE {{{
 test_that("get_idfobj_possible()", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_equivalent(get_idfobj_possible(idd_env, idf_env, 2),
@@ -87,7 +85,7 @@ test_that("get_idfobj_possible()", {
 
 # VALUE_RELATION {{{
 test_that("get_idfobj_relation()", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_equivalent(get_idfobj_relation(idd_env, idf_env, 2, 10),
@@ -132,7 +130,7 @@ test_that("get_idfobj_relation()", {
 
 # TABLE {{{
 test_that("get_idfobj_table()", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_equal(
@@ -147,7 +145,7 @@ test_that("get_idfobj_table()", {
 
 # STRING {{{
 test_that("get_idfobj_string()", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_equal(get_idfobj_string(idd_env, idf_env, 2, leading = 0, sep_at = 10, comment = FALSE),
@@ -178,7 +176,7 @@ test_that("get_idfobj_string()", {
 
 # COMMENT {{{
 test_that("set_idfobj_comment", {
-    idf_env <- parse_idf_file(text("idf", 8.8))
+    idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     # can delete comments

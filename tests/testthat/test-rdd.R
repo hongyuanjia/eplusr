@@ -1,5 +1,3 @@
-context("Rdd")
-
 test_that("Rdd", {
     skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)

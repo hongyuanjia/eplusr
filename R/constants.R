@@ -3,7 +3,7 @@
 ALL_EPLUS_VER <- c(
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"), paste0("8.3.", 1:3),
-    "9.0.0", "9.0.1", "9.1.0", "9.2.0"
+    paste0("9.0.", 0:1), paste0("9.", 1:4, ".0")
 )
 
 LATEST_EPLUS_VER <- ALL_EPLUS_VER[length(ALL_EPLUS_VER)]
@@ -19,11 +19,13 @@ ALL_IDD_VER <- c(
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"),
     paste0("9.0.", 0:1),
-    paste0("9.", 1:2, ".0")
+    paste0("9.", 1:4, ".0")
 )
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
     "version , commit
+     9.4.0   , 998c4b761e
+     9.3.0   , baff08990c
      9.2.0   , 921312fa1d
      9.1.0   , 08d2e308bb
      9.0.1   , bb7ca4f0da
@@ -133,7 +135,9 @@ utils::globalVariables(c(
     "right_distance_above", "right_distance_below", "right_extension",
     "right_tilt_angle", "subtype", "trans", "window_or_door_name", "x0", "z0",
     "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
-    "area", "dt", "interval_type", "time_index", "i.time_index"
+    "area", "dt", "interval_type", "new_rleid", "time_index", "i.time_index",
+    "i.environment_name", "i.environment_type", "i.simulation_index", "i.new",
+    "value_lower_start", "expand_obj"
 ))
 # }}}
 # nocov end

@@ -1,5 +1,3 @@
-context("Group metiods")
-
 test_that("Group methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)
@@ -43,6 +41,17 @@ test_that("Group methods", {
     )
 
     # Run and Status {{{
+    # can run in the same folder
+    expect_equal({
+        grp$run(dir = file.path(tempdir(), "test"), separate = FALSE)
+        basename(grp$status()$job_status$output_dir)
+    }, rep("test", 5L))
+    # can run in different folders
+    expect_equal({
+        grp$run(dir = file.path(tempdir(), "test"), separate = TRUE)
+        basename(grp$status()$job_status$output_dir)
+    }, tools::file_path_sans_ext(basename(path_idfs)))
+
     # can run the simulation and get status of simulation
     expect_equal({grp$run(dir = file.path(tempdir(), "test"), echo = FALSE); status <- grp$status(); names(status)},
         c("run_before", "alive", "terminated", "successful", "changed_after", "job_status")
@@ -78,7 +87,7 @@ test_that("Group methods", {
 
     expect_error(grp$read_table())
     expect_silent(tables <- grp$read_table(c(1, 2, 4), "Zones"))
-    expect_equal(names(tables)[1], "case")
+    expect_equal(names(tables)[1:2], c("index", "case"))
     # }}}
 
     # RDD & MDD {{{
@@ -146,7 +155,7 @@ test_that("Group methods", {
         "Asia/Shanghai"
     )
     expect_equal(names(grp$report_data(2, all = TRUE)),
-        c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
+        c("index", "case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
           "simulation_days", "day_type", "environment_name",
           "environment_period_index", "is_meter", "type", "index_group",
           "timestep_type", "key_value", "name", "reporting_frequency",
@@ -160,7 +169,8 @@ test_that("Group methods", {
     expect_equal(nrow(grp$report_data(2, month = 12)), 436)
     expect_equal(nrow(grp$report_data(2, month = 12, hour = 1)), 18)
     expect_equal(nrow(grp$report_data(2, minute = 0)), 872)
-    expect_equal(nrow(grp$report_data(2, interval = 60)), 864)
+    # See https://github.com/NREL/EnergyPlus/issues/8367
+    expect_equal(nrow(grp$report_data(2, interval = 60)), 872)
     expect_equal(nrow(grp$report_data(2, simulation_days = 1)), 872)
     expect_equal(nrow(grp$report_data(2, day_type = "WinterDesignDay")), 436)
     expect_equal(nrow(grp$report_data(2, environment_name = "DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB")), 436)

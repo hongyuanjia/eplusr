@@ -1,5 +1,3 @@
-context("Parametric metiods")
-
 test_that("Parametric methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)
@@ -199,7 +197,7 @@ test_that("Parametric methods", {
         "Asia/Shanghai"
     )
     expect_equal(names(param$report_data(2, all = TRUE)),
-        c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
+        c("index", "case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
           "simulation_days", "day_type", "environment_name",
           "environment_period_index", "is_meter", "type", "index_group",
           "timestep_type", "key_value", "name", "reporting_frequency",
@@ -236,7 +234,7 @@ test_that("Parametric methods", {
         "Asia/Shanghai"
     )
     expect_equal(names(param$report_data(all = TRUE)),
-        c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
+        c("index", "case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
           "simulation_days", "day_type", "environment_name",
           "environment_period_index", "is_meter", "type", "index_group",
           "timestep_type", "key_value", "name", "reporting_frequency",

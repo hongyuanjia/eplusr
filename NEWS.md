@@ -1,4 +1,85 @@
-# eplusr (development version)
+# eplusr 0.14.2
+
+## New features
+
+* `IddObject$output()` is added to extract all possible outputs of current
+  class. All outputs are extracted from the LaTeX source file of "Input
+  Output Reference" for EnergyPlus v9.5.0 and later. So empty result will
+  always be returned for `Idd` version lower than v9.5. It is possible that
+  there are some mistakes introduced when extracting the output variables.
+  Also, some outputs are only available if certain fields are set. Even they
+  are listed in the results, it does not mean that the `Idf` can report all
+  of them. It is strongly suggested to check the RDD and MDD file for
+  correctness (#427). Example:
+
+  ```r
+  idd <- use_idd(8.8)
+  idd$Lights$outputs()
+  ```
+
+## Break changes
+
+* Autocompletion is enabled by registering a S3 `.DollarNames` method. Option
+  `autocomplete` is deprecated. A warning is issued if you try to set it in
+  `eplusr_option()`. Also, `with_speed()` is deprecated and falls back to
+  `without_checking()` when called (#417).
+
+## Bug fixes
+
+* Fixed wrong transition of `FuelFactors` from v9.2 to v9.3 (#420).
+* Fixed `Idf$del` error when both sources and referees are given (#433).
+
+## Minor changes
+
+* Better error and verbose messages (#422, #423).
+
+# eplusr 0.14.1
+
+## Minor changes
+
+* Compatible changes for [units](https://github.com/r-quantities/units) v0.7-0
+  (#410).
+
+# eplusr 0.14.0
+
+## New features
+
+* `Epw$save()` gets a new option `format_digit`. If `TRUE`, the trailing digits
+  in EPW data will be formatted in the same way as Weather Converter (#323).
+* Add EnergyPlus v9.3 and v9.4 support (#343, #347, #369).
+* Now `ParametricJob$apply_measure()` will give a nice progress bar when
+  parametric models are creating (#378).
+* A new argument `separate` is added in `EplusGroupJob$run()` and
+  `ParametricJob$run()` with default value being `TRUE`. If set to `FALSE`, all
+  models are saved in `dir` when simulation, instead of creating a folder for
+  each model and running simulation there (#381).
+* When extracting grouped simulation results using `$report_data_dict()`,
+  `$report_data()` and etc in `EplusGroupJob` and `ParametricJob` class, a new
+  column `index` is added which contains the indices of simulated models (#388).
+  This is because when the same model runs with different weather files, the
+  original `case` column cannot be used as an identifier.
+
+## Major changes
+
+* Now eplusr will always use the SQLite output for data extraction instead of
+  using the CSV output. In EnergyPlus v9.3 and above, ReadVarsESO is deprecated
+  and EnergyPlus itself will generate CSV directly. CSVs for variables and
+  meters are always separated in this way. Together with the newly introduced
+  `Output:Control:Files` which can be set to disable CSV output, it becomes
+  very cumbersome to continuously support the CSV for data extraction (#307).
+
+## Minor changes
+
+* Now rgl and decido package has been moved from *Imports* to *Suggests*, since
+  they are only used in the `IdfViewer` class for 3D visualization which is not
+  the main focus of this package (368).
+* `run_multi()` now gets a new argument `expand_obj` to control whether
+  `ExpandObjects` should be called before simulation or not. Because there is a
+  known issue of `ExpandObjects` on Linux system
+  (https://github.com/NREL/EnergyPlus/issues/8376), here we want to avoid
+  unnecessary calls of `ExpandObjects` as possible. Also, `EplusJob$run()` and
+  `EplusGroupJob$run()` now will detect if there are any `HVACTemplate:*`
+  objects and set the `expand_obj` flag properly (#377).
 
 ## Bug fixes
 
@@ -7,6 +88,44 @@
 * Year fields are correctly calculated for EnergyPlus v9.1 and above (#312).
 * Fix coordinate system alignment in `IdfGeometry` class (#314).
 * Fix time matching in `EplusSql$report_data()` (#315).
+* EPW `COMMENT1` and `COMMENT2` are now parsed as a single string (#318).
+* Preserve input year values in `Epw$set()` (#322).
+* Additional columns in `Epw$set()` and `Epw$add()` input are now removed
+  (#320).
+* Now `Epw$abnormal_data()` can keep columns that contains abnormal data when
+  `keep_all` is `FALSE` (#326).
+* `Epw$save()` now formats the header in the same way as Weather Converter
+  (#328).
+* `Epw$comment1()` and `Epw$comment2()` now accepts `NULL` as input, which will
+  remove the comments. And `NULL` is returned if no comments are found (#330).
+* Fix the error when the first field is not in the input in `Idf$update()` (#332).
+* Fix the error in `EplusJob$report_data()` caused by incomplete
+  `EnvironmentPeriods` table in EnergyPlus SQL output (#336).
+* Make sure `Day of Week for Start Day` is reset to empty if `UseWeatherFile`
+  was used in transition from v8.9 to v9.0 (#338).
+* Fix the error in `EplusJob$report_data()` when multiple reporting frequencies
+  exist in the CSV output (#340).
+* Fix simulation error when FMU files are given in relative paths (#344). Now
+  all objects that reference to external files can be correctly copied into
+  output directory when `copy_external` is set to `TRUE`.
+* Fix the error when using an `Idf` as input in `Idf$insert()` (#348).
+* Sub-hourly EPW files are supported (#351).
+* Fix invalid references introduced by setting field values to empty (#355).
+* Fix the error message in `EplusGroupJob` when no CSV output was found (#357).
+* Fix false positive warnings when resolving IDF external file dependencies
+  (#366).
+* Empty string input, e.g. `"  "` in `Idf$add()` and `Idf$set()` are now
+  correctly converted to `NA`s (#370).
+* Now empty comments are kept in `IdfObject$comment()` (#372).
+* Fix `IdfGeometry$print()` when no building object exists (#395).
+* Now `IdfGeometry$round_digits()` also applies to `Zone` class (#397).
+* `read_epw()` now accepts date rewind in `TYPICAL/EXTREME PERIODS` header
+  (#401).
+* Fix `c.EpwDate()` error (#403).
+* Fix `IdfScheduleCompact$set()` evaluate issue when called in nested
+  environment (#405).
+* Now `IdfScheduleCompact$type_limits()` works properly when setting new type
+  limits (#407).
 
 # eplusr 0.13.0
 
@@ -93,9 +212,9 @@
   rgl package in a similar way as OpenStudio SketchUp Plugin. `Idf$geometry()`
   and `Idf$view()` methods are added to directly create an `IdfGeometry` and
   `IdfViewer` object based on current `Idf` object, respectively (#296).
-* A `plot.Idf` method is added which is basically a wrappper of `Idf$view()`
+* A `plot.Idf` method is added which is basically a wrapper of `Idf$view()`
   (#296).
-* Now eplusr can utilize the CSV output for report data extraction. Benifiting
+* Now eplusr can utilize the CSV output for report data extraction. Benefiting
   from the fantastic `data.table::fread`, this approach can be as 3~10X faster
   compared to the SQLite approach. eplusr will still use the SQLite if the CSV
   output is not available.
@@ -132,7 +251,7 @@
   value-relation extraction. It can be used to specify how to handle
   class-name-references. Class name references refer to references in like
   field `Component 1 Object Type` in `Branch` objects. Their value refers to
-  other many class names of objects, instaed of refering to specific field
+  other many class names of objects, instaed of referring to specific field
   values. There are 3 options in total, i.e. `"none"`, `"both"` and `"all"`,
   with `"both"` being the default.
 
@@ -177,7 +296,7 @@
 
 ## Bug fixes
 
-* Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails
+* Fix the bug caused by `ExpandObjects` executable that causes `run_idf` fails
   when running in parallel (#130)
 * `Idf$insert()` now will remove all duplicated objects in input (#219).
 * Fix the bug in `install_eplus()` on Windows (#230)
@@ -328,7 +447,7 @@
   install_eplus(8.8, local = TRUE, dir = "~/MyPrograms")
   ```
   Please see `?install_eplus` for details.
-* All documentation in R6 classes have been update thanks to roxyten2 R6 support (#156).
+* All documentation in R6 classes have been update thanks to roxygen2 R6 support (#156).
 * Deprecated methods in each class have all been remove (#156).
 * New parameter `case` has been added in
   `EplusSql$tabular_data()`. Similar like `case` parameter in

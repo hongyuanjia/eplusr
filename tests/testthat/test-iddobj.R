@@ -1,11 +1,9 @@
-context("IddObject")
-
 test_that("IddObject class", {
 
-    expect_silent(idd <- Idd$new(text("idd", 9.9)))
+    expect_silent(idd <- Idd$new(idftext("idd", 9.9)))
     expect_silent(simple <- IddObject$new("TestSimple", idd))
     expect_silent(slash <- IddObject$new("TestSlash", idd))
-    expect_silent(slash <- idd_object(use_idd(text("idd", 9.9)), "TestSlash"))
+    expect_silent(slash <- idd_object(use_idd(idftext("idd", 9.9)), "TestSlash"))
 
     expect_error(idd_object(), "based on a parent Idd object", class = "eplusr_error")
 
@@ -258,6 +256,28 @@ test_that("IddObject class", {
     expect_equal(format(slash, ver = FALSE), "<IddObject: 'TestSlash'>")
     expect_output(str(slash))
     expect_equal(as.character(slash), slash$to_string())
+    # }}}
+
+    # Outputs {{{
+    expect_equal(nrow(res <- use_idd(8.8, "auto")$Lights$outputs()), 25L)
+    expect_equal(names(res), c("index", "class", "reported_time_step",
+        "report_type", "variable", "units"))
+    expect_equivalent(use_idd(8.8, "auto")$Version$outputs(),
+        data.table(index = integer(),
+            class = character(),
+            reported_time_step = character(),
+            report_type = character(), variable = character(),
+            units = character()
+        )
+    )
+    expect_equivalent(idd$TestSlash$outputs(),
+        data.table(index = integer(),
+            class = character(),
+            reported_time_step = character(),
+            report_type = character(), variable = character(),
+            units = character()
+        )
+    )
     # }}}
 
     # can check equality

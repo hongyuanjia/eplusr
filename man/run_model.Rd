@@ -23,6 +23,7 @@ run_multi(
   output_dir,
   design_day = FALSE,
   annual = FALSE,
+  expand_obj = TRUE,
   wait = TRUE,
   echo = TRUE,
   eplus = NULL
@@ -90,7 +91,7 @@ should have the same length as \code{model}.}
 \item For \code{rum_multi()}, if \code{wait} is TRUE, a
 \link[data.table:data.table]{data.table} of 12 columns:\tabular{rlll}{
    No. \tab Column \tab Type \tab Description \cr
-   1 \tab \code{index} \tab \code{integer} \tab Index of simuation \cr
+   1 \tab \code{index} \tab \code{integer} \tab Index of simulation \cr
    2 \tab \code{status} \tab \code{character} \tab Simulation status \cr
    3 \tab \code{idf} \tab \code{character} \tab Full path of input IDF file \cr
    4 \tab \code{epw} \tab \code{character} \tab Full path of input EPW file. \code{NA} for design-day-only simulation \cr

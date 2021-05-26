@@ -853,7 +853,7 @@ preprocess_sch_compt_data <- function (data, type_limits = NULL) {
         set(data, NULL, "daytype_index", rleid(data$id, data$year_day))
     } else {
         set(data, NULL, "daytype_index", rleid(data$year_day, data$daytype))
-        meta <- unique(data, by = "daytype_index")
+        meta <- unique(copy(data), by = "daytype_index")
         set(meta, NULL, setdiff(names(meta), c("year_day", "daytype_index", "daytype")), NULL)
     }
     set(data, NULL, "value_index", seq_len(nrow(data)))

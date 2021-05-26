@@ -3,12 +3,15 @@ citHeader("To cite eplusr in publications use:")
 citEntry(
     entry  = "article",
     title = "eplusr: A framework for integrating building energy simulation and data-driven analytics",
-    author = c(person("Hongyuan", "Yu"), person("Adrian", "Chong")),
+    author = c(person("Hongyuan", "Jia"), person("Adrian", "Chong")),
     year = "2020",
-    journal = "*In Review*",
+    journal = "Energy and Buildings",
+    volume = "237",
     url = "https://CRAN.R-project.org/package=eplusr",
-    doi = "10.13140/RG.2.2.34326.16966",
-    textVersion = paste("Hongyuan Jia, Adrian Chong (2020).",
+    doi = "10.1016/j.enbuild.2021.110757",
+    textVersion = paste("Hongyuan Jia, Adrian Chong (2021).",
                         "eplusr: A framework for integrating building energy simulation and data-driven analytics.",
-                        "doi: 10.13140/RG.2.2.34326.16966")
+                        "Energy and Buildings 237: 110757.",
+                        "https://doi.org/10.1016/j.enbuild.2021.110757")
+
 )

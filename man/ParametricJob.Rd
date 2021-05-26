@@ -413,7 +413,7 @@ If \code{NULL}, the new \code{Idf}s will be named in format
 \subsection{Details}{
 \verb{$apply_measure()} allows to apply a measure to an \link{Idf} and creates
 parametric models for analysis. Basically, a measure is just a
-function that takes an \link{Idf} object and other arguments as input, and
+function that takes an \link{Idf} object and other arguements as input, and
 returns a modified \link{Idf} object as output. Use \code{...} to supply
 different arguments, \strong{except for the first \code{Idf} argument}, to that
 measure. Under the hook, \code{\link[base:mapply]{base::mapply()}} is used to create multiple
@@ -497,10 +497,7 @@ all models are saved in the specified directory. Default:
 \item{\code{copy_external}}{Only applicable when \code{separate} is \code{TRUE}. If
 \code{TRUE}, the external files that every \code{Idf} object depends on
 will also be copied into the saving directory. The values of
-file paths in the Idf will be changed automatically.
-Currently, only \code{Schedule:File} class is supported.  This
-ensures that the output directory will have all files needed
-for the model to run. Default: \code{FALSE}.}
+file paths in the Idf will be changed automatically.}
 }
 \if{html}{\out{</div>}}
 }
@@ -543,7 +540,8 @@ Run parametric simulations
   wait = TRUE,
   force = FALSE,
   copy_external = FALSE,
-  echo = wait
+  echo = wait,
+  separate = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -573,6 +571,11 @@ have all files needed for the model to run. Default is
 
 \item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to
 simulation status. Default: same as \code{wait}.}
+
+\item{\code{separate}}{If \code{TRUE}, all models are saved in a separate folder
+with each model's name under \code{dir} when simulation. If \code{FALSE},
+all models are saved in \code{dir} when simulation. Default:
+\code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

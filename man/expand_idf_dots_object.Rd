@@ -28,7 +28,7 @@ input. If \code{FALSE}, duplicates are kept. If \code{NULL}, duplicates are
 removed. Default: \code{TRUE}.}
 
 \item{.strict}{If \code{TRUE}, make sure all input objects come from the same
-verion as that from \code{idf_env}. Default: \code{TRUE}.}
+version as that from \code{idf_env}. Default: \code{TRUE}.}
 
 \item{.complete}{If \code{TRUE}, make sure the returned field number meets the
 \verb{\\min-fields} requirement. Default: \code{TRUE}}

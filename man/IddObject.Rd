@@ -32,6 +32,18 @@ The type of each default value will be consistent with field
 definition. However, for numeric fields with default values being
 \code{"autosize"} or \code{"autocalculate"}, the type of returned values will
 be character.
+
+All outputs are extracted from the LaTeX source file of "Input Output
+Reference" for EnergyPlus v9.5.0 and later. So empty result will
+always be returned for \link{Idd} version lower than v9.5.
+
+It is possible that there are some mistakes introduced when
+extracting the output variables.
+Also, some outputs are only available if certain fields
+are set. Even they are listed in the results, it does not mean that
+the \link{Idf} can report all of them.
+It is strongly suggested to check the RDD and MDD file for
+correctness.
 }
 \examples{
 
@@ -507,6 +519,15 @@ surf$has_ref_by(c("name", "zone name"))
 
 
 ## ------------------------------------------------
+## Method `IddObject$outputs`
+## ------------------------------------------------
+
+\dontrun{
+surf$outputs()
+}
+
+
+## ------------------------------------------------
 ## Method `IddObject$to_table`
 ## ------------------------------------------------
 
@@ -596,6 +617,7 @@ Hongyuan Jia
 \item \href{#method-has_ref}{\code{IddObject$has_ref()}}
 \item \href{#method-has_ref_to}{\code{IddObject$has_ref_to()}}
 \item \href{#method-has_ref_by}{\code{IddObject$has_ref_by()}}
+\item \href{#method-outputs}{\code{IddObject$outputs()}}
 \item \href{#method-to_table}{\code{IddObject$to_table()}}
 \item \href{#method-to_string}{\code{IddObject$to_string()}}
 \item \href{#method-print}{\code{IddObject$print()}}
@@ -2371,6 +2393,48 @@ A logical vector.
 surf$has_ref_by()
 
 surf$has_ref_by(c("name", "zone name"))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-outputs"></a>}}
+\if{latex}{\out{\hypertarget{method-outputs}{}}}
+\subsection{Method \code{outputs()}}{
+Get possible output variables for current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$outputs()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$outputs()} returns a \link[data.table:data.table]{data.table} that
+gives all possible outputs for current class.
+The returned \link[data.table:data.table]{data.table} has 6 columns:
+
+*\code{index}: Integer. Index of each variable.
+*\code{class}: Character. Name of current class.
+\itemize{
+\item \code{reported_time_step}: Character. Reported time step for the variables.
+Possible value: \code{Zone} and \code{HVAC}.
+\item \code{report_type}: Character. Report types. Possible value: \code{Average},
+\code{Sum}.
+\item \code{variable}: Character. Report variable names.
+\item \code{units}: Character. Units of reported values. \code{NA} if report values do not
+have units.
+}
+}
+
+\subsection{Returns}{
+A \link[data.table:data.table]{data.table} with 6 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+surf$outputs()
 }
 
 }

@@ -1300,6 +1300,49 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         # }}}
 
         # DATA EXTRACTION {{{
+        # outputs {{{
+        #' @description
+        #' Get possible output variables for current class
+        #'
+        #' @details
+        #' `$outputs()` returns a [data.table][data.table::data.table()] that
+        #' gives all possible outputs for current class.
+        #' The returned [data.table][data.table::data.table()] has 6 columns:
+        #'
+        #' *`index`: Integer. Index of each variable.
+        #' *`class`: Character. Name of current class.
+        #' * `reported_time_step`: Character. Reported time step for the variables.
+        #'   Possible value: `Zone` and `HVAC`.
+        #' * `report_type`: Character. Report types. Possible value: `Average`,
+        #'   `Sum`.
+        #' * `variable`: Character. Report variable names.
+        #' * `units`: Character. Units of reported values. `NA` if report values do not
+        #'   have units.
+        #'
+        #' @note
+        #' All outputs are extracted from the LaTeX source file of "Input Output
+        #' Reference" for EnergyPlus v9.5.0 and later. So empty result will
+        #' always be returned for [Idd] version lower than v9.5.
+        #'
+        #' It is possible that there are some mistakes introduced when
+        #' extracting the output variables.
+        #' Also, some outputs are only available if certain fields
+        #' are set. Even they are listed in the results, it does not mean that
+        #' the [Idf] can report all of them.
+        #' It is strongly suggested to check the RDD and MDD file for
+        #' correctness.
+        #'
+        #' @return A [data.table][data.table::data.table()] with 6 columns.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' surf$outputs()
+        #' }
+        #'
+        outputs = function ()
+            iddobj_outputs(self, private),
+        # }}}
+
         # to_table {{{
         #' @description
         #' Format an `IddObject` as a data.frame
@@ -1762,6 +1805,22 @@ iddobj_has_ref_to <- function (self, private, which = NULL, class = NULL, group 
     iddobj_has_ref(self, private, which, class = class, group = group, depth = depth, type = "ref_to")
 }
 # }}}
+# iddobj_outputs {{{
+iddobj_outputs <- function (self, private) {
+    vars <- OUTPUT_VARS[[as.character(private$m_parent$version())]]
+
+    if (!NROW(vars)) {
+        res <- OUTPUT_VARS[[1]][0]
+        set(res, NULL, "index", integer())
+    } else {
+        res <- vars[J(iddobj_class_name(self, private)), on = "class_name", nomatch = NULL]
+        set(res, NULL, "index", seq_len(nrow(res)))
+    }
+
+    setnames(res, "class_name", "class")
+    setcolorder(res, c("index", "class"))[]
+}
+# }}}
 # iddobj_to_table {{{
 iddobj_to_table <- function (self, private, all = FALSE) {
     get_iddobj_table(private$idd_env(), private$m_class_id, all)
@@ -1908,5 +1967,12 @@ str.IddObject <- function (object, brief = FALSE, ...) {
 #' @export
 `!=.IddObject` <- function (e1, e2) {
     Negate(`==.IddObject`)(e1, e2)
+}
+# }}}
+
+#' @export
+# .DollarNames.IddObject {{{
+.DollarNames.IddObject <- function (x, pattern = "") {
+    grep(pattern, c(x$field_name(), names(x)), value = TRUE)
 }
 # }}}

@@ -1,16 +1,23 @@
 #' @importFrom data.table fread
-#' @importFrom units install_symbolic_unit install_conversion_constant
 NULL
 
 # reg_custom_units {{{
 reg_custom_units <- function () {
     tryCatch(
         {
-            install_symbolic_unit("person")
-            install_symbolic_unit("dollar")
-            install_symbolic_unit("thousandths")
-            install_conversion_constant("Wh", "J", 3.6E3)
-            install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+            if (utils::packageVersion("units") < 0.7) {
+                units::install_symbolic_unit("person")
+                units::install_symbolic_unit("dollar")
+                units::install_symbolic_unit("thousandths")
+                units::install_conversion_constant("Wh", "J", 3.6E3)
+                units::install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+            } else {
+                units::install_unit("person")
+                units::install_unit("dollar")
+                units::install_unit("thousandths")
+                units::install_unit("Wh", "3.6E3 J")
+                units::install_unit("inH2O", "1 inch_H2O_39F")
+            }
             TRUE
         },
         warning = function (w) NULL,

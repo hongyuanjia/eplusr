@@ -1,5 +1,3 @@
-context("Geometry Implemention")
-
 # GEOMETRY EXTRACTION {{{
 test_that("Geometry Extraction", {
     skip_on_cran()

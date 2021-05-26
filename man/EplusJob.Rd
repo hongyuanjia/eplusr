@@ -27,10 +27,7 @@ methods to extract simulation outputs.
 for running EnergyPlus simulation and collecting outputs.
 }
 \details{
-eplusr uses the EnergyPlus SQL output and the CSV output for extracting
-simulation outputs. It will use the CSV output if possible, and will fall
-back to the SQL output when CSV output does not exist. Underneath,
-\code{\link[data.table:fread]{data.table::fread()}} is used to speed up the process when using CSV output.
+eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 
 \code{EplusJob} has provide some wrappers that do SQL query to get report data
 results, i.e. results from \code{Output:Variable} and \verb{Output:Meter*}. But for
@@ -46,11 +43,6 @@ In order to make sure \code{.rdd} (Report Data Dictionary) and \code{.mdd} (Mete
 Dictionary) files are created during simulation, an object in
 \code{Output:VariableDictionary} class with \verb{Key Field} value being \code{IDF} will be
 automatically created if it does not exists.
-
-In order to make sure all output variables and meters are placed in one CSV
-output, all objects in class \code{Output:Meter:MeterFileOnly}and
-\code{Output:Meter:Cumulative:MeterFileOnly} will be converted into \code{Output:Meter}
-and \code{Output:Meter:Cumulative}, respectively.
 }
 \examples{
 
@@ -487,9 +479,8 @@ standard output and error from EnergyPlus. Default: same as
 \item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
 object depends on will also be copied into the simulation
 output directory. The values of file paths in the Idf will be
-changed automatically. Currently, only \code{Schedule:File} class
-is supported.  This ensures that the output directory will
-have all files needed for the model to run. Default is
+changed automatically. This ensures that the output directory
+will have all files needed for the model to run. Default is
 \code{FALSE}.}
 }
 \if{html}{\out{</div>}}

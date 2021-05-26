@@ -84,7 +84,7 @@ get_building_transformation <- function (idf) {
     if (!idf$is_valid_class("Building")) {
         warn("Could not find 'Building' object, assuming 0 rotation", "geom_no_building")
 
-        list(id = NA_integer_, name = NA_character_, north = 0.0)
+        list(id = NA_integer_, name = NA_character_, north_axis = 0.0)
     } else {
         bldg <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
             "Building", field = 2L, complete = TRUE)
@@ -1427,10 +1427,14 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
 
     # only works for detailed geometry classes
     map <- data.table(
-        class = c("BuildingSurface:Detailed", "FenestrationSurface:Detailed",
+        class = c(
+            "Zone",
+            "BuildingSurface:Detailed", "FenestrationSurface:Detailed",
             "Shading:Site:Detailed", "Shading:Building:Detailed",
             "Shading:Zone:Detailed"),
-        first_vertex = c(11L, if (idf$version() < 9.0) 11L else 10L,
+        first_vertex = c(
+            3L,
+            11L, if (idf$version() < 9.0) 11L else 10L,
             4L, 4L, 5L
         )
     )

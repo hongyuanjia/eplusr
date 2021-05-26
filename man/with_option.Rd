@@ -4,7 +4,6 @@
 \alias{with_option}
 \alias{with_silent}
 \alias{with_verbose}
-\alias{with_speed}
 \alias{without_checking}
 \title{Evaluate an expression with temporary eplusr options}
 \usage{
@@ -13,8 +12,6 @@ with_option(opts, expr)
 with_silent(expr)
 
 with_verbose(expr)
-
-with_speed(expr)
 
 without_checking(expr)
 }
@@ -34,9 +31,6 @@ These functions evaluate an expression with temporary eplusr options
 \code{with_verbose} evaluates an expression with verbose messages.
 
 \code{without_checking} evaluates an expression with no checkings.
-
-\code{with_speed} evaluates an expression with no checkings and autocompletion
-functionality.
 }
 \examples{
 \dontrun{

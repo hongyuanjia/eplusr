@@ -1869,7 +1869,7 @@ relations with other objects are returned. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
 name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
-many class names of objects, instaed of refering to specific
+many class names of objects, instaed of referring to specific
 field values. There are 3 options in total, i.e. \code{"none"},
 \code{"both"} and \code{"all"}, with \code{"both"} being the default.
 * \code{"none"}: just ignore class-name-references. It is a reasonable
@@ -2323,7 +2323,7 @@ There is two special syntax in \verb{$set()}, which is inspired by the
 \code{=}. The main difference is that, unlike \code{=}, the left hand side of
 \verb{:=} should be a valid class name in current \code{Idf} object. It will
 set the field of all objects in specified class to specified value.
-\item \code{.(object, object) := list(field = value)}: Simimar like above, but
+\item \code{.(object, object) := list(field = value)}: Similar like above, but
 note the use of \code{.()} in the left hand side. You can put multiple
 object ID or names in \code{.()}. It will set the field of all specified
 objects to specified value.
@@ -3632,7 +3632,7 @@ type being a string instead of a number. Default: \code{TRUE}.}
 
 \item{\code{unit}}{Only applicable when \code{string_value} is \code{FALSE}. If
 \code{TRUE}, values of numeric fields are assigned with units using
-\code{\link[units:set_units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
+\code{\link[units:units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
 
 \item{\code{wide}}{Only applicable if target objects belong to a same class.
 If \code{TRUE}, a wide table will be returned, i.e. first three
@@ -3915,9 +3915,8 @@ start. Default: \code{FALSE}.}
 \item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
 object depends on will also be copied into the simulation
 output directory. The values of file paths in the Idf will be
-changed automatically. Currently, only \code{Schedule:File} class
-is supported.  This ensures that the output directory will
-have all files needed for the model to run. Default is
+changed automatically. This ensures that the output directory
+will have all files needed for the model to run. Default is
 \code{FALSE}.}
 
 \item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to show
@@ -4091,7 +4090,7 @@ geometry. Possible values are:
 \itemize{
 \item \code{"surface_type"}: Default. Render the model by surface type
 model. Walls, roofs, windows, doors, floors, and shading
-surfaces will have unqiue colors.
+surfaces will have unique colors.
 \item \code{"boundary"}: Render the model by outside boundary condition.
 Only surfaces that have boundary conditions will be rendered
 with a color. All other surfaces will be white.
@@ -4105,7 +4104,7 @@ inside face will be rendered as red.
 \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
 shown. Default: \code{TRUE}.}
 
-\item{\code{x_ray}}{If \code{TRUE}, all surfaces wll be rendered translucently.
+\item{\code{x_ray}}{If \code{TRUE}, all surfaces will be rendered translucently.
 Default: \code{FALSE}.}
 
 \item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the

@@ -1,5 +1,3 @@
-context("IdfSchedule")
-
 eplusr_option(verbose_info = FALSE)
 
 # NEW {{{
@@ -133,6 +131,10 @@ test_that("UPDATE", {
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+
+    # simple case
+    val <- data.table(year_day = 365, daytype = "AllDay", time = "24:00", value = 0)
+    expect_is(sch$update(val), "IdfScheduleCompact")
 
     # can work with compacted daytypes
     val1 <- data.table(year_day = "12/31",

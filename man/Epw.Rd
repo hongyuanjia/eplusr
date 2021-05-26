@@ -904,8 +904,10 @@ Get and modify COMMENT1 header
 }
 \subsection{Details}{
 \verb{$comment1()} takes a single string of new comments and replaces the
-old comment with input one. If no input is given, current comment is
-returned.
+old comment with input one. If \code{NULL} is given, the comment is
+removed. Empty string or a string that contains only spaces will be
+treated as \code{NULL}. If no input is given, current comment is returned.
+If no comments exist, \code{NULL} is returned.
 }
 
 \subsection{Returns}{
@@ -943,8 +945,10 @@ Get and modify COMMENT2 header
 }
 \subsection{Details}{
 \verb{$comment2()} takes a single string of new comments and replaces the
-old comment with input one. If no input is given, current comment is
-returned.
+old comment with input one. If \code{NULL} is given, the comment is
+removed. Empty string or a string that contains only spaces will be
+treated as \code{NULL}. If no input is given, current comment is returned.
+If no comments exist, \code{NULL} is returned.
 }
 
 \subsection{Returns}{
@@ -1606,7 +1610,7 @@ Add units to weather data variables
 
 \subsection{Details}{
 \verb{$add_unit()} assigns units to numeric weather data using
-\code{\link[units:set_units]{units::set_units()}} if applicable.
+\code{\link[units:units]{units::set_units()}} if applicable.
 
 \verb{$add_unit()}
 and
@@ -1951,7 +1955,7 @@ epw$is_unsaved()
 \subsection{Method \code{save()}}{
 Save \code{Epw} object as an EPW file
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$save(path = NULL, overwrite = FALSE, purge = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$save(path = NULL, overwrite = FALSE, purge = FALSE, format_digit = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1965,6 +1969,9 @@ Default is \code{FALSE}.}
 
 \item{\code{purge}}{Whether to remove redundant data when saving. Default:
 \code{FALSE}.}
+
+\item{\code{format_digit}}{Whether to remove trailing digits in weather
+data. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

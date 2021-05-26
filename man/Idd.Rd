@@ -680,7 +680,7 @@ names by the group they belong to. Default: \code{FALSE}.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$class_index()} returns the indices of specifed classes in
+\verb{$class_index()} returns the indices of specified classes in
 current \code{Idd}. A class index is just an integer indicating its
 appearance order in the \code{Idd}.
 }

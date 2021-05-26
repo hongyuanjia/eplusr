@@ -115,11 +115,11 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
 
             # add an indicator column to check if bad key is found
             set(idf_env$object, NULL, "ind", 0L)
-            on.exit(set(idf_env$object, NULL, "ind", NULL))
+            on.exit(set(idf_env$object, NULL, "ind", NULL), add = TRUE)
 
             obj <- idf_env$object[obj_in, on = c("class_id", col_on), allow.cartesian = TRUE]
 
-            check_bad_key(obj, "ind", col_on)
+            check_bad_key(obj, "ind", col_on, sprintf("in Class '%s'", cls_in$class_name))
             set(obj, NULL, "ind", NULL)
         }
 
@@ -1234,6 +1234,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     num <- rep(NA_real_, len)
                 } else if (l == 1L) {
                     if (is.character(v)) {
+                        v <- stri_trim_both(v)
+                        v[stri_isempty(v)] <- NA_character_
                         chr <- rep(v, len)
                         num <- rep(NA_real_, len)
                     } else {
@@ -1242,6 +1244,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     }
                 } else if (l == len) {
                     if (is.character(v)) {
+                        v <- stri_trim_both(v)
+                        v[stri_isempty(v)] <- NA_character_
                         chr <- v
                         num <- rep(NA_real_, len)
                     } else {
@@ -1966,7 +1970,7 @@ match_idd_field <- function (idd_env, dt_field) {
 #'        Default: `FALSE`.
 #'
 #' @param .strict If `TRUE`, make sure all input objects come from the same
-#'        verion as that from `idf_env`. Default: `TRUE`.
+#'        version as that from `idf_env`. Default: `TRUE`.
 #'
 #' @return A named list of 3 [data.table::data.table()]: `meta`, `object` and
 #' `value`.
@@ -2390,7 +2394,8 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         # extract object table
         obj_dt <- dt[, by = c("object_rleid"),
             list(rleid = rleid[[1L]], object_id = object_id[[1L]],
-                 class_name = class_name[[1L]], num = max(field_index)
+                 class_name = class_name[[1L]], num = max(field_index),
+                 value_type = value_type[[1L]]
             )
         ]
 
@@ -2440,17 +2445,17 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         }
 
         # update class id
-        set(obj_dt, NULL, "num", NULL)
         obj_dt[val_dt, on = c("object_rleid" = "rleid"), class_id := i.class_id]
 
         # assign input value
         val_dt[dt, on = c(rleid = "object_rleid", "field_index"),
-            `:=`(value_chr = i.value_chr, value_num = i.value_num,
-                 rleid = i.rleid, object_id = i.object_id,
-                 value_type = i.value_type, object_rleid = i.object_rleid
-            )
+            `:=`(value_chr = i.value_chr, value_num = i.value_num)
         ]
-        setnafill(val_dt, type = "locf", cols = c("rleid", "object_id", "object_rleid", "value_type"))
+        # update rleid related
+        val_dt[obj_dt, on = c("rleid" = "object_rleid"),
+            `:=`(rleid = i.rleid, object_rleid = i.object_rleid, value_type = i.value_type)
+        ]
+        set(obj_dt, NULL, c("num", "value_type"), NULL)
         # if value column is a character vector, need to reset values since
         # all of them are coerced regardless of field types
         val_dt[value_type == 1L & type_enum > IDDFIELD_TYPE$real, value_num := NA_real_]
@@ -2525,10 +2530,11 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
         abort("Class should not contain any duplication.")
     }
 
-    val <- get_idf_value(idd_env, idf_env, class)[
-        grepl(pattern, value_chr, ignore.case = ignore.case, perl = perl,
+    val <- get_idf_value(idd_env, idf_env, class, property = "type_enum")[,
+        matched := grepl(pattern, value_chr, ignore.case = ignore.case, perl = perl,
             fixed = fixed, useBytes = useBytes)
     ]
+    val <- val[J(val[matched == TRUE, unique(object_id)]), on = "object_id"]
 
     # add object rleid
     set(val, NULL, "rleid", rleid(val$object_id))
@@ -2549,6 +2555,7 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
             )
         )
         set(val, NULL, "value_num", suppressWarnings(as.double(val$value_chr)))
+        val[type_enum > IDDFIELD_TYPE$real, value_num := NA_real_]
     }
 
     # keep column order
@@ -2880,14 +2887,17 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     validity <- validate_on_level(idd_env, idf_env, dt_object, dt_value, level = chk)
     assert_valid(validity, "set")
 
+    # remove existing references whose fields have been set to empty. see #355
+    all_ref <- idf_env$reference[!dt_value[J(NA_character_), on = "value_chr", nomatch = NULL], on = "value_id"]
+
     # extract reference {{{
     # Since 'check_invalid_reference()' will add new field references in idf_env$reference
     # only check new sources
     if (chk$reference) {
         # extract new reference
         ref <- rbindlist(list(
-            idf_env$reference[J(dt_object$object_id), on = "object_id", nomatch = 0L],
-            idf_env$reference[J(dt_object$object_id), on = "src_object_id", nomatch = 0L]
+            all_ref[J(dt_object$object_id), on = "object_id", nomatch = 0L],
+            all_ref[J(dt_object$object_id), on = "src_object_id", nomatch = 0L]
         ))
     # manually check new reference
     } else {
@@ -2926,6 +2936,10 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
         } else {
             value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")
         }
+
+        # remove existing references whose fields have been set to empty. see #355
+        all_ref <- all_ref[!J(id_del), on = "value_id"][!J(id_del), on = "src_value_id"]
+        ref <- ref[!J(id_del), on = "value_id"][!J(id_del), on = "src_value_id"]
     } else {
         if (replace) {
             value <- append_dt(idf_env$value, dt_value, "object_id")
@@ -2937,7 +2951,7 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     order_idf_data(list(
         object = append_dt(idf_env$object, dt_object, "object_id"),
         value = value,
-        reference = append_dt(idf_env$reference, ref, "value_id"),
+        reference = append_dt(all_ref, ref, "value_id"),
         changed = c(dt_object$object_id),
         updated = setdiff(ref$object_id, dt_object$object_id)
     ))
@@ -3024,13 +3038,16 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
         if (chk$reference && !ref_by && !force && nrow(rel$ref_by)) {
             rel$ref_by <- rel$ref_by[!J(id_del), on = "object_id"]
 
-            if (!eplusr_option("verbose_info")) {
+            if (!in_verbose()) {
                 rel$ref_by <- add_idf_relation_format_cols(idd_env, idf_env, rel$ref_by)
             }
-            abort(paste0("Cannot delete object(s) that are referred by others:\n",
-                "\n",
-                paste0("  ", unlist(format_idf_relation(rel$ref_by, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
-            ), "del_referenced")
+
+            if (nrow(rel$ref_by)) {
+                abort(paste0("Cannot delete object(s) that are referred by others:\n",
+                    "\n",
+                    paste0("  ", unlist(format_idf_relation(rel$ref_by, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
+                ), "del_referenced")
+            }
         }
         # }}}
 
@@ -3826,12 +3843,15 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     if (!is.null(object)) {
         obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
     }
-    if (!is.null(obj_id)) {
+    if (depth == 0L && !is.null(obj_id)) {
         cur_nodes <- cur_nodes[J(obj_id), on = col_ref, nomatch = 0L]
     }
 
     # no matched objects found for specified classes or groups
-    if (!is.null(obj_id) && !length(obj_id)) all_nodes <- all_nodes[0L]
+    if (!is.null(obj_id) && !length(obj_id)) {
+        all_nodes <- all_nodes[0L]
+        cur_nodes <- cur_nodes[0L]
+    }
 
     # store classes or objects needed to be removed later
     del <- list()
@@ -4351,8 +4371,8 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
 }
 # }}}
 # resolve_idf_external_link {{{
-#  auto change full file path in `Schedule:File` to relative path and copy those
-#  files into the same directory of the model
+#  auto change full file path in `Schedule:File` and other classes to relative
+#  path and copy those files into the same directory of the model
 resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
     if (!has_names(idf_env$object, "class_name")) {
         added <- TRUE
@@ -4360,8 +4380,34 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         on.exit(set(idf_env$object, NULL, "class_name", NULL), add = TRUE)
     }
 
-    # Currently, only `Schedule:File` class is supported
-    if (!"Schedule:File" %in% idf_env$object$class_name) return(FALSE)
+    map <- data.table(
+        class_name = c(
+            "Schedule:File:Shading",
+            "Schedule:File",
+            "Construction:WindowDataFile",
+            "ExternalInterface:FunctionalMockupUnitImport",
+            "ExternalInterface:FunctionalMockupUnitImport:From:Variable",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Actuator",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Variable",
+            "Table:IndependentVariable",
+            "Table:Lookup"
+        ),
+        field_name = c(
+            "File Name",
+            "File Name",
+            "File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "External File Name",
+            "External File Name"
+        )
+    )
+
+    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(FALSE)
 
     # get full path of old and new
     old_dir <- normalizePath(dirname(old), mustWork = FALSE)
@@ -4373,9 +4419,12 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     setwd(old_dir)
 
     # get object table and value table
-    val <- get_idf_value(idd_env, idf_env, class = "Schedule:File", field = "File Name",
+    val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
         property = c("units", "ip_units", "type_enum")
-    )
+    )[!J(NA_character_), on = "value_chr"] # remove empty fields. See #366
+
+    # remove empty fields. See #366
+    if (!nrow(val)) return(FALSE)
 
     # check existence of old files
     set(val, NULL, "old_full_path", normalizePath(val$value_chr, mustWork = FALSE))
