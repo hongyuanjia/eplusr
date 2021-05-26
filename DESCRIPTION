@@ -40,6 +40,8 @@ Suggests:
     pkgdown,
     rgl (>= 0.100.26),
     rmarkdown,
+    shiny,
+    shinyWidgets,
     testthat (>= 2.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
@@ -48,6 +50,7 @@ RoxygenNote: 7.1.1
 SystemRequirements: EnergyPlus (>= 8.3, optional)
     (<https://energyplus.net>); udunits2
 Collate:
+    'addins.R'
     'constants.R'
     'assert.R'
     'diagram.R'
