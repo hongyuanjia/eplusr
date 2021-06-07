@@ -88,12 +88,16 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' }
         #'
         initialize = function (path) {
+            # only store if input is a path
+            if (is.character(path) && length(path) == 1L) {
+                if (file.exists(path)) private$m_path <- normalizePath(path)
+            }
+
             # add a uuid
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
-            private$m_path <- normalizePath(path)
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
