@@ -1,3 +1,9 @@
+# eplusr (development version)
+
+## New features
+
+* `Idd$path()` is added to show the path of IDD parsed (#442).
+
 # eplusr 0.14.2
 
 ## New features
