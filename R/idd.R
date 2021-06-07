@@ -706,6 +706,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         # PRIVATE FIELDS {{{
         m_version = NULL,
         m_build = NULL,
+        m_path = NULL,
         m_idd_env = NULL,
         m_log = NULL,
         # }}}
