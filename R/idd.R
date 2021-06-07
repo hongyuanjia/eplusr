@@ -93,7 +93,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
             private$m_log$uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
-            private$m_path <- path
+            private$m_path <- normalizePath(path)
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
