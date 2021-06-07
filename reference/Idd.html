@@ -99,7 +99,7 @@ IddObject provides detailed information of curtain class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9000</span>
       </span>
     </div>
 
@@ -250,6 +250,7 @@ curtain class</p></div>
 <li><p><a href='#method-new'><code>Idd$new()</code></a></p></li>
 <li><p><a href='#method-version'><code>Idd$version()</code></a></p></li>
 <li><p><a href='#method-build'><code>Idd$build()</code></a></p></li>
+<li><p><a href='#method-path'><code>Idd$path()</code></a></p></li>
 <li><p><a href='#method-group_name'><code>Idd$group_name()</code></a></p></li>
 <li><p><a href='#method-from_group'><code>Idd$from_group()</code></a></p></li>
 <li><p><a href='#method-class_name'><code>Idd$class_name()</code></a></p></li>
@@ -336,6 +337,26 @@ found, <code>NA</code> is returned.</p>
 <p><div class="r example copy"></p><pre>\dontrun{
 # get build tag
 idd$build()
+}
+
+</pre><p></div></p>
+
+<p><hr>
+<a id="method-path"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>path()</code></h3>
+<p>Get the file path of current <code>Idd</code></p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>Idd</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
+<p><code>$path()</code> returns the full path of current <code>Idd</code> or <code>NULL</code> if the
+<code>Idd</code> object is created using a character vector and not saved
+locally.</p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p><code>NULL</code> or a single string.</p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
+<p><div class="r example copy"></p><pre>\dontrun{
+# get path
+idd$path()
 }
 
 </pre><p></div></p>
@@ -914,11 +935,11 @@ idd$print()
 <span class='co'>## ------------------------------------------------</span>
 
 <span class='va'>Idd</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"Energy+.idd"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Failed to find configuration data of EnergyPlus v8.8</span></div><div class='output co'>#&gt; <span class='error'>Error in !nrow(dt): invalid argument type</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Failed to find configuration data of EnergyPlus v8.8</span></div><div class='output co'>#&gt; <span class='error'>Error: Failed to read input file. input= must be a single character string containing a file name, a system command containing at least one space, a URL starting 'http[s]://', 'ftp[s]://' or 'file://', or, the input data itself containing at least one \n or \r</span></div><div class='input'>
 <span class='co'># Preferable way</span>
 <span class='va'>idd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>IDD v8.8.0 has not been parsed before.</span>
-#&gt; <span class='message'>Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></div><div class='output co'>#&gt; <span class='message'>Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span></div><div class='output co'>#&gt; <span class='message'>Starting to download the IDD file from EnergyPlus GitHub repo...</span></div><div class='output co'>#&gt; <span class='message'>EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/RtmpbNlYOj.</span></div><div class='output co'>#&gt; <span class='message'>IDD file found: '/tmp/RtmpbNlYOj/V8-8-0-Energy+.idd'.</span></div><div class='output co'>#&gt; <span class='message'>Start parsing...</span></div><div class='output co'>#&gt; <span class='message'>Parsing completed.</span></div><div class='input'>
+#&gt; <span class='message'>Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></div><div class='output co'>#&gt; <span class='message'>Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span></div><div class='output co'>#&gt; <span class='message'>Starting to download the IDD file from EnergyPlus GitHub repo...</span></div><div class='output co'>#&gt; <span class='message'>EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/RtmpzVLedR.</span></div><div class='output co'>#&gt; <span class='message'>IDD file found: '/tmp/RtmpzVLedR/V8-8-0-Energy+.idd'.</span></div><div class='output co'>#&gt; <span class='message'>Start parsing...</span></div><div class='output co'>#&gt; <span class='message'>Parsing completed.</span></div><div class='input'>
 
 
 <span class='co'>## ------------------------------------------------</span>
@@ -939,6 +960,16 @@ idd$print()
 <span class='co'># get build tag</span>
 <span class='va'>idd</span><span class='op'>$</span><span class='fu'>build</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "7c3bbe4830"</div><div class='input'><span class='co'># }</span>
+
+
+<span class='co'>## ------------------------------------------------</span>
+<span class='co'>## Method `Idd$path`</span>
+<span class='co'>## ------------------------------------------------</span>
+
+<span class='co'># \dontrun{</span>
+<span class='co'># get path</span>
+<span class='va'>idd</span><span class='op'>$</span><span class='fu'>path</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "/tmp/RtmpzVLedR/V8-8-0-Energy+.idd"</div><div class='input'><span class='co'># }</span>
 
 
 <span class='co'>## ------------------------------------------------</span>
