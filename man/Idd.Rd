@@ -83,6 +83,16 @@ idd$build()
 
 
 ## ------------------------------------------------
+## Method `Idd$path`
+## ------------------------------------------------
+
+\dontrun{
+# get path
+idd$path()
+}
+
+
+## ------------------------------------------------
 ## Method `Idd$group_name`
 ## ------------------------------------------------
 
@@ -293,6 +303,7 @@ Hongyuan Jia
 \item \href{#method-new}{\code{Idd$new()}}
 \item \href{#method-version}{\code{Idd$version()}}
 \item \href{#method-build}{\code{Idd$build()}}
+\item \href{#method-path}{\code{Idd$path()}}
 \item \href{#method-group_name}{\code{Idd$group_name()}}
 \item \href{#method-from_group}{\code{Idd$from_group()}}
 \item \href{#method-class_name}{\code{Idd$class_name()}}
@@ -412,6 +423,37 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 \preformatted{\dontrun{
 # get build tag
 idd$build()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-path"></a>}}
+\if{latex}{\out{\hypertarget{method-path}{}}}
+\subsection{Method \code{path()}}{
+Get the file path of current \code{Idd}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$path()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$path()} returns the full path of current \code{Idd} or \code{NULL} if the
+\code{Idd} object is created using a character vector and not saved
+locally.
+}
+
+\subsection{Returns}{
+\code{NULL} or a single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get path
+idd$path()
 }
 
 }

@@ -93,6 +93,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
             private$m_log$uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
+            private$m_path <- path
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
@@ -145,6 +146,26 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         build = function ()
             idd_build(self, private),
         # }}}
+
+        # path {{{
+        #' @description
+        #' Get the file path of current `Idd`
+        #'
+        #' @details
+        #' `$path()` returns the full path of current `Idd` or `NULL` if the
+        #' `Idd` object is created using a character vector and not saved
+        #' locally.
+        #'
+        #' @return `NULL` or a single string.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # get path
+        #' idd$path()
+        #' }
+        #'
+        path = function ()
+            idd_path(self, private),
 
         # group_name {{{
         #' @description
@@ -700,6 +721,11 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 )
 # }}}
 
+# idd_path {{{
+idd_path <- function (self, private) {
+    private$m_path
+}
+# }}}
 # idd_version {{{
 idd_version <- function (self, private) {
     private$m_version
