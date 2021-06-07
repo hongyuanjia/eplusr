@@ -117,6 +117,9 @@ test_that("Idd class", {
     # can get Idd version
     expect_equal(idd$version(), as.numeric_version("9.9.9"))
 
+    # can get Idd path
+    expect_null(idd$path())
+
     # can get Idd build
     expect_equal(idd$build(), "7c3bbe4830")
 
