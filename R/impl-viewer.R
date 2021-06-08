@@ -1,3 +1,19 @@
+# rgl_vertice_trans {{{
+# transform geometry from EnergyPlus to OpenGL coordinate system
+# Energyplus --> OpenGL
+#          x -->      x
+#          y -->     -z
+#          z -->      y
+#
+# OpenGL --> EnergyPlus
+#      x -->          x
+#      y -->          z
+#      z -->         -y
+rgl_vertice_trans <- function(vertices){
+    set(vertices, NULL, c("y", "z"), list(vertices$z, -vertices$y))
+}
+# }}}
+
 # rgl_viewpoint {{{
 rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
     assert_choice(look_at, c("iso", "top", "bottom", "front", "back", "left", "right"), null.ok = TRUE)
@@ -15,13 +31,13 @@ rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov =
         if (!is.null(phi)) rot[1L] <- phi
     } else if (!is.null(look_at)) {
         rot <- switch(look_at,
-            top = c(0, 0, 0),
-            bottom = c(180, 0, 0),
-            front = c(-90, 0, 0),
-            back = c(-90, 0, -180),
-            left = c(-90, 0, 90),
-            right = c(-90, 0, -90),
-            iso = c(-75, 0, -30)
+            top = c(90, 0, 0),
+            bottom = c(-90, 180, 0),
+            front = c(0, 0, 0),
+            back = c(-180, 0, -180),
+            left = c(90, 90, -90),
+            right = c(90, -90, 90),
+            iso = c(15, -30, 0)
         )
     } else {
         # do nothing
@@ -263,6 +279,9 @@ rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red
         y = c(rep(0.0, 2L), 0.0, val * expand, rep(0.0, 2L)),
         z = c(rep(0.0, 4L), 0.0, val * max(c(1.25, expand / 2)))
     )
+    # transform EnergyPlus coordinate system to OpenGL coordinate
+    # system
+    vert <- rgl_vertice_trans(vert)
 
     c(north = id_north,
       axis = rgl_view_wireframe(dev, list(vertices = vert), width = width,

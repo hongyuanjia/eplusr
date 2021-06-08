@@ -528,6 +528,10 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
                     private$m_log$geoms, "absolute", "absolute", "absolute"
                 )
 
+                # transform EnergyPlus coordinate system to OpenGL coordinate
+                # system
+                private$m_log$geoms$vertices <- rgl_vertice_trans(private$m_log$geoms$vertices)
+
                 # vertices2 for triangulation
                 private$m_log$geoms$vertices2 <- triangulate_geoms(private$m_log$geoms)
             }
