@@ -10,6 +10,10 @@
 #      y -->          z
 #      z -->         -y
 rgl_vertice_trans <- function(vertices){
+    if (!NROW(vertices)) {
+        return(vertices)
+    }
+
     set(vertices, NULL, c("y", "z"), list(vertices$z, -vertices$y))
 }
 # }}}
