@@ -925,7 +925,7 @@ format.Idd <- function (x, ...) {
            if (n <= 1L) "class" else "classes"
         )
     } else {
-        sprintf("<EnergyPlus IDD v%s (%s) with %i classes>", x$version(), x$build(),
+        sprintf("<EnergyPlus IDD v%s (%s) with %i %s>", x$version(), x$build(),
             n, if (n <= 1L) "class" else "classes"
         )
     }
