@@ -107,10 +107,13 @@ lpad <- function(x, char = " ", width = NULL) {
 
 # read_lines {{{
 read_lines <- function(input, trim = TRUE, ...) {
+    # avoid memory leakage in data.table::fread. See #415
+    ori <- options(encoding = "native.enc")
+    on.exit(options(ori), add = TRUE)
     dt <- tryCatch(
-        fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
-        warning = function (w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
-        error = function (e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
+        data.table(string = readLines(input, encoding = "utf-8", warn = FALSE)),
+        warning = function (w) abort(paste0("Failed to read input file. ", conditionMessage(w)), "read_lines"),
+        error = function (e) abort(conditionMessage(e), "read_lines")
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
