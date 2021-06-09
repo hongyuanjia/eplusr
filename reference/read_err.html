@@ -242,8 +242,8 @@ otherwise.</p></li>
 <span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='va'>epw_name</span><span class='op'>)</span>
 <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EplusJob.html'>eplus_job</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmpzVLedR/1ZoneUncontrolled.idf.</span></div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.06.07 10:25
+</div><div class='output co'>#&gt; <span class='message'>Replace the existing IDF located at /tmp/RtmpA0bAlg/1ZoneUncontrolled.idf.</span></div><div class='output co'>#&gt; EnergyPlus Starting
+#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.06.09 06:25
 #&gt; Processing Data Dictionary
 #&gt; Processing Input File
 #&gt; Initializing Simulation
@@ -354,24 +354,24 @@ otherwise.</p></li>
 #&gt; Writing tabular output file results using XML format.
 #&gt; Writing final SQL reports
 #&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.25sec
+#&gt;  ReadVars Run Time=00hr 00min  0.24sec
 #&gt;  ReadVarsESO program completed successfully.
 #&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.12sec
+#&gt;  ReadVars Run Time=00hr 00min  0.11sec
 #&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  2.89sec
+#&gt; EnergyPlus Run Time=00hr 00min  2.09sec
 #&gt; 
 #&gt; </div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span> <span style='color: #00BB00;'>EnergPlus Simulation Job</span> <span style='color: #00BB00;'>────────────────────────────────────────────────────</span>
-#&gt; * Model: '/tmp/RtmpzVLedR/1ZoneUncontrolled.idf'
+#&gt; * Model: '/tmp/RtmpA0bAlg/1ZoneUncontrolled.idf'
 #&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...
 #&gt; * EnergyPlus Version: '8.8.0'
 #&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'
-#&gt; <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-06-07 10:25:39' and completed successfully after 2.93 secs.</span></div><div class='input'>
+#&gt; <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-06-09 06:25:11' and completed successfully after 2.13 secs.</span></div><div class='input'>
 <span class='co'># read the err file</span>
 <span class='fu'>read_err</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".err"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2021-06-07 10:25:00
+#&gt;   * Simulation started: 2021-06-09 06:25:00
 #&gt;   * Terminated: FALSE
 #&gt;   * Successful: TRUE
 #&gt;   * Warning[W]: 3
