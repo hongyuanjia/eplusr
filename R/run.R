@@ -45,38 +45,129 @@ NULL
 #' @export
 #' @author Hongyuan Jia
 # clean_wd {{{
-clean_wd <- function (path) {
+clean_wd <- function (path, suffix_type = c("C", "L", "D")) {
+    suffix_type <- match.arg(suffix_type)
     assert_string(path)
     base <- tools::file_path_sans_ext(basename(path))
     without_ext <- tools::file_path_sans_ext(path)
     wd <- dirname(path)
 
-    # files_to_delete {{{
-    suffix <- c(".Zsz", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dfs",
-        ".dxf", ".edd", ".eio", ".end", ".epmdet", ".epmidf", ".err", ".eso",
-        ".expidf", ".inp", ".log", ".mat", ".mdd", ".mtd", ".mtr", ".rdd",
-        ".rvaudit", ".sci", ".shd", ".sln", ".sql", ".ssz", ".svg", ".tab",
-        ".txt", ".wrl", "DElight.dfdmp", "DElight.eldmp", "DElight.in",
-        "DElight.out", "DFS.csv", "Map.csv", "Map.tab", "Map.txt", "Meter.csv",
-        "Meter.tab", "Meter.txt", "Screen.csv", "Spark.log", "Sqlite.err",
-        "Ssz.csv", "Ssz.tab", "Ssz.txt", "Table.csv", "Table.htm", "Table.html",
-        "Table.tab", "Table.txt", "Table.xml", "Zsz.csv", "Zsz.tab", "Zsz.txt")
-    out_files <- paste0(without_ext, suffix)
+    if (suffix_type == "C") {
+        prefix <- without_ext
+        prefix_sql <- without_ext
 
-    individual <- c("BasementGHTIn.idf", "audit.out", "expanded.idf",
-        "expandedidf.err", "in.epw", "in.idf", "in.imf", "in.stat", "out.idf",
-        "readvars.audit", "slab.int", "sqlite.err", "test.mvi", "fort.6")
+        suffix_normal <- ""
+        suffix_table <- "Table"
+        suffix_map <- "Map"
+        suffix_zsz <- "Zsz"
+        suffix_ssz <- "Ssz"
+        suffix_meter <- "Meter"
+        suffix_sqlite <- "Sqlite"
+        suffix_ads <- "Ads"
+        suffix_screen <- "Screen"
+        suffix_shd <- "Shading"
+        suffix_delight <- "DElight"
+        suffix_dfs <- ""
+    } else if (suffix_type == "L") {
+        prefix <- file.path(wd, "eplus")
+        prefix_sql <- file.path(wd, "")
 
-    if (base == "in") {
-        individual <- setdiff(individual, c("in.epw", "in.idf"))
+        suffix_normal <- "out"
+        suffix_table <- "tbl"
+        suffix_map <- "map"
+        suffix_zsz <- "zsz"
+        suffix_ssz <- "ssz"
+        suffix_meter <- "mtr"
+        suffix_sqlite <- "sqlite"
+        suffix_ads <- "ADS"
+        suffix_screen <- "screen"
+        suffix_shd <- "shading"
+        suffix_delight <- "out"
+        suffix_dfs <- "DFS"
+    } else if (suffix_type == "D" ){
+        prefix <- without_ext
+        prefix_sql <- without_ext
+
+        suffix_normal <- ""
+        suffix_table <- "-table"
+        suffix_map <- "-map"
+        suffix_zsz <- "-zsz"
+        suffix_ssz <- "-ssz"
+        suffix_meter <- "-meter"
+        suffix_sqlite <- "-sqlite"
+        suffix_ads <- "-ads"
+        suffix_screen <- "-screen"
+        suffix_shd <- "-shading"
+        suffix_delight <- "-delight"
+        suffix_dfs <- "-dfs"
     } else {
-        individual <- setdiff(individual, paste0(base, ".idf"))
+        abort("Unrecognized EnergyPlus output suffix style")
     }
 
-    seperates <- file.path(wd, individual)
+    ext_normal <- c(
+        ".inp", ".end", ".eso", ".rdd", ".mdd", ".dbg", ".eio", ".err", ".dxf",
+        ".sln", ".mtr", ".mtd", ".bnd", ".sci", ".log", ".svg", ".shd", ".wrl",
+        ".edd", ".csv", ".tab", ".txt", ".inp", ".audit", ".sql", ".glhe",
+        ".iperr", "_perflog.csv", ".rvaudit", ".epmdet", ".epmidf", ".expidf",
+        ".experr", ".epJSONout"
+        paste0("."              , c("json", "cbor", "msgpack")),
+        paste0("_detailed_zone.", c("json", "cbor", "msgpack")),
+        paste0("_detailed_HVAC.", c("json", "cbor", "msgpack")),
+        paste0("_timestep."     , c("json", "cbor", "msgpack")),
+        paste0("_yearly."       , c("json", "cbor", "msgpack")),
+        paste0("_monthly."      , c("json", "cbor", "msgpack")),
+        paste0("_daily."        , c("json", "cbor", "msgpack")),
+        paste0("_hourly."       , c("json", "cbor", "msgpack")),
+        paste0("_runperiod."    , c("json", "cbor", "msgpack")),
+    )
 
-    target <- c(out_files, seperates)
-    # }}}
+    ext_table <- c(".csv", ".tab", ".txt", ".htm", ".xml")
+    ext_map <- ext_zsz <- ext_ssz <- c(".csv", ".tab", ".txt")
+    ext_meter <- c(ext_map, "inp")
+    ext_sqlite <- ".err"
+    ext_ads <- ".out"
+    ext_screen <- ".csv"
+    ext_shd <- ".csv"
+
+    if (suffix_type == "L") {
+        ext_delight <- c(".delightin", ".delightout", ".delightdfdmp", ".delighteldmp")
+        ext_dfs <- ".dfs"
+    } else {
+        ext_delight <- c(".in", ".out", ".dfdmp", ".eldmp")
+        ext_dfs <- ".csv"
+    }
+
+    individual <- c(
+        "in.imf", "in.idf", "in.epJSON", "in.epw", "in.stat", "out.idf",
+        "test.mvi", "expanded.idf", "expandedidf.err", "readvars.audit",
+        "slab.int", "BasementGHTIn.idf", "Energy+.ini", "eplusADS.inp",
+        "audit.out", "fort.6"
+    )
+
+    # files_to_delete
+    out_files <- c(
+        paste0(prefix, suffix_normal, ext_normal),
+        paste0(prefix, suffix_table, ext_table),
+        paste0(prefix, suffix_map, ext_map),
+        paste0(prefix, suffix_zsz, ext_zsz),
+        paste0(prefix, suffix_ssz, ext_ssz),
+        paste0(prefix, suffix_meter, ext_meter),
+        paste0(prefix, suffix_ads, ext_ads),
+        paste0(prefix, suffix_screen, ext_screen),
+        paste0(prefix, suffix_shd, ext_shd),
+        paste0(prefix, suffix_delight, ext_delight),
+        paste0(prefix, suffix_dfs, ext_dfs),
+        paste0(prefix_sqlite, suffix_sqlite, ext_sqlite),
+    )
+
+    if (base == "in") {
+        # keep the original input IDF and EPW
+        individual <- file.path(wd, setdiff(individual, c("in.epw", "in.idf")))
+    } else {
+        individual <- file.path(wd, individual)
+    }
+
+    target <- c(out_files, individual)
 
     unlink(target[file.exists(target)])
 }
@@ -928,5 +1019,68 @@ expand_objects <- function (eplus, idf, keep_ext = FALSE) {
         attr(idf, "expanded") <- expanded
         idf
     }
+}
+# }}}
+# run_energyplus {{{
+run_energyplus <- function(eplus, idf, epw) {
+    # clean up working directory
+
+    # copy input into working directory
+
+    # run EPMacro
+
+    # run ExpandObjects
+
+    # run Basement preprocessor
+
+    # run Slab preprocessor
+
+    # run EnergyPlus
+
+    # copy post processing program command files to working directory
+
+    # run convertESOMTR post processor
+
+    # run ReadVarsESO post processor
+
+    # copy/rename output files
+
+    # FMUImport/FMUExport
+
+    # run CSVproc post processor
+
+    # clean up directory
+}
+# }}}
+# preprocessor_basement {{{
+preprocessor_basement <- function(eplus, idf) {
+    dir <- dirname(idf)
+    input <- file.path(dir, "BasementGHTIn.idf")
+
+    if (!file.exists(input)) {
+        return()
+    }
+
+    dir_bsmt <- file.path(dirname(eplus), "PreProcess/GrndTempCalc")
+    exe_bsmt <- file.path(dir_bsmt, paste0("Basement", if (is_windows()) ".exe" else ""))
+    idd_bsmt <- file.path(dir_bsmt, "BasementGHT.idd")
+
+    # create "in.idf"
+    file.copy(idf, file.path(dir, "in.idf"), overwrite = TRUE, copy.date = TRUE)
+    # create "in.epw"
+
+    # copy basement IDD to working directory
+    flag_copy <- file.copy(idd_bsmt, dir, overwrite = TRUE, copy.date = TRUE)
+
+    if (!flag_copy) {
+        abort(sprintf("Failed to copy 'BasementGHT.idd' to '%s'.", normalizePath(dir)),
+            "run_preprocess_basement"
+        )
+    }
+
+    # run Basement.exe
+    processx::run(exe_bsmt, wd = dir)
+
+
 }
 # }}}
