@@ -2,12 +2,18 @@ Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
 Version: 0.14.2.9000
-Authors@R:
+Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
            role = c("aut", "cre"),
            email = "hongyuanjia@outlook.com",
-           comment = c(ORCID = "0000-0002-0075-8183"))
+           comment = c(ORCID = "0000-0002-0075-8183")),
+    person(given = "Adrian",
+           family = "Chong",
+           role = c("aut"),
+           email = "bdgczma@nus.edu.sg",
+           comment = c(ORCID = "0000-0002-9486-4728"))
+    )
 Description: A rich toolkit of using the whole building
     simulation program 'EnergyPlus'(<https://energyplus.net>), which
     enables programmatic navigation, modification of 'EnergyPlus' models
