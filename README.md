@@ -193,7 +193,7 @@ inspired the development of eplusr package, especially these below:
 
 ## Author
 
-Hongyuan Jia
+Hongyuan Jia and Adrian Chong
 
 ## License
 
