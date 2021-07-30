@@ -45,89 +45,137 @@ NULL
 #' @export
 #' @author Hongyuan Jia
 # clean_wd {{{
-clean_wd <- function (path, suffix_type = c("C", "L", "D")) {
-    suffix_type <- match.arg(suffix_type)
+clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
     assert_string(path)
-    base <- tools::file_path_sans_ext(basename(path))
-    without_ext <- tools::file_path_sans_ext(path)
     wd <- dirname(path)
+
+    suffix_type <- match.arg(suffix_type)
+
+    out_files <- file.path(wd, get_eplus_output_name(path, suffix_type))
+
+    individuals <- c(
+        "in.imf", "in.idf", "in.epJSON", "in.epw", "in.stat", "out.idf",
+        "test.mvi", "expanded.idf", "expandedidf.err", "readvars.audit",
+        "slab.int", "BasementGHTIn.idf", "Energy+.ini", "eplusADS.inp",
+        "audit.out", "fort.6"
+    )
+
+    if (base == "in") {
+        # keep the original input IDF and EPW
+        individuals <- file.path(wd, setdiff(individuals, c("in.epw", "in.idf")))
+    } else {
+        individuals <- file.path(wd, individuals)
+    }
+
+    targets <- c(out_files, individuals)
+
+    unlink(targets[file.exists(targets)])
+}
+get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
+    suffix_type <- match.arg(suffix_type)
+
+    prefix <- get_eplus_output_prefix(path, suffix_type)
+    suffix <- get_eplus_output_suffix(path, suffix_type)
+
+    name <- lapply(names(suffix), function(nm) {
+        if (!is.null(prefix[[nm]])) {
+            paste0(prefix[[nm]], suffix[[nm]])
+        } else {
+            paste0(prefix[["normal"]], suffix[[nm]])
+        }
+    })
+    names(name) <- names(suffix)
+    name
+}
+get_eplus_output_prefix <- function(path, suffix_type = c("C", "L", "D")) {
+    suffix_type <- match.arg(suffix_type)
+    without_ext <- basename(tools::file_path_sans_ext(path))
 
     if (suffix_type == "C") {
         prefix <- without_ext
-        prefix_sql <- without_ext
-
-        suffix_normal <- ""
-        suffix_table <- "Table"
-        suffix_map <- "Map"
-        suffix_zsz <- "Zsz"
-        suffix_ssz <- "Ssz"
-        suffix_meter <- "Meter"
-        suffix_sqlite <- "Sqlite"
-        suffix_ads <- "Ads"
-        suffix_screen <- "Screen"
-        suffix_shd <- "Shading"
-        suffix_delight <- "DElight"
-        suffix_dfs <- ""
+        prefix_sqlite_err <- without_ext
     } else if (suffix_type == "L") {
-        prefix <- file.path(wd, "eplus")
-        prefix_sql <- file.path(wd, "")
-
-        suffix_normal <- "out"
-        suffix_table <- "tbl"
-        suffix_map <- "map"
-        suffix_zsz <- "zsz"
-        suffix_ssz <- "ssz"
-        suffix_meter <- "mtr"
-        suffix_sqlite <- "sqlite"
-        suffix_ads <- "ADS"
-        suffix_screen <- "screen"
-        suffix_shd <- "shading"
-        suffix_delight <- "out"
-        suffix_dfs <- "DFS"
-    } else if (suffix_type == "D" ){
-        prefix <- without_ext
-        prefix_sql <- without_ext
-
-        suffix_normal <- ""
-        suffix_table <- "-table"
-        suffix_map <- "-map"
-        suffix_zsz <- "-zsz"
-        suffix_ssz <- "-ssz"
-        suffix_meter <- "-meter"
-        suffix_sqlite <- "-sqlite"
-        suffix_ads <- "-ads"
-        suffix_screen <- "-screen"
-        suffix_shd <- "-shading"
-        suffix_delight <- "-delight"
-        suffix_dfs <- "-dfs"
+        prefix <- "eplus"
+        prefix_sqlite_err <- ""
     } else {
-        abort("Unrecognized EnergyPlus output suffix style")
+        prefix <- without_ext
+        prefix_sqlite_err <- without_ext
     }
 
-    ext_normal <- c(
-        ".inp", ".end", ".eso", ".rdd", ".mdd", ".dbg", ".eio", ".err", ".dxf",
-        ".sln", ".mtr", ".mtd", ".bnd", ".sci", ".log", ".svg", ".shd", ".wrl",
-        ".edd", ".csv", ".tab", ".txt", ".inp", ".audit", ".sql", ".glhe",
-        ".iperr", "_perflog.csv", ".rvaudit", ".epmdet", ".epmidf", ".expidf",
-        ".experr", ".epJSONout"
-        paste0("."              , c("json", "cbor", "msgpack")),
-        paste0("_detailed_zone.", c("json", "cbor", "msgpack")),
-        paste0("_detailed_HVAC.", c("json", "cbor", "msgpack")),
-        paste0("_timestep."     , c("json", "cbor", "msgpack")),
-        paste0("_yearly."       , c("json", "cbor", "msgpack")),
-        paste0("_monthly."      , c("json", "cbor", "msgpack")),
-        paste0("_daily."        , c("json", "cbor", "msgpack")),
-        paste0("_hourly."       , c("json", "cbor", "msgpack")),
-        paste0("_runperiod."    , c("json", "cbor", "msgpack")),
+    list(normal = prefix, sqlite_err = prefix_sqlite_err)
+}
+
+get_eplus_output_suffix <- function(path, suffix_type = c("C", "L", "D")) {
+    suffix_type <- match.arg(suffix_type)
+    without_ext <- basename(tools::file_path_sans_ext(path))
+
+    if (suffix_type == "C") {
+        suffix <- list(
+            normal = "",
+            table = "Table",
+            map = "Map",
+            zsz = "Zsz",
+            ssz = "Ssz",
+            meter = "Meter",
+            sqlite_err = "Sqlite",
+            ads = "Ads",
+            screen = "Screen",
+            shd = "Shading",
+            delight = "DElight",
+            dfs = ""
+        )
+    } else if (suffix_type == "L") {
+        suffix <- list(
+            normal = "out",
+            table = "tbl",
+            map = "map",
+            zsz = "zsz",
+            ssz = "ssz",
+            meter = "mtr",
+            sqlite_err = "sqlite",
+            ads = "ADS",
+            screen = "screen",
+            shd = "shading",
+            delight = "out",
+            dfs = "DFS"
+        )
+    } else {
+        suffix <- list(
+            normal = "",
+            table = "-table",
+            map = "-map",
+            zsz = "-zsz",
+            ssz = "-ssz",
+            meter = "-meter",
+            sqlite_err = "-sqlite",
+            ads = "-ads",
+            screen = "-screen",
+            shd = "-shading",
+            delight = "-delight",
+            dfs = "-dfs"
+        )
+    }
+
+    suffix$json <- c(
+        "",
+        "_detailed_zone",
+        "_detailed_HVAC",
+        "_timestep",
+        "_yearly",
+        "_monthly",
+        "_daily",
+        "_hourly",
+        "_runperiod"
     )
 
     ext_table <- c(".csv", ".tab", ".txt", ".htm", ".xml")
     ext_map <- ext_zsz <- ext_ssz <- c(".csv", ".tab", ".txt")
     ext_meter <- c(ext_map, "inp")
-    ext_sqlite <- ".err"
+    ext_sqlite_err <- ".err"
     ext_ads <- ".out"
     ext_screen <- ".csv"
     ext_shd <- ".csv"
+    ext_json <- c(".json", ".cbor", ".msgpack")
 
     if (suffix_type == "L") {
         ext_delight <- c(".delightin", ".delightout", ".delightdfdmp", ".delighteldmp")
@@ -137,39 +185,32 @@ clean_wd <- function (path, suffix_type = c("C", "L", "D")) {
         ext_dfs <- ".csv"
     }
 
-    individual <- c(
-        "in.imf", "in.idf", "in.epJSON", "in.epw", "in.stat", "out.idf",
-        "test.mvi", "expanded.idf", "expandedidf.err", "readvars.audit",
-        "slab.int", "BasementGHTIn.idf", "Energy+.ini", "eplusADS.inp",
-        "audit.out", "fort.6"
+    ext <- list(
+        normal = c(
+            ".inp", ".end", ".eso", ".rdd", ".mdd", ".dbg", ".eio", ".err", ".dxf",
+            ".sln", ".mtr", ".mtd", ".bnd", ".sci", ".log", ".svg", ".shd", ".wrl",
+            ".edd", ".csv", ".tab", ".txt", ".inp", ".audit", ".sql", ".glhe",
+            ".iperr", "_perflog.csv", ".rvaudit", ".epmdet", ".epmidf", ".expidf",
+            ".experr", ".epJSONout"
+        ),
+        table = ext_table,
+        map = ext_map,
+        zsz = ext_zsz,
+        ssz = ext_ssz,
+        meter = ext_meter,
+        sqlite_err = ext_sqlite_err,
+        ads = ext_ads,
+        screen = ext_screen,
+        shd = ext_shd,
+        delight = ext_delight,
+        dfs = ext_dfs,
+        json = ext_json
     )
 
-    # files_to_delete
-    out_files <- c(
-        paste0(prefix, suffix_normal, ext_normal),
-        paste0(prefix, suffix_table, ext_table),
-        paste0(prefix, suffix_map, ext_map),
-        paste0(prefix, suffix_zsz, ext_zsz),
-        paste0(prefix, suffix_ssz, ext_ssz),
-        paste0(prefix, suffix_meter, ext_meter),
-        paste0(prefix, suffix_ads, ext_ads),
-        paste0(prefix, suffix_screen, ext_screen),
-        paste0(prefix, suffix_shd, ext_shd),
-        paste0(prefix, suffix_delight, ext_delight),
-        paste0(prefix, suffix_dfs, ext_dfs),
-        paste0(prefix_sqlite, suffix_sqlite, ext_sqlite),
-    )
-
-    if (base == "in") {
-        # keep the original input IDF and EPW
-        individual <- file.path(wd, setdiff(individual, c("in.epw", "in.idf")))
-    } else {
-        individual <- file.path(wd, individual)
-    }
-
-    target <- c(out_files, individual)
-
-    unlink(target[file.exists(target)])
+    apply2(suffix, ext, function(x, y) {
+        d <- do.call(data.table::CJ, list(x, y))
+        paste0(d$V1, d$V2)
+    })
 }
 # }}}
 
