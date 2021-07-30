@@ -441,3 +441,35 @@ copy_list <- function(x) {
     x
 }
 # }}}
+
+file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = NULL) {
+    from <- normalizePath(from, mustWork = TRUE)
+    to <- normalizePath(to, mustWork = FALSE)
+
+    # remove duplications
+    copy <- unique(data.table(from = from[from != to], to = to[from != to]))
+
+    if (!nrow(copy)) return(to)
+
+    flag <- file.copy(copy$from, copy$to, copy.date = copy.date, copy.mode = copy.mode, overwrite = TRUE)
+
+    if (any(!flag)) {
+        failed_from <- normalizePath(from[!flag], mustWork = FALSE)
+        failed_to <- normalizePath(to[!flag], mustWork = FALSE)
+        if (is.null(err_title)) {
+            err_title <- "Failed to copy file"
+        } else {
+            assert_string(err_title)
+        }
+        stop(sprintf(
+            "%s:\n%s",
+            err_title,
+            paste0(collapse = "\n", sprintf(
+                "#%s | From '%s' to '%s'",
+                seq_along(failed_from), failed_from, failed_to
+            ))
+        ))
+    }
+
+    to
+}
