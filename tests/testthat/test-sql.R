@@ -119,9 +119,8 @@ test_that("Sql methods", {
         )
     )
 
-    skip_on_os("mac")
     # can get path
-    expect_equal(sql$path(), job$locate_output(".sql"))
+    if (!is_macos()) expect_equal(sql$path(), job$locate_output(".sql"))
     clean_wd(example$idf)
     unlink(c(example$idf, example$epw))
 })
