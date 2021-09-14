@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9001</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Work with ‘Schedule:Compact’ objects</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-06-11</h4>
+            <h4 class="date">2021-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/schedule.Rmd"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -188,7 +188,6 @@
 <span class="co">#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span>
 <span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
 <span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;  ✔ No error found.</span></code></pre></div>
 <p>Wrong schedule specifications cannot directly be caught by <code>IdfObject$validate()</code> since all fields are treated as arbitrary strings.</p>
@@ -201,7 +200,6 @@
 <span class="co">#&gt; │─ 3 : "Through: -1", !- Field 1</span>
 <span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,     !- Field 2</span>
 <span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;     !- Field 3</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;  ✔ No error found.</span></code></pre></div>
 <p>Moreover, every field value should be given as a string, even for schedule values.</p>
@@ -230,7 +228,6 @@
 <span class="co">#&gt; │─ 4 : "For: AllDays",   !- Field 2</span>
 <span class="co">#&gt; │─ 5 : "Until: 24:00",   !- Field 3</span>
 <span class="co">#&gt; └─ 6 : "1.0";            !- Field 4</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $Name</span>
 <span class="co">#&gt; [1] "sch"</span>
@@ -249,7 +246,6 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $`Field 4`</span>
 <span class="co">#&gt; [1] "1.0"</span>
-
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    id name            class index                     field          value</span>
 <span class="co">#&gt; 1: 54  sch Schedule:Compact     1                      Name            sch</span>
@@ -336,7 +332,6 @@
 <code class="sourceCode R"><span class="va">idf</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"ScheduleTypeLimits"</span><span class="op">)</span>
 <span class="co">#&gt; $ScheduleTypeLimits</span>
 <span class="co">#&gt; [1] "Fraction" "On/Off"</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="st">"fraction"</span><span class="op">)</span>
 <span class="co">#&gt; $name</span>
 <span class="co">#&gt; [1] "Fraction"</span>
@@ -398,7 +393,6 @@
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;  ✔ No error found.</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -484,7 +478,6 @@
 <span class="co">#&gt;  8:    12/31 weekday, summerdesignday 19:00  0.20</span>
 <span class="co">#&gt;  9:    12/31 weekday, summerdesignday 24:00  0.00</span>
 <span class="co">#&gt; 10:    12/31              allotherday 24:00  0.00</span>
-
 <span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span>
 <span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
@@ -672,7 +665,6 @@
 <span class="co">#&gt; 14:    12/31  2             AllOtherDay 18:00:00 0.00000000</span>
 <span class="co">#&gt; 15:    12/31  2             AllOtherDay 21:00:00 0.00000000</span>
 <span class="co">#&gt; 16:    12/31  2             AllOtherDay 24:00:00 0.00000000</span>
-
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;     year_day id                 daytype     time value</span>
 <span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 01:00:00  0.20</span>

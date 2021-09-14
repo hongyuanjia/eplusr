@@ -98,7 +98,7 @@ simplifications. For more details on Epw, please see Epw class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9001</span>
       </span>
     </div>
 
@@ -156,7 +156,7 @@ simplifications. For more details on Epw, please see Epw class." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -242,20 +242,7 @@ simplifications. For more details on <code>Epw</code>, please see <a href='Epw.h
 <span class='va'>path_file</span> <span class='op'>&lt;-</span> <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
 <span class='va'>path_epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>path_base</span>, <span class='va'>path_region</span>, <span class='va'>path_file</span><span class='op'>)</span>
 <span class='fu'>read_epw</span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Weather File ═════════════════════════════════════════════════════
-#&gt; [Location ]: San Francisco Intl Ap, CA, USA
-#&gt;              {N 37°37'}, {W 122°24'}, {UTC-08:00}
-#&gt; [Elevation]: 2m above see level
-#&gt; [Data Src ]: TMY3
-#&gt; [WMO Stat ]: 724940
-#&gt; [Leap Year]: No
-#&gt; [Interval ]: 60 mins
-#&gt; 
-#&gt; ── Data Periods ────────────────────────────────────────────────────────────────
-#&gt;    Name StartDayOfWeek StartDay EndDay
-#&gt; 1: Data         Sunday     1/ 1  12/31
-#&gt; 
-#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt; <span class='error'>Error: Failed to read input file. HTTP error 404.</span></div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

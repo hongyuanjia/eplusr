@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9001</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Parametric simulations</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-06-11</h4>
+            <h4 class="date">2021-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/param.Rmd"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -251,9 +251,9 @@
 <code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
+<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
@@ -262,7 +262,7 @@
 <span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; ── EnergPlus Parametric Simulation Job ─────────────────────────────────────────</span>
-<span class="co">#&gt; * Seed: '/tmp/RtmpKwG2Fi/MediumOffice.idf'</span>
+<span class="co">#&gt; * Seed: '/tmp/RtmpCGSogT/MediumOffice.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
@@ -274,8 +274,7 @@
 <span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt;  Simulation started at '2021-06-11 06:37:27' and completed successfully after 3.43 mins.</span>
-
+<span class="co">#&gt;  Simulation started at '2021-09-14 09:55:09' and completed successfully after 2.77 mins.</span>
 <span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
 <span class="co">#&gt; [1] TRUE</span>
@@ -294,12 +293,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $job_status</span>
 <span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpKwG2Fi/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpKwG2Fi/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpKwG2Fi/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/RtmpKwG2Fi/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/RtmpKwG2Fi/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/RtmpKwG2Fi/LED+0.2Frac/LED+0.2Frac.idf</span>
+<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpCGSogT/Ori/Ori.idf</span>
+<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpCGSogT/T5/T5.idf</span>
+<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpCGSogT/LED/LED.idf</span>
+<span class="co">#&gt; 4:     4 completed         /tmp/RtmpCGSogT/0.6Frac/0.6Frac.idf</span>
+<span class="co">#&gt; 5:     5 completed         /tmp/RtmpCGSogT/0.2Frac/0.2Frac.idf</span>
+<span class="co">#&gt; 6:     6 completed /tmp/RtmpCGSogT/LED+0.2Frac/LED+0.2Frac.idf</span>
 <span class="co">#&gt;                                                                                              epw</span>
 <span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="co">#&gt; 2: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
@@ -401,7 +400,6 @@
 <span class="co">#&gt; 28:          T5            Cooling  13.51</span>
 <span class="co">#&gt; 29:         LED            Cooling  13.01</span>
 <span class="va">....</span>
-
 <span class="co"># extract the seed model, i.e. "Ori" case as the baseline</span>
 <span class="va">ori_eui</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">==</span> <span class="st">"Ori"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span>
 
@@ -442,7 +440,6 @@
 <span class="co">#&gt; 28:          T5               Fans   3.55    3.77   5.835544</span>
 <span class="co">#&gt; 29:         LED               Fans   3.43    3.77   9.018568</span>
 <span class="va">....</span>
-
 <span class="co"># plot a bar chart to show the energy savings</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="va">param_savings</span> <span class="op">%&gt;%</span>

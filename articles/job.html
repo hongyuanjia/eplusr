@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9001</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Run simulation and data exploration</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-06-11</h4>
+            <h4 class="date">2021-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -164,7 +164,7 @@
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
 <span class="co">#&gt; EnergyPlus Starting</span>
-<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.06.11 06:36</span>
+<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.09.14 09:54</span>
 <span class="co">#&gt; Processing Data Dictionary</span>
 <span class="co">#&gt; Processing Input File</span>
 <span class="co">#&gt; Initializing Response Factors</span>
@@ -174,27 +174,25 @@
 <span class="co">#&gt; Calculating CTFs for "INT-WALL-1", Construction # 5</span>
 <span class="co">#&gt; Initializing Window Optical Properties</span>
 <span class="va">....</span>
-
 <span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">job</span><span class="op">)</span>
 <span class="co">#&gt; [1] "EplusJob" "R6"</span>
-
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpo5x9Rv/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpLeVlu0/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-06-11 06:36:23' and completed successfully after 0.94 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-09-14 09:54:19' and completed successfully after 0.72 secs.</span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
 <p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpo5x9Rv/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpLeVlu0/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-06-11 06:36:23' and completed successfully after 0.94 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-09-14 09:54:19' and completed successfully after 0.72 secs.</span></code></pre></div>
 </div>
 <div id="run-simulation-in-the-background" class="section level2">
 <h2 class="hasAnchor">
@@ -203,15 +201,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpo5x9Rv/5Zone_Transformer.idf.</span>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpLeVlu0/5Zone_Transformer.idf.</span>
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpo5x9Rv/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpLeVlu0/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-06-11 06:36:25' and is still running...</span>
-
+<span class="co">#&gt;  Simulation started at '2021-09-14 09:54:20' and is still running...</span>
 <span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
 <span class="co">#&gt; [1] TRUE</span>
@@ -236,7 +233,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
 <span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class="co">#&gt;   * Simulation started: 2021-06-11 06:36:00</span>
+<span class="co">#&gt;   * Simulation started: 2021-09-14 09:54:00</span>
 <span class="co">#&gt;   * Terminated: FALSE</span>
 <span class="co">#&gt;   * Successful: TRUE</span>
 <span class="co">#&gt;   * Warning[W]: 1</span>
@@ -383,7 +380,7 @@ An example of tidy BES output data representation where Table (a) is the standar
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">power</span><span class="op">)</span>
 <span class="co">#&gt;       case            datetime month day hour minute dst interval</span>
-<span class="co">#&gt; 1: example 2020-07-07 11:00:00     7   7   11      0   0       15</span>
+<span class="co">#&gt; 1: example 2015-07-07 11:00:00     7   7   11      0   0       15</span>
 <span class="co">#&gt;    simulation_days day_type environment_name environment_period_index is_meter</span>
 <span class="co">#&gt; 1:               1  Tuesday        SUMMERDAY                        4        0</span>
 <span class="co">#&gt;    type index_group timestep_type     key_value</span>
@@ -399,17 +396,17 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>environment_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"summerday"</span>, <span class="st">"winterday"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                    case            datetime   key_value</span>
-<span class="co">#&gt;    1: 5Zone_Transformer 2020-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;    2: 5Zone_Transformer 2020-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;    3: 5Zone_Transformer 2020-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;    4: 5Zone_Transformer 2020-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;    5: 5Zone_Transformer 2020-01-14 01:15:00 Environment</span>
+<span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
+<span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
+<span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
+<span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
+<span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
 <span class="co">#&gt;   ---                                                  </span>
-<span class="co">#&gt; 3836: 5Zone_Transformer 2020-07-07 23:00:00            </span>
-<span class="co">#&gt; 3837: 5Zone_Transformer 2020-07-07 23:15:00            </span>
-<span class="co">#&gt; 3838: 5Zone_Transformer 2020-07-07 23:30:00            </span>
-<span class="co">#&gt; 3839: 5Zone_Transformer 2020-07-07 23:45:00            </span>
-<span class="co">#&gt; 3840: 5Zone_Transformer 2020-07-08 00:00:00            </span>
+<span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span>
+<span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span>
+<span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span>
+<span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span>
+<span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span>
 <span class="co">#&gt;                                       name units value</span>
 <span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span>
 <span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span>
@@ -449,17 +446,17 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>day_type <span class="op">=</span> <span class="st">"normalday"</span><span class="op">)</span>
 <span class="co">#&gt;                    case            datetime   key_value</span>
-<span class="co">#&gt;    1: 5Zone_Transformer 2020-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;    2: 5Zone_Transformer 2020-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;    3: 5Zone_Transformer 2020-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;    4: 5Zone_Transformer 2020-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;    5: 5Zone_Transformer 2020-01-14 01:15:00 Environment</span>
+<span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
+<span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
+<span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
+<span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
+<span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
 <span class="co">#&gt;   ---                                                  </span>
-<span class="co">#&gt; 3836: 5Zone_Transformer 2020-07-07 23:00:00            </span>
-<span class="co">#&gt; 3837: 5Zone_Transformer 2020-07-07 23:15:00            </span>
-<span class="co">#&gt; 3838: 5Zone_Transformer 2020-07-07 23:30:00            </span>
-<span class="co">#&gt; 3839: 5Zone_Transformer 2020-07-07 23:45:00            </span>
-<span class="co">#&gt; 3840: 5Zone_Transformer 2020-07-08 00:00:00            </span>
+<span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span>
+<span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span>
+<span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span>
+<span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span>
+<span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span>
 <span class="co">#&gt;                                       name units value</span>
 <span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span>
 <span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span>
@@ -476,17 +473,17 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                   case            datetime   key_value</span>
-<span class="co">#&gt;   1: 5Zone_Transformer 2020-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;   2: 5Zone_Transformer 2020-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;   3: 5Zone_Transformer 2020-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;   4: 5Zone_Transformer 2020-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;   5: 5Zone_Transformer 2020-01-14 01:15:00 Environment</span>
+<span class="co">#&gt;   1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
+<span class="co">#&gt;   2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
+<span class="co">#&gt;   3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
+<span class="co">#&gt;   4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
+<span class="co">#&gt;   5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
 <span class="co">#&gt;  ---                                                  </span>
-<span class="co">#&gt; 188: 5Zone_Transformer 2020-07-07 23:00:00 Environment</span>
-<span class="co">#&gt; 189: 5Zone_Transformer 2020-07-07 23:15:00 Environment</span>
-<span class="co">#&gt; 190: 5Zone_Transformer 2020-07-07 23:30:00 Environment</span>
-<span class="co">#&gt; 191: 5Zone_Transformer 2020-07-07 23:45:00 Environment</span>
-<span class="co">#&gt; 192: 5Zone_Transformer 2020-07-08 00:00:00 Environment</span>
+<span class="co">#&gt; 188: 5Zone_Transformer 2015-07-07 23:00:00 Environment</span>
+<span class="co">#&gt; 189: 5Zone_Transformer 2015-07-07 23:15:00 Environment</span>
+<span class="co">#&gt; 190: 5Zone_Transformer 2015-07-07 23:30:00 Environment</span>
+<span class="co">#&gt; 191: 5Zone_Transformer 2015-07-07 23:45:00 Environment</span>
+<span class="co">#&gt; 192: 5Zone_Transformer 2015-07-08 00:00:00 Environment</span>
 <span class="co">#&gt;                                      name units  value</span>
 <span class="co">#&gt;   1: Site Outdoor Air Drybulb Temperature     C  9.900</span>
 <span class="co">#&gt;   2: Site Outdoor Air Drybulb Temperature     C  9.200</span>
@@ -564,7 +561,6 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span class="co">#&gt; 1: Building Area           Total Building Area   4982.19</span>
 <span class="co">#&gt; 2: Building Area Net Conditioned Building Area   4982.19</span>
 <span class="co">#&gt; 3: Building Area   Unconditioned Building Area      0.00</span>
-
 <span class="co"># read building energy consumption from Standard Reports</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">end_use</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;             case                             report_name      report_for</span>
@@ -631,7 +627,6 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span class="co">#&gt; 13:       0.00</span>
 <span class="co">#&gt; 14:       0.00</span>
 <span class="co">#&gt; 15:     174.59</span>
-
 <span class="co"># read zone metadata from Standard Input and Output</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">zones</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;     zone_index          zone_name rel_north origin_x origin_y origin_z</span>
@@ -729,7 +724,6 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span class="co">#&gt; 16:           136.91586          71.63358        65.28228                     1</span>
 <span class="co">#&gt; 17:            91.27669          47.75469        43.52200                     1</span>
 <span class="co">#&gt; 18:           202.83782         202.83782         0.00000                     0</span>
-
 <span class="co"># read hourly air-conditioning system output with all additional metadata for</span>
 <span class="co"># the annual simulation from Variable Output</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">aircon_out</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>
@@ -738,17 +732,17 @@ An example of tidy BES output data representation where Table (a) is the standar
     all <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                case            datetime month day hour minute dst interval</span>
-<span class="co">#&gt;     1: MediumOffice 2021-01-01 01:00:00     1   1    1      0   0       60</span>
-<span class="co">#&gt;     2: MediumOffice 2021-01-01 02:00:00     1   1    2      0   0       60</span>
-<span class="co">#&gt;     3: MediumOffice 2021-01-01 03:00:00     1   1    3      0   0       60</span>
-<span class="co">#&gt;     4: MediumOffice 2021-01-01 04:00:00     1   1    4      0   0       60</span>
-<span class="co">#&gt;     5: MediumOffice 2021-01-01 05:00:00     1   1    5      0   0       60</span>
+<span class="co">#&gt;     1: MediumOffice 2017-01-01 01:00:00     1   1    1      0   0       60</span>
+<span class="co">#&gt;     2: MediumOffice 2017-01-01 02:00:00     1   1    2      0   0       60</span>
+<span class="co">#&gt;     3: MediumOffice 2017-01-01 03:00:00     1   1    3      0   0       60</span>
+<span class="co">#&gt;     4: MediumOffice 2017-01-01 04:00:00     1   1    4      0   0       60</span>
+<span class="co">#&gt;     5: MediumOffice 2017-01-01 05:00:00     1   1    5      0   0       60</span>
 <span class="co">#&gt;    ---                                                                    </span>
-<span class="co">#&gt; 52556: MediumOffice 2021-12-31 20:00:00    12  31   20      0   0       60</span>
-<span class="co">#&gt; 52557: MediumOffice 2021-12-31 21:00:00    12  31   21      0   0       60</span>
-<span class="co">#&gt; 52558: MediumOffice 2021-12-31 22:00:00    12  31   22      0   0       60</span>
-<span class="co">#&gt; 52559: MediumOffice 2021-12-31 23:00:00    12  31   23      0   0       60</span>
-<span class="co">#&gt; 52560: MediumOffice 2022-01-01 00:00:00    12  31   24      0   0       60</span>
+<span class="co">#&gt; 52556: MediumOffice 2017-12-31 20:00:00    12  31   20      0   0       60</span>
+<span class="co">#&gt; 52557: MediumOffice 2017-12-31 21:00:00    12  31   21      0   0       60</span>
+<span class="co">#&gt; 52558: MediumOffice 2017-12-31 22:00:00    12  31   22      0   0       60</span>
+<span class="co">#&gt; 52559: MediumOffice 2017-12-31 23:00:00    12  31   23      0   0       60</span>
+<span class="co">#&gt; 52560: MediumOffice 2018-01-01 00:00:00    12  31   24      0   0       60</span>
 <span class="co">#&gt;        simulation_days day_type environment_name environment_period_index</span>
 <span class="co">#&gt;     1:               1  Holiday           ANNUAL                        3</span>
 <span class="co">#&gt;     2:               1  Holiday           ANNUAL                        3</span>
@@ -869,7 +863,6 @@ An example of tidy BES output data representation where Table (a) is the standar
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the `.groups` argument.</span>
-
 <span class="co"># plot a column chart to show the heating and cooling demand profile</span>
 <span class="va">aircon_out_mon</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
