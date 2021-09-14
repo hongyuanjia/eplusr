@@ -204,11 +204,29 @@ subset_sql_time <- function (time, year = NULL, tz = "UTC", period = NULL,
 
     # store day of week for the first simulation day
     if (datetime && is.null(year)) {
-        # get wday of first simulation day per environment
-        w <- time[SIMULATION_DAYS == 1L & !is.na(DAY_TYPE), .SD[1L],
-            .SDcols = c("MONTH", "DAY", "DAY_TYPE", "ENVIRONMENT_PERIOD_INDEX"),
+        # get wday of first normal simulation day per environment
+        # here should exclude special days including SummerDesignDay,
+        # WinterDesignDay, Holiday, CustomDay1 and CustomDay2
+        # see #450
+        #
+        # note that it is possible that there is only one day in a run period
+        # and that day is Holiday/CustomDay1/CustomDay2
+        # there is no way to get the day of the week of start day directly from
+        # the SQL
+        # in this case, still return the first day and the nearest year will be
+        # used
+        w <- time[!is.na(DAY_TYPE) &
+            !DAY_TYPE %chin% c("WinterDesignDay", "SummerDesignDay"),
+            {
+                if (all(unique(DAY_TYPE) %chin% c("Holiday", "CustomDay1", "CustomDay2"))) {
+                    .SD[1L]
+                } else {
+                    .SD[which(!DAY_TYPE %chin% c("Holiday", "CustomDay1", "CustomDay2"))[1L]]
+                }
+            },
+            .SDcols = c("MONTH", "DAY", "DAY_TYPE", "SIMULATION_DAYS"),
             by = "ENVIRONMENT_PERIOD_INDEX"
-        ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "DAY_TYPE"]
+        ]
     }
     if (!is.null(month)) {
         subset_time <- TRUE
@@ -342,8 +360,9 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
         year <- assert_count(year, positive = TRUE, coerce = TRUE)
         set(time, NULL, "year", year)
     } else {
-        # current year
-        cur_year <- lubridate::year(Sys.Date())
+        # use the nearest year as EnergyPlus
+        # see EnergyPlus/WeatherManager/findYearForWeekday
+        nearest_year <- 2017L
 
         if ("year" %in% names(time)) {
             time[J(0L), on = "year", year := NA_integer_]
@@ -354,9 +373,9 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
         # in case there is no valid day type
         if (!nrow(first_day)) {
             # directly assign current year
-            set(time, NULL, "year", cur_year)
+            set(time, NULL, "year", nearest_year)
         } else {
-            set(first_day, NULL, "date", lubridate::make_date(cur_year, first_day$month, first_day$day))
+            set(first_day, NULL, "date", lubridate::make_date(nearest_year, first_day$month, first_day$day))
             set(first_day, NULL, "dt", get_epw_wday(first_day$day_type))
 
             # check leap year
@@ -364,18 +383,18 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
 
             if (any(!is.na(first_day$dt))) {
                 for (i in which(!is.na(first_day$dt))) {
-                    set(first_day, i, "year", find_nearst_wday_year(first_day$date[i], first_day$dt[i], cur_year, leap))
+                    set(first_day, i, "year", find_nearst_wday_year(first_day$date[i], first_day$dt[i], nearest_year, leap))
                 }
             }
 
             # make sure all environments have a year value
             first_day[is.na(dt), year := lubridate::year(Sys.Date())]
 
-            set(time, NULL, "year", first_day[J(time$environment_period_index), on = "environment_period_index", year])
+            time[first_day, on = "environment_period_index", year := i.year]
         }
 
         # for SummerDesignDay and WinterDesignDay, directly use current year
-        time[J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type", year := cur_year]
+        time[J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type", year := nearest_year]
     }
 
     set(time, NULL, "datetime",

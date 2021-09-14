@@ -4,6 +4,10 @@
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).
 
+## Bug fixes
+
+* Fix the year value calculation when first day of a run period is holiday (#450)
+
 # eplusr 0.14.2
 
 ## New features
