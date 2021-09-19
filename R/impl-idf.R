@@ -976,6 +976,7 @@ expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .pro
 # }}}
 # parse_dots_value {{{
 #' @inherit expand_idf_dots_value
+#' @keywords internal
 #' @export
 parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                               .ref_assign = TRUE, .unique = FALSE,
