@@ -7,6 +7,7 @@
 ## Bug fixes
 
 * Fix the year value calculation when first day of a run period is holiday (#450)
+* Fix `download_weather()` file downloading URL (#452)
 
 # eplusr 0.14.2
 
