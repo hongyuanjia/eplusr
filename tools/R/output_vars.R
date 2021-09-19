@@ -1,4 +1,3 @@
-# get_tex_paths {{{
 # get all TeX files of I/O ref
 get_tex_paths <- function (dir_src) {
     dir <- file.path(dir_src, "doc/input-output-reference/src/overview")
@@ -9,26 +8,20 @@ get_tex_paths <- function (dir_src) {
 
     normalizePath(c(files, file_envfctr))
 }
-# }}}
 
-# comment_out_lines {{{
 comment_out_lines <- function(path, lines) {
     l <- readLines(path, warn = FALSE)
     l[lines] <- paste("%", l[lines])
     writeLines(l, path)
 }
-# }}}
 
-# get_md_paths {{{
 # get paths of Markdown files converted from TeX files using Pandoc
 get_md_paths <- function (dir_src, dir = tempdir(), ver = 9.4) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     paths <- get_tex_paths(dir_src)
     vapply(paths, convert_to_md, character(1), dir = dir, ver = ver)
 }
-# }}}
 
-# convert_to_md {{{
 # Convert TeX to Markdown using Pandoc
 convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
     stopifnot(file.copy(path, dir, overwrite = TRUE))
@@ -39,18 +32,26 @@ convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
     # use pandoc to convert EnergyPlus raw doc in tex to markdown
     status <- -1L
     while (status != 1L) {
-        # use system() in order to capture the error message
-        log <- suppressWarnings(system(sprintf("pandoc -f latex -t markdown %s -o %s --wrap=preserve",
-            shQuote(file), shQuote(md)), intern = TRUE
-        ))
+        f <- tempfile()
+        log <- try(
+            processx::run(
+                "pandoc", c("-f", "latex", "-t", "markdown", file, "-o", md, "--wrap=preserve"),
+                stderr = f
+            ),
+            silent = TRUE
+        )
 
-        status <- attr(log, "status")
+        if (!inherits(log, "try-error")) {
+            status <- log$status
+        }
+        err <- readLines(f, warn = FALSE)
+        unlink(f, force = TRUE)
 
-        if (!length(status)) break
+        if (status == 0L) break
 
         if (status != 1L) {
             # try to comment out invalid LaTeX lines in the source file
-            invld <- stringi::stri_match_first_regex(log, '^Error at "source" \\(line (\\d+), column \\d+\\)')[, 2L]
+            invld <- stringi::stri_match_first_regex(err, '^Error at "source" \\(line (\\d+), column \\d+\\)')[, 2L]
             invld <- invld[!is.na(invld)]
 
             if (length(invld)) {
@@ -72,7 +73,7 @@ convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
             # unknown error
             } else {
                 stop(sprintf("Failed to convert '%s' to Markdown:\n %s",
-                    path, paste0(log, collapse = "\n")
+                    path, paste0(err, collapse = "\n")
                 ))
             }
         }
@@ -80,9 +81,7 @@ convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
 
     md
 }
-# }}}
 
-# read_md_dt {{{
 # read Markdown file as a data.table using {parsermd} package
 read_md_dt <- function(path) {
     dt <- data.table::setDT(parsermd::as_tibble(parsermd::parse_rmd(path, parse_yaml = FALSE)))[]
@@ -95,16 +94,12 @@ read_md_dt <- function(path) {
 
     dt
 }
-# }}}
 
-# get_md_h_levels {{{
 # get the total heading levels
 get_md_h_levels <- function(doc) {
     sort(unique(unlist(lapply(doc$ast, function(x) if (!inherits(x, "rmd_heading")) NULL else x$level))))
 }
-# }}}
 
-# extract_outputs {{{
 # extract all output variables from Markdown file
 extract_outputs <- function (path, ver = 9.4) {
     cat(sprintf(" --> Processing file '%s'...\n", path))
@@ -153,9 +148,7 @@ extract_outputs <- function (path, ver = 9.4) {
     data.table::set(out, NULL, c("string", "index", "output", "group_name"), NULL)
     data.table::setcolorder(out, c("reported_time_step", "report_type", "variable", "units"))
 }
-# }}}
 
-# extract_outputs_from_heading_level {{{
 extract_outputs_from_heading_level <- function (doc, level, pattern = "Output", parent = NULL) {
     levels <- get_md_h_levels(doc)
     nm_sec <- function(level) {
@@ -210,9 +203,7 @@ extract_outputs_from_heading_level <- function (doc, level, pattern = "Output", 
 
     data.table::rbindlist(list(h, b), fill = TRUE)
 }
-# }}}
 
-# post_process_outputs {{{
 post_process_outputs <- function(file, doc, out, ver) {
     if (basename(file) == "group-location-climate-weather-file-access.markdown") {
         # outputs from "## Weather Data Related Outputs" apply to all "Environment"
@@ -560,16 +551,20 @@ post_process_outputs <- function(file, doc, out, ver) {
 
     out
 }
-# }}}
 
-# extract_all_eplus_outputs {{{
-extract_all_eplus_outputs <- function (eplus_src) {
+extract_output_vars <- function (eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     # get all possible released tags
     tags <- git2r::tags(eplus_src)
+    on.exit(git2r::checkout(eplus_src, "develop"), add = TRUE)
 
     # LaTeX doc was added since v8.5.0
-    eplus_ver <- numeric_version(eplusr:::ALL_EPLUS_VER)
+    eplus_ver <- numeric_version(ver)
     eplus_ver <- paste0("v", eplus_ver[eplus_ver >= 8.5])
+
+    if (!any(is_mis <- eplus_ver %in% names(tags))) {
+        stop(sprintf("Failed to find EnergyPlus version %s.", paste0(eplus_ver[is_mis], collapse = ", ")))
+    }
+
     tags <- names(tags[names(tags) %in% eplus_ver])
 
     outputs <- list()
@@ -587,10 +582,7 @@ extract_all_eplus_outputs <- function (eplus_src) {
         unlink("doc_md", recursive = TRUE, force = TRUE)
     }
 
-    git2r::checkout(eplus_src, "develop")
-
     names(outputs) <- substring(names(outputs), 2)
 
     outputs
 }
-# }}}
