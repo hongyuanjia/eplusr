@@ -223,10 +223,10 @@ without_checking <- function (expr) {
 }
 # }}}
 
-#' Deprecated functions since eplusr v0.15.0
+#' Evaluates an expression without checking
 #'
 #' @param expr An expression to be evaluated.
-#' @name eplusr-deprecated
+#' @keywords internal
 #' @export
 # with_speed {{{
 with_speed <- function (expr) {
