@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9002</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Update IDF version</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-09-14</h4>
+            <h4 class="date">2021-09-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/transition.Rmd"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -278,7 +278,7 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 263.721   2.255 265.203</span></code></pre></div>
+<span class="co">#&gt; 453.878   2.319 454.564</span></code></pre></div>
 </div>
 <div id="introduce-transition" class="section level1">
 <h1 class="hasAnchor">
@@ -319,8 +319,8 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   4.651   0.059   4.714</span></code></pre></div>
-<p>It is about 56.3 times faster.</p>
+<span class="co">#&gt;   5.976   0.051   6.028</span></code></pre></div>
+<p>It is about 75.4 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
