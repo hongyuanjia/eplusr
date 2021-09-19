@@ -43,7 +43,8 @@ options(data.table.print.class = TRUE)
 library(eplusr)
 if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
-rgl::setupKnitr()
+library(rgl)
+rgl::setupKnitr(autoprint = TRUE)
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
