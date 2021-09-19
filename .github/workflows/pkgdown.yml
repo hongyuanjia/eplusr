@@ -58,6 +58,8 @@ jobs:
           remotes::install_cran("pkgdown")
           remotes::install_cran("dplyr")
           remotes::install_cran("ggplot2")
+          # fix rgl in pkgdown
+          remotes::install_github(c("rstudio/webshot2", "rstudio/chromote", "r-lib/downlit", "dmurdoch/pkgdown@issue1689", "dmurdoch/htmlwidgets@rglpatch"))
         shell: Rscript {0}
 
       - name: Install package
