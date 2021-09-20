@@ -84,6 +84,7 @@ parse_kml <- function(path_kml, path_codes) {
     codes <- data.table::fread(path_codes)
     db <- codes[tbl, on = list(iso_codes = country_code)]
     data.table::set(db, NULL, c("iso_codes", "altitude"), NULL)
+    data.table::set(db, NULL, "provider", "Climate.OneBuilding.Org")
 }
 
 # read ISO 3166-1 alpha-3 country codes from Wikipedia
@@ -161,9 +162,8 @@ parse_weather_geojson <- function(path_json, path_codes) {
         )
     ]
 
-    m <- m[, list(title, location, state_province, country, wmo_region, wmo_number,
-        source_type, longitude, latitude, epw_url, ddy_url, stat_url, zip_url)]
-
-    data.table::fwrite(m, file.path(tempdir(), "weather_db.csv"))
-    m
+    m[, list(title, location, state_province, country, wmo_region, wmo_number,
+        source_type, longitude, latitude, epw_url, ddy_url, stat_url, zip_url,
+        provider = "EnergyPlus.net"
+    )]
 }
