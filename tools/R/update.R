@@ -1,20 +1,39 @@
-update_weather_db <- function(eplus_src = NULL, force = FALSE) {
+update_weather_db <- function(eplus_src = NULL, force = FALSE, dir_assets = here::here("tools/data/weather_db")) {
     meta <- read_meta()
     if (is.null(meta$weather_db)) force <- TRUE
 
-    geojson <- download_geojson(eplus_src)
+    if (is.null(dir_assets)) {
+        dir_assets <- here::here("tools/data/weather_db")
+        geojson <- download_geojson(eplus_src, file.path(dir_assets, "EnergyPlus"))
+        kml <- download_kml(file.path(dir_assets, "OneBuilding"))
+        country_code <- download_countrycode(dir_assets)
+    } else {
+        geojson <- normalizePath(file.path(dir_assets, "EnergyPlus/weather.geojson"), mustWork = TRUE)
+        kml <- normalizePath(list.files(file.path(dir_assets, "OneBuilding"), "\\.kml$", full.names = TRUE), mustWork = TRUE)
+        country_code <- normalizePath(file.path(dir_assets, "country_codes.csv"), mustWork = TRUE)
+    }
 
     # current hash
-    new_hash <- unname(tools::md5sum(geojson))
+    new_hash_geojson <- tools::md5sum(geojson)
+    new_hash_kml <- tools::md5sum(kml)
+    new_hash_country <- tools::md5sum(country_code)
+    names(new_hash_geojson) <- basename(names(new_hash_geojson))
+    names(new_hash_kml) <- basename(names(new_hash_kml))
+    names(new_hash_country) <- basename(names(new_hash_country))
 
-    if (identical(meta$weather_db, new_hash) && !force) {
+    hash <- list(geojson = as.list(new_hash_geojson), kml = as.list(new_hash_kml), country_code = as.list(new_hash_country))
+
+    if (identical(meta$weather_db, hash) && !force) {
         message("'weather.geojson' did not change since last update. Skip")
         return(invisible())
     }
 
-    db <- parse_weather_geojson(geojson, download_countrycode())
+    db_geojson <- parse_weather_geojson(geojson, country_code)
+    db_kml <- data.table::rbindlist(lapply(kml, parse_kml, path_codes = country_code))
 
-    write_meta(meta, weather_db = new_hash)
+    db <- rbindlist(list(db_geojson, db_kml), use.names = TRUE, fill = TRUE)
+
+    write_meta(meta, weather_db = hash)
 
     db
 }
@@ -70,9 +89,20 @@ update_reportvar_rules <- function(eplus_src, force = FALSE) {
 }
 
 update_internal_data <- function(eplus_src, force = FALSE) {
-    WEATHER_DB <- update_weather_db(eplus_src, force = force)
-    REPORTVAR_RULES <- update_reportvar_rules(eplus_src, force = force)
-    OUTPUT_VARS <- update_output_vars(eplus_src, force = force)
+    "%||%" <- function(x, y) if (is.null(x)) y else x
+    if (is.logical(force) && length(force) == 1L && !is.na(force)) {
+        force_weather_db <- force_reportvar_rules <- force_output_vars <- force
+    } else if (is.list(force) && !is.null(names(force))) {
+        force_weather_db <- force$weather_db %||% FALSE
+        force_reportvar_rules <- force$reportvar_rules %||% FALSE
+        force_output_vars <- force$output_vars %||% FALSE
+    } else {
+        stop("'force' should be a length-1 logical vector or a named list")
+    }
+
+    WEATHER_DB <- update_weather_db(eplus_src, force = force_weather_db)
+    REPORTVAR_RULES <- update_reportvar_rules(eplus_src, force = force_reportvar_rules)
+    OUTPUT_VARS <- update_output_vars(eplus_src, force = force_output_vars)
 
     save <- any(!is.null(WEATHER_DB), !is.null(REPORTVAR_RULES), !is.null(OUTPUT_VARS))
 

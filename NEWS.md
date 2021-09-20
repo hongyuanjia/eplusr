@@ -3,6 +3,8 @@
 ## New features
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).
+* Add epw data sources from [climate.onebuilding.org](http://climate.onebuilding.org/)
+  for `download_weather()` (#453).
 
 ## Bug fixes
 
