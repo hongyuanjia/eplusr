@@ -82,6 +82,12 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
+      - name: Install dependencies for rgl
+        if: runner.os == 'Linux'
+        run: |
+          remotes::install_github(c("rstudio/webshot2", "rstudio/chromote", "r-lib/downlit", "dmurdoch/pkgdown@issue1689", "dmurdoch/htmlwidgets@rglpatch"))
+        shell: Rscript {0}
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
