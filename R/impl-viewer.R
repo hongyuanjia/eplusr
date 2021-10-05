@@ -4,17 +4,24 @@
 #          x -->      x
 #          y -->     -z
 #          z -->      y
-#
-# OpenGL --> EnergyPlus
-#      x -->          x
-#      y -->          z
-#      z -->         -y
-rgl_vertice_trans <- function(vertices){
+rgl_vertice_trans_to_opengl <- function(vertices){
     if (!NROW(vertices)) {
         return(vertices)
     }
 
     set(vertices, NULL, c("y", "z"), list(vertices$z, -vertices$y))
+}
+# transform geometry from OpenGL to EnergyPlus coordinate system
+# OpenGL --> EnergyPlus
+#      x -->          x
+#      y -->          z
+#      z -->         -y
+rgl_vertice_trans_to_eplus <- function(vertices){
+    if (!NROW(vertices)) {
+        return(vertices)
+    }
+
+    set(vertices, NULL, c("y", "z"), list(-vertices$z, vertices$y))
 }
 # }}}
 
@@ -63,6 +70,12 @@ rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, 
     assert_flag(x_ray)
     # should contain vertices after triangulation
     assert_names(names(geoms), must.include = "vertices2")
+
+    # make sure all vertices are in the OpenGL coordinate system
+    if (!isTRUE(geoms$in_opengl)) {
+        rgl_vertice_trans_to_opengl(geoms$vertices2)
+        on.exit(rgl_vertice_trans_to_eplus(geoms$vertices2), add = TRUE)
+    }
 
     rgl::rgl.set(dev)
 
@@ -232,6 +245,12 @@ rgl_view_surface_oneside_quad <- function (vertices) {
 rgl_view_wireframe <- function (dev, geoms, color = "black", width = 1.5, alpha = 1.0, ...) {
     if (!nrow(geoms$vertices)) return(integer())
 
+    # make sure all vertices are in the OpenGL coordinate system
+    if (!isTRUE(geoms$in_opengl)) {
+        rgl_vertice_trans_to_opengl(geoms$vertices)
+        on.exit(rgl_vertice_trans_to_eplus(geoms$vertices), add = TRUE)
+    }
+
     rgl::rgl.set(dev)
     l <- pair_line_vertex(geoms$vertices)
     as.integer(rgl::rgl.lines(l$x, l$y, l$z, color = color, lwd = width, lit = FALSE, alpha = alpha, ...))
@@ -242,6 +261,13 @@ rgl_view_wireframe <- function (dev, geoms, color = "black", width = 1.5, alpha 
 rgl_view_point <- function (dev, geoms, color = "red", size = 8.0, lit = TRUE, ...) {
     if (!nrow(geoms$vertices)) return(integer())
     if (!nrow(geoms$daylighting_point)) return(integer())
+
+    # make sure all vertices are in the OpenGL coordinate system
+    if (!isTRUE(geoms$in_opengl)) {
+        rgl_vertice_trans_to_opengl(geoms$vertices)
+        on.exit(rgl_vertice_trans_to_eplus(geoms$vertices), add = TRUE)
+    }
+
     v <- geoms$vertices[J(geoms$daylighting_point$id), on = "id", nomatch = NULL]
 
     rgl::rgl.set(dev)
@@ -255,6 +281,13 @@ rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red
     assert_number(width, lower = 1E-5, finite = TRUE)
     assert_number(alpha, lower = 0, upper = 1)
     assert_character(color, len = 4L, any.missing = FALSE)
+
+    # change to EnergyPlus coordinate system in order to get the axis line
+    # length
+    if (isTRUE(geoms$in_opengl)) {
+        rgl_vertice_trans_to_eplus(geoms$vertices)
+        on.exit(rgl_vertice_trans_to_opengl(geoms$vertices), add = TRUE)
+    }
 
     x <- y <- z <- 0.0
     if (nrow(geoms$vertices)) {
@@ -274,7 +307,7 @@ rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red
         v <- rgl::rotate3d(v, deg_to_rad(-geoms$building$north_axis), 0, 0, 1)
         v <- set(setnames(as.data.table(v[, 1:3]), c("x", "y", "z")), NULL, c("id", "index"), list(1L, 1:2))
 
-        id_north <- rgl_view_wireframe(dev, list(vertices = v), color = color[4L], width = width * 2)
+        id_north <- rgl_view_wireframe(dev, list(in_opengl = FALSE, vertices = v), color = color[4L], width = width * 2)
     }
 
     vert <- data.table(
@@ -283,12 +316,9 @@ rgl_view_axis <- function (dev, geoms, expand = 2.0, width = 1.5, color = c("red
         y = c(rep(0.0, 2L), 0.0, val * expand, rep(0.0, 2L)),
         z = c(rep(0.0, 4L), 0.0, val * max(c(1.25, expand / 2)))
     )
-    # transform EnergyPlus coordinate system to OpenGL coordinate
-    # system
-    vert <- rgl_vertice_trans(vert)
 
     c(north = id_north,
-      axis = rgl_view_wireframe(dev, list(vertices = vert), width = width,
+      axis = rgl_view_wireframe(dev, list(in_opengl = FALSE, vertices = vert), width = width,
             alpha = alpha, color = rep(c(color[[1L]], color[[3L]], color[[2L]]), each = 2L))
     )
 }
@@ -300,7 +330,12 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
     assert_number(alpha, lower = 0.0, upper = 1.0)
     assert_string(color)
 
-    types <- c("surface", "subsurface", "shading", "daylighting_point")
+    # change to EnergyPlus coordinate system in order to get the axis line
+    # length
+    if (isTRUE(geoms$in_opengl)) {
+        rgl_vertice_trans_to_eplus(geoms$vertices)
+        on.exit(rgl_vertice_trans_to_opengl(geoms$vertices), add = TRUE)
+    }
 
     x <- y <- c(0.0, 0.0)
     if (nrow(geoms$vertices)) {
@@ -313,16 +348,26 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
     dis_x <- x[2L] - x[1L]
     dis_y <- y[2L] - y[1L]
     expand <- expand - 1.0
+
+    vert <- data.table(
+        x = c(
+            x[[1L]] - dis_x * expand,
+            x[[1L]] - dis_x * expand,
+            x[[2L]] + dis_x * expand,
+            x[[2L]] + dis_x * expand),
+        y = c(
+            y[[1L]] - dis_y * expand,
+            y[[2L]] + dis_y * expand,
+            y[[2L]] + dis_y * expand,
+            y[[1L]] - dis_y * expand),
+        z = 0
+    )
+
+    # transform geometry from EnergyPlus to OpenGL coordinate system
+    vert <- rgl_vertice_trans_to_opengl(vert)
+
     as.integer(rgl::rgl.quads(
-        c(x[[1L]] - dis_x * expand,
-          x[[2L]] + dis_x * expand,
-          x[[2L]] + dis_x * expand,
-          x[[1L]] - dis_x * expand),
-        c(y[[1L]] - dis_y * expand,
-          y[[1L]] - dis_y * expand,
-          y[[2L]] + dis_y * expand,
-          y[[2L]] + dis_y * expand),
-        0,
+        vert$x, vert$y, vert$z,
         color = color, lit = FALSE, alpha = alpha
     ))
 }
@@ -333,12 +378,12 @@ rgl_snapshot <- function (dev, filename) {
     assert_string(filename)
 
     # set the last plot device as active
-    rgl::rgl.set(dev)
+    if (!rgl::rgl.useNULL()) rgl::rgl.set(dev)
 
     if (!dir.exists(dirname(filename))) dir.create(dirname(filename), recursive = TRUE)
 
     if (has_ext(filename, "png")) {
-        rgl::rgl.snapshot(filename, "png", top = FALSE)
+        rgl::snapshot3d(filename, "png", top = FALSE)
     } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
         rgl::rgl.postscript(filename, tools::file_ext(filename))
     } else {

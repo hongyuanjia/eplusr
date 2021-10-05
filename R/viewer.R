@@ -519,23 +519,38 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         log_geom_uuid = function () private$m_log$geom_uuid <- get_priv_env(private$m_geom)$m_log$uuid,
         cached_geom_uuid = function () private$m_log$geom_uuid,
 
-        geoms = function () {
+        geoms = function (opengl = TRUE) {
             if (private$geom_uuid() != private$cached_geom_uuid() || is.null(private$m_log$geoms)) {
                 private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
+                private$m_log$geoms$in_opengl <- FALSE
 
                 # change all vertices to world coordinate system
                 private$m_log$geoms <- align_coord_system(
                     private$m_log$geoms, "absolute", "absolute", "absolute"
                 )
 
-                # transform EnergyPlus coordinate system to OpenGL coordinate
-                # system
-                private$m_log$geoms$vertices <- rgl_vertice_trans(private$m_log$geoms$vertices)
-
                 # vertices2 for triangulation
                 private$m_log$geoms$vertices2 <- triangulate_geoms(private$m_log$geoms)
             }
 
+            if (opengl) private$to_opengl_coord() else private$to_eplus_coord()
+        },
+
+        to_opengl_coord = function() {
+            if (private$m_log$geoms$in_opengl) return(private$m_log$geoms)
+
+            private$m_log$geoms$vertices <- rgl_vertice_trans_to_opengl(private$m_log$geoms$vertices)
+            private$m_log$geoms$vertices2 <- rgl_vertice_trans_to_opengl(private$m_log$geoms$vertices2)
+            private$m_log$geoms$in_opengl <- TRUE
+            private$m_log$geoms
+        },
+
+        to_eplus_coord = function() {
+            if (!private$m_log$geoms$in_opengl) return(private$m_log$geoms)
+
+            private$m_log$geoms$vertices <- rgl_vertice_trans_to_eplus(private$m_log$geoms$vertices)
+            private$m_log$geoms$vertices2 <- rgl_vertice_trans_to_eplus(private$m_log$geoms$vertices2)
+            private$m_log$geoms$in_opengl <- FALSE
             private$m_log$geoms
         }
         # }}}
@@ -851,7 +866,7 @@ idfviewer_close <- function (self, private) {
 # }}}
 # idfviewer_snapshot {{{
 idfviewer_snapshot <- function (self, private, filename) {
-    if (!length(self$device())) {
+    if (!rgl::rgl.useNULL() && !length(self$device())) {
         abort("No viewer window currently open. Please run '$show()' first.")
     }
 

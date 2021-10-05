@@ -454,7 +454,7 @@ Set the handlers of mouse control
   left = "trackball",
   right = "pan",
   middle = "fov",
-  wheel = "push"
+  wheel = "zoom"
 )}\if{html}{\out{</div>}}
 }
 
@@ -466,7 +466,7 @@ mouse, or simulations of them on other mice. Defaults:
 \code{"trackball"} (\code{left}), \code{"pan"} (\code{right}) and \code{"fov"}
 (\code{middle}).}
 
-\item{\code{wheel}}{Refer to the mouse wheel. Default: \code{"push"}.}
+\item{\code{wheel}}{Refer to the mouse wheel. Default: \code{"zoom"}.}
 }
 \if{html}{\out{</div>}}
 }
