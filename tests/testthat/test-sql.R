@@ -5,7 +5,7 @@ test_that("Sql methods", {
     example <- copy_example()
     idf <- read_idf(example$idf)
 
-    expect_is(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE), "EplusJob")
+    expect_is(job <- idf$run(example$epw, NULL, echo = FALSE), "EplusJob")
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
     expect_output(sql$print())
@@ -91,6 +91,7 @@ test_that("Sql methods", {
     # can convert to wide table
     expect_silent(tab <- sql$tabular_data(row_name = "Total Site Energy", wide = TRUE, case = NULL))
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
+
     expect_equivalent(
         read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
             run(NULL, tempdir(), echo = FALSE)$
@@ -118,6 +119,19 @@ test_that("Sql methods", {
             `Energy Per Conditioned Building Area [MJ/m2]` = "numeric"
         )
     )
+
+    # test if DDY HVAC sizing data can be extracted
+    idf$SimulationControl$Do_HVAC_Sizing_Simulation_for_Sizing_Periods <- "Yes"
+    idf$SimulationControl$Maximum_Number_of_HVAC_Sizing_Simulation_Passes <- 2
+    idf$save(overwrite = TRUE)
+    job <- idf$run(example$epw, NULL, echo = FALSE)
+    sql <- eplus_sql(job$locate_output(".sql"))
+    expect_equal(nrow(tab <- sql$report_data(all = TRUE)), 7680L)
+    expect_equal(nrow(tab[environment_period_index > 4L]), 3840L)
+    expect_equal(unique(tab[environment_period_index > 4L, unique(environment_name)]),
+        c("WinterDesignDay HVAC Sizing Pass 1", "SummerDesignDay HVAC Sizing Pass 1")
+    )
+    expect_equal(nrow(sql$report_data(wide = TRUE)), 384L)
 
     # can get path
     if (!is_macos()) expect_equal(sql$path(), job$locate_output(".sql"))
