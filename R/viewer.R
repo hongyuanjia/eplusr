@@ -235,13 +235,13 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        `"trackball"` (`left`), `"pan"` (`right`) and `"fov"`
         #'        (`middle`).
         #'
-        #' @param wheel Refer to the mouse wheel. Default: `"push"`.
+        #' @param wheel Refer to the mouse wheel. Default: `"pull"`.
         #'
         #' @examples
         #' \dontrun{
         #' viewer$mouse_mode()
         #' }
-        mouse_mode = function (left = "trackball", right = "pan", middle = "fov", wheel = "push")
+        mouse_mode = function (left = "trackball", right = "pan", middle = "fov", wheel = "pull")
             idfviewer_mouse_mode(self, private, left, right, middle, wheel),
         # }}}
 
@@ -495,7 +495,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         m_device = NULL,
         m_background = "white",
         m_viewpoint = list(look_at = "iso", fov = 30),
-        m_mouse_mode = list(left = "trackball", right = "pan", middle = "fov", wheel = "push"),
+        m_mouse_mode = list(left = "trackball", right = "pan", middle = "fov", wheel = "pull"),
         m_x_ray = FALSE,
         m_show_hidden = FALSE,
         m_render_by = "surface_type",
@@ -593,12 +593,12 @@ idfviewer_win_size <- function (self, private, left = 0, top = 0, right = 600, b
 }
 # }}}
 # idfviewer_mouse_mode {{{
-idfviewer_mouse_mode <- function (self, private, left = "trackball", right = "pan", middle = "fov", wheel = "push") {
+idfviewer_mouse_mode <- function (self, private, left = "trackball", right = "pan", middle = "fov", wheel = "pull") {
     choices <- c("none", "trackball", "xAxis", "yAxis", "zAxis", "polar", "zoom", "fov", "pull", "push", "pan")
     assert_choice(left, choices)
     assert_choice(right, choices)
     assert_choice(middle, choices)
-    assert_choice(wheel, c("none", "pull", "push"))
+    assert_choice(wheel, c("none", "pull", "push", "zoom"))
 
     if (length(self$device())) {
         cur <- rgl::par3d(dev = private$m_device, "mouseMode")
