@@ -586,7 +586,7 @@ the same start day of week as specified in the RunPeriod objects.
 
 eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
 which is the default behavior, eplusr will calculate a year value (from
-current year backwards) for each run period that compliances with the start
+year 2017 backwards) for each run period that compliances with the start
 day of week restriction.
 
 It is worth noting that EnergyPlus uses 24-hour clock system where 24 is only
