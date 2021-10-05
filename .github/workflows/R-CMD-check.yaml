@@ -69,7 +69,6 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
-          install.packages("pkgdown", type = "binary")
         shell: Rscript {0}
 
       - name: Check
