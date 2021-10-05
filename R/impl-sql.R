@@ -148,7 +148,7 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   case = "auto", wide = FALSE, string_value = !wide, index = NULL) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
-    dt <- setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
+    dt <- set(get_sql_query(sql, q), NULL, "tabular_data_index", NULL)
 
     if (!is.null(case)) {
         assert_scalar(case)
