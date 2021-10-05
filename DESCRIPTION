@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.14.2.9003
+Version: 0.14.2.9004
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -40,12 +40,8 @@ Imports:
     stringi,
     units
 Suggests:
-    covr,
     decido,
-    knitr,
-    pkgdown,
-    rgl (>= 0.100.26),
-    rmarkdown,
+    rgl (>= 0.105.13),
     testthat (>= 2.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",

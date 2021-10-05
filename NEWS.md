@@ -45,6 +45,7 @@
 ## Minor changes
 
 * Better error and verbose messages (#422, #423).
+* The default mouse mode for `wheel` has been changed to `"pull"`.
 
 # eplusr 0.14.1
 
