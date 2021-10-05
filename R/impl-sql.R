@@ -474,7 +474,7 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     if (has_names(dt, "index")) {
         fml <- paste("index", fml, sep = " + ")
     }
-    dt <- data.table::dcast.data.table(dt, as.formula(fml), value.var = "value")
+    dt <- data.table::dcast.data.table(dt, stats::as.formula(fml), value.var = "value")
 
     # clean
     set(dt, NULL, "row_index", NULL)
