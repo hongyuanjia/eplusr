@@ -65,27 +65,11 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
-      - name: Install system dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install --cask xquartz
-
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install xvfb
-          export DISPLAY=:99.0
-          Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-
-      - name: Install dependencies for rgl
-        if: runner.os == 'Linux'
-        run: |
-          remotes::install_github(c("rstudio/webshot2", "rstudio/chromote", "r-lib/downlit", "dmurdoch/pkgdown@issue1689", "dmurdoch/htmlwidgets@rglpatch"))
+          install.packages("pkgdown", type = "binary")
         shell: Rscript {0}
 
       - name: Check
