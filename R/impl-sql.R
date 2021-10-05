@@ -175,7 +175,9 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     }
 
     # add row index
-    dt[, row_index := seq_len(.N), by = c("case"[has_names(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
+    dt[, row_index := seq_len(.N), by = c(
+        "index"[has_names(dt, "index")], "case"[has_names(dt, "case")],
+        "report_name", "report_for", "table_name", "column_name")]
 
     # remove empty rows
     dt <- dt[!J(c("", "-"), c("", "-")), on = c("row_name", "value")]
@@ -465,17 +467,14 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     cols_num <- unique(dt$column_name[dt$is_num])
 
     # format table
+    fml <- "report_name + report_for + table_name + row_index + row_name ~ column_name"
     if (has_names(dt, "case")) {
-        dt <- data.table::dcast.data.table(dt,
-            case + report_name + report_for + table_name + row_index + row_name ~ column_name,
-            value.var = "value"
-        )
-    } else {
-        dt <- data.table::dcast.data.table(dt,
-            report_name + report_for + table_name + row_index + row_name ~ column_name,
-            value.var = "value"
-        )
+        fml <- paste("case", fml, sep = " + ")
     }
+    if (has_names(dt, "index")) {
+        fml <- paste("index", fml, sep = " + ")
+    }
+    dt <- data.table::dcast.data.table(dt, as.formula(fml), value.var = "value")
 
     # clean
     set(dt, NULL, "row_index", NULL)
