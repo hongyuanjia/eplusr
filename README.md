@@ -66,8 +66,7 @@ install.packages("eplusr")
 Alternatively, you can install the development version from GitHub.
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("hongyuanjia/eplusr")
+install.packages("epwmap", repos = "https://hongyuanjia.r-universe.dev")
 ```
 
 Since running the IDF files requires EnergyPlus

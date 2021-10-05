@@ -508,6 +508,39 @@ read_report_data_sql <- function (sql, env, dict, time,
                                   # run period
                                   environment_name = NULL,
                                   all = FALSE, wide = FALSE) {
+    # See https://github.com/NREL/EnergyPlus/issues/8268
+    # If `Do HVAC Sizing Simulation for Sizing Periods` is set to `Yes` in
+    # `SimulationControl`, extra run periods will be added for winter design day
+    # and summer design day. The problem is that the Time table has correctly
+    # reflected this by adding new time for those added run periods, but
+    # EnvironmentPeriods table did not have entries for those periods.
+    ind_time_env <- unique(time$environment_period_index)
+    if (length(extra_env <- setdiff(ind_time_env, env$environment_period_index))) {
+        # append rows for environment period table
+        time_env <- time[J(ind_time_env), on = "environment_period_index", mult = "first",
+            .SD, .SDcols = c("day_type", "environment_period_index")]
+        setorderv(time_env, c("environment_period_index", "day_type"))
+        env <- env[time_env, on = "environment_period_index"]
+        setnafill(env, "locf", cols = "simulation_index")
+        env[J(c("SummerDesignDay", "WinterDesignDay")), on = "day_type", by = "day_type",
+            environment_name := {
+                # construct environment name
+                n_pass <- .N - 1L
+                # It is possible that 'Run Simulation for Sizing Periods' is set to
+                # 'No' but 'Do HVAC Sizing Simulation for Sizing Periods' is set to
+                # 'Yes'. In this case, no DDY name is in the 'EnvironmentPeriods'
+                # table.
+                if (!n_pass) {
+                    environment_name <- paste(.BY$day_type, "HVAC Sizing Pass 1")
+                } else {
+                    suffix <- paste("HVAC Sizing Pass", seq_len(n_pass))
+                    environment_name[is.na(environment_name)] <- paste(environment_name[1L], suffix)
+                }
+                environment_name
+            }
+        ]
+    }
+
     dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
     env <- subset_sql_environment_periods(env, environment_name = environment_name)
     time <- time[env, on = "environment_period_index", nomatch = NULL]
