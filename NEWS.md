@@ -6,8 +6,10 @@
 
 ## Bug fixes
 
-* Fix the year value calculation when first day of a run period is holiday (#450)
-* Fix `download_weather()` file downloading URL (#452)
+* Fix the year value calculation when first day of a run period is holiday (#450).
+* Fix `download_weather()` file downloading URL (#452).
+* Fix `EplusSql$report_data(..., wide = TRUE)` when `Do HVAC Sizing Simulation
+  for Sizing Periods` is set to `Yes` in `SimulationControl` (#461).
 
 # eplusr 0.14.2
 
