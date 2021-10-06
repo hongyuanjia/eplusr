@@ -1,5 +1,5 @@
 test_that("Group methods", {
-    skip_on_cran()
+    # skip_on_cran()
     eplusr_option(verbose_info = FALSE)
 
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
@@ -102,6 +102,7 @@ test_that("Group methods", {
     # Report Data Dict {{{
     expect_error(grp$report_data_dict(), class = "eplusr_error_job_error")
     expect_is(grp$report_data_dict(c(1,2,4,5)), "data.table")
+    expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "index"))
     expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "case"))
     expect_equal(nrow(grp$report_data_dict(2)), 22)
     expect_equal(nrow(grp$report_data_dict("1zoneevapcooler")), 22)
@@ -135,6 +136,7 @@ test_that("Group methods", {
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
     expect_equivalent(tab[[1L]][, lapply(.SD, class)],
         data.table(
+            index = "integer",
             case = "character",
             report_name = "character",
             report_for = "character",
