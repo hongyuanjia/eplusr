@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9005</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Work with weather files</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-09-19</h4>
+            <h4 class="date">2021-10-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/epw.Rmd"><code>vignettes/epw.Rmd</code></a></small>
       <div class="hidden name"><code>epw.Rmd</code></div>
@@ -384,6 +384,7 @@
 <span class="co">#&gt; 8758: 2017-12-31 22:00:00</span>
 <span class="co">#&gt; 8759: 2017-12-31 23:00:00</span>
 <span class="co">#&gt; 8760: 2018-01-01 00:00:00</span>
+
 <span class="va">epw</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">d</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; ── Info ────────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Data period #1 has been replaced with input data.</span>
@@ -396,6 +397,7 @@
 <code class="sourceCode R"><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span>start_year <span class="op">=</span> <span class="fl">2014</span>, align_wday <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Data period #1 'Data' seems like a real-year data starting from 2017/</span>
 <span class="co">#&gt; 1/ 1 to 2017/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span>
+
 <span class="va">epw</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">d</span>, after <span class="op">=</span> <span class="fl">0L</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; ── Info ────────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; New data period has been added successfully:</span>
@@ -403,6 +405,7 @@
 <span class="co">#&gt;       Name StartDayOfWeek   StartDay     EndDay</span>
 <span class="co">#&gt;  1:  Data1      Wednesday 2014/ 1/ 1 2014/12/31</span>
 <span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span>
+
 <span class="va">epw</span><span class="op">$</span><span class="fu">period</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;    index  name start_day_of_week  start_day    end_day</span>
 <span class="co">#&gt; 1:     1 Data1         Wednesday 2014/ 1/ 1 2014/12/31</span>

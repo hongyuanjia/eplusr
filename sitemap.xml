@@ -85,9 +85,6 @@
     <loc>https://hongyuanjia.github.io/eplusr/reference/eplus_sql.html</loc>
   </url>
   <url>
-    <loc>https://hongyuanjia.github.io/eplusr/reference/eplusr-deprecated.html</loc>
-  </url>
-  <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/eplusr-package.html</loc>
   </url>
   <url>
@@ -239,6 +236,9 @@
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/with_option.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/reference/with_speed.html</loc>
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/articles/eplusr.html</loc>

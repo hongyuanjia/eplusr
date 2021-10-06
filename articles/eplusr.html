@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9005</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Introduction to eplusr</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-09-19</h4>
+            <h4 class="date">2021-10-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -162,6 +162,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] '8.8.0' '9.4.0'</span>
+
 <span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
 <span class="co">#&gt; $version</span>
 <span class="co">#&gt; [1] '8.8.0'</span>
@@ -204,6 +205,7 @@
 <span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-8-8-0/Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
+
 <span class="va">model</span>
 <span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
 <span class="co">#&gt;  * Path: '/home/runner/.local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transform...</span>
@@ -483,6 +485,7 @@
 <span class="co">#&gt;  [4] "SurfaceConvectionAlgorithm:Inside"         </span>
 <span class="co">#&gt;  [5] "SurfaceConvectionAlgorithm:Outside"        </span>
 <span class="va">....</span>
+
 <span class="co"># categorize by group names</span>
 <span class="va">model</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; $`Simulation Parameters`</span>
@@ -696,6 +699,7 @@
 <span class="co">#&gt; │─ 6: "FullExterior", !- Solar Distribution</span>
 <span class="co">#&gt; │─ 7: 25,             !- Maximum Number of Warmup Days</span>
 <span class="co">#&gt; └─ 8: 6;              !- Minimum Number of Warmup Days</span>
+
 <span class="co"># OR just</span>
 <span class="co"># model$Building</span></code></pre></div>
 <p>Many fields in a model can be referred by others. For example, the <code>Outside Layer</code> and other fields in <code>Construction</code> class refer to the <code>Name</code> field in <code>Material</code> class and other material related classes. Here it means that the <code>Outside Layer</code> field <strong>refers to</strong> the <code>Name</code> field and the <code>Name</code> field is <strong>referred by</strong> the <code>Outside Layer</code>. <code>$object_relation()</code> provides a simple interface to get this kind of relation. It takes a single object ID or name and also a relation direction, and returns an <code>IdfRelation</code> object which contains data presenting such relation above.</p>
@@ -743,6 +747,7 @@
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rp</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span>
 <span class="co">#&gt; [1] 14</span>
+
 <span class="co"># OR</span>
 <span class="co"># rp[["Begin Day of Month"]]</span>
 <span class="co"># rp[[3]]</span></code></pre></div>
@@ -899,7 +904,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-09-19</span>
+<span class="co">#&gt; !2021-10-06</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -953,7 +958,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-09-19</span>
+<span class="co">#&gt; !2021-10-06</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -1045,6 +1050,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span>
+
 <span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"CC03_renamed"</span><span class="op">)</span>
 <span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:52] `CC03_renamed`</span>
 <span class="co">#&gt; Class: &lt;Material&gt;</span>
@@ -1057,6 +1063,7 @@
 <span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
 <span class="co">#&gt; │─ 8 : 0.65,           !- Solar Absorptance</span>
 <span class="co">#&gt; └─ 9 : 0.65;           !- Visible Absorptance</span>
+
 <span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span>
 <span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Target(s) does not refer to any other field.</span>
@@ -1126,6 +1133,7 @@
 <span class="co">#&gt; │─ 08 : &lt;"Blank"&gt;,          !- Dry-Bulb Temperature Range Modifier Day Sche...</span>
 <span class="co">#&gt; │─ 09 : "Wetbulb",          !- Humidity Condition Type</span>
 <span class="va">....</span>
+
 <span class="co"># get location data</span>
 <span class="va">loc</span> <span class="op">&lt;-</span> <span class="va">ddy</span><span class="op">$</span><span class="va">Site_Location</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>
 
@@ -1150,6 +1158,7 @@
 <span class="co">#&gt; Class: &lt;Construction&gt;</span>
 <span class="co">#&gt; ├─ 1*: "new_const1", !- Name</span>
 <span class="co">#&gt; └─ 2*: "WD10";       !- Outside Layer</span>
+
 <span class="co"># extract first construction data in a data.table</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span>
 <span class="co"># modify value</span>
@@ -1237,6 +1246,7 @@
 <span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
 <span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span>
 <span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span>
+
 <span class="co"># extract roof construction data in a data.table</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">$</span><span class="va">`ROOF-1`</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span>
 <span class="co"># modify value</span>
@@ -1435,9 +1445,10 @@
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmpqUA4UZ/file2e2c4530f961.idf"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmpp4WwmD/file33872ee293b3.idf"</span>
+
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpqUA4UZ/file2e2c4530f961.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpp4WwmD/file33872ee293b3.idf.</span></code></pre></div>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">

@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9005</span>
       </span>
     </div>
 
@@ -196,8 +196,9 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li>Fix the year value calculation when first day of a run period is holiday (<a href='https://github.com/hongyuanjia/eplusr/issues/450'>#450</a>)</li>
-<li>Fix <code><a href="../reference/download_weather.html">download_weather()</a></code> file downloading URL (<a href='https://github.com/hongyuanjia/eplusr/issues/452'>#452</a>)</li>
+<li>Fix the year value calculation when first day of a run period is holiday (<a href='https://github.com/hongyuanjia/eplusr/issues/450'>#450</a>).</li>
+<li>Fix <code><a href="../reference/download_weather.html">download_weather()</a></code> file downloading URL (<a href='https://github.com/hongyuanjia/eplusr/issues/452'>#452</a>).</li>
+<li>Fix <code>EplusSql$report_data(..., wide = TRUE)</code> when <code>Do HVAC Sizing Simulation for Sizing Periods</code> is set to <code>Yes</code> in <code>SimulationControl</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/461'>#461</a>).</li>
 </ul>
 </div>
 </div>
@@ -222,7 +223,7 @@
 <h2 class="hasAnchor">
 <a href="#break-changes" class="anchor"></a>Break changes</h2>
 <ul>
-<li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/eplusr-deprecated.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href='https://github.com/hongyuanjia/eplusr/issues/417'>#417</a>).</li>
+<li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/with_speed.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href='https://github.com/hongyuanjia/eplusr/issues/417'>#417</a>).</li>
 </ul>
 </div>
 <div id="bug-fixes-1" class="section level2">
@@ -231,6 +232,7 @@
 <ul>
 <li>Fixed wrong transition of <code>FuelFactors</code> from v9.2 to v9.3 (<a href='https://github.com/hongyuanjia/eplusr/issues/420'>#420</a>).</li>
 <li>Fixed <code>Idf$del</code> error when both sources and referees are given (<a href='https://github.com/hongyuanjia/eplusr/issues/433'>#433</a>).</li>
+<li>Fixed the error that <code>EplusGroupJob$tabular_data(..., wide = TRUE)</code> did not return the <code>index</code> column (<a href='https://github.com/hongyuanjia/eplusr/issues/449'>#449</a>).</li>
 </ul>
 </div>
 <div id="minor-changes" class="section level2">
@@ -238,6 +240,7 @@
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Better error and verbose messages (<a href='https://github.com/hongyuanjia/eplusr/issues/422'>#422</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/423'>#423</a>).</li>
+<li>The default mouse mode for <code>wheel</code> has been changed to <code>"pull"</code>.</li>
 </ul>
 </div>
 </div>
@@ -352,7 +355,7 @@
 </li>
 <li><p>New methods <code>Idf$duplicatd()</code> and <code>Idf$unique()</code> have been added. They can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning (<a href='https://github.com/hongyuanjia/eplusr/issues/227'>#227</a>).</p></li>
 <li><p>Now if <code>class</code> is set to <code>NULL</code> in <code>Idf$definition()</code>, the underlying <code>Idd</code> object is returned (<a href='https://github.com/hongyuanjia/eplusr/issues/237'>#237</a>).</p></li>
-<li><p>Internal helper functions <code><a href="../reference/with_option.html">with_option()</a></code>, <code><a href="../reference/with_option.html">with_silent()</a></code>, <code><a href="../reference/with_option.html">with_verbose()</a></code>, <code><a href="../reference/eplusr-deprecated.html">with_speed()</a></code> and <code><a href="../reference/with_option.html">without_checking()</a></code> have been exported. They can be used to evaluate an expression with temporary eplusr options (<a href='https://github.com/hongyuanjia/eplusr/issues/240'>#240</a>).</p></li>
+<li><p>Internal helper functions <code><a href="../reference/with_option.html">with_option()</a></code>, <code><a href="../reference/with_option.html">with_silent()</a></code>, <code><a href="../reference/with_option.html">with_verbose()</a></code>, <code><a href="../reference/with_speed.html">with_speed()</a></code> and <code><a href="../reference/with_option.html">without_checking()</a></code> have been exported. They can be used to evaluate an expression with temporary eplusr options (<a href='https://github.com/hongyuanjia/eplusr/issues/240'>#240</a>).</p></li>
 <li><p>Now <code>Idf$insert()</code> can directly take an <code>Idf</code> object or a list of <code>Idf</code> objects as input. And also <code>Version</code> objects in input will be directly skipped instead of giving an error (<a href='https://github.com/hongyuanjia/eplusr/issues/245'>#245</a>).</p></li>
 <li><p>A new option <code>all</code> has been added in <code>IdfObject$print()</code> with default being <code>FALSE</code>. If <code>TRUE</code>, all fields defined in [Idd] are printed even they do not exist in current object (<a href='https://github.com/hongyuanjia/eplusr/issues/247'>#247</a>).</p></li>
 <li><p>New S3 methods of <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code> for all classes are added, i.e. <code>==.Idf</code>, <code>==.IdfObject</code>, <code>==.Idd</code>, <code>==.IddObject</code>, <code>==.Epw</code>, <code>==.EplusJob</code>, <code>==.EplusSql</code>, <code>==.EplusGroupJob</code>, <code>==.ParametricJob</code>. The negate methods are also added. This makes it quite easy to check the equality of R6 objects of these types (<a href='https://github.com/hongyuanjia/eplusr/issues/250'>#250</a>).</p></li>
