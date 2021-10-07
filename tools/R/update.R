@@ -4,8 +4,16 @@ update_weather_db <- function(eplus_src = NULL, force = FALSE, dir_assets = here
 
     if (is.null(dir_assets)) {
         dir_assets <- here::here("tools/data/weather_db")
+        if (!dir.exists(dir_assets)) dir.create(dir_assets, recursive = TRUE)
+
+        dir_assets_json <- file.path(dir_assets, "EnergyPlus")
+        if (!dir.exists(dir_assets_json)) dir.create(dir_assets_json)
         geojson <- download_geojson(eplus_src, file.path(dir_assets, "EnergyPlus"))
-        kml <- download_kml(file.path(dir_assets, "OneBuilding"))
+
+        dir_assets_kml <- file.path(dir_assets, "OneBuilding")
+        if (!dir.exists(dir_assets_kml)) dir.create(dir_assets_kml)
+        kml <- download_kml(dir_assets_kml)
+
         country_code <- download_countrycode(dir_assets)
     } else {
         geojson <- normalizePath(file.path(dir_assets, "EnergyPlus/weather.geojson"), mustWork = TRUE)
