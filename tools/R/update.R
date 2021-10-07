@@ -20,6 +20,7 @@ update_weather_db <- function(eplus_src = NULL, force = FALSE, dir_assets = here
         kml <- normalizePath(list.files(file.path(dir_assets, "OneBuilding"), "\\.kml$", full.names = TRUE), mustWork = TRUE)
         country_code <- normalizePath(file.path(dir_assets, "country_codes.csv"), mustWork = TRUE)
     }
+    kml <- sort(kml)
 
     # current hash
     new_hash_geojson <- tools::md5sum(geojson)
