@@ -1,5 +1,43 @@
 {
-  "weather_db": "869e19e57234db92af187beb43db11d0",
   "reportvar_rules": "9.4.0",
-  "output_vars": "9.4.0"
+  "output_vars": "9.4.0",
+  "weather_db": {
+    "geojson": {
+      "weather.geojson": "869e19e57234db92af187beb43db11d0"
+    },
+    "kml": {
+      "AMTUes_EPW_Processing_locations.kml": "721671b9230b633d5238b0984e09bf30",
+      "ArgTMY_EPW_Processing_locations.kml": "bebb9f832779fc253ed4ee75c2ed79a4",
+      "BBSR_EPW_Processing_locations.kml": "111be6cc5536c969204936c9ea8bdc22",
+      "CSWD_EPW_Processing_locations.kml": "538ba8ed04dc7609b44457969f9534ca",
+      "CTZ2_EPW_Processing_locations.kml": "7e02836d228a45e317ddb577e5007f00",
+      "CTZ2010_EPW_Processing_locations.kml": "7468fd672e7dee4a2405caa5bf48d921",
+      "CTZ2016_EPW_Processing_locations.kml": "ef7bc595c0fe51fb65e3cb750cdd9286",
+      "CWEC_EPW_Processing_locations.kml": "75591e8c2feefb4df203f578886ff2db",
+      "CWEC2016_EPW_Processing_locations.kml": "1f821adbd1020972143138e0c3aef470",
+      "IMGW_EPW_Processing_locations.kml": "f0a57616e387264810c5e42efc2f5700",
+      "IMS_EPW_Processing_locations.kml": "d33067cf241d614bde5d22ea0519a8f6",
+      "ISHRAE2014_EPW_Processing_locations.kml": "cd4f1a47fe5ee426beb50d3edf123903",
+      "ITMY_EPW_Processing_locations.kml": "8c15a4ea8f41eae6f94553c3d6064dde",
+      "JGMY_EPW_Processing_locations.kml": "a8a29897e2c245c35137c161f341124a",
+      "NIWA_EPW_Processing_locations.kml": "eafe51460031b17b9f3102cef53130ff",
+      "PHIKO_EPW_Processing_locations.kml": "6f0e97d620e60c5106bbf70954afe9e6",
+      "Reg1_Africa_TMYx_EPW_Processing_locations.kml": "597c82db3f1031b3bea42c2b297363dd",
+      "Reg2_Asia_TMYx_EPW_Processing_locations.kml": "c04842ed9a652ccb607a0d41b24915f9",
+      "Reg3_South_America_TMYx_EPW_Processing_locations.kml": "28a61067fd866986efb982e1f649088d",
+      "Reg4_Canada_TMYx_EPW_Processing_locations.kml": "61ac86be5592fb6dff1dbc5bfc27a606",
+      "Reg4_NA_CA_Caribbean_TMYx_EPW_Processing_locations.kml": "daee5512f5a56c2918174e27806ac520",
+      "Reg4_USA_TMYx_EPW_Processing_locations.kml": "c85c1222c816ea077e25cab45c9fe00a",
+      "Reg5_Southwest_Pacific_TMYx_EPW_Processing_locations.kml": "c740adbc9fbb5be662ba336579c76f16",
+      "Reg6_Europe_TMYx_EPW_Processing_locations.kml": "84d270c08e9363ba2ea1f609135e6ca8",
+      "Reg7_Antarctica_TMYx_EPW_Processing_locations.kml": "22a91a9eaa05ab1928ac880533390071",
+      "RMY2012_EPW_Processing_locations.kml": "516586cfdd3e22e28b03dfd1138eb49b",
+      "TMY_EPW_Processing_locations.kml": "50eaade970c9ca9e40a825e1109d2cac",
+      "TMY3a_EPW_Processing_locations.kml": "4e2862fd53e3992c9bfbe15a265d25ed",
+      "TurTMY_EPW_Processing_locations.kml": "db61adf0465ba1da97d780991f084383"
+    },
+    "country_code": {
+      "country_codes.csv": "48421e3ee0e1f23e66fc63d3951b34d7"
+    }
+  }
 }

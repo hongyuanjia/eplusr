@@ -2031,14 +2031,25 @@ format.Epw <- function (x, ...) {
 #' `download_weather()` makes it easy to download EnergyPlus weather files (EPW)
 #' and design day files (DDY).
 #'
+#' @section Data sources:
+#'
+#' There are 2 data sources:
+#'
+#' * [EnergyPlus.net](https://energyplus.net/weather)
+#' * [OneBuilding.org](http://climate.onebuilding.org/)
+#'
+#' EnergyPlus sources allow downloading EPW, STAT, and DDY files separately
+#' while OneBuilding sources can only download them all through a ZIP file.
+#'
 #' @param pattern A regular expression used to search locations, e.g. `"los
 #'     angeles.*tmy3"`. The search is case-insensitive.
 #' @param filename File names (without extension) used to save downloaded files.
 #'     Internally, [make.unique()] is called to ensure unique names.
-#' @param dir Directory to save downloaded files
-#' @param type File type to download. Should be one of `"all"`, `"epw"` and
-#'     `"ddy"`. If `"all"`, both weather files and design day files will be
-#'     downloaded.
+#' @param dir Directory to save downloaded files. Will create if not exist.
+#' @param type File type to download. Only applicable to data provided by
+#'      EnergyPlus website. For OneBuilding.org, `"all"` will always be used.
+#'      Should be one of `"all"`, `"epw"`, `"ddy"` and `"stat"`. If `"all"`, all
+#'      weather data will be downloaded in a ZIP file. Default: `"all"`.
 #' @param ask If `TRUE`, a command line menu will be shown to let you select
 #'     which one to download. If `FALSE` and the number of returned results is
 #'     less than `max_match`, files are downloaded automatically without asking.
@@ -2051,13 +2062,19 @@ format.Epw <- function (x, ...) {
 #' @author Hongyuan Jia
 #' @export
 # download_weather {{{
-download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy"),
+download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy", "stat"),
                               ask = TRUE, max_match = 3) {
+    assert_string(pattern)
+    assert_string(filename, null.ok = TRUE)
+    assert_flag(ask)
+    assert_count(max_match)
+    type <- match.arg(type)
+
     pattern <- gsub("\\s+", ".", pattern)
     d <- as.data.table(WEATHER_DB)
     res <- d[stri_detect_regex(title, pattern, case_insensitive = TRUE)]
 
-    mes_location <- function (index = NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude) {
+    mes_location <- function (index = NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude, provider) {
         if (!is.null(index)) {
             h <- cli::rule(paste0("[", index, "] ", title))
         } else {
@@ -2070,7 +2087,8 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
         source_type <- if (is.na(source_type)) NULL else paste0(" * Source type: ", source_type)
         longitude <- paste0(" * Longitude: ", longitude)
         latitude <- paste0(" * Latitude: ", latitude)
-        paste(h, country, state_province, location, wmo_number, source_type, longitude, latitude,
+        provider <- paste0(" * Provider: ", provider)
+        paste(h, country, state_province, location, wmo_number, source_type, longitude, latitude, provider,
             sep = "\n"
         )
     }
@@ -2083,7 +2101,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     }
 
     if (nrow(res) > 1L) {
-        m <- res[, mes_location(index, title, country, state_province, location, wmo_number, source_type, longitude, latitude), by = index]$V1
+        m <- res[, mes_location(index, title, country, state_province, location, wmo_number, source_type, longitude, latitude, provider), by = index]$V1
         if (ask) {
             h <- paste0(nrow(res), " matched results found. Please select which one to download:")
             ch <- c(res$title, "All")
@@ -2103,7 +2121,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
             }
         }
     } else {
-        m <- res[, mes_location(NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude), by = index]$V1
+        m <- res[, mes_location(NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude, provider), by = index]$V1
         if (ask) {
             h <- paste0("One matched result found. Please confirm to start downloading:")
             r <- utils::menu(c("Yes", "No"), title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
@@ -2116,32 +2134,23 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
         }
     }
 
-    type <- match.arg(type)
-    if (!dir.exists(dir)) dir.create(dir)
+    if (type != "all" && "Climate.OneBuilding.Org" %in% res$provider) {
+        verbose_info("Found sources from provider 'Climate.OneBuilding.Org'. 'type' will be reset to 'all'.")
+        type <- "all"
+    }
+    if (type == "all") type <- "zip"
+
+    set(res, NULL, "URL", res[[paste0(type, "_url")]])
     if (is.null(filename)) {
-        res[, `:=`(epw_name = basename(epw_url), ddy_name = basename(ddy_url))]
+        set(res, NULL, "NAME", basename(res[[paste0(type, "_url")]]))
     } else {
-        res[, `:=`(
-            epw_name = make.unique(paste0(filename, ".epw"), sep = "_"),
-            ddy_name = make.unique(paste0(filename, ".ddy"), sep = "_")
-        )]
+        set(res, NULL, "NAME", filename)
+        set(res, NULL, "NAME", paste0(make.unique(res$NAME, sep = "_"), ".", type))
     }
 
-    res[, `:=`(
-        epw_path = normalizePath(file.path(dir, epw_name), mustWork = FALSE),
-        ddy_path = normalizePath(file.path(dir, ddy_name), mustWork = FALSE))
-    ]
+    set(res, NULL, "PATH", normalizePath(file.path(dir, res$NAME), mustWork = FALSE))
 
-    if (type == "all") {
-        download_file(res$epw_url, res$epw_path)
-        download_file(res$ddy_url, res$ddy_path)
-        c(res$epw_path, res$ddy_path)
-    } else if (type == "ddy") {
-        download_file(res$ddy_url, res$ddy_path)
-        res$ddy_path
-    } else {
-        download_file(res$epw_url, res$epw_path)
-        res$epw_path
-    }
+    for (i in seq_along(res$URL)) download_file(res$URL[[i]], res$PATH[[i]])
+    res$PATH
 }
 # }}}

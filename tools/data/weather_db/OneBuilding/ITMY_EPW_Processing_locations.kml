@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>ITMY_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Bandar Abass Intl AP Hormozgan IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN HG Bandar.Abass.Intl.AP.408750 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>408750</b></td></tr>
+       <tr><td><b>N 27° 13.00'   E 56° 22.00'</b></td></tr>
+       <tr><td>Elevation <b>10</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>10.8 C</b>, <b>51.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.1 C</b>, <b>104.2 F</b></td></tr>
+       <tr><td>HDD18 <b>63</b>, CDD10 <b>6114</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/HG_Hormozgan/IRN_HG_Bandar.Abass.Intl.AP.408750_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>56.36667,27.21667,9.8</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Badr Esfahan AFB Esfahan IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN ES Badr.Esfahan.AFB.408000 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>408000</b></td></tr>
+       <tr><td><b>N 32° 37.00'   E 51° 40.00'</b></td></tr>
+       <tr><td>Elevation <b>1550</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.1 C</b>, <b>100.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1827</b>, CDD10 <b>2854</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/ES_Esfahan/IRN_ES_Badr.Esfahan.AFB.408000_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>51.66667,32.61667,1550.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shiraz Intl AP Fars IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN FA Shiraz.Intl.AP.408480 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>408480</b></td></tr>
+       <tr><td><b>N 29° 32.00'   E 52° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>1481</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.0 C</b>, <b>30.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.2 C</b>, <b>100.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1472</b>, CDD10 <b>3226</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/FA_Fars/IRN_FA_Shiraz.Intl.AP.408480_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>52.60000,29.53333,1481.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tabriz Intl AP Azarbayjan-e Sharqi IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN EA Tabriz.Intl.AP.407060 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>407060</b></td></tr>
+       <tr><td><b>N 38° 8.03'   E 46° 14.10'</b></td></tr>
+       <tr><td>Elevation <b>1361</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.2 C</b>, <b>15.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.2 C</b>, <b>93.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2921</b>, CDD10 <b>2057</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/EA_East Azarbaijan/IRN_EA_Tabriz.Intl.AP.407060_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>46.23500,38.13389,1361.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tehran Mehrabad Intl AP Tehran IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN TE Tehran.Mehrabad.Intl.AP.407540 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>407540</b></td></tr>
+       <tr><td><b>N 35° 41.00'   E 51° 19.00'</b></td></tr>
+       <tr><td>Elevation <b>1190</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.4 C</b>, <b>99.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1749</b>, CDD10 <b>3230</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/TE_Tehran/IRN_TE_Tehran.Mehrabad.Intl.AP.407540_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>51.31667,35.68333,1190.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yazd Shahid Sadooghi AP Yazd IRN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>IRN YA Yazd.Shahid.Sadooghi.AP.408210 ITMY</b></td></tr>
+       <tr><td><b>Data Source ITMY</td></tr>
+       <tr><td>WMO <b>408210</b></td></tr>
+       <tr><td><b>N 31° 54.00'   E 54° 17.00'</b></td></tr>
+       <tr><td>Elevation <b>1237</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.4 C</b>, <b>29.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.9 C</b>, <b>105.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1411</b>, CDD10 <b>3735</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/YA_Yazd/IRN_YA.Shahid.Sadooghi.AP.408210_ITMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>54.28333,31.90000,1237.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>

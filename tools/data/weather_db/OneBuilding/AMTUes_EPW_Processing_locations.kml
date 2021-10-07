@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>AMTUes_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Colonia del Sacramento CO URY</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>URY CO Colonia.de.Sacramento 865600 AMTUes</b></td></tr>
+       <tr><td><b>Data Source Custom-865600</td></tr>
+       <tr><td>WMO <b>865600</b></td></tr>
+       <tr><td><b>S 34° 27.00'   W 57° 46.20'</b></td></tr>
+       <tr><td>Elevation <b>20</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.0 C</b>, <b>41.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.9 C</b>, <b>85.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1216</b>, CDD10 <b>2567</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CO_Colonia/URY_CO_Colonia.de.Sacramento_865600_AMTUes.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-57.77000,-34.45000,20.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Montevideo Carrasco Intl AP CA URY</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>URY CA Montevideo-Carrasco.Intl.AP 865800 AMTUes</b></td></tr>
+       <tr><td><b>Data Source Custom-865800</td></tr>
+       <tr><td>WMO <b>865800</b></td></tr>
+       <tr><td><b>S 34° 49.80'   W 56° 0.60'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.8 C</b>, <b>37.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1047</b>, CDD10 <b>2464</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CA_Canelones/URY_CA_Montevideo-Carrasco.Intl.AP_865800_AMTUes.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-56.01000,-34.83000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rivera Gestido Intl AP RV URY</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>URY RV Rivera-Gestido.Intl.AP 863500 AMTUes</b></td></tr>
+       <tr><td><b>Data Source Custom-863500</td></tr>
+       <tr><td>WMO <b>863500</b></td></tr>
+       <tr><td><b>S 30° 54.00'   W 55° 32.40'</b></td></tr>
+       <tr><td>Elevation <b>240</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.7 C</b>, <b>38.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>732</b>, CDD10 <b>3110</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RV_Rivera/URY_RV_Rivera-Gestido.Intl.AP_863500_AMTUes.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-55.54000,-30.90000,240.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rocha RO URY</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>URY RO Rocha 865650 AMTUes</b></td></tr>
+       <tr><td><b>Data Source Custom-865650</td></tr>
+       <tr><td>WMO <b>865650</b></td></tr>
+       <tr><td><b>S 34° 29.40'   W 54° 18.60'</b></td></tr>
+       <tr><td>Elevation <b>18</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.8 C</b>, <b>85.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1077</b>, CDD10 <b>2352</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RO_Rocha/URY_RO_Rocha_865650_AMTUes.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-54.31000,-34.49000,18.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Salto Nueva Hesperides Intl AP SA URY</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>URY SA Salto-Nueva.Hesperides.Intl.AP 863600 AMTUes</b></td></tr>
+       <tr><td><b>Data Source Custom-863600</td></tr>
+       <tr><td>WMO <b>863600</b></td></tr>
+       <tr><td><b>S 31° 16.20'   W 57° 52.80'</b></td></tr>
+       <tr><td>Elevation <b>50</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>HDD18 <b>652</b>, CDD10 <b>3415</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/SA_Salto/URY_SA_Salto-Nueva.Hesperides.Intl.AP_863600_AMTUes.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-57.88000,-31.27000,50.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>
