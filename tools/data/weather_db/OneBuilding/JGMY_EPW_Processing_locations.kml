@@ -1,0 +1,3024 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>JGMY_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Abashiri Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Abashiri.474090 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47409</td></tr>
+       <tr><td>WMO <b>474090</b></td></tr>
+       <tr><td><b>N 44° 0.00'   E 144° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>38</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.8 C</b>, <b>10.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.7 C</b>, <b>78.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4434</b>, CDD10 <b>811</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Abashiri.474090_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>144.3000,44.00000,38.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Aburatsu Miyazaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MZ Aburatsu.478350 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47835</td></tr>
+       <tr><td>WMO <b>478350</b></td></tr>
+       <tr><td><b>N 31° 36.00'   E 131° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.5 C</b>, <b>36.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1137</b>, CDD10 <b>2949</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MZ_Miyazaki/JPN_MZ_Aburatsu.478350_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.4000,31.60000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Aikawa Niigata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NI Aikawa.476020 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47602</td></tr>
+       <tr><td>WMO <b>476020</b></td></tr>
+       <tr><td><b>N 38° 0.00'   E 138° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>35</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2283</b>, CDD10 <b>1884</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NI_Niigata/JPN_NI_Aikawa.476020_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.3000,38.00000,35.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ajiro Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Ajiro.476680 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47668</td></tr>
+       <tr><td>WMO <b>476680</b></td></tr>
+       <tr><td><b>N 35° 6.00'   E 139° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>67</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1542</b>, CDD10 <b>2393</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Ajiro.476680_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.1000,35.10000,67.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Akita Akita JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AK Akita.475820 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47582</td></tr>
+       <tr><td>WMO <b>475820</b></td></tr>
+       <tr><td><b>N 39° 42.00'   E 140° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.9 C</b>, <b>25.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2903</b>, CDD10 <b>1629</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AK_Akita/JPN_AK_Akita.475820_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.1000,39.70000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Akune Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Akune.478230 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47823</td></tr>
+       <tr><td>WMO <b>478230</b></td></tr>
+       <tr><td><b>N 32° 0.00'   E 130° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>40</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1347</b>, CDD10 <b>2710</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Akune.478230_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.2000,32.00000,40.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Aomori Aomori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AO Aomori.475750 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47575</td></tr>
+       <tr><td>WMO <b>475750</b></td></tr>
+       <tr><td><b>N 40° 48.00'   E 140° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.6 C</b>, <b>21.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.7 C</b>, <b>83.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3287</b>, CDD10 <b>1356</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AO_Aomori/JPN_AO_Aomori.475750_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.8000,40.80000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Asahikawa Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Asahikawa.474070 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47407</td></tr>
+       <tr><td>WMO <b>474070</b></td></tr>
+       <tr><td><b>N 43° 48.00'   E 142° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>112</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.2 C</b>, <b>4.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4379</b>, CDD10 <b>1077</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Asahikawa.474070_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>142.4000,43.80000,112.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Asosan Kumamoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KM Asosan.478210 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47821</td></tr>
+       <tr><td>WMO <b>478210</b></td></tr>
+       <tr><td><b>N 32° 54.00'   E 131° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>1143</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3249</b>, CDD10 <b>1182</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KM_Kumamoto/JPN_KM_Asosan.478210_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.1000,32.90000,1143.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Chiba Chiba JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN CH Chiba.476820 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47682</td></tr>
+       <tr><td>WMO <b>476820</b></td></tr>
+       <tr><td><b>N 35° 36.00'   E 140° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1788</b>, CDD10 <b>2303</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/CH_Chiba/JPN_CH_Chiba.476820_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.1000,35.60000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Chichibu Saitama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ST Chichibu.476410 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47641</td></tr>
+       <tr><td>WMO <b>476410</b></td></tr>
+       <tr><td><b>N 36° 0.00'   E 139° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>218</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.8 C</b>, <b>23.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2508</b>, CDD10 <b>1897</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ST_Saitama/JPN_ST_Chichibu.476410_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.1000,36.00000,218.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Chichijima Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Chichijima.479710 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47971</td></tr>
+       <tr><td>WMO <b>479710</b></td></tr>
+       <tr><td><b>N 27° 6.00'   E 142° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>14.3 C</b>, <b>57.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
+       <tr><td>HDD18 <b>72</b>, CDD10 <b>4709</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Chichijima.479710_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>142.2000,27.10000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Choshi Chiba JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN CH Choshi.476480 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47648</td></tr>
+       <tr><td>WMO <b>476480</b></td></tr>
+       <tr><td><b>N 35° 42.00'   E 140° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>20</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.4 C</b>, <b>34.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.2 C</b>, <b>84.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1643</b>, CDD10 <b>2219</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/CH_Chiba/JPN_CH_Choshi.476480_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.9000,35.70000,20.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Esashi Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Esashi.474280 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47428</td></tr>
+       <tr><td>WMO <b>474280</b></td></tr>
+       <tr><td><b>N 41° 54.00'   E 140° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.5 C</b>, <b>22.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.5 C</b>, <b>79.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3287</b>, CDD10 <b>1246</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Esashi.474280_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.1000,41.90000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fujisan Yamanashi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YN Fujisan.476390 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47639</td></tr>
+       <tr><td>WMO <b>476390</b></td></tr>
+       <tr><td><b>N 35° 24.00'   E 138° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>3775</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-26.7 C</b>, <b>-16.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>10.4 C</b>, <b>50.7 F</b></td></tr>
+       <tr><td>HDD18 <b>8929</b>, CDD10 <b>0</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YN_Yamanashi/JPN_YN_Fujisan.476390_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.7000,35.40000,3775.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukaura Aomori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AO Fukaura.475740 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47574</td></tr>
+       <tr><td>WMO <b>475740</b></td></tr>
+       <tr><td><b>N 40° 42.00'   E 139° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>66</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.5 C</b>, <b>23.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3031</b>, CDD10 <b>1457</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AO_Aomori/JPN_AO_Fukaura.475740_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.9000,40.70000,66.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukue Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Fukue.478430 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47843</td></tr>
+       <tr><td>WMO <b>478430</b></td></tr>
+       <tr><td><b>N 32° 42.00'   E 128° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>25</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.1 C</b>, <b>35.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1437</b>, CDD10 <b>2566</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Fukue.478430_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>128.8000,32.70000,25.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukui Fukui JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FI Fukui.476160 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47616</td></tr>
+       <tr><td>WMO <b>476160</b></td></tr>
+       <tr><td><b>N 36° 6.00'   E 136° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2156</b>, CDD10 <b>2221</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FI_Fukui/JPN_FI_Fukui.476160_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.2000,36.10000,9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukuoka Fukuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FO Fukuoka.478070 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47807</td></tr>
+       <tr><td>WMO <b>478070</b></td></tr>
+       <tr><td><b>N 33° 36.00'   E 130° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.0 C</b>, <b>35.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1558</b>, CDD10 <b>2636</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FO_Fukuoka/JPN_FO_Fukuoka.478070_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.4000,33.60000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukushima Fukushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FS Fukushima.475950 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47595</td></tr>
+       <tr><td>WMO <b>475950</b></td></tr>
+       <tr><td><b>N 37° 48.00'   E 140° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>67</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.8 C</b>, <b>27.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2503</b>, CDD10 <b>1903</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FS_Fukushima/JPN_FS_Fukushima.475950_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.5000,37.80000,67.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fukuyama Hiroshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HS Fukuyama.477670 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47767</td></tr>
+       <tr><td>WMO <b>477670</b></td></tr>
+       <tr><td><b>N 34° 30.00'   E 133° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.6 C</b>, <b>29.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1964</b>, CDD10 <b>2339</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HS_Hiroshima/JPN_HS_Fukuyama.477670_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.3000,34.50000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fushiki Toyama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TY Fushiki.476060 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47606</td></tr>
+       <tr><td>WMO <b>476060</b></td></tr>
+       <tr><td><b>N 36° 48.00'   E 137° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>12</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.5 C</b>, <b>29.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2233</b>, CDD10 <b>2090</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/Toyama/JPN_TY_Fushiki.476060_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.1000,36.80000,12.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Gifu Gifu JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN GF Gifu.476320 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47632</td></tr>
+       <tr><td>WMO <b>476320</b></td></tr>
+       <tr><td><b>N 35° 24.00'   E 136° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>13</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1895</b>, CDD10 <b>2451</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/GF_Gifu/JPN_GF_Gifu.476320_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.8000,35.40000,13.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Haboro Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Haboro.474040 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47404</td></tr>
+       <tr><td>WMO <b>474040</b></td></tr>
+       <tr><td><b>N 44° 24.00'   E 141° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>8</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.9 C</b>, <b>10.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4041</b>, CDD10 <b>982</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Haboro.474040_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.7000,44.40000,8.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hachijojima Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Hachijojima.476780 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47678</td></tr>
+       <tr><td>WMO <b>476780</b></td></tr>
+       <tr><td><b>N 33° 6.00'   E 139° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>79</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.9 C</b>, <b>42.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>HDD18 <b>904</b>, CDD10 <b>3034</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Hachijojima.476780_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.8000,33.10000,79.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hachinohe Aomori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AO Hachinohe.475810 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47581</td></tr>
+       <tr><td>WMO <b>475810</b></td></tr>
+       <tr><td><b>N 40° 30.00'   E 141° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.9 C</b>, <b>84.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3207</b>, CDD10 <b>1320</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AO_Aomori/JPN_AO_Hachinohe.475810_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.5000,40.50000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hagi Yamaguchi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YC Hagi.477540 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47754</td></tr>
+       <tr><td>WMO <b>477540</b></td></tr>
+       <tr><td><b>N 34° 24.00'   E 131° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.8 C</b>, <b>33.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1784</b>, CDD10 <b>2280</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YC_Yamaguchii/JPN_YC_Hagi.477540_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.4000,34.40000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hakodate Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Hakodate.474300 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47430</td></tr>
+       <tr><td>WMO <b>474300</b></td></tr>
+       <tr><td><b>N 41° 48.00'   E 140° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3629</b>, CDD10 <b>1135</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Hakodate.474300_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.8000,41.80000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hamada Shimane JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SM Hamada.477550 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47755</td></tr>
+       <tr><td>WMO <b>477550</b></td></tr>
+       <tr><td><b>N 34° 54.00'   E 132° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>19</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.1 C</b>, <b>34.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1736</b>, CDD10 <b>2269</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SM_Shimane/JPN_SM_Hamada.477550_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>132.1000,34.90000,19.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hamamatsu Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Hamamatsu.476540 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47654</td></tr>
+       <tr><td>WMO <b>476540</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 137° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.0 C</b>, <b>33.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1612</b>, CDD10 <b>2486</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Hamamatsu.476540_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.7000,34.70000,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hikone Shiga JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SH Hikone.477610 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47761</td></tr>
+       <tr><td>WMO <b>477610</b></td></tr>
+       <tr><td><b>N 35° 18.00'   E 136° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>87</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2123</b>, CDD10 <b>2194</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SH_Shiga/JPN_SH_Hikone.477610_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.3000,35.30000,87.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Himeji Hyogo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HG Himeji.477690 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47769</td></tr>
+       <tr><td>WMO <b>477690</b></td></tr>
+       <tr><td><b>N 34° 48.00'   E 134° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>38</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.3 C</b>, <b>29.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2007</b>, CDD10 <b>2300</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HG_Hyogo/JPN_HG_Himeji.477690_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.7000,34.80000,38.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hirado Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Hirado.478050 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47805</td></tr>
+       <tr><td>WMO <b>478050</b></td></tr>
+       <tr><td><b>N 33° 24.00'   E 129° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>58</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.9 C</b>, <b>85.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1540</b>, CDD10 <b>2436</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Hirado.478050_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>129.6000,33.40000,58.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hiroo Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Hiroo.474400 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47440</td></tr>
+       <tr><td>WMO <b>474400</b></td></tr>
+       <tr><td><b>N 42° 18.00'   E 143° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.3 C</b>, <b>77.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4221</b>, CDD10 <b>733</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Hiroo.474400_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>143.3000,42.30000,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hiroshima Hiroshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HS Hiroshima.477650 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47765</td></tr>
+       <tr><td>WMO <b>477650</b></td></tr>
+       <tr><td><b>N 34° 24.00'   E 132° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.2 C</b>, <b>32.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1889</b>, CDD10 <b>2346</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HS_Hiroshima/JPN_HS_Hiroshima.477650_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>132.5000,34.40000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hita Oita JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN OT Hita.478140 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47814</td></tr>
+       <tr><td>WMO <b>478140</b></td></tr>
+       <tr><td><b>N 33° 18.00'   E 130° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>83</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.4 C</b>, <b>27.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1962</b>, CDD10 <b>2377</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/OT_Oita/JPN_OT_Hita.478140_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.9000,33.30000,83.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hitoyoshi Kumamoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KM Hitoyoshi.478240 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47824</td></tr>
+       <tr><td>WMO <b>478240</b></td></tr>
+       <tr><td><b>N 32° 12.00'   E 130° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>146</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.2 C</b>, <b>28.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1871</b>, CDD10 <b>2360</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KM_Kumamoto/JPN_KM_Hitoyoshi.478240_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.8000,32.20000,146.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ibukiyama Gifu JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN GF Ibukiyama.477510 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47751</td></tr>
+       <tr><td>WMO <b>477510</b></td></tr>
+       <tr><td><b>N 35° 24.00'   E 136° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>1376</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-14.4 C</b>, <b>6.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.1 C</b>, <b>73.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4371</b>, CDD10 <b>722</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/GF_Gifu/JPN_GF_Ibukiyama.477510_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.4000,35.40000,1376.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Iida Nagano JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NN Iida.476370 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47637</td></tr>
+       <tr><td>WMO <b>476370</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 137° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>482</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.1 C</b>, <b>22.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2584</b>, CDD10 <b>1837</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NN_Nagano/JPN_NN_Iida.476370_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.8000,35.50000,482.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Iizuka Fukuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FO Iizuka.478090 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47809</td></tr>
+       <tr><td>WMO <b>478090</b></td></tr>
+       <tr><td><b>N 33° 42.00'   E 130° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>37</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.7 C</b>, <b>30.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1804</b>, CDD10 <b>2405</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FO_Fukuoka/JPN_FO_Iizuka.478090_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.7000,33.70000,37.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Irako Aichi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AI Irako.476530 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47653</td></tr>
+       <tr><td>WMO <b>476530</b></td></tr>
+       <tr><td><b>N 34° 36.00'   E 137° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.6 C</b>, <b>34.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1680</b>, CDD10 <b>2441</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AI_Aichi/JPN_AI_Irako.476530_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.1000,34.60000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Iriomotejima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Iriomotejima.479170 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47917</td></tr>
+       <tr><td>WMO <b>479170</b></td></tr>
+       <tr><td><b>N 24° 24.00'   E 123° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>13.8 C</b>, <b>56.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>HDD18 <b>79</b>, CDD10 <b>4873</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Iriomotejima.479170_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>123.8000,24.40000,9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Irozaki Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Irozaki.476660 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47666</td></tr>
+       <tr><td>WMO <b>476660</b></td></tr>
+       <tr><td><b>N 34° 36.00'   E 138° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>55</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.9 C</b>, <b>39.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.1 C</b>, <b>84.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1320</b>, CDD10 <b>2510</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Irozaki.476660_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.9000,34.60000,55.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ishigakijima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Ishigakijima.479180 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47918</td></tr>
+       <tr><td>WMO <b>479180</b></td></tr>
+       <tr><td><b>N 24° 18.00'   E 124° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>13.9 C</b>, <b>57.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>80</b>, CDD10 <b>5037</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Ishigakijima.479180_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>124.2000,24.30000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ishinomaki Miyagi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MG Ishinomaki.475920 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47592</td></tr>
+       <tr><td>WMO <b>475920</b></td></tr>
+       <tr><td><b>N 38° 24.00'   E 141° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>43</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.8 C</b>, <b>25.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2812</b>, CDD10 <b>1552</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MG_Miyagi/JPN_MG_Ishinomaki.475920_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.3000,38.40000,43.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Iwamizawa Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Iwamizawa.474130 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47413</td></tr>
+       <tr><td>WMO <b>474130</b></td></tr>
+       <tr><td><b>N 43° 12.00'   E 141° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>42</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.2 C</b>, <b>81.0 F</b></td></tr>
+       <tr><td>HDD18 <b>4056</b>, CDD10 <b>1084</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Iwamizawa.474130_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.8000,43.20000,42.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Izuhara Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Izuhara.478000 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47800</td></tr>
+       <tr><td>WMO <b>478000</b></td></tr>
+       <tr><td><b>N 34° 12.00'   E 129° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>21</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.1 C</b>, <b>32.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.5 C</b>, <b>86.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1742</b>, CDD10 <b>2307</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Izuhara.478000_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>129.3000,34.20000,21.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kagoshima-Yoshino Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Kagoshima-Yoshino.478270 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47827</td></tr>
+       <tr><td>WMO <b>478270</b></td></tr>
+       <tr><td><b>N 31° 36.00'   E 130° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1254</b>, CDD10 <b>3012</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Kagoshima-Yoshino.478270_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.6000,31.60000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kanazawa Ishikawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IS Kanazawa.476050 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47605</td></tr>
+       <tr><td>WMO <b>476050</b></td></tr>
+       <tr><td><b>N 36° 36.00'   E 136° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>26</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2117</b>, CDD10 <b>2193</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IS_Ishikawa/JPN_IS_Kanazawa.476050_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.7000,36.60000,26.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Karuizawa Nagano JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NN Karuizawa.476220 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47622</td></tr>
+       <tr><td>WMO <b>476220</b></td></tr>
+       <tr><td><b>N 36° 18.00'   E 138° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>999</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
+       <tr><td>HDD18 <b>3838</b>, CDD10 <b>988</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NN_Nagano/JPN_NN_Karuizawa.476220_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.6000,36.30000,999.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Katsuura Chiba JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN CH Katsuura.476740 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47674</td></tr>
+       <tr><td>WMO <b>476740</b></td></tr>
+       <tr><td><b>N 35° 12.00'   E 140° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>12</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.3 C</b>, <b>34.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1595</b>, CDD10 <b>2284</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/CH_Chiba/JPN_CH_Katsuura.476740_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.3000,35.20000,12.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kawaguchiko Yamanashi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YN Kawaguchiko.476400 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47640</td></tr>
+       <tr><td>WMO <b>476400</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 138° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>860</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.1 C</b>, <b>19.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.9 C</b>, <b>84.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3121</b>, CDD10 <b>1317</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YN_Yamanashi/JPN_YN_Kawaguchiko.476400_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.8000,35.50000,860.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kitamiesashi Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Kitamiesashi.474020 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47402</td></tr>
+       <tr><td>WMO <b>474020</b></td></tr>
+       <tr><td><b>N 44° 54.00'   E 142° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>7</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.1 C</b>, <b>10.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.3 C</b>, <b>77.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4583</b>, CDD10 <b>734</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Kitamiesashi.474020_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>142.6000,44.90000,7.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kobe Hyogo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HG Kobe.477700 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47770</td></tr>
+       <tr><td>WMO <b>477700</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 135° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>58</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1721</b>, CDD10 <b>2510</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HG_Hyogo/JPN_HG_Kobe.477700_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.2000,34.70000,58.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kochi Kochi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KC Kochi.478930 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47893</td></tr>
+       <tr><td>WMO <b>478930</b></td></tr>
+       <tr><td><b>N 33° 36.00'   E 133° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.3 C</b>, <b>32.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1509</b>, CDD10 <b>2690</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KC_Kochi/JPN_KC_Kochi.478930_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.5000,33.60000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kofu Yamanashi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YN Kofu.476380 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47638</td></tr>
+       <tr><td>WMO <b>476380</b></td></tr>
+       <tr><td><b>N 35° 42.00'   E 138° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>273</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.0 C</b>, <b>26.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.3 C</b>, <b>91.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2173</b>, CDD10 <b>2181</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YN_Yamanashi/JPN_YN_Kofu.476380_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.6000,35.70000,273.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kumagaya Saitama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ST Kumagaya.476260 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47626</td></tr>
+       <tr><td>WMO <b>476260</b></td></tr>
+       <tr><td><b>N 36° 12.00'   E 139° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2050</b>, CDD10 <b>2199</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ST_Saitama/JPN_ST_Kumagaya.476260_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.4000,36.20000,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kumamoto Kumamoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KM Kumamoto.478190 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47819</td></tr>
+       <tr><td>WMO <b>478190</b></td></tr>
+       <tr><td><b>N 32° 48.00'   E 130° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>38</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1616</b>, CDD10 <b>2697</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KM_Kumamoto/JPN_KM_Kumamoto.478190_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.7000,32.80000,38.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kumejima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Kumejima.479290 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47929</td></tr>
+       <tr><td>WMO <b>479290</b></td></tr>
+       <tr><td><b>N 26° 18.00'   E 126° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.8 C</b>, <b>53.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>186</b>, CDD10 <b>4534</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Kumejima.479290_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>126.8000,26.30000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kure Hiroshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HS Kure.477660 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47766</td></tr>
+       <tr><td>WMO <b>477660</b></td></tr>
+       <tr><td><b>N 34° 12.00'   E 132° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1679</b>, CDD10 <b>2510</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HS_Hiroshima/JPN_HS_Kure.477660_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>132.6000,34.20000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kushiro Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Kushiro.474180 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47418</td></tr>
+       <tr><td>WMO <b>474180</b></td></tr>
+       <tr><td><b>N 43° 0.00'   E 144° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.2 C</b>, <b>8.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.3 C</b>, <b>72.1 F</b></td></tr>
+       <tr><td>HDD18 <b>4483</b>, CDD10 <b>637</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Kushiro.474180_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>144.4000,43.00000,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kutchan Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Kutchan.474330 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47433</td></tr>
+       <tr><td>WMO <b>474330</b></td></tr>
+       <tr><td><b>N 42° 54.00'   E 140° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>174</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.2 C</b>, <b>8.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.2 C</b>, <b>79.2 F</b></td></tr>
+       <tr><td>HDD18 <b>4303</b>, CDD10 <b>953</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Kutchan.474330_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.8000,42.90000,174.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kyoto Kyoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KY Kyoto.477590 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47759</td></tr>
+       <tr><td>WMO <b>477590</b></td></tr>
+       <tr><td><b>N 35° 0.00'   E 135° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>41</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.1 C</b>, <b>32.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1863</b>, CDD10 <b>2497</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KY_Kyoto/JPN_KY_Kyoto.477590_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.7000,35.00000,41.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Maebashi Gunma JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN GM Maebashi.476240 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47624</td></tr>
+       <tr><td>WMO <b>476240</b></td></tr>
+       <tr><td><b>N 36° 24.00'   E 139° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>112</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.6 C</b>, <b>29.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2116</b>, CDD10 <b>2137</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/GM_Gunma/JPN_GM_Maebashi.476240_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.1000,36.40000,112.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Maizuru Kyoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KY Maizuru.477500 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47750</td></tr>
+       <tr><td>WMO <b>477500</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 135° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2108</b>, CDD10 <b>2199</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KY_Kyoto/JPN_KY_Maizuru.477500_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.3000,35.50000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Makurazaki Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Makurazaki.478310 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47831</td></tr>
+       <tr><td>WMO <b>478310</b></td></tr>
+       <tr><td><b>N 31° 18.00'   E 130° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.2 C</b>, <b>88.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1153</b>, CDD10 <b>2939</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Makurazaki.478310_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.3000,31.30000,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Matsue Shimane JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SM Matsue.477410 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47741</td></tr>
+       <tr><td>WMO <b>477410</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 133° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>17</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.2 C</b>, <b>31.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1998</b>, CDD10 <b>2199</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SM_Shimane/JPN_SM_Matsue.477410_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.1000,35.50000,17.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Matsumoto Nagano JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NN Matsumoto.476180 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47618</td></tr>
+       <tr><td>WMO <b>476180</b></td></tr>
+       <tr><td><b>N 36° 18.00'   E 138° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>610</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.8 C</b>, <b>19.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2901</b>, CDD10 <b>1694</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NN_Nagano/JPN_NN_Matsumoto.476180_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.0000,36.30000,610.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Matsuyama Ehime JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN EH Matsuyama.478870 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47887</td></tr>
+       <tr><td>WMO <b>478870</b></td></tr>
+       <tr><td><b>N 33° 48.00'   E 132° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1666</b>, CDD10 <b>2529</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/EH_Ehime/JPN_EH_Matsuyama.478870_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>132.8000,33.80000,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Minamidaitojima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Minamidaitojima.479450 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47945</td></tr>
+       <tr><td>WMO <b>479450</b></td></tr>
+       <tr><td><b>N 25° 48.00'   E 131° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>14</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>12.7 C</b>, <b>54.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>HDD18 <b>102</b>, CDD10 <b>4698</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Minamidaitojima.479450_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.2000,25.80000,14.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Minamitorishima Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Minamitorishima.479910 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47991</td></tr>
+       <tr><td>WMO <b>479910</b></td></tr>
+       <tr><td><b>N 24° 18.00'   E 154° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>8</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>18.7 C</b>, <b>65.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
+       <tr><td>HDD18 <b>0</b>, CDD10 <b>5578</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Minamitorishima.479910_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>154.0000,24.30000,8.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mishima Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Mishima.476570 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47657</td></tr>
+       <tr><td>WMO <b>476570</b></td></tr>
+       <tr><td><b>N 35° 6.00'   E 138° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>21</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1702</b>, CDD10 <b>2386</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Mishima.476570_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.9000,35.10000,21.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mito Ibaraki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IB Mito.476290 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47629</td></tr>
+       <tr><td>WMO <b>476290</b></td></tr>
+       <tr><td><b>N 36° 24.00'   E 140° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>29</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.8 C</b>, <b>27.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2285</b>, CDD10 <b>1930</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IB_Ibaraki/JPN_IB_Mito.476290_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.5000,36.40000,29.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miyakejima Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Miyakejima.476770 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47677</td></tr>
+       <tr><td>WMO <b>476770</b></td></tr>
+       <tr><td><b>N 34° 6.00'   E 139° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>36</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.3 C</b>, <b>41.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.4 C</b>, <b>84.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1061</b>, CDD10 <b>2811</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Miyakejima.476770_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.5000,34.10000,36.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miyako Iwate JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IW Miyako.475850 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47585</td></tr>
+       <tr><td>WMO <b>475850</b></td></tr>
+       <tr><td><b>N 39° 42.00'   E 142° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>43</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.1 C</b>, <b>22.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>HDD18 <b>3005</b>, CDD10 <b>1334</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IW_Iwate/JPN_IW_Miyako.475850_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>142.0000,39.70000,43.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miyakojima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Miyakojima.479270 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47927</td></tr>
+       <tr><td>WMO <b>479270</b></td></tr>
+       <tr><td><b>N 24° 48.00'   E 125° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>40</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>13.8 C</b>, <b>56.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>102</b>, CDD10 <b>4788</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Miyakojima.479270_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>125.3000,24.80000,40.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miyakonojo Miyazaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MZ Miyakonojo.478290 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47829</td></tr>
+       <tr><td>WMO <b>478290</b></td></tr>
+       <tr><td><b>N 31° 42.00'   E 131° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>154</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1609</b>, CDD10 <b>2537</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MZ_Miyazaki/JPN_MZ_Miyakonojo.478290_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.1000,31.70000,154.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miyazaki Miyazaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MZ Miyazaki.478300 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47830</td></tr>
+       <tr><td>WMO <b>478300</b></td></tr>
+       <tr><td><b>N 31° 54.00'   E 131° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.1 C</b>, <b>34.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1344</b>, CDD10 <b>2798</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MZ_Miyazaki/JPN_MZ_Miyazaki.478300_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.4000,31.90000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mombetsu Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Mombetsu.474350 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47435</td></tr>
+       <tr><td>WMO <b>474350</b></td></tr>
+       <tr><td><b>N 44° 24.00'   E 143° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>16</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.8 C</b>, <b>10.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4437</b>, CDD10 <b>779</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Mombetsu.474350_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>143.4000,44.40000,16.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Morioka Iwate JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IW Morioka.475840 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47584</td></tr>
+       <tr><td>WMO <b>475840</b></td></tr>
+       <tr><td><b>N 39° 42.00'   E 141° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>155</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.7 C</b>, <b>85.5 F</b></td></tr>
+       <tr><td>HDD18 <b>3270</b>, CDD10 <b>1441</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IW_Iwate/JPN_IW_Morioka.475840_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.2000,39.70000,155.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Muroran Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Muroran.474230 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47423</td></tr>
+       <tr><td>WMO <b>474230</b></td></tr>
+       <tr><td><b>N 42° 18.00'   E 141° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>40</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>HDD18 <b>3625</b>, CDD10 <b>1027</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Muroran.474230_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.0000,42.30000,40.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Murotomisaki Kochi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KC Murotomisaki.478990 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47899</td></tr>
+       <tr><td>WMO <b>478990</b></td></tr>
+       <tr><td><b>N 33° 18.00'   E 134° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>185</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.4 C</b>, <b>36.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.9 C</b>, <b>84.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1368</b>, CDD10 <b>2545</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KC_Kochi/JPN_KC_Murotomisaki.478990_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.2000,33.30000,185.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mutsu Aomori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AO Mutsu.475760 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47576</td></tr>
+       <tr><td>WMO <b>475760</b></td></tr>
+       <tr><td><b>N 41° 18.00'   E 141° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.6 C</b>, <b>20.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3400</b>, CDD10 <b>1193</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AO_Aomori/JPN_AO_Mutsu.475760_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.2000,41.30000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nagano Nagano JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NN Nagano.476100 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47610</td></tr>
+       <tr><td>WMO <b>476100</b></td></tr>
+       <tr><td><b>N 36° 42.00'   E 138° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>418</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.4 C</b>, <b>22.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>2861</b>, CDD10 <b>1782</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NN_Nagano/JPN_NN_Nagano.476100_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.2000,36.70000,418.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nagasaki Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Nagasaki.478170 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47817</td></tr>
+       <tr><td>WMO <b>478170</b></td></tr>
+       <tr><td><b>N 32° 42.00'   E 129° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.9 C</b>, <b>35.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1409</b>, CDD10 <b>2735</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Nagasaki.478170_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>129.9000,32.70000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nago Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Nago.479400 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47940</td></tr>
+       <tr><td>WMO <b>479400</b></td></tr>
+       <tr><td><b>N 26° 36.00'   E 128° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.6 C</b>, <b>52.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>279</b>, CDD10 <b>4236</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Nago.479400_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>128.0000,26.60000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nagoya Aichi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN AI Nagoya.476360 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47636</td></tr>
+       <tr><td>WMO <b>476360</b></td></tr>
+       <tr><td><b>N 35° 12.00'   E 137° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>51</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.3 C</b>, <b>31.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1874</b>, CDD10 <b>2435</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/AI_Aichi/JPN_AI_Nagoya.476360_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.0000,35.20000,51.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Naha Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Naha.479360 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47936</td></tr>
+       <tr><td>WMO <b>479360</b></td></tr>
+       <tr><td><b>N 26° 12.00'   E 127° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>28</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>12.9 C</b>, <b>55.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>HDD18 <b>172</b>, CDD10 <b>4554</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Naha.479360_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>127.7000,26.20000,28.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nara Nara JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NR Nara.477800 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47780</td></tr>
+       <tr><td>WMO <b>477800</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 135° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>104</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.4 C</b>, <b>29.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2028</b>, CDD10 <b>2254</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NR_Nara/JPN_NR_Nara.477800_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.8000,34.70000,104.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Naze Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Naze.479090 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47909</td></tr>
+       <tr><td>WMO <b>479090</b></td></tr>
+       <tr><td><b>N 28° 24.00'   E 129° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>10.4 C</b>, <b>50.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>343</b>, CDD10 <b>4157</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Naze.479090_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>129.5000,28.40000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nemuro Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Nemuro.474200 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47420</td></tr>
+       <tr><td>WMO <b>474200</b></td></tr>
+       <tr><td><b>N 43° 18.00'   E 145° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>26</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.0 C</b>, <b>15.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.6 C</b>, <b>72.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4391</b>, CDD10 <b>591</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Nemuro.474200_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>145.6000,43.30000,26.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Niigata Niigata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NI Niigata.476040 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47604</td></tr>
+       <tr><td>WMO <b>476040</b></td></tr>
+       <tr><td><b>N 37° 54.00'   E 139° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2329</b>, CDD10 <b>2028</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NI_Niigata/JPN_NI_Niigata.476040_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.1000,37.90000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nikko Tochigi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TC Nikko.476900 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47690</td></tr>
+       <tr><td>WMO <b>476900</b></td></tr>
+       <tr><td><b>N 36° 42.00'   E 139° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>1292</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.7 C</b>, <b>14.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.8 C</b>, <b>74.8 F</b></td></tr>
+       <tr><td>HDD18 <b>4160</b>, CDD10 <b>757</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TC_Tochigi/JPN_TC_Nikko.476900_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.5000,36.70000,1292.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nobeoka Miyazaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MZ Nobeoka.478220 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47822</td></tr>
+       <tr><td>WMO <b>478220</b></td></tr>
+       <tr><td><b>N 32° 36.00'   E 131° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>19</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.1 C</b>, <b>32.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1480</b>, CDD10 <b>2561</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MZ_Miyazaki/JPN_MZ_Nobeoka.478220_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.7000,32.60000,19.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Obihiro Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Obihiro.474170 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47417</td></tr>
+       <tr><td>WMO <b>474170</b></td></tr>
+       <tr><td><b>N 42° 54.00'   E 143° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>38</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-16.0 C</b>, <b>3.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
+       <tr><td>HDD18 <b>4350</b>, CDD10 <b>937</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Obihiro.474170_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>143.2000,42.90000,38.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ofunato Iwate JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IW Ofunato.475120 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47512</td></tr>
+       <tr><td>WMO <b>475120</b></td></tr>
+       <tr><td><b>N 39° 6.00'   E 141° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>37</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.9 C</b>, <b>25.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2864</b>, CDD10 <b>1460</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IW_Iwate/JPN_IW_Ofunato.475120_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.7000,39.10000,37.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Oita Oita JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN OT Oita.478150 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47815</td></tr>
+       <tr><td>WMO <b>478150</b></td></tr>
+       <tr><td><b>N 33° 12.00'   E 131° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>5</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.7 C</b>, <b>33.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1651</b>, CDD10 <b>2487</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/OT_Oita/JPN_OT_Oita.478150_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.6000,33.20000,5.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Okayama Okayama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN OY Okayama.477680 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47768</td></tr>
+       <tr><td>WMO <b>477680</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 133° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.2 C</b>, <b>31.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1751</b>, CDD10 <b>2621</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/OY_Okayama/JPN_OY_Okayama.477680_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.9000,34.70000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Okinoerabu Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Okinoerabu.479420 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47942</td></tr>
+       <tr><td>WMO <b>479420</b></td></tr>
+       <tr><td><b>N 27° 24.00'   E 128° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>12.2 C</b>, <b>54.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.3 C</b>, <b>88.3 F</b></td></tr>
+       <tr><td>HDD18 <b>175</b>, CDD10 <b>4472</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Okinoerabu.479420_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>128.7000,27.40000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Omaezaki Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Omaezaki.476550 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47655</td></tr>
+       <tr><td>WMO <b>476550</b></td></tr>
+       <tr><td><b>N 34° 36.00'   E 138° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>45</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.6 C</b>, <b>85.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1518</b>, CDD10 <b>2493</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Omaezaki.476550_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.2000,34.60000,45.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Omu Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Omu.474050 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47405</td></tr>
+       <tr><td>WMO <b>474050</b></td></tr>
+       <tr><td><b>N 44° 36.00'   E 143° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>14</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.2 C</b>, <b>6.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4677</b>, CDD10 <b>700</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Omu.474050_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>143.0000,44.60000,14.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Onahama Fukushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FS Onahama.475980 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47598</td></tr>
+       <tr><td>WMO <b>475980</b></td></tr>
+       <tr><td><b>N 37° 0.00'   E 140° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.3 C</b>, <b>29.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2261</b>, CDD10 <b>1774</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FS_Fukushima/JPN_FS_Onahama.475980_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.9000,37.00000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Osaka Osaka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN OS Osaka.477720 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47772</td></tr>
+       <tr><td>WMO <b>477720</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 135° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>23</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.6 C</b>, <b>34.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.4 C</b>, <b>92.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1612</b>, CDD10 <b>2688</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/OS_Osaka/JPN_OS_Osaka.477720_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.5000,34.70000,23.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Oshima Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Oshima.476750 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47675</td></tr>
+       <tr><td>WMO <b>476750</b></td></tr>
+       <tr><td><b>N 34° 48.00'   E 139° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>190</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.4 C</b>, <b>36.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.5 C</b>, <b>85.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1678</b>, CDD10 <b>2121</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Oshima.476750_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.4000,34.80000,190.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Otaru Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Otaru.474110 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47411</td></tr>
+       <tr><td>WMO <b>474110</b></td></tr>
+       <tr><td><b>N 43° 12.00'   E 141° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>25</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3714</b>, CDD10 <b>1133</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Otaru.474110_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.0000,43.20000,25.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Owase Mie JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ME Owase.476630 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47663</td></tr>
+       <tr><td>WMO <b>476630</b></td></tr>
+       <tr><td><b>N 34° 6.00'   E 136° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>15</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.5 C</b>, <b>32.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1595</b>, CDD10 <b>2405</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ME_Mie/JPN_ME_Owase.476630_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.2000,34.10000,15.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rumoi Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Rumoi.474060 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47406</td></tr>
+       <tr><td>WMO <b>474060</b></td></tr>
+       <tr><td><b>N 44° 0.00'   E 141° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>24</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.5 C</b>, <b>13.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.3 C</b>, <b>77.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4007</b>, CDD10 <b>994</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Rumoi.474060_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.6000,44.00000,24.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Saga Saga JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SG Saga.478130 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47813</td></tr>
+       <tr><td>WMO <b>478130</b></td></tr>
+       <tr><td><b>N 33° 18.00'   E 130° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.0 C</b>, <b>32.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.4 C</b>, <b>92.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1643</b>, CDD10 <b>2634</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SG_Saga/JPN_SG_Saga.478130_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.3000,33.30000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Saigo Shimane JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SM Saigo.477400 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47740</td></tr>
+       <tr><td>WMO <b>477400</b></td></tr>
+       <tr><td><b>N 36° 12.00'   E 133° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.4 C</b>, <b>86.7 F</b></td></tr>
+       <tr><td>HDD18 <b>2082</b>, CDD10 <b>2035</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SM_Shimane/JPN_SM_Saigo.477400_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.3000,36.20000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sakai Shimane JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SM Sakai.477420 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47742</td></tr>
+       <tr><td>WMO <b>477420</b></td></tr>
+       <tr><td><b>N 35° 36.00'   E 133° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.1 C</b>, <b>32.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1924</b>, CDD10 <b>2268</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SM_Shimane/JPN_SM_Sakai.477420_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.2000,35.60000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sakata Yamagata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YT Sakata.475870 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47587</td></tr>
+       <tr><td>WMO <b>475870</b></td></tr>
+       <tr><td><b>N 38° 54.00'   E 139° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.2 C</b>, <b>28.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.6 C</b>, <b>87.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2630</b>, CDD10 <b>1755</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YT_Yamagatai/JPN_YT_Sakata.475870_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.9000,38.90000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sapporo Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Sapporo.474120 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47412</td></tr>
+       <tr><td>WMO <b>474120</b></td></tr>
+       <tr><td><b>N 43° 6.00'   E 141° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>17</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.6 C</b>, <b>16.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3734</b>, CDD10 <b>1190</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Sapporo.474120_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.3000,43.10000,17.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sasebo Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Sasebo.478120 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47812</td></tr>
+       <tr><td>WMO <b>478120</b></td></tr>
+       <tr><td><b>N 33° 12.00'   E 129° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>17</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.5 C</b>, <b>34.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1510</b>, CDD10 <b>2654</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Sasebo.478120_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>129.7000,33.20000,17.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sendai Miyagi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN MG Sendai.475900 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47590</td></tr>
+       <tr><td>WMO <b>475900</b></td></tr>
+       <tr><td><b>N 38° 18.00'   E 140° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>39</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.6 C</b>, <b>27.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.9 C</b>, <b>85.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2614</b>, CDD10 <b>1685</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/MG_Miyagi/JPN_MG_Sendai.475900_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.9000,38.30000,39.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shimizu-Ashizuri Kochi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KC Shimizu-Ashizuri.478980 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47898</td></tr>
+       <tr><td>WMO <b>478980</b></td></tr>
+       <tr><td><b>N 32° 42.00'   E 133° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>31</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.0 C</b>, <b>37.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1093</b>, CDD10 <b>3007</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KC_Kochi/JPN_KC_Shimizu-Ashizuri.478980_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.0000,32.70000,31.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shimonoseki Yamaguchi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YC Shimonoseki.477620 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47762</td></tr>
+       <tr><td>WMO <b>477620</b></td></tr>
+       <tr><td><b>N 34° 0.00'   E 130° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.7 C</b>, <b>36.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.3 C</b>, <b>88.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1599</b>, CDD10 <b>2490</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YC_Yamaguchii/JPN_YC_Shimonoseki.477620_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.9000,34.00000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shinjo Yamagata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YT Shinjo.475200 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47520</td></tr>
+       <tr><td>WMO <b>475200</b></td></tr>
+       <tr><td><b>N 38° 48.00'   E 140° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>105</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.2 C</b>, <b>22.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.4 C</b>, <b>86.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3047</b>, CDD10 <b>1573</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YT_Yamagatai/JPN_YT_Shinjo.475200_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.3000,38.80000,105.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shionomisaki Wakayama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN WK Shionomisaki.477780 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47778</td></tr>
+       <tr><td>WMO <b>477780</b></td></tr>
+       <tr><td><b>N 33° 30.00'   E 135° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>73</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.9 C</b>, <b>37.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.8 C</b>, <b>85.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1274</b>, CDD10 <b>2689</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/WK_Wakayamai/JPN_WK_Shionomisaki.477780_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.8000,33.50000,73.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shirakawa Fukushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FS Shirakawa.475970 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47597</td></tr>
+       <tr><td>WMO <b>475970</b></td></tr>
+       <tr><td><b>N 37° 6.00'   E 140° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>354</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.7 C</b>, <b>23.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2876</b>, CDD10 <b>1553</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FS_Fukushima/JPN_FS_Shirakawa.475970_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.2000,37.10000,354.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shizuoka Shizuoka JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN SZ Shizuoka.476560 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47656</td></tr>
+       <tr><td>WMO <b>476560</b></td></tr>
+       <tr><td><b>N 35° 0.00'   E 138° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>14</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1498</b>, CDD10 <b>2550</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/SZ_Shizuoka/JPN_SZ_Shizuoka.476560_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.4000,35.00000,14.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sumoto Hyogo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HG Sumoto.477760 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47776</td></tr>
+       <tr><td>WMO <b>477760</b></td></tr>
+       <tr><td><b>N 34° 18.00'   E 134° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>109</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.8 C</b>, <b>87.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1792</b>, CDD10 <b>2367</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HG_Hyogo/JPN_HG_Sumoto.477760_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.9000,34.30000,109.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Suttsu Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Suttsu.474210 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47421</td></tr>
+       <tr><td>WMO <b>474210</b></td></tr>
+       <tr><td><b>N 42° 48.00'   E 140° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.3 C</b>, <b>18.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.5 C</b>, <b>77.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3681</b>, CDD10 <b>1042</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Suttsu.474210_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.2000,42.80000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Suwa Nagano JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NN Suwa.476200 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47620</td></tr>
+       <tr><td>WMO <b>476200</b></td></tr>
+       <tr><td><b>N 36° 6.00'   E 138° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>760</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>HDD18 <b>3095</b>, CDD10 <b>1541</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NN_Nagano/JPN_NN_Suwa.476200_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.1000,36.10000,760.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tadotsu Kagawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KG Tadotsu.478900 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47890</td></tr>
+       <tr><td>WMO <b>478900</b></td></tr>
+       <tr><td><b>N 34° 18.00'   E 133° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.7 C</b>, <b>90.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1695</b>, CDD10 <b>2492</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KG_Kagawa/JPN_KG_Tadotsu.478900_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.8000,34.30000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Takada Niigata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NI Takada.476120 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47612</td></tr>
+       <tr><td>WMO <b>476120</b></td></tr>
+       <tr><td><b>N 37° 6.00'   E 138° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>13</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.7 C</b>, <b>28.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2369</b>, CDD10 <b>2034</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NI_Niigata/JPN_NI_Takada.476120_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>138.3000,37.10000,13.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Takamatsu Kagawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KG Takamatsu.478910 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47891</td></tr>
+       <tr><td>WMO <b>478910</b></td></tr>
+       <tr><td><b>N 34° 18.00'   E 134° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.6 C</b>, <b>33.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.4 C</b>, <b>92.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1794</b>, CDD10 <b>2437</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KG_Kagawa/JPN_KG_Takamatsu.478910_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.1000,34.30000,9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Takayama Gifu JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN GF Takayama.476170 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47617</td></tr>
+       <tr><td>WMO <b>476170</b></td></tr>
+       <tr><td><b>N 36° 12.00'   E 137° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>560</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.3 C</b>, <b>88.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3137</b>, CDD10 <b>1572</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/GF_Gifu/JPN_GF_Takayama.476170_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.3000,36.20000,560.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tanegashima Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Tanegashima.478370 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47837</td></tr>
+       <tr><td>WMO <b>478370</b></td></tr>
+       <tr><td><b>N 30° 42.00'   E 131° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>17</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.9 C</b>, <b>44.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.2 C</b>, <b>88.2 F</b></td></tr>
+       <tr><td>HDD18 <b>704</b>, CDD10 <b>3447</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Tanegashima.478370_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.0000,30.70000,17.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tateno Ibaraki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IB Tateno.476460 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47646</td></tr>
+       <tr><td>WMO <b>476460</b></td></tr>
+       <tr><td><b>N 36° 6.00'   E 140° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>25</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-8.4 C</b>, <b>16.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2289</b>, CDD10 <b>1990</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IB_Ibaraki/JPN_IB_Tateno.476460_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.1000,36.10000,25.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tateyama Chiba JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN CH Tateyama.476720 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47672</td></tr>
+       <tr><td>WMO <b>476720</b></td></tr>
+       <tr><td><b>N 35° 0.00'   E 139° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1596</b>, CDD10 <b>2363</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/CH_Chiba/JPN_CH_Tateyama.476720_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.9000,35.00000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tokushima Tokushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TS Tokushima.478950 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47895</td></tr>
+       <tr><td>WMO <b>478950</b></td></tr>
+       <tr><td><b>N 34° 6.00'   E 134° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.5 C</b>, <b>34.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.3 C</b>, <b>90.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1615</b>, CDD10 <b>2555</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TS_Tokushima/JPN_TS_Tokushima.478950_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.6000,34.10000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tokyo Tokyo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TK Tokyo.476620 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47662</td></tr>
+       <tr><td>WMO <b>476620</b></td></tr>
+       <tr><td><b>N 35° 42.00'   E 139° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>5</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.7 C</b>, <b>35.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1681</b>, CDD10 <b>2462</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TK_Tokyo/JPN_TK_Tokyo.476620_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.8000,35.70000,5.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tomakomai Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Tomakomai.474240 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47424</td></tr>
+       <tr><td>WMO <b>474240</b></td></tr>
+       <tr><td><b>N 42° 36.00'   E 141° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.5 C</b>, <b>76.1 F</b></td></tr>
+       <tr><td>HDD18 <b>4026</b>, CDD10 <b>892</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Tomakomai.474240_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.6000,42.60000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tottori Tottori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TT Tottori.474240 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47746</td></tr>
+       <tr><td>WMO <b>477460</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 134° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>7</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1987</b>, CDD10 <b>2267</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TT_Tottori/JPN_TT_Tottori.474240_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.2000,35.50000,7.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Toyama Toyama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TY Toyama.476070 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47607</td></tr>
+       <tr><td>WMO <b>476070</b></td></tr>
+       <tr><td><b>N 36° 42.00'   E 137° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.5 C</b>, <b>29.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2260</b>, CDD10 <b>2082</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/Toyama/JPN_TY_Toyama.476070_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>137.2000,36.70000,9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Toyooka Hyogo JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HG Toyooka.477470 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47747</td></tr>
+       <tr><td>WMO <b>477470</b></td></tr>
+       <tr><td><b>N 35° 30.00'   E 134° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.3 C</b>, <b>29.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2215</b>, CDD10 <b>2143</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HG_Hyogo/JPN_HG_Toyooka.477470_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.8000,35.50000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tsu Mie JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ME Tsu.476510 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47651</td></tr>
+       <tr><td>WMO <b>476510</b></td></tr>
+       <tr><td><b>N 34° 42.00'   E 136° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1848</b>, CDD10 <b>2385</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ME_Mie/JPN_ME_Tsu.476510_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.5000,34.70000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tsuruga Fukui JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FI Tsuruga.476310 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47631</td></tr>
+       <tr><td>WMO <b>476310</b></td></tr>
+       <tr><td><b>N 35° 42.00'   E 136° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.4 C</b>, <b>32.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1929</b>, CDD10 <b>2317</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FI_Fukui/JPN_FI_Tsuruga.476310_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.1000,35.70000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tsurugisan Tokushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TS Tsurugisan.478940 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47894</td></tr>
+       <tr><td>WMO <b>478940</b></td></tr>
+       <tr><td><b>N 33° 54.00'   E 134° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>1945</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-18.2 C</b>, <b>-0.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>20.6 C</b>, <b>69.1 F</b></td></tr>
+       <tr><td>HDD18 <b>5016</b>, CDD10 <b>436</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TS_Tokushima/JPN_TS_Tsurugisan.478940_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.1000,33.90000,1945.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tsuyama Okayama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN OY Tsuyama.477560 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47756</td></tr>
+       <tr><td>WMO <b>477560</b></td></tr>
+       <tr><td><b>N 35° 6.00'   E 134° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>146</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.9 C</b>, <b>26.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.3 C</b>, <b>90.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2355</b>, CDD10 <b>2034</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/OY_Okayama/JPN_OY_Tsuyama.477560_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>134.0000,35.10000,146.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ueno Mie JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ME Ueno.476490 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47649</td></tr>
+       <tr><td>WMO <b>476490</b></td></tr>
+       <tr><td><b>N 34° 48.00'   E 136° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>159</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.1 C</b>, <b>28.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2271</b>, CDD10 <b>2063</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ME_Mie/JPN_ME_Ueno.476490_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.2000,34.80000,159.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Unzendake Nagasaki JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN NS Unzendake.478180 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47818</td></tr>
+       <tr><td>WMO <b>478180</b></td></tr>
+       <tr><td><b>N 32° 42.00'   E 130° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>678</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.1 C</b>, <b>26.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2363</b>, CDD10 <b>1719</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/NS_Nagasaki/JPN_NS_Unzendake.478180_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.3000,32.70000,678.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Urakawa Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Urakawa.474260 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47426</td></tr>
+       <tr><td>WMO <b>474260</b></td></tr>
+       <tr><td><b>N 42° 12.00'   E 142° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+10.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3838</b>, CDD10 <b>898</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Urakawa.474260_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>142.8000,42.20000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ushibuka Kumamoto JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KM Ushibuka.478380 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47838</td></tr>
+       <tr><td>WMO <b>478380</b></td></tr>
+       <tr><td><b>N 32° 12.00'   E 130° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.3 C</b>, <b>37.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1200</b>, CDD10 <b>2927</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KM_Kumamoto/JPN_KM_Ushibuka.478380_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.0000,32.20000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Utsunomiya Tochigi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TC Utsunomiya.476150 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47615</td></tr>
+       <tr><td>WMO <b>476150</b></td></tr>
+       <tr><td><b>N 36° 36.00'   E 139° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>119</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.1 C</b>, <b>26.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2357</b>, CDD10 <b>1971</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TC_Tochigi/JPN_TC_Utsunomiya.476150_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.9000,36.60000,119.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Uwajima Ehime JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN EH Uwajima.478920 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47892</td></tr>
+       <tr><td>WMO <b>478920</b></td></tr>
+       <tr><td><b>N 33° 12.00'   E 132° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>43</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.0 C</b>, <b>33.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1548</b>, CDD10 <b>2529</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/EH_Ehime/JPN_EH_Uwajima.478920_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>132.6000,33.20000,43.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wajima Ishikawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN IS Wajima.476000 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47600</td></tr>
+       <tr><td>WMO <b>476000</b></td></tr>
+       <tr><td><b>N 37° 24.00'   E 136° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>5</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.1 C</b>, <b>30.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2332</b>, CDD10 <b>1898</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/IS_Ishikawa/JPN_IS_Wajima.476000_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.9000,37.40000,5.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wakamatsu Fukushima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN FS Wakamatsu.475700 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47570</td></tr>
+       <tr><td>WMO <b>475700</b></td></tr>
+       <tr><td><b>N 37° 30.00'   E 139° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>212</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.0 C</b>, <b>23.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2926</b>, CDD10 <b>1747</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/FS_Fukushima/JPN_FS_Wakamatsu.475700_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.9000,37.50000,212.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wakayama Wakayama JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN WK Wakayama.477770 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47777</td></tr>
+       <tr><td>WMO <b>477770</b></td></tr>
+       <tr><td><b>N 34° 12.00'   E 135° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>14</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.4 C</b>, <b>34.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1604</b>, CDD10 <b>2624</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/WK_Wakayamai/JPN_WK_Wakayama.477770_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>135.2000,34.20000,14.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wakkanai Hokkaido JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN HK Wakkanai.474010 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47401</td></tr>
+       <tr><td>WMO <b>474010</b></td></tr>
+       <tr><td><b>N 45° 24.00'   E 141° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.7 C</b>, <b>14.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.6 C</b>, <b>74.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4270</b>, CDD10 <b>804</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/HK_Hokkaido/JPN_HK_Wakkanai.474010_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>141.7000,45.40000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yakushima Kagoshima JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KS Yakushima.478360 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47836</td></tr>
+       <tr><td>WMO <b>478360</b></td></tr>
+       <tr><td><b>N 30° 24.00'   E 130° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>36</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.9 C</b>, <b>44.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>HDD18 <b>720</b>, CDD10 <b>3382</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KS_Kagoshima/JPN_KS_Yakushima.478360_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>130.7000,30.40000,36.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yamagata Yamagata JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YT Yamagata.475880 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47588</td></tr>
+       <tr><td>WMO <b>475880</b></td></tr>
+       <tr><td><b>N 38° 18.00'   E 140° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>153</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.6 C</b>, <b>23.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2917</b>, CDD10 <b>1706</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YT_Yamagatai/JPN_YT_Yamagata.475880_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>140.4000,38.30000,153.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yamaguchi Yamaguchi JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN YC Yamaguchi.477840 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47784</td></tr>
+       <tr><td>WMO <b>477840</b></td></tr>
+       <tr><td><b>N 34° 12.00'   E 131° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>17</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.0 C</b>, <b>30.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.7 C</b>, <b>90.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1936</b>, CDD10 <b>2324</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/YC_Yamaguchii/JPN_YC_Yamaguchi.477840_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>131.5000,34.20000,17.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yokkaichi Mie JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ME Yokkaichi.476840 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47684</td></tr>
+       <tr><td>WMO <b>476840</b></td></tr>
+       <tr><td><b>N 34° 54.00'   E 136° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>47</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.0 C</b>, <b>30.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1848</b>, CDD10 <b>2321</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ME_Mie/JPN_ME_Yokkaichi.476840_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>136.6000,34.90000,47.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yokohama Kanagawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN KN Yokohama.476700 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47670</td></tr>
+       <tr><td>WMO <b>476700</b></td></tr>
+       <tr><td><b>N 35° 24.00'   E 139° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>39</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.5 C</b>, <b>34.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1721</b>, CDD10 <b>2352</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/KN_Kanagawa/JPN_KN_Yokohama.476700_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>139.7000,35.40000,39.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yonago Tottori JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN TT Yonago.477440 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47744</td></tr>
+       <tr><td>WMO <b>477440</b></td></tr>
+       <tr><td><b>N 35° 24.00'   E 133° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.3 C</b>, <b>31.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.7 C</b>, <b>90.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1986</b>, CDD10 <b>2227</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/TT_Tottori/JPN_TT_Yonago.477440_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>133.4000,35.40000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yonaguni-jima Okinawa JPN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>JPN ON Yonaguni-jima.479120 JGMY</b></td></tr>
+       <tr><td><b>Data Source TMY2-47912</td></tr>
+       <tr><td>WMO <b>479120</b></td></tr>
+       <tr><td><b>N 24° 30.00'   E 123° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>13.8 C</b>, <b>56.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
+       <tr><td>HDD18 <b>77</b>, CDD10 <b>4915</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/JPN_Japan/ON_Okinawa/JPN_ON_Yonaguni-jima.479120_JGMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>123.0000,24.50000,30.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>

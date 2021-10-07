@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>IMS_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Beer Sheva D ISR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>ISR D Beer.Sheva.City.401900 IMS</b></td></tr>
+       <tr><td><b>Data Source MSI</td></tr>
+       <tr><td>WMO <b>401900</b></td></tr>
+       <tr><td><b>N 31° 15.00'   E 34° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>280</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 401910</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>6.3 C</b>, <b>43.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
+       <tr><td>HDD18 <b>763</b>, CDD10 <b>3386</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Beer.Sheva.City.401900_IMS.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.80000,31.25000,280.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Eilat-Hozman AP D ISR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>ISR D Eilat-Hozman.AP.401990 IMS</b></td></tr>
+       <tr><td><b>Data Source MSI</td></tr>
+       <tr><td>WMO <b>401990</b></td></tr>
+       <tr><td><b>N 29° 33.00'   E 34° 57.00'</b></td></tr>
+       <tr><td>Elevation <b>12</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>9.9 C</b>, <b>49.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.6 C</b>, <b>106.9 F</b></td></tr>
+       <tr><td>HDD18 <b>207</b>, CDD10 <b>5358</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Eilat-Hozman.AP.401990_IMS.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.95000,29.55000,12.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Jerusalem-Atarot AP JM ISR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>ISR JM Jerusalem-Atarot.AP.401840 IMS</b></td></tr>
+       <tr><td><b>Data Source MSI</td></tr>
+       <tr><td>WMO <b>401840</b></td></tr>
+       <tr><td><b>N 31° 52.00'   E 35° 13.00'</b></td></tr>
+       <tr><td>Elevation <b>757</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 402900</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1364</b>, CDD10 <b>2397</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/JM_Yerushalayim/ISR_JM_Jerusalem-Atarot.AP.401840_IMS.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>35.21670,31.86670,757.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tel Aviv-Bet Dagan TA ISR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>ISR TA Tel.Aviv-Bet.Dagan.401790 IMS</b></td></tr>
+       <tr><td><b>Data Source MSI</td></tr>
+       <tr><td>WMO <b>401790</b></td></tr>
+       <tr><td><b>N 32° 0.00'   E 34° 49.00'</b></td></tr>
+       <tr><td>Elevation <b>35</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 401800</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.2 C</b>, <b>91.8 F</b></td></tr>
+       <tr><td>HDD18 <b>709</b>, CDD10 <b>3285</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/TA_Tel-Aviv/ISR_TA_Tel.Aviv-Bet.Dagan.401790_IMS.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.81670,32.00000,35.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>

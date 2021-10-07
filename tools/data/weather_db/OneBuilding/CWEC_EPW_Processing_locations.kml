@@ -1,0 +1,1574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>CWEC_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Calgary Intl AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Calgary.Intl.AP.718770 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718770</b></td></tr>
+       <tr><td><b>N 51° 7.20'   W 114° 1.20'</b></td></tr>
+       <tr><td>Elevation <b>1084</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-24.9 C</b>, <b>-12.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>HDD18 <b>5147</b>, CDD10 <b>666</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Calgary.Intl.AP.718770_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-114.0200,51.12000,1084.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Edmonton Intl AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Edmonton.Intl.AP.711230 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711230</b></td></tr>
+       <tr><td><b>N 53° 19.20'   W 113° 34.80'</b></td></tr>
+       <tr><td>Elevation <b>723</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.2 C</b>, <b>-20.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>HDD18 <b>5583</b>, CDD10 <b>579</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Edmonton.Intl.AP.711230_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-113.5800,53.32000,723.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fort McMurray AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Fort.McMurray.AP.715850 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>715850</b></td></tr>
+       <tr><td><b>N 56° 39.00'   W 111° 12.60'</b></td></tr>
+       <tr><td>Elevation <b>369</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-31.9 C</b>, <b>-25.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.7 C</b>, <b>80.1 F</b></td></tr>
+       <tr><td>HDD18 <b>6190</b>, CDD10 <b>686</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Fort.McMurray.AP.715850_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-111.2100,56.65000,369.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Grand Prairie AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Grande.Prairie.AP.719400 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719400</b></td></tr>
+       <tr><td><b>N 55° 10.80'   W 118° 52.80'</b></td></tr>
+       <tr><td>Elevation <b>669</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-31.4 C</b>, <b>-24.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.7 C</b>, <b>78.3 F</b></td></tr>
+       <tr><td>HDD18 <b>5897</b>, CDD10 <b>547</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Grande.Prairie.AP.719400_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-118.8800,55.18000,669.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Lethbridge AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Lethbridge.AP.712430 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>712430</b></td></tr>
+       <tr><td><b>N 49° 37.80'   W 112° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>929</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-24.5 C</b>, <b>-12.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.7 C</b>, <b>85.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4430</b>, CDD10 <b>908</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Lethbridge.AP.712430_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-112.8000,49.63000,929.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Medicine Hat AP AB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN AB Medicine.Hat.AP.710260 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>710260</b></td></tr>
+       <tr><td><b>N 50° 1.80'   W 110° 43.20'</b></td></tr>
+       <tr><td>Elevation <b>715</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6B - Cold - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-25.2 C</b>, <b>-13.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>HDD18 <b>4677</b>, CDD10 <b>1050</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/AB_Alberta/CAN_AB_Medicine.Hat.AP.710260_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-110.7200,50.03000,715.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Abbotsford Intl AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Abbotsford.Intl.AP.711080 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711080</b></td></tr>
+       <tr><td><b>N 49° 1.80'   W 122° 22.20'</b></td></tr>
+       <tr><td>Elevation <b>58</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4C - Mixed - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.1 C</b>, <b>22.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3135</b>, CDD10 <b>817</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Abbotsford.Intl.AP.711080_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.3700,49.03000,58.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Comox Valley AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Comox.Valley.AP.718930 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718930</b></td></tr>
+       <tr><td><b>N 49° 43.20'   W 124° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>24</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.7 C</b>, <b>27.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.8 C</b>, <b>76.6 F</b></td></tr>
+       <tr><td>HDD18 <b>3177</b>, CDD10 <b>758</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Comox.Valley.AP.718930_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-124.9000,49.72000,24.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Cranbrook AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Cranbrook.AP.718800 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718800</b></td></tr>
+       <tr><td><b>N 49° 36.60'   W 115° 46.80'</b></td></tr>
+       <tr><td>Elevation <b>940</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-20.0 C</b>, <b>-4.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.6 C</b>, <b>85.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4646</b>, CDD10 <b>778</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Cranbrook.AP.718800_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-115.7800,49.61000,940.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fort St John-North Peace Rgnl AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Fort.St.John-North.Peace.Rgnl.AP.719430 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719430</b></td></tr>
+       <tr><td><b>N 56° 13.80'   W 120° 43.80'</b></td></tr>
+       <tr><td>Elevation <b>695</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.6 C</b>, <b>-21.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.5 C</b>, <b>76.1 F</b></td></tr>
+       <tr><td>HDD18 <b>5862</b>, CDD10 <b>537</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/Fort.St.John-North.Peace.Rgnl.AP.719430_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-120.7300,56.23000,695.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kamloops AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Kamloops.AP.717410 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717410</b></td></tr>
+       <tr><td><b>N 50° 42.00'   W 120° 26.40'</b></td></tr>
+       <tr><td>Elevation <b>345</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 718870</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5B - Cool - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.6 C</b>, <b>3.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3630</b>, CDD10 <b>1277</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Kamloops.AP.717410_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-120.4400,50.70000,345.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Port Hardy AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Port.Hardy.AP.711090 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711090</b></td></tr>
+       <tr><td><b>N 50° 40.80'   W 127° 22.20'</b></td></tr>
+       <tr><td>Elevation <b>22</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.4 C</b>, <b>27.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>18.8 C</b>, <b>65.8 F</b></td></tr>
+       <tr><td>HDD18 <b>3712</b>, CDD10 <b>326</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Port.Hardy.AP.711090_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-127.3700,50.68000,22.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Prince George AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Prince.George.AP.713020 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>713020</b></td></tr>
+       <tr><td><b>N 53° 52.80'   W 122° 40.80'</b></td></tr>
+       <tr><td>Elevation <b>691</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 718960</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-25.4 C</b>, <b>-13.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>HDD18 <b>5071</b>, CDD10 <b>490</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Prince.George.AP.713020_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.6800,53.88000,691.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Prince Rupert-Digby Island AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Prince.Rupert-Digby.Island.AP.718980 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718980</b></td></tr>
+       <tr><td><b>N 54° 17.40'   W 130° 26.40'</b></td></tr>
+       <tr><td>Elevation <b>35</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 710220</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>17.9 C</b>, <b>64.2 F</b></td></tr>
+       <tr><td>HDD18 <b>4152</b>, CDD10 <b>272</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Prince.Rupert-Digby.Island.AP.718980_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-130.4400,54.29000,35.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sandspit AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Sandspit.AP.711010 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711010</b></td></tr>
+       <tr><td><b>N 53° 15.00'   W 131° 49.20'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 711110</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.1 C</b>, <b>28.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>18.6 C</b>, <b>65.5 F</b></td></tr>
+       <tr><td>HDD18 <b>3642</b>, CDD10 <b>399</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Sandspit.AP.711010_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-131.8200,53.25000,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Smithers Rgnl AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Smithers.Rgnl.AP.719500 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719500</b></td></tr>
+       <tr><td><b>N 54° 49.20'   W 127° 10.80'</b></td></tr>
+       <tr><td>Elevation <b>522</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-22.5 C</b>, <b>-8.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>HDD18 <b>5266</b>, CDD10 <b>422</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Smithers.Regl.AP.719500_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-127.1800,54.82000,522.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Summerland BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Summerland.717680 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717680</b></td></tr>
+       <tr><td><b>N 49° 34.20'   W 119° 39.00'</b></td></tr>
+       <tr><td>Elevation <b>479</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5B - Cool - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>HDD18 <b>3386</b>, CDD10 <b>1138</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Summerland.717680_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-119.6500,49.57000,479.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Vancouver Intl AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Vancouver.Intl.AP.718920 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718920</b></td></tr>
+       <tr><td><b>N 49° 10.80'   W 123° 10.20'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4C - Mixed - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.4 C</b>, <b>25.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.6 C</b>, <b>74.5 F</b></td></tr>
+       <tr><td>HDD18 <b>3020</b>, CDD10 <b>806</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Vancouver.Intl.AP.718920_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-123.1700,49.18000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Victoria Intl AP BC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN BC Victoria.Intl.AP.717990 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717990</b></td></tr>
+       <tr><td><b>N 48° 39.00'   W 123° 25.80'</b></td></tr>
+       <tr><td>Elevation <b>19</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.3 C</b>, <b>27.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3076</b>, CDD10 <b>686</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/BC_British_Columbia/CAN_BC_Victoria.Intl.AP.717990_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-123.4300,48.65000,19.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Brandon Muni AP MB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN MB Brandon.Muni.AP.711400 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711400</b></td></tr>
+       <tr><td><b>N 49° 55.20'   W 99° 57.00'</b></td></tr>
+       <tr><td>Elevation <b>409</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-30.5 C</b>, <b>-22.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>HDD18 <b>5911</b>, CDD10 <b>859</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/MB_Manitoba/CAN_MB_Brandon.Muni.AP.711400_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-99.95000,49.92000,409.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Churchill AP MB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN MB Churchill.AP.716180 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716180</b></td></tr>
+       <tr><td><b>N 58° 44.40'   W 94° 4.20'</b></td></tr>
+       <tr><td>Elevation <b>29</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-35.8 C</b>, <b>-32.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.3 C</b>, <b>73.9 F</b></td></tr>
+       <tr><td>HDD18 <b>9115</b>, CDD10 <b>190</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/MB_Manitoba/CAN_MB_Churchill.AP.716180_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-94.07000,58.74000,29.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>The Pas AP MB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN MB The.Pas.AP.716950 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716950</b></td></tr>
+       <tr><td><b>N 53° 58.20'   W 101° 6.00'</b></td></tr>
+       <tr><td>Elevation <b>274</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 718670</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-32.0 C</b>, <b>-25.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>HDD18 <b>6443</b>, CDD10 <b>790</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/MB_Manitoba/CAN_MB_The.Pas.AP.716950_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-101.1000,53.97000,274.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Winnipeg-Richardson Intl AP MB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN MB Winnipeg.Richardson.Intl.AP.718520 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718520</b></td></tr>
+       <tr><td><b>N 49° 54.00'   W 97° 13.80'</b></td></tr>
+       <tr><td>Elevation <b>239</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.7 C</b>, <b>-21.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>HDD18 <b>5754</b>, CDD10 <b>1004</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/MB_Manitoba/CAN_MB_Winnipeg.Richardson.Intl.AP.718520_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-97.23000,49.90000,239.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Fredericton Intl AP NB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NB Fredericton.Intl.AP.717000 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717000</b></td></tr>
+       <tr><td><b>N 45° 52.20'   W 66° 31.80'</b></td></tr>
+       <tr><td>Elevation <b>20</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-20.6 C</b>, <b>-5.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4734</b>, CDD10 <b>944</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NB_New_Brunswick/CAN_NB_Fredericton.Intl.AP.717000_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-66.53000,45.87000,20.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Miramichi AP NB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NB Miramichi.AP.717440 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717440</b></td></tr>
+       <tr><td><b>N 47° 0.60'   W 65° 27.60'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.1 C</b>, <b>-6.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
+       <tr><td>HDD18 <b>4920</b>, CDD10 <b>888</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NB_New_Brunswick/CAN_NB_Miramichi.AP.717440_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-65.46000,47.01000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Saint John AP NB CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NB Saint.John.AP.716090 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716090</b></td></tr>
+       <tr><td><b>N 45° 19.20'   W 65° 52.80'</b></td></tr>
+       <tr><td>Elevation <b>109</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-19.5 C</b>, <b>-3.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4695</b>, CDD10 <b>631</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NB_New_Brunswick/CAN_NB_Saint.John.AP.716090_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-65.88000,45.32000,109.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Gander Intl AP NL CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NL Gander.Intl.AP.717420 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717420</b></td></tr>
+       <tr><td><b>N 48° 57.00'   W 54° 34.20'</b></td></tr>
+       <tr><td>Elevation <b>151</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.4 C</b>, <b>4.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>HDD18 <b>5099</b>, CDD10 <b>536</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NL_Newfoundland_Labrador/CAN_NL_Gander.Intl.AP.717420_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-54.57000,48.95000,151.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Goose Bay AP NL CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NL Goose.Bay.AP.718160 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718160</b></td></tr>
+       <tr><td><b>N 53° 19.20'   W 60° 22.20'</b></td></tr>
+       <tr><td>Elevation <b>49</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-27.8 C</b>, <b>-18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.7 C</b>, <b>78.3 F</b></td></tr>
+       <tr><td>HDD18 <b>6558</b>, CDD10 <b>461</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NL_Newfoundland_Labrador/CAN_NL_Goose.Bay.AP.718160_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-60.37000,53.32000,49.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Marys Harbour AP NL CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NL Marys.Harbour.AP.713390 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>713390</b></td></tr>
+       <tr><td><b>N 52° 18.00'   W 55° 49.80'</b></td></tr>
+       <tr><td>Elevation <b>12</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-23.2 C</b>, <b>-9.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
+       <tr><td>HDD18 <b>6463</b>, CDD10 <b>54</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NL_Newfoundland_Labrador/CAN_NL_Marys.Harbour.AP.713390_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-55.83000,52.30000,12.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>St Johns Intl AP NL CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NL St.Johns.Intl.AP.718010 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718010</b></td></tr>
+       <tr><td><b>N 47° 37.20'   W 52° 43.80'</b></td></tr>
+       <tr><td>Elevation <b>140</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.3 C</b>, <b>73.9 F</b></td></tr>
+       <tr><td>HDD18 <b>4886</b>, CDD10 <b>483</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NL_Newfoundland_Labrador/CAN_NL_St.Johns.Intl.AP.718010_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-52.73000,47.62000,140.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Stephenville Intl AP NL CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NL Stephenville.Intl.AP.718150 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718150</b></td></tr>
+       <tr><td><b>N 48° 31.80'   W 58° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>25</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-3.5</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.3 C</b>, <b>4.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.0 C</b>, <b>71.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4723</b>, CDD10 <b>582</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NL_Newfoundland_Labrador/CAN_NL_Stephenville.Intl.AP.718150_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-58.55000,48.53000,25.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Greenwood CFB NS CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NS Greenwood.CFB.713970 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>713970</b></td></tr>
+       <tr><td><b>N 44° 58.80'   W 64° 55.20'</b></td></tr>
+       <tr><td>Elevation <b>28</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.3 C</b>, <b>4.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4130</b>, CDD10 <b>960</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NS_Nova_Scotia/CAN_NS_Greenwood.CFB.713970_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-64.92000,44.98000,28.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sable Island AP NS CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NS Sable.Island.AP.716000 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716000</b></td></tr>
+       <tr><td><b>N 43° 55.80'   W 60° 1.20'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.5 C</b>, <b>18.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.1 C</b>, <b>70.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3860</b>, CDD10 <b>662</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NS_Nova_Scotia/CAN_NS_Sable.Island.AP.716000_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-60.02000,43.93000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Shearwater-Halifax CFB NS CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NS Shearwater-Halifax.CFB.712640 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>712640</b></td></tr>
+       <tr><td><b>N 44° 37.80'   W 63° 30.60'</b></td></tr>
+       <tr><td>Elevation <b>51</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 716010</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.1 C</b>, <b>4.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4199</b>, CDD10 <b>774</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NS_Nova_Scotia/CAN_NS_Shearwater-Halifax.CFB.712640_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-63.51000,44.63000,51.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sydney-McCurdy AP NS CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NS Sydney-McCurdy.AP.717070 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717070</b></td></tr>
+       <tr><td><b>N 46° 10.20'   W 60° 3.00'</b></td></tr>
+       <tr><td>Elevation <b>62</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.2 C</b>, <b>4.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4634</b>, CDD10 <b>697</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NS_Nova_Scotia/CAN_NS_Sydney-McCurdy.AP.717070_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-60.05000,46.17000,62.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Truro NS CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NS Truro.713980 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>713980</b></td></tr>
+       <tr><td><b>N 45° 22.20'   W 63° 16.20'</b></td></tr>
+       <tr><td>Elevation <b>40</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 716710</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.0 C</b>, <b>5.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4536</b>, CDD10 <b>778</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NS_Nova_Scotia/CAN_NS_Truro.713980_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-63.27000,45.37000,40.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Inuvik-Zubko AP NT CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NT Inuvik-Zubko.AP.719570 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719570</b></td></tr>
+       <tr><td><b>N 68° 18.00'   W 133° 28.80'</b></td></tr>
+       <tr><td>Elevation <b>68</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-38.7 C</b>, <b>-37.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.0 C</b>, <b>75.2 F</b></td></tr>
+       <tr><td>HDD18 <b>9951</b>, CDD10 <b>237</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NT_Northern_Territories/CAN_NT_Inuvik-Zubko.AP.719570_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-133.4800,68.30000,68.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yellowknife AP NT CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NT Yellowknife.AP.719360 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719360</b></td></tr>
+       <tr><td><b>N 62° 28.20'   W 114° 27.00'</b></td></tr>
+       <tr><td>Elevation <b>206</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-38.3 C</b>, <b>-36.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
+       <tr><td>HDD18 <b>8257</b>, CDD10 <b>487</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NT_Northern_Territories/CAN_NT_Yellowknife.AP.719360_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-114.4500,62.47000,206.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Resolute Bay AP NU CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN NU Resolute.Bay.AP.710180 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>710180</b></td></tr>
+       <tr><td><b>N 74° 43.20'   W 94° 58.80'</b></td></tr>
+       <tr><td>Elevation <b>67</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-39.4 C</b>, <b>-38.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>10.7 C</b>, <b>51.3 F</b></td></tr>
+       <tr><td>HDD18 <b>12571</b>, CDD10 <b>0</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/NU_Nunavut/CAN_NU_Resolute.Bay.AP.710180_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-94.98000,74.72000,67.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kingston AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Kingston.AP.716200 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716200</b></td></tr>
+       <tr><td><b>N 44° 13.20'   W 76° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>93</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 712810</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-19.2 C</b>, <b>-2.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4287</b>, CDD10 <b>1124</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Kingston.AP.716200_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-76.60000,44.22000,93.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>London AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON London.Intl.AP.716220 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716220</b></td></tr>
+       <tr><td><b>N 43° 1.80'   W 81° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>278</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.9 C</b>, <b>3.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4111</b>, CDD10 <b>1177</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_London.Intl.AP.716220_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-81.50000,43.03000,278.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mount Forest ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Mount.Forest.716310 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716310</b></td></tr>
+       <tr><td><b>N 43° 58.80'   W 80° 45.00'</b></td></tr>
+       <tr><td>Elevation <b>415</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-18.0 C</b>, <b>-0.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
+       <tr><td>HDD18 <b>4580</b>, CDD10 <b>996</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/ON_Ontarior/CAN_Canada/CAN_ON_Mount.Forest.716310_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-80.75000,43.98000,415.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Muskoka AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Muskoka.AP.716300 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716300</b></td></tr>
+       <tr><td><b>N 44° 58.20'   W 79° 25.80'</b></td></tr>
+       <tr><td>Elevation <b>282</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 714325</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.1 C</b>, <b>-6.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>HDD18 <b>4773</b>, CDD10 <b>892</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Muskoka.AP.716300_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-79.43000,44.97000,282.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>North Bay AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON North.Bay.AP.717310 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717310</b></td></tr>
+       <tr><td><b>N 46° 21.00'   W 79° 25.80'</b></td></tr>
+       <tr><td>Elevation <b>371</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-24.5 C</b>, <b>-12.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.3 C</b>, <b>79.3 F</b></td></tr>
+       <tr><td>HDD18 <b>5340</b>, CDD10 <b>861</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_North.Bay.AP.717310_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-79.43000,46.35000,371.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ottawa Intl AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Ottawa.Intl.AP.716280 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716280</b></td></tr>
+       <tr><td><b>N 45° 19.20'   W 75° 40.20'</b></td></tr>
+       <tr><td>Elevation <b>114</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.3 C</b>, <b>-6.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
+       <tr><td>HDD18 <b>4664</b>, CDD10 <b>1119</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Ottawa.Intl.AP.716280_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-75.67000,45.32000,114.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sault Ste Marie AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Sault.Ste.Marie.AP.712600 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>712600</b></td></tr>
+       <tr><td><b>N 46° 28.80'   W 84° 30.60'</b></td></tr>
+       <tr><td>Elevation <b>192</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.5 C</b>, <b>-6.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>HDD18 <b>4992</b>, CDD10 <b>799</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Sault.Ste.Marie.AP.712600_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-84.51000,46.48000,192.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Simcoe AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Simcoe.AP.715270 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>715270</b></td></tr>
+       <tr><td><b>N 42° 51.00'   W 80° 16.20'</b></td></tr>
+       <tr><td>Elevation <b>241</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 715730</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-16.0 C</b>, <b>3.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4066</b>, CDD10 <b>1160</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Simcoe.715270_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-80.27000,42.85000,241.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Thunder Bay Intl AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Thunder.Bay.Intl.AP.716670 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716670</b></td></tr>
+       <tr><td><b>N 48° 22.20'   W 89° 19.80'</b></td></tr>
+       <tr><td>Elevation <b>199</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-26.2 C</b>, <b>-15.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>HDD18 <b>5623</b>, CDD10 <b>692</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Thunder.Bay.Intl.AP.716670_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-89.33000,48.37000,199.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Timmins-Power AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Timmins-Power.AP.717390 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717390</b></td></tr>
+       <tr><td><b>N 48° 34.20'   W 81° 22.80'</b></td></tr>
+       <tr><td>Elevation <b>295</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.8 C</b>, <b>-21.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>HDD18 <b>5952</b>, CDD10 <b>706</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Timmins-Power.AP.717390_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-81.38000,48.57000,295.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Toronto Pearson Intl AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Toronto.Pearson.Intl.AP.716240 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716240</b></td></tr>
+       <tr><td><b>N 43° 40.20'   W 79° 37.80'</b></td></tr>
+       <tr><td>Elevation <b>173</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.5 C</b>, <b>4.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.5 C</b>, <b>85.1 F</b></td></tr>
+       <tr><td>HDD18 <b>4089</b>, CDD10 <b>1172</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Toronto.Pearson.Intl.AP.716240_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-79.63000,43.67000,173.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Trenton CFB ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Trenton.CFB.716210 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716210</b></td></tr>
+       <tr><td><b>N 44° 7.20'   W 77° 31.80'</b></td></tr>
+       <tr><td>Elevation <b>86</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-18.6 C</b>, <b>-1.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>HDD18 <b>4175</b>, CDD10 <b>1134</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Trenton.CFB.716210_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-77.53000,44.12000,86.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Windsor Intl AP ON CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN ON Windsor.Intl.AP.715380 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>715380</b></td></tr>
+       <tr><td><b>N 42° 16.20'   W 82° 58.20'</b></td></tr>
+       <tr><td>Elevation <b>190</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.4 C</b>, <b>86.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3569</b>, CDD10 <b>1500</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/ON_Ontario/CAN_ON_Windsor.Intl.AP.715380_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-82.97000,42.27000,190.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Charlottetown AP PE CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN PE Charlottetown.AP.717060 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717060</b></td></tr>
+       <tr><td><b>N 46° 16.80'   W 63° 7.80'</b></td></tr>
+       <tr><td>Elevation <b>54</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-17.7 C</b>, <b>0.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
+       <tr><td>HDD18 <b>4646</b>, CDD10 <b>830</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/PE_Prince_Edward_Island/CAN_PE_Charlottetown.AP.717060_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-63.13000,46.28000,54.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bagotville CFB QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Bagotville.CFB.717270 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717270</b></td></tr>
+       <tr><td><b>N 48° 19.80'   W 71° 0.00'</b></td></tr>
+       <tr><td>Elevation <b>159</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-27.1 C</b>, <b>-16.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>HDD18 <b>5780</b>, CDD10 <b>664</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Bagotville.CFB.717270_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-71.00000,48.33000,159.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Baie-Comeau AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Baie-Comeau.AP.711870 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711870</b></td></tr>
+       <tr><td><b>N 49° 7.80'   W 68° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>22</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
+       <tr><td>HDD18 <b>5889</b>, CDD10 <b>432</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Baie-Comeau.AP.711870_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-68.20000,49.13000,22.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Grindstone Island QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Grindstone.Island CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>CAN13</b></td></tr>
+       <tr><td><b>N 47° 22.80'   W 61° 52.20'</b></td></tr>
+       <tr><td>Elevation <b>59</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 717100</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.4 C</b>, <b>4.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.5 C</b>, <b>72.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4940</b>, CDD10 <b>556</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Grindstone.Island_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-61.87000,47.38000,59.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kuujjuarapik AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Kuujjuarapik.AP.729050 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>729050</b></td></tr>
+       <tr><td><b>N 55° 16.80'   W 77° 45.00'</b></td></tr>
+       <tr><td>Elevation <b>10</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-35.5 C</b>, <b>-31.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
+       <tr><td>HDD18 <b>7987</b>, CDD10 <b>183</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Kuujjuarapik.AP.729050_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-77.75000,55.28000,10.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kuujuaq AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Kuujuaq.AP.719060 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719060</b></td></tr>
+       <tr><td><b>N 58° 6.00'   W 68° 25.20'</b></td></tr>
+       <tr><td>Elevation <b>39</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-34.3 C</b>, <b>-29.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.8 C</b>, <b>71.2 F</b></td></tr>
+       <tr><td>HDD18 <b>8491</b>, CDD10 <b>136</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Kuujuaq.AP.719060_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-68.42000,58.10000,39.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>La Grande Rivière AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC La.Grande.Riviere.AP.718270 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718270</b></td></tr>
+       <tr><td><b>N 53° 37.80'   W 77° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>195</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-33.0 C</b>, <b>-27.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.8 C</b>, <b>76.6 F</b></td></tr>
+       <tr><td>HDD18 <b>7616</b>, CDD10 <b>338</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_La.Grande.Riviere.AP.718270_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-77.70000,53.63000,195.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Lac Eon AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Lac.Eon.AP.714210 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>714210</b></td></tr>
+       <tr><td><b>N 51° 52.20'   W 63° 16.80'</b></td></tr>
+       <tr><td>Elevation <b>589</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-31.2 C</b>, <b>-24.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.3 C</b>, <b>73.9 F</b></td></tr>
+       <tr><td>HDD18 <b>7384</b>, CDD10 <b>246</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Lac.Eon.AP.714210_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-63.28000,51.87000,589.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mont-Joli AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Mont-Joli.AP.717180 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717180</b></td></tr>
+       <tr><td><b>N 48° 36.00'   W 68° 13.20'</b></td></tr>
+       <tr><td>Elevation <b>51</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.4 C</b>, <b>-6.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
+       <tr><td>HDD18 <b>5521</b>, CDD10 <b>655</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_PQ_Mont-Joli.AP.717180_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-68.22000,48.60000,51.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Montreal-College Jean-de-Brebeuf QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Montreal-College.Jean-de-Brebeuf.716120 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716120</b></td></tr>
+       <tr><td><b>N 45° 30.00'   W 73° 34.80'</b></td></tr>
+       <tr><td>Elevation <b>73</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-19.2 C</b>, <b>-2.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4615</b>, CDD10 <b>1179</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Montreal-College.Jean-de-Brebeuf.716120_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-73.58000,45.50000,73.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Montreal-Mirabel Intl AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Montreal-Mirabel.Intl.AP.716278 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716278</b></td></tr>
+       <tr><td><b>N 45° 40.80'   W 74° 1.80'</b></td></tr>
+       <tr><td>Elevation <b>82</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-22.9 C</b>, <b>-9.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>HDD18 <b>4862</b>, CDD10 <b>970</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Montreal-Mirabel.Intl.AP.716278_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-74.03000,45.68000,82.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Montreal Saint Hubert Longueuil.AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Montreal-St.Hubert-Longueuil.AP.713710 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>713710</b></td></tr>
+       <tr><td><b>N 45° 31.20'   W 73° 25.20'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-20.8 C</b>, <b>-5.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>HDD18 <b>4566</b>, CDD10 <b>1206</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Montreal-St.Hubert-Longueuil.AP.713710_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-73.42000,45.52000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Montreal-Trudeau Intl AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Montreal-Trudeau.Intl.AP.716270 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716270</b></td></tr>
+       <tr><td><b>N 45° 28.20'   W 73° 44.40'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-20.3 C</b>, <b>-4.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4493</b>, CDD10 <b>1185</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Montreal-Trudeau.Intl.AP.716270_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-73.74000,45.47000,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nitchequon AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Nitchequon.AP.CAN270 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>CAN270</b></td></tr>
+       <tr><td><b>N 53° 12.00'   W 70° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>536</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 715200</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-38.3 C</b>, <b>-36.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
+       <tr><td>HDD18 <b>7922</b>, CDD10 <b>247</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Nitchequon.AP.CAN270_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-70.90000,53.20000,536.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Quebec-Lesage Intl AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Quebec-Lesage.Intl.AP.717140 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717140</b></td></tr>
+       <tr><td><b>N 46° 47.40'   W 71° 22.80'</b></td></tr>
+       <tr><td>Elevation <b>74</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-21.9 C</b>, <b>-7.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
+       <tr><td>HDD18 <b>4966</b>, CDD10 <b>913</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/Quebec-Lesage.Intl.AP.717140_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-71.38000,46.79000,74.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rivière-du-Loup QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Riviere-du-Loup.717150 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717150</b></td></tr>
+       <tr><td><b>N 47° 48.60'   W 69° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>147</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-22.2 C</b>, <b>-8.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>5423</b>, CDD10 <b>679</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Riviere-du-Loup.717150_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-69.55000,47.81000,147.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Roberval AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Roberval.AP.717280 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717280</b></td></tr>
+       <tr><td><b>N 48° 31.20'   W 72° 16.20'</b></td></tr>
+       <tr><td>Elevation <b>179</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-27.6 C</b>, <b>-17.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>HDD18 <b>5757</b>, CDD10 <b>773</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Roberval.AP.717280_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-72.27000,48.52000,179.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sainte-Agathe-des-Monts QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Sainte-Agathe-des-Monts.717200 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717200</b></td></tr>
+       <tr><td><b>N 46° 3.00'   W 74° 16.80'</b></td></tr>
+       <tr><td>Elevation <b>395</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 713760</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-27.5 C</b>, <b>-17.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>HDD18 <b>5351</b>, CDD10 <b>754</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Sainte-Agathe-des-Monts.717200_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-74.28000,46.05000,395.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Schefferville AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Schefferville.AP.718280 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718280</b></td></tr>
+       <tr><td><b>N 54° 48.00'   W 66° 49.20'</b></td></tr>
+       <tr><td>Elevation <b>522</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>8 - Subarctic</b></td></tr>
+       <tr><td>99% Heating DB <b>-34.4 C</b>, <b>-29.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.8 C</b>, <b>71.2 F</b></td></tr>
+       <tr><td>HDD18 <b>8056</b>, CDD10 <b>192</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Schefferville.AP.718280_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-66.82000,54.80000,522.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sept-Îles AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Sept-Iles.AP.718110 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718110</b></td></tr>
+       <tr><td><b>N 50° 13.20'   W 66° 16.20'</b></td></tr>
+       <tr><td>Elevation <b>55</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-25.6 C</b>, <b>-14.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.3 C</b>, <b>70.3 F</b></td></tr>
+       <tr><td>HDD18 <b>6135</b>, CDD10 <b>400</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Sept-Iles.AP.718110_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-66.27000,50.22000,55.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sherbrooke AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Sherbrooke.AP.716100 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>716100</b></td></tr>
+       <tr><td><b>N 45° 25.80'   W 71° 40.80'</b></td></tr>
+       <tr><td>Elevation <b>241</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-24.2 C</b>, <b>-11.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
+       <tr><td>HDD18 <b>5067</b>, CDD10 <b>852</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Sherbrooke.AP.716100_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-71.68000,45.43000,241.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Val-dOr Rgnl AP QC CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN QC Val-dOr.Rgnl.AP.717250 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717250</b></td></tr>
+       <tr><td><b>N 48° 4.20'   W 77° 46.80'</b></td></tr>
+       <tr><td>Elevation <b>837</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.6 C</b>, <b>-21.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
+       <tr><td>HDD18 <b>6129</b>, CDD10 <b>683</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/QC_Quebec/CAN_QC_Val-dOr.Rgnl.AP.717250_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-77.78000,48.07000,837.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Estevan AP SK CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN SK Estevan.AP.718620 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718620</b></td></tr>
+       <tr><td><b>N 49° 13.20'   W 102° 58.20'</b></td></tr>
+       <tr><td>Elevation <b>581</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.4 C</b>, <b>-20.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.2 C</b>, <b>84.6 F</b></td></tr>
+       <tr><td>HDD18 <b>5368</b>, CDD10 <b>1013</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/SK_Saskatchewan/CAN_SK_Estevan.AP.718620_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-102.9700,49.22000,581.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>North Battleford AP SK CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN SK North.Battleford.AP.717540 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>717540</b></td></tr>
+       <tr><td><b>N 52° 46.20'   W 108° 15.60'</b></td></tr>
+       <tr><td>Elevation <b>548</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.6 C</b>, <b>-21.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
+       <tr><td>HDD18 <b>5961</b>, CDD10 <b>804</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/SK_Saskatchewan/CAN_SK_North.Battleford.AP.717540_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-108.2600,52.77000,548.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Regina Intl AP SK CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN SK Regina.Intl.AP.715140 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>715140</b></td></tr>
+       <tr><td><b>N 50° 25.80'   W 104° 40.20'</b></td></tr>
+       <tr><td>Elevation <b>577</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-29.5 C</b>, <b>-21.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.9 C</b>, <b>84.0 F</b></td></tr>
+       <tr><td>HDD18 <b>5646</b>, CDD10 <b>902</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/SK_Saskatchewan/CAN_SK_Regina.Intl.AP.715140_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-104.6700,50.43000,577.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Saskatoon Intl AP SK CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN SK Saskatoon.Intl.AP.718660 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>718660</b></td></tr>
+       <tr><td><b>N 52° 10.20'   W 106° 43.20'</b></td></tr>
+       <tr><td>Elevation <b>504</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-31.1 C</b>, <b>-24.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
+       <tr><td>HDD18 <b>5812</b>, CDD10 <b>839</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/SK_Saskatchewan/CAN_SK_Saskatoon.Intl.AP.718660_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-106.7200,52.17000,504.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Swift Current AP SK CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN SK Swift.Current.AP.711420 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>711420</b></td></tr>
+       <tr><td><b>N 50° 16.80'   W 107° 40.80'</b></td></tr>
+       <tr><td>Elevation <b>818</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-27.5 C</b>, <b>-17.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
+       <tr><td>HDD18 <b>5227</b>, CDD10 <b>844</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/SK_Saskatchewan/CAN_SK_Swift.Current.AP.711420_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-107.6800,50.28000,818.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Whitehorse AP YT CAN</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CAN YT Whitehorse.AP.719640 CWEC</b></td></tr>
+       <tr><td><b>Data Source CWEC</td></tr>
+       <tr><td>WMO <b>719640</b></td></tr>
+       <tr><td><b>N 60° 43.20'   W 135° 4.20'</b></td></tr>
+       <tr><td>Elevation <b>703</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>99% Heating DB <b>-34.6 C</b>, <b>-30.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.4 C</b>, <b>74.1 F</b></td></tr>
+       <tr><td>HDD18 <b>6946</b>, CDD10 <b>271</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/CAN_Canada/YT_Yukon_Territory/CAN_YT_Whitehorse.AP.719640_CWEC.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-135.0700,60.72000,703.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>
