@@ -51,18 +51,42 @@ clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
 
     suffix_type <- match.arg(suffix_type)
 
-    out_files <- file.path(wd, get_eplus_output_name(path, suffix_type))
+    out_files <- file.path(wd, unlist(get_eplus_output_name(path, suffix_type), use.names = FALSE))
 
     individuals <- c(
-        "in.imf", "in.idf", "in.epJSON", "in.epw", "in.stat", "out.idf",
-        "test.mvi", "expanded.idf", "expandedidf.err", "readvars.audit",
-        "slab.int", "BasementGHTIn.idf", "Energy+.ini", "eplusADS.inp",
-        "audit.out", "fort.6"
+        "Energy+.ini", "Energy+.idd",
+        # EPMacro input
+        "in.imf",
+        # EnergyPlus input
+        "in.idf",
+        # EnergyPlus epJSON input
+        "in.epJSON",
+        # EnergyPlus weather input
+        "in.epw",
+        # EnergyPlus weather input
+        "in.stat",
+        # EPMacro output
+        "out.idf",
+        # DO NOT KNOW what it is
+        "test.mvi",
+        # ReadVarsESO output
+        "readvars.audit",
+        # ExpandObjects output
+        "expanded.idf", "expandedidf.err", "BasementGHTIn.idf", "GHTIn.idf",
+        # Basement preprocessor output
+        "EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
+        "RunINPUT.TXT", "RunTGMAVG.TXT", "RunDEBUGOUT.TXT", "basementout.audit",
+        "MonthlyResults.csv",
+        # Slab preprocessor output
+        "slab.int", "SLABSurfaceTemps.TXT", "SLABINP.txt", "eplusout.err",
+        "SLABDBOUT.TXT", "SLABSplit Surface Temps.TXT", "audit.out",
+
+        "fort.6"
     )
 
-    if (base == "in") {
+    if (tools::file_path_sans_ext(basename(path)) == "in") {
         # keep the original input IDF and EPW
-        individuals <- file.path(wd, setdiff(individuals, c("in.epw", "in.idf")))
+        individuals <- file.path(wd, setdiff(individuals, c("in.epw", sprintf("in.%s", tools::file_ext(path)))))
     } else {
         individuals <- file.path(wd, individuals)
     }
@@ -71,146 +95,157 @@ clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
 
     unlink(targets[file.exists(targets)])
 }
+
 get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
     suffix_type <- match.arg(suffix_type)
 
-    prefix <- get_eplus_output_prefix(path, suffix_type)
-    suffix <- get_eplus_output_suffix(path, suffix_type)
-
-    name <- lapply(names(suffix), function(nm) {
-        if (!is.null(prefix[[nm]])) {
-            paste0(prefix[[nm]], suffix[[nm]])
-        } else {
-            paste0(prefix[["normal"]], suffix[[nm]])
-        }
-    })
-    names(name) <- names(suffix)
-    name
-}
-get_eplus_output_prefix <- function(path, suffix_type = c("C", "L", "D")) {
-    suffix_type <- match.arg(suffix_type)
-    without_ext <- basename(tools::file_path_sans_ext(path))
-
-    if (suffix_type == "C") {
-        prefix <- without_ext
-        prefix_sqlite_err <- without_ext
-    } else if (suffix_type == "L") {
-        prefix <- "eplus"
-        prefix_sqlite_err <- ""
+    if (is.null(path)) {
+        without_ext <- "eplus"
     } else {
-        prefix <- without_ext
-        prefix_sqlite_err <- without_ext
+        without_ext <- basename(tools::file_path_sans_ext(path))
+        if (without_ext == "in") without_ext <- "eplus"
     }
 
-    list(normal = prefix, sqlite_err = prefix_sqlite_err)
-}
+    pre <- switch(suffix_type, "C" = without_ext, "L" = "eplusout", "D" = without_ext)
 
-get_eplus_output_suffix <- function(path, suffix_type = c("C", "L", "D")) {
-    suffix_type <- match.arg(suffix_type)
-    without_ext <- basename(tools::file_path_sans_ext(path))
+    files <- list(
+        # TODO: did not know what this output is used for
+        log = list(pre = pre, ext = ".log"),
 
-    if (suffix_type == "C") {
-        suffix <- list(
-            normal = "",
-            table = "Table",
-            map = "Map",
-            zsz = "Zsz",
-            ssz = "Ssz",
-            meter = "Meter",
-            sqlite_err = "Sqlite",
-            ads = "Ads",
-            screen = "Screen",
-            shd = "Shading",
-            delight = "DElight",
-            dfs = ""
-        )
-    } else if (suffix_type == "L") {
-        suffix <- list(
-            normal = "out",
-            table = "tbl",
-            map = "map",
-            zsz = "zsz",
-            ssz = "ssz",
-            meter = "mtr",
-            sqlite_err = "sqlite",
-            ads = "ADS",
-            screen = "screen",
-            shd = "shading",
-            delight = "out",
-            dfs = "DFS"
-        )
-    } else {
-        suffix <- list(
-            normal = "",
-            table = "-table",
-            map = "-map",
-            zsz = "-zsz",
-            ssz = "-ssz",
-            meter = "-meter",
-            sqlite_err = "-sqlite",
-            ads = "-ads",
-            screen = "-screen",
-            shd = "-shading",
-            delight = "-delight",
-            dfs = "-dfs"
-        )
-    }
-
-    suffix$json <- c(
-        "",
-        "_detailed_zone",
-        "_detailed_HVAC",
-        "_timestep",
-        "_yearly",
-        "_monthly",
-        "_daily",
-        "_hourly",
-        "_runperiod"
-    )
-
-    ext_table <- c(".csv", ".tab", ".txt", ".htm", ".xml")
-    ext_map <- ext_zsz <- ext_ssz <- c(".csv", ".tab", ".txt")
-    ext_meter <- c(ext_map, "inp")
-    ext_sqlite_err <- ".err"
-    ext_ads <- ".out"
-    ext_screen <- ".csv"
-    ext_shd <- ".csv"
-    ext_json <- c(".json", ".cbor", ".msgpack")
-
-    if (suffix_type == "L") {
-        ext_delight <- c(".delightin", ".delightout", ".delightdfdmp", ".delighteldmp")
-        ext_dfs <- ".dfs"
-    } else {
-        ext_delight <- c(".in", ".out", ".dfdmp", ".eldmp")
-        ext_dfs <- ".csv"
-    }
-
-    ext <- list(
-        normal = c(
-            ".inp", ".end", ".eso", ".rdd", ".mdd", ".dbg", ".eio", ".err", ".dxf",
-            ".sln", ".mtr", ".mtd", ".bnd", ".sci", ".log", ".svg", ".shd", ".wrl",
-            ".edd", ".csv", ".tab", ".txt", ".inp", ".audit", ".sql", ".glhe",
-            ".iperr", "_perflog.csv", ".rvaudit", ".epmdet", ".epmidf", ".expidf",
-            ".experr", ".epJSONout"
+        # output from EPMacro program
+        epmidf = list(pre = pre, ext = ".epmidf"),
+        epmdet = list(pre = pre, ext = ".epmdet"),
+        # output from ExpandObjects program
+        epxidf = list(pre = pre, ext = ".expidf"),
+        experr = list(pre = pre, ext = ".experr"),
+        # echo of input
+        audit = list(pre = pre, ext = ".audit"),
+        # branches and nodes
+        bnd = list(pre = pre, ext = ".bnd"),
+        # debug output
+        dbg = list(pre = pre, ext = ".dbg"),
+        # surface drawing
+        dxf = list(pre = pre, ext = ".dxf"),
+        # EMS report
+        edd = list(pre = pre, ext = ".edd"),
+        # standard and optional reports
+        eio = list(pre = pre, ext = ".eio"),
+        # standard output file
+        eso = list(pre = pre, ext = ".eso"),
+        variable = list(pre = pre, ext = ".csv"),
+        # one line summary of success or failure
+        end = list(pre = pre, ext = ".end"),
+        # error file
+        err = list(pre = pre, ext = ".err"),
+        # meter names
+        mdd = list(pre = pre, ext = ".mdd"),
+        # meter details report
+        mtd = list(pre = pre, ext = ".mtd"),
+        # log file for PerformancemidcisionTradeoffs
+        perflog = list(pre = paste0(pre, "_perflog"), ext = ".csv"),
+        # variable names
+        rdd = list(pre = pre, ext = ".rdd"),
+        # results from Output:Surfaces:List, Lines
+        sln = list(pre = pre, ext = ".sln"),
+        # daylighting factors for exterior windows
+        dfs = list(pre = pre, ext = ".dfs"),
+        # HVAC-Diagram output
+        svg = list(pre = pre, ext = ".svg"),
+        # cost information
+        sci = list(pre = pre, ext = ".sci"),
+        # results from Output:Surfaces:List, VRML
+        wrl = list(pre = pre, ext = ".wrl"),
+        # SQLite file
+        sqlite = list(pre = pre, ext = ".sqlite"),
+        # GLHE
+        glhe = list(pre = pre, ext = ".glhe"),
+        # IP conversion error
+        iperr = list(pre = pre, ext = ".iperr"),
+        # readVarsESO
+        rvaudit = list(pre = pre, ext = "rvaudit"),
+        # JSON outputs
+        json = list(
+            pre = paste0(pre, c(
+                "",
+                "_detailed_zone",
+                "_detailed_HVAC",
+                "_timestep",
+                "_yearly",
+                "_monthly",
+                "_daily",
+                "_hourly",
+                "_runperiod"
+            )),
+            ext = ".json"
         ),
-        table = ext_table,
-        map = ext_map,
-        zsz = ext_zsz,
-        ssz = ext_ssz,
-        meter = ext_meter,
-        sqlite_err = ext_sqlite_err,
-        ads = ext_ads,
-        screen = ext_screen,
-        shd = ext_shd,
-        delight = ext_delight,
-        dfs = ext_dfs,
-        json = ext_json
-    )
+        epjson = list(pre = pre, ext = ".epJSONout"),
 
-    apply2(suffix, ext, function(x, y) {
-        d <- do.call(data.table::CJ, list(x, y))
-        paste0(d$V1, d$V2)
-    })
+        # tabular outputs
+        table = list(pre = pre, ext = c(".csv", ".tab", ".txt", ".htm", ".xml")),
+        # daylighting intensity map output
+        map = list(pre = pre, ext = c(".csv", ".tab", ".txt")),
+        # results from Sizing:System
+        ssz = list(pre = pre, ext = c(".csv", ".tab", ".txt")),
+        # results from Sizing:Zone
+        zsz = list(pre = pre, ext = c(".csv", ".tab", ".txt")),
+        # meter output file
+        mtr = list(pre = pre, ext = ".mtr"),
+        meter = list(pre = pre, ext = ".csv"),
+        # SQLite error file
+        sqlite_err = list(pre = pre, ext = ".err"),
+        # TODO: did not know what this output is used for
+        ads = list(pre = pre, ext = ".out"),
+        # window screen transmittance map output
+        screen = list(pre = pre, ext = ".csv"),
+        # surface shading combination report
+        shd = list(pre = pre, ext = ".shd"),
+        shading = list(pre = pre, ext = ".csv"),
+        # descriptive of inputs into DElight inputs and simulation results
+        delight = list(pre = pre, ext = c(".delightin", ".delightout", ".delighteldmp", ".delightdfdmp"))
+    )
+    files$cbor <- files$msgpack <- files$json
+    files$cbor$ext <- ".cbor"
+    files$msgpack$ext <- ".msgpack"
+
+    if (suffix_type == "C") {
+        files$table$pre       <-  paste0(pre, "Table")
+        files$map$pre         <-  paste0(pre, "Map")
+        files$zsz$pre         <-  paste0(pre, "Zsz")
+        files$ssz$pre         <-  paste0(pre, "Ssz")
+        files$meter$pre       <-  paste0(pre, "Meter")
+        files$ads$pre         <-  paste0(pre, "Ads")
+        files$sqlite_err$pre  <-  paste0(pre, "Sqlite")
+        files$screen$pre      <-  paste0(pre, "Screen")
+        files$shading$pre     <-  paste0(pre, "Shading")
+        files$delight$pre     <-  paste0(pre, "DElight")
+        files$delight$ext     <-  c(".in", ".out", ".dfdmp", ".eldmp")
+    } else if (suffix_type == "L") {
+        files$table$pre       <-  "eplustbl"
+        files$map$pre         <-  "eplusmap"
+        files$zsz$pre         <-  "epluszsz"
+        files$ssz$pre         <-  "eplusssz"
+        files$meter$pre       <-  "eplusmtr"
+        files$ads$pre         <-  "eplusADS"
+        files$sqlite_err$pre  <-  "sqlite"
+        files$screen$pre      <-  "eplusscreen"
+        files$shading$pre     <-  "eplusshading"
+        files$delight$pre     <-  "eplusout"
+        files$delight$ext     <-  c(".delightin", ".delightout", ".delightdfdmp", ".delighteldmp")
+    } else {
+        files$table$pre       <-  paste0(pre, "-table")
+        files$map$pre         <-  paste0(pre, "-map")
+        files$zsz$pre         <-  paste0(pre, "-zsz")
+        files$ssz$pre         <-  paste0(pre, "-ssz")
+        files$meter$pre       <-  paste0(pre, "-meter")
+        files$sqlite_err$pre  <-  paste0(pre, "-sqlite")
+        files$ads$pre         <-  paste0(pre, "-ads")
+        files$screen$pre      <-  paste0(pre, "-screen")
+        files$shading$pre         <-  paste0(pre, "-shading")
+        files$delight$pre     <-  paste0(pre, "-delight")
+        files$delight$ext     <-  c(".in", ".out", ".dfdmp", ".eldmp")
+    }
+
+    lapply(files, function(f) paste0(f$pre, f$ext))
 }
 # }}}
 
@@ -964,6 +999,11 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 # }}}
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
+    if (checkmate::test_file_exists(eplus, "x") || (is_windows() && has_ext(eplus, "exe"))) {
+        use_eplus(dirname(eplus))
+        return(normalizePath(eplus, mustWork = TRUE))
+    }
+
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
     config <- tryCatch(eplus_config(eplus),
         eplusr_warning_miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config")
@@ -983,22 +1023,8 @@ eplus_exe <- function (eplus) {
 # }}}
 # copy_run_files {{{
 copy_run_files <- function (file, dir) {
-    file <- normalizePath(file, mustWork = TRUE)
-    loc <- normalizePath(file.path(dir, basename(file)), mustWork = FALSE)
-    flag <- FALSE
-
-    if (all(file == loc)) return(file)
-
-    copy <- unique(data.table(from = file, to = loc))
-    flag <- apply2_int(copy$from, copy$to, file.copy,
-        more_args = list(overwrite = TRUE, copy.date = TRUE)
-    )
-
-    if (any(!flag))
-        abort(paste0("Unable to copy file ", surround(basename(file[!flag])), "into ",
-            "simulation output directory."), "copy_run_files")
-
-    loc
+    loc <- file.path(dir, basename(file))
+    file_copy(file, loc, err_title = "Failed to copy files into simulation output directory")
 }
 # }}}
 # get_run_time {{{
@@ -1062,15 +1088,165 @@ expand_objects <- function (eplus, idf, keep_ext = FALSE) {
     }
 }
 # }}}
-# run_energyplus {{{
-run_energyplus <- function(eplus, idf, epw) {
-    # clean up working directory
+create_energyplus_ini <- function(eplus, output_dir) {
+    dir <- normalizePath(dirname(eplus))
+    if (is_windows()) {
+        dir <- paste0(utils::shortPathName(dir), "\\")
+    } else {
+        dir <- paste0(dir, "/")
+    }
 
-    # copy input into working directory
+    ini <- c(
+        "[program]",
+        sprintf("dir=%s", dir),
+        "[BasementGHT]",
+        "dir=PreProcess\\GrndTempCalc",
+        "[SlabGHT]",
+        "dir=PreProcess\\GrndTempCalc"
+    )
+
+    out <- normalizePath(file.path(output_dir, "Energy+.ini"), mustWork = FALSE)
+    write_lines(ini, out)
+    out
+}
+copy_energyplus_idd <- function(eplus, output_dir, idd = NULL) {
+    if (is.null(idd)) {
+        # directly use the IDD file from EnergyPlus folder
+        idd <- normalizePath(file.path(dirname(eplus), "Energy+.idd"), mustWork = FALSE)
+        if (!file.exists(idd)) {
+            abort(sprintf("'Energy+.idd' file did not found in EnergyPlus installation folder: '%s'", dirname(idd)))
+        }
+    } else {
+        assert_file_exists(idd, "r", "idd")
+    }
+
+    file_copy(idd, file.path(output_dir, "Energy+.idd"))
+}
+
+# run_energyplus {{{
+run_energyplus <- function(eplus, model, weather, output_dir, output_prefix = NULL,
+                           output_suffix = c("C", "L", "D"), expand_obj = TRUE,
+                           readvars = TRUE, annual = FALSE, design_day = FALSE,
+                           idd = NULL, echo = TRUE, wait = TRUE) {
+
+    output_suffix <- match.arg(output_suffix)
+
+    assert_file_exists(eplus, "x")
+    assert_file_exists(model)
+    assert_flag(expand_obj)
+    assert_flag(readvars)
+    assert_flag(annual)
+    assert_flag(design_day)
+    assert_flag(echo)
+    assert_flag(wait)
+    if (!is.null(weather)) assert_file_exists(weather)
+
+    # use input name as prefix by default
+    if (is.null(output_prefix)) {
+        output_prefix <- tools::file_path_sans_ext(basename(model))
+    } else {
+        assert_string(output_prefix, null.ok = TRUE)
+        con <- try(file(output_prefix), TRUE)
+        # use file to test if output_prefix can be used as a file name
+        # see: https://stackoverflow.com/a/7779343
+        if (inherits(con, "connection")) {
+            close(con)
+            unlink(con, force = TRUE)
+        } else {
+            abort(sprintf("Invalid 'output_prefix': '%s'", output_prefix))
+        }
+    }
+
+    # create output directory if not exists
+    if (is.null(output_dir)) {
+        output_dir <- dirname(model)
+    } else {
+        if (!dir.exists(output_dir)) {
+            dir.create(output_dir, FALSE, TRUE)
+        }
+        assert_directory_exists(output_dir, "w")
+    }
+
+    # cannot set both annual and design_day
+    if (annual && design_day) {
+        abort("Cannot force both design-day and annual simulations", "both_ddy_annual")
+    }
+
+    # run simulation:
+    # 1. clean up working directory
+    clean_wd(input_idf, suffix_type)
+
+    # 2. handle temporary simulation directory
+    #    NOTE: For EnergyPlus lower than v8.3, copy input files to a temporary
+    #          folder inside the specified output directory in case that
+    #          multiple EnergyPlus instances are running which all expect an
+    #          "in.idf" input file. This behavior mimicks EP-Launch.
+    if (get_ver_from_path(dirname(eplus)) < 8.3) {
+        sim_dir <- tempfile("EPTEMP-", output_dir)
+    } else {
+        sim_dir <- output_dir
+    }
+
+    # 3. create ini file in and copy idd to the simulation directory
+    create_energyplus_ini(eplus, sim_dir)
+    copy_energyplus_idd(eplus, sim_dir)
+
+    # 4. copy input files to the simulation directory
+    if (normalizePath(dirname(model)) == normalizePath(sim_dir)) {
+        idf <- model
+    } else {
+        idf <- file_copy(model, file.path(sim_dir, basename(model)))
+    }
+    if (is.null(weather)) {
+        epw <- NULL
+    } else if (normalizePath(dirname(weather)) == normalizePath(sim_dir)) {
+        epw <- weather
+    } else {
+        epw <- file_copy(weather, file.path(sim_dir, basename(weather)))
+    }
 
     # run EPMacro
+    input_idf <- run_epmacro(eplus, idf)
 
     # run ExpandObjects
+    if (expand_obj) {
+        run_expand_objects(eplus, idf)
+        expandobjects <- normalizePath(file.path(eplusdir, "ExpandObjects", exe), mustWork = FALSE)
+        if (!file.exists(expandobjects)) {
+            abort(paste0(
+                "'expand_obj' is set to 'TRUE'",
+                "but ExpandObjects exectuable cannot be found at ",
+                surround(expandobjects)
+            ))
+        }
+
+        if (basename(input_idf) != "in.idf") {
+            file_copy(input_idf, "in.idf")
+        }
+
+        # check if IDD exists in the output folder
+        if (normalizePath(idd) != normalizePath(file.path(output_dir, "Energy+.idd"))) {
+            file_copy(idd, file.path(output_dir, "Energy+.idd"))
+        }
+
+        # call ExpandObjects
+        if (wait) {
+            stdout_expandobjects <- "|"
+            stderr_expandobjects <- "|"
+        } else {
+            stdout_expandobjects <- tempfile()
+            stderr_expandobjects <- tempfile()
+        }
+        processx::run(expandobjects, wd = output_dir, stdout = stdout_expandobjects, stderr = stderr_expandobjects)
+    }
+
+    # copy input into working directory
+    copy_run_files(idf, output_dir)
+    if (!is.null(epw)) {
+        copy_run_files(epw, output_dir)
+    }
+    copy_run_files(file.path(eplus, "Energy+.idd"), output_dir)
+    create_energyplus_ini(eplus, output_dir)
 
     # run Basement preprocessor
 
@@ -1093,35 +1269,606 @@ run_energyplus <- function(eplus, idf, epw) {
     # clean up directory
 }
 # }}}
-# preprocessor_basement {{{
-preprocessor_basement <- function(eplus, idf) {
-    dir <- dirname(idf)
-    input <- file.path(dir, "BasementGHTIn.idf")
+get_eplus_processor_path <- function(eplus, ...) {
+    inputs <- c(...)
+    exe <- if (is_windows()) ".exe" else ""
+    inputs[length(inputs)] <- sprintf("%s%s", inputs[length(inputs)], exe)
 
-    if (!file.exists(input)) {
-        return()
+    path <- do.call(file.path, as.list(c(dirname(eplus), inputs)))
+    normalizePath(path, mustWork = FALSE)
+}
+
+run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
+                        post_callback = NULL, post_name = NULL,
+                        exit_msg = NULL, exit_callback = NULL) {
+    assert_character(args, null.ok = TRUE)
+    assert_flag(wait)
+    assert_flag(echo)
+    assert_string(post_name, null.ok = TRUE)
+    assert_string(exit_msg, null.ok = TRUE)
+    assert_function(post_callback, null.ok = TRUE)
+    assert_function(exit_callback, null.ok = TRUE)
+
+    args <- args %||% character()
+
+    if (wait) {
+        std_out <- "|"
+        std_err <- "|"
+        post_fun <- NULL
+    } else {
+        std_out <- tempfile()
+        std_err <- tempfile()
+
+        post_fun <- function() {
+            out <- suppressWarnings(read_lines(std_out)$string)
+            err <- suppressWarnings(read_lines(std_err)$string)
+
+            if (!length(out)) out <- NULL
+            if (!length(err)) err <- NULL
+
+            unlink(c(std_out, std_err))
+
+            res <- list(stdout = out, stderr = err, end_time = Sys.time())
+
+            if (!is.null(post_callback)) {
+                res <- list(post_callback(), run = res)
+                if (!is.null(post_name)) {
+                    names(res) <- c(post_name, "run")
+                }
+            }
+
+            res
+        }
     }
 
-    dir_bsmt <- file.path(dirname(eplus), "PreProcess/GrndTempCalc")
-    exe_bsmt <- file.path(dir_bsmt, paste0("Basement", if (is_windows()) ".exe" else ""))
-    idd_bsmt <- file.path(dir_bsmt, "BasementGHT.idd")
+    proc <- processx::process$new(command = command, args = args,
+        wd = wd, cleanup = TRUE, cleanup_tree = TRUE,
+        windows_verbatim_args = FALSE,
+        stdout = std_out, stderr = std_err, post_process = post_fun
+    )
 
-    # create "in.idf"
-    file.copy(idf, file.path(dir, "in.idf"), overwrite = TRUE, copy.date = TRUE)
-    # create "in.epw"
+    if (!wait) {
+        # just return the process
+        res <- list(
+            process = proc,
+            exit_status = NULL,
+            stdout = NULL,
+            stderr = NULL,
+            start_time = lubridate::with_tz(proc$get_start_time(), Sys.timezone()),
+            end_time = NULL
+        )
+    } else {
+        callback <- function () {
+            if (!proc$is_alive()) return(NULL)
 
-    # copy basement IDD to working directory
-    flag_copy <- file.copy(idd_bsmt, dir, overwrite = TRUE, copy.date = TRUE)
+            k <- tryCatch(proc$kill(), error = function(e) FALSE)
 
-    if (!flag_copy) {
-        abort(sprintf("Failed to copy 'BasementGHT.idd' to '%s'.", normalizePath(dir)),
-            "run_preprocess_basement"
+            if (!is.null(exit_callback)) exit_callback(command, args)
+
+            if (k && !is.null(exit_msg)) {
+                cli::cat_line(exit_msg, col = "white", background_col = "red")
+            }
+        }
+
+        # kill the process when  exits
+        on.exit(callback(), add = TRUE)
+
+        stdout <- c()
+        stderr <- c()
+        get_output <- function(echo = TRUE) {
+            newout <- proc$read_output_lines(2000)
+            if (echo) cli::cat_line(newout)
+            if (length(newout) && all(nzchar(newout))) {
+                stdout <<- c(stdout, newout)
+            }
+
+            newerr <- proc$read_error(2000)
+            if (echo) cli::cat_line(newerr, col = "red")
+            if (length(newerr) && all(nzchar(newerr))) {
+                stderr <<- c(stderr, newerr)
+            }
+        }
+
+        while (proc$is_alive()) {
+            polled <- proc$poll_io(200)
+
+            # if output/error, collect it
+            if (any(polled == "ready")) get_output(echo)
+        }
+
+        # needed to get the exit status
+        proc$wait()
+
+        # might still have output
+        while (proc$is_incomplete_output() || proc$is_incomplete_error()) {
+            proc$poll_io(-1)
+            get_output(echo)
+        }
+
+        list(process = proc,
+             exit_status = proc$get_exit_status(),
+             stdout = stdout,
+             stderr = stderr,
+             start_time = lubridate::with_tz(proc$get_start_time(), Sys.timezone()),
+             end_time = Sys.time()
+        )
+    }
+}
+get_eplus_loc_from_input <- function(idf, eplus = NULL) {
+    eplus <- eplus %||% as.character(get_idf_ver(read_lines(idf)))
+    if (!length(eplus)) {
+        abort(paste0("Missing version field in input IDF file. ",
+            "Failed to determine the version of EnergyPlus to use."),
+            "miss_idf_ver"
         )
     }
 
-    # run Basement.exe
-    processx::run(exe_bsmt, wd = dir)
-
-
+    eplus_exe(eplus)
 }
-# }}}
+
+pre_eplus_command <- function(exectuable,
+                              model, weather = NULL,
+                              output_dir = NULL, output_prefix = NULL,
+                              wait = TRUE, echo = TRUE, eplus = NULL) {
+    assert_flag(wait)
+    assert_flag(echo)
+
+    assert_file_exists(model, "r", c("idf", "epmidf", "epxidf", "imf"))
+    model <- normalizePath(model)
+
+    if (!is.null(weather)) {
+        assert_file_exists(weather, "r", "epw")
+        weather <- normalizePath(weather)
+    }
+
+    energyplus_exe <- get_eplus_loc_from_input(model, eplus)
+
+    assert_string(output_dir, null.ok = TRUE)
+    output_dir <- normalizePath(output_dir %||% dirname(model), mustWork = FALSE)
+    if (!dir.exists(output_dir) && !dir.create(output_dir, FALSE, TRUE)) {
+        abort(sprintf("Failed to create output directory '%s'.", output_dir))
+    }
+    # always copy input files to the output directory
+    if (output_dir != normalizePath(dirname(model))) {
+        file_copy(model, output_dir)
+        if (!is.null(weather)) file_copy(weather, output_dir)
+    }
+
+    assert_string(output_prefix, null.ok = TRUE)
+    if (is.null(output_prefix)) {
+        output_prefix <- tools::file_path_sans_ext(basename(model))
+    } else {
+        if (!is_valid_file_name(output_prefix)) {
+            abort(sprintf("Invalid 'output_prefix': '%s'", output_prefix))
+        }
+    }
+
+    if (is.null(exectuable)) {
+        exectuable <- energyplus_exe
+    } else {
+        exectuable <- get_eplus_processor_path(energyplus_exe, exectuable)
+        if (!file.exists(exectuable)) {
+            abort(sprintf(
+                "'%s' exectuable cannot be found at '%s'.",
+                basename(exectuable), dirname(exectuable)
+            ))
+        }
+    }
+
+    # create in.idf/in.imf in the same directory
+    model_in <- tools::file_path_sans_ext(basename(model))
+    model_ext <- tools::file_ext(model)
+    idf <- model
+    if (tolower(model_in) != "in") {
+        if (model_ext %in% c("epmidf", "epxidf")) {
+            model_ext <- "idf"
+        }
+        idf <- file_copy(model, file.path(dirname(model), sprintf("in.%s", model_ext)))
+    }
+
+    # create in.epw in the same directory of input model
+    epw <- weather
+    if (!is.null(weather)) {
+        weather_in <- tools::file_path_sans_ext(basename(weather))
+        weather_ext <- tools::file_ext(weather)
+        if (tolower(weather_in) != "in") {
+            epw <- file_copy(weather, file.path(dirname(model), sprintf("in.%s", weather_ext)))
+        }
+    }
+
+    list(
+        energyplus = energyplus_exe, exectuable = exectuable,
+        model = model, weather = weather,
+        idf = idf, epw = epw,
+        output_dir = output_dir, output_prefix = output_prefix
+    )
+}
+remove_eplus_in_files <- function(model, weather = NULL) {
+    wd <- dirname(model)
+    if (tools::file_path_sans_ext(basename(model)) != "in") {
+        unlink(file.path(wd, sprintf("in.%s", tools::file_ext(model))))
+    }
+
+    if (!is.null(weather)) {
+        if (tools::file_path_sans_ext(basename(weather)) != "in") {
+            unlink(file.path(wd, sprintf("in.%s", tools::file_ext(weather))))
+        }
+    }
+}
+
+#' @name EnergyPlus
+#' @keywords internal
+#' @export
+EPMacro <- function(model,
+                    output_dir = NULL, output_prefix = NULL,
+                    wait = TRUE, echo = TRUE, eplus = NULL) {
+    cmd <- pre_eplus_command(
+        exectuable = "EPMacro",
+        model = model, weather = NULL,
+        output_dir = output_dir, output_prefix = output_prefix,
+        wait = wait, echo = echo, eplus = eplus
+    )
+
+    if (!has_ext(model, "imf")) {
+        verbose_info(sprintf(
+            "Input model has an extension of '%s' but not '.imf'. Skip...",
+            tools::file_ext(model)
+        ))
+        remove_eplus_in_files(cmd$model, cmd$weather)
+
+        return(list(file = NULL, run = NULL))
+    }
+
+    # handle ouput file renaming
+    file_callback <- function() {
+        remove_eplus_in_files(cmd$model, cmd$weather)
+
+        file <- list()
+        with_wd(cmd$output_dir, {
+            wd <- dirname(cmd$model)
+            file$idf <- file_rename_if_exist(file.path(wd, "out.idf"), sprintf("%s.epmidf", cmd$output_prefix))
+            file$audit <- file_rename_if_exist(file.path(wd, "audit.out"), sprintf("%s.epmdet", cmd$output_prefix))
+        })
+        file
+    }
+
+    # only run post processing when running in background
+    post_callback <- NULL
+    if (!wait) post_callback <- file_callback
+
+    run <- run_command(cmd$exectuable, wd = dirname(cmd$model), wait = wait, echo = echo,
+        post_callback = post_callback, post_name = "file"
+    )
+
+    file <- NULL
+    if (wait) file <- file_callback()
+
+    list(file = file, run = run)
+}
+
+#' @name EnergyPlus
+#' @keywords internal
+#' @export
+ExpandObjects <- function(model,
+                          output_dir = NULL, output_prefix = NULL,
+                          wait = TRUE, echo = TRUE, eplus = NULL, idd = NULL) {
+    cmd <- pre_eplus_command(
+        exectuable = "ExpandObjects",
+        model = model, weather = NULL,
+        output_dir = output_dir, output_prefix = output_prefix,
+        wait = wait, echo = echo, eplus = eplus
+    )
+
+    if (!is.null(idd)) assert_file_exists(idd, "r", "idd")
+
+    wd <- dirname(cmd$idf)
+    create_energyplus_ini(cmd$energyplus, wd)
+    copy_energyplus_idd(cmd$energyplus, wd, idd)
+
+    # handle ouput file renaming
+    file_callback <- function() {
+        remove_eplus_in_files(cmd$model, cmd$weather)
+        unlink(file.path(wd, c("Energy+.ini", "Energy+.idd")))
+
+        file <- list()
+        with_wd(cmd$output_dir, {
+            file$idf <- file_rename_if_exist(file.path(wd, "expanded.idf"), sprintf("%s.expidf", cmd$output_prefix))
+            file$basement <- file_rename_if_exist(file.path(wd, "BasementGHTIn.idf"), "BasementGHTIn.idf")
+            file$slab <- file_rename_if_exist(file.path(wd, "GHTIn.idf"), "GHTIn.idf")
+            file$audit <- file_rename_if_exist(file.path(wd, "expandedidf.err"), sprintf("%s.err", cmd$output_prefix))
+        })
+        file
+    }
+
+    # only run post processing when running in background
+    post_callback <- NULL
+    if (!wait) post_callback <- file_callback
+
+    run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
+        post_callback = post_callback, post_name = "file"
+    )
+
+    file <- NULL
+    if (wait) file <- file_callback()
+
+    list(file = file, run = run)
+}
+
+#' @name EnergyPlus
+#' @keywords internal
+#' @export
+Basement <- function(model, weather,
+                     output_dir = NULL, output_prefix = NULL,
+                     wait = TRUE, echo = TRUE, eplus = NULL, idd = NULL) {
+    cmd <- pre_eplus_command(
+        exectuable = c("PreProcess", "GrndTempCalc", "Basement"),
+        model = model, weather = weather,
+        output_dir = output_dir, output_prefix = output_prefix,
+        wait = wait, echo = echo, eplus = eplus
+    )
+
+    if (!is.null(idd)) assert_file_exists(idd, "r", "idd")
+
+    cmd$idf <- file_rename_if_exist(cmd$idf, file.path(dirname(cmd$idf), "BasementGHTIn.idf"))
+
+    wd <- dirname(cmd$idf)
+    with_wd(wd, {
+        unlink(c("EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
+            "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
+            "rundebugout.txt", "basementout.audit"))
+
+        unlink(sprintf(
+            "%s%s", cmd$output_prefix,
+            c(
+                ".audit", ".out", "_out.idf", "_bsmt.csv", "_bsmt.audit",
+                "_bsmt.out", "_out_bsmt.idf"
+            )
+        ))
+    })
+
+    create_energyplus_ini(cmd$energyplus, wd)
+
+    # copy BasementGHT.idd
+    idd <- file.path(dirname(cmd$energyplus), "PreProcess", "GrndTempCalc", "BasementGHT.idd")
+    idd <- file_copy(idd, file.path(wd, "BasementGHT.idd"))
+
+    # handle ouput file renaming
+    file_callback <- function() {
+        remove_eplus_in_files(cmd$model, cmd$weather)
+        unlink(file.path(wd, c("Energy+.ini", "BasementGHT.idd", "BasementGHTIn.idf")))
+
+        file <- list()
+        with_wd(wd, {
+            file$idf <- file_rename_if_exist("EPObjects.txt", sprintf("%s_bsmt.idf", cmd$output_prefix))
+            file$csv <- file_rename_if_exist("MonthlyResults.csv", sprintf("%s_bsmt.csv", cmd$output_prefix))
+            file$out <- file_rename_if_exist("RunINPUT.TXT", sprintf("%s_bsmt.out", cmd$output_prefix))
+
+            if (!file.exists("RunDEBUGOUT.TXT")) {
+                file$audit <- normalizePath(sprintf("%s_bsmt.audit", cmd$output_prefix), mustWork = FALSE)
+                write_lines("Basement Audit File", file$audit)
+            } else {
+                file$audit <- file_rename_if_exist("RunDEBUGOUT.TXT", sprintf("%s_bsmt.audit", cmd$output_prefix))
+            }
+
+            if (file.exists("audit.out")) {
+                write_lines(read_lines("audit.out"), file$audit, append = TRUE)
+            }
+            if (file.exists("eplusout.err")) {
+                write_lines(read_lines("eplusout.err"), file$audit, append = TRUE)
+            }
+
+            unlink(c("EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
+                "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
+                "RunDEBUGOUT.TXT", "basementout.audit", "eplusout.err"))
+        })
+
+        file
+    }
+
+    # only run post processing when running in background
+    post_callback <- NULL
+    if (!wait) post_callback <- file_callback
+
+    run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
+        post_callback = post_callback, post_name = "file"
+    )
+
+    file <- NULL
+    if (wait) file <- file_callback()
+
+    list(file = file, run = run)
+}
+
+#' @name EnergyPlus
+#' @keywords internal
+#' @export
+Slab <- function(model, weather,
+                 output_dir = NULL, output_prefix = NULL,
+                 wait = TRUE, echo = TRUE, eplus = NULL, idd = NULL) {
+    cmd <- pre_eplus_command(
+        exectuable = c("PreProcess", "GrndTempCalc", "Slab"),
+        model = model, weather = weather,
+        output_dir = output_dir, output_prefix = output_prefix,
+        wait = wait, echo = echo, eplus = eplus
+    )
+
+    if (!is.null(idd)) assert_file_exists(idd, "r", "idd")
+
+    cmd$idf <- file_rename_if_exist(cmd$idf, file.path(dirname(cmd$idf), "GHTIn.idf"))
+
+    wd <- dirname(cmd$idf)
+    with_wd(wd, {
+        unlink(c("EPObjects.TXT", "SLABDBOUT.TXT", "SLABINP.TXT",
+            "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"))
+
+        unlink(sprintf(
+            "%s%s", cmd$output_prefix, c(".gtp", ".ger", "_slab.gtp", "_slab.ger")
+        ))
+    })
+
+    create_energyplus_ini(cmd$energyplus, wd)
+
+    # copy BasementGHT.idd
+    idd <- file.path(dirname(cmd$energyplus), "PreProcess", "GrndTempCalc", "SlabGHT.idd")
+    idd <- file_copy(idd, file.path(wd, "SlabGHT.idd"))
+
+    # handle ouput file renaming
+    file_callback <- function() {
+        remove_eplus_in_files(cmd$model, cmd$weather)
+        unlink(file.path(wd, c("Energy+.ini", "SlabGHT.idd", "GHTIn.idf")))
+
+        file <- list()
+        with_wd(wd, {
+            file$idf <- file_rename_if_exist("SLABSurfaceTemps.txt", sprintf("%s_slab.gtp", cmd$output_prefix))
+            file$out <- file_rename_if_exist("SLABINP.txt", sprintf("%s_slab.out", cmd$output_prefix))
+
+            file$audit <- NA_character_
+            if (file.exists("eplusout.err")) {
+                file$audit <- normalizePath(sprintf("%s_slab.ger", cmd$output_prefix), mustWork = FALSE)
+                write_lines(read_lines("eplusout.err", FALSE), file$audit, append = TRUE)
+            }
+
+            unlink(c("EPObjects.TXT", "eplusout.err", "SLABDBOUT.TXT",
+                "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"))
+        })
+
+        file
+    }
+
+    # only run post processing when running in background
+    post_callback <- NULL
+    if (!wait) post_callback <- file_callback
+
+    run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
+        post_callback = post_callback, post_name = "file"
+    )
+
+    file <- NULL
+    if (wait) file <- file_callback()
+
+    list(file = file, run = run)
+}
+
+#' @name EnergyPlus
+#' @keywords internal
+#' @export
+EnergyPlus <- function(model, weather, output_dir = NULL,
+                       output_prefix = NULL, output_suffix = c("C", "L", "D"),
+                       wait = TRUE, echo = TRUE,
+                       annual = FALSE, design_day = FALSE,
+                       idd = NULL, eplus = NULL) {
+    assert_flag(annual)
+    assert_flag(design_day)
+    output_suffix <- match.arg(output_suffix)
+
+    cmd <- pre_eplus_command(
+        exectuable = NULL,
+        model = model, weather = weather,
+        output_dir = output_dir, output_prefix = output_prefix,
+        wait = wait, echo = echo, eplus = eplus
+    )
+
+    eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
+
+    # cannot set annual and design_day if energy
+    if (any(annual, design_day) && eplus_ver < 8.3) {
+        abort(
+            paste0(
+                "Currently, 'annual' and 'design_day' options are only supported when running IDFs of EnergyPlus v8.3 and above. ",
+                "This is because those options are only implemented in EnergyPlus command line interface ",
+                "which is available only in EnergyPlus v8.3 and above. ",
+                "You can update the version of your model using 'transition()' or 'version_updater()' and try again."
+            ),
+            "eplus_ver_not_supported"
+        )
+    }
+
+    # cannot set both annual and design_day
+    if (annual && design_day) {
+        abort("Cannot force both design-day and annual simulations", "both_ddy_annual")
+    }
+
+    # clean up working directory
+    clean_wd(cmd$idf, "L")
+
+    # get all lagency EnergyPlus output file names
+    lagency_files <- get_eplus_output_name(NULL, "L")
+
+    # get all targeted EnergyPlus output file names
+    out_files <- get_eplus_output_name(cmd$output_prefix, output_suffix)
+
+    # remove all old output files in the output directory
+    unlink(file.path(cmd$output_dir, unlist(out_files, use.names = FALSE)))
+
+    # exclude EPMacro and ExpandObjects outputs
+    out_files <- out_files[!names(out_files) %in% c("epmidf", "epmdet", "epxidf", "experr")]
+    lagency_files <- lagency_files[names(lagency_files) %in% names(out_files)]
+
+    # handle EnergyPlus < v8.3 where there is no EnergyPlus command line
+    # interface
+    if (eplus_ver < 8.3) {
+        # create ini file in and copy idd
+        create_energyplus_ini(cmd$energyplus, dirname(cmd$model))
+        copy_energyplus_idd(cmd$energyplus, dirname(cmd$model), idd = idd)
+
+        args <- character()
+
+        # handle ouput file renaming
+        file_callback <- function() {
+            remove_eplus_in_files(cmd$model, cmd$weather)
+            wd <- dirname(cmd$model)
+            unlink(file.path(wd, c("Energy+.ini", "Energy+.idd")))
+
+            # manually handle file renaming
+            file <- lapply(seq_along(lagency_files), function(i) {
+                from <- file.path(wd, lagency_files[[i]])
+                to <- file.path(cmd$output_dir, out_files[[i]])
+                files <- file_rename_if_exist(from, to)
+                files[!is.na(files)]
+            })
+            names(file) <- names(out_files)
+
+            file
+        }
+    } else {
+        # no need for "in.idf" and "in.epw"
+        remove_eplus_in_files(cmd$model, cmd$weather)
+
+        args <- c(
+            "--output-directory", cmd$output_dir,
+            "--output-prefix", cmd$output_prefix,
+            "--output-suffix", output_suffix
+        )
+
+        if (annual) args <- c(args, "--annual")
+        if (design_day) args <- c(args, "--design-day")
+        if (!is.null(idd)) args <- c(args, "--idd", normalizePath(idd, mustWork = FALSE))
+        if (!is.null(weather)) args <- c(args, "--weather", normalizePath(weather, mustWork = FALSE))
+
+        args <- c(args, cmd$model)
+
+        file_callback <- function() {
+            file <- lapply(out_files, function(files) {
+                files <- file.path(cmd$output_dir, files)
+                normalizePath(files[file.exists(files)])
+            })
+
+            file
+        }
+    }
+
+    # only run post processing when running in background
+    post_callback <- NULL
+    if (!wait) post_callback <- file_callback
+
+    run <- run_command(cmd$exectuable, args, wd = dirname(cmd$idf), wait = wait, echo = echo,
+        post_callback = post_callback, post_name = "file",
+        exit_msg = sprintf("TERMINATED--> [Idf] '%s' + [Epw] '%s'",
+            basename(cmd$model), basename(cmd$weather %||% "<Empty>")
+        )
+    )
+
+    if (wait) file <- file_callback()
+
+    list(file = file, run = run)
+}

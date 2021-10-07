@@ -3,6 +3,9 @@
 ## New features
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).
+* `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
+  procedure. This will remove the previous IDF version requirement (>= 8.3) when
+  running simulations (#446).
 
 ## Bug fixes
 

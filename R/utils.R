@@ -106,9 +106,10 @@ lpad <- function(x, char = " ", width = NULL) {
 # }}}
 
 # read_lines {{{
-read_lines <- function(input, trim = TRUE, ...) {
+read_lines <- function(input, trim = TRUE, encoding = "UTF-8", ...) {
     dt <- tryCatch(
-        fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
+        fread(input = input, sep = NULL, header = FALSE, col.names = "string",
+            encoding = encoding, strip.white = FALSE, ...),
         warning = function (w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
         error = function (e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
     )
@@ -472,4 +473,39 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
     }
 
     to
+}
+
+with_wd <- function(wd, expr, env = parent.frame()) {
+    owd <- setwd(wd)
+    on.exit(setwd(owd), add = TRUE)
+    eval(expr, envir = env)
+}
+
+file_rename_if_exist <- function(from, to) {
+    assert_same_len(from, to)
+
+    to <- normalizePath(to, mustWork = FALSE)
+    res <- rep(NA_character_, length(from))
+
+    exist <- which(file.exists(from))
+
+    if (length(exist)) {
+        flag <- file.rename(from[exist], to[exist])
+        res[exist[flag]] <- to[exist[flag]]
+    }
+
+    res
+}
+
+is_valid_file_name <- function(x) {
+    con <- try(file(x, "wb"), TRUE)
+    # use file to test if output_prefix can be used as a file name
+    # see: https://stackoverflow.com/a/7779343
+    if (inherits(con, "connection")) {
+        close(con)
+        unlink(con, force = TRUE)
+        TRUE
+    } else {
+        FALSE
+    }
 }
