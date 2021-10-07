@@ -521,5 +521,8 @@ test_that("download_weather()", {
     expect_message({path_epw <- with_verbose(
         download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "epw", dir = tempdir(), max_match = 2)
     )})
+    expect_message({path_epw <- with_verbose(
+        download_weather("Nanjing.*TMYx.2004-2018", "Nanjing", ask = FALSE, type = "epw", dir = tempdir(), max_match = 1)
+    )})
 })
 # }}}

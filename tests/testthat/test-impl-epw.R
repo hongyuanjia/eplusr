@@ -355,7 +355,7 @@ test_that("Epw Header", {
 
     expect_equal(format_epw_meta(h),
         c("[Location ]: city, state, country",
-          "             {N 1°0'}, {E 2°0'}, {UTC+03:00}",
+          "             {N 1\u00B00'}, {E 2\u00B00'}, {UTC+03:00}",
           "[Elevation]: 4m above see level",
           "[Data Src ]: type",
           "[WMO Stat ]: wmo",
