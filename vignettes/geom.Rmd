@@ -192,7 +192,7 @@ viewer <- geom$view()
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_default.png")
+knitr::include_graphics("geom-viewer_default.png")
 ```
 
 ## Tweak the view
@@ -221,7 +221,7 @@ viewer$background("grey50")
 ``
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_background1.png")
+knitr::include_graphics("geom-viewer_background1.png")
 ```
 
 ```{r, eval = FALSE}
@@ -229,7 +229,7 @@ viewer$background("white")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_background2.png")
+knitr::include_graphics("geom-viewer_background2.png")
 ```
 
 ### Change viewpoint
@@ -239,7 +239,7 @@ viewer$viewpoint("top")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_viewpoint1.png")
+knitr::include_graphics("geom-viewer_viewpoint1.png")
 ```
 
 ```{r, eval = FALSE}
@@ -247,7 +247,7 @@ viewer$viewpoint("iso")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_viewpoint1.png")
+knitr::include_graphics("geom-viewer_viewpoint2.png")
 ```
 
 ### Change axis style
@@ -257,7 +257,7 @@ viewer$axis(width = 5)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_axis.png")
+knitr::include_graphics("geom-viewer_axis.png")
 ```
 
 ```{r, eval = FALSE}
@@ -265,7 +265,7 @@ viewer$axis(FALSE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_noaxis.png")
+knitr::include_graphics("geom-viewer_noaxis.png")
 ```
 
 ### Change ground style
@@ -275,7 +275,7 @@ viewer$ground(TRUE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_ground.png")
+knitr::include_graphics("geom-viewer_ground.png")
 ```
 
 ### Turn on/off X-ray style
@@ -285,7 +285,7 @@ viewer$x_ray(TRUE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_xray.png")
+knitr::include_graphics("geom-viewer_xray.png")
 ```
 
 ```{r, eval = FALSE}
@@ -293,7 +293,7 @@ viewer$x_ray(FALSE)
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_ground.png")
+knitr::include_graphics("geom-viewer_ground.png")
 ```
 
 ### Change render style
@@ -303,7 +303,7 @@ viewer$render_by("zone")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_zone_color.png")
+knitr::include_graphics("geom-viewer_zone_color.png")
 ```
 
 ```{r, eval = FALSE}
@@ -311,7 +311,7 @@ viewer$render_by("surface_type")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_ground.png")
+knitr::include_graphics("geom-viewer_ground.png")
 ```
 
 ### Turn on/off components
@@ -321,7 +321,7 @@ viewer$show(zone = "floor 7 clean")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_show_zone.png")
+knitr::include_graphics("geom-viewer_show_zone.png")
 ```
 
 ```{r, eval = FALSE}
@@ -329,7 +329,7 @@ viewer$show(surface = "MOB Floor 5 Perimeter 2 Ext Wall")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_show_surface.png")
+knitr::include_graphics("geom-viewer_show_surface.png")
 ```
 
 ```{r, eval = FALSE}
@@ -337,7 +337,7 @@ viewer$show(type = "wall")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_show_wall.png")
+knitr::include_graphics("geom-viewer_show_wall.png")
 ```
 
 ## Save the snapshot
@@ -351,7 +351,7 @@ viewer$snapshot("view.png")
 ```
 
 ```{r, echo = FALSE}
-knitr::include_graphics("vignettes/geom-viewer_ground.png")
+knitr::include_graphics("geom-viewer_ground.png")
 ```
 
 ## Work with the rgl window
