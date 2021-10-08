@@ -168,35 +168,39 @@ test_that("run_multi()", {
     expect_null(get_run_time("a"))
 })
 
-test_that("EPMacro", {
+test_that("EPMacro()", {
     main <- test_path("file/macro.imf")
     part <- test_path("file/part.idf")
     write_lines("##include part.idf\nVersion,8.8;", main)
     write_lines("Building,\nBldg;", part)
 
-    res <- EPMacro(part, eplus = 8.8)
+    res <- EPMacro(part, echo = FALSE, eplus = 8.8)
     expect_equal(names(res), c("file", "run"))
     expect_equal(res$file, NULL)
     expect_equal(res$run, NULL)
 
-    res <- EPMacro(main)
+    res <- EPMacro(main, echo = FALSE, eplus = 8.8)
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "audit"))
+    expect_true(file.exists(res$file$imf))
+    expect_true(file.exists(res$file$epmidf))
+    expect_true(file.exists(res$file$epmdet))
+    expect_equal(names(res$file), c("imf", "epmidf", "epmdet"))
     expect_equal(names(res$run), c("process", "exit_status", "stdout",
         "stderr", "start_time", "end_time"))
     expect_equal(res$run$stdout, NULL)
     expect_equal(res$run$stderr, NULL)
-    unlink(c(res$file$idf, res$file$audit))
+    unlink(c(res$file$epmidf, res$file$epmdet))
 
     res <- EPMacro(main, tempdir())
-    expect_equal(dirname(res$file$idf), normalizePath(tempdir(), "/"))
-    expect_equal(dirname(res$file$audit), normalizePath(tempdir(), "/"))
-    unlink(c(res$file$idf, res$file$audit, file.path(tempdir(), basename(main))))
+    expect_equal(dirname(res$file$imf), normalizePath(tempdir(), "/"))
+    expect_equal(dirname(res$file$epmidf), normalizePath(tempdir(), "/"))
+    expect_equal(dirname(res$file$epmdet), normalizePath(tempdir(), "/"))
+    unlink(unlist(res$file))
 
     res <- EPMacro(main, output_prefix = "test")
-    expect_equal(basename(res$file$idf), "test.epmidf")
-    expect_equal(basename(res$file$audit), "test.epmdet")
-    unlink(c(res$file$idf, res$file$audit))
+    expect_equal(basename(res$file$epmidf), "test.epmidf")
+    expect_equal(basename(res$file$epmdet), "test.epmdet")
+    unlink(c(res$file$epmidf, res$file$epmdet))
 
     res <- EPMacro(main, wait = FALSE, echo = FALSE)
     expect_equal(res$file, NULL)
@@ -208,17 +212,18 @@ test_that("EPMacro", {
     post <- res$run$process$get_result()
     expect_equal(names(post), c("file", "run"))
     res <- modifyList(res, post)
-    expect_equal(basename(res$file$idf), "macro.epmidf")
-    expect_equal(basename(res$file$audit), "macro.epmdet")
+    expect_equal(basename(res$file$imf), "macro.imf")
+    expect_equal(basename(res$file$epmidf), "macro.epmidf")
+    expect_equal(basename(res$file$epmdet), "macro.epmdet")
     expect_equal(res$run$stdout, NULL)
     expect_equal(res$run$stderr, NULL)
     expect_equal(res$run$process$get_exit_status(), 0L)
-    unlink(c(res$file$idf, res$file$audit))
+    unlink(unlist(res$file))
 
     unlink(c(main, part))
 })
 
-test_that("ExpandObjects", {
+test_that("ExpandObjects()", {
     path <- test_path("file/expandobj.idf")
     write_lines(
         "Version, 8.8;
@@ -232,27 +237,34 @@ test_that("ExpandObjects", {
         path
     )
 
-    res <- ExpandObjects(path)
+    res <- ExpandObjects(path, echo = FALSE)
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "basement", "slab", "audit"))
+    expect_equal(names(res$file), c("idf", "expidf", "basement", "slab", "experr"))
+    expect_true(file.exists(res$file$idf))
+    expect_true(file.exists(res$file$expidf))
     expect_equal(res$file$basement, NA_character_)
     expect_equal(res$file$slab, NA_character_)
-    expect_equal(res$file$audit, NA_character_)
+    expect_equal(res$file$experr, NA_character_)
     expect_equal(names(res$run), c("process", "exit_status", "stdout",
         "stderr", "start_time", "end_time"))
     expect_false(is.null(res$run$stdout))
     expect_null(res$run$stderr)
-    unlink(c(res$file$idf, res$file$audit))
+    unlink(res$file$expidf)
 
-    res <- ExpandObjects(path, tempdir())
+    res <- ExpandObjects(path, tempdir(), echo = FALSE)
     expect_equal(dirname(res$file$idf), normalizePath(tempdir(), "/"))
-    expect_equal(res$file$audit, NA_character_)
-    unlink(c(res$file$idf, res$file$audit, file.path(tempdir(), basename(path))))
+    expect_equal(dirname(res$file$expidf), normalizePath(tempdir(), "/"))
+    expect_equal(res$file$basement, NA_character_)
+    expect_equal(res$file$slab, NA_character_)
+    expect_equal(res$file$experr, NA_character_)
+    unlink(c(res$file$idf, res$file$expidf))
 
     res <- ExpandObjects(path, output_prefix = "test", echo = FALSE)
-    expect_equal(basename(res$file$idf), "test.expidf")
-    expect_equal(res$file$audit, NA_character_)
-    unlink(c(res$file$idf, res$file$audit))
+    expect_equal(basename(res$file$expidf), "test.expidf")
+    expect_equal(res$file$basement, NA_character_)
+    expect_equal(res$file$slab, NA_character_)
+    expect_equal(res$file$experr, NA_character_)
+    unlink(res$file$expidf)
 
     res <- ExpandObjects(path, wait = FALSE, echo = FALSE)
     expect_equal(res$file, NULL)
@@ -264,17 +276,17 @@ test_that("ExpandObjects", {
     post <- res$run$process$get_result()
     expect_equal(names(post), c("file", "run"))
     res <- modifyList(res, post)
-    expect_equal(basename(res$file$idf), "expandobj.expidf")
+    expect_equal(basename(res$file$expidf), "expandobj.expidf")
     expect_false(is.null(res$run$stdout))
     expect_null(res$run$stderr)
-    expect_equal(res$file$audit, NA_character_)
+    expect_equal(res$file$experr, NA_character_)
     expect_equal(res$run$process$get_exit_status(), 0L)
-    unlink(c(res$file$idf, res$file$audit))
+    unlink(res$file$expidf)
 
     unlink(path)
 })
 
-test_that("Basement", {
+test_that("Basement()", {
     path <- test_path("file/basement.idf")
     write_lines(
         "SimParameters,
@@ -359,13 +371,15 @@ test_that("Basement", {
     )
     weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- Basement(path, weather, eplus = 8.8)
+    res <- Basement(path, weather, echo = FALSE, eplus = 8.8)
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "csv", "out", "audit"))
-    expect_equal(basename(res$file$idf), "basement_bsmt.idf")
-    expect_equal(basename(res$file$csv), "basement_bsmt.csv")
-    expect_equal(basename(res$file$out), "basement_bsmt.out")
-    expect_equal(basename(res$file$audit), "basement_bsmt.audit")
+    expect_equal(names(res$file), c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit"))
+    expect_true(file.exists(res$file$idf))
+    expect_true(file.exists(res$file$epw))
+    expect_equal(basename(res$file$bsmt_idf), "basement_bsmt.idf")
+    expect_equal(basename(res$file$bsmt_csv), "basement_bsmt.csv")
+    expect_equal(basename(res$file$bsmt_out), "basement_bsmt.out")
+    expect_equal(basename(res$file$bsmt_audit), "basement_bsmt.audit")
     expect_equal(names(res$run), c("process", "exit_status", "stdout",
         "stderr", "start_time", "end_time"))
     expect_false(is.null(res$run$stdout))
@@ -375,7 +389,7 @@ test_that("Basement", {
     unlink(path)
 })
 
-test_that("Slab", {
+test_that("Slab()", {
     path <- test_path("file/slab.idf")
     write_lines(
         "Materials,
@@ -440,12 +454,14 @@ test_that("Slab", {
     )
     weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- Slab(path, weather, eplus = 8.8)
+    res <- Slab(path, weather, eplus = 8.8, echo = FALSE)
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "out", "audit"))
-    expect_equal(basename(res$file$idf), "slab_slab.gtp")
-    expect_equal(basename(res$file$out), "slab_slab.out")
-    expect_equal(basename(res$file$audit), "slab_slab.ger")
+    expect_equal(names(res$file), c("idf", "epw", "slab_gtp", "slab_out", "slab_ger"))
+    expect_true(file.exists(res$file$idf))
+    expect_true(file.exists(res$file$epw))
+    expect_equal(basename(res$file$slab_gtp), "slab_slab.gtp")
+    expect_equal(basename(res$file$slab_out), "slab_slab.out")
+    expect_equal(basename(res$file$slab_ger), "slab_slab.ger")
     expect_equal(names(res$run), c("process", "exit_status", "stdout",
         "stderr", "start_time", "end_time"))
     expect_false(is.null(res$run$stdout))
@@ -455,7 +471,135 @@ test_that("Slab", {
     unlink(path)
 })
 
-test_that("EnergyPlus", {
+test_that("EnergyPlus()", {
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
+    file.copy(path, tempdir())
+    path <- file.path(tempdir(), basename(path))
+
+    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+
+    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+    expect_equal(names(res), c("file", "run"))
+    expect_equal(length(res$file), 42L)
+    expect_equal(
+        sort(names(which(vapply(res$file, function(x) !anyNA(x), logical(1))))),
+        c("audit", "bnd", "dxf", "eio", "end", "epw", "err", "eso", "idf",
+            "mdd", "mtd", "mtr", "rdd", "shd", "sqlite_err", "table")
+    )
+    expect_equal(names(res$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_false(is.null(res$run$stdout))
+    expect_false(is.null(res$run$stderr))
+    unlink(unlist(res$file))
+
+    unlink(path)
+})
+
+test_that("convertESOMTR()", {
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
+    file.copy(path, tempdir())
+    path <- file.path(tempdir(), basename(path))
+
+    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+
+    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+
+    eso <- convertESOMTR(res$file$eso, eplus = 8.8, echo = FALSE)
+    expect_equal(names(eso), c("file", "run"))
+    expect_equal(names(eso$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
+    expect_true(file.exists(eso$file$eso))
+    expect_true(file.exists(eso$file$ipeso))
+    expect_true(is.na(eso$file$mtr))
+    expect_true(is.na(eso$file$ipmtr))
+    expect_true(is.na(eso$file$iperr))
+    expect_equal(names(eso$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_false(is.null(eso$run$stdout))
+    expect_true(is.null(eso$run$stderr))
+    unlink(unlist(eso$file))
+
+    mtr <- convertESOMTR(res$file$mtr, eplus = 8.8, echo = FALSE)
+    expect_equal(names(mtr), c("file", "run"))
+    expect_equal(names(mtr$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
+    expect_true(file.exists(mtr$file$mtr))
+    expect_true(file.exists(mtr$file$ipmtr))
+    expect_true(is.na(mtr$file$eso))
+    expect_true(is.na(mtr$file$ipeso))
+    expect_true(is.na(mtr$file$iperr))
+    expect_equal(names(mtr$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_false(is.null(mtr$run$stdout))
+    expect_true(is.null(mtr$run$stderr))
+    unlink(unlist(mtr$file))
+
+    unlink(unlist(res$file))
+    unlink(path)
+})
+
+test_that("ReadVarsESO()", {
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
+    file.copy(path, tempdir())
+    path <- file.path(tempdir(), basename(path))
+
+    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+
+    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+
+    eso <- ReadVarsESO(res$file$eso, eplus = 8.8, echo = FALSE)
+    expect_equal(names(eso), c("file", "run"))
+    expect_equal(names(eso$file), c("eso", "mtr", "variable", "meter", "rvaudit"))
+    expect_true(file.exists(eso$file$eso))
+    expect_true(file.exists(eso$file$variable))
+    expect_true(file.exists(eso$file$rvaudit))
+    expect_true(is.na(eso$file$mtr))
+    expect_true(is.na(eso$file$meter))
+    expect_equal(names(eso$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_true(!is.na(eso$file$variable))
+    expect_true(is.na(eso$file$meter))
+    expect_true(!is.na(eso$file$rvaudit))
+    unlink(unlist(eso$file))
+
+    mtr <- ReadVarsESO(res$file$mtr, eplus = 8.8, echo = FALSE)
+    expect_equal(names(mtr$file), c("eso", "mtr", "variable", "meter", "rvaudit"))
+    expect_true(file.exists(mtr$file$mtr))
+    expect_true(file.exists(mtr$file$meter))
+    expect_true(file.exists(mtr$file$rvaudit))
+    expect_true(is.na(mtr$file$eso))
+    expect_true(is.na(mtr$file$variable))
+    expect_equal(names(mtr$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_true(is.na(mtr$file$variable))
+    expect_true(!is.na(mtr$file$meter))
+    expect_true(!is.na(mtr$file$rvaudit))
+    unlink(unlist(mtr$file))
+
+    unlink(unlist(res$file))
+    unlink(path)
+})
+
+test_that("HVAC_Diagram()", {
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
+    file.copy(path, tempdir())
+    path <- file.path(tempdir(), basename(path))
+
+    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+
+    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+
+    svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
+    expect_equal(names(svg), c("file", "run"))
+    expect_equal(names(svg$file), c("bnd", "svg"))
+    expect_true(file.exists(svg$file$bnd))
+    expect_true(file.exists(svg$file$bnd))
+    expect_equal(names(svg$run), c("process", "exit_status", "stdout",
+        "stderr", "start_time", "end_time"))
+    expect_true(!is.na(svg$file$svg))
+    unlink(unlist(svg$file))
+
+    unlink(unlist(res$file))
+    unlink(path)
+})
     path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
     file.copy(path, tempdir())
     path <- file.path(tempdir(), basename(path))
