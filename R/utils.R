@@ -503,7 +503,7 @@ is_valid_file_name <- function(x) {
     # see: https://stackoverflow.com/a/7779343
     if (inherits(con, "connection")) {
         close(con)
-        unlink(con, force = TRUE)
+        unlink(x, force = TRUE)
         TRUE
     } else {
         FALSE
