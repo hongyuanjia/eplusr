@@ -3,9 +3,17 @@
 ## New features
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).
+* Add epw data sources from [climate.onebuilding.org](http://climate.onebuilding.org/)
+  for `download_weather()`. `type` will always be `"all"` for those sources (#453).
+* Add a new `"stat"` option in `type` in `download_weather()` (#453).
 * `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
   procedure. This will remove the previous IDF version requirement (>= 8.3) when
   running simulations (#446).
+
+## Minor changes
+
+* When `type` is `"all"` in `download_weather()`, the ZIP file will be
+  downloaded instead of downloading both `EPW` and `DDY` files (#453).
 
 ## Bug fixes
 

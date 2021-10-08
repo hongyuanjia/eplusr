@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>CTZ2_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Climate Zone 1 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ01RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>725945</b></td></tr>
+       <tr><td><b>N 40° 48.00'   W 124° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>13</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4C - Mixed - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>0.5 C</b>, <b>32.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2185</b>, CDD10 <b>887</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ01RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-124.2000,40.80000,13.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 02 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ02RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>C00002</b></td></tr>
+       <tr><td><b>N 38° 24.00'   W 122° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>50</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 724957</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3C - Warm - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.5 C</b>, <b>31.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.7 C</b>, <b>90.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1707</b>, CDD10 <b>1715</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ02RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.7000,38.40000,50.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 3 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ03RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>724930</b></td></tr>
+       <tr><td><b>N 37° 42.00'   W 122° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3C - Warm - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>3.8 C</b>, <b>38.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.2 C</b>, <b>79.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1438</b>, CDD10 <b>1555</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ03RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.2000,37.70000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 4 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ04RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>724945</b></td></tr>
+       <tr><td><b>N 37° 24.00'   W 122° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3C - Warm - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>3.2 C</b>, <b>37.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1315</b>, CDD10 <b>1879</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ04RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.4000,37.40000,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 5 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ05RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>723940</b></td></tr>
+       <tr><td><b>N 34° 54.00'   W 120° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>72</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3C - Warm - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>2.0 C</b>, <b>35.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.7 C</b>, <b>80.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1391</b>, CDD10 <b>1586</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ05RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-120.4000,34.90000,72.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 6 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ06RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>722970</b></td></tr>
+       <tr><td><b>N 33° 54.00'   W 118° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>6.5 C</b>, <b>43.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>HDD18 <b>845</b>, CDD10 <b>2293</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ06RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-118.5000,33.90000,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 7 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ07RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>722900</b></td></tr>
+       <tr><td><b>N 32° 42.00'   W 117° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3C - Warm - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>8.3 C</b>, <b>46.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.0 C</b>, <b>80.6 F</b></td></tr>
+       <tr><td>HDD18 <b>718</b>, CDD10 <b>2506</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ07RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-117.2000,32.70000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 8 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ08RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>690140</b></td></tr>
+       <tr><td><b>N 33° 36.00'   W 117° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>117</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 722908</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>7.4 C</b>, <b>45.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>791</b>, CDD10 <b>2589</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ08RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-117.7000,33.60000,117.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 9 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ09RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>722880</b></td></tr>
+       <tr><td><b>N 34° 9.00'   W 118° 9.00'</b></td></tr>
+       <tr><td>Elevation <b>263</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.0 C</b>, <b>41.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.5 C</b>, <b>94.1 F</b></td></tr>
+       <tr><td>HDD18 <b>756</b>, CDD10 <b>2742</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ09RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-118.1500,34.15000,263.3</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 10 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ10RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>722860</b></td></tr>
+       <tr><td><b>N 33° 52.80'   W 117° 16.20'</b></td></tr>
+       <tr><td>Elevation <b>469</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>1.7 C</b>, <b>35.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.1 C</b>, <b>98.8 F</b></td></tr>
+       <tr><td>HDD18 <b>930</b>, CDD10 <b>2790</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ10RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-117.2700,33.88000,469.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 11 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ11RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>725910</b></td></tr>
+       <tr><td><b>N 40° 12.00'   W 122° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>104</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.3 C</b>, <b>32.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.5 C</b>, <b>101.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1505</b>, CDD10 <b>2446</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ11RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.2000,40.20000,104.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 12 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ12RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>724830</b></td></tr>
+       <tr><td><b>N 38° 30.00'   W 121° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>5</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.9 C</b>, <b>33.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.0 C</b>, <b>96.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1486</b>, CDD10 <b>2117</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ12RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-121.5000,38.50000,5.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 13 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ13RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>723890</b></td></tr>
+       <tr><td><b>N 36° 48.00'   W 119° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>100</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.3 C</b>, <b>100.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1243</b>, CDD10 <b>2965</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ13RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-119.7000,36.80000,100.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 14 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ14RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>C00014</b></td></tr>
+       <tr><td><b>N 35° 42.00'   W 117° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>699</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 723810</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.8 C</b>, <b>25.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.9 C</b>, <b>102.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1655</b>, CDD10 <b>2672</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ14RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-117.7000,35.70000,699.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 15 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ15RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>747185</b></td></tr>
+       <tr><td><b>N 32° 48.00'   W 115° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>-9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>3.3 C</b>, <b>37.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.8 C</b>, <b>109.0 F</b></td></tr>
+       <tr><td>HDD18 <b>486</b>, CDD10 <b>4750</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ15RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-115.6000,32.80000,-9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Climate Zone 16 CA USA</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>CZ16RV2</b></td></tr>
+       <tr><td><b>Data Source CTZRV2</td></tr>
+       <tr><td>WMO <b>725957</b></td></tr>
+       <tr><td><b>N 41° 18.00'   W 122° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>1080</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.0 C</b>, <b>21.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3008</b>, CDD10 <b>1124</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/California_Climate_Zones/California_CTZ2_1991/CZ16RV2.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>-122.3000,41.30000,1080.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>

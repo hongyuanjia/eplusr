@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>NIWA_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Auckland AUK NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL AUK Auckland.AK.931190 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>931190</b></td></tr>
+       <tr><td><b>S 37° 0.60'   E 174° 47.40'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.2 C</b>, <b>41.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.8 C</b>, <b>76.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1165</b>, CDD10 <b>1939</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/AUK_Auckland/NZL_AUK_Auckland.AK.931190_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>174.7900,-37.01000,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tauranga BOP NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL BOP Tauranga.BP.931850 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>931850</b></td></tr>
+       <tr><td><b>S 37° 40.20'   E 176° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 931860</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>4.1 C</b>, <b>39.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1274</b>, CDD10 <b>1856</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/BOP_Bay_of_Plenty/NZL_BOP_Tauranga.BP.931850_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>176.2000,-37.67000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Christchurch CAN NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL CAN Christchurch.CC.937800 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>937800</b></td></tr>
+       <tr><td><b>S 43° 29.40'   E 172° 32.40'</b></td></tr>
+       <tr><td>Elevation <b>37</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2490</b>, CDD10 <b>962</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/CAN_Canterbury/NZL_CAN_Christchurch.CC.937800_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>172.5400,-43.49000,37.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Dunedin OTA NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL OTA Dunedin.DN.938910 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>938910</b></td></tr>
+       <tr><td><b>S 45° 54.00'   E 170° 30.60'</b></td></tr>
+       <tr><td>Elevation <b>2</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.1 C</b>, <b>26.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
+       <tr><td>HDD18 <b>2657</b>, CDD10 <b>649</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/OTA_Otago/NZL_OTA_Dunedin.DN.938910_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>170.5100,-45.90000,2.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Napier HKB NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL HKB Napier.EC.933730 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>933730</b></td></tr>
+       <tr><td><b>S 39° 27.60'   E 176° 51.60'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.3 C</b>, <b>36.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1604</b>, CDD10 <b>1592</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/HKB_Hawkes_Bay/NZL_HKB_Napier.EC.933730_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>176.8600,-39.46000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hamilton WKO NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WKO Hamilton.HN.931730 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>931730</b></td></tr>
+       <tr><td><b>S 37° 46.80'   E 175° 18.60'</b></td></tr>
+       <tr><td>Elevation <b>40</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 933090</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.5 C</b>, <b>38.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.5 C</b>, <b>72.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1710</b>, CDD10 <b>1451</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WKO_Waikato/NZL_WKO_Hamilton.HN.931730_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>175.3100,-37.78000,40.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Invercargill STL NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL STL Invercargill.IN.938450 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>938450</b></td></tr>
+       <tr><td><b>S 46° 25.20'   E 168° 19.80'</b></td></tr>
+       <tr><td>Elevation <b>0</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.4 C</b>, <b>70.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2937</b>, CDD10 <b>535</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/STL_Southland/NZL_STL_Invercargill.IN.938450_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>168.3300,-46.42000,0.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Paraparaumu MWT NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL MWT Paraparaumu.MW.934200 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>934200</b></td></tr>
+       <tr><td><b>S 40° 54.60'   E 174° 58.80'</b></td></tr>
+       <tr><td>Elevation <b>5</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.5 C</b>, <b>34.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>21.7 C</b>, <b>71.1 F</b></td></tr>
+       <tr><td>HDD18 <b>1821</b>, CDD10 <b>1282</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/MWT_Manawatu_Wanganui/NZL_MWT_Paraparaumu.MW.934200_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>174.9800,-40.91000,5.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kaitaia NTL NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL NTL Kaitaia.NL.930120 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>930120</b></td></tr>
+       <tr><td><b>S 35° 7.80'   E 173° 15.60'</b></td></tr>
+       <tr><td>Elevation <b>85</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.4 C</b>, <b>43.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.0 C</b>, <b>75.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1024</b>, CDD10 <b>2003</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/NTL_Northland/NZL_NTL_Kaitaia.NL.930120_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>173.2600,-35.13000,85.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nelson NSN NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL NSN Nelson.NM.935460 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>935460</b></td></tr>
+       <tr><td><b>S 41° 18.00'   E 173° 13.20'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.1 C</b>, <b>73.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1912</b>, CDD10 <b>1275</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/NSN_Nelson/NZL_NSN_Nelson.NM.935460_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>173.2200,-41.30000,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>New Plymouth TKI NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL TKI New.Plymouth.NP.933090 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>933090</b></td></tr>
+       <tr><td><b>S 39° 0.60'   E 174° 10.80'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.5 C</b>, <b>38.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.5 C</b>, <b>72.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1646</b>, CDD10 <b>1392</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/TKI_Taranaki/NZL_TKI_New.Plymouth.NP.933090_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>174.1800,-39.01000,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Lauder OTA NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL OTA Lauder.OC.938510 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>938510</b></td></tr>
+       <tr><td><b>S 45° 2.40'   E 169° 41.40'</b></td></tr>
+       <tr><td>Elevation <b>370</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 938310</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.2 C</b>, <b>26.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3164</b>, CDD10 <b>728</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/OTA_Otago/NZL_OTA_Lauder.OC.938510_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>169.6900,-45.04000,370.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Queenstown OTA NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL OTA Queenstown.QL.938310 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>938310</b></td></tr>
+       <tr><td><b>S 45° 1.20'   E 168° 44.40'</b></td></tr>
+       <tr><td>Elevation <b>354</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.2 C</b>, <b>26.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3121</b>, CDD10 <b>689</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/OTA_Otago/NZL_OTA_Queenstown.QL.938310_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>168.7400,-45.02000,354.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rotorua WKO NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WKO Rotorua.RR.932470 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>932470</b></td></tr>
+       <tr><td><b>S 38° 6.60'   E 176° 19.20'</b></td></tr>
+       <tr><td>Elevation <b>283</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 931860</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>4.1 C</b>, <b>39.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.6 C</b>, <b>76.3 F</b></td></tr>
+       <tr><td>HDD18 <b>2146</b>, CDD10 <b>1076</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WKO_Waikato/NZL_WKO_Rotorua.RR.932470_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>176.3200,-38.11000,283.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Taupo-Turangi WKO NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WKO Taupo-Turangi.TP.932450 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>932450</b></td></tr>
+       <tr><td><b>S 38° 59.40'   E 175° 48.60'</b></td></tr>
+       <tr><td>Elevation <b>375</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.4 C</b>, <b>29.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>23.3 C</b>, <b>73.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2365</b>, CDD10 <b>991</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WKO_Waikato/NZL_WKO_Taupo-Turangi.TP.932450_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>175.8100,-38.99000,375.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hokitika WTC NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WTC Hokitika.WC.936150 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>936150</b></td></tr>
+       <tr><td><b>S 42° 43.20'   E 170° 58.80'</b></td></tr>
+       <tr><td>Elevation <b>38</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 936140</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>20.5 C</b>, <b>68.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2416</b>, CDD10 <b>837</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WTC_West_Coast/NZL_WTC_Hokitika.WC.936150_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>170.9800,-42.72000,38.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wairarapa-Masterton WGN NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WGN Wairarapa-Masterton.WI.934710 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>934710</b></td></tr>
+       <tr><td><b>S 41° 1.20'   E 175° 37.20'</b></td></tr>
+       <tr><td>Elevation <b>91</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 934040</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.1 C</b>, <b>34.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.5 C</b>, <b>76.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2100</b>, CDD10 <b>1219</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WGN_Wellington/NZL_WGN_Masterton.WI.934710_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>175.6200,-41.02000,91.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Wellington WGN NZL</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>NZL WGN Wellington.WN.934360 NIWA</b></td></tr>
+       <tr><td><b>Data Source NIWA</td></tr>
+       <tr><td>WMO <b>934360</b></td></tr>
+       <tr><td><b>S 41° 24.60'   E 174° 52.20'</b></td></tr>
+       <tr><td>Elevation <b>79</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.1 C</b>, <b>35.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>22.2 C</b>, <b>72.0 F</b></td></tr>
+       <tr><td>HDD18 <b>1930</b>, CDD10 <b>1160</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/NZL_New_Zealand/WGN_Wellington/NZL_WGN_Wellington.WN.934360_NIWA.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>174.8700,-41.41000,79.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>

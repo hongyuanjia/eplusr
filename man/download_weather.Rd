@@ -8,7 +8,7 @@ download_weather(
   pattern,
   filename = NULL,
   dir = ".",
-  type = c("all", "epw", "ddy"),
+  type = c("all", "epw", "ddy", "stat"),
   ask = TRUE,
   max_match = 3
 )
@@ -19,11 +19,12 @@ download_weather(
 \item{filename}{File names (without extension) used to save downloaded files.
 Internally, \code{\link[=make.unique]{make.unique()}} is called to ensure unique names.}
 
-\item{dir}{Directory to save downloaded files}
+\item{dir}{Directory to save downloaded files. Will create if not exist.}
 
-\item{type}{File type to download. Should be one of \code{"all"}, \code{"epw"} and
-\code{"ddy"}. If \code{"all"}, both weather files and design day files will be
-downloaded.}
+\item{type}{File type to download. Only applicable to data provided by
+EnergyPlus website. For OneBuilding.org, \code{"all"} will always be used.
+Should be one of \code{"all"}, \code{"epw"}, \code{"ddy"} and \code{"stat"}. If \code{"all"}, all
+weather data will be downloaded in a ZIP file. Default: \code{"all"}.}
 
 \item{ask}{If \code{TRUE}, a command line menu will be shown to let you select
 which one to download. If \code{FALSE} and the number of returned results is
@@ -38,6 +39,19 @@ A character vector containing paths of downloaded files.
 \code{download_weather()} makes it easy to download EnergyPlus weather files (EPW)
 and design day files (DDY).
 }
+\section{Data sources}{
+
+
+There are 2 data sources:
+\itemize{
+\item \href{https://energyplus.net/weather}{EnergyPlus.net}
+\item \href{http://climate.onebuilding.org/}{OneBuilding.org}
+}
+
+EnergyPlus sources allow downloading EPW, STAT, and DDY files separately
+while OneBuilding sources can only download them all through a ZIP file.
+}
+
 \examples{
 \dontrun{
 download_weather("los angeles.*tmy3", "LosAngeles", tempdir(), ask = FALSE)

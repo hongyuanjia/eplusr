@@ -1,0 +1,1582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>TurTMY_EPW_Processing locations in GoogleEarth KML format</name>
+  <open>1</open>
+  <Style id="weatherlocation_hiliteicon">
+    <IconStyle>
+      <scale>1.3</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <Style id="weatherlocation_normal">
+    <IconStyle>
+      <scale>1.1</scale>
+      <Icon>
+         <href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href>
+      </Icon>
+      <hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+    </IconStyle>
+    <LabelStyle>
+      <scale>0.2</scale>
+    </LabelStyle>
+  </Style>
+  <StyleMap id="weatherlocation">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#weatherlocation_normal</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#weatherlocation_hiliteicon</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Placemark>
+    <name>Adana AA TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AA Adana 173510 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>173510</b></td></tr>
+       <tr><td><b>N 36° 58.80'   E 35° 21.00'</b></td></tr>
+       <tr><td>Elevation <b>27</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 173520</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.9 C</b>, <b>37.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.1 C</b>, <b>95.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1170</b>, CDD10 <b>3231</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AA_Adana/TUR_AA_Adana_173510_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>35.35000,36.98000,27.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Adapazari SK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SK Adapazari 170690 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170690</b></td></tr>
+       <tr><td><b>N 40° 47.00'   E 30° 25.00'</b></td></tr>
+       <tr><td>Elevation <b>30</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-2.3 C</b>, <b>27.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2090</b>, CDD10 <b>1940</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SK_Sakarya/TUR_SK_Adapazari_170690_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.41660,40.78330,30.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Adiyaman AD TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AD Adiyaman 172650 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172650</b></td></tr>
+       <tr><td><b>N 37° 45.00'   E 38° 16.80'</b></td></tr>
+       <tr><td>Elevation <b>672</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-2.9 C</b>, <b>26.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.7 C</b>, <b>108.9 F</b></td></tr>
+       <tr><td>HDD18 <b>1983</b>, CDD10 <b>3002</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AD_Adiyaman/TUR_AD_Adiyaman_172650_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>38.28000,37.75000,672.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Afyonkarahisar AF TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AF Afyonkarahisar 171900 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171900</b></td></tr>
+       <tr><td><b>N 38° 45.00'   E 30° 32.00'</b></td></tr>
+       <tr><td>Elevation <b>1034</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-11.1 C</b>, <b>12.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3394</b>, CDD10 <b>1290</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AF_Afyonkarahisar/TUR_AF_Afyonkarahisar_171900_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.53330,38.75000,1034.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Agri AG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AG Agri 170990 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170990</b></td></tr>
+       <tr><td><b>N 39° 43.80'   E 43° 3.00'</b></td></tr>
+       <tr><td>Elevation <b>1632</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-30.1 C</b>, <b>-22.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.9 C</b>, <b>91.2 F</b></td></tr>
+       <tr><td>HDD18 <b>5006</b>, CDD10 <b>1119</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AG_Agri/TUR_AG_Agri_170990_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>43.05000,39.73000,1632.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Aksaray AK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AK Aksaray 171920 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171920</b></td></tr>
+       <tr><td><b>N 38° 23.00'   E 34° 3.00'</b></td></tr>
+       <tr><td>Elevation <b>961</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-15.2 C</b>, <b>4.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>3067</b>, CDD10 <b>1745</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AK_Aksaray/TUR_AK_Aksaray_171920_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.05000,38.38330,961.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Amasya AM TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AM Amasya 170850 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170850</b></td></tr>
+       <tr><td><b>N 40° 39.00'   E 35° 51.00'</b></td></tr>
+       <tr><td>Elevation <b>412</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-9.9 C</b>, <b>14.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.9 C</b>, <b>96.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2591</b>, CDD10 <b>1922</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AM_Amasya/TUR_AM_Amasya_170850_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>35.85000,40.65000,412.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ankara AN Unknown</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AN Ankara 171300 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171300</b></td></tr>
+       <tr><td><b>N 39° 57.00'   E 32° 53.00'</b></td></tr>
+       <tr><td>Elevation <b>891</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.8 C</b>, <b>21.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2999</b>, CDD10 <b>1727</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AN_Ankara/TUR_AN_Ankara_171300_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>32.88330,39.95000,891.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Antalya AL TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AL Antalya 173000 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>173000</b></td></tr>
+       <tr><td><b>N 36° 52.00'   E 30° 44.00'</b></td></tr>
+       <tr><td>Elevation <b>64</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.1 C</b>, <b>37.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.8 C</b>, <b>98.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1296</b>, CDD10 <b>3058</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AL_Antalya/TUR_AL_Antalya_173000_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.73330,36.86660,64.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ardahan AR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AR Ardahan 170460 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170460</b></td></tr>
+       <tr><td><b>N 41° 7.00'   E 42° 43.00'</b></td></tr>
+       <tr><td>Elevation <b>1829</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-27.4 C</b>, <b>-17.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.4 C</b>, <b>79.5 F</b></td></tr>
+       <tr><td>HDD18 <b>6000</b>, CDD10 <b>540</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AR_Ardahan/TUR_AR_Ardahan_170460_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>42.71660,41.11660,1829.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Artvin AV TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AV Artvin 170450 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170450</b></td></tr>
+       <tr><td><b>N 41° 11.00'   E 41° 49.00'</b></td></tr>
+       <tr><td>Elevation <b>628</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-4.3 C</b>, <b>24.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2959</b>, CDD10 <b>1418</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AV_Artvin/TUR_AV_Artvin_170450_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>41.81660,41.18330,628.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Aydin AY TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR AY Aydin 172340 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172340</b></td></tr>
+       <tr><td><b>N 37° 51.00'   E 27° 51.00'</b></td></tr>
+       <tr><td>Elevation <b>56</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.7 C</b>, <b>33.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.8 C</b>, <b>98.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1647</b>, CDD10 <b>2731</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/AY_Aydin/TUR_AY_Aydin_172340_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.85000,37.85000,56.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Balikesir BK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BK Balikesir 171500 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171500</b></td></tr>
+       <tr><td><b>N 39° 37.00'   E 27° 55.00'</b></td></tr>
+       <tr><td>Elevation <b>102</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.0 C</b>, <b>24.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2349</b>, CDD10 <b>2035</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BK_Balikesir/TUR_BK_Balikesir_171500_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.91660,39.61660,102.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bartin BR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BR Bartin 170200 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170200</b></td></tr>
+       <tr><td><b>N 41° 38.00'   E 32° 20.00'</b></td></tr>
+       <tr><td>Elevation <b>33</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-8.1 C</b>, <b>17.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.1 C</b>, <b>84.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2636</b>, CDD10 <b>1443</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BR_Bartin/TUR_BR_Bartin_170200_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>32.33330,41.63330,33.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Batman BM TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BM Batman 172820 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172820</b></td></tr>
+       <tr><td><b>N 37° 53.00'   E 41° 7.00'</b></td></tr>
+       <tr><td>Elevation <b>540</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-18.7 C</b>, <b>-1.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.4 C</b>, <b>106.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2163</b>, CDD10 <b>2909</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BM_Batman/TUR_BM_Batman_172820_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>41.11660,37.88330,540.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bayburt BB TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BB Bayburt 170890 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170890</b></td></tr>
+       <tr><td><b>N 40° 15.00'   E 40° 14.00'</b></td></tr>
+       <tr><td>Elevation <b>1584</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-22.0 C</b>, <b>-7.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>HDD18 <b>4655</b>, CDD10 <b>961</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BB_Bayburt/TUR_BB_Bayburt_170890_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>40.23330,40.25000,1584.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bilecik BC TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BC Bilecik 171200 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171200</b></td></tr>
+       <tr><td><b>N 40° 9.00'   E 29° 58.00'</b></td></tr>
+       <tr><td>Elevation <b>539</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.9 C</b>, <b>14.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2924</b>, CDD10 <b>1555</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BC_Bilecik/TUR_BC_Bilecik_171200_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.96660,40.15000,539.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bingol BG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BG Bingol 172030 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172030</b></td></tr>
+       <tr><td><b>N 38° 52.00'   E 40° 30.00'</b></td></tr>
+       <tr><td>Elevation <b>1177</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.1 C</b>, <b>12.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.0 C</b>, <b>95.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3588</b>, CDD10 <b>1853</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BG_Bingöl/TUR_BG_Bingol_172030_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>40.50000,38.86660,1177.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bitlis BT TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BT Bitlis 178480 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>178480</b></td></tr>
+       <tr><td><b>N 38° 24.00'   E 42° 6.50'</b></td></tr>
+       <tr><td>Elevation <b>1400</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>3767</b>, CDD10 <b>1381</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BT_Bitlis/TUR_BT_Bitlis_178480_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>42.10830,38.40000,1400.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bolu BL Unknown</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BL Bolu 170700 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170700</b></td></tr>
+       <tr><td><b>N 40° 44.00'   E 31° 36.00'</b></td></tr>
+       <tr><td>Elevation <b>743</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.7 C</b>, <b>85.5 F</b></td></tr>
+       <tr><td>HDD18 <b>3368</b>, CDD10 <b>1181</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BL_Bolu/TUR_BL_Bolu_170700_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>31.60000,40.73330,743.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Burdur BD TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BD Burdur 172380 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172380</b></td></tr>
+       <tr><td><b>N 37° 40.00'   E 30° 20.00'</b></td></tr>
+       <tr><td>Elevation <b>967</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-9.1 C</b>, <b>15.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>3143</b>, CDD10 <b>1565</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BD_Burdur/TUR_BD_Burdur_172380_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.33330,37.66660,967.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Bursa BU TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR BU Bursa 171160 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171160</b></td></tr>
+       <tr><td><b>N 40° 11.00'   E 29° 4.00'</b></td></tr>
+       <tr><td>Elevation <b>100</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2352</b>, CDD10 <b>1935</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/BU_Bursa/TUR_BU_Bursa_171160_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.06660,40.18330,100.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Canakkale CK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR CK Canakkale 171120 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171120</b></td></tr>
+       <tr><td><b>N 40° 8.00'   E 26° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>6</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2047</b>, CDD10 <b>2228</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/CK_Canakkale/TUR_CK_Canakkale_171120_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>26.40000,40.13330,6.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Cankiri CI TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR CI Cankiri 170800 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170800</b></td></tr>
+       <tr><td><b>N 40° 36.00'   E 33° 37.00'</b></td></tr>
+       <tr><td>Elevation <b>751</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.5 C</b>, <b>95.9 F</b></td></tr>
+       <tr><td>HDD18 <b>3428</b>, CDD10 <b>1510</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/CI_Cankiri/TUR_CI_Cankiri_170800_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>33.61660,40.60000,751.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Corum CM TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR CM Corum 170840 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170840</b></td></tr>
+       <tr><td><b>N 40° 33.00'   E 34° 57.00'</b></td></tr>
+       <tr><td>Elevation <b>776</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4C - Mixed - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.2 C</b>, <b>15.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3297</b>, CDD10 <b>1298</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/CM_Corum/TUR_CM_Corum_170840_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.95000,40.55000,776.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Denizli DN TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR DN Denizli 172370 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172370</b></td></tr>
+       <tr><td><b>N 37° 47.00'   E 29° 5.00'</b></td></tr>
+       <tr><td>Elevation <b>425</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.1 C</b>, <b>30.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.9 C</b>, <b>98.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1865</b>, CDD10 <b>2607</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/DN_Denizli/TUR_DN_Denizli_172370_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.08330,37.78330,425.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Diyarbakir DY TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR DY Diyarbakir 172800 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172800</b></td></tr>
+       <tr><td><b>N 37° 53.00'   E 40° 12.00'</b></td></tr>
+       <tr><td>Elevation <b>674</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.1 C</b>, <b>102.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2392</b>, CDD10 <b>2745</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/DY_Diyarbakir/TUR_DY_Diyarbakir_172800_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>40.20000,37.88330,674.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Duzce DU TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR DU Duzce 170720 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170720</b></td></tr>
+       <tr><td><b>N 40° 50.00'   E 31° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>146</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-8.1 C</b>, <b>17.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2387</b>, CDD10 <b>1764</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/DU_Duzce/TUR_DU_Duzce_170720_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>31.16660,40.83330,146.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Edirne ED TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR ED Edirne 170500 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170500</b></td></tr>
+       <tr><td><b>N 41° 40.00'   E 26° 34.00'</b></td></tr>
+       <tr><td>Elevation <b>51</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.1 C</b>, <b>22.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2704</b>, CDD10 <b>1849</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/ED_Edirne/TUR_ED_Edirne_170500_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>26.56660,41.66660,51.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Elazig EG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR EG Elazig 172020 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172020</b></td></tr>
+       <tr><td><b>N 38° 36.00'   E 39° 17.00'</b></td></tr>
+       <tr><td>Elevation <b>881</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.7 C</b>, <b>16.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.8 C</b>, <b>98.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2916</b>, CDD10 <b>2172</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/EG_Elazig/TUR_EG_Elazig_172020_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>39.28330,38.60000,881.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Erzincan EN TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR EN Erzincan 170920 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170920</b></td></tr>
+       <tr><td><b>N 39° 42.00'   E 39° 31.00'</b></td></tr>
+       <tr><td>Elevation <b>1154</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.0 C</b>, <b>6.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>HDD18 <b>3161</b>, CDD10 <b>1837</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/EN_Erzincan/TUR_EN_Erzincan_170920_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>39.51660,39.70000,1154.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Erzurum EM TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR EM Erzurum 170960 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170960</b></td></tr>
+       <tr><td><b>N 39° 57.00'   E 41° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>1758</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-26.1 C</b>, <b>-15.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
+       <tr><td>HDD18 <b>5473</b>, CDD10 <b>826</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/EM_Erzurum/TUR_EM_Erzurum_170960_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>41.16660,39.95000,1758.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Eskisehir ES TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR ES Eskisehir 171240 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171240</b></td></tr>
+       <tr><td><b>N 39° 47.00'   E 30° 34.00'</b></td></tr>
+       <tr><td>Elevation <b>786</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.2 C</b>, <b>17.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>HDD18 <b>3336</b>, CDD10 <b>1233</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/ES_Eskisehir/TUR_ES_Eskisehir_171240_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.56660,39.78330,786.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Gaziantep GA TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR GA Gaziantep 172600 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172600</b></td></tr>
+       <tr><td><b>N 37° 5.00'   E 37° 22.00'</b></td></tr>
+       <tr><td>Elevation <b>701</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.1 C</b>, <b>26.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.8 C</b>, <b>100.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2205</b>, CDD10 <b>2472</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/GS_Gaziantep/TUR_GA_Gaziantep_172600_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>37.36660,37.08333,701.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Giresun GI TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR GI Giresun 170340 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170340</b></td></tr>
+       <tr><td><b>N 40° 55.00'   E 38° 23.00'</b></td></tr>
+       <tr><td>Elevation <b>37</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.8 C</b>, <b>85.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2058</b>, CDD10 <b>1966</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/GI_Giresun/TUR_GI_Giresun_170340_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>38.38330,40.91660,37.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Gumushane GU TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR GU Gumushane 170880 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170880</b></td></tr>
+       <tr><td><b>N 40° 28.00'   E 39° 28.00'</b></td></tr>
+       <tr><td>Elevation <b>1219</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-18.4 C</b>, <b>-1.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
+       <tr><td>HDD18 <b>3741</b>, CDD10 <b>1247</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/GU_Gumushane/TUR_GU_Gumushane_170880_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>39.46660,40.46660,1219.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Hakkari HK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR HK Hakkari 172850 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172850</b></td></tr>
+       <tr><td><b>N 37° 34.00'   E 43° 46.00'</b></td></tr>
+       <tr><td>Elevation <b>1728</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-12.9 C</b>, <b>8.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.1 C</b>, <b>95.2 F</b></td></tr>
+       <tr><td>HDD18 <b>3783</b>, CDD10 <b>1885</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/HK_Hakkari/TUR_HK_Hakkari_172850_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>43.76660,37.56660,1728.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Antakya HT TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR HT Antakya 173720 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>173720</b></td></tr>
+       <tr><td><b>N 36° 12.00'   E 36° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>100</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>0.3 C</b>, <b>32.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.7 C</b>, <b>94.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1387</b>, CDD10 <b>2866</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/HT_Hatay/TUR_HT_Antakya_173720_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>36.16660,36.20000,100.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Igdir IG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR IG Igdir 171000 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171000</b></td></tr>
+       <tr><td><b>N 39° 55.00'   E 44° 3.00'</b></td></tr>
+       <tr><td>Elevation <b>858</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-17.4 C</b>, <b>0.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.7 C</b>, <b>92.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3040</b>, CDD10 <b>1856</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/IG_Igdir/TUR_IG_Igdir_171000_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>44.05000,39.91660,858.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Isparta IP TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR IP Isparta 172400 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172400</b></td></tr>
+       <tr><td><b>N 37° 45.00'   E 30° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>997</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.2 C</b>, <b>20.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>HDD18 <b>3109</b>, CDD10 <b>1604</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/IP_Isparta/TUR_IP_Isparta_172400_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>30.55000,37.75000,997.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Istanbul IB TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR IB Istanbul 170620 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170620</b></td></tr>
+       <tr><td><b>N 40° 54.00'   E 29° 9.00'</b></td></tr>
+       <tr><td>Elevation <b>18</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from alternate WMO 170600</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.2 C</b>, <b>31.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.6 C</b>, <b>87.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2241</b>, CDD10 <b>1831</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/IB_Istanbul/TUR_IB_Istanbul_170620_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.15000,40.90000,18.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Izmir IZ TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR IZ Izmir 172200 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172200</b></td></tr>
+       <tr><td><b>N 38° 26.00'   E 27° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>29</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-1.5 C</b>, <b>29.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.9 C</b>, <b>96.6 F</b></td></tr>
+       <tr><td>HDD18 <b>1538</b>, CDD10 <b>2795</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/IZ_Izmir/TUR_IZ_Izmir_172200_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.16660,38.43330,29.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kahramanmaras KM TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KM Kahramanmaras 172550 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172550</b></td></tr>
+       <tr><td><b>N 37° 36.00'   E 36° 56.00'</b></td></tr>
+       <tr><td>Elevation <b>572</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.1 C</b>, <b>104.2 F</b></td></tr>
+       <tr><td>HDD18 <b>1941</b>, CDD10 <b>2756</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KM_Kahramanmaras/TUR_KM_Kahramanmaras_172550_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>36.93330,37.60000,572.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Karabuk KB TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KB Karabuk 170780 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170780</b></td></tr>
+       <tr><td><b>N 41° 12.00'   E 32° 38.00'</b></td></tr>
+       <tr><td>Elevation <b>259</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.1 C</b>, <b>97.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2501</b>, CDD10 <b>1802</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KB_Karabuk/TUR_KB_Karabuk_170780_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>32.63330,41.20000,259.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Karaman KR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KR Karaman 172460 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172460</b></td></tr>
+       <tr><td><b>N 37° 12.00'   E 33° 13.00'</b></td></tr>
+       <tr><td>Elevation <b>1023</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-17.3 C</b>, <b>0.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.0 C</b>, <b>95.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3191</b>, CDD10 <b>1638</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KR_Karaman/TUR_KR_Karaman_172460_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>33.21666,37.20000,1023.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kars KA TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KA Kars 170980 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170980</b></td></tr>
+       <tr><td><b>N 40° 33.00'   E 43° 5.00'</b></td></tr>
+       <tr><td>Elevation <b>1795</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-22.4 C</b>, <b>-8.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>HDD18 <b>5254</b>, CDD10 <b>588</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KA_Kars/TUR_KA_Kars_170980_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>43.08333,40.55000,1795.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kastamonu KS TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KS Kastamonu 170740 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170740</b></td></tr>
+       <tr><td><b>N 41° 22.00'   E 33° 47.00'</b></td></tr>
+       <tr><td>Elevation <b>800</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3555</b>, CDD10 <b>1088</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KS_Kastamonu/TUR_KS_Kastamonu_170740_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>33.78330,41.36660,800.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kayseri KY TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KY Kayseri 171950 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171950</b></td></tr>
+       <tr><td><b>N 38° 49.00'   E 35° 26.00'</b></td></tr>
+       <tr><td>Elevation <b>1054</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.4 C</b>, <b>9.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3266</b>, CDD10 <b>1437</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KY_Kayseri/TUR_KY_Kayseri_171950_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>35.43330,38.81660,1054.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kilis KI TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KI Kilis 172620 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172620</b></td></tr>
+       <tr><td><b>N 36° 43.00'   E 37° 7.00'</b></td></tr>
+       <tr><td>Elevation <b>638</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-0.8 C</b>, <b>30.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.6 C</b>, <b>101.5 F</b></td></tr>
+       <tr><td>HDD18 <b>1836</b>, CDD10 <b>2748</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KI_Kilis/TUR_KI_Kilis_172620_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>37.11660,36.71660,638.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kirikkale KK TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KK Kirikkale 171350 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171350</b></td></tr>
+       <tr><td><b>N 39° 51.00'   E 33° 31.00'</b></td></tr>
+       <tr><td>Elevation <b>748</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.1 C</b>, <b>93.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2948</b>, CDD10 <b>1761</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KK_Kirikkale/TUR_KK_Kirikkale_171350_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>33.51660,39.85000,748.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kirklareli KL TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KL Kirklareli 170520 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170520</b></td></tr>
+       <tr><td><b>N 41° 44.00'   E 27° 14.00'</b></td></tr>
+       <tr><td>Elevation <b>232</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.8 C</b>, <b>94.6 F</b></td></tr>
+       <tr><td>HDD18 <b>2735</b>, CDD10 <b>1781</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KL_Kirklareli/TUR_KL_Kirklareli_170520_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.23330,41.73330,232.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kirsehir KH TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KH Kirsehir 171600 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171600</b></td></tr>
+       <tr><td><b>N 39° 9.00'   E 34° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>1007</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.5 C</b>, <b>14.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3221</b>, CDD10 <b>1595</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KH_Kirsehir/TUR_KH_Kirsehir_171600_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.16660,39.15000,1007.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ismit KC TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KC Ismit 170660 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170660</b></td></tr>
+       <tr><td><b>N 40° 46.00'   E 29° 55.00'</b></td></tr>
+       <tr><td>Elevation <b>76</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-2.1 C</b>, <b>28.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>HDD18 <b>2148</b>, CDD10 <b>1874</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KC_Kocaeli/TUR_KC_Ismit_170660_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.91660,40.76660,76.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Konya KO TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KO Konya 172440 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172440</b></td></tr>
+       <tr><td><b>N 37° 58.00'   E 32° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>1031</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.2 C</b>, <b>15.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.8 C</b>, <b>91.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3302</b>, CDD10 <b>1486</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KO_Konya/TUR_KO_Konya_172440_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>32.55000,37.96660,1031.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Kutahya KU TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR KU Kutahya 171550 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171550</b></td></tr>
+       <tr><td><b>N 39° 25.00'   E 29° 58.00'</b></td></tr>
+       <tr><td>Elevation <b>969</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-16.7 C</b>, <b>1.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>3419</b>, CDD10 <b>1247</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/KU_Kutahya/TUR_KU_Kutahya_171550_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.96660,39.41660,969.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Malatya ML TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR ML Malatya 171990 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171990</b></td></tr>
+       <tr><td><b>N 38° 21.00'   E 38° 19.00'</b></td></tr>
+       <tr><td>Elevation <b>948</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-6.8 C</b>, <b>19.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.4 C</b>, <b>97.5 F</b></td></tr>
+       <tr><td>HDD18 <b>2723</b>, CDD10 <b>2257</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/ML_Malatya/TUR_ML_Malatya_171990_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>38.31660,38.35000,948.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Manisa MN TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR MN Manisa 171860 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171860</b></td></tr>
+       <tr><td><b>N 38° 37.00'   E 27° 26.00'</b></td></tr>
+       <tr><td>Elevation <b>71</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-5.4 C</b>, <b>22.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.0 C</b>, <b>100.4 F</b></td></tr>
+       <tr><td>HDD18 <b>1866</b>, CDD10 <b>2617</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/MN_Manisa/TUR_MN_Manisa_171860_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.43330,38.61660,71.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mardin MR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR MR Mardin 172750 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172750</b></td></tr>
+       <tr><td><b>N 37° 18.00'   E 40° 44.00'</b></td></tr>
+       <tr><td>Elevation <b>1050</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-5.1 C</b>, <b>22.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.3 C</b>, <b>99.1 F</b></td></tr>
+       <tr><td>HDD18 <b>2392</b>, CDD10 <b>2763</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/MR_Mardin/TUR_MR_Mardin_172750_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>40.73330,37.30000,1050.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mersin IC TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR IC Mersin 173400 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>173400</b></td></tr>
+       <tr><td><b>N 36° 48.00'   E 34° 38.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>HDD18 <b>995</b>, CDD10 <b>3549</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/IC_Mersin/TUR_IC_Mersin_173400_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.63330,36.80000,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mugla MG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR MG Mugla 172920 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172920</b></td></tr>
+       <tr><td><b>N 37° 13.00'   E 28° 22.00'</b></td></tr>
+       <tr><td>Elevation <b>646</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.2 C</b>, <b>95.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2362</b>, CDD10 <b>1984</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/MG_Mugla/TUR_MG_Mugla_172920_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>28.36660,37.21660,646.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Mus MS TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR MS Mus 172040 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172040</b></td></tr>
+       <tr><td><b>N 38° 44.00'   E 41° 31.00'</b></td></tr>
+       <tr><td>Elevation <b>1320</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-26.8 C</b>, <b>-16.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.3 C</b>, <b>97.3 F</b></td></tr>
+       <tr><td>HDD18 <b>4169</b>, CDD10 <b>1772</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/MS_Mus/TUR_MS_Mus_172040_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>41.51660,38.73330,1320.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nevsehir NV TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR NV Nevsehir 171930 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171930</b></td></tr>
+       <tr><td><b>N 38° 37.00'   E 34° 42.00'</b></td></tr>
+       <tr><td>Elevation <b>1260</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-10.9 C</b>, <b>12.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3414</b>, CDD10 <b>1296</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/NV_Nevsehir/TUR_NV_Nevsehir_171930_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.70000,38.61660,1260.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Nigde NG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR NG Nigde 172500 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172500</b></td></tr>
+       <tr><td><b>N 37° 58.00'   E 34° 41.00'</b></td></tr>
+       <tr><td>Elevation <b>1210</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-13.8 C</b>, <b>7.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>HDD18 <b>3408</b>, CDD10 <b>1458</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/NG_Nigde/TUR_NG_Nigde_172500_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.68330,37.96660,1210.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Ordu OR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR OR Ordu 170330 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170330</b></td></tr>
+       <tr><td><b>N 40° 59.00'   E 37° 54.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2115</b>, CDD10 <b>1895</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/OR_Ordu/TUR_OR_Ordu_170330_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>37.90000,40.98330,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Osmaniye OS TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR OS Osmaniye 173550 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>173550</b></td></tr>
+       <tr><td><b>N 37° 6.00'   E 36° 15.00'</b></td></tr>
+       <tr><td>Elevation <b>94</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.7 C</b>, <b>96.3 F</b></td></tr>
+       <tr><td>HDD18 <b>1347</b>, CDD10 <b>2935</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/OS_Osmaniye/TUR_OS_Osmaniye_173550_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>36.25000,37.10000,94.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Rize RI TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR RI Rize 170400 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170400</b></td></tr>
+       <tr><td><b>N 41° 2.00'   E 40° 31.00'</b></td></tr>
+       <tr><td>Elevation <b>9</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-0.7 C</b>, <b>30.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.7 C</b>, <b>83.7 F</b></td></tr>
+       <tr><td>HDD18 <b>2094</b>, CDD10 <b>1837</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/RI_Rize/TUR_RI_Rize_170400_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>40.51660,41.03330,9.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Samsun SS TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SS Samsun 170300 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170300</b></td></tr>
+       <tr><td><b>N 41° 17.00'   E 36° 18.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.3 C</b>, <b>32.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2140</b>, CDD10 <b>1940</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SS_Samsun/TUR_SS_Samsun_170300_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>36.30000,41.28330,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sanliurfa SU TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SU Sanliurfa 172700 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172700</b></td></tr>
+       <tr><td><b>N 37° 8.00'   E 38° 46.00'</b></td></tr>
+       <tr><td>Elevation <b>549</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>0.3 C</b>, <b>32.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.9 C</b>, <b>103.8 F</b></td></tr>
+       <tr><td>HDD18 <b>1707</b>, CDD10 <b>3503</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SU_Sanliurfa/TUR_SU_Sanliurfa_172700_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>38.76660,37.13330,549.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Siirt SI TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SI Siirt 172100 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>172100</b></td></tr>
+       <tr><td><b>N 37° 55.00'   E 41° 57.00'</b></td></tr>
+       <tr><td>Elevation <b>896</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-3.5 C</b>, <b>25.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.0 C</b>, <b>104.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2389</b>, CDD10 <b>2766</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SI_Siirt/TUR_SI_Siirt_172100_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>41.95000,37.91660,896.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sinop SP TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SP Sinop 170260 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170260</b></td></tr>
+       <tr><td><b>N 42° 2.00'   E 35° 10.00'</b></td></tr>
+       <tr><td>Elevation <b>32</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
+       <tr><td>HDD18 <b>2071</b>, CDD10 <b>1999</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SP_Sinop/TUR_SP_Sinop_170260_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>35.16660,42.03330,32.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sirnak SR TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SR Sirnak 179500 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>179500</b></td></tr>
+       <tr><td><b>N 37° 30.98'   E 42° 27.67'</b></td></tr>
+       <tr><td>Elevation <b>400</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>0.4 C</b>, <b>32.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>45.4 C</b>, <b>113.7 F</b></td></tr>
+       <tr><td>HDD18 <b>1495</b>, CDD10 <b>3988</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SR_Sirnak/TUR_SR_Sirnak_179500_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>42.46110,37.51640,400.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Sivas SV TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR SV Sivas 170900 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170900</b></td></tr>
+       <tr><td><b>N 39° 45.00'   E 37° 1.00'</b></td></tr>
+       <tr><td>Elevation <b>1285</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.4 C</b>, <b>6.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
+       <tr><td>HDD18 <b>3967</b>, CDD10 <b>1137</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/SV_Sivas/TUR_SV_Sivas_170900_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>37.01660,39.75000,1285.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tekirdag TG TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR TG Tekirdag 170560 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170560</b></td></tr>
+       <tr><td><b>N 40° 59.00'   E 27° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>3</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.0 C</b>, <b>28.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.4 C</b>, <b>84.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2327</b>, CDD10 <b>1981</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/TG_Tekirdag/TUR_TG_Tekirdag_170560_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>27.55000,40.98330,3.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tokat TT TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR TT Tokat 170860 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170860</b></td></tr>
+       <tr><td><b>N 40° 18.00'   E 36° 34.00'</b></td></tr>
+       <tr><td>Elevation <b>608</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.6 C</b>, <b>20.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
+       <tr><td>HDD18 <b>2864</b>, CDD10 <b>1656</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/TT_Tokat/TUR_TT_Tokat_170860_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>36.56660,40.30000,608.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Trabzon TB TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR TB Trabzon 170380 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170380</b></td></tr>
+       <tr><td><b>N 41° 0.00'   E 39° 43.00'</b></td></tr>
+       <tr><td>Elevation <b>34</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.3 C</b>, <b>34.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>HDD18 <b>2090</b>, CDD10 <b>1846</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/TB_Trabzon/TUR_TB_Trabzon_170380_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>39.71660,41.00000,34.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Tunceli TC TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR TC Tunceli 171650 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171650</b></td></tr>
+       <tr><td><b>N 39° 7.00'   E 39° 33.00'</b></td></tr>
+       <tr><td>Elevation <b>981</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-14.9 C</b>, <b>5.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.9 C</b>, <b>98.4 F</b></td></tr>
+       <tr><td>HDD18 <b>3076</b>, CDD10 <b>2091</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/TC_Tunceli/TUR_TC__Tunceli_171650_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>39.55000,39.11660,981.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Usak US TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR US Usak 171880 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171880</b></td></tr>
+       <tr><td><b>N 38° 41.00'   E 29° 24.00'</b></td></tr>
+       <tr><td>Elevation <b>919</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.4 C</b>, <b>22.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2982</b>, CDD10 <b>1612</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/US_Usak/TUR_US_Usak_171880_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.40000,38.68330,919.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Van VA TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR VA Van 171700 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171700</b></td></tr>
+       <tr><td><b>N 38° 28.00'   E 43° 21.00'</b></td></tr>
+       <tr><td>Elevation <b>1671</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.3 C</b>, <b>11.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.8 C</b>, <b>82.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3571</b>, CDD10 <b>1369</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/VA_Van/TUR_VA_Van_171700_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>43.35000,38.46660,1671.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yalova YL TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR YL Yalova 171190 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171190</b></td></tr>
+       <tr><td><b>N 40° 40.00'   E 29° 17.00'</b></td></tr>
+       <tr><td>Elevation <b>4</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-2.4 C</b>, <b>27.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.5 C</b>, <b>86.9 F</b></td></tr>
+       <tr><td>HDD18 <b>2209</b>, CDD10 <b>1841</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/YL_Yalova/TUR_YL_Yalova_171190_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>29.28330,40.66660,4.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Yozgat YZ TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR YZ Yozgat 171400 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>171400</b></td></tr>
+       <tr><td><b>N 39° 49.00'   E 34° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>1298</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>Design conditions from weather file</td></tr>
+       <tr><td>99% Heating DB <b>-17.4 C</b>, <b>0.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>HDD18 <b>3982</b>, CDD10 <b>1094</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/YZ_Yozgat/TUR_YZ_Yozgat_171400_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>34.80000,39.81660,1298.0</coordinates>
+   </Point>
+  </Placemark>
+  <Placemark>
+    <name>Zonguldak ZO TUR</name>
+    <description><![CDATA[<table><tr><td colspan="2"><b>TUR ZO Zonguldak 170220 TurTMY</b></td></tr>
+       <tr><td><b>Data Source TurTMY</td></tr>
+       <tr><td>WMO <b>170220</b></td></tr>
+       <tr><td><b>N 41° 27.00'   E 31° 48.00'</b></td></tr>
+       <tr><td>Elevation <b>137</b> m</td></tr>
+       <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
+       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.2 C</b>, <b>31.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.2 C</b>, <b>81.0 F</b></td></tr>
+       <tr><td>HDD18 <b>2449</b>, CDD10 <b>1570</b></td></tr>
+       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/TUR_Turkey/ZO_Zonguldak/TUR_ZO_Zonguldak_170220_TurTMY.zip</td></tr></table>]]></description>
+   <styleUrl>#weatherlocation</styleUrl>
+   <Point>
+     <altitudeMode>absolute</altitudeMode>
+     <coordinates>31.80000,41.45000,137.0</coordinates>
+   </Point>
+  </Placemark>
+</Document>
+</kml>
