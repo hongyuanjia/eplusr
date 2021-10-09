@@ -154,7 +154,7 @@ clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
         "in.stat",
         # EPMacro output
         "out.idf",
-        # DO NOT KNOW what it is
+        # temporary mvi file used for ReadVarsESO for eplusout.mtr
         "test.mvi",
         # ReadVarsESO output
         "readvars.audit",
@@ -205,6 +205,15 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
         # output from ExpandObjects program
         epxidf = list(pre = pre, ext = ".expidf"),
         experr = list(pre = pre, ext = ".experr"),
+        # output from Basement program
+        bsmt_idf = list(pre = pre, ext = "_bsmt.idf"),
+        bsmt_csv = list(pre = pre, ext = "_bsmt.csv"),
+        bsmt_out = list(pre = pre, ext = "_bsmt.out"),
+        bsmt_audit = list(pre = pre, ext = "_bsmt.audit"),
+        # output from Slab program
+        slab_gtp = list(pre = pre, ext = "_slab.gtp"),
+        slab_out = list(pre = pre, ext = "_slab.out"),
+        slab_ger = list(pre = pre, ext = "_slab.ger"),
         # echo of input
         audit = list(pre = pre, ext = ".audit"),
         # branches and nodes
@@ -246,10 +255,12 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
         sqlite = list(pre = pre, ext = ".sqlite"),
         # GLHE
         glhe = list(pre = pre, ext = ".glhe"),
-        # IP conversion error
+        # output from convertESOMTR program
+        ipeso = list(pre = pre, ext = ".ipeso"),
+        ipmtr = list(pre = pre, ext = ".ipmtr"),
         iperr = list(pre = pre, ext = ".iperr"),
-        # readVarsESO
-        rvaudit = list(pre = pre, ext = "rvaudit"),
+        # ReadVarsESO audit
+        rvaudit = list(pre = pre, ext = ".rvaudit"),
         # JSON outputs
         json = list(
             pre = paste0(pre, c(
