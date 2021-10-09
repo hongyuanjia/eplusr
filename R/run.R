@@ -54,7 +54,6 @@ NULL
 #' path_eplus_dataset(8.8, "Boilers.idf")
 #' path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")
 #' }
-#' }
 #' @export
 #' @author Hongyuan Jia
 path_eplus <- function(ver, ..., .strict = FALSE) {
@@ -1429,13 +1428,7 @@ pre_eplus_command <- function(exectuable,
     if (is.null(exectuable)) {
         exectuable <- energyplus_exe
     } else {
-        exectuable <- path_eplus_processor(energyplus_exe, exectuable)
-        if (!file.exists(exectuable)) {
-            abort(sprintf(
-                "'%s' exectuable cannot be found at '%s'.",
-                basename(exectuable), dirname(exectuable)
-            ))
-        }
+        exectuable <- path_eplus_processor(dirname(energyplus_exe), exectuable, .strict = TRUE)
     }
 
     idf <- NULL
@@ -1568,7 +1561,7 @@ ExpandObjects <- function(model,
             file$expidf <- file_rename_if_exist(file.path(wd, "expanded.idf"), sprintf("%s.expidf", cmd$output_prefix))
             file$basement <- file_rename_if_exist(file.path(wd, "BasementGHTIn.idf"), "BasementGHTIn.idf")
             file$slab <- file_rename_if_exist(file.path(wd, "GHTIn.idf"), "GHTIn.idf")
-            file$experr <- file_rename_if_exist(file.path(wd, "expandedidf.err"), sprintf("%s.err", cmd$output_prefix))
+            file$experr <- file_rename_if_exist(file.path(wd, "expandedidf.err"), sprintf("%s.experr", cmd$output_prefix))
         })
         file
     }
@@ -1873,6 +1866,8 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     list(file = file, run = run)
 }
 
+#' @keywords internal
+#' @export
 convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = NULL,
                           wait = TRUE, echo = TRUE, eplus = NULL) {
     assert_file_exists(eso, "r", c("eso", "mtr"))
@@ -1954,6 +1949,8 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
     list(file = file, run = run)
 }
 
+#' @keywords internal
+#' @export
 ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
                         output_suffix = c("C", "L", "D"),
                         max_col = NULL, wait = TRUE, echo = TRUE, eplus = NULL) {
@@ -2035,7 +2032,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
             }
 
             if (file.exists("readvars.audit")) {
-                file$rvaudit <- file_rename("readvars.audit", sprintf("%s.rvaudit", cmd$output_prefix))
+                file$rvaudit <- file_rename("readvars.audit", file.path(cmd$output_dir, sprintf("%s.rvaudit", cmd$output_prefix)))
             }
         })
 
@@ -2056,6 +2053,8 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     list(file = file, run = run)
 }
 
+#' @keywords internal
+#' @export
 HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
                          wait = TRUE, echo = TRUE, eplus = NULL) {
     assert_file_exists(bnd, "r", "bnd")
@@ -2102,4 +2101,363 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
     if (wait) file <- file_callback()
 
     list(file = file, run = run)
+}
+
+#' @keywords internal
+#' @export
+energyplus <- function(model, weather, output_dir = NULL,
+                       output_prefix = NULL, output_suffix = c("C", "L", "D"),
+                       epmacro = TRUE, expand_obj = TRUE,
+                       annual = FALSE, design_day = FALSE,
+                       eso_to_ip = FALSE, readvars = TRUE,
+                       wait = TRUE, echo = TRUE,
+                       idd = NULL, eplus = NULL) {
+    assert_flag(epmacro)
+    assert_flag(expand_obj)
+    assert_flag(eso_to_ip)
+    assert_flag(readvars)
+    output_suffix <- match.arg(output_suffix)
+
+    # validate inputs and do some preparations and create "in.idf" and
+    # "in.epw" in the same directory as input model
+    cmd <- pre_eplus_command(NULL, model, weather, output_dir, output_prefix,
+        wait = wait, echo = echo, eplus = eplus)
+
+    # get EnergyPlus exectuable version
+    eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
+    legacy <- eplus_ver < 8.3
+
+    file <- list()
+    run <- list()
+
+    # run simulation in a temporary simulation directory
+    # NOTE: Copy input files to a temporary folder inside the specified output
+    #       directory in case that multiple EnergyPlus instances are running
+    #       with that folder being the output directory which all expect an
+    #       "in.idf" input file. This behavior mimicks EP-Launch.
+    #
+    #       For EnergyPlus v8.3 and above, there is no need to do so thanks to
+    #       the command line interface. But all the preprocessors and
+    #       postprocessors behave the same despite the version which all expect
+    #       the legacy input/output file names. They should be run inside the
+    #       temperory simulation directory under the specified output directory.
+    #       Once finished, move them back to the output directory.
+    cmd$sim_dir <- cmd$output_dir
+    temp_dir <- FALSE
+    if (legacy || epmacro || expand_obj || eso_to_ip || readvars) {
+        temp_dir <- TRUE
+        cmd$sim_dir <- normalizePath(tempfile("EPTEMP-", cmd$output_dir), mustWork = FALSE)
+        while (dir.exists(cmd$sim_dir)) {
+            cmd$sim_dir <- normalizePath(tempfile("EPTEMP-", cmd$output_dir), mustWork = FALSE)
+        }
+        if (!dir.create(cmd$sim_dir, FALSE)) {
+            abort(sprintf("Failed to create simulation directory '%s'.", cmd$sim_dir))
+        }
+    # If only run EnergyPlus with command line interface, there is no need to
+    # create "in.idf" and "in.epw"
+    } else if (!legacy) {
+        unlink(c(cmd$idf, cmd$epw))
+        cmd$idf <- cmd$model
+        cmd$epw <- cmd$weather
+    }
+
+    path_sim <- function(file) file.path(cmd$sim_dir, basename(file))
+    path_out <- function(file) file.path(cmd$output_dir, basename(file))
+
+    # clean output directory
+    clean_wd(path_out("in.imf"), "L")
+    clean_wd(path_out(basename(cmd$model)), output_suffix)
+    browser()
+
+    # move "in.epw" to the simulation directory
+    file$epw <- NA_character_
+    if (!is.null(cmd$epw)) {
+        file$epw <- path_out(basename(cmd$weather))
+        if (temp_dir) cmd$epw <- file_rename(cmd$epw, path_sim(cmd$epw))
+    }
+
+    # 1. run EPMacro
+    run$EPMacro <- list()
+    file$imf <- NA_character_
+    if (!epmacro && has_ext(cmd$idf, "imf")) {
+        file$imf <- path_out(basename(cmd$model))
+        epmacro <- TRUE
+    }
+    if (!epmacro || !has_ext(cmd$idf, "imf")) {
+        file$epmidf <- NA_character_
+        file$epmdet <- NA_character_
+    } else {
+        res_epmacro <- EPMacro(cmd$idf, cmd$sim_dir, cmd$output_prefix,
+            wait = TRUE, echo = echo, eplus = eplus_ver)
+        run$EPMacro <- res_epmacro$run
+
+        # Since cmd$idf has the legency name "in.imf", EPMacro() will not delete
+        # it after calling EPMacro
+        unlink(cmd$idf)
+
+        # copy the output epmidf file to the output directory
+        file$epmidf <- NA_character_
+        if (!is.na(res_epmacro$file$epmidf)) {
+            file$epmidf <- file_copy(res_epmacro$file$epmidf, path_out(res_epmacro$file$epmidf))
+
+            # rename the output epmidf file to "in.epmidf" to avoid redundant
+            # file copy
+            cmd$idf <- file_rename(res_epmacro$file$epmidf, path_sim("in.epmidf"))
+        }
+
+        # move the output epmdet file to the output directory
+        file$epmdet <- NA_character_
+        if (!is.na(res_epmacro$file$epmdet)) {
+            file$epmdet <- file_rename(res_epmacro$file$epmdet, path_out(res_epmacro$file$epmdet))
+        }
+    }
+
+    # 2. run ExpandObjects
+    run$ExpandObjects <- list()
+    file$expidf <- NA_character_
+    file$basement <- NA_character_
+    file$slab <- NA_character_
+    file$experr <- NA_character_
+    if (expand_obj) {
+        res_expandobj <- ExpandObjects(cmd$idf, cmd$sim_dir, cmd$output_prefix,
+            wait = TRUE, echo = echo, eplus = eplus_ver, idd = idd)
+        run$ExpandObjects <- res_expandobj$run
+
+        # copy the output expidf file to the output directory
+        file$expidf <- NA_character_
+        if (!is.na(res_expandobj$file$expidf)) {
+            file$expidf <- file_copy(res_expandobj$file$expidf, path_out(res_expandobj$file$expidf))
+        # If no expanded object generated, the input idf should be used as the
+        # input for EnergyPlus simulation and should be deleted after simulation
+        } else {
+            # prepend an "_expanded" suffix
+            cmd$idf <- file_rename(res_expandobj$file$idf, path_out(sprintf("%s_expanded.idf", cmd$output_prefix)))
+        }
+
+    }
+
+    # 3. run Basement preprocessor
+    run$Basement <- list()
+    if (!is.na(file$basement)) {
+        if (is.null(cmd$epw)) {
+            abort(paste(
+                "'BasementGHTIn.idf' found after running ExpandObjects",
+                "which means that the Basement preprocessor is needed to run",
+                "before running EnergyPlus. However, no weather input is found.",
+                "Please specify a non-NULL 'weather' argument and run again."
+            ))
+        }
+
+        res_basement <- Basement(cmd$model, cmd$epw, cmd$sim_dir, cmd$output_prefix,
+            wait = TRUE, echo = echo, eplus = eplus_ver)
+        run$Basement <- res_basement$run
+    }
+
+    # 4. run Slab preprocessor
+    run$Slab <- list()
+    if (!is.na(res_expandobj$file$slab)) {
+        if (is.null(cmd$epw)) {
+            abort(paste(
+                "'GHTIn.idf' found after running ExpandObjects ",
+                "which means that the Slab preprocessor is needed to run ",
+                "before running EnergyPlus. However, no weather input is found.",
+                "Please specify a non-NULL 'weather' argument and run again."
+            ))
+        }
+        res_slab <- Slab(res_expandobj$file$slab, cmd$epw, cmd$sim_dir, cmd$output_prefix,
+            wait = TRUE, echo = echo, eplus = eplus_ver)
+        run$Slab <- res_slab$run
+
+        if (!is.na(res_slab$file$idf)) {
+            write_lines(c(read_lines(res_slab$file$idf)$string, ""), cmd$model, append = TRUE)
+        }
+    }
+
+    # 5. run EnergyPlus
+    # For EnergyPlus earlier than v8.3, run the simulation in the temporary
+    # simulation directory.
+    # NOTE: It is possible that the input file still uses resources with
+    # relative paths, e.g. `Schedule:File`. But currently this is the approach I
+    # came out with.
+    #
+    # TODO: Revisit this after refactor IDF parsing. If the time spent on
+    # parsing the IDF file is neglectable, copy all external files into the
+    # temporary simulation directory maybe an option.
+    if (legacy) {
+
+    # For EnergyPlus v8.3 and later, running directly using the output directory
+    # is safe
+    } else {
+        res_eplus <- EnergyPlus(cmd$idf, cmd$weather, cmd$output_dir, cmd$output_prefix,
+            output_suffix, wait = TRUE, echo = echo, annual = annual,
+            design_day = design_day, idd = idd, eplus = eplus_ver)
+
+        # delete the temporary input model since it has been put in the output
+        # directory but not the simulation directory
+        unlink(cmd$idf)
+
+        # In order to avoid unnecessary file copy of the output eso/mtr file,
+        # rename it to the legacy name "eplusout.eso/mtr".
+        if (eso_to_ip || readvars) {
+            res_eplus$file$eso <- file_rename_if_exist(res_eplus$file$eso, path_sim("eplusout.eso"))
+            res_eplus$file$mtr <- file_rename_if_exist(res_eplus$file$mtr, path_sim("eplusout.mtr"))
+        }
+    }
+    run$EnergyPlus <- res_eplus$run
+
+    # 6. run convertESOMTR
+    run$convertESOMTR <- list()
+    file$ipeso <- NA_character_
+    file$ipmtr <- NA_character_
+    file$iperr <- NA_character_
+    if (eso_to_ip) {
+        if (!is.na(res_eplus$file$eso) || !is.na(res_eplus$file$mtr)) {
+            # convertESOMTR() calls convertESOMTR without any arguments.
+            # If both "eplusout.eso" and "eplusout.mtr" exist, both ipeso and
+            # ipmtr will be generated. There is no need to call convertESOMTR
+            # with "eplusout.mtr" as the input.
+            res_ip <- convertESOMTR(res_eplus$file$eso, cmd$sim_dir, cmd$outptu_prefix,
+                wait = TRUE, echo = echo, eplus = eplus_ver)
+            run$convertESOMTR <- res_ip$run
+
+            # directly move the error file to the output directory
+            res_ip$file$iperr <- file_rename_if_exist(res_ip$file$iperr, path_out(sprintf("%s.iperr", cmd$output_prefix)))
+            file$iperr <- res_ip$file$iperr
+
+            if (!readvars) {
+                file$ipeso <- res_ip$file$ipeso
+                file$ipmtr <- res_ip$file$ipmtr
+            # In order to avoid unnecessary file copy of the output eso/mtr file,
+            # backup the original "eplusout.eso/mtr" to "eplusout.sieso/simtr"
+            # and rename its IP version to the legacy name "eplusout.eso/mtr".
+            } else {
+                res_ip$file$eso <- file_rename_if_exist(res_ip$file$eso, path_sim("eplusout.sieso"))
+                res_ip$file$mtr <- file_rename_if_exist(res_ip$file$mtr, path_sim("eplusout.simtr"))
+                res_ip$file$ipeso <- file_rename_if_exist(res_ip$file$ipeso, path_sim("eplusout.eso"))
+                res_ip$file$ipmtr <- file_rename_if_exist(res_ip$file$ipmtr, path_sim("eplusout.mtr"))
+
+                # the file data will be appended during calling ReadVarsESO()
+            }
+        }
+    }
+
+    # 7. run ReadVarsESO
+    run$ReadVarsESO_MTR <- list()
+    run$ReadVarsESO_ESO <- list()
+    file$eso <- NA_character_
+    file$mtr <- NA_character_
+    file$variable <- NA_character_
+    file$meter <- NA_character_
+    file$rvaudit <- NA_character_
+    if (readvars) {
+        if (!eso_to_ip) {
+            eso <- res_eplus$file$eso
+            mtr <- res_eplus$file$mtr
+        } else {
+            eso <- res_ip$file$ipeso
+            mtr <- res_ip$file$ipmtr
+        }
+
+        if (!is.na(mtr)) {
+            res_readmtr <- ReadVarsESO(mtr, cmd$output_dir, cmd$output_prefix, output_suffix,
+                wait = TRUE, echo = echo, eplus = eplus_ver)
+            run$ReadVarsESO_MTR <- res_readmtr$run
+
+            # Since mtr is the legacy name "eplusout.mtr", ReadVarsESO() will
+            # not delete it after calling ReadVarsESO.
+            unlink(path_out("eplusout.mtr"))
+
+            file$meter <- res_readmtr$file$meter
+            file$rvaudit <- res_readmtr$file$rvaudit
+
+            if (!eso_to_ip) {
+                res_eplus$file$mtr <- file_rename(res_eplus$file$mtr, path_out(sprintf("%s.mtr", cmd$output_prefix)))
+                file$mtr <- res_eplus$file$mtr
+            } else {
+                # For eplusout.ipmtr, since it is not needed anymore, directly
+                # move it to the output directory
+                res_ip$file$ipmtr <- file_rename(res_ip$file$ipmtr, path_out(sprintf("%s.ipmtr", cmd$output_prefix)))
+                file$ipmtr <- res_ip$file$ipmtr
+
+                # move "eplusout.mtr" to the output directory
+                res_ip$file$mtr <- file_rename(res_ip$file$mtr, path_out(sprintf("%s.mtr", cmd$output_prefix)))
+                file$mtr <- res_ip$file$mtr
+            }
+
+            # read meter rvaudit in order to append it to variable rvaudit
+            mtr_rvaudit <- NULL
+            if (!is.na(file$rvaudit)) {
+                mtr_rvaudit <- read_lines(file$rvaudit, trim = FALSE)
+            }
+        }
+
+        if (!is.na(eso)) {
+            res_readeso <- ReadVarsESO(eso, cmd$output_dir, cmd$output_prefix, output_suffix,
+                wait = TRUE, echo = echo, eplus = eplus_ver)
+            run$ReadVarsESO_ESO <- res_readeso$run
+
+            # Since eso is the legacy name "eplusout.eso", ReadVarsESO() will
+            # not delete it after calling ReadVarsESO.
+            unlink(path_out("eplusout.eso"))
+
+            file$variable <- res_readeso$file$variable
+            file$rvaudit <- res_readeso$file$rvaudit
+
+            if (!eso_to_ip) {
+                res_eplus$file$eso <- file_rename(res_eplus$file$eso, path_out(sprintf("%s.eso", cmd$output_prefix)))
+                file$eso <- res_eplus$file$eso
+            } else {
+                # For eplusout.ipeso, since it is not needed anymore, directly
+                # move it to the output directory
+                res_ip$file$ipeso <- file_rename(res_ip$file$ipmtr, path_out(sprintf("%s.ipeso", cmd$output_prefix)))
+                file$ipeso <- res_ip$file$ipeso
+
+                # move "eplusout.eso" to the output directory
+                res_ip$file$eso <- file_rename(res_ip$file$eso, path_out(sprintf("%s.eso", cmd$output_prefix)))
+                file$eso <- res_ip$file$eso
+            }
+
+            if (!is.na(res_eplus$file$mtr) && !is.null(mtr_rvaudit) && nrow(mtr_rvaudit)) {
+                write_lines(mtr_rvaudit, file$rvaudit, append = TRUE)
+            }
+        }
+    }
+
+    # 8. run HVACDiagram
+    run$HVAC_Diagram <- list()
+    if (!is.na(res_eplus$file$bnd)) {
+        res_eplus$file$bnd <- file_rename(res_eplus$file$bnd, path_sim("eplusout.bnd"))
+
+        res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$output_dir, cmd$output_prefix,
+            wait = TRUE, echo = echo, eplus = eplus_ver)
+        run$HVAC_Diagram <- res_diagram$run
+
+        # Since bnd is the legacy name "eplusout.bnd", HVAC_Diagram() will
+        # not delete it after calling HVAC-Diagram
+        unlink(path_out("eplusout.bnd"))
+
+        res_eplus$file$bnd <- file_rename(res_eplus$file$bnd, path_out(sprintf("%s.bnd", cmd$output_prefix)))
+    }
+
+    file <- modifyList(res_eplus$file, file)
+    file <- file[order(names(file))]
+    file$idf <- NA_character_
+    if (is.na(file$imf)) file$idf <- path_out(basename(file$idf))
+
+    run <- data.table(
+        program = names(run),
+        exit_status = lapply(run, "[[", "exit_status"),
+        start_time = lapply(run, "[[", "start_time"),
+        end_time = lapply(run, "[[", "end_time"),
+        stdout = lapply(run, "[[", "stdout"),
+        stderr = lapply(run, "[[", "stderr"),
+        process = lapply(run, "[[", "process")
+    )
+
+    # 9. FMUImport/FMUExport
+    unlink(path_sim("tmp-fmus"), recursive = TRUE, force = TRUE)
+
+    if (temp_dir) unlink(cmd$sim_dir, recursive = TRUE, force = TRUE)
+
+    return(list(file = file, run = run))
 }
