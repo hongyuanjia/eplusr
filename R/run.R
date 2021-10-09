@@ -1087,7 +1087,7 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
     if (checkmate::test_file_exists(eplus, "x") || (is_windows() && has_ext(eplus, "exe"))) {
-        use_eplus(dirname(eplus))
+        suppressMessages(use_eplus(dirname(eplus)))
         return(normalizePath(eplus, mustWork = TRUE))
     }
 
@@ -1175,6 +1175,7 @@ expand_objects <- function (eplus, idf, keep_ext = FALSE) {
     }
 }
 # }}}
+
 create_energyplus_ini <- function(eplus, output_dir) {
     dir <- normalizePath(dirname(eplus))
     if (is_windows()) {
@@ -1196,6 +1197,7 @@ create_energyplus_ini <- function(eplus, output_dir) {
     write_lines(ini, out)
     out
 }
+
 copy_energyplus_idd <- function(eplus, output_dir, idd = NULL, name = "Energy+.idd") {
     output_dir <- normalizePath(output_dir, "/")
     if (is.null(idd)) {
@@ -1214,161 +1216,6 @@ copy_energyplus_idd <- function(eplus, output_dir, idd = NULL, name = "Energy+.i
 
     attr(idd, "copied") <- idd_copied
     idd
-}
-
-# run_energyplus {{{
-run_energyplus <- function(eplus, model, weather, output_dir, output_prefix = NULL,
-                           output_suffix = c("C", "L", "D"), expand_obj = TRUE,
-                           readvars = TRUE, annual = FALSE, design_day = FALSE,
-                           idd = NULL, echo = TRUE, wait = TRUE) {
-
-    output_suffix <- match.arg(output_suffix)
-
-    assert_file_exists(eplus, "x")
-    assert_file_exists(model)
-    assert_flag(expand_obj)
-    assert_flag(readvars)
-    assert_flag(annual)
-    assert_flag(design_day)
-    assert_flag(echo)
-    assert_flag(wait)
-    if (!is.null(weather)) assert_file_exists(weather)
-
-    # use input name as prefix by default
-    if (is.null(output_prefix)) {
-        output_prefix <- tools::file_path_sans_ext(basename(model))
-    } else {
-        assert_string(output_prefix, null.ok = TRUE)
-        con <- try(file(output_prefix), TRUE)
-        # use file to test if output_prefix can be used as a file name
-        # see: https://stackoverflow.com/a/7779343
-        if (inherits(con, "connection")) {
-            close(con)
-            unlink(con, force = TRUE)
-        } else {
-            abort(sprintf("Invalid 'output_prefix': '%s'", output_prefix))
-        }
-    }
-
-    # create output directory if not exists
-    if (is.null(output_dir)) {
-        output_dir <- dirname(model)
-    } else {
-        if (!dir.exists(output_dir)) {
-            dir.create(output_dir, FALSE, TRUE)
-        }
-        assert_directory_exists(output_dir, "w")
-    }
-
-    # cannot set both annual and design_day
-    if (annual && design_day) {
-        abort("Cannot force both design-day and annual simulations", "both_ddy_annual")
-    }
-
-    # run simulation:
-    # 1. clean up working directory
-    clean_wd(input_idf, suffix_type)
-
-    # 2. handle temporary simulation directory
-    #    NOTE: For EnergyPlus lower than v8.3, copy input files to a temporary
-    #          folder inside the specified output directory in case that
-    #          multiple EnergyPlus instances are running which all expect an
-    #          "in.idf" input file. This behavior mimicks EP-Launch.
-    if (get_ver_from_path(dirname(eplus)) < 8.3) {
-        sim_dir <- tempfile("EPTEMP-", output_dir)
-    } else {
-        sim_dir <- output_dir
-    }
-
-    # 3. create ini file in and copy idd to the simulation directory
-    create_energyplus_ini(eplus, sim_dir)
-    copy_energyplus_idd(eplus, sim_dir)
-
-    # 4. copy input files to the simulation directory
-    if (normalizePath(dirname(model)) == normalizePath(sim_dir)) {
-        idf <- model
-    } else {
-        idf <- file_copy(model, file.path(sim_dir, basename(model)))
-    }
-    if (is.null(weather)) {
-        epw <- NULL
-    } else if (normalizePath(dirname(weather)) == normalizePath(sim_dir)) {
-        epw <- weather
-    } else {
-        epw <- file_copy(weather, file.path(sim_dir, basename(weather)))
-    }
-
-    # run EPMacro
-    input_idf <- run_epmacro(eplus, idf)
-
-    # run ExpandObjects
-    if (expand_obj) {
-        run_expand_objects(eplus, idf)
-        expandobjects <- normalizePath(file.path(eplusdir, "ExpandObjects", exe), mustWork = FALSE)
-        if (!file.exists(expandobjects)) {
-            abort(paste0(
-                "'expand_obj' is set to 'TRUE'",
-                "but ExpandObjects exectuable cannot be found at ",
-                surround(expandobjects)
-            ))
-        }
-
-        if (basename(input_idf) != "in.idf") {
-            file_copy(input_idf, "in.idf")
-        }
-
-        # check if IDD exists in the output folder
-        if (normalizePath(idd) != normalizePath(file.path(output_dir, "Energy+.idd"))) {
-            file_copy(idd, file.path(output_dir, "Energy+.idd"))
-        }
-
-        # call ExpandObjects
-        if (wait) {
-            stdout_expandobjects <- "|"
-            stderr_expandobjects <- "|"
-        } else {
-            stdout_expandobjects <- tempfile()
-            stderr_expandobjects <- tempfile()
-        }
-        processx::run(expandobjects, wd = output_dir, stdout = stdout_expandobjects, stderr = stderr_expandobjects)
-    }
-
-    # copy input into working directory
-    copy_run_files(idf, output_dir)
-    if (!is.null(epw)) {
-        copy_run_files(epw, output_dir)
-    }
-    copy_run_files(file.path(eplus, "Energy+.idd"), output_dir)
-    create_energyplus_ini(eplus, output_dir)
-
-    # run Basement preprocessor
-
-    # run Slab preprocessor
-
-    # run EnergyPlus
-
-    # copy post processing program command files to working directory
-
-    # run convertESOMTR post processor
-
-    # run ReadVarsESO post processor
-
-    # copy/rename output files
-
-    # FMUImport/FMUExport
-
-    # run CSVproc post processor
-
-    # clean up directory
-}
-# }}}
-get_eplus_processor_path <- function(eplus, ...) {
-    inputs <- c(...)
-    exe <- if (is_windows()) ".exe" else ""
-    inputs[length(inputs)] <- sprintf("%s%s", inputs[length(inputs)], exe)
-
-    path <- do.call(file.path, as.list(c(dirname(eplus), inputs)))
-    normalizePath(path, mustWork = FALSE)
 }
 
 run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
@@ -1508,11 +1355,11 @@ pre_eplus_command <- function(exectuable,
                               model, weather = NULL,
                               output_dir = NULL, output_prefix = NULL,
                               wait = TRUE, echo = TRUE, eplus = NULL,
-                              strict = TRUE, legency = TRUE) {
+                              strict = TRUE, legacy = TRUE) {
     assert_flag(wait)
     assert_flag(echo)
     assert_flag(strict)
-    assert_flag(legency)
+    assert_flag(legacy)
 
     if (!strict) {
         assert_file_exists(model, "r")
@@ -1550,6 +1397,7 @@ pre_eplus_command <- function(exectuable,
     if (!dir.exists(output_dir) && !dir.create(output_dir, FALSE, TRUE)) {
         abort(sprintf("Failed to create output directory '%s'.", output_dir))
     }
+
     # always copy input files to the output directory
     if (output_dir != dir_model) {
         file_copy(model, file.path(output_dir, file_model))
@@ -1570,7 +1418,7 @@ pre_eplus_command <- function(exectuable,
     if (is.null(exectuable)) {
         exectuable <- energyplus_exe
     } else {
-        exectuable <- get_eplus_processor_path(energyplus_exe, exectuable)
+        exectuable <- path_eplus_processor(energyplus_exe, exectuable)
         if (!file.exists(exectuable)) {
             abort(sprintf(
                 "'%s' exectuable cannot be found at '%s'.",
@@ -1582,12 +1430,12 @@ pre_eplus_command <- function(exectuable,
     idf <- NULL
     epw <- NULL
 
-    if (legency) {
+    if (legacy) {
         # create in.idf/in.imf in the same directory
-        if (tolower(name_model) == "in") {
+        if (tolower(name_model) == "in" && ext_model == "idf") {
             idf <- model
         } else {
-            if (ext_model %in% c("epmidf", "epxidf")) ext_model <- "idf"
+            if (ext_model %in% c("epmidf", "expidf")) ext_model <- "idf"
 
             if (ext_model %in% c("idf", "imf")) {
                 idf <- file_copy(model, file.path(dir_model, sprintf("in.%s", ext_model)))
@@ -1603,7 +1451,6 @@ pre_eplus_command <- function(exectuable,
             }
         }
     }
-
 
     list(
         energyplus = energyplus_exe, exectuable = exectuable,
@@ -1651,7 +1498,8 @@ EPMacro <- function(model,
 
     # handle ouput file renaming
     file_callback <- function() {
-        remove_eplus_in_files(cmd$model, cmd$weather)
+        if (tools::file_ext(cmd$model) != "imf") unlink(cmd$idf)
+        remove_eplus_in_files(cmd$model)
 
         file <- list()
         file$imf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
@@ -1698,6 +1546,7 @@ ExpandObjects <- function(model,
 
     # handle ouput file renaming
     file_callback <- function() {
+        if (tools::file_ext(cmd$model) != "idf") unlink(cmd$idf)
         remove_eplus_in_files(cmd$model)
         unlink(file.path(wd, "Energy+.ini"))
         if (wd != dirname(cmd$energyplus)) unlink(file.path(wd, "Energy+.idd"))
@@ -1782,7 +1631,7 @@ Basement <- function(model, weather,
                 file$bsmt_audit <- normalizePath(sprintf("%s_bsmt.audit", cmd$output_prefix), mustWork = FALSE)
                 write_lines("Basement Audit File", file$bsmt_audit)
             } else {
-                file$bsmt_audit <- file_rename_if_exist("RunDEBUGOUT.TXT", sprintf("%s_bsmt.audit", cmd$output_prefix))
+                file$bsmt_audit <- file_rename("RunDEBUGOUT.TXT", sprintf("%s_bsmt.audit", cmd$output_prefix))
             }
 
             if (file.exists("audit.out")) {
@@ -1921,7 +1770,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     # clean up working directory
     clean_wd(cmd$idf, "L")
 
-    # get all lagency EnergyPlus output file names
+    # get all legacy EnergyPlus output file names
     lagency_files <- get_eplus_output_name(NULL, "L")
 
     # get all targeted EnergyPlus output file names
@@ -2064,16 +1913,16 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
 
             if (file.exists("ip.eso")) {
                 if (eso_copied) unlink("eplusout.eso")
-                file$ipeso <- file_rename_if_exist("ip.eso", sprintf("%s.ipeso", cmd$output_prefix))
+                file$ipeso <- file_rename("ip.eso", sprintf("%s.ipeso", cmd$output_prefix))
             }
 
             if (file.exists("ip.mtr")) {
                 if (eso_copied) unlink("eplusout.mtr")
-                file$ipmtr <- file_rename_if_exist("ip.mtr", sprintf("%s.ipmtr", cmd$output_prefix))
+                file$ipmtr <- file_rename("ip.mtr", sprintf("%s.ipmtr", cmd$output_prefix))
             }
 
             if (file.exists("ip.err")) {
-                file$iperr <- file_rename_if_exist("ip.err", sprintf("%s.iperr", cmd$output_prefix))
+                file$iperr <- file_rename("ip.err", sprintf("%s.iperr", cmd$output_prefix))
             }
         })
 
@@ -2165,7 +2014,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
             unlink(inp)
 
             if (file.exists(csv)) {
-                csv <- file_rename_if_exist(csv, file.path(cmd$output_dir, csv))
+                csv <- file_rename(csv, file.path(cmd$output_dir, csv))
                 if (ext_in == "eso") {
                     file$variable <- csv
                 } else {
@@ -2175,7 +2024,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
             }
 
             if (file.exists("readvars.audit")) {
-                file$rvaudit <- file_rename_if_exist("readvars.audit", sprintf("%s.rvaudit", cmd$output_prefix))
+                file$rvaudit <- file_rename("readvars.audit", sprintf("%s.rvaudit", cmd$output_prefix))
             }
         })
 
@@ -2223,7 +2072,7 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
             if (copied) unlink(bnd)
 
             if (file.exists("eplusout.svg")) {
-                file$svg <- file_rename_if_exist("eplusout.svg", file.path(cmd$output_dir, sprintf("%s.svg", cmd$output_prefix)))
+                file$svg <- file_rename("eplusout.svg", file.path(cmd$output_dir, sprintf("%s.svg", cmd$output_prefix)))
             }
         })
 

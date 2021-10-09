@@ -443,16 +443,25 @@ copy_list <- function(x) {
 }
 # }}}
 
+with_wd <- function(wd, expr, env = parent.frame()) {
+    owd <- setwd(wd)
+    on.exit(setwd(owd), add = TRUE)
+    eval(expr, envir = env)
+}
+
 file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = NULL) {
     from <- normalizePath(from, mustWork = TRUE)
     to <- normalizePath(to, mustWork = FALSE)
 
     # remove duplications
-    copy <- unique(data.table(from = from[from != to], to = to[from != to]))
+    same <- from == to
+    from <- from[!same]
 
-    if (!nrow(copy)) return(to)
+    if (!length(from)) return(to)
 
-    flag <- file.copy(copy$from, copy$to, copy.date = copy.date, copy.mode = copy.mode, overwrite = TRUE)
+    to <- to[!same]
+
+    flag <- file.copy(from, to, copy.date = copy.date, copy.mode = copy.mode, overwrite = TRUE)
 
     if (any(!flag)) {
         failed_from <- normalizePath(from[!flag], mustWork = FALSE)
@@ -462,7 +471,7 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
         } else {
             assert_string(err_title)
         }
-        stop(sprintf(
+        abort(sprintf(
             "%s:\n%s",
             err_title,
             paste0(collapse = "\n", sprintf(
@@ -475,24 +484,48 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
     to
 }
 
-with_wd <- function(wd, expr, env = parent.frame()) {
-    owd <- setwd(wd)
-    on.exit(setwd(owd), add = TRUE)
-    eval(expr, envir = env)
+file_rename <- function(from, to, err_title = NULL) {
+    from <- normalizePath(from, mustWork = TRUE)
+    to <- normalizePath(to, mustWork = FALSE)
+
+    # remove duplications
+    same <- from == to
+    from <- from[!same]
+
+    if (!length(from)) return(to)
+
+    to <- to[!same]
+
+    flag <- file.rename(from, to)
+
+    if (any(!flag)) {
+        failed_from <- normalizePath(from[!flag], mustWork = FALSE)
+        failed_to <- normalizePath(to[!flag], mustWork = FALSE)
+        if (is.null(err_title)) {
+            err_title <- "Failed to move file"
+        } else {
+            assert_string(err_title)
+        }
+        abort(sprintf(
+            "%s:\n%s",
+            err_title,
+            paste0(collapse = "\n", sprintf(
+                "#%s | From '%s' to '%s'",
+                seq_along(failed_from), failed_from, failed_to
+            ))
+        ))
+    }
+
+    to
 }
 
-file_rename_if_exist <- function(from, to) {
-    assert_same_len(from, to)
-
+file_rename_if_exist <- function(from, to, err_title = NULL) {
+    from <- normalizePath(from, mustWork = FALSE)
     to <- normalizePath(to, mustWork = FALSE)
     res <- rep(NA_character_, length(from))
 
     exist <- which(file.exists(from))
-
-    if (length(exist)) {
-        flag <- file.rename(from[exist], to[exist])
-        res[exist[flag]] <- to[exist[flag]]
-    }
+    if (length(exist)) res[exist] <- file_rename(from[exist], to[exist])
 
     res
 }

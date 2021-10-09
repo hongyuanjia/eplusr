@@ -385,7 +385,7 @@ test_that("Basement()", {
         ",
         path
     )
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- Basement(path, weather, echo = FALSE, eplus = 8.8)
     expect_equal(names(res), c("file", "run"))
@@ -468,7 +468,7 @@ test_that("Slab()", {
         ",
         path
     )
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- Slab(path, weather, eplus = 8.8, echo = FALSE)
     expect_equal(names(res), c("file", "run"))
@@ -488,11 +488,8 @@ test_that("Slab()", {
 })
 
 test_that("EnergyPlus()", {
-    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
-    file.copy(path, tempdir())
-    path <- file.path(tempdir(), basename(path))
-
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
     expect_equal(names(res), c("file", "run"))
@@ -512,11 +509,8 @@ test_that("EnergyPlus()", {
 })
 
 test_that("convertESOMTR()", {
-    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
-    file.copy(path, tempdir())
-    path <- file.path(tempdir(), basename(path))
-
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
 
@@ -553,11 +547,8 @@ test_that("convertESOMTR()", {
 })
 
 test_that("ReadVarsESO()", {
-    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
-    file.copy(path, tempdir())
-    path <- file.path(tempdir(), basename(path))
-
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
 
@@ -595,11 +586,8 @@ test_that("ReadVarsESO()", {
 })
 
 test_that("HVAC_Diagram()", {
-    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
-    file.copy(path, tempdir())
-    path <- file.path(tempdir(), basename(path))
-
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+    model <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
 
