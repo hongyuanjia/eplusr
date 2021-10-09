@@ -59,7 +59,7 @@ NULL
 #' @author Hongyuan Jia
 path_eplus <- function(ver, ..., .strict = FALSE) {
     inputs <- c(...)
-    dir <- eplus_config(ver)$dir
+    dir <- suppressMessages(use_eplus(ver))$dir
 
     path <- normalizePath(do.call(file.path, as.list(c(dir, inputs))), mustWork = FALSE)
     if (.strict && !file.exists(path)) {
