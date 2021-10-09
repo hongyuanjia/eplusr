@@ -9,6 +9,8 @@
 * `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
   procedure. This will remove the previous IDF version requirement (>= 8.3) when
   running simulations (#446).
+* Functions `path_eplus()` and `path_eplus_*()` have been added to help specify
+  file paths under EnergyPlus installation directory (#446).
 
 ## Minor changes
 

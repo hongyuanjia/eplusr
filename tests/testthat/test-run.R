@@ -168,6 +168,22 @@ test_that("run_multi()", {
     expect_null(get_run_time("a"))
 })
 
+test_that("path_eplus()", {
+    expect_equal(basename(path_eplus(8.8, "a", "b")), "b")
+    expect_error(basename(path_eplus(8.8, "a", "b", .strict = TRUE)))
+
+    expect_true(is.character(path_eplus_processor(8.8, "EPMacro", .strict = TRUE)))
+    expect_true(is.character(path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", .strict = TRUE)))
+
+    expect_true(is.character(path_eplus_example(8.8, "1ZoneUncontrolled.idf")))
+    expect_true(is.character(path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")))
+
+    expect_true(is.character(path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")))
+
+    expect_true(is.character(path_eplus_dataset(8.8, "Boilers.idf")))
+    expect_true(is.character(path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")))
+})
+
 test_that("EPMacro()", {
     main <- test_path("file/macro.imf")
     part <- test_path("file/part.idf")

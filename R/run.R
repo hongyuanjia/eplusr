@@ -11,6 +11,93 @@
 #' @importFrom tools file_path_sans_ext
 NULL
 
+#' Get file path from EnergyPlus installation directory
+#'
+#' @details
+#'
+#' * `path_eplus()` returns the file path specified in EnergyPlus installation
+#'   directory.
+#' * `path_eplus_processor()` is the same as `path_eplus()` expect it
+#'   automatically prepend the executable extension, i.e. `.exe` on Windows and
+#'   empty on macOS and Linux.
+#' * `path_eplus_example()` returns the file path specified under the `ExampleFiles`
+#'   folder in EnergyPlus installation directory.
+#' * `path_eplus_weather()` returns the file path specified under the
+#'   `WeatherData` folder in EnergyPlus installation directory.
+#' * `path_eplus_dataset()` returns the file path specified under the
+#'   `DataSets` folder in EnergyPlus installation directory.
+#'
+#' @note
+#'
+#' These functions are not vectorized, which means that only a single file path
+#' can be specified at a time.
+#'
+#' @param ver An acceptable EnergyPlus version or an EnergyPlus installation
+#'        directory
+#' @param ... File paths passed to [base::file.path()].
+#' @param file A single string of file name.
+#' @param .strict If `TRUE`, an error will be issued if the specified file does
+#'        not exist
+#'
+#' @examples
+#' \dontrun{
+#' path_eplus(8.8, "Energy+.idd")
+#'
+#' path_eplus_processor(8.8, "EPMacro", .strict = TRUE)
+#' path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", .strict = TRUE)
+#'
+#' path_eplus_example(8.8, "1ZoneUncontrolled.idf")
+#' path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")
+#'
+#' path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+#'
+#' path_eplus_dataset(8.8, "Boilers.idf")
+#' path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")
+#' }
+#' }
+#' @export
+#' @author Hongyuan Jia
+path_eplus <- function(ver, ..., .strict = FALSE) {
+    inputs <- c(...)
+    dir <- eplus_config(ver)$dir
+
+    path <- normalizePath(do.call(file.path, as.list(c(dir, inputs))), mustWork = FALSE)
+    if (.strict && !file.exists(path)) {
+        abort(sprintf(
+            "Failed to find file '%s' under EnergyPlus installation directory ('%s').",
+            substring(gsub(dir, "", path, fixed = TRUE), 2L), dir
+        ))
+    }
+    path
+}
+
+#' @export
+#' @rdname path_eplus
+path_eplus_processor <- function(ver, ..., .strict = FALSE) {
+    inputs <- c(...)
+    exe <- if (is_windows()) ".exe" else ""
+    inputs[length(inputs)] <- sprintf("%s%s", inputs[length(inputs)], exe)
+    path_eplus(ver, inputs, .strict = .strict)
+}
+
+#' @export
+#' @rdname path_eplus
+path_eplus_example <- function(ver, file, .strict = FALSE) {
+    path_eplus(ver, "ExampleFiles", file, .strict = .strict)
+}
+
+#' @export
+#' @rdname path_eplus
+path_eplus_weather <- function(ver, file, .strict = FALSE) {
+    path_eplus(ver, "WeatherData", file, .strict = .strict)
+}
+
+#' @export
+#' @rdname path_eplus
+path_eplus_dataset <- function(ver, file, .strict = FALSE) {
+    path_eplus(ver, "DataSets", file, .strict = .strict)
+}
+
 #' Clean working directory of a previous EnergyPlus simulation
 #'
 #' Clean working directory of an EnergyPlus simulation by deleting all input and
