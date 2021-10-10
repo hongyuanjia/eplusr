@@ -2693,8 +2693,7 @@ energyplus <- function(model, weather, output_dir = NULL,
         start_time = lapply(run, "[[", "start_time"),
         end_time = lapply(run, "[[", "end_time"),
         stdout = lapply(run, "[[", "stdout"),
-        stderr = lapply(run, "[[", "stderr"),
-        process = lapply(run, "[[", "process")
+        stderr = lapply(run, "[[", "stderr")
     )
 
     # 9. FMUImport/FMUExport
