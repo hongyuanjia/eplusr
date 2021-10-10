@@ -1484,7 +1484,7 @@ interrupted_msg <- function(exe, idf, epw) {
     sprintf("TERMINATED [%s] --> [IDF] '%s' + [EPW] '%s'", exe, basename(idf), basename(epw %||% "<Empty>"))
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 EPMacro <- function(model,
@@ -2149,29 +2149,29 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #'
 #' `energyplus()` can only run in waiting mode.
 #'
-#' @param model [`character(1)`]\cr
+#' @param model \[`character(1)`\]\cr
 #' A path of an EnergyPlus IDF or IMF file.
 #'
-#' @param eso [`character(1)`]\cr
+#' @param eso \[`character(1)`\]\cr
 #' A path of an EnergyPlus standard output (`.eso`) or EnergyPlus meter output
 #' (`.mtr`) file.
 #'
-#' @param bnd [`character(1)`]\cr
+#' @param bnd \[`character(1)`\]\cr
 #' A path of an EnergyPlus branch node details (`.bnd`) file.
 #'
-#' @param weather [`character(1)` or `NULL`]\cr
+#' @param weather \[`character(1)` or `NULL`\]\cr
 #' A path of an EnergyPlus weather (EPW) file. If `NULL`, design-day-only
 #' simulation is triggered, regardless of the `design_day` value.
 #'
-#' @param output_dir [`character(1)` or `NULL`]\cr
+#' @param output_dir \[`character(1)` or `NULL`\]\cr
 #' Output directory of EnergyPlus simulation outputs. If `NULL`, the directory
 #' where the input `model` locates is used. Default: `NULL`.
 #'
-#' @param output_prefix [`character(1)` or `NULL`]\cr
+#' @param output_prefix \[`character(1)` or `NULL`\]\cr
 #' Prefix for EnergyPlus output file names. If `NULL`, the input `model` file
 #' name is used.  Default: `NULL`.
 #'
-#' @param output_suffix [`character(1)`]\cr
+#' @param output_suffix \[`character(1)`\]\cr
 #' Suffix style for EnergyPlus output file names. Should be one of the
 #' followings:
 #'
@@ -2179,47 +2179,47 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' - `L`: **Legacy**, e.g. `eplustbl.csv`.
 #' - `D`: **Dash**, e.g. `eplus-table.csv`.
 #'
-#' @param epmacro [`logical(1)`]\cr
+#' @param epmacro \[`logical(1)`\]\cr
 #' If `TRUE`, EPMacro processor is called perior to simulation. Only applicable
 #' if input file is an `IMF` file. Default: `TRUE`.
 #'
-#' @param expand_obj [`logical(1)`]\cr
+#' @param expand_obj \[`logical(1)`\]\cr
 #' If `TRUE`, ExpandObjects processor is called perior to simulation. Should be
 #' `TRUE` if calling Basement or Slab preprocessors is desired. Default: `TRUE`.
 #'
-#' @param annual [`logical(1)`]\cr
+#' @param annual \[`logical(1)`\]\cr
 #' If `TRUE`, annual simulation is forced. Currently, only support EnergyPlus >=
 #' v8.3. Note that `annual` and `design_day` cannot both be `TRUE`. Default:
 #' `FALSE`.
 #'
-#' @param design_day [`logical(1)`]\cr
+#' @param design_day \[`logical(1)`\]\cr
 #' If `TRUE`, design-day-only simulation is forced. Currently, only support
 #' EnergyPlus >= v8.3. Note that `annual` and `design_day` cannot both be
 #' `TRUE`. Default: `FALSE`.
 #'
-#' @param eso_to_ip [`logical(1)`]\cr
+#' @param eso_to_ip \[`logical(1)`\]\cr
 #' If `TRUE`, convertESOMTR post-processor is called after simulation to convert
 #' the units of data in `eso` file from SI units to IP units. Default: `FALSE`.
 #'
-#' @param readvars [`logical(1)`]\cr
+#' @param readvars \[`logical(1)`\]\cr
 #' If `TRUE`, ReadVarsESO post-processor is called after to simulation. Default:
 #' `TRUE`.
 #'
-#' @param echo [`logical(1)`]\cr
+#' @param echo \[`logical(1)`\]\cr
 #' Wheter to show standard output and error from EnergyPlus and its pre- and
 #' post- processors. Default: `TRUE`.
 #'
-#' @param wait [`logical(1)`]\cr
+#' @param wait \[`logical(1)`\]\cr
 #' If `FALSE`, simualtion is run in the background and a [processx::process]
 #' object is returned. Extra steps are needed to collect the results after the
 #' process completes.
 #'
-#' @param idd [`character(1)` or `NULL`]\cr
+#' @param idd \[`character(1)` or `NULL`\]\cr
 #' The full path of EnergyPlus IDD (Input Data Dictionary). If `NULL`,
 #' `Energy+.idd` file in EnergyPlus installation directory is used. Default:
 #' `NULL`.
 #'
-#' @param eplus [`character(1)` or `NULL`]\cr
+#' @param eplus \[`character(1)` or `NULL`\]\cr
 #' An EnergyPlus version or a path of EnergyPlus installation directory. If
 #' `NULL`, the version of EnergyPlus to use is determined by the version of
 #' input `model`.  Default: `NULL`.
