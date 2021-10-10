@@ -2128,7 +2128,7 @@ energyplus <- function(model, weather, output_dir = NULL,
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
     # just for test purpose
-    legacy <- getOption("eplusr.eplus_83", eplus_ver < 8.3)
+    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < 8.3)
 
     file <- list()
     run <- list()
