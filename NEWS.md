@@ -7,8 +7,9 @@
   for `download_weather()`. `type` will always be `"all"` for those sources (#453).
 * Add a new `"stat"` option in `type` in `download_weather()` (#453).
 * `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
-  procedure. This will remove the previous IDF version requirement (>= 8.3) when
-  running simulations (#446).
+  procedure. It supports to call the `Basement` and `Slab` processors. Now the
+  requirement of EnergyPlus >=v8.3 for running simulations has been droppped
+  (#446).
 * Functions `path_eplus()` and `path_eplus_*()` have been added to help specify
   file paths under EnergyPlus installation directory (#446).
 
