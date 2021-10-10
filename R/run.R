@@ -1106,15 +1106,6 @@ eplus_exe <- function (eplus) {
         eplusr_warning_miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config")
     )
 
-    if (config$version < 8.3) {
-        abort(paste0("Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
-             "This is because eplusr uses EnergyPlus command line interface ",
-             "which is available only in EnergyPlus v8.3 and above. ",
-             "You can update the version of your model using 'transition()' or 'version_updater()' and try again."),
-             "eplus_ver_not_supported"
-        )
-    }
-
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
 }
 # }}}
