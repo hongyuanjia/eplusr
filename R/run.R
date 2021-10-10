@@ -2258,6 +2258,8 @@ energyplus <- function(model, weather, output_dir = NULL,
     assert_flag(readvars)
     output_suffix <- match.arg(output_suffix)
 
+    start_time <- current()
+
     # validate inputs and do some preparations and create "in.idf" and
     # "in.epw" in the same directory as input model
     cmd <- pre_eplus_command(NULL, model, weather, output_dir, output_prefix,
@@ -2683,6 +2685,7 @@ energyplus <- function(model, weather, output_dir = NULL,
     file <- file[order(names(file))]
     file$idf <- NA_character_
     if (is.na(file$imf)) file$idf <- path_out(basename(cmd$model))
+    file <- lapply(file, function(f) if (all(is.na(f))) f else basename(f))
 
     run <- data.table(
         program = names(run),
@@ -2699,5 +2702,9 @@ energyplus <- function(model, weather, output_dir = NULL,
 
     if (temp_dir) unlink(cmd$sim_dir, recursive = TRUE, force = TRUE)
 
-    return(list(file = file, run = run))
+    list(
+        ver = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus)),
+        start_time = start_time, end_time = current(),
+        output_dir = cmd$output_dir, file = file, run = run
+    )
 }
