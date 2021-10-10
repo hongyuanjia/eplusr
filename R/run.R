@@ -1274,11 +1274,20 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
         }
     }
 
-    proc <- processx::process$new(command = command, args = args,
-        wd = wd, cleanup = TRUE, cleanup_tree = TRUE,
-        windows_verbatim_args = FALSE,
-        stdout = std_out, stderr = std_err, post_process = post_fun
-    )
+    if (call_r) {
+        if (!length(args)) args <- list()
+        proc <- callr::r_bg(func = command, args = args,
+            wd = wd, cleanup = TRUE, cleanup_tree = TRUE,
+            windows_verbatim_args = FALSE,
+            stdout = std_out, stderr = std_err, post_process = post_fun
+        )
+    } else {
+        proc <- processx::process$new(command = command, args = args,
+            wd = wd, cleanup = TRUE, cleanup_tree = TRUE,
+            windows_verbatim_args = FALSE,
+            stdout = std_out, stderr = std_err, post_process = post_fun
+        )
+    }
 
     if (!wait) {
         # just return the process
@@ -1347,6 +1356,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
         )
     }
 }
+
 get_eplus_loc_from_input <- function(idf, eplus = NULL) {
     eplus <- eplus %||% as.character(get_idf_ver(read_lines(idf)))
     if (!length(eplus)) {
@@ -2224,7 +2234,6 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' `NULL`, the version of EnergyPlus to use is determined by the version of
 #' input `model`.  Default: `NULL`.
 #'
-#' @name energyplus
 #' @keywords internal
 #' @return
 #'
@@ -2702,7 +2711,7 @@ energyplus <- function(model, weather, output_dir = NULL,
     if (temp_dir) unlink(cmd$sim_dir, recursive = TRUE, force = TRUE)
 
     list(
-        ver = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus)),
+        ver = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus), mustWork = FALSE),
         start_time = start_time, end_time = current(),
         output_dir = cmd$output_dir, file = file, run = run
     )
