@@ -1752,9 +1752,11 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     )
 
     eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
+    # just for test purpose
+    legacy <- getOption("eplusr.eplus_83", eplus_ver < 8.3)
 
     # cannot set annual and design_day if energy
-    if (any(annual, design_day) && eplus_ver < 8.3) {
+    if (any(annual, design_day) && legacy) {
         abort(
             paste0(
                 "Currently, 'annual' and 'design_day' options are only supported when running IDFs of EnergyPlus v8.3 and above. ",
@@ -1775,7 +1777,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     clean_wd(cmd$idf, "L")
 
     # get all legacy EnergyPlus output file names
-    lagency_files <- get_eplus_output_name(NULL, "L")
+    legacy_files <- get_eplus_output_name(NULL, "L")
 
     # get all targeted EnergyPlus output file names
     out_files <- get_eplus_output_name(cmd$output_prefix, output_suffix)
@@ -1785,11 +1787,11 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
 
     # exclude EPMacro and ExpandObjects outputs
     out_files <- out_files[!names(out_files) %in% c("epmidf", "epmdet", "epxidf", "experr")]
-    lagency_files <- lagency_files[names(lagency_files) %in% names(out_files)]
+    legacy_files <- legacy_files[names(legacy_files) %in% names(out_files)]
 
     # handle EnergyPlus < v8.3 where there is no EnergyPlus command line
     # interface
-    if (eplus_ver < 8.3) {
+    if (legacy) {
         wd <- dirname(cmd$model)
 
         # create ini file in and copy idd
@@ -1803,8 +1805,8 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
             unlink(file.path(wd, "Energy+.ini"))
 
             # manually handle file renaming
-            file <- lapply(seq_along(lagency_files), function(i) {
-                from <- file.path(wd, lagency_files[[i]])
+            file <- lapply(seq_along(legacy_files), function(i) {
+                from <- file.path(wd, legacy_files[[i]])
                 to <- file.path(cmd$output_dir, out_files[[i]])
                 files <- file_rename_if_exist(from, to)
                 files <- files[!is.na(files)]
@@ -2125,7 +2127,8 @@ energyplus <- function(model, weather, output_dir = NULL,
 
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
-    legacy <- eplus_ver < 8.3
+    # just for test purpose
+    legacy <- getOption("eplusr.eplus_83", eplus_ver < 8.3)
 
     file <- list()
     run <- list()
