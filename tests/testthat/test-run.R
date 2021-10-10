@@ -604,24 +604,114 @@ test_that("HVAC_Diagram()", {
     unlink(unlist(res$file))
     unlink(path)
 })
-    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "1ZoneUncontrolled.idf")
-    file.copy(path, tempdir())
-    path <- file.path(tempdir(), basename(path))
 
-    weather <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CO_Golden-NREL.724666_TMY3.epw")
+test_that("energyplus()", {
+    weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    out_dir <- file.path(tempdir(), "EnergyPlus")
 
-    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8)
-    res$file
-    expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "out", "audit"))
-    expect_equal(basename(res$file$idf), "slab_slab.gtp")
-    expect_equal(basename(res$file$out), "slab_slab.out")
-    expect_equal(basename(res$file$audit), "slab_slab.ger")
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
-    expect_false(is.null(res$run$stdout))
-    expect_false(is.null(res$run$stderr))
-    unlink(unlist(res$file))
+    # can run EPMacro
+    path_imf <- copy_eplus_example(8.8, "AbsorptionChiller_Macro.imf")
+    path_resouces <- c(
+        copy_eplus_example(8.8, "HVAC3ZoneChillerSpec.imf"),
+        copy_eplus_example(8.8, "HVAC3ZoneGeometry.imf"),
+        copy_eplus_example(8.8, "HVAC3Zone-IntGains-Def.imf"),
+        copy_eplus_example(8.8, "HVAC3ZoneMat-Const.imf")
+    )
+    res_imf <- energyplus(path_imf, weather, out_dir, echo = FALSE)
+    expect_equal(names(res_imf), c("file", "run"))
+    expect_equal(length(res_imf$file), 56L)
+    expect_equal({files <- unlist(res_imf$file); files <- files[!is.na(files)]; length(files)}, 20L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "AbsorptionChiller_Macro"))
+    expect_is(res_imf$run, "data.table")
+    expect_equal(names(res_imf$run),
+        c("program", "exit_status", "start_time", "end_time", "stdout", "stderr", "process")
+    )
+    expect_equal(res_imf$run$program,
+        c("EPMacro", "ExpandObjects", "Basement", "Slab", "EnergyPlus",
+          "convertESOMTR", "ReadVarsESO_MTR", "ReadVarsESO_ESO", "HVAC_Diagram")
+    )
+    expect_equal(res_imf$run[program == "EPMacro", exit_status], list(0L))
+    expect_true(file.exists(files["epmidf"]))
+    expect_true(file.exists(files["epmdet"]))
+    expect_true(file.exists(files["eso"]))
+    expect_true(file.exists(files["mtr"]))
+    expect_true(file.exists(files["bnd"]))
+    expect_true(file.exists(files["svg"]))
+    unlink(c(path_imf, path_resouces, out_dir), recursive = TRUE)
 
-    unlink(path)
+    # can run ExpandObjects
+    path_exp <- copy_eplus_example(8.8, "HVACTemplate-5ZoneFanCoil.idf")
+    res_exp <- energyplus(path_exp, weather, out_dir, echo = FALSE)
+    expect_equal(length(res_exp$file), 56L)
+    expect_equal({files <- unlist(res_exp$file); files <- files[!is.na(files)]; length(files)}, 23L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "HVACTemplate-5ZoneFanCoil"))
+    expect_equal(res_exp$run[program == "ExpandObjects", exit_status], list(0L))
+    expect_true(file.exists(files["expidf"]))
+    expect_true(is.na(files["experr"]))
+    unlink(c(path_exp, out_dir), recursive = TRUE)
+
+    # can run Basement
+    path_base <- copy_eplus_example(8.8, "LgOffVAVusingBasement.idf")
+    # modify the input in order to reduce the simulation time
+    l <- read_lines(path_base)
+    l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
+    write_lines(l, path_base)
+    res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
+    expect_equal(length(res_base$file), 56L)
+    expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 27L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
+    expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
+    expect_true(file.exists(files["expidf"]))
+    expect_true(file.exists(files["bsmt_idf"]))
+    expect_true(file.exists(files["bsmt_csv"]))
+    expect_true(file.exists(files["bsmt_out"]))
+    expect_true(file.exists(files["bsmt_audit"]))
+    unlink(c(path_base, out_dir), recursive = TRUE)
+
+    # can run Slab
+    path_slab <- copy_eplus_example(8.8, "5ZoneAirCooledWithSlab.idf")
+    # modify the input in order to reduce the simulation time
+    l <- read_lines(path_slab)
+    l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
+    l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
+    write_lines(l, path_slab)
+    res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
+    expect_equal(length(res_slab$file), 56L)
+    expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 26L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
+    expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
+    expect_true(file.exists(files["slab_ger"]))
+    expect_true(file.exists(files["slab_gtp"]))
+    expect_true(file.exists(files["slab_out"]))
+    unlink(c(path_slab, out_dir), recursive = TRUE)
+
+    # can convert eso to IP
+    path_ip <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    res_ip <- energyplus(path_ip, weather, out_dir, eso_to_ip = TRUE, echo = FALSE)
+    expect_equal(length(res_ip$file), 56L)
+    expect_equal({files <- unlist(res_ip$file); files <- files[!is.na(files)]; length(files)}, 26L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
+    expect_equal(res_ip$run[program == "convertESOMTR", exit_status], list(0L))
+    expect_true(file.exists(files["ipeso"]))
+    expect_true(file.exists(files["ipmtr"]))
+    expect_true(is.na(files["iperr"]))
+    unlink(c(path_ip, out_dir), recursive = TRUE)
+
+    # can run with EnergyPlus < 8.3
+    options("eplusr.eplus_legacy" = TRUE)
+    path_legacy <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
+    expect_equal(length(res_legacy$file), 56L)
+    expect_equal({files <- unlist(res_legacy$file); files <- files[!is.na(files)]; length(files)}, 24L)
+    expect_equal(length(files[!file.exists(files)]), 0L)
+    expect_equal(sort(basename(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
+    unlink(out_dir, recursive = TRUE)
+    options("eplusr.eplus_legacy" = NULL)
+    res_norm <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
+    expect_equal(res_legacy$file, res_norm$file)
 })
