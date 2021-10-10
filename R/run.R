@@ -11,6 +11,13 @@
 #' @importFrom tools file_path_sans_ext
 NULL
 
+# get current time with system time zone
+current <- function() {
+    tm <- Sys.time()
+    attr(tm, "tzone") <- Sys.timezone()
+    tm
+}
+
 #' Get file path from EnergyPlus installation directory
 #'
 #' @details
@@ -1000,7 +1007,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
             if (!length(stderr)) stderr <- character(0)
             if (expanded) rename_exp()
             unlink(c(p_stdout, p_stderr))
-            list(stdout = stdout, stderr = stderr, end_time = Sys.time())
+            list(stdout = stdout, stderr = stderr, end_time = current())
         }
     }
 
@@ -1085,12 +1092,15 @@ eplus_run_wait <- function (proc, echo = TRUE) {
         get_output(echo)
     }
 
+    start_time <- proc$get_start_time()
+    attr(start_time, "tzone") <- Sys.timezone()
+
     list(process = proc,
          exit_status = proc$get_exit_status(),
          stdout = stdout,
          stderr = stderr,
-         start_time = lubridate::with_tz(proc$get_start_time(), Sys.timezone()),
-         end_time = Sys.time()
+         start_time = start_time,
+         end_time = current()
     )
 }
 # }}}
@@ -1230,6 +1240,8 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
     assert_function(post_callback, null.ok = TRUE)
     assert_function(exit_callback, null.ok = TRUE)
 
+    start_time <- current()
+
     args <- args %||% character()
 
     if (wait) {
@@ -1249,7 +1261,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
 
             unlink(c(std_out, std_err))
 
-            res <- list(stdout = out, stderr = err, end_time = Sys.time())
+            res <- list(stdout = out, stderr = err, end_time = current())
 
             if (!is.null(post_callback)) {
                 res <- list(post_callback(), run = res)
@@ -1275,7 +1287,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             exit_status = NULL,
             stdout = NULL,
             stderr = NULL,
-            start_time = lubridate::with_tz(proc$get_start_time(), Sys.timezone()),
+            start_time = start_time,
             end_time = NULL
         )
     } else {
@@ -1330,8 +1342,8 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
              exit_status = proc$get_exit_status(),
              stdout = stdout,
              stderr = stderr,
-             start_time = lubridate::with_tz(proc$get_start_time(), Sys.timezone()),
-             end_time = Sys.time()
+             start_time = start_time,
+             end_time = current()
         )
     }
 }
