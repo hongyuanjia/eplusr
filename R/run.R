@@ -1621,7 +1621,7 @@ Basement <- function(model, weather,
     file_callback <- function() {
         remove_eplus_in_files(cmd$model, cmd$weather)
         if (attr(idd, "copied")) unlink(file.path(wd, "BasementGHT.idd"))
-        unlink(file.path(wd, c("Energy+.ini", "BasementGHTIn.idf")))
+        unlink(file.path(wd, "Energy+.ini"))
 
         file <- list()
         file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
@@ -1701,7 +1701,7 @@ Slab <- function(model, weather,
     file_callback <- function() {
         remove_eplus_in_files(cmd$model, cmd$weather)
         if (attr(idd, "copied")) unlink(file.path(wd, "SlabGHT.idd"))
-        unlink(file.path(wd, c("Energy+.ini", "GHTIn.idf")))
+        unlink(file.path(wd, "Energy+.ini"))
 
         file <- list()
         file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
