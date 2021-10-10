@@ -1468,7 +1468,11 @@ remove_eplus_in_files <- function(model, weather = NULL) {
     }
 }
 
-#' @name EnergyPlus
+interrupted_msg <- function(exe, idf, epw) {
+    sprintf("TERMINATED [%s] --> [IDF] '%s' + [EPW] '%s'", exe, basename(idf), basename(epw %||% "<Empty>"))
+}
+
+#' @name energyplus
 #' @keywords internal
 #' @export
 EPMacro <- function(model,
@@ -1511,7 +1515,8 @@ EPMacro <- function(model,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = dirname(cmd$model), wait = wait, echo = echo,
-        post_callback = post_callback, post_name = "file"
+        post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("EPMacro", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -1520,7 +1525,7 @@ EPMacro <- function(model,
     list(file = file, run = run)
 }
 
-#' @name EnergyPlus
+#' @name energyplus
 #' @keywords internal
 #' @export
 ExpandObjects <- function(model,
@@ -1562,7 +1567,8 @@ ExpandObjects <- function(model,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
-        post_callback = post_callback, post_name = "file"
+        post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("ExpandObjects", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -1571,7 +1577,7 @@ ExpandObjects <- function(model,
     list(file = file, run = run)
 }
 
-#' @name EnergyPlus
+#' @name energyplus
 #' @keywords internal
 #' @export
 Basement <- function(model, weather,
@@ -1649,7 +1655,8 @@ Basement <- function(model, weather,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
-        post_callback = post_callback, post_name = "file"
+        post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("Basement", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -1658,7 +1665,7 @@ Basement <- function(model, weather,
     list(file = file, run = run)
 }
 
-#' @name EnergyPlus
+#' @name energyplus
 #' @keywords internal
 #' @export
 Slab <- function(model, weather,
@@ -1714,7 +1721,8 @@ Slab <- function(model, weather,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = dirname(cmd$idf), wait = wait, echo = echo,
-        post_callback = post_callback, post_name = "file"
+        post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("Slab", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -1723,7 +1731,7 @@ Slab <- function(model, weather,
     list(file = file, run = run)
 }
 
-#' @name EnergyPlus
+#' @name energyplus
 #' @keywords internal
 #' @export
 EnergyPlus <- function(model, weather, output_dir = NULL,
@@ -1765,7 +1773,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     }
 
     # clean up working directory
-    clean_wd(cmd$idf, "L")
+    .clean_wd(cmd$idf, "L")
 
     # get all legacy EnergyPlus output file names
     legacy_files <- get_eplus_output_name(NULL, "L")
@@ -1828,7 +1836,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
         file_callback <- function() {
             file <- list()
             file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
-            file$epw <- normalizePath(file.path(cmd$output_dir, basename(cmd$weather)))
+            if (!is.null(cmd$weather)) {
+                file$epw <- normalizePath(file.path(cmd$output_dir, basename(cmd$weather)))
+            }
             out <- lapply(out_files, function(files) {
                 files <- file.path(cmd$output_dir, files)
                 files <- files[file.exists(files)]
@@ -1849,9 +1859,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
 
     run <- run_command(cmd$exectuable, args, wd = dirname(cmd$idf), wait = wait, echo = echo,
         post_callback = post_callback, post_name = "file",
-        exit_msg = sprintf("TERMINATED--> [Idf] '%s' + [Epw] '%s'",
-            basename(cmd$model), basename(cmd$weather %||% "<Empty>")
-        )
+        exit_msg = interrupted_msg("EnergyPlus", cmd$model, cmd$weather)
     )
 
     if (wait) file <- file_callback()
@@ -1859,6 +1867,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     list(file = file, run = run)
 }
 
+#' @name energyplus
 #' @keywords internal
 #' @export
 convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = NULL,
@@ -1933,7 +1942,8 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = wd, wait = wait, echo = echo,
-        post_callback = post_callback, post_name = "file"
+        post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("convertESOMTR", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -1942,6 +1952,7 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
     list(file = file, run = run)
 }
 
+#' @name energyplus
 #' @keywords internal
 #' @export
 ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
@@ -2037,7 +2048,8 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, c(basename(inp), max_col), wd = wd, wait = wait,
-        echo = echo, post_callback = post_callback, post_name = "file"
+        echo = echo, post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("ReadVarsESO", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -2046,6 +2058,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     list(file = file, run = run)
 }
 
+#' @name energyplus
 #' @keywords internal
 #' @export
 HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
@@ -2087,7 +2100,8 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
     if (!wait) post_callback <- file_callback
 
     run <- run_command(cmd$exectuable, wd = wd, wait = wait,
-        echo = echo, post_callback = post_callback, post_name = "file"
+        echo = echo, post_callback = post_callback, post_name = "file",
+        exit_msg = interrupted_msg("HVAC-Diagram", cmd$model, cmd$weather)
     )
 
     file <- NULL
@@ -2096,6 +2110,9 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
     list(file = file, run = run)
 }
 
+#' Run EnergyPlus
+#'
+#' @name energyplus
 #' @keywords internal
 #' @export
 energyplus <- function(model, weather, output_dir = NULL,
@@ -2103,8 +2120,7 @@ energyplus <- function(model, weather, output_dir = NULL,
                        epmacro = TRUE, expand_obj = TRUE,
                        annual = FALSE, design_day = FALSE,
                        eso_to_ip = FALSE, readvars = TRUE,
-                       wait = TRUE, echo = TRUE,
-                       idd = NULL, eplus = NULL) {
+                       echo = TRUE, idd = NULL, eplus = NULL) {
     assert_flag(epmacro)
     assert_flag(expand_obj)
     assert_flag(eso_to_ip)
@@ -2114,7 +2130,7 @@ energyplus <- function(model, weather, output_dir = NULL,
     # validate inputs and do some preparations and create "in.idf" and
     # "in.epw" in the same directory as input model
     cmd <- pre_eplus_command(NULL, model, weather, output_dir, output_prefix,
-        wait = wait, echo = echo, eplus = eplus)
+        echo = echo, eplus = eplus)
 
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_path(dirname(cmd$energyplus))
@@ -2155,8 +2171,8 @@ energyplus <- function(model, weather, output_dir = NULL,
         cmd$epw <- cmd$weather
     }
 
-    path_sim <- function(file) file.path(cmd$sim_dir, basename(file))
-    path_out <- function(file) file.path(cmd$output_dir, basename(file))
+    path_sim <- function(file) normalizePath(file.path(cmd$sim_dir, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
     temp_name <- function() basename(tempfile(tmpdir = cmd$sim_dir))
     file_temp <- function(file, ext = NULL) {
         res <- rep(NA_character_, length(file))
@@ -2174,8 +2190,8 @@ energyplus <- function(model, weather, output_dir = NULL,
     }
 
     # clean output directory
-    clean_wd(path_out("in.imf"), "L")
-    clean_wd(path_out(basename(cmd$model)), output_suffix)
+    .clean_wd(path_out("in.imf"), "L")
+    .clean_wd(path_out(basename(cmd$model)), output_suffix)
 
     # move "in.epw" to the simulation directory
     file$epw <- NA_character_
@@ -2224,7 +2240,7 @@ energyplus <- function(model, weather, output_dir = NULL,
         }
     } else {
         file$idf <- path_out(basename(cmd$model))
-        cmd$idf <- file_rename(cmd$idf, path_sim("in.idf"))
+        cmd$idf <- file_copy(cmd$model, path_sim("in.idf"))
     }
 
     # 2. run ExpandObjects
