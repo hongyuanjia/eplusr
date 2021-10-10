@@ -137,8 +137,8 @@ path_eplus_dataset <- function(ver, file, .strict = FALSE) {
 #' }
 #' @export
 #' @author Hongyuan Jia
-# clean_wd {{{
-clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
+clean_wd <- function(path) .clean_wd(path, "C")
+.clean_wd <- function(path, suffix_type = c("C", "L", "D")) {
     assert_string(path)
     wd <- dirname(path)
 
