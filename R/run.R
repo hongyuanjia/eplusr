@@ -2110,10 +2110,129 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
     list(file = file, run = run)
 }
 
-#' Run EnergyPlus
+#' Run EnergyPlus and its various processors
+#'
+#' @details
+#'
+#' `EPMacro()` calls the EnergyPlus EPMacro processor.
+#'
+#' `ExpandObjects()` calls the EnergyPlus ExpandObjects processor.
+#'
+#' `Basement()` calls the EnergyPlus Basement preprocessor.
+#'
+#' `Slab()` calls the EnergyPlus Slab preprocessor.
+#'
+#' `EnergyPlus()` calls EnergyPlus itself.
+#'
+#' `convertESOMTR()` calls EnergyPlus convertESOMTR post-processor.
+#'
+#' `ReadVarsESO()` calls EnergyPlus ReadVarsESO post-processor.
+#'
+#' `HVAC_Diagram()` calls EnergyPlus HVAC-Diagram post-processor.
+#'
+#' `energyplus()` is the one which correctly chains all the steps that call
+#' those pre- and post- processors to form a complete EnergyPlus simulation.
+#'
+#' @note
+#'
+#' `energyplus()` can only run in waiting mode.
+#'
+#' @param model [`character(1)`]\cr
+#' A path of an EnergyPlus IDF or IMF file.
+#'
+#' @param eso [`character(1)`]\cr
+#' A path of an EnergyPlus standard output (`.eso`) or EnergyPlus meter output
+#' (`.mtr`) file.
+#'
+#' @param bnd [`character(1)`]\cr
+#' A path of an EnergyPlus branch node details (`.bnd`) file.
+#'
+#' @param weather [`character(1)` or `NULL`]\cr
+#' A path of an EnergyPlus weather (EPW) file. If `NULL`, design-day-only
+#' simulation is triggered, regardless of the `design_day` value.
+#'
+#' @param output_dir [`character(1)` or `NULL`]\cr
+#' Output directory of EnergyPlus simulation outputs. If `NULL`, the directory
+#' where the input `model` locates is used. Default: `NULL`.
+#'
+#' @param output_prefix [`character(1)` or `NULL`]\cr
+#' Prefix for EnergyPlus output file names. If `NULL`, the input `model` file
+#' name is used.  Default: `NULL`.
+#'
+#' @param output_suffix [`character(1)`]\cr
+#' Suffix style for EnergyPlus output file names. Should be one of the
+#' followings:
+#'
+#' - `C`: **Capital**, e.g. `eplusTable.csv`. This is the default.
+#' - `L`: **Legacy**, e.g. `eplustbl.csv`.
+#' - `D`: **Dash**, e.g. `eplus-table.csv`.
+#'
+#' @param epmacro [`logical(1)`]\cr
+#' If `TRUE`, EPMacro processor is called perior to simulation. Only applicable
+#' if input file is an `IMF` file. Default: `TRUE`.
+#'
+#' @param expand_obj [`logical(1)`]\cr
+#' If `TRUE`, ExpandObjects processor is called perior to simulation. Should be
+#' `TRUE` if calling Basement or Slab preprocessors is desired. Default: `TRUE`.
+#'
+#' @param annual [`logical(1)`]\cr
+#' If `TRUE`, annual simulation is forced. Currently, only support EnergyPlus >=
+#' v8.3. Note that `annual` and `design_day` cannot both be `TRUE`. Default:
+#' `FALSE`.
+#'
+#' @param design_day [`logical(1)`]\cr
+#' If `TRUE`, design-day-only simulation is forced. Currently, only support
+#' EnergyPlus >= v8.3. Note that `annual` and `design_day` cannot both be
+#' `TRUE`. Default: `FALSE`.
+#'
+#' @param eso_to_ip [`logical(1)`]\cr
+#' If `TRUE`, convertESOMTR post-processor is called after simulation to convert
+#' the units of data in `eso` file from SI units to IP units. Default: `FALSE`.
+#'
+#' @param readvars [`logical(1)`]\cr
+#' If `TRUE`, ReadVarsESO post-processor is called after to simulation. Default:
+#' `TRUE`.
+#'
+#' @param echo [`logical(1)`]\cr
+#' Wheter to show standard output and error from EnergyPlus and its pre- and
+#' post- processors. Default: `TRUE`.
+#'
+#' @param wait [`logical(1)`]\cr
+#' If `FALSE`, simualtion is run in the background and a [processx::process]
+#' object is returned. Extra steps are needed to collect the results after the
+#' process completes.
+#'
+#' @param idd [`character(1)` or `NULL`]\cr
+#' The full path of EnergyPlus IDD (Input Data Dictionary). If `NULL`,
+#' `Energy+.idd` file in EnergyPlus installation directory is used. Default:
+#' `NULL`.
+#'
+#' @param eplus [`character(1)` or `NULL`]\cr
+#' An EnergyPlus version or a path of EnergyPlus installation directory. If
+#' `NULL`, the version of EnergyPlus to use is determined by the version of
+#' input `model`.  Default: `NULL`.
 #'
 #' @name energyplus
 #' @keywords internal
+#' @return
+#'
+#' Functions except for `energyplus()` return a list of two elements:
+#'
+#' - `file`: a named list of full paths of output files
+#' - `run`: a named list of outputs from the process.
+#'
+#' `energyplus()` returns a list of 7 elements:
+#'
+#' - `ver`: EnergyPlus [version][numeric_version()] used
+#' - `energyplus`: EnergyPlus installation directory
+#' - `start_time`: a [POSIXct()] giving the local time when the simulation
+#'   starts
+#' - `end_time`: a [POSIXct()] giving the local time when the simulation ends
+#' - `output_dir`: full path of output directory of simulation outputs
+#' - `file`: a named list of relative paths of output files under `output_dir`
+#' - `run`: a [data.table][data.table::data.table()] of each outputs from the
+#'   all called processes
+#'
 #' @export
 energyplus <- function(model, weather, output_dir = NULL,
                        output_prefix = NULL, output_suffix = c("C", "L", "D"),
