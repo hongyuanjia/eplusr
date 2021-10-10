@@ -344,14 +344,13 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
         files$sqlite_err$pre  <-  paste0(pre, "-sqlite")
         files$ads$pre         <-  paste0(pre, "-ads")
         files$screen$pre      <-  paste0(pre, "-screen")
-        files$shading$pre         <-  paste0(pre, "-shading")
+        files$shading$pre     <-  paste0(pre, "-shading")
         files$delight$pre     <-  paste0(pre, "-delight")
         files$delight$ext     <-  c(".in", ".out", ".dfdmp", ".eldmp")
     }
 
     lapply(files, function(f) paste0(f$pre, f$ext))
 }
-# }}}
 
 #' Run simulations of EnergyPlus models.
 #'
@@ -490,60 +489,59 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
 #' a more friendly interface to run EnergyPlus simulations and collect outputs.
 #' @author Hongyuan Jia
 #' @export
-# run_idf {{{
 run_idf <- function (model, weather, output_dir, design_day = FALSE,
                      annual = FALSE, expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL) {
+    assert_flag(wait)
 
-    model <- normalizePath(model, mustWork = TRUE)
-    if (!is.null(weather)) weather <- normalizePath(weather, mustWork = TRUE)
-
-    eplus <- eplus %||% as.character(get_idf_ver(read_lines(model)))
-    if (!length(eplus)) {
-        abort(paste0("Missing version field in input IDF file. ",
-            "Failed to determine the version of EnergyPlus to use."),
-            "miss_idf_ver"
-        )
+    if (!missing(expand_obj)) {
+        warn("'expand_obj' in 'run_idf()' has been deprecated. Now 'ExpandObjects' pre-processor will always be called before simulation.")
     }
 
-    energyplus_exe <- eplus_exe(eplus)
+    if (is.null(weather)) design_day <- TRUE
 
-    # get output directory
-    if (is.null(output_dir)) output_dir <- dirname(model)
-    output_dir <- normalizePath(output_dir, mustWork = FALSE)
-    if (!dir.exists(output_dir)) {
-        tryCatch(dir.create(output_dir, recursive = TRUE),
-            warning = function (w) abort(paste0("Failed to create output directory: ", surround(output_dir)), "create_output_dir")
+    # res[c("idf", "epw", "version", "exit_status", "start_time", "end_time", "output_dir",
+    #     "energyplus", "stdout", "stderr", "process")]
+
+    start_time <- current()
+
+    post_fun <- function(res) {
+        out <- list()
+        out$idf <- res$file$idf
+        out$epw <- res$file$epw
+        if (is.na(out$epw)) out$epw <- list(NULL)
+        out$version <- res$ver
+        out$exit_status <- res$run[program == "EnergyPlus", exit_status[[1L]]]
+        out$start_time <- res$start_time
+        out$end_time <- res$end_time
+        out$output_dir <- res$output_dir
+        out$energyplus <- normalizePath(
+            file.path(res$energyplus, sprintf("EnergyPlus%s", c(".exe", "")[c(is_windows(), !is_windows())]))
         )
+        out$stdout <- unlist(res$run$stdout)
+        out$stderr <- unlist(res$run$stderr)
+        out
     }
 
-    # copy input files
-    loc_m <- copy_run_files(model, output_dir)
-    if (is.null(weather)) {
-        loc_w <- NULL
+    if (wait) {
+        res <- energyplus(model, weather, output_dir = output_dir,
+            annual = annual, design_day = design_day, expand_obj = expand_obj,
+            echo = echo, eplus = eplus)
+
+        out <- post_fun(res)
+        out$process <- list(NULL)
     } else {
-        loc_w <- copy_run_files(weather, output_dir)
+        proc <- run_command(
+            command = function(..., post_fun) {
+                post_fun(eplusr::energyplus(...))
+            },
+            args = list(model = model, weather = weather, output_dir = output_dir,
+                annual = annual, design_day = design_day, echo = echo, eplus = eplus,
+                post_fun = post_fun
+            ),
+            wd = tempdir(), call_r = TRUE
+        )
     }
-
-    # clean wd
-    clean_wd(loc_m)
-
-    # Let energyplus commandline interface itself to handle output file
-    # directory. This is the easiest way to external file dependencies, instead
-    # of doing it on the R side.
-    # See #344
-    res <- energyplus(energyplus_exe, model, weather, output_dir = output_dir,
-        annual = annual, design_day = design_day, expand_obj = expand_obj,
-        wait = wait, echo = echo)
-
-    res$idf <- model
-    # in case no weather is given
-    res["epw"] <- list(weather)
-    res$version <- as.character(eplus_config(eplus)$version)
-
-    res[c("idf", "epw", "version", "exit_status", "start_time", "end_time", "output_dir",
-        "energyplus", "stdout", "stderr", "process")]
 }
-# }}}
 
 #' @export
 #' @rdname run_model
@@ -1231,14 +1229,15 @@ copy_energyplus_idd <- function(eplus, output_dir, idd = NULL, name = "Energy+.i
 
 run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
                         post_callback = NULL, post_name = NULL,
-                        exit_msg = NULL, exit_callback = NULL) {
-    assert_character(args, null.ok = TRUE)
+                        exit_msg = NULL, exit_callback = NULL, call_r = FALSE) {
     assert_flag(wait)
     assert_flag(echo)
     assert_string(post_name, null.ok = TRUE)
     assert_string(exit_msg, null.ok = TRUE)
     assert_function(post_callback, null.ok = TRUE)
     assert_function(exit_callback, null.ok = TRUE)
+    assert_flag(call_r)
+    if (!call_r) assert_character(args, null.ok = TRUE)
 
     start_time <- current()
 
@@ -2711,7 +2710,7 @@ energyplus <- function(model, weather, output_dir = NULL,
     if (temp_dir) unlink(cmd$sim_dir, recursive = TRUE, force = TRUE)
 
     list(
-        ver = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus), mustWork = FALSE),
+        ver = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus)),
         start_time = start_time, end_time = current(),
         output_dir = cmd$output_dir, file = file, run = run
     )
