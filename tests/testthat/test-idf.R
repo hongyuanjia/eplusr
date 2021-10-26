@@ -163,6 +163,10 @@ test_that("$is_valid_id()", {
     expect_false(idf$is_valid_id(6L))
     expect_equal(idf$is_valid_id(1L:4L), rep(TRUE, times = 4L))
     expect_error(idf$is_valid_id("1"))
+
+    # can check inside a specific class
+    expect_false(idf$is_valid_id(1L, "Version"))
+    expect_true(idf$is_valid_id(1L, "Material"))
 })
 # }}}
 
@@ -175,6 +179,10 @@ test_that("$is_valid_name()", {
     expect_true(idf$is_valid_name("wd01"))
     expect_error(idf$is_valid_name(NA_character_))
     expect_equal(idf$is_valid_name(c("wd01", "WALL-1")), c(TRUE, TRUE))
+
+    # can check inside a specific class
+    expect_false(idf$is_valid_name("WD01", "Version"))
+    expect_true(idf$is_valid_name("WD01", "Material"))
 })
 # }}}
 
