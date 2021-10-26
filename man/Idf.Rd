@@ -1473,13 +1473,17 @@ idf$object_num(c("Zone", "Schedule:Compact"))
 \subsection{Method \code{is_valid_id()}}{
 Check if elements in input integer vector are valid object IDs.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$is_valid_id(id)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idf$is_valid_id(id, class = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{An integer vector to check.}
+
+\item{\code{class}}{A single string indicates the class where the objects to
+check against. If \code{NULL}, all classes in current \code{Idf} are
+used. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1510,13 +1514,17 @@ idf$is_valid_id(c(51, 1000))
 \subsection{Method \code{is_valid_name()}}{
 Check if elements in input character vector are valid object names.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$is_valid_name(name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idf$is_valid_name(name, class = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{name}}{A character vector to check.}
+
+\item{\code{class}}{A single string indicates the class where the objects to
+check against. If \code{NULL}, all classes in current \code{Idf} are
+used. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
