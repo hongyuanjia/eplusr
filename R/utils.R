@@ -106,7 +106,7 @@ lpad <- function(x, char = " ", width = NULL) {
 # }}}
 
 # read_lines {{{
-read_lines <- function(input, trim = TRUE, encoding = "UTF-8", ...) {
+read_lines <- function(input, trim = TRUE, encoding = "unknown", ...) {
     dt <- tryCatch(
         fread(input = input, sep = NULL, header = FALSE, col.names = "string",
             encoding = encoding, strip.white = FALSE, ...),
