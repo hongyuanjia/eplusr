@@ -19,7 +19,7 @@ copy_example <- function (ver = 8.8) {
 }
 
 copy_eplus_example <- function(ver, file, dir = tempdir()) {
-    path <- path_eplus_example(ver, file, .strict = TRUE)
+    path <- path_eplus_example(ver, file, strict = TRUE)
     dest <- normalizePath(file.path(dir, basename(path)), mustWork = FALSE)
 
     flag <- file.copy(path, dest, overwrite = TRUE, copy.mode = TRUE, copy.date = TRUE)
