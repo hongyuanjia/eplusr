@@ -1579,6 +1579,13 @@ run_energyplus <- function(
         cmd$epw <- file_rename(cmd$epw, path_sim(cmd$epw))
     }
 
+    # make sure the resources are copied to both the temporary and output
+    # directory, which is essential for obFMU to work
+    if (!is.null(resources)) {
+        file_copy(resources, path_sim(resources))
+        file_copy(resources, path_out(resources))
+    }
+
     # 1. run EPMacro
     run$EPMacro <- list()
     file$imf <- NA_character_
@@ -1734,13 +1741,6 @@ run_energyplus <- function(
     # TODO: Revisit this after refactor IDF parsing. If the time spent on
     # parsing the IDF file is neglectable, copy all external files into the
     # temporary simulation directory maybe an option.
-    #
-    # make sure the resources are copied to both the temporary and output
-    # directory, which is essential for obFMU to work
-    if (!is.null(resources)) {
-        file_copy(resources, path_sim(resources))
-        file_copy(resources, path_out(resources))
-    }
     res_eplus <- EnergyPlus(cmd$idf, cmd$weather, cmd$sim_dir, cmd$output_prefix,
         output_suffix, wait = TRUE, echo = echo, annual = annual,
         design_day = design_day, idd = idd, eplus = eplus_ver)
