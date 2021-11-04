@@ -2060,7 +2060,7 @@ handle_sim_events <- function(state) {
             # somehow get_exit_status() function may return NA after execution
             # of a (successful) command
             # ref: https://github.com/r-lib/processx/issues/220
-            exit_status <- viapply(process, function (x) x$get_exit_status())
+            exit_status <- viapply(res, "[[", "exit_status")
             exit_status[is.na(exit_status)] <- 0L
 
             if (state$options$echo) {
@@ -2151,7 +2151,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
         output_dir <- normalizePath(dirname(model))
     } else {
         assert_same_len(model, output_dir)
-        output_dir <- normalizePath(output_dir, mustWork = TRUE)
+        output_dir <- normalizePath(output_dir, mustWork = FALSE)
     }
     set(jobs, NULL, "output_dir", output_dir)
     if (anyDuplicated(jobs)) {
@@ -2174,6 +2174,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
     ddy <- is.na(weather)
     weather <- as.list(weather)
     weather[ddy] <- list(NULL)
+    if (length(weather) == 1L) weather <- list()
     set(jobs, NULL, "weather", weather)
 
     # validate eplus
@@ -2183,7 +2184,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 
         is_miss <- viapply(jobs$ver, length) == 0L
         if (any(is_miss)) {
-            msg <- paste0("  #", lpad(seq_along(unique(model[is_miss]))), "| ", surround(unique(model[ver_miss])), collapse = "\n")
+            msg <- paste0("  #", lpad(seq_along(unique(model[is_miss]))), "| ", surround(unique(model[is_miss])), collapse = "\n")
             abort(paste0("Missing version field in input IDF file. Failed to determine the ",
                 "version of EnergyPlus to use:\n", msg), "miss_idf_ver")
         }
@@ -2380,8 +2381,8 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
         } else {
             out$epw <- normalizePath(file.path(res$output_dir, res$file$epw))
         }
-        out$version <- res$ver
-        out$exit_status <- res$run[program == "EnergyPlus", exit_status[[1L]]]
+        out$version <- res$version
+        out$exit_status <- res$exit_status
         out$start_time <- res$start_time
         out$end_time <- res$end_time
         out$output_dir <- res$output_dir
