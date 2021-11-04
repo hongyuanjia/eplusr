@@ -34,11 +34,6 @@ current <- function() {
 #' * `path_eplus_dataset()` returns the file path specified under the
 #'   `DataSets` folder in EnergyPlus installation directory.
 #'
-#' @note
-#'
-#' These functions are not vectorized, which means that only a single file path
-#' can be specified at a time.
-#'
 #' @param ver An acceptable EnergyPlus version or an EnergyPlus installation
 #'        directory
 #' @param ... File paths passed to [base::file.path()].
@@ -64,14 +59,18 @@ current <- function() {
 #' @export
 #' @author Hongyuan Jia
 path_eplus <- function(ver, ..., strict = FALSE) {
-    inputs <- c(...)
+    inputs <- list(...)
     dir <- suppressMessages(use_eplus(ver))$dir
 
-    path <- normalizePath(do.call(file.path, as.list(c(dir, inputs))), mustWork = FALSE)
-    if (strict && !file.exists(path)) {
+    path <- normalizePath(do.call(file.path, c(dir, inputs)), mustWork = FALSE)
+    if (strict && any(miss <- !file.exists(path))) {
         abort(sprintf(
-            "Failed to find file '%s' under EnergyPlus installation directory ('%s').",
-            substring(gsub(dir, "", path, fixed = TRUE), 2L), dir
+            "Failed to find file(s) under EnergyPlus installation directory ('%s'):\n%s",
+            dir,
+            paste0(collapse = "\n", sprintf(" #%s| '%s'",
+                lpad(which(miss), "0"),
+                substring(gsub(dir, "", path, fixed = TRUE), 2L)
+            ))
         ))
     }
     path
@@ -80,10 +79,10 @@ path_eplus <- function(ver, ..., strict = FALSE) {
 #' @export
 #' @rdname path_eplus
 path_eplus_processor <- function(ver, ..., strict = FALSE) {
-    inputs <- c(...)
+    inputs <- list(...)
     exe <- if (is_windows()) ".exe" else ""
-    inputs[length(inputs)] <- sprintf("%s%s", inputs[length(inputs)], exe)
-    path_eplus(ver, inputs, strict = strict)
+    inputs[[length(inputs)]] <- sprintf("%s%s", inputs[[length(inputs)]], exe)
+    do.call(path_eplus, c(ver = ver, inputs, strict = strict))
 }
 
 #' @export

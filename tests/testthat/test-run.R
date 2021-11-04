@@ -170,10 +170,10 @@ test_that("run_multi()", {
 
 test_that("path_eplus()", {
     expect_equal(basename(path_eplus(8.8, "a", "b")), "b")
-    expect_error(basename(path_eplus(8.8, "a", "b", .strict = TRUE)))
+    expect_error(basename(path_eplus(8.8, "a", "b", strict = TRUE)))
 
-    expect_true(is.character(path_eplus_processor(8.8, "EPMacro", .strict = TRUE)))
-    expect_true(is.character(path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", .strict = TRUE)))
+    expect_true(is.character(path_eplus_processor(8.8, "EPMacro", strict = TRUE)))
+    expect_true(is.character(path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)))
 
     expect_true(is.character(path_eplus_example(8.8, "1ZoneUncontrolled.idf")))
     expect_true(is.character(path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")))
