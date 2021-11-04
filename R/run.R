@@ -637,7 +637,9 @@ pre_eplus_command <- function(exectuable,
     if (is.null(exectuable)) {
         exectuable <- energyplus_exe
     } else {
-        exectuable <- path_eplus_processor(dirname(energyplus_exe), exectuable, strict = TRUE)
+        exectuable <- do.call(path_eplus_processor,
+            c(ver = dirname(energyplus_exe), as.list(exectuable), strict = TRUE)
+        )
     }
 
     idf <- NULL
