@@ -378,19 +378,20 @@ get_run_time <- function (stdout) {
 
 create_energyplus_ini <- function(eplus, output_dir) {
     dir <- normalizePath(dirname(eplus))
+    sep <- if (is_windows()) "\\" else "/"
     if (is_windows()) {
-        dir <- paste0(utils::shortPathName(dir), "\\")
+        dir <- paste0(utils::shortPathName(dir), sep)
     } else {
-        dir <- paste0(dir, "/")
+        dir <- paste0(dir, sep)
     }
 
     ini <- c(
         "[program]",
         sprintf("dir=%s", dir),
         "[BasementGHT]",
-        "dir=PreProcess\\GrndTempCalc",
+        sprintf("dir=PreProcess%sGrndTempCalc%s", sep, sep),
         "[SlabGHT]",
-        "dir=PreProcess\\GrndTempCalc"
+        sprintf("dir=PreProcess%sGrndTempCalc", sep, sep)
     )
 
     out <- normalizePath(file.path(output_dir, "Energy+.ini"), mustWork = FALSE)
