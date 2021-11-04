@@ -446,13 +446,13 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             out <- suppressWarnings(read_lines(std_out)$string)
             err <- suppressWarnings(read_lines(std_err)$string)
 
-            if (!length(out)) out <- NULL
-            if (!length(err)) err <- NULL
-            unlink(c(std_out, std_err))
-
             # remove "\r"
             out <- gsub("\r", "", out, fixed = TRUE)
             err <- gsub("\r", "", err, fixed = TRUE)
+
+            if (!length(out)) out <- NULL
+            if (!length(err)) err <- NULL
+            unlink(c(std_out, std_err))
 
             res <- list(stdout = out, stderr = err, end_time = current())
 
@@ -513,14 +513,14 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
         stderr <- c()
         get_output <- function(echo = TRUE) {
             newout <- proc$read_output_lines(2000)
-            if (echo) cli::cat_line(newout)
             if (length(newout) && all(nzchar(newout))) {
+                if (echo) cli::cat_line(gsub("\r", "", newout, fixed = TRUE))
                 stdout <<- c(stdout, newout)
             }
 
             newerr <- proc$read_error(2000)
-            if (echo) cli::cat_line(newerr, col = "red")
             if (length(newerr) && all(nzchar(newerr))) {
+                if (echo) cli::cat_line(gsub("\r", "", newerr, fixed = TRUE), col = "red")
                 stderr <<- c(stderr, newerr)
             }
         }
