@@ -515,13 +515,15 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
         get_output <- function(echo = TRUE) {
             newout <- proc$read_output_lines(2000)
             if (length(newout) && all(nzchar(newout))) {
-                if (echo) cli::cat_line(gsub("\r", "", newout, fixed = TRUE))
+                newout <- gsub("\r", "", newout, fixed = TRUE)
+                if (echo) cli::cat_line(newout)
                 stdout <<- c(stdout, newout)
             }
 
             newerr <- proc$read_error(2000)
             if (length(newerr) && all(nzchar(newerr))) {
-                if (echo) cli::cat_line(gsub("\r", "", newerr, fixed = TRUE), col = "red")
+                newerr <- gsub("\r", "", newerr, fixed = TRUE)
+                if (echo) cli::cat_line(newerr, col = "red")
                 stderr <<- c(stderr, newerr)
             }
         }
