@@ -2375,11 +2375,11 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
 
     post_fun <- function(res) {
         out <- list()
-        out$idf <- normalizePath(file.path(res$output_dir, res$file$idf))
+        out$idf <- normalizePath(model, mustWork = FALSE)
         if (is.na(res$file$epw)) {
             out["epw"] <- list(NULL)
         } else {
-            out$epw <- normalizePath(file.path(res$output_dir, res$file$epw))
+            out$epw <- normalizePath(weather, mustWork = FALSE)
         }
         out$version <- res$version
         out$exit_status <- res$exit_status
@@ -2430,24 +2430,24 @@ run_multi <- function(model, weather, output_dir, design_day = FALSE,
     post_callback <- function(state) {
         jobs <- setDT(state$jobs)
 
-        # remove input info
-        set(jobs, NULL, c("model", "weather"), NULL)
+        set(jobs, NULL, "idf", normalizePath(jobs$model, mustWork = FALSE))
+        set(jobs, NULL, "model", NULL)
 
-        file_path <- function(...) normalizePath(file.path(...), mustWork = FALSE)
-        set(jobs, NULL, "idf",
-            vcapply(jobs$result, function(res) file_path(res$output_dir, res$file$idf))
-        )
         set(jobs, NULL, "epw",
-            vcapply(jobs$result, function(res) {
+            apply2_chr(jobs$result, jobs$weather, function(res, weather) {
                 if (is.na(res$file$epw)) {
                     NA_character_
                 } else {
-                    file_path(res$output_dir, res$file$epw)
+                    normalizePath(weather, mustWork = FALSE)
                 }
             })
         )
+        set(jobs, NULL, "weather", NULL)
+
         set(jobs, NULL, "version", vcapply(jobs$energyplus_exe, function(ep) as.character(get_ver_from_eplus_path(dirname(ep)))))
+
         set(jobs, NULL, "output_dir", vcapply(jobs$result, function(res) res$output_dir))
+
         setnames(jobs, "energyplus_exe", "energyplus")
 
         cols <- c("index", "status", "idf", "epw", "version", "exit_status",
