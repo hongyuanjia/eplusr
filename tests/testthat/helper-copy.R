@@ -24,8 +24,8 @@ copy_eplus_example <- function(ver, file, dir = tempdir()) {
 
     flag <- file.copy(path, dest, overwrite = TRUE, copy.mode = TRUE, copy.date = TRUE)
 
-    if (!flag) {
-        stop(sprintf("Failed to copy file from '%s' to '%s'.", path, dest))
+    if (any(!flag)) {
+        stop(sprintf("Failed to copy file from '%s' to '%s'.", path[!flag], dest[!flag]))
     }
 
     dest

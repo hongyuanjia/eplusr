@@ -1507,10 +1507,9 @@ run_energyplus <- function(
 
     start_time <- current()
 
-    # validate inputs and do some preparations and create "in.idf" and
-    # "in.epw" in the same directory as input model
+    # validate inputs and copy input files into the output directory
     cmd <- pre_eplus_command(NULL, model, weather, output_dir, output_prefix,
-        echo = echo, eplus = eplus)
+        echo = echo, eplus = eplus, legacy = FALSE)
 
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
@@ -1566,22 +1565,14 @@ run_energyplus <- function(
     }
 
     # clean output directory
-    exclude <- NULL
-    if (normalizePath(dirname(cmd$model)) == cmd$output_dir) {
-        # If output directory is the same as the model, keep the created
-        # "in.idf/imf" and "in.epw" file
-        exclude <- c(sprintf("in.%s", tools::file_ext(cmd$model)), "in.epw")
-    }
-    .clean_wd(path_out("in.imf"), "L", exclude)
-    .clean_wd(path_out(basename(cmd$model)), output_suffix, exclude)
+    .clean_wd(path_out(cmd$model), output_suffix)
 
-    # move "in.idf/imf" to the simulation directory
-    cmd$idf <- file_rename(cmd$idf, path_sim(cmd$idf))
-    # move "in.epw" to the simulation directory
+    # create "in.i[dm]f" file to the simulation directory
+    cmd$idf <- file_copy(cmd$model, path_sim(sprintf("in.%s", file_ext(cmd$model))))
     file$epw <- NA_character_
-    if (!is.null(cmd$epw)) {
-        file$epw <- path_out(basename(cmd$weather))
-        cmd$epw <- file_rename(cmd$epw, path_sim(cmd$epw))
+    if (!is.null(cmd$weather)) {
+        file$epw <- path_out(cmd$weather)
+        cmd$epw <- file_copy(cmd$weather, path_sim(sprintf("in.%s", file_ext(cmd$weather))))
     }
 
     # make sure the resources are copied to both the temporary and output
@@ -1597,8 +1588,10 @@ run_energyplus <- function(
     file$epmidf <- NA_character_
     file$epmdet <- NA_character_
     if (!epmacro && has_ext(cmd$idf, "imf")) epmacro <- TRUE
-    if (epmacro && has_ext(cmd$idf, "imf")) {
-        file$imf <- path_out(basename(cmd$model))
+    if (!(epmacro && has_ext(cmd$idf, "imf"))) {
+        file$idf <- path_out(cmd$model)
+    } else {
+        file$imf <- path_out(cmd$model)
 
         res_epmacro <- EPMacro(cmd$idf, cmd$sim_dir, cmd$output_prefix,
             wait = TRUE, echo = echo, eplus = eplus_ver)
@@ -1629,9 +1622,6 @@ run_energyplus <- function(
             # directory
             file$epmdet <- file_temp(res_epmacro$file$epmdet)
         }
-    } else {
-        file$idf <- path_out(basename(cmd$model))
-        cmd$idf <- file_copy(cmd$model, path_sim("in.idf"))
     }
 
     # 2. run ExpandObjects
@@ -1746,7 +1736,7 @@ run_energyplus <- function(
     # TODO: Revisit this after refactor IDF parsing. If the time spent on
     # parsing the IDF file is neglectable, copy all external files into the
     # temporary simulation directory maybe an option.
-    res_eplus <- EnergyPlus(cmd$idf, cmd$weather, cmd$sim_dir, cmd$output_prefix,
+    res_eplus <- EnergyPlus(cmd$idf, cmd$epw, cmd$sim_dir, cmd$output_prefix,
         output_suffix, wait = TRUE, echo = echo, annual = annual,
         design_day = design_day, idd = idd, eplus = eplus_ver)
     # now it's safe to move all output files to the output directory
@@ -1922,7 +1912,7 @@ run_energyplus <- function(
     file <- modifyList(res_eplus$file, file)
     file <- file[order(names(file))]
     file$idf <- NA_character_
-    if (is.na(file$imf)) file$idf <- path_out(basename(cmd$model))
+    if (is.na(file$imf)) file$idf <- path_out(cmd$model)
     file <- lapply(file, function(f) if (all(is.na(f))) f else basename(f))
 
     run <- data.table(
@@ -2219,12 +2209,14 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'        `run_multi()`) of EnergyPlus IDF or IMF files.
 #'
 #' @param weather A path (for `run_idf()`) or a vector of paths (for
-#'        `run_multi()`) of EnergyPlus EPW weather files. For `run_multi()`,
-#'        `weather` can also be a single EPW file path. In this case, that
-#'        weather will be used for all simulations; otherwise, `model` and
-#'        `weather` should have the same length. If set to `NULL`,
-#'        design-day-only simulation will be triggered, regardless of the
-#'        `design-day` value.
+#'        `run_multi()`) of EnergyPlus EPW weather files.
+#'        If set to `NULL`, design-day-only simulation will be triggered,
+#'        regardless of the `design-day` value.
+#'        For `run_multi()`, `weather` can also be a single EPW file path. In
+#'        this case, that weather will be used for all simulations; otherwise,
+#'        `model` and `weather` should have the same length. You can set to
+#'        design-day-only simulation to some specific simulations by setting the
+#'        corresponding weather to `NA`.
 #'
 #' @param output_dir Output directory path (for `rum_idf()`) or paths (for
 #'        `run_mult()`). If NULL, the directory of input model is used. For

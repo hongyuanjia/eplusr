@@ -579,7 +579,7 @@ use_eplus <- function (eplus) {
             abort(paste0(msg, fail, "\nPlease specify explicitly the path of EnergyPlus installation."), "locate_eplus")
         }
     } else if (is_eplus_path(eplus)){
-        ver <- get_ver_from_path(eplus)
+        ver <- get_ver_from_eplus_path(eplus)
         eplus_dir <- eplus
     } else {
         abort("`eplus` should be either a valid EnergyPlus version or an EnergyPlus installation path.")
@@ -693,8 +693,8 @@ eplus_default_path <- function (ver, local = FALSE) {
     d
 }
 # }}}
-# get_ver_from_path {{{
-get_ver_from_path <- function (path) {
+# get_ver_from_eplus_path {{{
+get_ver_from_eplus_path <- function (path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
     tryCatch(get_idd_ver(read_lines(idd_file, nrows = 1L)),
