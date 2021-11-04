@@ -391,7 +391,7 @@ create_energyplus_ini <- function(eplus, output_dir) {
         "[BasementGHT]",
         sprintf("dir=PreProcess%sGrndTempCalc%s", sep, sep),
         "[SlabGHT]",
-        sprintf("dir=PreProcess%sGrndTempCalc", sep, sep)
+        sprintf("dir=PreProcess%sGrndTempCalc%s", sep, sep)
     )
 
     out <- normalizePath(file.path(output_dir, "Energy+.ini"), mustWork = FALSE)
