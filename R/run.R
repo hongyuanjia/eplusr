@@ -1905,8 +1905,9 @@ run_energyplus <- function(
     if (!is.na(res_eplus$file$bnd)) {
         res_eplus$file$bnd <- file_rename(res_eplus$file$bnd, path_sim("eplusout.bnd"))
 
+        # do not echo
         res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$output_dir, cmd$output_prefix,
-            wait = TRUE, echo = echo, eplus = eplus_ver)
+            wait = TRUE, echo = FALSE, eplus = eplus_ver)
         run$HVAC_Diagram <- res_diagram$run
 
         # Since bnd is the legacy name "eplusout.bnd", HVAC_Diagram() will
