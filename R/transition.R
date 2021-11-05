@@ -3543,6 +3543,132 @@ trans_funs$f930t940 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_940_950 {{{
+#' @importFrom checkmate assert_true
+trans_funs$f940t540 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.4)
+
+    target_cls <- c(
+        "Construction:AirBoundary",                    # 1
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit", # 2
+        "Coil:Heating:WaterToAirHeatPump:EquationFit", # 3
+        "Construction:InternalSource",                 # 4
+        "HeatPump:WaterToWater:EquationFit:Cooling",   # 5
+        "HeatPump:WaterToWater:EquationFit:Heating",   # 6
+        "ZoneAirMassFlowConservation",                 # 7
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow", # 8
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", # 9
+        "ZoneHVAC:Baseboard:RadiantConvective:Water",  # 10
+        "ZoneHVAC:Baseboard:RadiantConvective:System"  # 11
+    )
+
+    new_idf <- trans_preprocess(idf, 9.5, target_cls)
+
+    # 1: Construction:AirBoundary {{{
+    dt1 <- trans_action(idf, "Construction:AirBoundary")
+
+    # }}}
+    # 2: Coil:Cooling:WaterToAirHeatPump:EquationFit {{{
+    dt2 <- trans_action(idf,
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+    )
+    # }}}
+    # 3: Coil:Heating:WaterToAirHeatPump:EquationFit {{{
+    dt3 <- trans_action(idf, "Coil:Heating:WaterToAirHeatPump:EquationFit")
+    if (nrow(dt3)) {
+        # convert 1 & 0 to Yes and No and warning if non-numeric values found
+        set(dt3, NULL, "value_num", suppressWarnings(as.numeric(dt3$value)))
+        set(dt3, NULL, "value", "No")
+
+        dt3[is.na(value_num), by = c("id", "index"), c("value", "value_num") := {
+            warn(sprintf(paste0(
+                "Field '%s' for object [id:%s] in class 'Output:DebuggingData' ",
+                "is not a number, defaulting to 'No'."),
+                field[1L], .BY$id
+            ))
+            list("No", 0.0)
+        }]
+
+        dt3[as.integer(value_num) == 1L, value := "Yes"]
+        set(dt3, NULL, "value_num", NULL)
+    }
+    # }}}
+    # 4: Construction:InternalSource {{{
+    dt4 <- trans_action(idf, "Construction:InternalSource")
+    if (nrow(dt4)) {
+        if (length(unique(dt4$id)) > 1L) {
+            # consolidate all into one
+            warn(paste0(
+                "'Output:Diagnostics' has become an unique-object class in EnergyPlus v9.4. ",
+                "All other objects except the first one found will be listed as comments and ",
+                "their keys will be all consolidated into the first one."
+            ))
+            id_cmt <- unique(dt4$id)[-1L]
+            id_left <- dt4$id[1L]
+            cmt <- idf$to_string(id_cmt, header = FALSE, format = "new_bot")
+            idf$object(id_left)$comment(cmt)
+
+            dt4 <- unique(dt4, by = "value")
+            set(dt4, NULL, "id", id_left)
+            set(dt4, NULL, "index", seq_len(nrow(dt4)))
+        }
+    }
+    # }}}
+    # 5: HeatPump:WaterToWater:EquationFit:Cooling {{{
+    dt5 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Cooling", reset = list(3L, "Mode05", "Mode06"))
+    # }}}
+    # 6: HeatPump:WaterToWater:EquationFit:Heating {{{
+    dt6 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Heating",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "HalfFlowPower")
+    )
+    # }}}
+    # 7: ZoneAirMassFlowConservation {{{
+    dt7 <- trans_action(idf, "ZoneAirMassFlowConservation",
+        insert = list(10L, "HalfFlowPower")
+    )
+    # }}}
+    # 8: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
+    dt8 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "0.8")
+    )
+    # }}}
+    # 9: ZoneHVAC:LowTemperatureRadiant:ConstantFlow {{{
+    dt9 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+        insert = list(15L, "Yes"),
+        insert = list(16L),
+        insert = list(17L),
+        delete = list(19L)
+    )
+    if (nrow(dt9)) dt9[, by = "id", index := seq_len(.N)]
+    # }}}
+    # 10: ZoneHVAC:Baseboard:RadiantConvective:Water {{{
+    dt10 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Water",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "0.8")
+    )
+    # }}}
+    # 11: ZoneHVAC:Baseboard:RadiantConvective:System {{{
+    dt11 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:System",
+        insert = list(5L, "ConvectionOnly"),
+        insert = list(7L, "0.016"),
+        insert = list(9L, "0.35"),
+        insert = list(11L, "0.8")
+    )
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:11))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
