@@ -9,6 +9,7 @@
 * `Idf$is_valid_id()` and `Idf$is_valid_name()` gain a new argument named
   `class` defaulting to `NULL` to check the validity of object IDs and names
   again a specific class.
+* Add support for EnergyPlus v9.5 (#438).
 
 ## Minor changes
 
