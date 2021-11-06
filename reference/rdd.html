@@ -241,234 +241,239 @@ simulation.</p></li>
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
-<span class='co'># run simulation and get the err file</span>
-<span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
-<span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
-<span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='va'>idf_name</span><span class='op'>)</span>
-<span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='va'>epw_name</span><span class='op'>)</span>
-<span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EplusJob.html'>eplus_job</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></div><div class='input'><span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; EnergyPlus Starting
-#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.10.26 17:35
-#&gt; Processing Data Dictionary
-#&gt; Processing Input File
-#&gt; Initializing Simulation
-#&gt; Reporting Surfaces
-#&gt; Beginning Primary Simulation
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Warming up {19}
-#&gt; Warming up {20}
-#&gt; Warming up {21}
-#&gt; Warming up {22}
-#&gt; Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB
-#&gt; Initializing New Environment Parameters
-#&gt; Warming up {1}
-#&gt; Warming up {2}
-#&gt; Warming up {3}
-#&gt; Warming up {4}
-#&gt; Warming up {5}
-#&gt; Warming up {6}
-#&gt; Warming up {7}
-#&gt; Warming up {8}
-#&gt; Warming up {9}
-#&gt; Warming up {10}
-#&gt; Warming up {11}
-#&gt; Warming up {12}
-#&gt; Warming up {13}
-#&gt; Warming up {14}
-#&gt; Warming up {15}
-#&gt; Warming up {16}
-#&gt; Warming up {17}
-#&gt; Warming up {18}
-#&gt; Starting Simulation at 01/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=01/21
-#&gt; Continuing Simulation at 01/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=02/10
-#&gt; Continuing Simulation at 02/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=03/02
-#&gt; Continuing Simulation at 03/02 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=03/22
-#&gt; Continuing Simulation at 03/22 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=04/11
-#&gt; Continuing Simulation at 04/11 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=05/01
-#&gt; Continuing Simulation at 05/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=05/21
-#&gt; Continuing Simulation at 05/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=06/10
-#&gt; Continuing Simulation at 06/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=06/30
-#&gt; Continuing Simulation at 06/30 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=07/20
-#&gt; Continuing Simulation at 07/20 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=08/09
-#&gt; Continuing Simulation at 08/09 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=08/29
-#&gt; Continuing Simulation at 08/29 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=09/18
-#&gt; Continuing Simulation at 09/18 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=10/08
-#&gt; Continuing Simulation at 10/08 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=10/28
-#&gt; Continuing Simulation at 10/28 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=11/17
-#&gt; Continuing Simulation at 11/17 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=12/07
-#&gt; Continuing Simulation at 12/07 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Updating Shadowing Calculations, Start Date=12/27
-#&gt; Continuing Simulation at 12/27 for San Francisco Intl Ap CA USA TMY3 WMO#=724940
-#&gt; Writing tabular output file results using comma format.
-#&gt; Writing tabular output file results using tab format.
-#&gt; Writing tabular output file results using text format.
-#&gt; Writing tabular output file results using HTML format.
-#&gt; Writing tabular output file results using XML format.
-#&gt; Writing final SQL reports
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.28sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt;  ReadVarsESO program starting.
-#&gt;  ReadVars Run Time=00hr 00min  0.12sec
-#&gt;  ReadVarsESO program completed successfully.
-#&gt; EnergyPlus Run Time=00hr 00min  3.03sec
-#&gt; 
-#&gt; </div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span> <span style='color: #00BB00;'>EnergPlus Simulation Job</span> <span style='color: #00BB00;'>────────────────────────────────────────────────────</span>
-#&gt; * Model: '/tmp/RtmpnJDxc4/1ZoneUncontrolled.idf'
-#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...
-#&gt; * EnergyPlus Version: '8.8.0'
-#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'
-#&gt; <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-10-26 17:35:16' and completed successfully after 3.08 secs.</span></div><div class='input'>
-<span class='co'># read the err file</span>
-<span class='fu'>read_rdd</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".rdd"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Report Data Dictionary File ══════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2021-10-26 17:35:00
-#&gt; 
-#&gt; ── Details ─────────────────────────────────────────────────────────────────────
-#&gt;      index reported_time_step report_type
-#&gt;   1:     1               Zone     Average
-#&gt;   2:     2               Zone     Average
-#&gt;   3:     3               Zone     Average
-#&gt;   4:     4               Zone     Average
-#&gt;   5:     5               Zone     Average
-#&gt;  ---                                     
-#&gt; 244:   244               Zone         Sum
-#&gt; 245:   245               Zone     Average
-#&gt; 246:   246               HVAC         Sum
-#&gt; 247:   247               HVAC         Sum
-#&gt; 248:   248               HVAC         Sum
-#&gt;                                                             variable
-#&gt;   1:                            Site Outdoor Air Drybulb Temperature
-#&gt;   2:                           Site Outdoor Air Dewpoint Temperature
-#&gt;   3:                            Site Outdoor Air Wetbulb Temperature
-#&gt;   4:                                 Site Outdoor Air Humidity Ratio
-#&gt;   5:                              Site Outdoor Air Relative Humidity
-#&gt;  ---                                                                
-#&gt; 244:           Facility Cooling Setpoint Not Met While Occupied Time
-#&gt; 245:                                                  Schedule Value
-#&gt; 246: Environmental Impact Total N2O Emissions Carbon Equivalent Mass
-#&gt; 247: Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
-#&gt; 248: Environmental Impact Total CO2 Emissions Carbon Equivalent Mass
-#&gt;                 units
-#&gt;   1:                C
-#&gt;   2:                C
-#&gt;   3:                C
-#&gt;   4: kgWater/kgDryAir
-#&gt;   5:                %
-#&gt;  ---                 
-#&gt; 244:               hr
-#&gt; 245:             &lt;NA&gt;
-#&gt; 246:               kg
-#&gt; 247:               kg
-#&gt; 248:               kg</div><div class='input'><span class='fu'>read_mdd</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".mdd"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ══ EnergyPlus Meter Data Dictionary File ═══════════════════════════════════════
-#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#&gt;   * Simulation started: 2021-10-26 17:35:00
-#&gt; 
-#&gt; ── Details ─────────────────────────────────────────────────────────────────────
-#&gt;     index reported_time_step report_type
-#&gt;  1:     1               Zone       Meter
-#&gt;  2:     2               Zone       Meter
-#&gt;  3:     3               Zone       Meter
-#&gt;  4:     4               Zone       Meter
-#&gt;  5:     5               Zone       Meter
-#&gt;  6:     6               Zone       Meter
-#&gt;  7:     7               Zone       Meter
-#&gt;  8:     8               Zone       Meter
-#&gt;  9:     9               Zone       Meter
-#&gt; 10:    10               Zone       Meter
-#&gt; 11:    11               Zone       Meter
-#&gt; 12:    12               Zone       Meter
-#&gt; 13:    13               Zone       Meter
-#&gt; 14:    14               Zone       Meter
-#&gt; 15:    15               Zone       Meter
-#&gt; 16:    16               Zone       Meter
-#&gt; 17:    17               Zone       Meter
-#&gt; 18:    18               Zone       Meter
-#&gt; 19:    19               Zone       Meter
-#&gt; 20:    20               Zone       Meter
-#&gt; 21:    21               Zone       Meter
-#&gt;     index reported_time_step report_type
-#&gt;                                        variable units
-#&gt;  1:                        Electricity:Facility     J
-#&gt;  2:                  ExteriorLights:Electricity     J
-#&gt;  3:   Grounds Lights:ExteriorLights:Electricity     J
-#&gt;  4:                     EnergyTransfer:Facility     J
-#&gt;  5:                     EnergyTransfer:Building     J
-#&gt;  6:                EnergyTransfer:Zone:ZONE ONE     J
-#&gt;  7:                      Heating:EnergyTransfer     J
-#&gt;  8:        Heating:EnergyTransfer:Zone:ZONE ONE     J
-#&gt;  9:                      Cooling:EnergyTransfer     J
-#&gt; 10:        Cooling:EnergyTransfer:Zone:ZONE ONE     J
-#&gt; 11:               ElectricityPurchased:Facility     J
-#&gt; 12:                  ElectricityPurchased:Plant     J
-#&gt; 13:           Cogeneration:ElectricityPurchased     J
-#&gt; 14:             ElectricitySurplusSold:Facility     J
-#&gt; 15:                ElectricitySurplusSold:Plant     J
-#&gt; 16:         Cogeneration:ElectricitySurplusSold     J
-#&gt; 17:                     ElectricityNet:Facility     J
-#&gt; 18:                        ElectricityNet:Plant     J
-#&gt; 19:                 Cogeneration:ElectricityNet     J
-#&gt; 20:                  Carbon Equivalent:Facility    kg
-#&gt; 21: CarbonEquivalentEmissions:Carbon Equivalent    kg
-#&gt;                                        variable units</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># run simulation and get the err file</span></span>
+<span class='r-in'><span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span></span>
+<span class='r-in'><span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
+<span class='r-in'><span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='va'>idf_name</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='va'>epw_name</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EplusJob.html'>eplus_job</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
+<span class='r-in'><span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus Starting</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.06 17:08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Processing Data Dictionary</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Processing Input File</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Initializing Simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Reporting Surfaces</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Beginning Primary Simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Initializing New Environment Parameters</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {1}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {2}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {3}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {4}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {5}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {6}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {7}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {8}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {9}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {10}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {11}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {12}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {13}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {14}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {15}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {16}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {17}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {18}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {19}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {20}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {21}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {22}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Starting Simulation at 12/21 for DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Initializing New Environment Parameters</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {1}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {2}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {3}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {4}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {5}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {6}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {7}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {8}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {9}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {10}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {11}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {12}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {13}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {14}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {15}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {16}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Starting Simulation at 07/21 for DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Initializing New Environment Parameters</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {1}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {2}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {3}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {4}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {5}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {6}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {7}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {8}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {9}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {10}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {11}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {12}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {13}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {14}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {15}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {16}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {17}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Warming up {18}</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Starting Simulation at 01/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=01/21</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 01/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=02/10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 02/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=03/02</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 03/02 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=03/22</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 03/22 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=04/11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 04/11 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=05/01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 05/01 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=05/21</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 05/21 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=06/10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 06/10 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=06/30</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 06/30 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=07/20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 07/20 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=08/09</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 08/09 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=08/29</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 08/29 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=09/18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 09/18 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=10/08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 10/08 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=10/28</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 10/28 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=11/17</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 11/17 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=12/07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 12/07 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Updating Shadowing Calculations, Start Date=12/27</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Continuing Simulation at 12/27 for San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using comma format.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using tab format.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using text format.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using HTML format.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using XML format.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Writing final SQL reports</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program starting.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVars Run Time=00hr 00min  0.24sec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program completed successfully.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program starting.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVars Run Time=00hr 00min  0.11sec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program completed successfully.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus Run Time=00hr 00min  2.23sec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>──</span> <span style='color: #00BB00;'>EnergPlus Simulation Job</span> <span style='color: #00BB00;'>────────────────────────────────────────────────────</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> * Model: '/tmp/RtmpXqWGge/1ZoneUncontrolled.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> * EnergyPlus Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-11-06 17:08:23' and completed successfully after 2.27 secs.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># read the err file</span></span>
+<span class='r-in'><span class='fu'>read_rdd</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".rdd"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ══ EnergyPlus Report Data Dictionary File ══════════════════════════════════════</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Simulation started: 2021-11-06 17:08:00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── Details ─────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      index reported_time_step report_type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1:     1               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2:     2               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3:     3               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4:     4               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5:     5               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ---                                     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 244:   244               Zone         Sum</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 245:   245               Zone     Average</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 246:   246               HVAC         Sum</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 247:   247               HVAC         Sum</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 248:   248               HVAC         Sum</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                                                             variable</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1:                            Site Outdoor Air Drybulb Temperature</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2:                           Site Outdoor Air Dewpoint Temperature</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3:                            Site Outdoor Air Wetbulb Temperature</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4:                                 Site Outdoor Air Humidity Ratio</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5:                              Site Outdoor Air Relative Humidity</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ---                                                                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 244:           Facility Cooling Setpoint Not Met While Occupied Time</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 245:                                                  Schedule Value</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 246: Environmental Impact Total N2O Emissions Carbon Equivalent Mass</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 247: Environmental Impact Total CH4 Emissions Carbon Equivalent Mass</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 248: Environmental Impact Total CO2 Emissions Carbon Equivalent Mass</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                 units</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1:                C</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2:                C</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3:                C</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4: kgWater/kgDryAir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5:                %</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ---                 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 244:               hr</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 245:             &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 246:               kg</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 247:               kg</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 248:               kg</span>
+<span class='r-in'><span class='fu'>read_mdd</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".mdd"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ══ EnergyPlus Meter Data Dictionary File ═══════════════════════════════════════</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Simulation started: 2021-11-06 17:08:00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── Details ─────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     index reported_time_step report_type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  1:     1               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  2:     2               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  3:     3               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  4:     4               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  5:     5               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  6:     6               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  7:     7               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  8:     8               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  9:     9               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10:    10               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11:    11               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12:    12               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13:    13               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14:    14               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15:    15               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16:    16               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17:    17               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18:    18               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 19:    19               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 20:    20               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 21:    21               Zone       Meter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     index reported_time_step report_type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                                        variable units</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  1:                        Electricity:Facility     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  2:                  ExteriorLights:Electricity     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  3:   Grounds Lights:ExteriorLights:Electricity     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  4:                     EnergyTransfer:Facility     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  5:                     EnergyTransfer:Building     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  6:                EnergyTransfer:Zone:ZONE ONE     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  7:                      Heating:EnergyTransfer     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  8:        Heating:EnergyTransfer:Zone:ZONE ONE     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  9:                      Cooling:EnergyTransfer     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10:        Cooling:EnergyTransfer:Zone:ZONE ONE     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11:               ElectricityPurchased:Facility     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12:                  ElectricityPurchased:Plant     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13:           Cogeneration:ElectricityPurchased     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14:             ElectricitySurplusSold:Facility     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15:                ElectricitySurplusSold:Plant     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16:         Cogeneration:ElectricitySurplusSold     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17:                     ElectricityNet:Facility     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18:                        ElectricityNet:Plant     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 19:                 Cogeneration:ElectricityNet     J</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 20:                  Carbon Equivalent:Facility    kg</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 21: CarbonEquivalentEmissions:Carbon Equivalent    kg</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                                        variable units</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

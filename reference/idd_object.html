@@ -208,53 +208,55 @@ corresponding <a href='IddObject.html'>IddObject</a>. For details, see <a href='
     <p>An <a href='IddObject.html'>IddObject</a> object.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
-<span class='va'>idd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span>
-
-<span class='co'># get an IddObject using class name</span>
-<span class='fu'>idd_object</span><span class='op'>(</span><span class='va'>idd</span>, <span class='st'>"Material"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IddObject: 'Material'&gt;
-#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────
-#&gt;   "Regular materials described with full set of thermal properties"
-#&gt; 
-#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────
-#&gt;   * Group: 'Surface Construction Elements'
-#&gt;   * Unique: FALSE
-#&gt;   * Required: FALSE
-#&gt;   * Total fields: 9
-#&gt; 
-#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────
-#&gt;   1*: Name
-#&gt;   2*: Roughness
-#&gt;   3*: Thickness
-#&gt;   4*: Conductivity
-#&gt;   5*: Density
-#&gt;   6*: Specific Heat
-#&gt;   7 : Thermal Absorptance
-#&gt;   8 : Solar Absorptance
-#&gt;   9 : Visible Absorptance</div><div class='input'><span class='fu'>idd_object</span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"Material"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IddObject: 'Material'&gt;
-#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────
-#&gt;   "Regular materials described with full set of thermal properties"
-#&gt; 
-#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────
-#&gt;   * Group: 'Surface Construction Elements'
-#&gt;   * Unique: FALSE
-#&gt;   * Required: FALSE
-#&gt;   * Total fields: 9
-#&gt; 
-#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────
-#&gt;   1*: Name
-#&gt;   2*: Roughness
-#&gt;   3*: Thickness
-#&gt;   4*: Conductivity
-#&gt;   5*: Density
-#&gt;   6*: Specific Heat
-#&gt;   7 : Thermal Absorptance
-#&gt;   8 : Solar Absorptance
-#&gt;   9 : Visible Absorptance</div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>idd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get an IddObject using class name</span></span>
+<span class='r-in'><span class='fu'>idd_object</span><span class='op'>(</span><span class='va'>idd</span>, <span class='st'>"Material"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IddObject: 'Material'&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── MEMO ────────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   "Regular materials described with full set of thermal properties"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── PROPERTIES ──────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Group: 'Surface Construction Elements'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Unique: FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Required: FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Total fields: 9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── FIELDS ──────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1*: Name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2*: Roughness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3*: Thickness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4*: Conductivity</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5*: Density</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   6*: Specific Heat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   7 : Thermal Absorptance</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   8 : Solar Absorptance</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   9 : Visible Absorptance</span>
+<span class='r-in'><span class='fu'>idd_object</span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"Material"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IddObject: 'Material'&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── MEMO ────────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   "Regular materials described with full set of thermal properties"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── PROPERTIES ──────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Group: 'Surface Construction Elements'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Unique: FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Required: FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Total fields: 9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── FIELDS ──────────────────────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1*: Name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2*: Roughness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3*: Thickness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4*: Conductivity</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5*: Density</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   6*: Specific Heat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   7 : Thermal Absorptance</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   8 : Solar Absorptance</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   9 : Visible Absorptance</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

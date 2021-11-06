@@ -333,8 +333,8 @@ be used.</p></dd>
 <p><div class="arguments"></p><dl>
 <dt><code>...</code></dt><dd><p>Schedule day types and value specifications in lists.
 <ul>
-<li><p>Group day types inside <code><a href='https://rdrr.io/r/base/c.html'>c(...)</a></code> at the LHS of <code>:=</code></p></li>
-<li><p>Put actual schedule values inside <code><a href='https://rdrr.io/r/base/list.html'>list(...)</a></code> at the RHS of <code>:=</code></p></li>
+<li><p>Group day types inside <code>c(...)</code> at the LHS of <code>:=</code></p></li>
+<li><p>Put actual schedule values inside <code>list(...)</code> at the RHS of <code>:=</code></p></li>
 <li><p>Each schedule value should be named a time. Time can be given in
 either <code>..H</code> or <code>"HH:MM"</code>.</p></li>
 </ul></p></dd>
@@ -403,12 +403,12 @@ following formats:</p><ul>
 where <code>HH</code> is the hour in <code>0:24</code> and <code>MM</code> is the
 minute in <code>0:60</code></p></li>
 <li><p><code>integer</code>: Time differences from <code>00:00:00</code> in <strong>minutes</strong>, e.g.
-<code><a href='https://rdrr.io/r/base/seq.html'>seq(60, 60 * 24, by = 60)</a></code></p></li>
+<code>seq(60, 60 * 24, by = 60)</code></p></li>
 <li><p><code>hms</code>: <code>hms</code> objects constructed using <code><a href='https://hms.tidyverse.org/reference/hms.html'>hms::hms()</a></code> or
-equivalents, e.g.  <code><a href='https://hms.tidyverse.org/reference/hms.html'>hms::hms(minutes = 30, hours = 1)</a></code>, and
-<code><a href='https://hms.tidyverse.org/reference/hms.html'>hms::as_hms("1:30:00")</a></code></p></li>
+equivalents, e.g.  <code>hms::hms(minutes = 30, hours = 1)</code>, and
+<code>hms::as_hms("1:30:00")</code></p></li>
 <li><p><code>difftime</code>: <code>difftime</code> objects constructed using <code><a href='https://rdrr.io/r/base/difftime.html'>as.difftime()</a></code>
-or equivalents, e.g. <code><a href='https://rdrr.io/r/base/difftime.html'>as.difftime(1:24, units = "hours")</a></code></p></li>
+or equivalents, e.g. <code>as.difftime(1:24, units = "hours")</code></p></li>
 <li><p><code>ITime</code>: <code>ITime</code> objects constructed using
 <code><a href='https://Rdatatable.gitlab.io/data.table/reference/IDateTime.html'>data.table::as.ITime()</a></code>, e.g. <code>as.ITime("01:30:00")</code></p></li>
 </ul></li>
@@ -535,14 +535,14 @@ behavior.</p></li>
 <li><p><code>FALSE</code> or <code>"compact"</code>: Same schedule values from different day
 types will be compacted together.</p></li>
 <li><p>A character vector specifying the grouped day types, e.g.
-<code><a href='https://rdrr.io/r/base/c.html'>c("weekday", "summerdesignday")</a></code>. All other days except specified
+<code>c("weekday", "summerdesignday")</code>. All other days except specified
 ones will be classified into day type <code>AllOtherDays</code>, if possible.
 If not possible, those day types will still be extracted
 separately.</p></li>
 </ul></p></dd>
 
 <dt><code>timestep</code></dt><dd><p>The time step of schedule values, e.g. "10 mins" and
-"1 hour". Valid units include <code>sec(s)</code>, <code><a href='https://rdrr.io/r/base/Extremes.html'>min(s)</a></code>, and
+"1 hour". Valid units include <code>sec(s)</code>, <code>min(s)</code>, and
 <code>hour(s)</code>. If <code>NULL</code>, the original time specifications will be
 kept. If <code>"auto"</code>, the time periods with the same schedule
 values will be compacted. Default: <code>NULL</code>.</p></dd>
@@ -594,94 +594,107 @@ sch$extract(timestep = "30 mins")
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$new`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># create an empty 'Schedule:Compact'</span>
-<span class='fu'>schedule_compact</span><span class='op'>(</span><span class='va'>model</span>, <span class='st'>"sch"</span>, <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`
-#&gt; Class: &lt;Schedule:Compact&gt;
-#&gt; ├─ 1*: "sch",      !- Name
-#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name
-#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1
-#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2
-#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</div><div class='input'>
-<span class='co'># get an existing 'Schedule:Compact'</span>
-<span class='va'>sch</span> <span class='op'>&lt;-</span> <span class='fu'>schedule_compact</span><span class='op'>(</span><span class='va'>model</span>, <span class='st'>"sch"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error: Failed to locate 'Through:' fields for object ID [54] (name 'sch') in class 'Schedule:Compact'</span>
-#&gt; <span class='error'>  --&gt; 3: "NA", !- Field 1</span></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$set`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>set</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"weekday"</span>, <span class='st'>"summerdesignday"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
-    ..6 <span class='op'>=</span> <span class='fl'>0.2</span>, <span class='st'>"8:00"</span> <span class='op'>=</span> <span class='fl'>0.5</span>,
-    ..12 <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='st'>"13:30"</span> <span class='op'>=</span> <span class='fl'>0.6</span>, ..14 <span class='op'>=</span> <span class='fl'>0.8</span>,
-    ..18 <span class='op'>=</span> <span class='fl'>0.95</span>, ..19 <span class='op'>=</span> <span class='fl'>0.2</span>, ..24 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>,
-    allotherday <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>..24 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
-<span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$update`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>update</span><span class='op'>(</span><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'>
-<span class='va'>val1</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>
-    year_day <span class='op'>=</span> <span class='st'>"12/31"</span>,
-    daytype <span class='op'>=</span> <span class='st'>"weekday,summerdesignday"</span>,
-    time <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"6:00"</span>, <span class='st'>"8:00"</span>, <span class='st'>"12:00"</span>, <span class='st'>"13:30"</span>, <span class='st'>"14:00"</span>, <span class='st'>"18:00"</span>, <span class='st'>"19:00"</span>, <span class='st'>"24:00"</span><span class='op'>)</span>,
-    value <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>,    <span class='fl'>0.5</span>,    <span class='fl'>0.95</span>,    <span class='fl'>0.6</span>,     <span class='fl'>0.8</span>,     <span class='fl'>0.95</span>,    <span class='fl'>0.2</span>,     <span class='fl'>0.0</span><span class='op'>)</span>
-<span class='op'>)</span>
-<span class='va'>val2</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>
-    year_day <span class='op'>=</span> <span class='st'>"12/31"</span>, daytype <span class='op'>=</span> <span class='st'>"allotherday"</span>,
-    time <span class='op'>=</span> <span class='st'>"24:00"</span>, value <span class='op'>=</span> <span class='fl'>0.0</span>
-<span class='op'>)</span>
-<span class='va'>val</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html'>rbindlist</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>val1</span>, <span class='va'>val2</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>update</span><span class='op'>(</span><span class='va'>val</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$validate`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'>
-<span class='co'># check at predefined validate level</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"none"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$is_valid`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='co'># }</span>
-
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfScheduleCompact$extract`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='st'>"expand"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span>timestep <span class='op'>=</span> <span class='st'>"30 mins"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'sch' not found</span></div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$new`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create an empty 'Schedule:Compact'</span></span>
+<span class='r-in'><span class='fu'>schedule_compact</span><span class='op'>(</span><span class='va'>model</span>, <span class='st'>"sch"</span>, <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Schedule:Compact&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ 1*: "sch",      !- Name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get an existing 'Schedule:Compact'</span></span>
+<span class='r-in'><span class='va'>sch</span> <span class='op'>&lt;-</span> <span class='fu'>schedule_compact</span><span class='op'>(</span><span class='va'>model</span>, <span class='st'>"sch"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error:</span> Failed to locate 'Through:' fields for object ID [54] (name 'sch') in class 'Schedule:Compact'</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span>   --&gt; 3: "NA", !- Field 1</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$set`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>set</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"weekday"</span>, <span class='st'>"summerdesignday"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span></span>
+<span class='r-in'>    ..6 <span class='op'>=</span> <span class='fl'>0.2</span>, <span class='st'>"8:00"</span> <span class='op'>=</span> <span class='fl'>0.5</span>,</span>
+<span class='r-in'>    ..12 <span class='op'>=</span> <span class='fl'>0.95</span>, <span class='st'>"13:30"</span> <span class='op'>=</span> <span class='fl'>0.6</span>, ..14 <span class='op'>=</span> <span class='fl'>0.8</span>,</span>
+<span class='r-in'>    ..18 <span class='op'>=</span> <span class='fl'>0.95</span>, ..19 <span class='op'>=</span> <span class='fl'>0.2</span>, ..24 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>,</span>
+<span class='r-in'>    allotherday <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>..24 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$update`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>update</span><span class='op'>(</span><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>val1</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span></span>
+<span class='r-in'>    year_day <span class='op'>=</span> <span class='st'>"12/31"</span>,</span>
+<span class='r-in'>    daytype <span class='op'>=</span> <span class='st'>"weekday,summerdesignday"</span>,</span>
+<span class='r-in'>    time <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"6:00"</span>, <span class='st'>"8:00"</span>, <span class='st'>"12:00"</span>, <span class='st'>"13:30"</span>, <span class='st'>"14:00"</span>, <span class='st'>"18:00"</span>, <span class='st'>"19:00"</span>, <span class='st'>"24:00"</span><span class='op'>)</span>,</span>
+<span class='r-in'>    value <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>,    <span class='fl'>0.5</span>,    <span class='fl'>0.95</span>,    <span class='fl'>0.6</span>,     <span class='fl'>0.8</span>,     <span class='fl'>0.95</span>,    <span class='fl'>0.2</span>,     <span class='fl'>0.0</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>val2</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span></span>
+<span class='r-in'>    year_day <span class='op'>=</span> <span class='st'>"12/31"</span>, daytype <span class='op'>=</span> <span class='st'>"allotherday"</span>,</span>
+<span class='r-in'>    time <span class='op'>=</span> <span class='st'>"24:00"</span>, value <span class='op'>=</span> <span class='fl'>0.0</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>val</span> <span class='op'>&lt;-</span> <span class='fu'>data.table</span><span class='fu'>::</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html'>rbindlist</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>val1</span>, <span class='va'>val2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>update</span><span class='op'>(</span><span class='va'>val</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$validate`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># check at predefined validate level</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"none"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"draft"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>validate</span><span class='op'>(</span><span class='st'>"final"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$is_valid`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>is_valid</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfScheduleCompact$extract`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span><span class='st'>"expand"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='va'>sch</span><span class='op'>$</span><span class='fu'>extract</span><span class='op'>(</span>timestep <span class='op'>=</span> <span class='st'>"30 mins"</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Run simulation and data exploration</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-10-26</h4>
+            <h4 class="date">2021-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -164,7 +164,7 @@
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
 <span class="co">#&gt; EnergyPlus Starting</span>
-<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.10.26 17:36</span>
+<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.06 17:09</span>
 <span class="co">#&gt; Processing Data Dictionary</span>
 <span class="co">#&gt; Processing Input File</span>
 <span class="co">#&gt; Initializing Response Factors</span>
@@ -180,21 +180,21 @@
 
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpCCAhFW/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpCZEyjs/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-10-26 17:36:22' and completed successfully after 0.98 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-11-06 17:09:14' and completed successfully after 0.72 secs.</span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
 <p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpCCAhFW/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpCZEyjs/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-10-26 17:36:22' and completed successfully after 0.98 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-11-06 17:09:14' and completed successfully after 0.72 secs.</span></code></pre></div>
 </div>
 <div id="run-simulation-in-the-background" class="section level2">
 <h2 class="hasAnchor">
@@ -203,14 +203,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpCCAhFW/5Zone_Transformer.idf.</span>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpCZEyjs/5Zone_Transformer.idf.</span>
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpCCAhFW/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpCZEyjs/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-10-26 17:36:24' and is still running...</span>
+<span class="co">#&gt;  Simulation started at '2021-11-06 17:09:15' and is still running...</span>
 
 <span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -236,7 +236,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
 <span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class="co">#&gt;   * Simulation started: 2021-10-26 17:36:00</span>
+<span class="co">#&gt;   * Simulation started: 2021-11-06 17:09:00</span>
 <span class="co">#&gt;   * Terminated: FALSE</span>
 <span class="co">#&gt;   * Successful: TRUE</span>
 <span class="co">#&gt;   * Warning[W]: 1</span>
@@ -810,24 +810,24 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
 <span class="co"># calculate Energy Use Intensity (EUI) for electricity</span>
-<span class="va">eui</span> <span class="op">&lt;-</span> <span class="va">end_use</span> <span class="op">%&gt;%</span>
+<span class="va">eui</span> <span class="op">&lt;-</span> <span class="va">end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># only select columns of interest</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># get rid of category with empty energy consumption</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># order by value</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># calculate EUI</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># calculate proportion of each category</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>proportion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">eui</span> <span class="op">/</span> <span class="va">eui</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>proportion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">eui</span> <span class="op">/</span> <span class="va">eui</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># remove electricity column</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span>
 
 <span class="co"># plot a pie chart to show EUI breakdown</span>
-<span class="va">eui</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Total End Uses"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%s [%.2f%%]"</span>, <span class="va">category</span>, <span class="va">proportion</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Total End Uses"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%s [%.2f%%]"</span>, <span class="va">category</span>, <span class="va">proportion</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="st">""</span>, <span class="va">proportion</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
@@ -840,43 +840,43 @@ An example of tidy BES output data representation where Table (a) is the standar
 <a href="#get-heating-and-cooling-demand-profile" class="anchor"></a>Get heating and cooling demand profile</h3>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate air-conditioned floor area per storey</span>
-<span class="va">storey</span> <span class="op">&lt;-</span> <span class="va">zones</span> <span class="op">%&gt;%</span>
+<span class="va">storey</span> <span class="op">&lt;-</span> <span class="va">zones</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># exclude plenum zones</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">is_part_of_total_area</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">is_part_of_total_area</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># group by centroid height</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span>centroid_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">centroid_z</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span>centroid_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">centroid_z</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># calculate total floor area</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>floor_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">floor_area</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>floor_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">floor_area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># add storey index</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">centroid_height</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>storey <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, air_system <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"VAV"</span>, <span class="va">storey</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">centroid_height</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>storey <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, air_system <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"VAV"</span>, <span class="va">storey</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">air_system</span>, <span class="va">floor_area</span><span class="op">)</span>
 
 <span class="co"># get monthly heating and cooling demands per served area</span>
-<span class="va">aircon_out_mon</span> <span class="op">&lt;-</span> <span class="va">aircon_out</span> <span class="op">%&gt;%</span>
+<span class="va">aircon_out_mon</span> <span class="op">&lt;-</span> <span class="va">aircon_out</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># only consider weekdays</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">day_type</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Holiday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">day_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Holiday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># add an identifier column to indicate cooling and heating condition</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span>
         <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Heating"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Heating"</span>,
         <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Cooling"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Cooling"</span>
-    <span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># add floor area served by each air-conditioning system</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">storey</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"key_value"</span> <span class="op">=</span> <span class="st">"air_system"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">storey</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"key_value"</span> <span class="op">=</span> <span class="st">"air_system"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># calculate the monthly averaged heating and cooling demands in MJ/m2</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the `.groups` argument.</span>
 
 <span class="co"># plot a column chart to show the heating and cooling demand profile</span>
-<span class="va">aircon_out_mon</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">aircon_out_mon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span>
         <span class="va">type</span> <span class="op">==</span> <span class="st">"Heating"</span> <span class="op">~</span> <span class="op">-</span><span class="va">system_output</span>,
         <span class="va">type</span> <span class="op">==</span> <span class="st">"Cooling"</span> <span class="op">~</span> <span class="va">system_output</span>
-    <span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">system_output</span>, group <span class="op">=</span> <span class="va">type</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">air_system</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>

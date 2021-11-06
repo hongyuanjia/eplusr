@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Parametric simulations</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-10-26</h4>
+            <h4 class="date">2021-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/param.Rmd"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -198,9 +198,9 @@
     <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"bldg_equip_sch"</span><span class="op">)</span>
 
     <span class="co"># modify certain schedule value specified using field names</span>
-    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">sch</span> <span class="op">%&gt;%</span>
+    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">sch</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
         <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span>
-            <span class="va">field</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Field"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">14</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">*</span> <span class="va">frac</span><span class="op">)</span>,
+            <span class="va">field</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Field"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">14</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">*</span> <span class="va">frac</span><span class="op">)</span>,
             <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">value</span>
         <span class="op">)</span><span class="op">)</span>
 
@@ -251,9 +251,9 @@
 <code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
 <span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
@@ -262,7 +262,7 @@
 <span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; ── EnergPlus Parametric Simulation Job ─────────────────────────────────────────</span>
-<span class="co">#&gt; * Seed: '/tmp/Rtmp5VL93n/MediumOffice.idf'</span>
+<span class="co">#&gt; * Seed: '/tmp/RtmplcdFmn/MediumOffice.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
@@ -274,7 +274,7 @@
 <span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt;  Simulation started at '2021-10-26 17:37:31' and completed successfully after 3.8 mins.</span>
+<span class="co">#&gt;  Simulation started at '2021-11-06 17:10:05' and completed successfully after 2.75 mins.</span>
 
 <span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -294,12 +294,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $job_status</span>
 <span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/Rtmp5VL93n/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/Rtmp5VL93n/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/Rtmp5VL93n/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/Rtmp5VL93n/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/Rtmp5VL93n/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/Rtmp5VL93n/LED+0.2Frac/LED+0.2Frac.idf</span>
+<span class="co">#&gt; 1:     1 completed                 /tmp/RtmplcdFmn/Ori/Ori.idf</span>
+<span class="co">#&gt; 2:     2 completed                   /tmp/RtmplcdFmn/T5/T5.idf</span>
+<span class="co">#&gt; 3:     3 completed                 /tmp/RtmplcdFmn/LED/LED.idf</span>
+<span class="co">#&gt; 4:     4 completed         /tmp/RtmplcdFmn/0.6Frac/0.6Frac.idf</span>
+<span class="co">#&gt; 5:     5 completed         /tmp/RtmplcdFmn/0.2Frac/0.2Frac.idf</span>
+<span class="co">#&gt; 6:     6 completed /tmp/RtmplcdFmn/LED+0.2Frac/LED+0.2Frac.idf</span>
 <span class="co">#&gt;                                                                                              epw</span>
 <span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="co">#&gt; 2: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
@@ -361,12 +361,12 @@
 <span class="va">area</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
 
 <span class="co"># calculate EUI breakdown</span>
-<span class="va">param_eui</span> <span class="op">&lt;-</span> <span class="va">param_end_use</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">case</span>, category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">category</span>, <span class="va">eui</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">param_eui</span> <span class="op">&lt;-</span> <span class="va">param_end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">case</span>, category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">category</span>, <span class="va">eui</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="co"># exclude categories that did not change</span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Pumps"</span>, <span class="va">category</span> <span class="op">!=</span> <span class="st">"Exterior Lighting"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">param_eui</span><span class="op">)</span>
@@ -403,12 +403,12 @@
 <span class="va">....</span>
 
 <span class="co"># extract the seed model, i.e. "Ori" case as the baseline</span>
-<span class="va">ori_eui</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">==</span> <span class="st">"Ori"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span>
+<span class="va">ori_eui</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">==</span> <span class="st">"Ori"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span>
 
 <span class="co"># calculate energy savings based on the baseline EUI</span>
-<span class="va">param_savings</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join</a></span><span class="op">(</span><span class="va">ori_eui</span>, by <span class="op">=</span> <span class="st">"category"</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"_ori"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>savings <span class="op">=</span> <span class="op">(</span><span class="va">eui_ori</span> <span class="op">-</span> <span class="va">eui</span><span class="op">)</span> <span class="op">/</span> <span class="va">eui_ori</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">param_savings</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join</a></span><span class="op">(</span><span class="va">ori_eui</span>, by <span class="op">=</span> <span class="st">"category"</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"_ori"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>savings <span class="op">=</span> <span class="op">(</span><span class="va">eui_ori</span> <span class="op">-</span> <span class="va">eui</span><span class="op">)</span> <span class="op">/</span> <span class="va">eui_ori</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">!=</span> <span class="st">"Ori"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">param_savings</span><span class="op">)</span>
 <span class="co">#&gt;            case           category    eui eui_ori    savings</span>
@@ -445,8 +445,8 @@
 
 <span class="co"># plot a bar chart to show the energy savings</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="va">param_savings</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">case</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">param_savings</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">case</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">savings</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span>, stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">0.6</span>, color <span class="op">=</span> <span class="st">"black"</span>,
         show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>

@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Update IDF version</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-10-26</h4>
+            <h4 class="date">2021-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/transition.Rmd"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -153,7 +153,7 @@
 <ul>
 <li><p>IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01) fails to translate <code>FenesreationSurface:Detailed</code> objects. <code><a href="../reference/version_updater.html">version_updater()</a></code> will try to use the transition programs that come from the latest EnergyPlus installed on your computer, but will skip v9.0 if possible.</p></li>
 <li><p>Like IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> also renames all output file with suffix <code>VXY0</code>, where <code>X</code> and <code>Y</code> indicates the major and minor version of input IDF file. However, <code><a href="../reference/version_updater.html">version_updater()</a></code> always keep the original input file untouched and save a copy and rename it in the same pattern.</p></li>
-<li><p>All messages generated from each transition program are parsed, stored in a list and saved as an attributes named <code>errors</code>. So that you can easily extract all messages by <code><a href="https://rdrr.io/r/base/attr.html">attr(results, "errors")</a></code>. The error messages are parsed and stored as <a href="http://r-datatable.com"><code>data.table</code>s</a> which make it easy for post-processing.</p></li>
+<li><p>All messages generated from each transition program are parsed, stored in a list and saved as an attributes named <code>errors</code>. So that you can easily extract all messages by <code>attr(results, "errors")</code>. The error messages are parsed and stored as <a href="http://r-datatable.com"><code>data.table</code>s</a> which make it easy for post-processing.</p></li>
 <li><p>A <code>dir</code> argument can be given to further specify where the updated models to be saved.</p></li>
 </ul>
 <p>Unfortunately, even though the transition programs are written in Fortran, it could still take several minutes to complete the update process</p>
@@ -279,7 +279,7 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 487.173   2.807 488.453</span></code></pre></div>
+<span class="co">#&gt; 245.983   2.306 247.534</span></code></pre></div>
 </div>
 <div id="introduce-transition" class="section level1">
 <h1 class="hasAnchor">
@@ -320,8 +320,8 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   5.859   0.060   5.919</span></code></pre></div>
-<p>It is about 82.5 times faster.</p>
+<span class="co">#&gt;   4.558   0.035   4.594</span></code></pre></div>
+<p>It is about 53.9 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>

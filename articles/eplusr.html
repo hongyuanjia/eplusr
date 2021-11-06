@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Introduction to eplusr</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-10-26</h4>
+            <h4 class="date">2021-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -196,7 +196,7 @@
 <a href="#read-and-parse-idf" class="anchor"></a>Read and parse IDF</h1>
 <p>All IDF reading process starts with function <code><a href="../reference/read_idf.html">read_idf()</a></code>, which returns an <code>Idf</code> object. The IDF will be printed in a similar style you see in IDF Editor, with additional heading lines showing the <code>Path</code>, <code>Version</code> of the model. The classes of objects in the model are ordered by groups and the number of objects in classes are shown in square bracket.</p>
 <p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we have already got the IDD, we can just ignore the <code>idd</code> argument.</p>
-<p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is successfully located, all IDFs with versions lower than <code>X.Y</code> can be parsed. For example, if you have EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using simply <code><a href="../reference/read_idf.html">read_idf(path)</a></code> without specifying <code>idd</code>. This is because eplusr will use IDD files distributed with EnergyPlus VersionUpdater program.</p>
+<p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is successfully located, all IDFs with versions lower than <code>X.Y</code> can be parsed. For example, if you have EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using simply <code>read_idf(path)</code> without specifying <code>idd</code>. This is because eplusr will use IDD files distributed with EnergyPlus VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span>
 <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
@@ -504,7 +504,7 @@
 <div id="class-definition" class="section level1">
 <h1 class="hasAnchor">
 <a href="#class-definition" class="anchor"></a>Class definition</h1>
-<p>You can get class definition using <code>$definition()</code>, which returns an <code>IddObject</code>. All required fields in each class are marked with <code><a href="https://rdrr.io/r/base/Arithmetic.html">*</a></code>. For example, you can get the <code>IddObject</code> of class <code>Material</code>:</p>
+<p>You can get class definition using <code>$definition()</code>, which returns an <code>IddObject</code>. All required fields in each class are marked with <code>*</code>. For example, you can get the <code>IddObject</code> of class <code>Material</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">def_mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span>
 <span class="va">def_mat</span>
@@ -851,7 +851,7 @@
 <span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
 <span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
 <span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
-<p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
+<p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code>=</code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,
@@ -904,7 +904,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-10-26</span>
+<span class="co">#&gt; !2021-11-06</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -958,7 +958,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-10-26</span>
+<span class="co">#&gt; !2021-11-06</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -1378,7 +1378,7 @@
 <div id="check-possible-field-errors-idfvalidate" class="section level1">
 <h1 class="hasAnchor">
 <a href="#check-possible-field-errors-idfvalidate" class="anchor"></a>Check possible field errors (<code>Idf$validate()</code>)</h1>
-<p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code><a href="../reference/eplusr_option.html">eplusr_option("validate_level")</a></code>.</p>
+<p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code>eplusr_option("validate_level")</code>.</p>
 <p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span>
@@ -1445,10 +1445,10 @@
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmppeoSEp/file2ff3551291ae.idf"</span>
+<span class="co">#&gt; [1] "/tmp/RtmpP4BWG7/file30321500ed38.idf"</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmppeoSEp/file2ff3551291ae.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpP4BWG7/file30321500ed38.idf.</span></code></pre></div>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">

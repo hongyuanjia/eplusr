@@ -349,7 +349,7 @@ viewer$background("blue")
 <p><div class="arguments"></p><dl>
 <dt><code>look_at</code></dt><dd><p>A single string indicating a standard view. If
 specified, <code>theta</code> and <code>phi</code> will be ignored. Should be
-one of <code><a href='https://rdrr.io/r/base/c.html'>c("top", "bottom", "left", "right", "front", "back", "iso")</a></code>. <code>look_at</code> will be ignored if any of <code>theta</code> and <code>phi</code>
+one of <code>c("top", "bottom", "left", "right", "front", "back", "iso")</code>. <code>look_at</code> will be ignored if any of <code>theta</code> and <code>phi</code>
 is specified. Default: <code>iso</code> (i.e. isometric).</p></dd>
 
 <dt><code>theta</code></dt><dd><p>Theta in polar coordinates. If <code>NULL</code>, no changes will
@@ -459,7 +459,7 @@ the largest X, Y and Z coordinate values. Default: <code>2.0</code>.</p></dd>
 used for the true north axis. Default: <code>1.5</code>.</p></dd>
 
 <dt><code>color</code></dt><dd><p>A character of length 4 giving the color of X, Y, Z and
-true north axis. Default: <code><a href='https://rdrr.io/r/base/c.html'>c("red", "green", "blue", "orange")</a></code>.</p></dd>
+true north axis. Default: <code>c("red", "green", "blue", "orange")</code>.</p></dd>
 
 <dt><code>alpha</code></dt><dd><p>A number giving the alpha value of axis. Default: <code>1.0</code>.</p></dd>
 
@@ -517,7 +517,7 @@ is turned off. Default: <code>TRUE</code>.</p></dd>
 <dt><code>width</code></dt><dd><p>A number giving the line width of axis. Default: <code>1.5</code>.</p></dd>
 
 <dt><code>color</code></dt><dd><p>A character of length 3 giving the color of X, Y and Z
-axis. Default: <code><a href='https://rdrr.io/r/base/c.html'>c("red", "green", "blue")</a></code>.</p></dd>
+axis. Default: <code>c("red", "green", "blue")</code>.</p></dd>
 
 <dt><code>alpha</code></dt><dd><p>A number giving the alpha value of axis. Default: <code>1.0</code>.</p></dd>
 
@@ -707,223 +707,231 @@ viewer$print()
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$new`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span>
-<span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span>
-
-<span class='co'># create from an Idf object</span>
-<span class='va'>idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='fu'>idf_viewer</span><span class='op'>(</span><span class='va'>idf</span><span class='op'>)</span>
-<span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='va'>IdfViewer</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>idf</span><span class='op'>)</span>
-
-<span class='co'># create from an IDF file</span>
-<span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='fu'>idf_viewer</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>
-<span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='va'>IdfViewer</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$parent`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>parent</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
-#&gt; 
-#&gt; Group: &lt;Location and Climate&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
-#&gt; 
-#&gt; Group: &lt;Schedules&gt;
-#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
-#&gt; 
-#&gt; Group: &lt;Surface Construction Elements&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
-#&gt; 
-#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
-#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; 
-#&gt; Group: &lt;Internal Gains&gt;
-#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
-#&gt; 
-#&gt; Group: &lt;Exterior Equipment&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
-#&gt; 
-#&gt; Group: &lt;Output Reporting&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
-#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$geometry`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>geometry</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'
-#&gt;  * Building: 'Simple One Zone (Wireframe DXF)'
-#&gt;  * North Axis: 0°
-#&gt;  * Zone Num: 1
-#&gt;  * Surface Num: 6
-#&gt;  * SubSurface Num: 0
-#&gt;  * Shading Num: 0
-#&gt;  * Dayl Ref Pnt Num: 0
-#&gt;  * Coordinate System:
-#&gt;    - Detailed: 'Absolute'
-#&gt;    - Simple:   'Relative'
-#&gt;    - Daylighting: 'Relative'</div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$device`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>device</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; NULL</div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$background`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>background</span><span class='op'>(</span><span class='st'>"blue"</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$viewpoint`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>viewpoint</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$win_size`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>win_size</span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>400</span>, <span class='fl'>500</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$mouse_mode`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>mouse_mode</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$axis`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>axis</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$ground`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>ground</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$wireframe`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>wireframe</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$x_ray`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>x_ray</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$render_by`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>render_by</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$show`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>show</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$focus`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>top</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): attempt to apply non-function</span></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$close`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>close</span><span class='op'>(</span><span class='op'>)</span>
-<span class='co'># }</span>
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$snapshot`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>show</span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>snapshot</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span>fileext <span class='op'>=</span> <span class='st'>".png"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: webshot = TRUE requires the webshot2 package; using rgl.snapshot() instead</span></div><div class='output co'>#&gt; <span class='warning'>Warning: this build of rgl does not support snapshots</span></div><div class='output co'>#&gt; [1] "/tmp/RtmpnJDxc4/file2e1310493147.png"</div><div class='input'><span class='co'># }</span>
-
-
-<span class='co'>## ------------------------------------------------</span>
-<span class='co'>## Method `IdfViewer$print`</span>
-<span class='co'>## ------------------------------------------------</span>
-
-<span class='co'># \dontrun{</span>
-<span class='va'>viewer</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus IDF Geometry Viewer ───────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$new`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span></span>
+<span class='r-in'><span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create from an Idf object</span></span>
+<span class='r-in'><span class='va'>idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='fu'>idf_viewer</span><span class='op'>(</span><span class='va'>idf</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='va'>IdfViewer</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>idf</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create from an IDF file</span></span>
+<span class='r-in'><span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='fu'>idf_viewer</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>viewer</span> <span class='op'>&lt;-</span> <span class='va'>IdfViewer</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$parent`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>parent</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Location and Climate&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Schedules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Surface Construction Elements&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Material&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Construction&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Thermal Zones and Surfaces&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Zone&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Internal Gains&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Exterior Equipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Output Reporting&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$geometry`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>geometry</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Building: 'Simple One Zone (Wireframe DXF)'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * North Axis: 0°</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Zone Num: 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Surface Num: 6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * SubSurface Num: 0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Shading Num: 0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Dayl Ref Pnt Num: 0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Coordinate System:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    - Detailed: 'Absolute'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    - Simple:   'Relative'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    - Daylighting: 'Relative'</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$device`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>device</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> NULL</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$background`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>background</span><span class='op'>(</span><span class='st'>"blue"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$viewpoint`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>viewpoint</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$win_size`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>win_size</span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>400</span>, <span class='fl'>500</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$mouse_mode`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>mouse_mode</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$axis`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>axis</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$ground`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>ground</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$wireframe`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>wireframe</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$x_ray`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>x_ray</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$render_by`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>render_by</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$show`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>show</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$focus`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>top</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> attempt to apply non-function</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$close`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>close</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$snapshot`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>show</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>snapshot</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span>fileext <span class='op'>=</span> <span class='st'>".png"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>webshot = TRUE requires the webshot2 package; using rgl.snapshot() instead</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>this build of rgl does not support snapshots</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "/tmp/RtmpXqWGge/file2e6466c499bc.png"</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `IdfViewer$print`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>viewer</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus IDF Geometry Viewer ───────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -269,71 +269,73 @@ validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> an
 what validation components those levels contain, see <code><a href='level_checks.html'>level_checks()</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>custom_validate</span><span class='op'>(</span>unique_object <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $required_object
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $unique_object
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $unique_name
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $extensible
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $required_field
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $auto_field
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $type
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $choice
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $range
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $reference
-#&gt; [1] FALSE
-#&gt; </div><div class='input'>
-<span class='co'># only check unique name during validation</span>
-<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span><span class='op'>(</span>validate_level <span class='op'>=</span> <span class='fu'>custom_validate</span><span class='op'>(</span>unique_name <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $validate_level
-#&gt; $validate_level$required_object
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$unique_object
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$unique_name
-#&gt; [1] TRUE
-#&gt; 
-#&gt; $validate_level$extensible
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$required_field
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$auto_field
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$type
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$choice
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$range
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $validate_level$reference
-#&gt; [1] FALSE
-#&gt; 
-#&gt; </div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'>custom_validate</span><span class='op'>(</span>unique_object <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $required_object</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $unique_object</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $unique_name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $extensible</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $required_field</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $auto_field</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $choice</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $range</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $reference</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># only check unique name during validation</span></span>
+<span class='r-in'><span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span><span class='op'>(</span>validate_level <span class='op'>=</span> <span class='fu'>custom_validate</span><span class='op'>(</span>unique_name <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$required_object</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$unique_object</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$unique_name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$extensible</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$required_field</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$auto_field</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$choice</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$range</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $validate_level$reference</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

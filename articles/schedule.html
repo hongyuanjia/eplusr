@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Work with ‘Schedule:Compact’ objects</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-10-26</h4>
+            <h4 class="date">2021-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/schedule.Rmd"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -349,9 +349,9 @@
 <a href="#set-schedule-values-using-lists" class="anchor"></a>Set schedule values using lists</h2>
 <p>The <code>$set()</code> method provides a flexible interface to modify schedule values using lists:</p>
 <ul>
-<li>Day types can be grouped inside <code><a href="https://rdrr.io/r/base/c.html">c(...)</a></code> at the LHS of <code>:=</code>
+<li>Day types can be grouped inside <code>c(...)</code> at the LHS of <code>:=</code>
 </li>
-<li>Put actual schedule values inside <code><a href="https://rdrr.io/r/base/list.html">list(...)</a></code> at the RHS</li>
+<li>Put actual schedule values inside <code>list(...)</code> at the RHS</li>
 <li>Each schedule value should be named a time. Time can be given in either <code>..H</code> or <code>"HH:MM"</code>.</li>
 </ul>
 <blockquote>
@@ -448,13 +448,13 @@
 <code>character</code>: Time specifications in <code>HH:MM</code> where <code>HH</code> is the hour in <code>0:24</code> and <code>MM</code> is the minute in <code>0:60</code>
 </li>
 <li>
-<code>integer</code>: Time differences from <code>00:00:00</code> in <strong>minutes</strong>, e.g. <code><a href="https://rdrr.io/r/base/seq.html">seq(60, 60 * 24, by = 60)</a></code>
+<code>integer</code>: Time differences from <code>00:00:00</code> in <strong>minutes</strong>, e.g. <code>seq(60, 60 * 24, by = 60)</code>
 </li>
 <li>
-<code>hms</code>: <code>hms</code> objects constructed using <code><a href="https://hms.tidyverse.org/reference/hms.html">hms::hms()</a></code> or equivalents, e.g. <code><a href="https://hms.tidyverse.org/reference/hms.html">hms::hms(minutes = 30, hours = 1)</a></code>, and <code><a href="https://hms.tidyverse.org/reference/hms.html">hms::as_hms("1:30:00")</a></code>
+<code>hms</code>: <code>hms</code> objects constructed using <code><a href="https://hms.tidyverse.org/reference/hms.html">hms::hms()</a></code> or equivalents, e.g. <code>hms::hms(minutes = 30, hours = 1)</code>, and <code>hms::as_hms("1:30:00")</code>
 </li>
 <li>
-<code>difftime</code>: <code>difftime</code> objects constructed using <code><a href="https://rdrr.io/r/base/difftime.html">as.difftime()</a></code> or equivalents, e.g. <code><a href="https://rdrr.io/r/base/difftime.html">as.difftime(1:24, units = "hours")</a></code>
+<code>difftime</code>: <code>difftime</code> objects constructed using <code><a href="https://rdrr.io/r/base/difftime.html">as.difftime()</a></code> or equivalents, e.g. <code>as.difftime(1:24, units = "hours")</code>
 </li>
 <li>
 <code>ITime</code>: <code>ITime</code> objects constructed using <code><a href="https://Rdatatable.gitlab.io/data.table/reference/IDateTime.html">data.table::as.ITime()</a></code>, e.g. <code>as.ITime("01:30:00")</code>

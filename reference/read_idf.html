@@ -228,179 +228,185 @@ parametric analysis.</p>
     <p>Hongyuan Jia</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
-<span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span>
-<span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span>
-
-<span class='co'># if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur</span>
-<span class='co'># if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus</span>
-<span class='co'># installation folder will be used for pasing</span>
-<span class='co'># if Idd v8.8 is found, it will be used automatically</span>
-<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='use_idd.html'>is_avail_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
-<span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
-#&gt; 
-#&gt; Group: &lt;Location and Climate&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
-#&gt; 
-#&gt; Group: &lt;Schedules&gt;
-#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
-#&gt; 
-#&gt; Group: &lt;Surface Construction Elements&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
-#&gt; 
-#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
-#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; 
-#&gt; Group: &lt;Internal Gains&gt;
-#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
-#&gt; 
-#&gt; Group: &lt;Exterior Equipment&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
-#&gt; 
-#&gt; Group: &lt;Output Reporting&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
-#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'>
-<span class='co'># argument `idd` can be specified explicitly using `use_idd()`</span>
-<span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span>, idd <span class='op'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
-#&gt; 
-#&gt; Group: &lt;Location and Climate&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
-#&gt; 
-#&gt; Group: &lt;Schedules&gt;
-#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
-#&gt; 
-#&gt; Group: &lt;Surface Construction Elements&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
-#&gt; 
-#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
-#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; 
-#&gt; Group: &lt;Internal Gains&gt;
-#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
-#&gt; 
-#&gt; Group: &lt;Exterior Equipment&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
-#&gt; 
-#&gt; Group: &lt;Output Reporting&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
-#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'>
-<span class='co'># you can set `download` arugment to "auto" in `use_idd()` if you want to</span>
-<span class='co'># automatically download corresponding IDD file when necessary</span>
-<span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;
-#&gt; 
-#&gt; Group: &lt;Location and Climate&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;
-#&gt; 
-#&gt; Group: &lt;Schedules&gt;
-#&gt; ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;
-#&gt; 
-#&gt; Group: &lt;Surface Construction Elements&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Material&gt;
-#&gt; │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Construction&gt;
-#&gt; 
-#&gt; Group: &lt;Thermal Zones and Surfaces&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Zone&gt;
-#&gt; └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;
-#&gt; 
-#&gt; Group: &lt;Internal Gains&gt;
-#&gt; └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;
-#&gt; 
-#&gt; Group: &lt;Exterior Equipment&gt;
-#&gt; └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;
-#&gt; 
-#&gt; Group: &lt;Output Reporting&gt;
-#&gt; ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;
-#&gt; │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;
-#&gt; │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;
-#&gt; └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</div><div class='input'>
-<span class='co'># Besides use a path to an IDF file, you can also provide IDF in literal</span>
-<span class='co'># string format</span>
-<span class='va'>idf_string</span> <span class='op'>&lt;-</span>
-    <span class='st'>"
-    Version, 8.8;
-    Building,
-        Building;                !- Name
-    "</span>
-
-<span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_string</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#&gt;  * Path: <span style='background-color: #BB0000; font-weight: bold;'>NOT LOCAL</span>
-#&gt;  * Version: '8.8.0'
-#&gt; 
-#&gt; Group: &lt;Simulation Parameters&gt;
-#&gt; ├─ [1&lt;O&gt;] Class: &lt;Version&gt;
-#&gt; └─ [1&lt;O&gt;] Class: &lt;Building&gt;</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span></span>
+<span class='r-in'><span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, package <span class='op'>=</span> <span class='st'>"eplusr"</span><span class='op'>)</span> <span class='co'># v8.8</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur</span></span>
+<span class='r-in'><span class='co'># if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus</span></span>
+<span class='r-in'><span class='co'># installation folder will be used for pasing</span></span>
+<span class='r-in'><span class='co'># if Idd v8.8 is found, it will be used automatically</span></span>
+<span class='r-in'><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
+<span class='r-in'><span class='fu'><a href='use_idd.html'>is_avail_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Location and Climate&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Schedules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Surface Construction Elements&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Material&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Construction&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Thermal Zones and Surfaces&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Zone&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Internal Gains&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Exterior Equipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Output Reporting&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># argument `idd` can be specified explicitly using `use_idd()`</span></span>
+<span class='r-in'><span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span>, idd <span class='op'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Location and Climate&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Schedules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Surface Construction Elements&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Material&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Construction&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Thermal Zones and Surfaces&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Zone&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Internal Gains&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Exterior Equipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Output Reporting&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># you can set `download` arugment to "auto" in `use_idd()` if you want to</span></span>
+<span class='r-in'><span class='co'># automatically download corresponding IDD file when necessary</span></span>
+<span class='r-in'><span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Location and Climate&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Schedules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Surface Construction Elements&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Material&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Construction&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Thermal Zones and Surfaces&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Zone&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Internal Gains&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Exterior Equipment&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Output Reporting&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Besides use a path to an IDF file, you can also provide IDF in literal</span></span>
+<span class='r-in'><span class='co'># string format</span></span>
+<span class='r-in'><span class='va'>idf_string</span> <span class='op'>&lt;-</span></span>
+<span class='r-in'>    <span class='st'>"</span>
+<span class='r-in'>    Version, 8.8;</span>
+<span class='r-in'>    Building,</span>
+<span class='r-in'>        Building;                !- Name</span>
+<span class='r-in'>    "</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>read_idf</span><span class='op'>(</span><span class='va'>idf_string</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span><span class='op'>(</span><span class='fl'>8.8</span>, download <span class='op'>=</span> <span class='st'>"auto"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: <span style='background-color: #BB0000; font-weight: bold;'>NOT LOCAL</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ├─ [1&lt;O&gt;] Class: &lt;Version&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [1&lt;O&gt;] Class: &lt;Building&gt;</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
