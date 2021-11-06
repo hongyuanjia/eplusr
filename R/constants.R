@@ -3,7 +3,7 @@
 ALL_EPLUS_VER <- c(
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"), paste0("8.3.", 1:3),
-    paste0("9.0.", 0:1), paste0("9.", 1:4, ".0")
+    paste0("9.0.", 0:1), paste0("9.", 1:5, ".0")
 )
 
 LATEST_EPLUS_VER <- ALL_EPLUS_VER[length(ALL_EPLUS_VER)]
@@ -19,11 +19,12 @@ ALL_IDD_VER <- c(
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"),
     paste0("9.0.", 0:1),
-    paste0("9.", 1:4, ".0")
+    paste0("9.", 1:5, ".0")
 )
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
     "version , commit
+     9.5.0   , de239b2e5f
      9.4.0   , 998c4b761e
      9.3.0   , baff08990c
      9.2.0   , 921312fa1d
@@ -137,7 +138,7 @@ utils::globalVariables(c(
     "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
     "area", "dt", "interval_type", "new_rleid", "time_index", "i.time_index",
     "i.environment_name", "i.environment_type", "i.simulation_index", "i.new",
-    "value_lower_start", "expand_obj", "i.year"
+    "value_lower_start", "expand_obj", "i.year", "provider"
 ))
 # }}}
 # nocov end

@@ -2074,3 +2074,184 @@ test_that("Transition v9.3 --> v9.4", {
     )
 })
 # }}}
+# v9.4 --> v9.5 {{{
+test_that("Transition v9.4 --> v9.5", {
+    skip_on_cran()
+    from <- 9.4
+    to <- 9.5
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "Construction:AirBoundary" := list(
+                c("CAB1", "CAB2"),
+                c("InteriorWindow", "GroupedZones"),
+                c("GroupedZones", "IRTSurface")
+            ),
+            "Coil:Cooling:WaterToAirHeatPump:EquationFit" = list(
+                "ClgEF1", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
+                "Autosize", "Autosize", "Autosize", "Autosize", 5.0,
+                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5, 6,
+                1, 2, 3, 4, 5,
+                0, 0
+            ),
+            "Coil:Heating:WaterToAirHeatPump:EquationFit" := list(
+                "HtgEF1", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
+                "Autosize", "Autosize", "Autosize", 5.0,
+                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5
+            ),
+            "Coil:Cooling:WaterToAirHeatPump:EquationFit" = list("ClgEF2"),
+            "Coil:Heating:WaterToAirHeatPump:EquationFit" = list("HtgEF2"),
+            "Construction:InternalSource" = list(
+                "CIS", 2, 2, 1, 0.1, 0, "layer1", "layer2"
+            ),
+            "Construction:InternalSource" = list("CIS2"),
+            "HeatPump:WaterToWater:EquationFit:Cooling" = list(
+                "WWClgEF1", "Inlet1", "Outlet1", "Inlet2", "Outlet2",
+                "Autosize", "Autosize", "Autosize", "Autosize",
+                1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 8.0, 1.0, "Pump"
+            ),
+            "HeatPump:WaterToWater:EquationFit:Heating" = list(
+                "WWHtgEF1", "Inlet1", "Outlet1", "Inlet2", "Outlet2",
+                "Autosize", "Autosize", "Autosize", "Autosize",
+                1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 8.0, 1.0, "Pump"
+            ),
+            "HeatPump:WaterToWater:EquationFit:Cooling" = list("WWClgEF2"),
+            "HeatPump:WaterToWater:EquationFit:Heating" = list("WWHtgEF2"),
+            "ZoneAirMassFlowConservation" = list("Yes"),
+            "ZoneHVAC:LowTemperatureRadiant:VariableFlow" = list(
+                "RadVF1", "Avail", "Zone", "Surface", "ConvectionOnly",
+                0.01, 0.01, "Autosize", 0.35, "MeanAirTemperature", "HalfFlowPower",
+                "HeatingDesignCapacity", "Autosize", NULL, NULL, "Autosize", "Inlet1", "Outlet1", 2.0, "HtgSp",
+                "CoolingDesignCapacity", "Autosize", NULL, NULL, "Autosize", "Inlet2", "Outlet2", 2.0, "ClgSp",
+                "Off", NULL, NULL, NULL
+            ),
+            "ZoneHVAC:LowTemperatureRadiant:VariableFlow" = list("RadVF2"),
+            "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" = list(
+                "RadCF1", "Avail", "Zone", "Surface", "ConvectionOnly",
+                0.01, 0.01, 400, 0.35, "MeanAirTemperature", 0.8, 8e-05, NULL, 8e5, 10, 0.8, 0.1,
+                "Inlet1", "Outlet1", "HighWSch", "LowWSch", "HighCSch", "LowCSch"
+            ),
+            "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" = list("RadCF2"),
+            "ZoneHVAC:Baseboard:RadiantConvective:Water" = list(
+                "BoardC1", "Avial", "Inlet", "Outlet", 80, 0.01, "HeatingDesignCapacity",
+                "Autosize", NULL, NULL, "Autosize", 0.001, 0.3, 0.3,
+                "Surface1", 0.4, "Surface2", 0.2, "Surface3", 0.1
+            ),
+            "ZoneHVAC:Baseboard:RadiantConvective:Water" = list("BoardC2"),
+            "ZoneHVAC:Baseboard:RadiantConvective:Steam" = list(
+                "Steam1", "Avail", "Inlet", "Outlet", "HeatingDesignCapacity",
+                "Autosize", NULL, NULL, 5, "Autosize", 0.001, 0.3, 0.3,
+                "Surface1", 0.4, "Surface2", 0.2, "Surface3", 0.1
+            ),
+            "ZoneHVAC:Baseboard:RadiantConvective:Steam" = list("Steam2"),
+            .all = FALSE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(idfTR <- transition(idfOri, to), "Construction:AirBoundary")
+
+    expect_equal(
+        idfVU$"Construction:AirBoundary"$CAB1$value(),
+        idfTR$"Construction:AirBoundary"$CAB1$value()
+    )
+    expect_equal(
+        idfVU$"Construction:AirBoundary"$CAB2$value(),
+        idfTR$"Construction:AirBoundary"$CAB2$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$ClgEF1$value(),
+        idfTR$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$ClgEF1$value()
+    )
+    # version updater remove trailing empty fields
+    expect_equal(
+        idfVU$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$ClgEF2$value(),
+        idfTR$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$ClgEF2$value()[1:13]
+    )
+
+    expect_equal(
+        idfVU$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HtgEF1$value(),
+        idfTR$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HtgEF1$value()
+    )
+    # version updater removes trailing empty fields
+    expect_equal(
+        idfVU$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HtgEF2$value(),
+        idfTR$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HtgEF2$value()[1:11]
+    )
+
+    expect_equal(
+        idfVU$"ConstructionProperty:InternalHeatSource"$"CIS Heat Source"$value(),
+        idfTR$"ConstructionProperty:InternalHeatSource"$"CIS Heat Source"$value()
+    )
+    expect_equal(
+        idfVU$"ConstructionProperty:InternalHeatSource"$"CIS2 Heat Source"$value(),
+        idfTR$"ConstructionProperty:InternalHeatSource"$"CIS2 Heat Source"$value()
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:WaterToWater:EquationFit:Cooling"$"WWClgEF1"$value(),
+        idfTR$"HeatPump:WaterToWater:EquationFit:Cooling"$"WWClgEF1"$value()
+    )
+    # version updater removes trailing empty fields
+    expect_equal(
+        idfVU$"HeatPump:WaterToWater:EquationFit:Cooling"$"WWClgEF2"$value(),
+        idfTR$"HeatPump:WaterToWater:EquationFit:Cooling"$"WWClgEF2"$value()[1:11]
+    )
+
+    expect_equal(
+        idfVU$"HeatPump:WaterToWater:EquationFit:Heating"$"WWHtgEF1"$value(),
+        idfTR$"HeatPump:WaterToWater:EquationFit:Heating"$"WWHtgEF1"$value()
+    )
+    # version updater removes trailing empty fields
+    expect_equal(
+        idfVU$"HeatPump:WaterToWater:EquationFit:Heating"$"WWHtgEF2"$value(),
+        idfTR$"HeatPump:WaterToWater:EquationFit:Heating"$"WWHtgEF2"$value()[1:11]
+    )
+
+    expect_equal(
+        idfVU$"ZoneAirMassFlowConservation"$value(),
+        idfTR$"ZoneAirMassFlowConservation"$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$RadVF1$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$RadVF1$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$RadVF2$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$RadVF2$value()
+    )
+
+    # version updater fails to keep the "Hydronnic Tubing Length"
+    # see: https://github.com/NREL/EnergyPlus/issues/9171
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$RadCF1$value()[-6],
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$RadCF1$value()[-6]
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$RadCF2$value()[-6],
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"$RadCF2$value()[-6]
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Water"$BoardC1$value(),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Water"$BoardC1$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Water"$BoardC2$value(),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Water"$BoardC2$value()
+    )
+
+    expect_equal(
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$Steam1$value(),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$Steam1$value()
+    )
+    expect_equal(
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$Steam2$value(),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$Steam2$value()
+    )
+})
+# }}}
