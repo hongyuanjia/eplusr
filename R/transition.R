@@ -3545,7 +3545,7 @@ trans_funs$f930t940 <- function (idf) {
 # }}}
 # trans_940_950 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f940t540 <- function (idf) {
+trans_funs$f940t950 <- function (idf) {
     assert_true(idf$version()[, 1:2] == 9.4)
 
     target_cls <- c(
@@ -3559,109 +3559,188 @@ trans_funs$f940t540 <- function (idf) {
         "ZoneHVAC:LowTemperatureRadiant:VariableFlow", # 8
         "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", # 9
         "ZoneHVAC:Baseboard:RadiantConvective:Water",  # 10
-        "ZoneHVAC:Baseboard:RadiantConvective:System"  # 11
+        "ZoneHVAC:Baseboard:RadiantConvective:Steam"   # 11
     )
 
     new_idf <- trans_preprocess(idf, 9.5, target_cls)
+    NUM_ADDED <- 0L
 
     # 1: Construction:AirBoundary {{{
-    dt1 <- trans_action(idf, "Construction:AirBoundary")
+    dt1 <- trans_action(idf, "Construction:AirBoundary", min_fields = 6)
+    if (nrow(dt1)) {
+        dt1[index == 2L & stri_trans_tolower(value) %chin% "interiorwindow", {
+            warn(sprintf(paste0(
+                "Option 'InteriorWindow' for field 'Solar and Daylighting Method' ",
+                "in class 'Construction:AirBoundary' is no loger valid in Energyplus v9.5. ",
+                "All air boundaries will be modelled using the 'GroupedZones' method. Object(s) below were affected:\n%s"),
+                paste(sprintf(" #%s| Object '%s' [ID: %i]", lpad(seq_along(index), "0"), name, id), collapse = "\n")
+            ))
+        }]
+        dt1[index == 3L & stri_trans_tolower(value) %chin% "irtsurface", {
+            warn(sprintf(paste0(
+                "Option 'IRTSurface' for field 'Radiant Exchange Method' ",
+                "in class 'Construction:AirBoundary' is no loger valid in Energyplus v9.5. ",
+                "All air boundaries will be modelled using the 'GroupedZones' method. Object(s) below were affected:\n%s"),
+                paste(sprintf(" #%s| Object '%s' [ID: %i]", lpad(seq_along(index), "0"), name, id), collapse = "\n")
+            ))
+        }]
 
+        dt1 <- dt1[!index %in% c(2L, 3L)]
+        dt1[, index := seq_len(.N), by = "id"]
+    }
     # }}}
+
+    split_curves <- function(dt, pos, name) {
+        if (!nrow(dt)) return(dt)
+
+        num_objs <- length(unique(dt$id))
+        num <- viapply(pos, length)
+        rng <- range(unlist(pos, use.names = FALSE))
+
+        # fields that are retained
+        dt_remain <- dt[index < rng[1L] | index > rng[2L]]
+        # update field index
+        dt_remain[index > rng[2L], index := seq(rng[1L] + length(pos), length.out = .N), by = "id"]
+
+        # curve fields
+        dt_name <- dt[J(viapply(pos, "[[", 1L, use.names = FALSE)), on = "index"]
+        set(dt_name, NULL, "value", paste(rep(name, each = num_objs), rep(seq.int(num_objs), length(pos))))
+        set(dt_name, NULL, "index", rep(seq(min(pos[[1L]]), length.out = length(pos)), each = num_objs))
+
+        # curve objects
+        ind_curve <- unlist(lapply(pos, function(x) c(1L, x)), use.names = FALSE)
+        dt_curve <- dt[J(ind_curve), on = "index"]
+        dt_curve[J(1L), on = "index", value := dt_name$value]
+
+        # update curve object IDs
+        set(dt_curve, NULL, "id", rep(NUM_ADDED - seq.int(num_objs * length(pos)), rep(num + 1L, num_objs)))
+        # update curve object classes
+        set(dt_curve, NULL, "class", rep(rep(names(pos), num + 1L), num_objs))
+        # update curve object indices
+        set(dt_curve, NULL, "index", rep(unlist(lapply(num + 1L, seq.int), use.names = FALSE), num_objs))
+        # create min max table
+        dt_rng <- dt_curve[, by = "id", {
+            class <- class[1L]
+            num <- data.table::fcase(
+                class[1L] == "Curve:QuadLinear", 8L,
+                class[1L] == "Curve:QuintLinear", 10L
+            )
+            index <- seq.int(num)
+            value <- rep(c("-100", "100"), num / 2L)
+            list(name = NA_character_, class, index, field = NA_character_, value)
+        }]
+        dt_curve <- rbindlist(list(dt_curve, dt_rng))
+        dt_curve[, by = "id", index := seq.int(.N)]
+        # update num of new objects added
+        NUM_ADDED <<- min(dt_curve$id)
+
+        rbindlist(list(dt_remain, dt_name, dt_curve))
+    }
+
     # 2: Coil:Cooling:WaterToAirHeatPump:EquationFit {{{
-    dt2 <- trans_action(idf,
-        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+    dt2 <- trans_action(idf, "Coil:Cooling:WaterToAirHeatPump:EquationFit", all = TRUE)
+    dt2 <- split_curves(dt2,
+        list("Curve:QuadLinear" = 11:15, "Curve:QuintLinear" = 16:21, "Curve:QuadLinear" = 22:26),
+        c("WAHPCoolCapCurveTot", "WAHPCoolCapCurveSens", "WAHPCoolPowCurve")
     )
     # }}}
     # 3: Coil:Heating:WaterToAirHeatPump:EquationFit {{{
-    dt3 <- trans_action(idf, "Coil:Heating:WaterToAirHeatPump:EquationFit")
-    if (nrow(dt3)) {
-        # convert 1 & 0 to Yes and No and warning if non-numeric values found
-        set(dt3, NULL, "value_num", suppressWarnings(as.numeric(dt3$value)))
-        set(dt3, NULL, "value", "No")
-
-        dt3[is.na(value_num), by = c("id", "index"), c("value", "value_num") := {
-            warn(sprintf(paste0(
-                "Field '%s' for object [id:%s] in class 'Output:DebuggingData' ",
-                "is not a number, defaulting to 'No'."),
-                field[1L], .BY$id
-            ))
-            list("No", 0.0)
-        }]
-
-        dt3[as.integer(value_num) == 1L, value := "Yes"]
-        set(dt3, NULL, "value_num", NULL)
-    }
+    dt3 <- trans_action(idf, "Coil:Heating:WaterToAirHeatPump:EquationFit", all = TRUE)
+    dt3 <- split_curves(dt3,
+        list("Curve:QuadLinear" = 10:14, "Curve:QuadLinear" = 15:19),
+        c("WAHPHeatCapCurve", "WAHPHeatPowCurve")
+    )
     # }}}
     # 4: Construction:InternalSource {{{
-    dt4 <- trans_action(idf, "Construction:InternalSource")
+    dt4 <- trans_action(idf,
+        c("ConstructionProperty:InternalHeatSource" = "Construction:InternalSource"),
+        insert = list(1)
+    )
     if (nrow(dt4)) {
-        if (length(unique(dt4$id)) > 1L) {
-            # consolidate all into one
-            warn(paste0(
-                "'Output:Diagnostics' has become an unique-object class in EnergyPlus v9.4. ",
-                "All other objects except the first one found will be listed as comments and ",
-                "their keys will be all consolidated into the first one."
-            ))
-            id_cmt <- unique(dt4$id)[-1L]
-            id_left <- dt4$id[1L]
-            cmt <- idf$to_string(id_cmt, header = FALSE, format = "new_bot")
-            idf$object(id_left)$comment(cmt)
+        dt4[J(1L), on = "index", value := paste(name, "Heat Source")]
+        # new construction
+        dt41 <- dt4[index == 2L | index >= 8L]
+        set(dt41, NULL, "class", "Construction")
+        dt41[, index := seq.int(.N), by = "id"]
+        set(dt41, NULL, "id", -rleid(dt41$id) + NUM_ADDED)
+        NUM_ADDED <- min(dt41$id)
 
-            dt4 <- unique(dt4, by = "value")
-            set(dt4, NULL, "id", id_left)
-            set(dt4, NULL, "index", seq_len(nrow(dt4)))
-        }
+        dt4 <- rbindlist(list(dt4[index <= 7L], dt41))
     }
     # }}}
     # 5: HeatPump:WaterToWater:EquationFit:Cooling {{{
-    dt5 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Cooling", reset = list(3L, "Mode05", "Mode06"))
+    dt5 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Cooling", all = TRUE)
+    dt5 <- split_curves(dt5,
+        list("Curve:QuadLinear" = 10:14, "Curve:QuadLinear" = 15:19),
+        c("WWHPCoolCapCurve", "WWHPCoolPowCurve")
+    )
     # }}}
     # 6: HeatPump:WaterToWater:EquationFit:Heating {{{
-    dt6 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Heating",
-        insert = list(5L, "ConvectionOnly"),
-        insert = list(7L, "0.016"),
-        insert = list(9L, "0.35"),
-        insert = list(11L, "HalfFlowPower")
+    dt6 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Heating", all = TRUE)
+    dt6 <- split_curves(dt6,
+        list("Curve:QuadLinear" = 10:14, "Curve:QuadLinear" = 15:19),
+        c("WWHPHeatCapCurve", "WWHPHeatPowCurve")
     )
     # }}}
     # 7: ZoneAirMassFlowConservation {{{
     dt7 <- trans_action(idf, "ZoneAirMassFlowConservation",
-        insert = list(10L, "HalfFlowPower")
+        reset = list(1L, "Yes", "AdjustMixingOnly"),
+        reset = list(1L, "No", "None")
     )
     # }}}
+
+    split_radiant <- function(dt, remain, new, remain_since = NULL) {
+        if (!nrow(dt)) return(dt)
+        dt1 <- dt[J(c(remain)), on = "index", nomatch = NULL]
+        if (!is.null(remain_since)) {
+            dt1 <- rbindlist(list(dt1, dt[index >= remain_since]))
+        }
+        dt2 <- dt[J(c(new)), on = "index", nomatch = NULL]
+
+        # construct design name
+        dt1[, index := seq.int(.N), by = "id"]
+        dt1[J(2L), on = "index", value := paste(value, "Design Object")]
+
+        # construct design object
+        set(dt2, NULL, "class", paste0(dt2$class, ":Design"))
+        dt2[, index := seq.int(.N), by = "id"]
+        dt2[J(1L), on = "index", value := paste(value, "Design Object")]
+        dt2[, by = "id", id := NUM_ADDED - .GRP]
+        NUM_ADDED <<- min(dt2$id)
+
+        dt <- rbindlist(list(dt1, dt2))
+    }
+
     # 8: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
-    dt8 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
-        insert = list(5L, "ConvectionOnly"),
-        insert = list(7L, "0.016"),
-        insert = list(9L, "0.35"),
-        insert = list(11L, "0.8")
+    dt8 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow")
+    dt8 <- split_radiant(dt8,
+        c(1L, 1L, 2:4, 8, 13L, 16:18, 22L, 25:27, 32:33),
+        c(1L, 5:7, 9:12, 14:15, 19:24, 28:31, 34L)
     )
     # }}}
     # 9: ZoneHVAC:LowTemperatureRadiant:ConstantFlow {{{
-    dt9 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
-        insert = list(15L, "Yes"),
-        insert = list(16L),
-        insert = list(17L),
-        delete = list(19L)
+    dt9 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow")
+    dt9 <- split_radiant(dt9,
+        c(1L, 1L, 2:4, 8, 12:15, 18:29, 32:33),
+        c(1L, 5:7, 9:11, 16:17, 30:31)
     )
-    if (nrow(dt9)) dt9[, by = "id", index := seq_len(.N)]
     # }}}
     # 10: ZoneHVAC:Baseboard:RadiantConvective:Water {{{
-    dt10 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Water",
-        insert = list(5L, "ConvectionOnly"),
-        insert = list(7L, "0.016"),
-        insert = list(9L, "0.35"),
-        insert = list(11L, "0.8")
+    dt10 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Water")
+    dt10 <- split_radiant(dt10,
+        c(1L, 1L, 2:6, 8, 11),
+        c(1L, 7L, 9:10, 12:14),
+        15L
     )
     # }}}
-    # 11: ZoneHVAC:Baseboard:RadiantConvective:System {{{
-    dt11 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:System",
-        insert = list(5L, "ConvectionOnly"),
-        insert = list(7L, "0.016"),
-        insert = list(9L, "0.35"),
-        insert = list(11L, "0.8")
+    # 11: ZoneHVAC:Baseboard:RadiantConvective:Steam {{{
+    dt11 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Steam")
+    dt11 <- split_radiant(dt11,
+        c(1L, 1L, 2:4, 6L, 9:10),
+        c(1L, 5L, 7:8, 11:13),
+        14L
     )
+    dt11[order(id)]
     # }}}
 
     trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:11))))
