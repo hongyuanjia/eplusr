@@ -138,7 +138,7 @@ utils::globalVariables(c(
     "zone", "GlobalGeometryRules", "inv_x", "inv_y", "inv_z", paste0("V", 1:16),
     "area", "dt", "interval_type", "new_rleid", "time_index", "i.time_index",
     "i.environment_name", "i.environment_type", "i.simulation_index", "i.new",
-    "value_lower_start", "expand_obj", "i.year"
+    "value_lower_start", "expand_obj", "i.year", "provider"
 ))
 # }}}
 # nocov end
