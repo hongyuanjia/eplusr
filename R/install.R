@@ -395,20 +395,23 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
 # }}}
 # patch_eplus_linux_sh {{{
 patch_eplus_linux_sh <- function (ver, exec) {
-    if (ver == "9.1.0") {
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 47,
-            "ori_install_directory=${install_directory}\\ninstall_directory=${install_directory}\\/${package_name}",
+    if (ver >= 9.1 && ver <= 9.4) {
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            77,
+            "\\${install_directory}",
+            "\\${install_directory}\\/\\${package_name}",
             exec
         ))
-        # change the start line of tar.gz as a new line has been added above
-        system(sprintf("sed -i '%is/+163/+164/' %s", 80, exec))
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 89,
-            "install_directory=${ori_install_directory}",
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            79,
+            "\\${install_directory}",
+            "\\${install_directory}\\/\\${package_name}",
             exec
         ))
-    } else if (ver > 9.1) {
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 70,
-            "install_directory=${install_directory}\\/${package_name}",
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            116,
+            "ParametricPreProcessor",
+            "ParametricPreprocessor",
             exec
         ))
     }
