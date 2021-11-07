@@ -2258,6 +2258,13 @@ test_that("Transition v9.4 --> v9.5", {
 # v9.5 --> v9.6 {{{
 test_that("Transition v9.5 --> v9.6", {
     skip_on_cran()
+
+    # Only install EnergyPlus v9.6 for testing v9.5 to v9.6 transition, because
+    # this version of transition breaks `Wall:Detailed`, `Floor:Detailed`, etc.
+    # See: https://github.com/NREL/EnergyPlus/issues/9172
+    if (!is_avail_eplus(9.6)) install_eplus(9.6, local = TRUE)
+    expect_true(is_avail_eplus(9.6))
+
     from <- 9.5
     to <- 9.6
     expect_is(
