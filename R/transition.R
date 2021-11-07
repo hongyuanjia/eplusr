@@ -389,7 +389,7 @@ trans_funs$f720t800 <- function (idf) {
                     "Results may be different than previous. ",
                     "See InputOutputReference document for details."
                 ),
-                "warning_trans_720_800"
+                "trans_720_800"
             )
         }
 
@@ -652,7 +652,7 @@ trans_funs$f810t820 <- function (idf) {
                 warn(paste0("Invalid 'Fan Control Type' value for object [ID:", id, "] ",
                     "in class 'ZoneHVAC:UnitHeater' in original v8.1 IDF. ",
                     "Expected 'OnOff' or 'Continuous'. Assuming 'OnOff'..."),
-                    "warning_trans_810_820"
+                    "trans_810_820"
                 )
                 fantype[!fantype %in% c("No", "Yes")] <- "No"
             }
@@ -1402,7 +1402,7 @@ trans_funs$f850t860 <- function (idf) {
                             value[[1L]], "' referenced in class ",
                             "'MaterialProperty:MoisturePenetrationDepth:Settings'."
                         ),
-                        "warning_tran_850_860"
+                        "tran_850_860"
                     )
                     den <- NA_real_
                 }
@@ -1630,7 +1630,7 @@ trans_funs$f870t880 <- function (idf) {
                             "Please check your inputs to make sure this ",
                             "reflects your foundation."
                         ),
-                        "warning_trans_870_880"
+                        "trans_870_880"
                     )
 
                     dt
@@ -1672,7 +1672,7 @@ trans_funs$f870t880 <- function (idf) {
                             "Please check your inputs to make sure this ",
                             "reflects your foundation."
                         ),
-                        "warning_trans_870_880"
+                        "trans_870_880"
                     )
 
                     dt
@@ -1897,7 +1897,7 @@ trans_funs$f890t900 <- function (idf) {
         )
     )
     if (nrow(dt1) && idf$object_num("OutdoorAir:Mixer") > 1L) {
-        warn("Multiple 'OutdoorAir:Mixer' object found.", "warning_trans_890_900")
+        warn("Multiple 'OutdoorAir:Mixer' object found.", "trans_890_900")
     }
     # }}}
     # 2: AirflowNetwork:Distribution:Component:ReliefAirFlow {{{
@@ -1909,7 +1909,7 @@ trans_funs$f890t900 <- function (idf) {
         )
     )
     if (nrow(dt2) && idf$object_num("OutdoorAir:Mixer") > 1L) {
-        warn("Multiple 'OutdoorAir:Mixer' object found.", "warning_trans_890_900")
+        warn("Multiple 'OutdoorAir:Mixer' object found.", "trans_890_900")
     }
     # }}}
     # 3: Boiler:HotWater {{{
@@ -1934,7 +1934,7 @@ trans_funs$f890t900 <- function (idf) {
                         "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
                         "start week day is set by the input start date."
                     ),
-                    "warning_trans_890_900"
+                    "trans_890_900"
                 )
                 value[usewthrfile] <- NA_character_
             }
@@ -1983,7 +1983,7 @@ trans_funs$f890t900 <- function (idf) {
                                 "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
                                 "start week day is set by the input start date."
                             ),
-                            "warning_trans_890_900"
+                            "trans_890_900"
                         )
                         value[8L] <- NA_character_
                     }
@@ -1997,7 +1997,7 @@ trans_funs$f890t900 <- function (idf) {
                                 "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
                                 "start week day is set by the input start date."
                             ),
-                            "warning_trans_890_900"
+                            "trans_890_900"
                         )
                         value[8L] <- NA_character_
                     }
@@ -2012,7 +2012,7 @@ trans_funs$f890t900 <- function (idf) {
                                     "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
                                     "start week day is set by the input start date."
                                 ),
-                                "warning_trans_890_900"
+                                "trans_890_900"
                             )
                             value[8L] <- NA_character_
                         }
@@ -2040,7 +2040,7 @@ trans_funs$f890t900 <- function (idf) {
                                     "Option 'UseWeatherFile' for 'Start Day of Week' has been removed, ",
                                     "start week day is set by the input start date."
                                 ),
-                                "warning_trans_890_900"
+                                "trans_890_900"
                             )
                             value[8L] <- NA_character_
                             # Sunday
@@ -2053,7 +2053,7 @@ trans_funs$f890t900 <- function (idf) {
                                         "Invalid 'Start Day of Week' (", surround(value[8L]), ") found. ",
                                         "Assuming 'Sunday'."
                                     ),
-                                    "warning_trans_890_900"
+                                    "trans_890_900"
                                 )
                             }
                         }
@@ -2095,7 +2095,7 @@ trans_funs$f890t900 <- function (idf) {
                             "With 'Number of Times Runperiod to be Repeated' being ", num_rep,
                             "the end year will be ", end_year, ", which is not a leap year. ",
                             "The end date will be reset to Feb 28th."
-                        ), "error_trans_890_900")
+                        ), "trans_890_900")
                         value[6L] <- "28"
                     }
 
@@ -2250,7 +2250,7 @@ trans_funs$f890t900 <- function (idf) {
                 collapse(unique(empty[, {ifelse(is.na(name), "", (name))}])),
                 " was not used by any surfaces, so it has been deleted.",
                 collpase = "\n"
-            ), "warning_trans_890_900")
+            ), "trans_890_900")
             dt11 <- dt11[!empty, on = c("id", "name")]
             fene_daylight_zone <- fene_daylight_zone[!empty, on = c("id_ctrl" = "id", "name_ctrl" = "name")]
         }
@@ -2488,7 +2488,7 @@ trans_funs$f910t920 <- function (idf) {
     warn_removed_as_comment <- function (idf, class) {
         warn(paste0("Class '", class, "' has been removed in EnergyPlus v9.2. ",
             "Objects in that class will be listed as comments in the new output file."
-        ), "warning_trans_910_920")
+        ), "trans_910_920")
 
         # separate by objects
         cmt <- idf$to_string(class = class, header = FALSE, format = "new_top")
@@ -2517,7 +2517,7 @@ trans_funs$f910t920 <- function (idf) {
             "file. External files must be converted to the new format and saved ",
             "to CSV with a name suffix '-New':\n",
             paste0(obj, ": ", surround(files))
-        ), "warning_trans_910_920")
+        ), "trans_910_920")
 
         # convert
         if (is.null(ascending)) {
@@ -3218,7 +3218,7 @@ trans_funs$f920t930 <- function (idf) {
                         "is not an 'AirflowNetwork:Distribution:Component:Duct' object. ",
                         "No new duct will be added."),
                         value[4L], name[1L], .BY$id
-                    ))
+                    ), "trans_920_930")
                 }
                 val
             }]
@@ -3466,7 +3466,7 @@ trans_funs$f930t940 <- function (idf) {
                 "Field '%s' for object [id:%s] in class 'Output:DebuggingData' ",
                 "is not a number, defaulting to 'No'."),
                 field[1L], .BY$id
-            ))
+            ), "trans_930_940")
             list("No", 0.0)
         }]
 
@@ -3483,7 +3483,7 @@ trans_funs$f930t940 <- function (idf) {
                 "'Output:Diagnostics' has become an unique-object class in EnergyPlus v9.4. ",
                 "All other objects except the first one found will be listed as comments and ",
                 "their keys will be all consolidated into the first one."
-            ))
+            ), "trans_930_940")
             id_cmt <- unique(dt4$id)[-1L]
             id_left <- dt4$id[1L]
             cmt <- idf$to_string(id_cmt, header = FALSE, format = "new_bot")
@@ -3534,7 +3534,7 @@ trans_funs$f930t940 <- function (idf) {
         warn(paste0("Objects in class 'PythonPlugin:Instance' found. ",
             "Note that the API has been changed from v9.3 and v9.4. ",
             "Please check the docs and update with new state argument."
-        ))
+        ), "trans_930_940")
     }
     # }}}
 
@@ -3574,7 +3574,7 @@ trans_funs$f940t950 <- function (idf) {
                 "in class 'Construction:AirBoundary' is no loger valid in Energyplus v9.5. ",
                 "All air boundaries will be modelled using the 'GroupedZones' method. Object(s) below were affected:\n%s"),
                 paste(sprintf(" #%s| Object '%s' [ID: %i]", lpad(seq_along(index), "0"), name, id), collapse = "\n")
-            ))
+            ), "trans_940_950")
         }]
         dt1[index == 3L & stri_trans_tolower(value) %chin% "irtsurface", {
             warn(sprintf(paste0(
@@ -3582,7 +3582,7 @@ trans_funs$f940t950 <- function (idf) {
                 "in class 'Construction:AirBoundary' is no loger valid in Energyplus v9.5. ",
                 "All air boundaries will be modelled using the 'GroupedZones' method. Object(s) below were affected:\n%s"),
                 paste(sprintf(" #%s| Object '%s' [ID: %i]", lpad(seq_along(index), "0"), name, id), collapse = "\n")
-            ))
+            ), "trans_940_950")
         }]
 
         dt1 <- dt1[!index %in% c(2L, 3L)]
