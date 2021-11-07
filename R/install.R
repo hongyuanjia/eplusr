@@ -234,7 +234,13 @@ eplus_download_url <- function (ver) {
     } else {
         arch <- "i386"
     }
-    ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+
+    if (ver <= 9.2) {
+        ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+    } else {
+        # use QtIFW installer for Linux
+        ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "run")
+    }
 
     base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
     file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, os, arch, ext)
