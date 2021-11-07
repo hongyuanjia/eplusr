@@ -347,6 +347,8 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
 # install_eplus_linux {{{
 #' @importFrom checkmate assert_string
 install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
+    ver <- standardize_ver(ver)
+
     if (local) {
         if (is.null(dir)) dir <- "~/.local"
         if (is.null(dir_bin)) dir_bin <- "~/.local/bin"
@@ -362,11 +364,12 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     dir <- normalizePath(dir, mustWork = TRUE)
     dir_bin <- normalizePath(dir_bin, mustWork = TRUE)
 
-    system(sprintf('chmod +x %s', exec))
+    ver_dash <- gsub("\\.", "-", ver)
+    dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
+
     # EnergyPlus installation are broken since 9.1.0, which extract all files
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
-    ver_dash <- gsub("\\.", "-", standardize_ver(ver))
     if (ver == 9.1) {
         if (Sys.which("sed") != "") {
             # copy the original installer
@@ -381,7 +384,6 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
             patch_eplus_linux_sh(ver, temp_exec)
             exec <- temp_exec
         } else {
-            dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
             message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
                 "fails to extract files into correct directory ('", dir_eplus, "'). ",
                 "eplusr uses 'sed' to fix the issue before running the installation, ",
@@ -394,12 +396,21 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
         }
     }
 
-    if (local) {
-        system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
-        system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+    # EnergyPlus v9.3 and above provide a QtIFW based installer for Linux
+    if (ver >= 9.3) {
+        install_eplus_qt(exec, dir, local)
     } else {
-        system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+        system(sprintf('chmod +x %s', exec))
+        # installers for EnergyPlus v9.2 and above should provide the full path
+        # of EnergyPlus install directory
+        if (ver >= 9.2) dir <- dir_eplus
+        if (local) {
+            system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
+            system(sprintf('chmod -R a+w %s', dir_eplus))
+        } else {
+            system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
+            system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
+        }
     }
 }
 # }}}
