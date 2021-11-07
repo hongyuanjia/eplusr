@@ -366,10 +366,20 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     # EnergyPlus installation are broken since 9.1.0, which extract all files
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
-    ver_dash <- gsub("\\.", "-", ver)
-    if (ver >= 9.1) {
+    ver_dash <- gsub("\\.", "-", standardize_ver(ver))
+    if (ver >= 9.1 && ver <= 9.4) {
         if (Sys.which("sed") != "") {
-            patch_eplus_linux_sh(ver, exec)
+            # copy the original installer
+            temp_exec <- file.path(tempdir(), basename(exec))
+            flag <- file.copy(exec, temp_exec, overwrite = TRUE, copy.date = TRUE)
+            if (!flag) {
+                abort(paste0(
+                    "Failed to create a temporary copy of EnergyPlus installer '",
+                    dir, "' at temporary directory '", tempdir(), "'."
+                ))
+            }
+            patch_eplus_linux_sh(ver, temp_exec)
+            exec <- temp_exec
         } else {
             dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
             message("There is a known issue in EnergyPlus installation since v9.1.0 which ",
