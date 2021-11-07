@@ -235,16 +235,11 @@ eplus_download_url <- function (ver) {
         arch <- "i386"
     }
 
-    if (ver <= 9.2) {
-        ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
-    } else {
-        # use QtIFW installer for Linux
-        ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "run")
-    }
+    ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
 
     base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
     file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, os, arch, ext)
-    paste0(base_url,"v", cmt$version, "/", file)
+    paste0(base_url, "v", cmt$version, "/", file)
 }
 # }}}
 # eplus_release_commit: return EnergyPlus release commit data {{{
@@ -397,20 +392,16 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     }
 
     # EnergyPlus v9.3 and above provide a QtIFW based installer for Linux
-    if (ver >= 9.3) {
-        install_eplus_qt(exec, dir, local)
+    system(sprintf('chmod +x %s', exec))
+    # installers for EnergyPlus v9.2 and above should provide the full path
+    # of EnergyPlus install directory
+    if (ver >= 9.2) dir <- dir_eplus
+    if (local) {
+        system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
+        system(sprintf('chmod -R a+w %s', dir_eplus))
     } else {
-        system(sprintf('chmod +x %s', exec))
-        # installers for EnergyPlus v9.2 and above should provide the full path
-        # of EnergyPlus install directory
-        if (ver >= 9.2) dir <- dir_eplus
-        if (local) {
-            system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
-            system(sprintf('chmod -R a+w %s', dir_eplus))
-        } else {
-            system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-            system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
-        }
+        system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
+        system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
     }
 }
 # }}}
