@@ -3748,6 +3748,120 @@ trans_funs$f940t950 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_950_960 {{{
+trans_funs$f950t960 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.5)
+
+    target_cls <- c(
+        "AirflowNetwork:MultiZone:ReferenceCrackConditions", # 1
+        "AirLoopHVAC:OutdoorAirSystem",                      # 2
+        "BuildingSurface:Detailed",                          # 3
+        "Ceiling:Adiabatic",                                 # 4
+        "Ceiling:Interzone",                                 # 5
+        "Controller:MechanicalVentilation",                  # 6
+        "Floor:Detailed",                                    # 7
+        "Floor:GroundContact",                               # 8
+        "Floor:Adiabatic",                                   # 9
+        "Floor:Interzone",                                   # 10
+        "GroundHeatExchanger:System",                        # 11
+        "InternalMass",                                      # 12
+        "RoofCeiling:Detailed",                              # 13
+        "Sizing:System",                                     # 14
+        "Roof",                                              # 15
+        "PerformancePrecisionTradeoffs",                     # 16
+        "Wall:Detailed",                                     # 17
+        "Wall:Exterior",                                     # 18
+        "Wall:Adiabatic",                                    # 19
+        "Wall:Underground",                                  # 20
+        "Wall:Interzone"                                     # 21
+    )
+
+    new_idf <- trans_preprocess(idf, 9.6, target_cls)
+
+    # 1: AirflowNetwork:MultiZone:ReferenceCrackConditions {{{
+    dt1 <- trans_action(idf, "AirflowNetwork:MultiZone:ReferenceCrackConditions",
+        reset = list(2, NA_character_, "20.0")
+    )
+    # }}}
+    # 2: AirLoopHVAC:OutdoorAirSystem {{{
+    dt2 <- trans_action(idf, "AirLoopHVAC:OutdoorAirSystem", delete = list(4L))
+    # }}}
+    # 3:BuildingSurface:Detailed {{{
+    dt3 <- trans_action(idf, "BuildingSurface:Detailed", insert = list(5L))
+    # }}}
+    # 4: Construction:InternalSource {{{
+    dt4 <- trans_action(idf, "Ceiling:Adiabatic", insert = list(4L))
+    # }}}
+    # 5: Ceiling:Interzone {{{
+    dt5 <- trans_action(idf, "Ceiling:Interzone", insert = list(4L))
+    # }}}
+    # 6: Controller:MechanicalVentilation {{{
+    dt6 <- trans_action(idf, "Controller:MechanicalVentilation",
+        reset = list(4L, "VentilationRateProcedure", "Standard62.1VentilationRateProcedure")
+    )
+    # }}}
+    # 7: Floor:Detailed {{{
+    dt7 <- trans_action(idf, "Floor:Detailed", insert = list(4L))
+    # }}}
+    # 8: Floor:GroundContact {{{
+    dt8 <- trans_action(idf, "Floor:GroundContact", insert = list(4L))
+    # }}}
+    # 9: Floor:Adiabatic {{{
+    dt9 <- trans_action(idf, "Floor:Adiabatic", insert = list(4L))
+    # }}}
+    # 10: Floor:Interzone {{{
+    dt10 <- trans_action(idf, "Floor:Interzone", insert = list(4L))
+    # }}}
+    # 11: GroundHeatExchanger:System {{{
+    dt11 <- trans_action(idf, "GroundHeatExchanger:System", insert = list(10L))
+    if (nrow(dt11)) {
+        id_target <- dt11[index == 9L & is.na(value), id]
+        if (length(id_target)) {
+            dt11[J(id_target, 10L), on = c("id", "index"), value := "UHFCalc"]
+        }
+    }
+    # }}}
+    # 12: InternalMass {{{
+    dt12 <- trans_action(idf, "InternalMass", insert = list(4L))
+    # }}}
+    # 13: RoofCeiling:Detailed {{{
+    dt13 <- trans_action(idf, "RoofCeiling:Detailed", insert = list(4L))
+    # }}}
+    # 14: Sizing:System {{{
+    dt14 <- trans_action(idf, "Sizing:System",
+        reset = list(27L, "VentilationRateProcedure", "Standard62.1VentilationRateProcedure")
+    )
+    # }}}
+    # 15: Roof {{{
+    dt15 <- trans_action(idf, "Roof", insert = list(4L))
+    # }}}
+    # 16: PerformancePrecisionTradeoffs {{{
+    dt16 <- trans_action(idf, "PerformancePrecisionTradeoffs",
+        reset = list(3L, "Mode07", "Mode08"),
+        reset = list(3L, "Mode06", "Mode07")
+    )
+    # }}}
+    # 17: Wall:Detailed {{{
+    dt17 <- trans_action(idf, "Wall:Detailed", insert = list(4L))
+    # }}}
+    # 18: Wall:Exterior {{{
+    dt18 <- trans_action(idf, "Wall:Exterior", insert = list(4L))
+    # }}}
+    # 19: Wall:Adiabatic {{{
+    dt19 <- trans_action(idf, "Wall:Adiabatic", insert = list(4L))
+    # }}}
+    # 20: Wall:Underground {{{
+    dt20 <- trans_action(idf, "Wall:Underground", insert = list(4L))
+    # }}}
+    # 21: Wall:Interzone {{{
+    dt21 <- trans_action(idf, "Wall:Interzone", insert = list(4L))
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:21))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

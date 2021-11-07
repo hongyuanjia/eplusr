@@ -2255,3 +2255,197 @@ test_that("Transition v9.4 --> v9.5", {
     )
 })
 # }}}
+# v9.5 --> v9.6 {{{
+test_that("Transition v9.5 --> v9.6", {
+    skip_on_cran()
+    from <- 9.5
+    to <- 9.6
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "AirflowNetwork:MultiZone:ReferenceCrackConditions" = list("AN", NULL),
+            "AirLoopHVAC:OutdoorAirSystem" = list(
+                "OAS", "OAS Ctrl", "OAS Equip", "OAS Avail"
+            ),
+            "BuildingSurface:Detailed" = list(
+                "Surface", "Wall", "Const", "Zone", "Outdoors", NULL,
+                "SunExposed", "WindExposed", 0.5, 3,
+                0, 0, 0, 1, 1, 1, 2, 2, 2
+            ),
+            "Ceiling:Interzone" = list(
+                "CI", "Const", "Zone", "Outdoors", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Ceiling:Adiabatic" = list(
+                "CA", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Controller:MechanicalVentilation" = list(
+                "CMV", "Avail", "Yes", "VentilationRateProcedure", 1.0, "Zone", "OASpec", "AirDistSpec"
+            ),
+            "Floor:Detailed" = list(
+                "FD", "Const", "Zone", "Outdoors", NULL,
+                "SunExposed", "WindExposed", 0.5, 3,
+                0, 0, 0, 1, 1, 1, 2, 2, 2
+            ),
+            "Floor:GroundContact" = list(
+                "FG", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Floor:Adiabatic" = list(
+                "FA", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Floor:Interzone" = list(
+                "FI", "Const", "Zone", "Outdoors", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "GroundHeatExchanger:System" = list(
+                "GHES1", "Inlet", "Outlet", 0.0003,
+                "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                "Vertical Ground Heat Exchanger Ground Temps",
+                0.7, 2347000,
+                "Vertical Ground Heat Exchanger g-functions"
+            ),
+            "GroundHeatExchanger:System" = list(
+                "GHES2", "Inlet", "Outlet", 0.0003,
+                "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                "Vertical Ground Heat Exchanger Ground Temps",
+                0.7, 2347000, NULL,
+                "Array1", "Single1", "Array2", "Single2"
+            ),
+            "InternalMass" = list("IM", "Const", "Zone", 50),
+            "RoofCeiling:Detailed" = list(
+                "RD", "Const", "Zone", "Outdoors", NULL,
+                "SunExposed", "WindExposed", 0.5, 3,
+                0, 0, 0, 1, 1, 1, 2, 2, 2
+            ),
+            "Sizing:System" = list("SS", ..27 = "VentilationRateProcedure"),
+            "Roof" = list(
+                "CI", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "PerformancePrecisionTradeoffs" = list("Yes", "ScriptF", "Mode06"),
+            "Wall:Detailed" = list(
+                "WD", "Const", "Zone", "Outdoors", NULL,
+                "SunExposed", "WindExposed", 0.5, 3,
+                0, 0, 0, 1, 1, 1, 2, 2, 2
+            ),
+            "Wall:Exterior" = list(
+                "WE", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Wall:Adiabatic" = list(
+                "WA", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Wall:Underground" = list(
+                "WU", "Const", "Zone", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            "Wall:Interzone" = list(
+                "WI", "Const", "Zone", "Outdoors", 0, 90, 0, 0, 0, 0.5, 0.5
+            ),
+            .all = FALSE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_is(idfTR <- transition(idfOri, to), "Idf")
+
+    expect_equal(
+        idfVU$"AirflowNetwork:MultiZone:ReferenceCrackConditions"$AN$value(),
+        idfTR$"AirflowNetwork:MultiZone:ReferenceCrackConditions"$AN$value()
+    )
+
+    expect_equal(
+        idfVU$"AirLoopHVAC:OutdoorAirSystem"$OAS$value(),
+        idfTR$"AirLoopHVAC:OutdoorAirSystem"$OAS$value()
+    )
+
+    expect_equal(
+        idfVU$"BuildingSurface:Detailed"$Surface$value(),
+        idfTR$"BuildingSurface:Detailed"$Surface$value()
+    )
+
+    expect_equal(
+        idfVU$"Ceiling:Interzone"$CI$value(),
+        idfTR$"Ceiling:Interzone"$CI$value()
+    )
+
+    expect_equal(
+        idfVU$"Ceiling:Adiabatic"$CA$value(),
+        idfTR$"Ceiling:Adiabatic"$CA$value()
+    )
+
+    expect_equal(
+        idfVU$"Controller:MechanicalVentilation"$CMV$value(),
+        idfTR$"Controller:MechanicalVentilation"$CMV$value()
+    )
+
+    expect_equal(
+        idfVU$"Floor:Detailed"$FD$value(),
+        idfTR$"Floor:Detailed"$FD$value()
+    )
+
+    expect_equal(
+        idfVU$"Floor:GroundContact"$FG$value(),
+        idfTR$"Floor:GroundContact"$FG$value()
+    )
+
+    expect_equal(
+        idfVU$"Floor:Adiabatic"$FA$value(),
+        idfTR$"Floor:Adiabatic"$FA$value()
+    )
+
+    expect_equal(
+        idfVU$"Floor:Interzone"$FI$value(),
+        idfTR$"Floor:Interzone"$FI$value()
+    )
+
+    expect_equal(
+        idfVU$"GroundHeatExchanger:System"$GHES1$value(),
+        idfTR$"GroundHeatExchanger:System"$GHES1$value()
+    )
+    expect_equal(
+        tolower(idfVU$"GroundHeatExchanger:System"$GHES2$value()),
+        tolower(idfTR$"GroundHeatExchanger:System"$GHES2$value())
+    )
+
+    expect_equal(
+        idfVU$"InternalMass"$IM$value(),
+        idfTR$"InternalMass"$IM$value()
+    )
+
+    expect_equal(
+        idfVU$"RoofCeiling:Detailed"$RD$value(),
+        idfTR$"RoofCeiling:Detailed"$RD$value()
+    )
+
+    expect_equal(
+        idfVU$"Sizing:System"[[1]]$value(),
+        idfTR$"Sizing:System"[[1]]$value()
+    )
+
+    expect_equal(
+        idfVU$"PerformancePrecisionTradeoffs"$value(),
+        idfTR$"PerformancePrecisionTradeoffs"$value()
+    )
+
+    expect_equal(
+        idfVU$"Wall:Detailed"$WD$value(),
+        idfTR$"Wall:Detailed"$WD$value()
+    )
+
+    expect_equal(
+        idfVU$"Wall:Exterior"$WE$value(),
+        idfTR$"Wall:Exterior"$WE$value()
+    )
+
+    expect_equal(
+        idfVU$"Wall:Adiabatic"$WA$value(),
+        idfTR$"Wall:Adiabatic"$WA$value()
+    )
+
+    expect_equal(
+        idfVU$"Wall:Underground"$WU$value(),
+        idfTR$"Wall:Underground"$WU$value()
+    )
+
+    expect_equal(
+        idfVU$"Wall:Interzone"$WI$value(),
+        idfTR$"Wall:Interzone"$WI$value()
+    )
+})
+# }}}
