@@ -269,6 +269,7 @@ download_file <- function (url, dest) {
 # }}}
 # install_eplus_win {{{
 install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
+    ver <- standardize_ver(ver)
     if (is.null(dir)) {
         if (local) {
             dir <- get_win_user_path(error = TRUE)
@@ -487,11 +488,45 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
         };
     ", collapse = "\n"))
     # use headless install unless on macOS
-    system(sprintf("%s %s --script %s", exec, if (!is_macos()) "--platform minimal", ctrl))
+    system(sprintf("%s --script %s", exec, ctrl))
+}
+# }}}
+# uninstall_eplus_win {{{
+uninstall_eplus_win <- function (ver, dir) {
+    ver <- standardize_ver(ver)
+    uninstaller <- normalizePath(file.path(dir, "Uninstall.exe"), mustWork = FALSE)
+    if (!file.exists(uninstaller)) {
+        abort(sprintf(paste0(
+            "Failed to locate 'Uninstall.exe' under EnergyPlus installation directory '%s'.",
+        ), dir))
+    }
+
+    verbose_info(sprintf("Removing installation of EnergyPlus v%s.", ver))
+    message(paste("The uninstaller will pop up a message box asking",
+        "whether to remove files copied to the system directory during installation.",
+        "Please make your choice."
+    ))
+    system(sprintf("%s /S", uninstaller))
+    verbose_info(sprintf("EnergyPlus v%s has been uninstalled successfully.", ver))
+    invisible(TRUE)
 }
 # }}}
 # uninstall_eplus_qt {{{
-uninstall_eplus_qt <- function (exec) install_eplus_qt(exec, "")
+uninstall_eplus_qt <- function (ver, dir) {
+    ver <- standardize_ver(ver)
+    ext <- if (is_windows()) ".exe" else ""
+    uninstaller <- normalizePath(file.path(dir, paste0("maintenancetool", ext)), mustWork = FALSE)
+    if (!file.exists(uninstaller)) {
+        abort(sprintf(
+            "Failed to locate '%s' under EnergyPlus installation directory '%s'.",
+            basename(uninstaller), dir)
+        )
+    }
+    verbose_info(sprintf("Removing installation of EnergyPlus v%s.", ver))
+    install_eplus_qt(uninstaller, dir)
+    verbose_info(sprintf("EnergyPlus v%s has been uninstalled successfully.", ver))
+    invisible(TRUE)
+}
 # }}}
 # uninstall_eplus_linux {{{
 uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
