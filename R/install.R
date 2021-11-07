@@ -495,33 +495,32 @@ uninstall_eplus_qt <- function (exec) install_eplus_qt(exec, "")
 # }}}
 # uninstall_eplus_linux {{{
 uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
-    if (ver <= 9.4) {
-        uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
-        if (!file.exists(uninstaller)) {
-            if (!force) {
-                abort(sprintf(paste0(
-                    "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
-                    "Unable to remove symbolic links."
-                ), dir))
-            } else {
-                warn(sprintf(paste0(
-                    "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
-                    "Symbolic links will NOT be removed"
-                ), dir))
-            }
+    ver <- standardize_ver(ver)
+    uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
+    if (!file.exists(uninstaller)) {
+        if (!force) {
+            abort(sprintf(paste0(
+                "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                "Unable to remove symbolic links."
+            ), dir))
+        } else {
+            warn(sprintf(paste0(
+                "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                "Symbolic links will NOT be removed"
+            ), dir))
         }
-
-        if (!utils::file_test("-x", uninstaller)) {
-            system(sprintf("sudo chmod +x %s", uninstaller))
-        }
-
-        verbose_info(sprintf("Removing symbolic links for EnergyPlus v%s.", ver))
-        system(sprintf("sudo bash %s", uninstaller))
-        verbose_info(sprintf("Removing installation directory of EnergyPlus v%s.", ver))
-        system(sprintf("sudo rm -rf %s", dir))
-        verbose_info(sprintf("EnergyPlus v%s has been uninstalled successfully.", ver))
-        TRUE
     }
+
+    if (!utils::file_test("-x", uninstaller)) {
+        system(sprintf("sudo chmod +x %s", uninstaller))
+    }
+
+    verbose_info(sprintf("Removing symbolic links for EnergyPlus v%s.", ver))
+    system(sprintf("sudo bash %s", uninstaller))
+    verbose_info(sprintf("Removing installation directory of EnergyPlus v%s.", ver))
+    system(sprintf("sudo rm -rf %s", dir))
+    verbose_info(sprintf("EnergyPlus v%s has been uninstalled successfully.", ver))
+    invisible(TRUE)
 }
 # }}}
 
