@@ -367,7 +367,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
     ver_dash <- gsub("\\.", "-", standardize_ver(ver))
-    if (ver >= 9.1 && ver <= 9.4) {
+    if (ver == 9.1) {
         if (Sys.which("sed") != "") {
             # copy the original installer
             temp_exec <- file.path(tempdir(), basename(exec))
@@ -382,7 +382,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
             exec <- temp_exec
         } else {
             dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
-            message("There is a known issue in EnergyPlus installation since v9.1.0 which ",
+            message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
                 "fails to extract files into correct directory ('", dir_eplus, "'). ",
                 "eplusr uses 'sed' to fix the issue before running the installation, ",
                 "but 'sed' is not found on current system. ",
@@ -405,7 +405,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
 # }}}
 # patch_eplus_linux_sh {{{
 patch_eplus_linux_sh <- function (ver, exec) {
-    if (ver >= 9.1 && ver <= 9.4) {
+    if (ver == 9.1) {
         system(sprintf("sed -i '%is/%s/%s/' %s",
             77,
             "\\${install_directory}",
@@ -435,20 +435,16 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
     if (is_windows()) dir <- gsub("\\", "\\\\", dir, fixed = TRUE)
     write_lines(file = ctrl, x = paste0("
         function Controller() {
-            installer.setMessageBoxAutomaticAnswer('OverwriteTargetDirectory', QMessageBox.Yes);
-            installer.setMessageBoxAutomaticAnswer('TargetDirectoryInUse', QMessageBox.Ok);
-            installer.setMessageBoxAutomaticAnswer('cancelInstallation', QMessageBox.Yes);
             installer.installationFinished.connect(function() {
+                gui.clickButton(buttons.NextButton);
+            })
+            installer.uninstallationFinished.connect(function() {
                 gui.clickButton(buttons.NextButton);
             })
         };
 
         Controller.prototype.IntroductionPageCallback = function() {
             gui.clickButton(buttons.NextButton);
-            var page = gui.currentPageWidget()
-            page.completeChanged.connect(function() {
-                gui.clickButton(buttons.NextButton);
-            });
         };
 
         Controller.prototype.TargetDirectoryPageCallback = function() {
@@ -488,7 +484,42 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
             gui.clickButton(buttons.FinishButton);
         };
     ", collapse = "\n"))
-    system(sprintf("%s --script %s", exec, ctrl))
+    # use headless install unless on macOS
+    system(sprintf("%s %s --script %s", exec, if (!is_macos()) "--platform minimal", ctrl))
+}
+# }}}
+# uninstall_eplus_qt {{{
+uninstall_eplus_qt <- function (exec) install_eplus_qt(exec, "")
+# }}}
+# uninstall_eplus_linux {{{
+uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
+    if (ver <= 9.4) {
+        uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
+        if (!file.exists(uninstaller)) {
+            if (!force) {
+                abort(sprintf(paste0(
+                    "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                    "Unable to remove symbolic links."
+                ), dir))
+            } else {
+                warn(sprintf(paste0(
+                    "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                    "Symbolic links will NOT be removed"
+                ), dir))
+            }
+        }
+
+        if (!utils::file_test("-x", uninstaller)) {
+            system(sprintf("sudo chmod +x %s", uninstaller))
+        }
+
+        verbose_info(sprintf("Removing symbolic links for EnergyPlus v%s.", ver))
+        system(sprintf("sudo bash %s", uninstaller))
+        verbose_info(sprintf("Removing installation directory of EnergyPlus v%s.", ver))
+        system(sprintf("sudo rm -rf %s", dir))
+        verbose_info(sprintf("EnergyPlus v%s has been uninstalled successfully.", ver))
+        TRUE
+    }
 }
 # }}}
 
