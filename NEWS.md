@@ -10,6 +10,7 @@
   `class` defaulting to `NULL` to check the validity of object IDs and names
   again a specific class.
 * Add support for EnergyPlus v9.5 (#438).
+* Add support for EnergyPlus v9.6 (#460).
 
 ## Minor changes
 
