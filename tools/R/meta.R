@@ -13,9 +13,10 @@ read_meta <- function(path = here::here("tools/meta.json")) {
 
 write_meta <- function(meta, ...) {
     d <- list(...)
-    jsonlite::write_json(c(meta[!names(meta) %in% c("path", names(d))], d),
-        meta$path, pretty = TRUE, auto_unbox = TRUE
-    )
+
+    # reorder
+    d <- c(meta[!names(meta) %in% c("path", names(d))], d)
+    jsonlite::write_json(d[order(names(d))], meta$path, pretty = TRUE, auto_unbox = TRUE)
 }
 
 set_proxy <- function() {

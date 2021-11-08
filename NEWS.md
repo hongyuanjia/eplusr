@@ -6,6 +6,11 @@
 * Add epw data sources from [climate.onebuilding.org](http://climate.onebuilding.org/)
   for `download_weather()`. `type` will always be `"all"` for those sources (#453).
 * Add a new `"stat"` option in `type` in `download_weather()` (#453).
+* `Idf$is_valid_id()` and `Idf$is_valid_name()` gain a new argument named
+  `class` defaulting to `NULL` to check the validity of object IDs and names
+  again a specific class.
+* Add support for EnergyPlus v9.5 (#438).
+* Add support for EnergyPlus v9.6 (#460).
 * `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
   procedure. It supports to call the `Basement` and `Slab` processors. Now the
   requirement of EnergyPlus >=v8.3 for running simulations has been droppped
