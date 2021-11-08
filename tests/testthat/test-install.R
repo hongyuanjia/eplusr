@@ -21,6 +21,6 @@ test_that("Install", {
         # still need EnergyPlus v9.5 for testing transitions
         install_eplus_from_file(9.5, installer, TRUE)
         # refresh config database
-        expect_is(locate_eplus(), "list")
+        expect_is(locate_eplus(), "numeric_version")
     }
 })
