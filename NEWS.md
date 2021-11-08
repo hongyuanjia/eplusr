@@ -11,6 +11,11 @@
   again a specific class.
 * Add support for EnergyPlus v9.5 (#438).
 * Add support for EnergyPlus v9.6 (#460).
+* Internal function `locate_eplus()` has been exported to enable user to find
+  all available EnergyPlus without restarting R.
+* `uninstall_eplus()` has been added to enable uninstall EnergyPlus from R.
+* Now force reinstallation of EnergyPlus `install_eplus(force = TRUE)` has been
+  updated to support all platforms, including macOS.
 
 ## Minor changes
 

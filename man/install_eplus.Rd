@@ -2,16 +2,20 @@
 % Please edit documentation in R/install.R
 \name{install_eplus}
 \alias{install_eplus}
+\alias{uninstall_eplus}
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
 install_eplus(ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...)
 
+uninstall_eplus(ver)
+
 download_eplus(ver = "latest", dir)
 }
 \arguments{
-\item{ver}{The EnergyPlus version number, e.g., \code{8.7}. The special value
-\code{"latest"}, which is the default, means the latest version.}
+\item{ver}{The EnergyPlus version number, e.g., \code{8.7}. For \code{download_eplus()}
+and \code{install_eplus()}, the special value \code{"latest"}, which is the
+default, means the latest version supported by eplusr.}
 
 \item{local}{Whether to install EnergyPlus only for current user. For Windows
 and Linux, if \code{FALSE}, administrative privileges are required to
@@ -37,13 +41,17 @@ location. Default: \code{NULL}.
 }}
 
 \item{force}{Whether to install EnergyPlus even if it has already been
-installed.}
+installed. On Windows and macOS, for EnergyPlus v9.2 and above, the
+existing EnergyPlus will be \strong{UNINSTALLED} before reinstallation.
+Please make sure you really want to do so. Default: \code{FALSE}.}
 
 \item{...}{Other arguments to be passed to the installer. Current only one
 additional argument exists and is only for Linux:
-* dir_bin: A path where symbolic links will be created to the software
+\itemize{
+\item \code{dir_bin}: A path where symbolic links will be created to the software
 executables. The default is \verb{/usr/local/bin} if \code{local} is \code{FALSE}
-and \verb{~/.local/bin} if \code{local} is \code{TRUE}.}
+and \verb{~/.local/bin} if \code{local} is \code{TRUE}.
+}}
 }
 \value{
 An invisible integer \code{0} if succeed. Moreover, some attributes will
@@ -68,7 +76,7 @@ install it.
 \code{download_eplus()} downloads specified version of EnergyPlus from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
 
-\code{install_eplus()} will try to install EnergyPlus into the default location,
+\code{install_eplus()} tries to install EnergyPlus into the default location,
 e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, \verb{/usr/local/EnergyPlus-X-Y-0} on
 Linux, and \verb{/Applications/EnergyPlus-X-Y-0} on macOS.
 
@@ -98,6 +106,10 @@ directory.
 
 Please note that on macOS, when \code{local} is set to \code{FALSE}, no symbolic links
 will be created, since this process requires administrative privileges.
+
+\code{uninstall_eplus()} tries to uninstall specified version of EnergyPlus
+located by eplusr. Similar as \code{install_eplus()}, administrative privileges
+may be required.
 }
 \examples{
 \dontrun{
