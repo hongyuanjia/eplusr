@@ -9,8 +9,9 @@ NULL
 #' Download specified version of EnergyPlus for your platform from GitHub and
 #' install it.
 #'
-#' @param ver The EnergyPlus version number, e.g., `8.7`. The special value
-#'        `"latest"`, which is the default, means the latest version.
+#' @param ver The EnergyPlus version number, e.g., `8.7`. For `download_eplus()`
+#'        and `install_eplus()`, the special value `"latest"`, which is the
+#'        default, means the latest version supported by eplusr.
 #'
 #' @param local Whether to install EnergyPlus only for current user. For Windows
 #'        and Linux, if `FALSE`, administrative privileges are required to
@@ -33,20 +34,24 @@ NULL
 #'       location. Default: `NULL`.
 #'
 #' @param force Whether to install EnergyPlus even if it has already been
-#'        installed.
+#'        installed. Setting to `TRUE` if you want to install the downloaded
+#'        EnergyPlus anyway. Please note that this may results in multiple
+#'        EnergyPlus installations of the same version at different locations.
+#'        eplusr will only use the first EnergyPlus installation. Default: `FALSE`.
 #'
 #' @param ... Other arguments to be passed to the installer. Current only one
 #'        additional argument exists and is only for Linux:
-#'     * dir_bin: A path where symbolic links will be created to the software
-#'       executables. The default is `/usr/local/bin` if `local` is `FALSE`
-#'       and `~/.local/bin` if `local` is `TRUE`.
+#'
+#'   * `dir_bin`: A path where symbolic links will be created to the software
+#'     executables. The default is `/usr/local/bin` if `local` is `FALSE`
+#'     and `~/.local/bin` if `local` is `TRUE`.
 #'
 #' @details
 #'
 #' `download_eplus()` downloads specified version of EnergyPlus from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus).
 #'
-#' `install_eplus()` will try to install EnergyPlus into the default location,
+#' `install_eplus()` tries to install EnergyPlus into the default location,
 #' e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, `/usr/local/EnergyPlus-X-Y-0` on
 #' Linux, and `/Applications/EnergyPlus-X-Y-0` on macOS.
 #'
@@ -71,8 +76,12 @@ NULL
 #' administrator privileges if you do not have the write access to that
 #' directory.
 #'
-#' Please note that on macOS, when `local` is set to `FALSE`, no symbolic links
+#' Please note that when `local` is set to `FALSE`, no symbolic links
 #' will be created, since this process requires administrative privileges.
+#'
+#' `uninstall_eplus()` tries to uninstall specified version of EnergyPlus
+#' located by eplusr. Similar as `install_eplus()`, administrative privileges
+#' may be required.
 #'
 #' @name install_eplus
 #' @return An invisible integer `0` if succeed. Moreover, some attributes will
@@ -109,8 +118,8 @@ NULL
 #' @importFrom checkmate assert_string
 # install_eplus {{{
 install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...) {
+    checkmate::assert_atomic_vector(ver, any.missing = FALSE, len = 1L)
     ver <- standardize_ver(ver)
-    assert_string(dir, null.ok = TRUE)
 
     # check if the same version has been installed already
     if (is_avail_eplus(ver)) {
@@ -119,42 +128,75 @@ install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FA
                 surround(eplus_config(ver)$dir), ". Set `force` to `TRUE` to reinstall."
             ))
         }
-
-        if (is_macos() & ver >= 9.1) {
-            abort(paste0("Cannot perform force reinstallation when EnergyPlus version is v9.1 and above. ",
-                "Please first uninstall EnergyPlus v", ver, " at ",
-                surround(eplus_config(ver)$dir), " and then run 'install_eplus(\"", ver, "\")'."
-            ))
-        }
     }
 
-    verbose_info(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
+    verbose_info(sprintf("Starting to download EnergyPlus v%s...", ver))
 
     dl <- download_eplus(ver, tempdir())
+    inst <- attr(dl, "file")
 
-    verbose_info(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
+    path <- install_eplus_from_file(ver, inst, local = local, dir = dir, ...)
+
+    # add newly installed EnergyPlus to dictionary
+    use_eplus(path)
+
+    res <- 0L
+    attr(res, "path") <- path
+    attr(res, "installer") <- inst
+
+    invisible(res)
+}
+# }}}
+# install_eplus_from_file {{{
+install_eplus_from_file <- function(ver, inst, local = FALSE, dir = NULL, ...) {
+    ver <- standardize_ver(ver)
+    verbose_info(sprintf("Starting to install EnergyPlus v%s...", ver))
 
     if (!local)
         verbose_info("NOTE: Administrative privileges required during installation. ",
             "Please make sure R is running with an administrator acount or equivalent.")
 
-    inst <- attr(dl, "file")
     res <- switch(os_type(),
            windows = install_eplus_win(ver, inst, local = local, dir = dir),
            linux = install_eplus_linux(ver, inst, local = local, dir = dir, ...),
            macos = install_eplus_macos(ver, inst, local = local))
 
-    if (res != 0L) stop("Failed to install EnergyPlus v", ver, ".", call. = FALSE)
+    if (res != 0L) abort(paste0("Failed to install EnergyPlus v", ver, "."))
 
-    path <- eplus_default_path(ver)
-    verbose_info(sprintf("EnergyPlus v%s successfully installed into %s.", ver, path))
+    path <- eplus_default_path(ver, local = local)
+    verbose_info(sprintf("EnergyPlus v%s successfully installed into '%s'.", ver, path))
+    path
+}
+# }}}
 
-    # add newly installed EnergyPlus to dictionary
-    use_eplus(ver)
+#' @name install_eplus
+#' @export
+# uninstall_eplus {{{
+uninstall_eplus <- function (ver) {
+    ver <- standardize_ver(ver)
 
-    res <- 0L
-    attr(res, "path") <- path
-    attr(res, "installer") <- inst
+    # stop if cannot locate EnergyPlus
+    dir <- tryCatch(eplus_config(ver)$dir, eplusr_warning_miss_eplus_config = function(w) abort(conditionMessage(w)))
+
+    verbose_info(sprintf("Start uninstalling EnergyPlus v%s...", ver))
+    verbose_info("NOTE: Administrative privileges may be required during uninstallation. ",
+        "Please make sure R is running with an administrator acount or equivalent.")
+
+    res <- switch(os_type(),
+           windows = uninstall_eplus_win(ver, dir),
+           linux = uninstall_eplus_linux(ver, dir),
+           macos = uninstall_eplus_macos(ver, dir)
+    )
+
+    if (res != 0L) abort(paste0("Failed to uninstall EnergyPlus v", ver, "."))
+
+    verbose_info(sprintf("EnergyPlus v%s ('%s') has been uninstalled successfully.", ver, dir))
+
+    # remove config
+    .globals$eplus[[as.character(ver)]] <- NULL
+    verbose_info(sprintf("Configuration of EnergyPlus v%s has been removed.", ver))
+
+    attr(res, "path") <- dir
 
     invisible(res)
 }
@@ -234,11 +276,12 @@ eplus_download_url <- function (ver) {
     } else {
         arch <- "i386"
     }
+
     ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
 
     base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
     file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, os, arch, ext)
-    paste0(base_url,"v", cmt$version, "/", file)
+    paste0(base_url, "v", cmt$version, "/", file)
 }
 # }}}
 # eplus_release_commit: return EnergyPlus release commit data {{{
@@ -268,6 +311,7 @@ download_file <- function (url, dest) {
 # }}}
 # install_eplus_win {{{
 install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
+    ver <- standardize_ver(ver)
     if (is.null(dir)) {
         if (local) {
             dir <- get_win_user_path(error = TRUE)
@@ -279,8 +323,8 @@ install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     dir <- normalizePath(file.path(dir, paste0("EnergyPlusV", gsub("\\.", "-", ver))), mustWork = FALSE)
 
-    if (ver > 9.1) {
-        install_eplus_qt(exec, dir, local = local)
+    if (ver >= 9.2) {
+        install_eplus_qt(ver, exec, dir, local = local)
     } else {
         system(sprintf("%s /S /D=%s", exec, dir))
     }
@@ -312,17 +356,28 @@ get_win_user_path <- function (error = FALSE) {
     normalizePath(file.path("C:/Users", user, "AppData/Local"))
 }
 # }}}
+# sudo_on_mac_interactive {{{
+sudo_on_mac <- function(cmd) {
+    if (interactive()) {
+        # see: https://stackoverflow.com/questions/1517183/is-there-any-graphical-sudo-for-mac-os-x
+        system(sprintf("osascript -e 'do shell script \"%s\" with administrator privileges'", cmd))
+    } else {
+        system(sprintf("sudo %s", cmd))
+    }
+}
+# }}}
 # install_eplus_macos {{{
 install_eplus_macos <- function (ver, exec, local = FALSE) {
+    ver <- standardize_ver(ver)
     no_ext <- tools::file_path_sans_ext(basename(exec))
 
     # mount
     system(sprintf("hdiutil mount %s", exec))
     if (ver < 9.1) {
         if (local) {
-            system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
+            res <- system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
         } else {
-            system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+            res <- sudo_on_mac(sprintf("installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
         }
     } else {
         ver_dash <- gsub("\\.", "-", ver)
@@ -332,15 +387,17 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
             dir <- file.path("/Applications", paste0("EnergyPlus-", ver_dash))
         }
         exec <- sprintf("/Volumes/%s/%s.app/Contents/MacOS/%s", no_ext, no_ext, no_ext)
-        system(sprintf('chmod +x %s', exec))
-        install_eplus_qt(exec, dir, local = local)
+        res <- install_eplus_qt(ver, exec, dir, local = local)
     }
     system(sprintf("hdiutil unmount /Volumes/%s/", no_ext))
+    res
 }
 # }}}
 # install_eplus_linux {{{
 #' @importFrom checkmate assert_string
 install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
+    ver <- standardize_ver(ver)
+
     if (local) {
         if (is.null(dir)) dir <- "~/.local"
         if (is.null(dir_bin)) dir_bin <- "~/.local/bin"
@@ -356,17 +413,27 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     dir <- normalizePath(dir, mustWork = TRUE)
     dir_bin <- normalizePath(dir_bin, mustWork = TRUE)
 
-    system(sprintf('chmod +x %s', exec))
+    ver_dash <- gsub("\\.", "-", ver)
+    dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
+
     # EnergyPlus installation are broken since 9.1.0, which extract all files
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
-    ver_dash <- gsub("\\.", "-", ver)
-    if (ver >= 9.1) {
+    if (ver == 9.1) {
         if (Sys.which("sed") != "") {
-            patch_eplus_linux_sh(ver, exec)
+            # copy the original installer
+            temp_exec <- file.path(tempdir(), basename(exec))
+            flag <- file.copy(exec, temp_exec, overwrite = TRUE, copy.date = TRUE)
+            if (!flag) {
+                abort(paste0(
+                    "Failed to create a temporary copy of EnergyPlus installer '",
+                    dir, "' at temporary directory '", tempdir(), "'."
+                ))
+            }
+            patch_eplus_linux_sh(ver, temp_exec)
+            exec <- temp_exec
         } else {
-            dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
-            message("There is a known issue in EnergyPlus installation since v9.1.0 which ",
+            message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
                 "fails to extract files into correct directory ('", dir_eplus, "'). ",
                 "eplusr uses 'sed' to fix the issue before running the installation, ",
                 "but 'sed' is not found on current system. ",
@@ -378,64 +445,71 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
         }
     }
 
+    # EnergyPlus v9.3 and above provide a QtIFW based installer for Linux
+    system(sprintf('chmod +x %s', exec))
+    # installers for EnergyPlus v9.2 and above should provide the full path
+    # of EnergyPlus install directory
+    if (ver >= 9.2) dir <- dir_eplus
     if (local) {
         system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
-        system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+        system(sprintf('chmod -R a+w %s', dir_eplus))
     } else {
         system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+        system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
     }
 }
 # }}}
 # patch_eplus_linux_sh {{{
 patch_eplus_linux_sh <- function (ver, exec) {
-    if (ver == "9.1.0") {
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 47,
-            "ori_install_directory=${install_directory}\\ninstall_directory=${install_directory}\\/${package_name}",
+    if (ver == 9.1) {
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            77,
+            "\\${install_directory}",
+            "\\${install_directory}\\/\\${package_name}",
             exec
         ))
-        # change the start line of tar.gz as a new line has been added above
-        system(sprintf("sed -i '%is/+163/+164/' %s", 80, exec))
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 89,
-            "install_directory=${ori_install_directory}",
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            79,
+            "\\${install_directory}",
+            "\\${install_directory}\\/\\${package_name}",
             exec
         ))
-    } else if (ver > 9.1) {
-        system(sprintf("sed -i '%is/^.*$/%s/' %s", 70,
-            "install_directory=${install_directory}\\/${package_name}",
+        system(sprintf("sed -i '%is/%s/%s/' %s",
+            116,
+            "ParametricPreProcessor",
+            "ParametricPreprocessor",
             exec
         ))
     }
 }
 # }}}
 # install_eplus_qt {{{
-install_eplus_qt <- function (exec, dir, local = FALSE) {
+install_eplus_qt <- function (ver, exec, dir, local = FALSE, verbose = FALSE) {
+    ver <- standardize_ver(ver)
     # create a tempfile of QTIFW control script
     ctrl <- tempfile(fileext = ".qs")
     # NOTE: shoud escape slash twice here
     if (is_windows()) dir <- gsub("\\", "\\\\", dir, fixed = TRUE)
     write_lines(file = ctrl, x = paste0("
         function Controller() {
-            installer.setMessageBoxAutomaticAnswer('OverwriteTargetDirectory', QMessageBox.Yes);
-            installer.setMessageBoxAutomaticAnswer('TargetDirectoryInUse', QMessageBox.Ok);
-            installer.setMessageBoxAutomaticAnswer('cancelInstallation', QMessageBox.Yes);
             installer.installationFinished.connect(function() {
                 gui.clickButton(buttons.NextButton);
             })
+            installer.uninstallationFinished.connect(function() {
+                gui.clickButton(buttons.NextButton);
+            })
+
+            gui.setSilent(true);
         };
 
         Controller.prototype.IntroductionPageCallback = function() {
             gui.clickButton(buttons.NextButton);
-            var page = gui.currentPageWidget()
-            page.completeChanged.connect(function() {
-                gui.clickButton(buttons.NextButton);
-            });
         };
 
         Controller.prototype.TargetDirectoryPageCallback = function() {
             var page = gui.pageWidgetByObjectName('TargetDirectoryPage');
             page.TargetDirectoryLineEdit.setText(\"", dir, "\");
-            gui.clickButton(buttons.NextButton);
+            gui.clickButton(buttons.NextButton, 1000);
         };
 
         Controller.prototype.ComponentSelectionPageCallback = function() {
@@ -444,12 +518,24 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
             "gui.currentPageWidget().deselectComponent(\"Symlinks\");"
         },
         "
-            gui.clickButton(buttons.NextButton);
+            gui.clickButton(buttons.NextButton, 1000);
         };
 
         Controller.prototype.LicenseAgreementPageCallback = function() {
+        ",
+        if (ver < 9.6) {
+        "
             gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
-            gui.clickButton(buttons.NextButton);
+        "
+        # Fix action of license acceptance
+        # see: https://github.com/NREL/EnergyPlus/issues/9174
+        } else {
+        '
+            gui.currentPageWidget().AcceptLicenseCheckBox.setChecked(true);
+        '
+        },
+        "
+            gui.clickButton(buttons.NextButton, 1000);
         };
 
         Controller.prototype.StartMenuDirectoryPageCallback = function() {
@@ -469,7 +555,97 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
             gui.clickButton(buttons.FinishButton);
         };
     ", collapse = "\n"))
-    system(sprintf("%s --script %s", exec, ctrl))
+    res <- system(sprintf("%s %s --script %s", exec, if (verbose) "--verbose " else "", ctrl))
+    # sometimes QtIFW returns 1 if success for EnergyPlus v9.5 installer
+    if (res == 1L) res <- res - 1L
+    res
+}
+# }}}
+# uninstall_eplus_win {{{
+uninstall_eplus_win <- function (ver, dir) {
+    ver <- standardize_ver(ver)
+
+    if (ver >= 9.2) {
+        uninstall_eplus_qt(ver, dir)
+    } else {
+        uninstaller <- normalizePath(file.path(dir, "Uninstall.exe"), mustWork = FALSE)
+        if (!file.exists(uninstaller)) {
+            abort(sprintf(paste0(
+                "Failed to locate 'Uninstall.exe' under EnergyPlus installation directory '%s'.",
+            ), dir))
+        }
+
+        message(paste("The uninstaller will pop up a message box asking",
+            "whether to remove files copied to the system directory during installation.",
+            "Please make your choice."
+        ))
+        system(sprintf("%s /S", uninstaller))
+    }
+}
+# }}}
+# uninstall_eplus_macos {{{
+uninstall_eplus_macos <- function (ver, dir) {
+    ver <- standardize_ver(ver)
+
+    if (ver >= 9.2) {
+        uninstall_eplus_qt(ver, dir)
+    } else {
+        # test if EnergyPlus directory is accessible for current user
+        if (identical(unname(try(file.access(dir, 2L), silent = TRUE)), 0L)) {
+            system(sprintf("rm -rf %s", dir))
+        } else {
+            sudo_on_mac(sprintf("rm -rf %s", dir))
+        }
+    }
+}
+# }}}
+# uninstall_eplus_qt {{{
+uninstall_eplus_qt <- function (ver, dir) {
+    ver <- standardize_ver(ver)
+
+    ext <- if (is_windows()) ".exe" else ""
+    if (!is_macos()) {
+        exe <- sprintf("maintenancetool%s", ext)
+    } else {
+        exe <- "maintenancetool.app/Contents/MacOS/maintenancetool"
+    }
+
+    uninstaller <- normalizePath(file.path(dir, exe), mustWork = FALSE)
+    if (!file.exists(uninstaller)) {
+        abort(sprintf(
+            "Failed to locate '%s' under EnergyPlus installation directory '%s'.",
+            basename(uninstaller), dir)
+        )
+    }
+    install_eplus_qt(ver, uninstaller, dir)
+}
+# }}}
+# uninstall_eplus_linux {{{
+uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
+    ver <- standardize_ver(ver)
+    uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
+    if (!file.exists(uninstaller)) {
+        if (!force) {
+            abort(sprintf(paste0(
+                "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                "Unable to remove symbolic links."
+            ), dir))
+        } else {
+            warn(sprintf(paste0(
+                "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
+                "Symbolic links will NOT be removed"
+            ), dir))
+        }
+    }
+
+    if (!utils::file_test("-x", uninstaller)) {
+        system(sprintf("sudo chmod +x %s", uninstaller))
+    }
+
+    verbose_info(sprintf("Removing symbolic links for EnergyPlus v%s.", ver))
+    system(sprintf("sudo bash %s", uninstaller))
+    verbose_info(sprintf("Removing installation directory of EnergyPlus v%s.", ver))
+    system(sprintf("sudo rm -rf %s", dir))
 }
 # }}}
 
@@ -490,6 +666,11 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
 #' EnergyPlus. If no data found, an empty list will be returned.
 #'
 #' `avail_eplus()` returns all versions of available EnergyPlus.
+#'
+#' `locate_eplus()` re-searches all EnergyPlus installations at the **default**
+#' locations and returns versions of EnergyPlus it finds. Please note that all
+#' configure data of EnergyPlus installed at custom locations will be
+#' **removed**.
 #'
 #' `is_avail_eplus()` checks if the specified version of EnergyPlus is
 #' available or not.
@@ -624,7 +805,7 @@ eplus_config <- function (ver) {
     ver_m <- convert_to_eplus_ver(ver, all_ver = names(.globals$eplus))
 
     if (is.na(ver_m)) {
-        warn(paste0("Failed to find configuration data of EnergyPlus v", ver), "miss_eplus_config")
+        warn(paste0("Failed to find configuration data of EnergyPlus v", standardize_ver(ver)), "miss_eplus_config")
         return(list())
     }
 
@@ -650,6 +831,8 @@ is_avail_eplus <- function (ver) {
 }
 # }}}
 
+#' @rdname use_eplus
+#' @export
 # locate_eplus {{{
 locate_eplus <- function () {
     find_eplus <- function (ver) {
@@ -659,7 +842,7 @@ locate_eplus <- function () {
 
     lapply(rev(ALL_EPLUS_RELEASE_COMMIT$version), find_eplus)
 
-    invisible()
+    avail_eplus()
 }
 # }}}
 # eplus_default_path {{{

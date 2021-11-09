@@ -5,6 +5,7 @@
 \alias{eplus_config}
 \alias{avail_eplus}
 \alias{is_avail_eplus}
+\alias{locate_eplus}
 \title{Configure which version of EnergyPlus to use}
 \usage{
 use_eplus(eplus)
@@ -14,6 +15,8 @@ eplus_config(ver)
 avail_eplus()
 
 is_avail_eplus(ver)
+
+locate_eplus()
 }
 \arguments{
 \item{eplus}{An acceptable EnergyPlus version or an EnergyPlus installation
@@ -44,6 +47,11 @@ EnergyPlus to run models.
 EnergyPlus. If no data found, an empty list will be returned.
 
 \code{avail_eplus()} returns all versions of available EnergyPlus.
+
+\code{locate_eplus()} re-searches all EnergyPlus installations at the \strong{default}
+locations and returns versions of EnergyPlus it finds. Please note that all
+configure data of EnergyPlus installed at custom locations will be
+\strong{removed}.
 
 \code{is_avail_eplus()} checks if the specified version of EnergyPlus is
 available or not.

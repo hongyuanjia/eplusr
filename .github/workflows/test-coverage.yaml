@@ -16,6 +16,7 @@ jobs:
       RGL_USE_NULL: true
       RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
       NOT_CRAN: true
+      COVR_COVRIGNORE: ".github/workflows/.covrignore"
 
     steps:
       - uses: actions/checkout@v2
