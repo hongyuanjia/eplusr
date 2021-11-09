@@ -109,10 +109,12 @@ reference:
   - title: Configure EnergyPlus
     contents:
       - install_eplus
+      - uninstall_eplus
       - download_eplus
       - use_eplus
       - eplus_config
       - avail_eplus
+      - locate_eplus
       - is_avail_eplus
       - path_eplus
       - path_eplus_processor
