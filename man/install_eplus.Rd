@@ -41,9 +41,10 @@ location. Default: \code{NULL}.
 }}
 
 \item{force}{Whether to install EnergyPlus even if it has already been
-installed. On Windows and macOS, for EnergyPlus v9.2 and above, the
-existing EnergyPlus will be \strong{UNINSTALLED} before reinstallation.
-Please make sure you really want to do so. Default: \code{FALSE}.}
+installed. Setting to \code{TRUE} if you want to install the downloaded
+EnergyPlus anyway. Please note that this may results in multiple
+EnergyPlus installations of the same version at different locations.
+eplusr will only use the first EnergyPlus installation. Default: \code{FALSE}.}
 
 \item{...}{Other arguments to be passed to the installer. Current only one
 additional argument exists and is only for Linux:
@@ -104,7 +105,7 @@ On Windows and Linux, you can also specify your custom directory using the
 administrator privileges if you do not have the write access to that
 directory.
 
-Please note that on macOS, when \code{local} is set to \code{FALSE}, no symbolic links
+Please note that when \code{local} is set to \code{FALSE}, no symbolic links
 will be created, since this process requires administrative privileges.
 
 \code{uninstall_eplus()} tries to uninstall specified version of EnergyPlus

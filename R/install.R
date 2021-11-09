@@ -34,9 +34,10 @@ NULL
 #'       location. Default: `NULL`.
 #'
 #' @param force Whether to install EnergyPlus even if it has already been
-#'        installed. On Windows and macOS, for EnergyPlus v9.2 and above, the
-#'        existing EnergyPlus will be **UNINSTALLED** before reinstallation.
-#'        Please make sure you really want to do so. Default: `FALSE`.
+#'        installed. Setting to `TRUE` if you want to install the downloaded
+#'        EnergyPlus anyway. Please note that this may results in multiple
+#'        EnergyPlus installations of the same version at different locations.
+#'        eplusr will only use the first EnergyPlus installation. Default: `FALSE`.
 #'
 #' @param ... Other arguments to be passed to the installer. Current only one
 #'        additional argument exists and is only for Linux:
@@ -75,7 +76,7 @@ NULL
 #' administrator privileges if you do not have the write access to that
 #' directory.
 #'
-#' Please note that on macOS, when `local` is set to `FALSE`, no symbolic links
+#' Please note that when `local` is set to `FALSE`, no symbolic links
 #' will be created, since this process requires administrative privileges.
 #'
 #' `uninstall_eplus()` tries to uninstall specified version of EnergyPlus
@@ -126,12 +127,6 @@ install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FA
             abort(paste0("It seems EnergyPlus v", ver, " has been already installed at ",
                 surround(eplus_config(ver)$dir), ". Set `force` to `TRUE` to reinstall."
             ))
-        }
-
-        if (!is_linux() && ver >= 9.2) {
-            verbose_info("For EnergyPlus v9.2 and above, existing EnergyPlus at '",
-                eplus_config(ver)$dir, "' will be **UNINSTALLED** before reinstallation.")
-            uninstall_eplus_qt(ver, eplus_config(ver)$dir)
         }
     }
 
@@ -361,6 +356,16 @@ get_win_user_path <- function (error = FALSE) {
     normalizePath(file.path("C:/Users", user, "AppData/Local"))
 }
 # }}}
+# sudo_on_mac_interactive {{{
+sudo_on_mac <- function(cmd) {
+    if (interactive()) {
+        # see: https://stackoverflow.com/questions/1517183/is-there-any-graphical-sudo-for-mac-os-x
+        system(sprintf("osascript -e 'do shell script \"%s\" with administrator privileges'", cmd))
+    } else {
+        system(sprintf("sudo %s", cmd))
+    }
+}
+# }}}
 # install_eplus_macos {{{
 install_eplus_macos <- function (ver, exec, local = FALSE) {
     ver <- standardize_ver(ver)
@@ -370,9 +375,9 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
     system(sprintf("hdiutil mount %s", exec))
     if (ver < 9.1) {
         if (local) {
-            system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
+            res <- system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
         } else {
-            system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+            res <- sudo_on_mac(sprintf("installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
         }
     } else {
         ver_dash <- gsub("\\.", "-", ver)
@@ -382,10 +387,10 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
             dir <- file.path("/Applications", paste0("EnergyPlus-", ver_dash))
         }
         exec <- sprintf("/Volumes/%s/%s.app/Contents/MacOS/%s", no_ext, no_ext, no_ext)
-        system(sprintf('chmod +x %s', exec))
-        install_eplus_qt(ver, exec, dir, local = local)
+        res <- install_eplus_qt(ver, exec, dir, local = local)
     }
     system(sprintf("hdiutil unmount /Volumes/%s/", no_ext))
+    res
 }
 # }}}
 # install_eplus_linux {{{
@@ -479,7 +484,7 @@ patch_eplus_linux_sh <- function (ver, exec) {
 }
 # }}}
 # install_eplus_qt {{{
-install_eplus_qt <- function (ver, exec, dir, local = FALSE) {
+install_eplus_qt <- function (ver, exec, dir, local = FALSE, verbose = FALSE) {
     ver <- standardize_ver(ver)
     # create a tempfile of QTIFW control script
     ctrl <- tempfile(fileext = ".qs")
@@ -550,7 +555,7 @@ install_eplus_qt <- function (ver, exec, dir, local = FALSE) {
             gui.clickButton(buttons.FinishButton);
         };
     ", collapse = "\n"))
-    res <- system(sprintf("%s --script %s", exec, ctrl))
+    res <- system(sprintf("%s %s --script %s", exec, if (verbose) "--verbose " else "", ctrl))
     # sometimes QtIFW returns 1 if success for EnergyPlus v9.5 installer
     if (res == 1L) res <- res - 1L
     res
@@ -585,15 +590,27 @@ uninstall_eplus_macos <- function (ver, dir) {
     if (ver >= 9.2) {
         uninstall_eplus_qt(ver, dir)
     } else {
-        stop("Not implemented yet")
+        # test if EnergyPlus directory is accessible for current user
+        if (identical(unname(try(file.access(dir, 2L), silent = TRUE)), 0L)) {
+            system(sprintf("rm -rf %s", dir))
+        } else {
+            sudo_on_mac(sprintf("rm -rf %s", dir))
+        }
     }
 }
 # }}}
 # uninstall_eplus_qt {{{
 uninstall_eplus_qt <- function (ver, dir) {
     ver <- standardize_ver(ver)
+
     ext <- if (is_windows()) ".exe" else ""
-    uninstaller <- normalizePath(file.path(dir, paste0("maintenancetool", ext)), mustWork = FALSE)
+    if (!is_macos()) {
+        exe <- sprintf("maintenancetool%s", ext)
+    } else {
+        exe <- "maintenancetool.app/Contents/MacOS/maintenancetool"
+    }
+
+    uninstaller <- normalizePath(file.path(dir, exe), mustWork = FALSE)
     if (!file.exists(uninstaller)) {
         abort(sprintf(
             "Failed to locate '%s' under EnergyPlus installation directory '%s'.",
