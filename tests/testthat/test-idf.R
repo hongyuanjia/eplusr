@@ -186,6 +186,27 @@ test_that("$is_valid_name()", {
 })
 # }}}
 
+# EXTERNAL_DEPS {{{
+test_that("$external_deps()", {
+    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+
+    sch <- file.path(tempdir(), "schedule_file.csv")
+    write_lines("index, value\n1, 1\n", sch)
+    idf$add(Schedule_File = list("Schedule", NULL, sch, 2, 1))
+
+    expect_equal(idf$external_deps(), normalizePath(sch))
+    expect_null(attr(idf$external_deps(), "extra"))
+
+    expect_equivalent(idf$external_deps(full = TRUE),
+        data.table(
+            id = 6L, name = "Schedule", class = "Schedule:File",
+            index = 3L, field = "File Name", value = sch,
+            path = normalizePath(sch), exist = TRUE
+        )
+    )
+})
+# }}}
+
 # IS_UNSAVED {{{
 test_that("$is_unsaved()", {
     expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")

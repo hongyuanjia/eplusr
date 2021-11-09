@@ -4371,6 +4371,95 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
     setattr(path, "path_updated", modified)
 }
 # }}}
+
+# get_idf_external_deps {{{
+get_idf_external_deps <- function(idd_env, idf_env, base_dir = NULL) {
+    # add class name
+    if (!has_names(idf_env$object, "class_name")) {
+        added <- TRUE
+        add_class_name(idd_env, idf_env$object)
+        on.exit(set(idf_env$object, NULL, "class_name", NULL), add = TRUE)
+    }
+
+    map <- data.table(
+        class_name = c(
+            "Schedule:File:Shading",
+            "Schedule:File",
+            "Construction:WindowDataFile",
+            "ExternalInterface:FunctionalMockupUnitImport",
+            "ExternalInterface:FunctionalMockupUnitImport:From:Variable",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Actuator",
+            "ExternalInterface:FunctionalMockupUnitImport:To:Variable",
+            "Table:IndependentVariable",
+            "Table:Lookup"
+        ),
+        field_name = c(
+            "File Name",
+            "File Name",
+            "File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "FMU File Name",
+            "External File Name",
+            "External File Name"
+        )
+    )
+
+    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(data.table())
+
+    # get full path of the base directory
+    if (!is.null(base_dir)) {
+        base_dir <- normalizePath(base_dir, mustWork = TRUE)
+
+        # restore current working directory
+        ori <- getwd()
+        on.exit(setwd(ori), add = TRUE)
+        setwd(base_dir)
+    }
+
+    # get object table and value table
+    val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
+        property = c("units", "ip_units", "type_enum")
+    )[!J(NA_character_), on = "value_chr"] # remove empty fields. See #366
+
+    # remove empty fields. See #366
+    if (!nrow(val)) return(data.table())
+
+    # check existence of old files
+    val[, by = "value_chr", c("path", "exist") := {
+        path <- normalizePath(value_chr, mustWork = FALSE)
+        exist <- file.exists(path)
+        list(path, exist)
+    }]
+
+    if (!any(val$exist)) return(val)
+
+    # HANDLE FMU
+    # It is possible that the FMU file list other file dependencies in the
+    # resources directory. If this is the case, also copy them
+    if (!length(fmus <- val[exist == TRUE & file_ext(path) == "fmu", unique(path)])) return(val)
+
+    extra <- list()
+
+    for (fmu in fmus) {
+        # check if there are any resources directory
+        files <- setDT(utils::unzip(fmu, list = TRUE))
+        resrc <- files[grepl("resources/.+", Name), gsub("resources/", "", Name, fixed = TRUE)]
+        resrc <- normalizePath(resrc, mustWork = FALSE)
+
+        if (length(resrc) && length(xmls <- resrc[file_ext(resrc) == "xml"])) {
+            extra[[fmu]] <- c(xmls, unlist(lapply(xmls, extract_schema_path_from_xml)))
+        }
+    }
+
+    if (length(extra)) setattr(val, "extra", extra)
+
+    val
+}
+# }}}
 # resolve_idf_external_link {{{
 #  auto change full file path in `Schedule:File` and other classes to relative
 #  path and copy those files into the same directory of the model
