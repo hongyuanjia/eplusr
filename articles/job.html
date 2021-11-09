@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Run simulation and data exploration</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-07</h4>
+            <h4 class="date">2021-11-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -164,7 +164,7 @@
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
 <span class="co">#&gt; EnergyPlus Starting</span>
-<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.07 09:56</span>
+<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.09 05:28</span>
 <span class="co">#&gt; Processing Data Dictionary</span>
 <span class="co">#&gt; Processing Input File</span>
 <span class="co">#&gt; Initializing Response Factors</span>
@@ -180,21 +180,21 @@
 
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpuKCuwS/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpQI8iXE/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-11-07 09:56:48' and completed successfully after 0.72 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-11-09 05:28:33' and completed successfully after 1 secs.</span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
 <p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpuKCuwS/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpQI8iXE/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-11-07 09:56:48' and completed successfully after 0.72 secs.</span></code></pre></div>
+<span class="co">#&gt;  Simulation started at '2021-11-09 05:28:33' and completed successfully after 1 secs.</span></code></pre></div>
 </div>
 <div id="run-simulation-in-the-background" class="section level2">
 <h2 class="hasAnchor">
@@ -203,14 +203,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpuKCuwS/5Zone_Transformer.idf.</span>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpQI8iXE/5Zone_Transformer.idf.</span>
 <span class="va">job</span>
 <span class="co">#&gt; ── EnergPlus Simulation Job ────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Model: '/tmp/RtmpuKCuwS/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpQI8iXE/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt;  Simulation started at '2021-11-07 09:56:49' and is still running...</span>
+<span class="co">#&gt;  Simulation started at '2021-11-09 05:28:35' and is still running...</span>
 
 <span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -236,7 +236,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
 <span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class="co">#&gt;   * Simulation started: 2021-11-07 09:56:00</span>
+<span class="co">#&gt;   * Simulation started: 2021-11-09 05:28:00</span>
 <span class="co">#&gt;   * Terminated: FALSE</span>
 <span class="co">#&gt;   * Successful: TRUE</span>
 <span class="co">#&gt;   * Warning[W]: 1</span>

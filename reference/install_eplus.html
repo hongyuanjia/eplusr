@@ -97,7 +97,7 @@ install it." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
       </span>
     </div>
 
@@ -190,6 +190,8 @@ install it.</p>
 
     <pre class="usage"><span class='fu'>install_eplus</span><span class='op'>(</span>ver <span class='op'>=</span> <span class='st'>"latest"</span>, local <span class='op'>=</span> <span class='cn'>FALSE</span>, dir <span class='op'>=</span> <span class='cn'>NULL</span>, force <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='fu'>uninstall_eplus</span><span class='op'>(</span><span class='va'>ver</span><span class='op'>)</span>
+
 <span class='fu'>download_eplus</span><span class='op'>(</span>ver <span class='op'>=</span> <span class='st'>"latest"</span>, <span class='va'>dir</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,8 +199,9 @@ install it.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ver</th>
-      <td><p>The EnergyPlus version number, e.g., <code>8.7</code>. The special value
-<code>"latest"</code>, which is the default, means the latest version.</p></td>
+      <td><p>The EnergyPlus version number, e.g., <code>8.7</code>. For <code>download_eplus()</code>
+and <code>install_eplus()</code>, the special value <code>"latest"</code>, which is the
+default, means the latest version supported by eplusr.</p></td>
     </tr>
     <tr>
       <th>local</th>
@@ -229,15 +232,19 @@ location. Default: <code>NULL</code>.</p></li>
     <tr>
       <th>force</th>
       <td><p>Whether to install EnergyPlus even if it has already been
-installed.</p></td>
+installed. Setting to <code>TRUE</code> if you want to install the downloaded
+EnergyPlus anyway. Please note that this may results in multiple
+EnergyPlus installations of the same version at different locations.
+eplusr will only use the first EnergyPlus installation. Default: <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>Other arguments to be passed to the installer. Current only one
-additional argument exists and is only for Linux:
-* dir_bin: A path where symbolic links will be created to the software
+additional argument exists and is only for Linux:</p><ul>
+<li><p><code>dir_bin</code>: A path where symbolic links will be created to the software
 executables. The default is <code>/usr/local/bin</code> if <code>local</code> is <code>FALSE</code>
-and <code>~/.local/bin</code> if <code>local</code> is <code>TRUE</code>.</p></td>
+and <code>~/.local/bin</code> if <code>local</code> is <code>TRUE</code>.</p></li>
+</ul></td>
     </tr>
     </table>
 
@@ -258,7 +265,7 @@ also be returned:</p><ul>
 
     <p><code>download_eplus()</code> downloads specified version of EnergyPlus from
 <a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>.</p>
-<p><code>install_eplus()</code> will try to install EnergyPlus into the default location,
+<p><code>install_eplus()</code> tries to install EnergyPlus into the default location,
 e.g. <code>C:\EnergyPlusVX-Y-0</code> on Windows, <code>/usr/local/EnergyPlus-X-Y-0</code> on
 Linux, and <code>/Applications/EnergyPlus-X-Y-0</code> on macOS.</p>
 <p>Note that installing to the default location requires administrative
@@ -280,8 +287,11 @@ variable <code>"LOCALAPPDATA"</code> is not set</p></li>
 <code>dir</code> argument. Remember to change <code>local</code> to <code>FALSE</code> in order to ask for
 administrator privileges if you do not have the write access to that
 directory.</p>
-<p>Please note that on macOS, when <code>local</code> is set to <code>FALSE</code>, no symbolic links
+<p>Please note that when <code>local</code> is set to <code>FALSE</code>, no symbolic links
 will be created, since this process requires administrative privileges.</p>
+<p><code>uninstall_eplus()</code> tries to uninstall specified version of EnergyPlus
+located by eplusr. Similar as <code>install_eplus()</code>, administrative privileges
+may be required.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Hongyuan Jia</p>
@@ -290,67 +300,55 @@ will be created, since this process requires administrative privileges.</p>
     <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='co'># download the latest version of EnergyPlus</span></span>
 <span class='r-in'><span class='fu'>download_eplus</span><span class='op'>(</span><span class='st'>"latest"</span>, dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v9.6.0 'EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v9.6.0 'EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-in'><span class='co'># install the latest version of EnergyPlus system-wide which is the default</span></span>
 <span class='r-in'><span class='co'># and requires administrative privileges</span></span>
 <span class='r-in'><span class='fu'>install_eplus</span><span class='op'>(</span><span class='st'>"latest"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to download EnergyPlus v9.6.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v9.6.0 'EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v9.6.0 'EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to install EnergyPlus v9.6.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE: Administrative privileges required during installation. Please make sure R is running with an administrator acount or equivalent.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v9.6.0 successfully installed into /usr/local/EnergyPlus-9-6-0.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Found EnergyPlus v9.6 in system directory: /usr/local/EnergyPlus-9-6-0</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>one argument not used by format 'sudo chmod -R a+w %s'</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v9.6.0 successfully installed into '/usr/local/EnergyPlus-9-6-0'.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v9.6.0 located at '/usr/local/EnergyPlus-9-6-0' has been added.</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># for a specific version of EnergyPlus</span></span>
 <span class='r-in'><span class='fu'>download_eplus</span><span class='op'>(</span><span class='fl'>8.8</span>, dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-in'><span class='fu'>install_eplus</span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to download EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to install EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE: Administrative privileges required during installation. Please make sure R is running with an administrator acount or equivalent.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into /usr/local/EnergyPlus-8-8-0.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Found EnergyPlus v8.8 in system directory: /usr/local/EnergyPlus-8-8-0</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>one argument not used by format 'sudo chmod -R a+w %s'</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into '/usr/local/EnergyPlus-8-8-0'.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 located at '/usr/local/EnergyPlus-8-8-0' has been added.</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># force to reinstall</span></span>
 <span class='r-in'><span class='fu'>install_eplus</span><span class='op'>(</span><span class='fl'>8.8</span>, force <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to download EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to install EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE: Administrative privileges required during installation. Please make sure R is running with an administrator acount or equivalent.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into /usr/local/EnergyPlus-8-8-0.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Found EnergyPlus v8.8 in system directory: /usr/local/EnergyPlus-8-8-0</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>one argument not used by format 'sudo chmod -R a+w %s'</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into '/usr/local/EnergyPlus-8-8-0'.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Configure data of EnergyPlus v8.8.0 located at '/usr/local/EnergyPlus-8-8-0' already exists. No Updating performed.</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># install EnergyPlus in your home directory</span></span>
 <span class='r-in'><span class='fu'>install_eplus</span><span class='op'>(</span><span class='fl'>8.8</span>, local <span class='op'>=</span> <span class='cn'>TRUE</span>, force <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to download EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to install EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into /usr/local/EnergyPlus-8-8-0.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Found EnergyPlus v8.8 in user directory: ~/.local/EnergyPlus-8-8-0</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into '~/.local/EnergyPlus-8-8-0'.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Update configure data of EnergyPlus v8.8.0:</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>   Former location: '/usr/local/EnergyPlus-8-8-0' ---&gt; New location: '/home/runner/.local/EnergyPlus-8-8-0'</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># custom EnergyPlus install home directory</span></span>
 <span class='r-in'><span class='fu'>install_eplus</span><span class='op'>(</span><span class='fl'>8.8</span>, dir <span class='op'>=</span> <span class='st'>"~/MyPrograms"</span>, local <span class='op'>=</span> <span class='cn'>TRUE</span>, force <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to download EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpOeEq3S.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> The installer file of EnergyPlus v8.8.0 'EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh' has been successfully downloaded into /tmp/RtmpvcQdAr.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Starting to install EnergyPlus v8.8.0...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> ════════════════════════════════════════════════════════════════════════════════</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into /usr/local/EnergyPlus-8-8-0.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Found EnergyPlus v8.8 in user directory: ~/.local/EnergyPlus-8-8-0</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> EnergyPlus v8.8.0 successfully installed into '~/.local/EnergyPlus-8-8-0'.</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Configure data of EnergyPlus v8.8.0 located at '/home/runner/.local/EnergyPlus-8-8-0' already exists. No Updating performed.</span>
 <span class='r-in'><span class='co'># }</span></span>
 </pre>

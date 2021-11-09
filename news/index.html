@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
       </span>
     </div>
 
@@ -196,6 +196,12 @@
 <code>Idf$is_valid_id()</code> and <code>Idf$is_valid_name()</code> gain a new argument named <code>class</code> defaulting to <code>NULL</code> to check the validity of object IDs and names again a specific class.</li>
 <li>Add support for EnergyPlus v9.5 (<a href='https://github.com/hongyuanjia/eplusr/issues/438'>#438</a>).</li>
 <li>Add support for EnergyPlus v9.6 (<a href='https://github.com/hongyuanjia/eplusr/issues/460'>#460</a>).</li>
+<li>Internal function <code><a href="../reference/use_eplus.html">locate_eplus()</a></code> has been exported to enable user to find all available EnergyPlus without restarting R (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
+<li>
+<code><a href="../reference/install_eplus.html">uninstall_eplus()</a></code> has been added to enable uninstall EnergyPlus from R on all platform (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
+<li>Now force re-installation of EnergyPlus <code>install_eplus(force = TRUE)</code> has been updated to support all platforms, including macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
+<li>
+<code><a href="../reference/install_eplus.html">install_eplus()</a></code> has been updated to behave smarter on macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
 </ul>
 </div>
 <div id="minor-changes" class="section level2">
