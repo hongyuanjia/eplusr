@@ -110,8 +110,10 @@ energyplus(
   eso_to_ip = FALSE,
   readvars = TRUE,
   echo = TRUE,
+  wait = TRUE,
   idd = NULL,
-  eplus = NULL
+  eplus = NULL,
+  resources = NULL
 )
 }
 \arguments{
@@ -127,7 +129,7 @@ Prefix for EnergyPlus output file names. If \code{NULL}, the input \code{model} 
 name is used.  Default: \code{NULL}.}
 
 \item{wait}{[\code{logical(1)}]\cr
-If \code{FALSE}, simualtion is run in the background and a \link[processx:process]{processx::process}
+If \code{FALSE}, simulation is run in the background and a \link[processx:process]{processx::process}
 object is returned. Extra steps are needed to collect the results after the
 process completes.}
 
@@ -138,7 +140,7 @@ post- processors. Default: \code{TRUE}.}
 \item{eplus}{[\code{character(1)} or \code{NULL}]\cr
 An EnergyPlus version or a path of EnergyPlus installation directory. If
 \code{NULL}, the version of EnergyPlus to use is determined by the version of
-input \code{model}.  Default: \code{NULL}.}
+input \code{model}. Default: \code{NULL}.}
 
 \item{idd}{[\code{character(1)} or \code{NULL}]\cr
 The full path of EnergyPlus IDD (Input Data Dictionary). If \code{NULL},
@@ -190,6 +192,10 @@ the units of data in \code{eso} file from SI units to IP units. Default: \code{F
 \item{readvars}{[\code{logical(1)}]\cr
 If \code{TRUE}, ReadVarsESO post-processor is called after to simulation. Default:
 \code{TRUE}.}
+
+\item{resources}{[\code{character()} or \code{NULL}]\cr
+Any external file dependencies that EnergyPlus will use for simulation. If
+not \code{NULL}, files will be copied to the output directory. Default: \code{NULL}.}
 }
 \value{
 Functions except for \code{energyplus()} return a list of two elements:

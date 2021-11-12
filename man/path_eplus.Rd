@@ -8,15 +8,15 @@
 \alias{path_eplus_dataset}
 \title{Get file path from EnergyPlus installation directory}
 \usage{
-path_eplus(ver, ..., .strict = FALSE)
+path_eplus(ver, ..., strict = FALSE)
 
-path_eplus_processor(ver, ..., .strict = FALSE)
+path_eplus_processor(ver, ..., strict = FALSE)
 
-path_eplus_example(ver, file, .strict = FALSE)
+path_eplus_example(ver, file, strict = FALSE)
 
-path_eplus_weather(ver, file, .strict = FALSE)
+path_eplus_weather(ver, file, strict = FALSE)
 
-path_eplus_dataset(ver, file, .strict = FALSE)
+path_eplus_dataset(ver, file, strict = FALSE)
 }
 \arguments{
 \item{ver}{An acceptable EnergyPlus version or an EnergyPlus installation
@@ -24,7 +24,7 @@ directory}
 
 \item{...}{File paths passed to \code{\link[base:file.path]{base::file.path()}}.}
 
-\item{.strict}{If \code{TRUE}, an error will be issued if the specified file does
+\item{strict}{If \code{TRUE}, an error will be issued if the specified file does
 not exist}
 
 \item{file}{A single string of file name.}
@@ -47,16 +47,12 @@ folder in EnergyPlus installation directory.
 \code{DataSets} folder in EnergyPlus installation directory.
 }
 }
-\note{
-These functions are not vectorized, which means that only a single file path
-can be specified at a time.
-}
 \examples{
 \dontrun{
 path_eplus(8.8, "Energy+.idd")
 
-path_eplus_processor(8.8, "EPMacro", .strict = TRUE)
-path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", .strict = TRUE)
+path_eplus_processor(8.8, "EPMacro", strict = TRUE)
+path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)
 
 path_eplus_example(8.8, "1ZoneUncontrolled.idf")
 path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")

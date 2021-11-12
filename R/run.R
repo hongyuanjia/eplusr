@@ -368,14 +368,6 @@ eplus_exe <- function (eplus) {
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
 }
 
-get_run_time <- function (stdout) {
-    if (!length(stdout)) return(NULL)
-    last <- stdout[length(stdout)]
-
-    period <- lubridate::hms(last, quiet = TRUE)
-    if (is.na(period)) NULL else period
-}
-
 create_energyplus_ini <- function(eplus, output_dir) {
     dir <- normalizePath(dirname(eplus))
     sep <- if (is_windows()) "\\" else "/"

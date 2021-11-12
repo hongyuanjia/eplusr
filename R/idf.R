@@ -2384,12 +2384,13 @@ Idf <- R6::R6Class(classname = "Idf",
         #'     `eplusr_option("save_format")`.
         #' @param overwrite Whether to overwrite the file if it already exists.
         #'        Default: `FALSE`.
-        #' @param copy_external If `TRUE`, the external files that current `Idf`
-        #'        object depends on will also be copied into the same directory.
+        #' @param copy_external If `TRUE`, the external files extracted from
+        #'        `$external_deps()` will also be copied into the same directory.
         #'        The values of file paths in the `Idf` will be changed into
         #'        relative path automatically. This makes it possible to create
-        #'        fully reproducible simulation conditions. Currently, only
-        #'        `Schedule:File` class is supported. Default: `FALSE`.
+        #'        fully reproducible simulation conditions. If `FALSE`, the
+        #'        values of those fields that reference external file paths will
+        #'        be updated to absolute paths. Default: `FALSE`.
         #'
         #' @return A length-one character vector, invisibly.
         #'

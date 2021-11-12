@@ -3,9 +3,10 @@ test_that("Job methods", {
     skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
-    example <- copy_example()
+    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path_epw <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    expect_silent(job <- eplus_job(example$idf, example$epw))
+    expect_silent(job <- eplus_job(path_idf, path_epw))
 
     expect_equal(job$version(), numeric_version("8.8.0"))
     expect_output(job$print())
@@ -27,10 +28,11 @@ test_that("Job methods", {
     )
 
     # can kill job
-    expect_silent(job$kill())
+    expect_false(job$kill())
 
-    example <- copy_example()
-    job <- eplus_job(example$idf, example$epw)
+    # can read ERR file
+    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    job <- eplus_job(path_idf, path_epw)
     expect_is({job$run(echo = FALSE);job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
     expect_silent({err <- job$errors()})
@@ -44,8 +46,8 @@ test_that("Job methods", {
     expect_equal(attr(err, "terminated"), FALSE)
 
     # can retrieve simulation data
-    idf <- read_idf(example$idf)
-    job <- idf$run(example$epw, dir = NULL, echo = FALSE)
+    idf <- read_idf(path_idf)
+    job <- idf$run(path_epw, dir = NULL, echo = FALSE)
     # can get all table names
     expect_equal(length(job$list_table()), 44L)
 
@@ -99,12 +101,12 @@ test_that("Job methods", {
 
     skip_on_os("mac")
     # can get path
-    expect_equal(job$path(), c(idf = example$idf, epw = example$epw))
-    expect_equal(job$path("idf"), c(example$idf))
-    expect_equal(job$path("epw"), c(example$epw))
+    expect_equal(job$path(), c(idf = path_idf, epw = path_epw))
+    expect_equal(job$path("idf"), c(path_idf))
+    expect_equal(job$path("epw"), c(path_epw))
 
     # can get output dir
-    expect_equal(job$output_dir(), dirname(example$idf))
+    expect_equal(job$output_dir(), dirname(path_idf))
 
     # can get output file path
     expect_equal(
@@ -112,6 +114,6 @@ test_that("Job methods", {
         normalizePath(file.path(tempdir(), "5Zone_Transformer.err"))
     )
 
-    clean_wd(example$idf)
-    unlink(c(example$idf, example$epw))
+    clean_wd(path_idf)
+    unlink(c(path_idf, file.path(tempdir(), basename(path_epw))))
 })

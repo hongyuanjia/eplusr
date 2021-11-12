@@ -4459,99 +4459,60 @@ get_idf_external_deps <- function(idd_env, idf_env, base_dir = NULL) {
 
     val
 }
+extract_schema_path_from_xml <- function(xml) {
+    l <- read_lines(xml)
+    loc_schema <- l[stri_detect_fixed(string, "xsi:noNamespaceSchemaLocation="), string]
+    loc_schema <- stri_match_first_regex(loc_schema, "xsi:noNamespaceSchemaLocation=\"(.+?)\"")[, 2L]
+
+    file_schema <- normalizePath(file.path(dirname(xml), loc_schema), mustWork = FALSE)
+    file_schema[file.exists(file_schema)]
+}
 # }}}
 # resolve_idf_external_link {{{
 #  auto change full file path in `Schedule:File` and other classes to relative
 #  path and copy those files into the same directory of the model
 resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
-    if (!has_names(idf_env$object, "class_name")) {
-        added <- TRUE
-        add_class_name(idd_env, idf_env$object)
-        on.exit(set(idf_env$object, NULL, "class_name", NULL), add = TRUE)
-    }
+    val <- get_idf_external_deps(idd_env, idf_env, old)
 
-    map <- data.table(
-        class_name = c(
-            "Schedule:File:Shading",
-            "Schedule:File",
-            "Construction:WindowDataFile",
-            "ExternalInterface:FunctionalMockupUnitImport",
-            "ExternalInterface:FunctionalMockupUnitImport:From:Variable",
-            "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
-            "ExternalInterface:FunctionalMockupUnitImport:To:Actuator",
-            "ExternalInterface:FunctionalMockupUnitImport:To:Variable",
-            "Table:IndependentVariable",
-            "Table:Lookup"
-        ),
-        field_name = c(
-            "File Name",
-            "File Name",
-            "File Name",
-            "FMU File Name",
-            "FMU File Name",
-            "FMU File Name",
-            "FMU File Name",
-            "FMU File Name",
-            "External File Name",
-            "External File Name"
-        )
-    )
-
-    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(FALSE)
-
-    # get full path of old and new
-    old_dir <- normalizePath(dirname(old), mustWork = FALSE)
-    new_dir <- normalizePath(dirname(new), mustWork = FALSE)
-
-    # restore current working directory
-    ori <- getwd()
-    on.exit(setwd(ori), add = TRUE)
-    setwd(old_dir)
-
-    # get object table and value table
-    val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
-        property = c("units", "ip_units", "type_enum")
-    )[!J(NA_character_), on = "value_chr"] # remove empty fields. See #366
-
-    # remove empty fields. See #366
     if (!nrow(val)) return(FALSE)
 
-    # check existence of old files
-    set(val, NULL, "old_full_path", normalizePath(val$value_chr, mustWork = FALSE))
-    set(val, NULL, "old_exist", file.exists(val$old_full_path))
+    # get full path of old and new
+    new_dir <- normalizePath(dirname(new), mustWork = FALSE)
 
     # stop if old file does not exist
-    if (nrow(val[old_exist == FALSE])) {
-        on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
-        options(warning.length = 8170)
-
+    if (any(!val$exist)) {
         m <- paste0("  ", unlist(format_objects(val, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
         warn(paste0("Broken external file link found in IDF:\n\n", m),
-            "warning_broken_file_link"
-        )
+            "warning_broken_file_link")
     }
 
+    # check if old dir and new dir is the same
     set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path), mustWork = FALSE) == new_dir)
 
+    # extra external files for obFMU
+    extra <- attr(val, "extra")
+
     # find files to copy
-    val <- val[old_exist == TRUE & same_dir == FALSE]
+    val <- val[exist == TRUE & same_dir == FALSE]
 
     if (!nrow(val)) return(FALSE)
 
-    # copy external files and change values to relative paths
-    if (!copy) {
-        set(val, NULL, "new_value", val$old_full_path)
     # change all paths to full paths
+    if (!copy) {
+        set(val, NULL, "new_value", val$path)
+        to_copy <- character()
+    # copy external files and change values to relative paths
     } else {
-        set(val, NULL, "file_name", basename(val$value_chr))
+        set(val, NULL, "file_name", basename(val$path))
         set(val, NULL, "new_value", val$file_name)
 
-        # copy files
-        to_copy <- unique(val$old_full_path)
+        # get files to copy
+        to_copy <- unique(val$path, unlist(extra, FALSE, FALSE))
+
         flag <- file.copy(to_copy, new_dir, copy.date = TRUE, overwrite = TRUE)
         if (any(!flag)) {
-            invld <- val[J(to_copy[!flag]), on = c("old_full_path")]
+            invld <- val[J(to_copy[!flag]), on = "path"]
             m <- paste0("  ", unlist(format_objects(invld, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
             abort(paste0("Failed to copy external file into the output directory ",

@@ -733,6 +733,15 @@ idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 
 
 ## ------------------------------------------------
+## Method `Idf$external_deps`
+## ------------------------------------------------
+
+\dontrun{
+idf$external_deps()
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$is_unsaved`
 ## ------------------------------------------------
 
@@ -895,6 +904,7 @@ Hongyuan Jia
 \item \href{#method-is_valid}{\code{Idf$is_valid()}}
 \item \href{#method-to_string}{\code{Idf$to_string()}}
 \item \href{#method-to_table}{\code{Idf$to_table()}}
+\item \href{#method-external_deps}{\code{Idf$external_deps()}}
 \item \href{#method-is_unsaved}{\code{Idf$is_unsaved()}}
 \item \href{#method-save}{\code{Idf$save()}}
 \item \href{#method-run}{\code{Idf$run()}}
@@ -3776,6 +3786,79 @@ idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-external_deps"></a>}}
+\if{latex}{\out{\hypertarget{method-external_deps}{}}}
+\subsection{Method \code{external_deps()}}{
+Get external file dependencies that the Idf needs for simulation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$external_deps(full = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{full}}{If \code{TRUE}, a \link[data.table:data.table]{data.table} is
+returned giving details about the objects and fields that use those
+external file dependencies. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$external_deps()} returns information of files that are used as
+external resources for the simulation.
+
+Currently, classes below are checked:
+\itemize{
+\item \code{Schedule:File:Shading}
+\item \code{Schedule:File}
+\item \code{Construction:WindowDataFile}
+\item \code{ExternalInterface:FunctionalMockupUnitImport}
+\item \code{ExternalInterface:FunctionalMockupUnitImport:From:Variable}
+\item \code{ExternalInterface:FunctionalMockupUnitImport:To:Schedule}
+\item \code{ExternalInterface:FunctionalMockupUnitImport:To:Actuator}
+\item \code{ExternalInterface:FunctionalMockupUnitImport:To:Variable}
+\item \code{Table:IndependentVariable}
+\item \code{Table:Lookup}
+}
+
+Note that, for \code{ExternalInterface:FunctionalMockupUnitImport} and
+\verb{ExternalInterface:FunctionalMockupUnitImport:*}, resources of FMU
+will also be extracted.
+}
+
+\subsection{Returns}{
+When \code{full} is \code{FALSE}, which is the default, a character vector.
+
+When \code{full} is \code{TRUE}, a \link[data.table:data.table]{data.table} of 8
+columns:
+\itemize{
+\item \code{id}: Integer type. Object IDs.
+\item \code{name}: Character type. Object names.
+\item \code{class}: Character type. Current class name.
+\item \code{index}: Integer type. Field indexes.
+\item \code{field}: Character type. Field names.
+\item \code{value}: Character type. Field values.
+\item \code{path}: Character type. Full file paths.
+\item \code{exist}: Logical type. \code{TRUE} if file exists, \code{FALSE} otherwise.
+}
+
+If there are any FMUs using external file resources, the returned
+data.table will have an attribute named \code{extra} which is a list
+giving the FMU name and external file resources it use.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+idf$external_deps()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_unsaved"></a>}}
 \if{latex}{\out{\hypertarget{method-is_unsaved}{}}}
 \subsection{Method \code{is_unsaved()}}{
@@ -3842,12 +3925,13 @@ options \code{"Sorted"}, \code{"Original with New at Top"}, and \code{"Original 
 \item{\code{overwrite}}{Whether to overwrite the file if it already exists.
 Default: \code{FALSE}.}
 
-\item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
-object depends on will also be copied into the same directory.
+\item{\code{copy_external}}{If \code{TRUE}, the external files extracted from
+\verb{$external_deps()} will also be copied into the same directory.
 The values of file paths in the \code{Idf} will be changed into
 relative path automatically. This makes it possible to create
-fully reproducible simulation conditions. Currently, only
-\code{Schedule:File} class is supported. Default: \code{FALSE}.}
+fully reproducible simulation conditions. If \code{FALSE}, the
+values of those fields that reference external file paths will
+be updated to absolute paths. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

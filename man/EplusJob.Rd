@@ -52,17 +52,17 @@ automatically created if it does not exists.
 
 \dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    name_idf <- "1ZoneUncontrolled.idf"
+    name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+    path_idf <- path_eplus_example(8.8, name_idf)
+    path_epw <- path_eplus_weather(8.8, name_epw)
 
     # create from local files
-    job <- eplus_job(idf_path, epw_path)
+    job <- eplus_job(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+    job <- eplus_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 
@@ -347,17 +347,17 @@ An \code{EplusJob} object.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    name_idf <- "1ZoneUncontrolled.idf"
+    name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+    path_idf <- path_eplus_example(8.8, name_idf)
+    path_epw <- path_eplus_weather(8.8, name_epw)
 
     # create from local files
-    job <- eplus_job(idf_path, epw_path)
+    job <- eplus_job(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+    job <- eplus_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 }
@@ -455,9 +455,10 @@ Run simulationA
 \describe{
 \item{\code{epw}}{A path to an \code{.epw} file or an \link{Epw} object. \code{epw} can
 also be \code{NULL} which will force design-day-only simulation.
-Note this needs at least one \code{Sizing:DesignDay} object exists
-in the \code{Idf}. If not given, the \code{epw} input used when creating
-this \code{EplusJob} object will be used.}
+Note this needs EnergyPlus v8.3 and later, and at least one
+\code{Sizing:DesignDay} object exists in the \code{Idf}. If not given,
+the \code{epw} input used when creating this \code{EplusJob} object will
+be used.}
 
 \item{\code{dir}}{The directory to save the simulation results. If \code{NULL},
 the input \code{idf} folder will be used. Default: \code{NULL}.}
@@ -482,6 +483,12 @@ output directory. The values of file paths in the Idf will be
 changed automatically. This ensures that the output directory
 will have all files needed for the model to run. Default is
 \code{FALSE}.}
+
+\item{\code{readvars}}{If \code{TRUE}, the \code{ReadVarESO} post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to \code{FALSE} can speed up the simulation if there are
+hundreds of output variables or meters. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
