@@ -260,7 +260,7 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
         # results from Output:Surfaces:List, VRML
         wrl = list(pre = pre, ext = ".wrl"),
         # SQLite file
-        sqlite = list(pre = pre, ext = ".sqlite"),
+        sqlite = list(pre = pre, ext = ".sql"),
         # GLHE
         glhe = list(pre = pre, ext = ".glhe"),
         # output from convertESOMTR program
