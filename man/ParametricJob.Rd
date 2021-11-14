@@ -208,6 +208,7 @@ Hongyuan Jia
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors">}\href{../../eplusr/html/EplusGroupJob.html#method-errors}{\code{eplusr::EplusGroupJob$errors()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill">}\href{../../eplusr/html/EplusGroupJob.html#method-kill}{\code{eplusr::EplusGroupJob$kill()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files">}\href{../../eplusr/html/EplusGroupJob.html#method-list_files}{\code{eplusr::EplusGroupJob$list_files()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table">}\href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{eplusr::EplusGroupJob$list_table()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output">}\href{../../eplusr/html/EplusGroupJob.html#method-locate_output}{\code{eplusr::EplusGroupJob$locate_output()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir">}\href{../../eplusr/html/EplusGroupJob.html#method-output_dir}{\code{eplusr::EplusGroupJob$output_dir()}}\out{</span>}
