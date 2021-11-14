@@ -21,17 +21,18 @@ NULL
 #'        macOS, administrative privileges are always required no matter you
 #'        want EnergyPlus to be install at `/Applications` or `~/Applications`.
 #'
-#' @param dir
-#'     * For `download_eplus()`, where to save EnergyPlus installer file.
-#'       Default: `"."`.
-#'     * For `install_eplus()`, the installer will always be saved into
-#'       [tempdir()]. But you can use `dir` to specify the **parent** directory
-#'       of EnergyPlus installation, i.e. the **parent** directory of
-#'       `EnergyPlusVX-Y-0` on Windows and `EnergyPlus-X-Y-0` on Linux. macOS is
-#'       not supported. If `NULL`, the default installation path will be used.
-#'       See details for more information. Please note that `dir` does not work
-#'       on macOS and EnergyPlus will always be installed into the default
-#'       location. Default: `NULL`.
+#' @param dir A single string of directory.
+#'
+#'   * For `download_eplus()`, where to save EnergyPlus installer file.
+#'     Default: `"."`.
+#'   * For `install_eplus()`, the installer will always be saved into
+#'     [tempdir()]. But you can use `dir` to specify the **parent** directory
+#'     of EnergyPlus installation, i.e. the **parent** directory of
+#'     `EnergyPlusVX-Y-0` on Windows and `EnergyPlus-X-Y-0` on Linux. macOS is
+#'     not supported. If `NULL`, the default installation path will be used.
+#'     See details for more information. Please note that `dir` does not work
+#'     on macOS and EnergyPlus will always be installed into the default
+#'     location. Default: `NULL`.
 #'
 #' @param force Whether to install EnergyPlus even if it has already been
 #'        installed. Setting to `TRUE` if you want to install the downloaded

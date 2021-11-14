@@ -25,10 +25,10 @@ access to the directory specified via \code{dir}. Default: \code{FALSE}. For
 macOS, administrative privileges are always required no matter you
 want EnergyPlus to be install at \verb{/Applications} or \verb{~/Applications}.}
 
-\item{dir}{\itemize{
+\item{dir}{A single string of directory.
+\itemize{
 \item For \code{download_eplus()}, where to save EnergyPlus installer file.
 Default: \code{"."}.
-\itemize{
 \item For \code{install_eplus()}, the installer will always be saved into
 \code{\link[=tempdir]{tempdir()}}. But you can use \code{dir} to specify the \strong{parent} directory
 of EnergyPlus installation, i.e. the \strong{parent} directory of
@@ -37,7 +37,6 @@ not supported. If \code{NULL}, the default installation path will be used.
 See details for more information. Please note that \code{dir} does not work
 on macOS and EnergyPlus will always be installed into the default
 location. Default: \code{NULL}.
-}
 }}
 
 \item{force}{Whether to install EnergyPlus even if it has already been
