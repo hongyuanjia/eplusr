@@ -24,6 +24,8 @@
   (#446).
 * Functions `path_eplus()` and `path_eplus_*()` have been added to help specify
   file paths under EnergyPlus installation directory (#446).
+* A new `EplusJob` method `$list_files()` is added to list all inputs and output
+  files for current simulation.
 
 ## Minor changes
 

@@ -281,6 +281,109 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             job_output_dir(self, private, open),
         # }}}
 
+        # list_files {{{
+        #' @description
+        #' List all output files in current simulation
+        #'
+        #' @details
+        #' `$list_files()` returns all input and output files for current
+        #' EnergyPlus simulation.
+        #'
+        #' Description of all possible outputs from EnergyPlus can be found in
+        #' EnergyPlus documentation "Output Details and Examples".
+        #'
+        #' Below gives a brief summary on the meaning of elements in the
+        #' returned list.
+        #'
+        #' | #   | Element      | Description                                                           |
+        #' | --- | ---          | ---                                                                   |
+        #' | 1   | `ads`        | EnergyPlus AirflowNetwork related output                              |
+        #' | 2   | `audit`      | EnergyPlus inputs echo                                                |
+        #' | 3   | `bnd`        | EnergyPlus branch node details                                        |
+        #' | 4   | `bsmt_audit` | Basement input Echo                                                   |
+        #' | 5   | `bsmt_csv`   | Basement CSV output                                                   |
+        #' | 6   | `bsmt_idf`   | Basement IDF output                                                   |
+        #' | 7   | `bsmt_out`   | Basement Output                                                       |
+        #' | 8   | `cbor`       | Energyplus CBOR binary output introduced since v9.5                   |
+        #' | 9   | `dbg`        | Energyplus debug output                                               |
+        #' | 10  | `delight`    | EnergyPlus DElight simulation inputs and outputs                      |
+        #' | 11  | `dfs`        | EnergyPlus daylighting factor for exterior windows                    |
+        #' | 12  | `dxf`        | EnergyPlus surface drawing output                                     |
+        #' | 13  | `edd`        | EnergyPlus EMS report                                                 |
+        #' | 14  | `eio`        | EnergyPlus standard and optional reports                              |
+        #' | 15  | `end`        | EnergyPlus simulation status in one line                              |
+        #' | 16  | `epjson`     | EnergyPlus epJSON input converted from IDF                            |
+        #' | 17  | `epmdet`     | EPMacro inputs echo                                                   |
+        #' | 18  | `epmidf`     | EPMacro IDF output                                                    |
+        #' | 19  | `epw`        | EnergyPlus Weather File input                                         |
+        #' | 20  | `err`        | EnergyPlus error summarry                                             |
+        #' | 21  | `eso`        | EnergyPlus standard output                                            |
+        #' | 22  | `experr`     | ExpandObjects error summary                                           |
+        #' | 23  | `expidf`     | ExpandObjects IDF output                                              |
+        #' | 24  | `glhe`       | EnergyPlus ground heat exchange file                                  |
+        #' | 25  | `idf`        | EnergyPlus IDF input                                                  |
+        #' | 26  | `imf`        | EPMacro IMF input                                                     |
+        #' | 27  | `iperr`      | convertESOMTR error summary                                           |
+        #' | 28  | `ipeso`      | convertESOMTR standard output in IP units                             |
+        #' | 29  | `ipmtr`      | convertESOMTR meter output in IP units                                |
+        #' | 30  | `json`       | EnergyPlus JSON time series output introduced since v9.5              |
+        #' | 31  | `log`        | EnergyPlus log output                                                 |
+        #' | 32  | `map`        | EnergyPlus daylighting intensity map output                           |
+        #' | 33  | `mdd`        | EnergyPlus meter list                                                 |
+        #' | 34  | `meter`      | EnergyPlus meter CSV output                                           |
+        #' | 35  | `msgpack`    | EnergyPlus MessagePack binary output introduced since v9.5            |
+        #' | 36  | `mtd`        | EnergyPlus meter details                                              |
+        #' | 37  | `mtr`        | EnergyPlus meter output                                               |
+        #' | 38  | `perflog`    | EnergyPlus log for `PerformancePrecisionTradeoffs                     |
+        #' | 39  | `rdd`        | EnergyPlus report variable names                                      |
+        #' | 40  | `rvaudit`    | ReadVarsESO input echo                                                |
+        #' | 41  | `sci`        | EnergyPlus cost benefit calculation information                       |
+        #' | 42  | `screen`     | EnergyPlus window scrren transmittance map output                     |
+        #' | 43  | `shading`    | EnergyPlus surface shading CSV output                                 |
+        #' | 44  | `shd`        | EnergyPlus surface shading combination report                         |
+        #' | 45  | `slab_ger`   | Slab error summary                                                    |
+        #' | 46  | `slab_gtp`   | Slab ground temperature output                                        |
+        #' | 47  | `slab_out`   | Slab IDF output                                                       |
+        #' | 48  | `sln`        | EnergyPlus `Output:Surfaces:List, Lines` output                       |
+        #' | 49  | `sqlite`     | EnergyPlus SQLite output                                              |
+        #' | 50  | `sqlite_err` | EnergyPlus SQLite error summary                                       |
+        #' | 51  | `ssz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 52  | `svg`        | HVAC-Diagram HVAC diagram output                                      |
+        #' | 53  | `table`      | EnergyPlus tabular outputs in CSV, TAB, TXT, HTM, or XML format       |
+        #' | 54  | `variable`   | EnergyPlus report variable CSV output                                 |
+        #' | 55  | `wrl`        | EnergyPlus `Output:Surfaces:List, VRML` output                        |
+        #' | 56  | `zsz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 57  | `resource`   | External file resources used for the simulation, e.g. `Schedule:File` |
+        #'
+        #' @param simplify If `TRUE`, a character vector of EnergyPlus input
+        #' and output file names in the output directory is given. If `FALSE`, a
+        #' full named list of all possible input and output types is given. `NA`
+        #' is returned if no input or output files are found for that type.
+        #' Default: `FALSE`.
+        #'
+        #' @param full If `TRUE`, the full file paths in the output directory
+        #' are returned. Otherwise, only the file names are returned. Default:
+        #' `FALSE`.
+        #'
+        #' @return If `FALSE`, a character vector. Otherwise, a named list.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # list all files in the output directory
+        #' job$list_files(simplify = TRUE)
+        #'
+        #' # get a full list of all possible inputs and outputs even though they
+        #' # may not exist for current simulation
+        #' job$list_files()
+        #'
+        #' # return the full paths instead of just file names
+        #' job$locate_output(full = TRUE)
+        #' }
+        #'
+        list_files = function (simplify = FALSE, full = FALSE)
+            job_list_files(self, private, simplify, full),
+        # }}}
+
         # locate_output {{{
         #' @description
         #' Get path of output file
@@ -996,6 +1099,49 @@ job_output_dir <- function (self, private, open = FALSE) {
         }
     }
     dir
+}
+# }}}
+# job_list_files {{{
+job_list_files <- function (self, private, simplify = FALSE, full = FALSE) {
+    assert_flag(simplify)
+    assert_flag(full)
+
+    status <- job_status(self, private)
+
+    if (!isTRUE(status$run_before)) {
+        stop("Simulation did not run before. Please run it using `$run()` ",
+            "before collect output", call. = FALSE)
+    }
+
+    if (isTRUE(status$terminated))
+        stop("Simulation was terminated before. Please solve ",
+            "the problems and re-run the simulation before collect ",
+            "output", call. = FALSE)
+
+    if (isTRUE(status$alive))
+        stop("Simulation is still running. Please wait simulation ",
+            "to finish before collecting results.", call. = FALSE)
+
+    files <- private$m_job$file
+    if (simplify) {
+        files <- unlist(files, FALSE, FALSE)
+        files <- files[!is.na(files)]
+
+        if (full) {
+            files <- file.path(job_output_dir(self, private), files)
+            files <- normalizePath(files, mustWork = FALSE)
+        }
+    } else if (full) {
+        files <- lapply(files, function(f) {
+            if (all(is.na(f))) {
+                f
+            } else {
+                normalizePath(file.path(job_output_dir(self, private), f), mustWork = FALSE)
+            }
+        })
+    }
+
+    files
 }
 # }}}
 # job_locate_output {{{
