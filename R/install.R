@@ -456,7 +456,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
         system(sprintf('chmod -R a+w %s', dir_eplus))
     } else {
         system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-        system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
+        system(sprintf('sudo chmod -R a+w %s', dir_eplus))
     }
 }
 # }}}
