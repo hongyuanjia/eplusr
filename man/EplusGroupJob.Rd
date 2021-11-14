@@ -394,12 +394,6 @@ simulation status. Default: same as \code{wait}.}
 with each model's name under \code{dir} when simulation. If \code{FALSE},
 all models are saved in \code{dir} when simulation. Default:
 \code{TRUE}.}
-
-\item{\code{readvars}}{If \code{TRUE}, the \code{ReadVarESO} post-processor will run
-to generate CSV files from the ESO output. Since those CSV
-files are never used when extracting simulation data in eplusr,
-setting it to \code{FALSE} can speed up the simulation if there are
-hundreds of output variables or meters. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -617,12 +611,16 @@ group$output_dir(c(1, 4))
 \subsection{Method \code{list_files()}}{
 List all output files in simulations
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$list_files(simplify = FALSE, full = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$list_files(which = NULL, simplify = FALSE, full = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
 \item{\code{simplify}}{If \code{TRUE}, a list of character vectors of EnergyPlus
 input and output file names in the output directory for each
 simulation is given. If \code{FALSE}, a

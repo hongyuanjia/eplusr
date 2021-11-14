@@ -541,7 +541,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     # copy weather
     path_epw <- private$m_epws_path
     if (!is.null(path_epw)) {
-        path_epw <- copy_run_files(path_epw, unique(dirname(path_param)))
+        path_epw <- file_copy(path_epw, file.path(unique(dirname(path_param)), basename(path_epw)))
     } else {
         path_epw <- NA_character_
     }

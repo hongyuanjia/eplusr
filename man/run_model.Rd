@@ -91,7 +91,7 @@ should have the same length as \code{model}.}
    8 \tab \code{energyplus} \tab \code{character(1)} \tab Full path of called EnergyPlus executable \cr
    9 \tab \code{stdout} \tab \code{character(1)} or \code{NULL} \tab Standard output of EnergyPlus during simulation \cr
    10 \tab \code{stderr} \tab \code{character(1)} or \code{NULL} \tab Standard error of EnergyPlus during simulation \cr
-   11 \tab \code{process} \tab \link[=callr:r_bg]{r_process} \tab A process object which called EnergyPlus and ran the simulation \cr
+   11 \tab \code{process} \tab \link[callr:r_bg]{r_process} \tab A process object which called EnergyPlus and ran the simulation \cr
 }
 
 

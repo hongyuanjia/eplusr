@@ -2275,7 +2275,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #' | 8    | `energyplus`  | `character(1)`            | Full path of called EnergyPlus executable                            |
 #' | 9    | `stdout`      | `character(1)` or `NULL`  | Standard output of EnergyPlus during simulation                      |
 #' | 10   | `stderr`      | `character(1)` or `NULL`  | Standard error of EnergyPlus during simulation                       |
-#' | 11   | `process`     | [r_process][callr:r_bg()] | A process object which called EnergyPlus and ran the simulation      |
+#' | 11   | `process`     | [r_process][callr::r_bg()] | A process object which called EnergyPlus and ran the simulation      |
 #'
 #'   If `wait` is `FALSE`, the [R process][callr::r_bg()] is directly returned.
 #'   You can get the results by calling `result <- proc$get_result()` (`proc` is
