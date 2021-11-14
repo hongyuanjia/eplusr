@@ -32,7 +32,7 @@ test_that("Utility functions", {
     expect_error(write_lines(1:3, f), "Must be of type 'character'")
 
     expect_equal(read_lines(test_path("file/latin1"), encoding = "Latin-1")$string[1], "N13, \\field Young’s modulus")
-    expect_equal(underscore_name(read_lines(test_path("file/latin1"), F)$string)[1], "N13_field_Young_s_modulus")
+    expect_equal(underscore_name(read_lines(test_path("file/latin1"), F, encoding = "Latin-1")$string)[1], "N13_field_Young_s_modulus")
 
     expect_equal(standardize_ver("latest"), numeric_version("9.6.0"))
     expect_equal(standardize_ver("latest", strict = TRUE), numeric_version(NA, strict = FALSE))
