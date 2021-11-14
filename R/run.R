@@ -245,7 +245,7 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
         mdd = list(pre = pre, ext = ".mdd"),
         # meter details report
         mtd = list(pre = pre, ext = ".mtd"),
-        # log file for PerformancemidcisionTradeoffs
+        # log file for PerformancePrecisionTradeoffs
         perflog = list(pre = paste0(pre, "_perflog"), ext = ".csv"),
         # variable names
         rdd = list(pre = pre, ext = ".rdd"),
@@ -740,7 +740,7 @@ EPMacro <- function(model,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 ExpandObjects <- function(model,
@@ -792,7 +792,7 @@ ExpandObjects <- function(model,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 Basement <- function(model, weather,
@@ -880,7 +880,7 @@ Basement <- function(model, weather,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 Slab <- function(model, weather,
@@ -946,7 +946,7 @@ Slab <- function(model, weather,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 EnergyPlus <- function(model, weather, output_dir = NULL,
@@ -1084,7 +1084,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = NULL,
@@ -1169,7 +1169,7 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
@@ -1275,7 +1275,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     list(file = file, run = run)
 }
 
-#' @name energyplus
+#' @rdname energyplus
 #' @keywords internal
 #' @export
 HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
@@ -1571,7 +1571,7 @@ run_energyplus <- function(
     # directory, which is essential for obFMU to work
     if (!is.null(resources)) {
         file_copy(resources, path_sim(resources))
-        file_copy(resources, path_out(resources))
+        resources <- file_copy(resources, path_out(resources))
     }
 
     # 1. run EPMacro
@@ -1905,7 +1905,9 @@ run_energyplus <- function(
     file <- file[order(names(file))]
     file$idf <- NA_character_
     if (is.na(file$imf)) file$idf <- path_out(cmd$model)
-    file <- lapply(file, function(f) if (all(is.na(f))) f else basename(f))
+    file <- lapply(file, basename)
+    if (is.null(resources)) resources <- NA_character_
+    file['resource'] <- list(basename(resources))
 
     run <- data.table(
         program = names(run),
@@ -2074,8 +2076,9 @@ do_sim <- function(state) {
     state$jobs[ready, by = "index", c("status", "process", "start_time") := {
         process <- energyplus(eplus = energyplus_exe, model = model,
             weather = unlist(weather), output_dir = output_dir, annual = annual,
-            design_day = design_day, wait = FALSE, echo = FALSE,
-            expand_obj = state$options$expand_obj)
+            design_day = design_day, wait = FALSE, echo = FALSE, resources = resources[[1L]],
+            expand_obj = state$options$expand_obj, readvars = state$options$readvars
+        )
 
         if (state$options$echo) {
             run <- get_sim_status_string("running", index, model, weather)
@@ -2408,7 +2411,9 @@ run_multi <- function(model, weather, output_dir, design_day = FALSE,
     assert_flag(echo)
 
     jobs <- pre_job_inputs(model, weather, output_dir, design_day, annual, eplus)
-    options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo, expand_obj = expand_obj)
+    set(jobs, NULL, "resources", list())
+    options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo,
+        expand_obj = expand_obj, readvars = TRUE)
     state <- list(jobs = jobs, options = options)
 
     post_callback <- function(state) {

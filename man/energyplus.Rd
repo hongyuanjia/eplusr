@@ -2,7 +2,6 @@
 % Please edit documentation in R/run.R
 \name{EPMacro}
 \alias{EPMacro}
-\alias{energyplus}
 \alias{ExpandObjects}
 \alias{Basement}
 \alias{Slab}
@@ -10,6 +9,7 @@
 \alias{convertESOMTR}
 \alias{ReadVarsESO}
 \alias{HVAC_Diagram}
+\alias{energyplus}
 \title{Run EnergyPlus and its various processors}
 \usage{
 EPMacro(
