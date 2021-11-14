@@ -364,7 +364,7 @@ test_that("Slab()", {
 test_that("EnergyPlus()", {
     skip_on_cran()
 
-    out_dir <- file.path(tempdir(), "energyplus")
+    out_dir <- file.path(tempdir(), "Energyplus")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
     path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
@@ -440,7 +440,7 @@ test_that("ReadVarsESO()", {
     path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- EnergyPlus(path, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+    res <- EnergyPlus(path, weather, out_dir, eplus = 8.8, echo = FALSE)
 
     eso <- ReadVarsESO(res$file$eso, eplus = 8.8, echo = FALSE)
     expect_equal(names(eso), c("file", "run"))
@@ -485,7 +485,7 @@ test_that("HVAC_Diagram()", {
     model <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- EnergyPlus(model, weather, file.path(tempdir(), "EnergyPlus"), eplus = 8.8, echo = FALSE)
+    res <- EnergyPlus(model, weather, file.path(tempdir(), out_dir), eplus = 8.8, echo = FALSE)
 
     svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
     expect_equal(names(svg), c("file", "run"))
