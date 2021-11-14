@@ -525,10 +525,12 @@ test_that("energyplus()", {
     expect_is(res_imf$start_time, "POSIXct")
     expect_is(res_imf$end_time, "POSIXct")
     expect_equal(res_imf$output_dir, normalizePath(out_dir))
-    expect_equal(length(res_imf$file), 56L)
-    expect_equal({files <- unlist(res_imf$file); files <- files[!is.na(files)]; length(files)}, 20L)
+    expect_equal(length(res_imf$file), 57L)
+    expect_equal({files <- unlist(res_imf$file); files <- files[!is.na(files)]; length(files)}, 24L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "AbsorptionChiller_Macro"))
+    expect_equal(sort(unname(files[names(files) != "epw"])),
+        sort(c(list.files(out_dir, "AbsorptionChiller_Macro"), basename(path_resources)))
+    )
     expect_is(res_imf$run, "data.table")
     expect_equal(names(res_imf$run),
         c("program", "exit_status", "start_time", "end_time", "stdout", "stderr")
@@ -549,7 +551,7 @@ test_that("energyplus()", {
     # can run ExpandObjects
     path_exp <- copy_eplus_example(8.8, "HVACTemplate-5ZoneFanCoil.idf")
     res_exp <- energyplus(path_exp, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_exp$file), 56L)
+    expect_equal(length(res_exp$file), 57L)
     expect_equal({files <- unlist(res_exp$file); files <- files[!is.na(files)]; length(files)}, 23L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "HVACTemplate-5ZoneFanCoil"))
@@ -565,7 +567,7 @@ test_that("energyplus()", {
     l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
     write_lines(l, path_base)
     res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
-    expect_equal(length(res_base$file), 56L)
+    expect_equal(length(res_base$file), 57L)
     expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 27L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
@@ -585,7 +587,7 @@ test_that("energyplus()", {
     l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
     write_lines(l, path_slab)
     res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_slab$file), 56L)
+    expect_equal(length(res_slab$file), 57L)
     expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 26L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
@@ -598,7 +600,7 @@ test_that("energyplus()", {
     # can convert eso to IP
     path_ip <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
     res_ip <- energyplus(path_ip, weather, out_dir, eso_to_ip = TRUE, echo = FALSE)
-    expect_equal(length(res_ip$file), 56L)
+    expect_equal(length(res_ip$file), 57L)
     expect_equal({files <- unlist(res_ip$file); files <- files[!is.na(files)]; length(files)}, 26L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
@@ -612,7 +614,7 @@ test_that("energyplus()", {
     options("eplusr.eplus_legacy" = TRUE)
     path_legacy <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
     res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_legacy$file), 56L)
+    expect_equal(length(res_legacy$file), 57L)
     expect_equal({files <- unlist(res_legacy$file); files <- files[!is.na(files)]; length(files)}, 24L)
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
