@@ -485,7 +485,7 @@ test_that("HVAC_Diagram()", {
     model <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- EnergyPlus(model, weather, file.path(tempdir(), out_dir), eplus = 8.8, echo = FALSE)
+    res <- EnergyPlus(model, weather, out_dir, eplus = 8.8, echo = FALSE)
 
     svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
     expect_equal(names(svg), c("file", "run"))
