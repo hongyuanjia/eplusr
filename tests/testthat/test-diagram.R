@@ -7,9 +7,10 @@ test_that("HVAC Diagram", {
 
     expect_silent(job <- eplus_job(example$idf, example$epw))
 
-    expect_null(hvac_diagram(job$version(), tempfile()))
+    expect_warning(res <- hvac_diagram(job$version(), tempfile()))
 
     expect_is(job$run(wait = TRUE, echo = FALSE), "EplusJob")
 
-    expect_is(hvac_diagram(job$version(), job$locate_output(".bnd")), "character")
+    expect_warning(res <- hvac_diagram(job$version(), job$locate_output(".bnd")))
+    expect_is(res, "character")
 })
