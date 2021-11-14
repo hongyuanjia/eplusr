@@ -130,8 +130,9 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
-            epgroup_run(self, private, dir, wait, force, copy_external, echo, separate),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE,
+                        echo = wait, separate = TRUE, readvars = TRUE)
+            epgroup_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
         # }}}
 
         # kill {{{
@@ -926,7 +927,7 @@ group_job <- function (idfs, epws) {
 # epgroup_run {{{
 epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
                          force = FALSE, copy_external = FALSE, echo = wait,
-                         separate = TRUE) {
+                         separate = TRUE, readvars = TRUE) {
     # check if generated models have been modified outside
     uuid <- private$idf_uuid()
     if (any(i <- uuid != private$cached_idf_uuid())) {
@@ -940,15 +941,18 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
 
     private$log_new_uuid()
 
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
 }
 # }}}
 # epgroup_run_models {{{
 #' @importFrom checkmate test_names
 epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
                                 force = FALSE, copy_external = FALSE, echo = wait,
-                                separate = TRUE) {
-    checkmate::assert_flag(separate)
+                                separate = TRUE, readvars = TRUE) {
+    assert_flag(wait)
+    assert_flag(echo)
+    assert_flag(separate)
+    assert_flag(readvars)
 
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
