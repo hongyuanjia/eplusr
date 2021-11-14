@@ -117,8 +117,8 @@ test_that("Job methods", {
     # can list all output files
     expect_equal(length(job$list_files()), 57L)
     expect_equal(length(job$list_files(full = TRUE)), 57L)
-    expect_equal(length(job$list_files(simplify = TRUE)), 18L)
-    expect_equal(length(job$list_files(simplify = TRUE, full = TRUE)), 18L)
+    expect_equal(length(job$list_files(simplify = TRUE)), 23L)
+    expect_equal(length(job$list_files(simplify = TRUE, full = TRUE)), 23L)
     expect_equal(normalizePath(unique(dirname(job$list_files(simplify = TRUE, full = TRUE)))), job$output_dir())
 
     clean_wd(path_idf)
