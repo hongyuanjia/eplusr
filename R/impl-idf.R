@@ -4472,7 +4472,7 @@ extract_schema_path_from_xml <- function(xml) {
 #  auto change full file path in `Schedule:File` and other classes to relative
 #  path and copy those files into the same directory of the model
 resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
-    val <- get_idf_external_deps(idd_env, idf_env, old)
+    val <- get_idf_external_deps(idd_env, idf_env, dirname(old))
 
     if (!nrow(val)) return(FALSE)
 
@@ -4488,7 +4488,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # check if old dir and new dir is the same
-    set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path), mustWork = FALSE) == new_dir)
+    set(val, NULL, "same_dir", normalizePath(dirname(val$path), mustWork = FALSE) == new_dir)
 
     # extra external files for obFMU
     extra <- attr(val, "extra")
