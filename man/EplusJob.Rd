@@ -156,6 +156,23 @@ job$output_dir()
 
 
 ## ------------------------------------------------
+## Method `EplusJob$list_files`
+## ------------------------------------------------
+
+\dontrun{
+# list all files in the output directory
+job$list_files(simplify = TRUE)
+
+# get a full list of all possible inputs and outputs even though they
+# may not exist for current simulation
+job$list_files()
+
+# return the full paths instead of just file names
+job$locate_output(full = TRUE)
+}
+
+
+## ------------------------------------------------
 ## Method `EplusJob$locate_output`
 ## ------------------------------------------------
 
@@ -311,6 +328,7 @@ Hongyuan Jia
 \item \href{#method-status}{\code{EplusJob$status()}}
 \item \href{#method-errors}{\code{EplusJob$errors()}}
 \item \href{#method-output_dir}{\code{EplusJob$output_dir()}}
+\item \href{#method-list_files}{\code{EplusJob$list_files()}}
 \item \href{#method-locate_output}{\code{EplusJob$locate_output()}}
 \item \href{#method-read_rdd}{\code{EplusJob$read_rdd()}}
 \item \href{#method-read_mdd}{\code{EplusJob$read_mdd()}}
@@ -674,6 +692,123 @@ job$output_dir()
 
 # Below will open output directory
 # job$output_dir(open = TRUE)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_files"></a>}}
+\if{latex}{\out{\hypertarget{method-list_files}{}}}
+\subsection{Method \code{list_files()}}{
+List all output files in current simulation
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$list_files(simplify = FALSE, full = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{simplify}}{If \code{TRUE}, a character vector of EnergyPlus input
+and output file names in the output directory is given. If \code{FALSE}, a
+full named list of all possible input and output types is given. \code{NA}
+is returned if no input or output files are found for that type.
+Default: \code{FALSE}.}
+
+\item{\code{full}}{If \code{TRUE}, the full file paths in the output directory
+are returned. Otherwise, only the file names are returned. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$list_files()} returns all input and output files for current
+EnergyPlus simulation.
+
+Description of all possible outputs from EnergyPlus can be found in
+EnergyPlus documentation "Output Details and Examples".
+
+Below gives a brief summary on the meaning of elements in the
+returned list.\tabular{lll}{
+   # \tab Element \tab Description \cr
+   1 \tab \code{ads} \tab EnergyPlus AirflowNetwork related output \cr
+   2 \tab \code{audit} \tab EnergyPlus inputs echo \cr
+   3 \tab \code{bnd} \tab EnergyPlus branch node details \cr
+   4 \tab \code{bsmt_audit} \tab Basement input Echo \cr
+   5 \tab \code{bsmt_csv} \tab Basement CSV output \cr
+   6 \tab \code{bsmt_idf} \tab Basement IDF output \cr
+   7 \tab \code{bsmt_out} \tab Basement Output \cr
+   8 \tab \code{cbor} \tab Energyplus CBOR binary output introduced since v9.5 \cr
+   9 \tab \code{dbg} \tab Energyplus debug output \cr
+   10 \tab \code{delight} \tab EnergyPlus DElight simulation inputs and outputs \cr
+   11 \tab \code{dfs} \tab EnergyPlus daylighting factor for exterior windows \cr
+   12 \tab \code{dxf} \tab EnergyPlus surface drawing output \cr
+   13 \tab \code{edd} \tab EnergyPlus EMS report \cr
+   14 \tab \code{eio} \tab EnergyPlus standard and optional reports \cr
+   15 \tab \code{end} \tab EnergyPlus simulation status in one line \cr
+   16 \tab \code{epjson} \tab EnergyPlus epJSON input converted from IDF \cr
+   17 \tab \code{epmdet} \tab EPMacro inputs echo \cr
+   18 \tab \code{epmidf} \tab EPMacro IDF output \cr
+   19 \tab \code{epw} \tab EnergyPlus Weather File input \cr
+   20 \tab \code{err} \tab EnergyPlus error summarry \cr
+   21 \tab \code{eso} \tab EnergyPlus standard output \cr
+   22 \tab \code{experr} \tab ExpandObjects error summary \cr
+   23 \tab \code{expidf} \tab ExpandObjects IDF output \cr
+   24 \tab \code{glhe} \tab EnergyPlus ground heat exchange file \cr
+   25 \tab \code{idf} \tab EnergyPlus IDF input \cr
+   26 \tab \code{imf} \tab EPMacro IMF input \cr
+   27 \tab \code{iperr} \tab convertESOMTR error summary \cr
+   28 \tab \code{ipeso} \tab convertESOMTR standard output in IP units \cr
+   29 \tab \code{ipmtr} \tab convertESOMTR meter output in IP units \cr
+   30 \tab \code{json} \tab EnergyPlus JSON time series output introduced since v9.5 \cr
+   31 \tab \code{log} \tab EnergyPlus log output \cr
+   32 \tab \code{map} \tab EnergyPlus daylighting intensity map output \cr
+   33 \tab \code{mdd} \tab EnergyPlus meter list \cr
+   34 \tab \code{meter} \tab EnergyPlus meter CSV output \cr
+   35 \tab \code{msgpack} \tab EnergyPlus MessagePack binary output introduced since v9.5 \cr
+   36 \tab \code{mtd} \tab EnergyPlus meter details \cr
+   37 \tab \code{mtr} \tab EnergyPlus meter output \cr
+   38 \tab \code{perflog} \tab EnergyPlus log for `PerformancePrecisionTradeoffs \cr
+   39 \tab \code{rdd} \tab EnergyPlus report variable names \cr
+   40 \tab \code{rvaudit} \tab ReadVarsESO input echo \cr
+   41 \tab \code{sci} \tab EnergyPlus cost benefit calculation information \cr
+   42 \tab \code{screen} \tab EnergyPlus window scrren transmittance map output \cr
+   43 \tab \code{shading} \tab EnergyPlus surface shading CSV output \cr
+   44 \tab \code{shd} \tab EnergyPlus surface shading combination report \cr
+   45 \tab \code{slab_ger} \tab Slab error summary \cr
+   46 \tab \code{slab_gtp} \tab Slab ground temperature output \cr
+   47 \tab \code{slab_out} \tab Slab IDF output \cr
+   48 \tab \code{sln} \tab EnergyPlus \verb{Output:Surfaces:List, Lines} output \cr
+   49 \tab \code{sqlite} \tab EnergyPlus SQLite output \cr
+   50 \tab \code{sqlite_err} \tab EnergyPlus SQLite error summary \cr
+   51 \tab \code{ssz} \tab EnergyPlus system sizing outputs in CSV, TAB or TXT format \cr
+   52 \tab \code{svg} \tab HVAC-Diagram HVAC diagram output \cr
+   53 \tab \code{table} \tab EnergyPlus tabular outputs in CSV, TAB, TXT, HTM, or XML format \cr
+   54 \tab \code{variable} \tab EnergyPlus report variable CSV output \cr
+   55 \tab \code{wrl} \tab EnergyPlus \verb{Output:Surfaces:List, VRML} output \cr
+   56 \tab \code{zsz} \tab EnergyPlus system sizing outputs in CSV, TAB or TXT format \cr
+   57 \tab \code{resource} \tab External file resources used for the simulation, e.g. \code{Schedule:File} \cr
+}
+}
+
+\subsection{Returns}{
+If \code{FALSE}, a character vector. Otherwise, a named list.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# list all files in the output directory
+job$list_files(simplify = TRUE)
+
+# get a full list of all possible inputs and outputs even though they
+# may not exist for current simulation
+job$list_files()
+
+# return the full paths instead of just file names
+job$locate_output(full = TRUE)
 }
 
 }

@@ -247,6 +247,121 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             epgroup_output_dir(self, private, which),
         # }}}
 
+        # list_files {{{
+        #' @description
+        #' List all output files in simulations
+        #'
+        #' @details
+        #' `$list_files()` returns all input and output files for the grouped
+        #' EnergyPlus simulations.
+        #'
+        #' Description of all possible outputs from EnergyPlus can be found in
+        #' EnergyPlus documentation "Output Details and Examples".
+        #'
+        #' Below gives a brief summary on the meaning of elements in the
+        #' returned list.
+        #'
+        #' | #   | Element      | Description                                                           |
+        #' | --- | ---          | ---                                                                   |
+        #' | 1   | `ads`        | EnergyPlus AirflowNetwork related output                              |
+        #' | 2   | `audit`      | EnergyPlus inputs echo                                                |
+        #' | 3   | `bnd`        | EnergyPlus branch node details                                        |
+        #' | 4   | `bsmt_audit` | Basement input Echo                                                   |
+        #' | 5   | `bsmt_csv`   | Basement CSV output                                                   |
+        #' | 6   | `bsmt_idf`   | Basement IDF output                                                   |
+        #' | 7   | `bsmt_out`   | Basement Output                                                       |
+        #' | 8   | `cbor`       | Energyplus CBOR binary output introduced since v9.5                   |
+        #' | 9   | `dbg`        | Energyplus debug output                                               |
+        #' | 10  | `delight`    | EnergyPlus DElight simulation inputs and outputs                      |
+        #' | 11  | `dfs`        | EnergyPlus daylighting factor for exterior windows                    |
+        #' | 12  | `dxf`        | EnergyPlus surface drawing output                                     |
+        #' | 13  | `edd`        | EnergyPlus EMS report                                                 |
+        #' | 14  | `eio`        | EnergyPlus standard and optional reports                              |
+        #' | 15  | `end`        | EnergyPlus simulation status in one line                              |
+        #' | 16  | `epjson`     | EnergyPlus epJSON input converted from IDF                            |
+        #' | 17  | `epmdet`     | EPMacro inputs echo                                                   |
+        #' | 18  | `epmidf`     | EPMacro IDF output                                                    |
+        #' | 19  | `epw`        | EnergyPlus Weather File input                                         |
+        #' | 20  | `err`        | EnergyPlus error summarry                                             |
+        #' | 21  | `eso`        | EnergyPlus standard output                                            |
+        #' | 22  | `experr`     | ExpandObjects error summary                                           |
+        #' | 23  | `expidf`     | ExpandObjects IDF output                                              |
+        #' | 24  | `glhe`       | EnergyPlus ground heat exchange file                                  |
+        #' | 25  | `idf`        | EnergyPlus IDF input                                                  |
+        #' | 26  | `imf`        | EPMacro IMF input                                                     |
+        #' | 27  | `iperr`      | convertESOMTR error summary                                           |
+        #' | 28  | `ipeso`      | convertESOMTR standard output in IP units                             |
+        #' | 29  | `ipmtr`      | convertESOMTR meter output in IP units                                |
+        #' | 30  | `json`       | EnergyPlus JSON time series output introduced since v9.5              |
+        #' | 31  | `log`        | EnergyPlus log output                                                 |
+        #' | 32  | `map`        | EnergyPlus daylighting intensity map output                           |
+        #' | 33  | `mdd`        | EnergyPlus meter list                                                 |
+        #' | 34  | `meter`      | EnergyPlus meter CSV output                                           |
+        #' | 35  | `msgpack`    | EnergyPlus MessagePack binary output introduced since v9.5            |
+        #' | 36  | `mtd`        | EnergyPlus meter details                                              |
+        #' | 37  | `mtr`        | EnergyPlus meter output                                               |
+        #' | 38  | `perflog`    | EnergyPlus log for `PerformancePrecisionTradeoffs                     |
+        #' | 39  | `rdd`        | EnergyPlus report variable names                                      |
+        #' | 40  | `rvaudit`    | ReadVarsESO input echo                                                |
+        #' | 41  | `sci`        | EnergyPlus cost benefit calculation information                       |
+        #' | 42  | `screen`     | EnergyPlus window scrren transmittance map output                     |
+        #' | 43  | `shading`    | EnergyPlus surface shading CSV output                                 |
+        #' | 44  | `shd`        | EnergyPlus surface shading combination report                         |
+        #' | 45  | `slab_ger`   | Slab error summary                                                    |
+        #' | 46  | `slab_gtp`   | Slab ground temperature output                                        |
+        #' | 47  | `slab_out`   | Slab IDF output                                                       |
+        #' | 48  | `sln`        | EnergyPlus `Output:Surfaces:List, Lines` output                       |
+        #' | 49  | `sqlite`     | EnergyPlus SQLite output                                              |
+        #' | 50  | `sqlite_err` | EnergyPlus SQLite error summary                                       |
+        #' | 51  | `ssz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 52  | `svg`        | HVAC-Diagram HVAC diagram output                                      |
+        #' | 53  | `table`      | EnergyPlus tabular outputs in CSV, TAB, TXT, HTM, or XML format       |
+        #' | 54  | `variable`   | EnergyPlus report variable CSV output                                 |
+        #' | 55  | `wrl`        | EnergyPlus `Output:Surfaces:List, VRML` output                        |
+        #' | 56  | `zsz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 57  | `resource`   | External file resources used for the simulation, e.g. `Schedule:File` |
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #' or names of parametric simulations. If `NULL`, results of all
+        #' parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @param simplify If `TRUE`, a list of character vectors of EnergyPlus
+        #' input and output file names in the output directory for each
+        #' simulation is given. If `FALSE`, a
+        #' [data.table][data.table::data.table()] giving all possible input and
+        #' output types is given. `NA` is returned if no input or output files
+        #' are found for that type. Default: `FALSE`.
+        #'
+        #' @param full If `TRUE`, the full file paths in the output directory
+        #' are returned. Otherwise, only the file names are returned. Default:
+        #' `FALSE`.
+        #'
+        #' @return If simplify is `TRUE`, a list. Otherwise, a
+        #' [data.table][data.table::data.table()] of 3 columns:
+        #'
+        #' * `index`: Integer type. Simulation indices.
+        #' * `type`: Character type. Input or output types. See table above for
+        #'   the meaning
+        #' * `file`: List type. File names if `full` is `FALSE`. Full file paths
+        #'   if `full` is `TRUE`
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # list all files in the output directory
+        #' group$list_files(simplify = TRUE)
+        #'
+        #' # get a data.table that contains a full list of all possible inputs
+        #' # and outputs even though they may not exist for current simulation
+        #' group$list_files()
+        #'
+        #' # return the full paths instead of just file names
+        #' group$locate_output(full = TRUE)
+        #' }
+        #'
+        list_files = function (which = NULL, simplify = FALSE, full = FALSE)
+            epgroup_list_files(self, private, which, simplify, full),
+        # }}}
+
         # locate_output {{{
         #' @description
         #' Get paths of output file
@@ -875,15 +990,11 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
     }
 
     # check if the model is still running
-    old <- private$m_job
-    if (!is.null(old)) {
-        # update status
-        epgroup_retrieve_data(self, private)
-        old <- private$m_job
-
+    proc <- private$m_job
+    if (!is.null(proc)) {
         # check if running in non-waiting mode
-        if (inherits(old, "process") && old$is_alive()) {
-            pid <- old$get_pid()
+        if (inherits(proc, "process") && proc$is_alive()) {
+            pid <- proc$get_pid()
             if (force) {
                 verbose_info("Force to kill all current running parametric simulations (",
                     "Parent R Process PID: ", pid, ") and restart...")
@@ -913,20 +1024,43 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
     }
 
     # reset status
-    private$m_log$start_time <- Sys.time()
+    private$m_log$start_time <- current()
     private$m_log$killed <- NULL
-    private$m_log$stdout <- NULL
-    private$m_log$stderr <- NULL
     private$m_job <- NULL
 
     ver <- vcapply(private$m_idfs, function (idf) as.character(idf$version()))
-    tbl <- run_multi(path_group, path_epw, NULL, design_day = design_day,
-        expand_obj = expand_obj, wait = wait, echo = echo, eplus = ver
-    )
 
-    private$m_job <- tbl
+    # init job table
+    jobs <- pre_job_inputs(path_group, path_epw, NULL, design_day, FALSE, ver)
+    if (!copy_external) {
+        set(jobs, NULL, "resources", list())
+    } else {
+        # check if external file dependencies are found
+        resrc <- lapply(private$m_idfs, function(idf) {
+            deps <- idf$external_deps()
+            if (!length(deps)) deps <- NULL
+            deps
+        })
+        set(jobs, NULL, "resources", resrc)
+    }
 
-    if (wait) private$m_log$end_time <- Sys.time()
+    options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo,
+        expand_obj = TRUE, readvars = readvars)
+    state <- list(jobs = jobs, options = options)
+
+    if (wait) {
+        private$m_job <- run_sim_event_loop(state)
+    } else {
+        # always echo in order to catch standard output and error
+        state$options$echo <- TRUE
+        private$m_job <- callr::r_bg(
+            function(state) run_sim_event_loop(state),
+            args = list(state = state), package = TRUE
+        )
+    }
+
+    private$log_new_uuid()
+    if (wait) private$m_log$end_time <- current()
 
     self
 }
@@ -1018,16 +1152,19 @@ epgroup_status <- function (self, private) {
         } else {
             status$alive <- FALSE
 
-            # in waiting mode
-            if (!is.null(proc$exit_status)) {
-                exit_status <- proc$exit_status
-            # in non-waiting mode
-            } else {
-                proc$wait()
-                exit_status <- proc$get_exit_status()
-            }
+            proc$wait()
+            exit_status <- proc$get_exit_status()
 
-            status$job_status <- tryCatch(proc$get_result(), error = function (e) data.table())
+            # retrieve results
+            res <- tryCatch(proc$get_result(), error = function (e) data.table())
+
+            if (!is.null(res)) {
+                # update job
+                private$m_job <- res
+
+                # process the raw table
+                status$job_status <- post_process_sim_state(res)
+            }
 
             # only if all simulation ran successfully
             if (!is.na(exit_status) && exit_status == 0L &&
@@ -1040,8 +1177,8 @@ epgroup_status <- function (self, private) {
 
     } else {
         status$alive <- FALSE
-        status$successful <- all(proc$exit_status == 0L)
-        status$job_status <- proc
+        status$successful <- all(proc$jobs$exit_status == 0L)
+        status$job_status <- post_process_sim_state(proc)
     }
 
     status
@@ -1052,14 +1189,61 @@ epgroup_output_dir <- function (self, private, which = NULL) {
     epgroup_job_from_which(self, private, which, keep_unsucess = TRUE)$output_dir
 }
 # }}}
+# epgroup_list_files {{{
+epgroup_list_files <- function (self, private, which = NULL, simplify = FALSE, full = FALSE) {
+    assert_flag(simplify)
+    assert_flag(full)
+
+    jobs <- epgroup_job_from_which(self, private, which, keep_unsucess = TRUE)
+
+    jobs <- jobs[, .SD, .SDcols = c("index", "output_dir", "result")]
+    set(jobs, NULL, "file", lapply(jobs$result, "[[", "file"))
+    set(jobs, NULL, "result", NULL)
+
+    if (simplify) {
+        files <- lapply(jobs$file, function(f) {
+            files <- unlist(f, FALSE, FALSE)
+            files[!is.na(files)]
+        })
+
+        if (full) {
+            files <- apply2(jobs$output_dir, files, use.names = FALSE,
+                function(dir, file) normalizePath(file.path(dir, file), mustWork = FALSE)
+            )
+        }
+    } else {
+        if (!full) {
+            files <- jobs[, by = "index", {
+                list(type = names(file[[1L]]), file = file[[1L]])
+            }]
+        } else {
+            files <- jobs[, by = "index", {
+                file <- file[[1L]]
+                type <- names(file)
+                file <- lapply(file, function(f) {
+                    if (all(is.na(f))) {
+                        f
+                    } else {
+                        normalizePath(file.path(output_dir, f), mustWork = FALSE)
+                    }
+                })
+
+                list(type = type, file = file)
+            }]
+        }
+    }
+
+    files
+}
+# }}}
 # epgroup_locate_output {{{
 epgroup_locate_output <- function (self, private, which = NULL, suffix = ".err", strict = TRUE, keep_unsucess = FALSE) {
     job <- epgroup_job_from_which(self, private, which, keep_unsucess = keep_unsucess)
 
-    out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
+    out <- paste0(tools::file_path_sans_ext(job$model), suffix)
 
     if (strict && any(!file.exists(out))) {
-        msg <- job[!file.exists(out), sim_status("MISSING", index, idf, epw)]
+        msg <- job[!file.exists(out), get_sim_status_string("MISSING", index, model, weather)]
         stop("Path does not exist for job:\n", paste0(msg, collapse = "\n"), call. = FALSE)
     }
 
@@ -1234,9 +1418,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 }
 # }}}
 # epgroup_retrieve_data {{{
-epgroup_retrieve_data <- function (self, private) {
-    status <- epgroup_status(self, private)
-
+epgroup_retrieve_data <- function (self, private, status) {
     if (!status$run_before) return(invisible())
 
     if (status$alive) {
@@ -1285,9 +1467,9 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
             "The job output may not be correct.", call. = FALSE)
 
     # if success, retrieve data
-    epgroup_retrieve_data(self, private)
+    epgroup_retrieve_data(self, private, status)
 
-    jobs <- private$m_job
+    jobs <- private$m_job$jobs
 
     idx <- epgroup_case_from_which(self, private, which, name = FALSE)
 
@@ -1297,7 +1479,7 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
     # some output files such like .err files. (#24)
     if (nrow(job[status != "completed"])) {
         incomplete <- job[status != "completed"]
-        msg <- incomplete[, sim_status(rpad(toupper(status)), index, idf, epw)]
+        msg <- incomplete[, get_sim_status_string(rpad(toupper(status)), index, model, weather)]
         if (keep_unsucess) {
             warn(paste0("Some of jobs failed to complete. ",
                 "Simulation results may not be correct:\n",
@@ -1341,7 +1523,7 @@ epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) 
                 collapse(which[!valid]), ".", call. = FALSE)
         idx <- which
     } else {
-        stop("`which` should either be a character or an integer vector.",
+        stop("'which' should either be a character or an integer vector.",
             call. = FALSE)
     }
 
@@ -1376,8 +1558,8 @@ epgroup_combine_data <- function (self, private, which, data, fill = TRUE) {
 # }}}
 # epgroup_print_status {{{
 epgroup_print_status <- function (self, private, epw = TRUE) {
-    epgroup_retrieve_data(self, private)
     status <- epgroup_status(self, private)
+    epgroup_retrieve_data(self, private, status)
 
     if (!is.null(names(private$m_idfs))) {
         nm_idf <- paste0(names(private$m_idfs), ".idf")
@@ -1447,7 +1629,7 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
             cli::cat_line(paste0(str_trunc(rpad(nm), width = getOption("width", 60L) - 15L),
                 " <-- TERMINATED", collapse = "\n"))
         } else {
-            nm <- private$m_job[, paste0(
+            nm <- private$m_job$jobs[, paste0(
                 ifelse(exit_status == 0L,
                     paste0(str_trunc(rpad(nm), getOption("width", 60L) - 14L), " <-- SUCCEEDED"),
                     paste0(str_trunc(rpad(nm), getOption("width", 60L) - 11L), " <-- FAILED")

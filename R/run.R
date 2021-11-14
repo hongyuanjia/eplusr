@@ -2416,45 +2416,45 @@ run_multi <- function(model, weather, output_dir, design_day = FALSE,
         expand_obj = expand_obj, readvars = TRUE)
     state <- list(jobs = jobs, options = options)
 
-    post_callback <- function(state) {
-        jobs <- setDT(state$jobs)
-
-        set(jobs, NULL, "idf", normalizePath(jobs$model, mustWork = FALSE))
-        set(jobs, NULL, "model", NULL)
-
-        set(jobs, NULL, "epw",
-            apply2_chr(jobs$result, jobs$weather, function(res, weather) {
-                if (is.na(res$file$epw)) {
-                    NA_character_
-                } else {
-                    normalizePath(weather, mustWork = FALSE)
-                }
-            })
-        )
-        set(jobs, NULL, "weather", NULL)
-
-        set(jobs, NULL, "version", vcapply(jobs$energyplus_exe, function(ep) as.character(get_ver_from_eplus_path(dirname(ep)))))
-
-        set(jobs, NULL, "output_dir", vcapply(jobs$result, function(res) res$output_dir))
-
-        setnames(jobs, "energyplus_exe", "energyplus")
-
-        cols <- c("index", "status", "idf", "epw", "version", "exit_status",
-            "start_time", "end_time", "output_dir", "energyplus", "stdout", "stderr")
-
-        set(jobs, NULL, setdiff(names(jobs), cols), NULL)
-        setcolorder(jobs, cols)
-        jobs
-    }
-
     if (wait) {
-        post_callback(run_sim_event_loop(state))
+        post_process_sim_state(run_sim_event_loop(state))
     } else {
         # always echo in order to catch standard output and error
         state$options$echo <- TRUE
         callr::r_bg(
-            function(state) post_callback(run_sim_event_loop(state)),
+            function(state) post_process_sim_state(run_sim_event_loop(state)),
             args = list(state = state), package = TRUE
         )
     }
+}
+
+post_process_sim_state <- function(state) {
+    jobs <- copy(state$jobs)
+
+    set(jobs, NULL, "idf", normalizePath(jobs$model, mustWork = FALSE))
+    set(jobs, NULL, "model", NULL)
+
+    set(jobs, NULL, "epw",
+        apply2_chr(jobs$result, jobs$weather, function(res, weather) {
+            if (is.na(res$file$epw)) {
+                NA_character_
+            } else {
+                normalizePath(weather, mustWork = FALSE)
+            }
+        })
+    )
+    set(jobs, NULL, "weather", NULL)
+
+    set(jobs, NULL, "version", vcapply(jobs$energyplus_exe, function(ep) as.character(get_ver_from_eplus_path(dirname(ep)))))
+
+    set(jobs, NULL, "output_dir", vcapply(jobs$result, function(res) res$output_dir))
+
+    setnames(jobs, "energyplus_exe", "energyplus")
+
+    cols <- c("index", "status", "idf", "epw", "version", "exit_status",
+        "start_time", "end_time", "output_dir", "energyplus", "stdout", "stderr")
+
+    set(jobs, NULL, setdiff(names(jobs), cols), NULL)
+    setcolorder(jobs, cols)
+    jobs
 }
