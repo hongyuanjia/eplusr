@@ -975,12 +975,12 @@ job_status <- function (self, private) {
 # }}}
 # job_output_dir {{{
 job_output_dir <- function (self, private, open = FALSE) {
-    dir <- dirname(private$m_idf$path())
+    dir <- normalizePath(dirname(private$m_idf$path()), mustWork = FALSE)
     if (!open) return(dir)
     if (open) {
         if (is.null(dir)) {
             verbose_info("No simulation has been run yet.")
-            return(invisible())
+            return(invisible(dir))
         }
 
         # Reference:

@@ -29,6 +29,7 @@
 
 * When `type` is `"all"` in `download_weather()`, the ZIP file will be
   downloaded instead of downloading both `EPW` and `DDY` files (#453).
+* `EplusJob$output_dir()` now use backslash in the returned path on Windows.
 
 ## Bug fixes
 

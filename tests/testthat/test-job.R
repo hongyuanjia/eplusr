@@ -106,7 +106,7 @@ test_that("Job methods", {
     expect_equal(job$path("epw"), c(path_epw))
 
     # can get output dir
-    expect_equal(job$output_dir(), dirname(path_idf))
+    expect_equal(job$output_dir(), normalizePath(dirname(path_idf)))
 
     # can get output file path
     expect_equal(
