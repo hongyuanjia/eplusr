@@ -26,6 +26,13 @@
   file paths under EnergyPlus installation directory (#446).
 * A new `EplusJob` method `$list_files()` is added to list all inputs and output
   files for current simulation.
+* A new argument `readvars` can be specified in `EplusJob$run()` and
+  `EplusGroupJob$run()`. Setting it to `FALSE` will disable to run ReadVarsESO
+  post-processor and thus no CSVs will be generated for Report variables and
+  meters. This can speed up simulations significantly if there are hundreds of
+  outputs in the model. Setting it to `FALSE` will not affect any data
+  extraction functionalities in eplusr, as it uses the SQLite output instead of
+  the CSVs.
 
 ## Minor changes
 

@@ -973,20 +973,26 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
         }
     }
 
-    private$m_log$start_time <- Sys.time()
+    # reset status
+    private$m_log$start_time <- current()
     private$m_log$killed <- NULL
 
-    # check if external file dependencies are found
-    resrc <- private$m_idf$external_deps()
-    if (!length(resrc)) resrc <- NULL
+    resrc <- NULL
+    if (copy_external) {
+        # check if external file dependencies are found
+        resrc <- private$m_idf$external_deps()
+        if (!length(resrc)) resrc <- NULL
+    }
 
     private$m_job <- energyplus(
         model = path_idf, weather = path_epw, design_day = is.null(private$m_epw_path),
-        eso_to_ip = FALSE, readvars = FALSE, echo = echo, wait = wait,
+        eso_to_ip = FALSE, readvars = readvars, echo = echo, wait = wait,
         eplus = private$m_idf$version(), resources = resrc
     )
 
     private$log_new_uuid()
+    if (wait) private$m_log$end_time <- current()
+
     self
 }
 # }}}
