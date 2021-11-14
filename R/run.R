@@ -1891,7 +1891,7 @@ run_energyplus <- function(
         res_eplus$file$bnd <- file_rename(res_eplus$file$bnd, path_sim("eplusout.bnd"))
 
         # do not echo
-        res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$output_dir, cmd$output_prefix,
+        res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$sim_dir, cmd$output_prefix,
             wait = TRUE, echo = FALSE, eplus = eplus_ver)
         run$HVAC_Diagram <- res_diagram$run
 
