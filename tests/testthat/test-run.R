@@ -364,7 +364,7 @@ test_that("Slab()", {
 test_that("EnergyPlus()", {
     skip_on_cran()
 
-    out_dir <- file.path(tempdir(), "EnergyPlus")
+    out_dir <- file.path(tempdir(), "energyplus")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
     path <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
