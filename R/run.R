@@ -623,10 +623,6 @@ pre_eplus_command <- function(exectuable,
     assert_string(output_prefix, null.ok = TRUE)
     if (is.null(output_prefix)) {
         output_prefix <- tools::file_path_sans_ext(file_model)
-    } else {
-        if (!is_valid_file_name(output_prefix)) {
-            abort(sprintf("Invalid 'output_prefix': '%s'", output_prefix))
-        }
     }
 
     if (is.null(exectuable)) {

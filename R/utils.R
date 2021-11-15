@@ -519,16 +519,3 @@ file_rename_if_exist <- function(from, to, err_title = NULL) {
 
     res
 }
-
-is_valid_file_name <- function(x) {
-    con <- try(file(x, "wb"), TRUE)
-    # use file to test if output_prefix can be used as a file name
-    # see: https://stackoverflow.com/a/7779343
-    if (inherits(con, "connection")) {
-        close(con)
-        unlink(x, force = TRUE)
-        TRUE
-    } else {
-        FALSE
-    }
-}
