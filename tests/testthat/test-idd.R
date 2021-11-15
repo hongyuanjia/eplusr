@@ -5,6 +5,8 @@ test_that("download_idd() can download IDD from EnergyPlus repo", {
     expect_error(download_idd(1, tempdir()), classs = "eplusr_error_invalid_eplus_ver")
 
     skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
+
     # should download IDD v9.0.1 if input is 9, 9.0, 9.0.1
     expect_equal(read_idd(attr(download_idd(9.0, tempdir()), "file"))$version(), numeric_version("9.0.1"))
     expect_equal(read_idd(attr(download_idd("9.0.1", tempdir()), "file"))$version(), numeric_version("9.0.1"))

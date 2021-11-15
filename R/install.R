@@ -21,17 +21,18 @@ NULL
 #'        macOS, administrative privileges are always required no matter you
 #'        want EnergyPlus to be install at `/Applications` or `~/Applications`.
 #'
-#' @param dir
-#'     * For `download_eplus()`, where to save EnergyPlus installer file.
-#'       Default: `"."`.
-#'     * For `install_eplus()`, the installer will always be saved into
-#'       [tempdir()]. But you can use `dir` to specify the **parent** directory
-#'       of EnergyPlus installation, i.e. the **parent** directory of
-#'       `EnergyPlusVX-Y-0` on Windows and `EnergyPlus-X-Y-0` on Linux. macOS is
-#'       not supported. If `NULL`, the default installation path will be used.
-#'       See details for more information. Please note that `dir` does not work
-#'       on macOS and EnergyPlus will always be installed into the default
-#'       location. Default: `NULL`.
+#' @param dir A single string of directory.
+#'
+#'   * For `download_eplus()`, where to save EnergyPlus installer file.
+#'     Default: `"."`.
+#'   * For `install_eplus()`, the installer will always be saved into
+#'     [tempdir()]. But you can use `dir` to specify the **parent** directory
+#'     of EnergyPlus installation, i.e. the **parent** directory of
+#'     `EnergyPlusVX-Y-0` on Windows and `EnergyPlus-X-Y-0` on Linux. macOS is
+#'     not supported. If `NULL`, the default installation path will be used.
+#'     See details for more information. Please note that `dir` does not work
+#'     on macOS and EnergyPlus will always be installed into the default
+#'     location. Default: `NULL`.
 #'
 #' @param force Whether to install EnergyPlus even if it has already been
 #'        installed. Setting to `TRUE` if you want to install the downloaded
@@ -455,7 +456,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
         system(sprintf('chmod -R a+w %s', dir_eplus))
     } else {
         system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-        system(sprintf('sudo chmod -R a+w %s', dir_eplus, ver_dash))
+        system(sprintf('sudo chmod -R a+w %s', dir_eplus))
     }
 }
 # }}}
@@ -760,7 +761,7 @@ use_eplus <- function (eplus) {
             abort(paste0(msg, fail, "\nPlease specify explicitly the path of EnergyPlus installation."), "locate_eplus")
         }
     } else if (is_eplus_path(eplus)){
-        ver <- get_ver_from_path(eplus)
+        ver <- get_ver_from_eplus_path(eplus)
         eplus_dir <- eplus
     } else {
         abort("`eplus` should be either a valid EnergyPlus version or an EnergyPlus installation path.")
@@ -876,8 +877,8 @@ eplus_default_path <- function (ver, local = FALSE) {
     d
 }
 # }}}
-# get_ver_from_path {{{
-get_ver_from_path <- function (path) {
+# get_ver_from_eplus_path {{{
+get_ver_from_eplus_path <- function (path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
     tryCatch(get_idd_ver(read_lines(idd_file, nrows = 1L)),

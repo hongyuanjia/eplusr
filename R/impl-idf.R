@@ -4371,10 +4371,10 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
     setattr(path, "path_updated", modified)
 }
 # }}}
-# resolve_idf_external_link {{{
-#  auto change full file path in `Schedule:File` and other classes to relative
-#  path and copy those files into the same directory of the model
-resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
+
+# get_idf_external_deps {{{
+get_idf_external_deps <- function(idd_env, idf_env, base_dir = NULL) {
+    # add class name
     if (!has_names(idf_env$object, "class_name")) {
         added <- TRUE
         add_class_name(idd_env, idf_env$object)
@@ -4408,16 +4408,17 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         )
     )
 
-    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(FALSE)
+    if (!nrow(map <- map[class_name %chin% idf_env$object$class_name])) return(data.table())
 
-    # get full path of old and new
-    old_dir <- normalizePath(dirname(old), mustWork = FALSE)
-    new_dir <- normalizePath(dirname(new), mustWork = FALSE)
+    # get full path of the base directory
+    if (!is.null(base_dir)) {
+        base_dir <- normalizePath(base_dir, mustWork = TRUE)
 
-    # restore current working directory
-    ori <- getwd()
-    on.exit(setwd(ori), add = TRUE)
-    setwd(old_dir)
+        # restore current working directory
+        ori <- getwd()
+        on.exit(setwd(ori), add = TRUE)
+        setwd(base_dir)
+    }
 
     # get object table and value table
     val <- get_idf_value(idd_env, idf_env, class = map$class_name, field = map$field_name,
@@ -4425,44 +4426,93 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     )[!J(NA_character_), on = "value_chr"] # remove empty fields. See #366
 
     # remove empty fields. See #366
-    if (!nrow(val)) return(FALSE)
+    if (!nrow(val)) return(data.table())
 
     # check existence of old files
-    set(val, NULL, "old_full_path", normalizePath(val$value_chr, mustWork = FALSE))
-    set(val, NULL, "old_exist", file.exists(val$old_full_path))
+    val[, by = "value_chr", c("path", "exist") := {
+        path <- normalizePath(value_chr, mustWork = FALSE)
+        exist <- file.exists(path)
+        list(path, exist)
+    }]
+
+    if (!any(val$exist)) return(val)
+
+    # HANDLE FMU
+    # It is possible that the FMU file list other file dependencies in the
+    # resources directory. If this is the case, also copy them
+    if (!length(fmus <- val[exist == TRUE & file_ext(path) == "fmu", unique(path)])) return(val)
+
+    extra <- list()
+
+    for (fmu in fmus) {
+        # check if there are any resources directory
+        files <- setDT(utils::unzip(fmu, list = TRUE))
+        resrc <- files[grepl("resources/.+", Name), gsub("resources/", "", Name, fixed = TRUE)]
+        resrc <- normalizePath(resrc, mustWork = FALSE)
+
+        if (length(resrc) && length(xmls <- resrc[file_ext(resrc) == "xml"])) {
+            extra[[fmu]] <- c(xmls, unlist(lapply(xmls, extract_schema_path_from_xml)))
+        }
+    }
+
+    if (length(extra)) setattr(val, "extra", extra)
+
+    val
+}
+extract_schema_path_from_xml <- function(xml) {
+    l <- read_lines(xml)
+    loc_schema <- l[stri_detect_fixed(string, "xsi:noNamespaceSchemaLocation="), string]
+    loc_schema <- stri_match_first_regex(loc_schema, "xsi:noNamespaceSchemaLocation=\"(.+?)\"")[, 2L]
+
+    file_schema <- normalizePath(file.path(dirname(xml), loc_schema), mustWork = FALSE)
+    file_schema[file.exists(file_schema)]
+}
+# }}}
+# resolve_idf_external_link {{{
+#  auto change full file path in `Schedule:File` and other classes to relative
+#  path and copy those files into the same directory of the model
+resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
+    val <- get_idf_external_deps(idd_env, idf_env, dirname(old))
+
+    if (!nrow(val)) return(FALSE)
+
+    # get full path of old and new
+    new_dir <- normalizePath(dirname(new), mustWork = FALSE)
 
     # stop if old file does not exist
-    if (nrow(val[old_exist == FALSE])) {
-        on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
-        options(warning.length = 8170)
-
+    if (any(!val$exist)) {
         m <- paste0("  ", unlist(format_objects(val, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
         warn(paste0("Broken external file link found in IDF:\n\n", m),
-            "warning_broken_file_link"
-        )
+            "warning_broken_file_link")
     }
 
-    set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path), mustWork = FALSE) == new_dir)
+    # check if old dir and new dir is the same
+    set(val, NULL, "same_dir", normalizePath(dirname(val$path), mustWork = FALSE) == new_dir)
+
+    # extra external files for obFMU
+    extra <- attr(val, "extra")
 
     # find files to copy
-    val <- val[old_exist == TRUE & same_dir == FALSE]
+    val <- val[exist == TRUE & same_dir == FALSE]
 
     if (!nrow(val)) return(FALSE)
 
-    # copy external files and change values to relative paths
-    if (!copy) {
-        set(val, NULL, "new_value", val$old_full_path)
     # change all paths to full paths
+    if (!copy) {
+        set(val, NULL, "new_value", val$path)
+        to_copy <- character()
+    # copy external files and change values to relative paths
     } else {
-        set(val, NULL, "file_name", basename(val$value_chr))
+        set(val, NULL, "file_name", basename(val$path))
         set(val, NULL, "new_value", val$file_name)
 
-        # copy files
-        to_copy <- unique(val$old_full_path)
+        # get files to copy
+        to_copy <- unique(val$path, unlist(extra, FALSE, FALSE))
+
         flag <- file.copy(to_copy, new_dir, copy.date = TRUE, overwrite = TRUE)
         if (any(!flag)) {
-            invld <- val[J(to_copy[!flag]), on = c("old_full_path")]
+            invld <- val[J(to_copy[!flag]), on = "path"]
             m <- paste0("  ", unlist(format_objects(invld, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
             abort(paste0("Failed to copy external file into the output directory ",

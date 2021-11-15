@@ -2281,6 +2281,63 @@ Idf <- R6::R6Class(classname = "Idf",
                 all = all, group_ext = match.arg(group_ext), force = force, init = init),
         # }}}
 
+        # external_deps {{{
+        #' @description
+        #' Get external file dependencies that the Idf needs for simulation.
+        #'
+        #' @details
+        #' `$external_deps()` returns information of files that are used as
+        #' external resources for the simulation.
+        #'
+        #' Currently, classes below are checked:
+        #'
+        #' * `Schedule:File:Shading`
+        #' * `Schedule:File`
+        #' * `Construction:WindowDataFile`
+        #' * `ExternalInterface:FunctionalMockupUnitImport`
+        #' * `ExternalInterface:FunctionalMockupUnitImport:From:Variable`
+        #' * `ExternalInterface:FunctionalMockupUnitImport:To:Schedule`
+        #' * `ExternalInterface:FunctionalMockupUnitImport:To:Actuator`
+        #' * `ExternalInterface:FunctionalMockupUnitImport:To:Variable`
+        #' * `Table:IndependentVariable`
+        #' * `Table:Lookup`
+        #'
+        #' Note that, for `ExternalInterface:FunctionalMockupUnitImport` and
+        #' `ExternalInterface:FunctionalMockupUnitImport:*`, resources of FMU
+        #' will also be extracted.
+        #'
+        #' @param full If `TRUE`, a [data.table][data.table::data.table()] is
+        #' returned giving details about the objects and fields that use those
+        #' external file dependencies. Default: `FALSE`.
+        #'
+        #' @return
+        #' When `full` is `FALSE`, which is the default, a character vector.
+        #'
+        #' When `full` is `TRUE`, a [data.table][data.table::data.table()] of 8
+        #' columns:
+        #'
+        #' * `id`: Integer type. Object IDs.
+        #' * `name`: Character type. Object names.
+        #' * `class`: Character type. Current class name.
+        #' * `index`: Integer type. Field indexes.
+        #' * `field`: Character type. Field names.
+        #' * `value`: Character type. Field values.
+        #' * `path`: Character type. Full file paths.
+        #' * `exist`: Logical type. `TRUE` if file exists, `FALSE` otherwise.
+        #'
+        #' If there are any FMUs using external file resources, the returned
+        #' data.table will have an attribute named `extra` which is a list
+        #' giving the FMU name and external file resources it use.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' idf$external_deps()
+        #' }
+        #'
+        external_deps = function (full = FALSE)
+            idf_external_deps(self, private, full),
+        # }}}
+
         # is_unsaved {{{
         #' @description
         #' Check if there are unsaved changes in current `Idf`
@@ -2327,12 +2384,13 @@ Idf <- R6::R6Class(classname = "Idf",
         #'     `eplusr_option("save_format")`.
         #' @param overwrite Whether to overwrite the file if it already exists.
         #'        Default: `FALSE`.
-        #' @param copy_external If `TRUE`, the external files that current `Idf`
-        #'        object depends on will also be copied into the same directory.
+        #' @param copy_external If `TRUE`, the external files extracted from
+        #'        `$external_deps()` will also be copied into the same directory.
         #'        The values of file paths in the `Idf` will be changed into
         #'        relative path automatically. This makes it possible to create
-        #'        fully reproducible simulation conditions. Currently, only
-        #'        `Schedule:File` class is supported. Default: `FALSE`.
+        #'        fully reproducible simulation conditions. If `FALSE`, the
+        #'        values of those fields that reference external file paths will
+        #'        be updated to absolute paths. Default: `FALSE`.
         #'
         #' @return A length-one character vector, invisibly.
         #'
@@ -2746,6 +2804,26 @@ idf_is_valid_object_name <- function (self, private, name, class = NULL) {
     } else {
         stri_trans_tolower(name) %chin% stri_trans_tolower(get_idf_object_name(private$idd_env(), private$idf_env(), class, simplify = TRUE))
     }
+}
+# }}}
+# idf_external_deps {{{
+idf_external_deps <- function (self, private, full = FALSE) {
+    assert_flag(full)
+
+    base_dir <- if (!is.null(private$m_path)) dirname(private$m_path) else NULL
+    deps <- get_idf_external_deps(private$idd_env(), private$idf_env(), base_dir)
+
+    if (!full) return(c(unique(deps$path), unlist(attr(deps, "extra"), FALSE, FALSE)))
+
+    setnames(deps,
+        c("object_id", "object_name", "class_name", "field_index", "field_name", "value_chr"),
+        c("id", "name", "class", "index", "field", "value"))
+
+    cols <- c("id", "name", "class", "index", "field", "value", "path", "exist")
+
+    if (length(to_del <- setdiff(names(deps), cols))) set(deps, NULL, to_del, NULL)
+
+    setcolorder(deps, cols)[]
 }
 # }}}
 # idf_is_unsaved {{{

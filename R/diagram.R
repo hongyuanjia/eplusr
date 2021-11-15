@@ -12,6 +12,12 @@
 # @export
 # hvac_diagram {{{
 hvac_diagram <- function (eplus, path) {
+    warn(paste(
+      "'hvac_diagram()' has been deprecated as `HVAC-Diagram` will always be",
+      "called after EnergyPlus simulation. If you still want to generate HVAC",
+      "`svg` diagram manually, please use 'HVAC_Diagram()' instead."
+    ), "deprecated_fun")
+
     if (!checkmate::test_file_exists(path, "r", "bnd")) return(NULL)
     assert_vector(eplus, len = 1L)
 

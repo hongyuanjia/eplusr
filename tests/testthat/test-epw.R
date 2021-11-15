@@ -517,6 +517,7 @@ test_that("==.Epw & !=.Epw", {
 test_that("download_weather()", {
     skip_on_cran()
 
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_") != "")
     # download weather
     expect_message({path_epw <- with_verbose(
         download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "epw", dir = tempdir(), max_match = 2)

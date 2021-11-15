@@ -84,7 +84,16 @@ reload.Epw <- function (x, ...) {
 
 #' @export
 reload.EplusJob <- function (x, ...) {
-    reload.Idf(get_priv_env(x)$m_idf)
+    priv <- get_priv_env(x)
+    reload.Idf(priv$m_idf)
+
+    if (!is.null(priv$m_job$file)) {
+        priv$m_job$file <- setDT(priv$m_job$file)
+    }
+    if (!is.null(priv$m_job$run)) {
+        priv$m_job$run <- setDT(priv$m_job$run)
+    }
+
     x
 }
 
@@ -93,7 +102,10 @@ reload.EplusGroupJob <- function (x, ...) {
     priv <- get_priv_env(x)
     for (idf in priv$m_idfs) reload.Idf(idf, ...)
 
-    if (inherits(priv$m_job, "data.table")) priv$m_job <- setDT(priv$m_job)
+    if (inherits(priv$m_job$jobs, "data.table")) {
+        priv$m_job$jobs <- setDT(priv$m_job$jobs)
+    }
+
     x
 }
 
@@ -103,6 +115,8 @@ reload.ParametricJob <- function (x, ...) {
     reload.Idf(priv$m_seed)
     if (!is.null(priv$m_idfs)) for (idf in priv$m_idfs) reload.Idf(idf, ...)
 
-    if (inherits(priv$m_job, "data.table")) priv$m_job <- setDT(priv$m_job)
+    if (inherits(priv$m_job$jobs, "data.table")) {
+        priv$m_job$jobs <- setDT(priv$m_job$jobs)
+    }
     x
 }

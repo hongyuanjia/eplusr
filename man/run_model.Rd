@@ -34,10 +34,14 @@ run_multi(
 \code{run_multi()}) of EnergyPlus IDF or IMF files.}
 
 \item{weather}{A path (for \code{run_idf()}) or a vector of paths (for
-\code{run_multi()}) of EnergyPlus EPW weather files. For \code{run_multi()},
-\code{weather} can also be a single EPW file path. In this case, that
-weather will be used for all simulations; otherwise, \code{model} and
-\code{weather} should have the same length.}
+\code{run_multi()}) of EnergyPlus EPW weather files.
+If set to \code{NULL}, design-day-only simulation will be triggered,
+regardless of the \code{design-day} value.
+For \code{run_multi()}, \code{weather} can also be a single EPW file path. In
+this case, that weather will be used for all simulations; otherwise,
+\code{model} and \code{weather} should have the same length. You can set to
+design-day-only simulation to some specific simulations by setting the
+corresponding weather to \code{NA}.}
 
 \item{output_dir}{Output directory path (for \code{rum_idf()}) or paths (for
 \code{run_mult()}). If NULL, the directory of input model is used. For
@@ -47,23 +51,24 @@ length as \code{model}. Any duplicated combination of \code{model} and
 
 \item{design_day}{Force design-day-only simulation. For \code{rum_multi()},
 \code{design_day} can also be a logical vector which has the same length as
-\code{model}. Default: \code{FALSE}.}
+\code{model}. Note that \code{design_day} and \code{annual} cannot be all \code{TRUE} at
+the same time. Default: \code{FALSE}.}
 
-\item{annual}{Force design-day-only simulation. For \code{rum_multi()},
+\item{annual}{Force annual simulation. For \code{rum_multi()},
 \code{annual} can also be a logical vector which has the same length as
 \code{model}. Note that \code{design_day} and \code{annual} cannot be all \code{TRUE} at
 the same time. Default: \code{FALSE}.}
 
 \item{expand_obj}{Whether to run ExpandObject preprocessor before simulation.
-Default: \code{TRUE}.}
+Default: TRUE.}
 
 \item{wait}{If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
 finish. If \code{FALSE}, all EnergyPlus simulations are run in the
 background, and a \link[processx:process]{process} object is returned.}
 
 \item{echo}{Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
-output and error from EnergyPlus command line interface for
-\code{run_idf()} and simulation status for \code{run_multi()}. Default: \code{TRUE}.}
+output and error from EnergyPlus for \code{run_idf()} and simulation status
+for \code{run_multi()}. Default: \code{TRUE}.}
 
 \item{eplus}{An acceptable input (for \code{run_idf()}) or inputs (for
 \code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If \code{NULL}, which
@@ -73,7 +78,8 @@ should have the same length as \code{model}.}
 }
 \value{
 \itemize{
-\item For \code{run_idf()}, a named list of 11 elements:\tabular{rlll}{
+\item For \code{run_idf()}, if \code{wait} is \code{TRUE}, a named list of 11 elements:
+}\tabular{rlll}{
    No. \tab Column \tab Type \tab Description \cr
    1 \tab \code{idf} \tab \code{character(1)} \tab Full path of input IDF file \cr
    2 \tab \code{epw} \tab \code{character(1)} or \code{NULL} \tab Full path of input EPW file \cr
@@ -85,9 +91,15 @@ should have the same length as \code{model}.}
    8 \tab \code{energyplus} \tab \code{character(1)} \tab Full path of called EnergyPlus executable \cr
    9 \tab \code{stdout} \tab \code{character(1)} or \code{NULL} \tab Standard output of EnergyPlus during simulation \cr
    10 \tab \code{stderr} \tab \code{character(1)} or \code{NULL} \tab Standard error of EnergyPlus during simulation \cr
-   11 \tab \code{process} \tab \link[processx:process]{process} \tab A \link[processx:process]{process} object which called EnergyPlus and ran the simulation \cr
+   11 \tab \code{process} \tab \link[callr:r_bg]{r_process} \tab A process object which called EnergyPlus and ran the simulation \cr
 }
 
+
+If \code{wait} is \code{FALSE}, the \link[callr:r_bg]{R process} is directly returned.
+You can get the results by calling \code{result <- proc$get_result()} (\code{proc} is
+the returned process). Please note that in this case, \code{result$process} will
+alwasy be \code{NULL}. But you can easily assign it by running \code{result$process <- proc}
+\itemize{
 \item For \code{rum_multi()}, if \code{wait} is TRUE, a
 \link[data.table:data.table]{data.table} of 12 columns:\tabular{rlll}{
    No. \tab Column \tab Type \tab Description \cr
@@ -123,19 +135,24 @@ get the final data.table using \verb{$get_result()} method.
 Run simulations of EnergyPlus models.
 }
 \details{
-\code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
-run EnergyPlus model with different options.
+\code{run_idf()} is a wrapper of EnergyPlus itself, plus various pre-processors
+and post-processors which enables to run EnergyPlus model with different
+options.
 
 \code{run_multi()} provides the functionality of running multiple models in
 parallel.
 
-\code{run_idf()} and \code{run_multi()} currently only support EnergyPlus v8.3 and
-above. This is because eplusr uses EnergyPlus command line interface which is
-a new feature as of EnergyPlus v8.3.
-
 It is suggested to run simulations using \link{EplusJob} class and \link{EplusGroupJob}
 class, which provide much more detailed controls on the simulation and also
 methods to extract simulation outputs.
+}
+\note{
+If your input model has external file dependencies, e.g. FMU, schedule files,
+etc. \code{run_idf()} and \code{run_multi()} will not work if the output directory is
+different that where the input mode lives. If this is the case, parse the
+model using \code{\link[=read_idf]{read_idf()}} and use \link[=Idf]{Idf$run()} or \code{\link[=eplus_job]{eplus_job()}} instead.
+They are able to automatically change the paths of external files to absolute
+paths or copy them into the output directory, based on your choice.
 }
 \examples{
 \dontrun{
@@ -165,8 +182,8 @@ if (is_avail_eplus(8.8)) {
 \href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
 }
 \seealso{
-\link{EplusJob} class and \link{ParametricJob} class which provide
-a more friendly interface to run EnergyPlus simulations and collect outputs.
+\link{EplusJob} class and \link{ParametricJob} class which provide a more friendly
+interface to run EnergyPlus simulations and collect outputs.
 }
 \author{
 Hongyuan Jia
