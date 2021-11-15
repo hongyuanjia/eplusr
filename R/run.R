@@ -2392,7 +2392,7 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
         out$end_time <- res$end_time
         out$output_dir <- res$output_dir
         out$energyplus <- normalizePath(
-            file.path(res$energyplus, sprintf("EnergyPlus%s", c(".exe", "")[c(is_windows(), !is_windows())]))
+            file.path(res$energyplus, sprintf("energyplus%s", c(".exe", "")[c(is_windows(), !is_windows())]))
         )
         out$stdout <- unlist(res$run$stdout)
         out$stderr <- unlist(res$run$stderr)
