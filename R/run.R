@@ -1257,7 +1257,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
         unlink(inp)
 
         if (file.exists(path_sim(csv))) {
-            csv <- file_rename(csv, path_out(csv))
+            csv <- file_rename(path_sim(csv), path_out(csv))
             if (ext_in == "eso") {
                 file$variable <- csv
             } else {
