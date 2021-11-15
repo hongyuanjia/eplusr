@@ -106,31 +106,28 @@ lpad <- function(x, char = " ", width = NULL) {
 # }}}
 
 # read_lines {{{
-read_lines <- function(input, trim = TRUE, ...) {
+read_lines <- function(input, trim = TRUE, encoding = "unknown", ...) {
     dt <- tryCatch(
-        fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
+        fread(input = input, sep = NULL, header = FALSE, col.names = "string",
+            encoding = encoding, strip.white = FALSE, ...),
         warning = function (w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
         error = function (e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
 
-    if (trim) {
-        tryCatch(set(dt, j = "string", value = stri_trim_both(dt[["string"]])),
-            error = function (e) {
-                if (!grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
-                    signalCondition(e)
-                }
-
-                # fix encoding issue in older versions of IDD files
-                dt[!stringi::stri_enc_isutf8(string), string :=
-                    stringi::stri_encode(string, "windows-1252", "UTF-8")
-                ]
-
-                set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
-            }
+    # stringi will silent convert every inputs to UTF-8 encoded
+    if (any(not_valid <- !stringi::stri_enc_isutf8(dt$string) & !stringi::stri_enc_isascii(dt$string))) {
+        # try to fix the problems using the most possible encoding guessed from
+        # stringi
+        enc <- vcapply(stringi::stri_enc_detect(dt$string[not_valid]),
+            function(l) .subset2(.subset2(l, "Encoding"), 1L)
         )
+        enc <- names(table(enc))[1L]
+        set(dt, which(not_valid), "string", stringi::stri_encode(dt$string[not_valid], enc, "UTF-8"))
     }
+
+    if (trim) set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
 
     setcolorder(dt, c("line", "string"))
 
@@ -153,6 +150,7 @@ write_lines <- function (x, file = "", append = FALSE) {
 # }}}
 
 # os_type: Return operation system type {{{
+# nocov start
 os_type <- function () {
     if (.Platform$OS.type == 'windows') {
         "windows"
@@ -164,6 +162,7 @@ os_type <- function () {
         "unknown"
     }
 }
+# nocov end
 # }}}
 
 # standardize_ver {{{
@@ -294,20 +293,7 @@ lower_name <- function (name) {
 
 # underscore_name {{{
 underscore_name <- function (name, merge = TRUE) {
-    tryCatch(
-        stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge),
-        error = function (e) {
-            if (!grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
-                signalCondition(e)
-            }
-
-            # fix encoding issue in older versions of IDD files
-            name[!stringi::stri_enc_isutf8(name)] <-
-                stringi::stri_encode(name[!stringi::stri_enc_isutf8(name)], "windows-1252", "UTF-8")
-
-            stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
-        }
-    )
+    stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
 }
 # }}}
 
@@ -441,3 +427,88 @@ copy_list <- function(x) {
     x
 }
 # }}}
+
+file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = NULL) {
+    from <- normalizePath(from, mustWork = TRUE)
+    to <- normalizePath(to, mustWork = FALSE)
+
+    # remove duplications
+    same <- from == to
+    from <- from[!same]
+
+    if (!length(from)) return(to)
+
+    to <- to[!same]
+
+    flag <- file.copy(from, to, copy.date = copy.date, copy.mode = copy.mode, overwrite = TRUE)
+
+    # nocov start
+    if (any(!flag)) {
+        failed_from <- normalizePath(from[!flag], mustWork = FALSE)
+        failed_to <- normalizePath(to[!flag], mustWork = FALSE)
+        if (is.null(err_title)) {
+            err_title <- "Failed to copy file"
+        } else {
+            assert_string(err_title)
+        }
+        abort(sprintf(
+            "%s:\n%s",
+            err_title,
+            paste0(collapse = "\n", sprintf(
+                "#%s | From '%s' to '%s'",
+                seq_along(failed_from), failed_from, failed_to
+            ))
+        ))
+    }
+    # nocov end
+
+    to
+}
+
+file_rename <- function(from, to, err_title = NULL) {
+    from <- normalizePath(from, mustWork = TRUE)
+    to <- normalizePath(to, mustWork = FALSE)
+
+    # remove duplications
+    same <- from == to
+    from <- from[!same]
+
+    if (!length(from)) return(to)
+
+    to <- to[!same]
+
+    flag <- file.rename(from, to)
+
+    # nocov start
+    if (any(!flag)) {
+        failed_from <- normalizePath(from[!flag], mustWork = FALSE)
+        failed_to <- normalizePath(to[!flag], mustWork = FALSE)
+        if (is.null(err_title)) {
+            err_title <- "Failed to move file"
+        } else {
+            assert_string(err_title)
+        }
+        abort(sprintf(
+            "%s:\n%s",
+            err_title,
+            paste0(collapse = "\n", sprintf(
+                "#%s | From '%s' to '%s'",
+                seq_along(failed_from), failed_from, failed_to
+            ))
+        ))
+    }
+    # nocov end
+
+    to
+}
+
+file_rename_if_exist <- function(from, to, err_title = NULL) {
+    from <- normalizePath(from, mustWork = FALSE)
+    to <- normalizePath(to, mustWork = FALSE)
+    res <- rep(NA_character_, length(from))
+
+    exist <- which(file.exists(from))
+    if (length(exist)) res[exist] <- file_rename(from[exist], to[exist])
+
+    res
+}

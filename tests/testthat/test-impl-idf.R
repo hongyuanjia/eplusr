@@ -2492,6 +2492,7 @@ test_that("resolve external link", {
     dir <- tempfile()
     dir.create(dir, FALSE)
     path <- file.path(dir, "test.idf")
+    empty_idf(8.8)$save(path)
     expect_warning(flg <- resolve_idf_external_link(idd_env, l, path, tempfile(fileext = ".idf")), "Broken")
     expect_false(flg)
 

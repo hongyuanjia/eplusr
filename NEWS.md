@@ -18,11 +18,42 @@
 * Now force re-installation of EnergyPlus `install_eplus(force = TRUE)` has been
   updated to support all platforms, including macOS (#477).
 * `install_eplus()` has been updated to behave smarter on macOS (#477).
+* `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
+  procedure. It supports to call the `Basement` and `Slab` processors. Now the
+  requirement of EnergyPlus >=v8.3 for running simulations has been droppped
+  Now simulations with FMU, including obFMU are supported. (#467).
+* `HVAC-Diagram` will be called when running simulations to make sure the `svg`
+  output of HVAC diagram can be generated. Therefore, `hvac_diagram()`
+  has been deprecated and will be removed in next major version (#467).
+* Functions `path_eplus()` and `path_eplus_*()` have been added to help specify
+  file paths under EnergyPlus installation directory (#467).
+* A new `Idf` method `$external_deps()` is added to extra any external file
+  resources specified in the IDF that are needed for simulation, e.g. schedule
+  files (#467).
+* Now `Idf$save(external = TRUE)` and `Idf$run(copy_external)` save external
+  file dependencies based on the results of `Idf$external_deps()` (#467).
+* A new `EplusJob` method `$list_files()` is added to list all inputs and output
+  files for current simulation (#467).
+* A new argument `readvars` can be specified in `EplusJob$run()` and
+  `EplusGroupJob$run()`. Setting it to `FALSE` will disable to run ReadVarsESO
+  post-processor and thus no CSVs will be generated for Report variables and
+  meters. This can speed up simulations significantly if there are hundreds of
+  outputs in the model. Setting it to `FALSE` will not affect any data
+  extraction functionalities in eplusr, as it uses the SQLite output instead of
+  the CSVs (#467).
+
+## Break changes
+
+* `hvac_diagram()` has been deprecated as `HVAC-Diagram` will always be called
+  after EnergyPlus simulation. If you still want to generate HVAC `svg` diagram
+  manually, please use `HVAC_Diagram()` instead (#467).
 
 ## Minor changes
 
 * When `type` is `"all"` in `download_weather()`, the ZIP file will be
   downloaded instead of downloading both `EPW` and `DDY` files (#453).
+* `EplusJob$output_dir()` now use backslash in the returned path on Windows
+  (#467).
 
 ## Bug fixes
 
@@ -30,6 +61,8 @@
 * Fix `download_weather()` file downloading URL (#452).
 * Fix `EplusSql$report_data(..., wide = TRUE)` when `Do HVAC Sizing Simulation
   for Sizing Periods` is set to `Yes` in `SimulationControl` (#461).
+* Now `read_idf()` and other functions that read files from disk can use
+  `stringi::stri_enc_detect()` to fix encoding issue (#467).
 
 # eplusr 0.14.2
 

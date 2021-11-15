@@ -8,6 +8,7 @@ NULL
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
 #' methods to extract simulation outputs.
 #'
+#' @details
 #' eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 #'
 #' `EplusJob` has provide some wrappers that do SQL query to get report data
@@ -48,17 +49,17 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' @examples
         #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
-        #'     idf_name <- "1ZoneUncontrolled.idf"
-        #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+        #'     name_idf <- "1ZoneUncontrolled.idf"
+        #'     name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
         #'
-        #'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-        #'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+        #'     path_idf <- path_eplus_example(8.8, name_idf)
+        #'     path_epw <- path_eplus_weather(8.8, name_epw)
         #'
         #'     # create from local files
-        #'     job <- eplus_job(idf_path, epw_path)
+        #'     job <- eplus_job(path_idf, path_epw)
         #'
         #'     # create from an Idf and an Epw object
-        #'     job <- eplus_job(read_idf(idf_path), read_epw(epw_path))
+        #'     job <- eplus_job(read_idf(path_idf), read_epw(path_epw))
         #' }
         #' }
         initialize = function (idf, epw) {
@@ -127,9 +128,10 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'
         #' @param epw A path to an `.epw` file or an [Epw] object. `epw` can
         #'        also be `NULL` which will force design-day-only simulation.
-        #'        Note this needs at least one `Sizing:DesignDay` object exists
-        #'        in the `Idf`. If not given, the `epw` input used when creating
-        #'        this `EplusJob` object will be used.
+        #'        Note this needs EnergyPlus v8.3 and later, and at least one
+        #'        `Sizing:DesignDay` object exists in the `Idf`. If not given,
+        #'        the `epw` input used when creating this `EplusJob` object will
+        #'        be used.
         #' @param dir The directory to save the simulation results. If `NULL`,
         #'        the input `idf` folder will be used. Default: `NULL`.
         #' @param wait If `TRUE`, R will hang on and wait for the simulation to
@@ -149,6 +151,11 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'        changed automatically. This ensures that the output directory
         #'        will have all files needed for the model to run. Default is
         #'        `FALSE`.
+        #' @param readvars If `TRUE`, the `ReadVarESO` post-processor will run
+        #'        to generate CSV files from the ESO output. Since those CSV
+        #'        files are never used when extracting simulation data in eplusr,
+        #'        setting it to `FALSE` can speed up the simulation if there are
+        #'        hundreds of output variables or meters. Default: `TRUE`.
         #'
         #' @return The `EplusJob` object itself, invisibly.
         #'
@@ -272,6 +279,109 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'
         output_dir = function (open = FALSE)
             job_output_dir(self, private, open),
+        # }}}
+
+        # list_files {{{
+        #' @description
+        #' List all output files in current simulation
+        #'
+        #' @details
+        #' `$list_files()` returns all input and output files for current
+        #' EnergyPlus simulation.
+        #'
+        #' Description of all possible outputs from EnergyPlus can be found in
+        #' EnergyPlus documentation "Output Details and Examples".
+        #'
+        #' Below gives a brief summary on the meaning of elements in the
+        #' returned list.
+        #'
+        #' | #   | Element      | Description                                                           |
+        #' | --- | ---          | ---                                                                   |
+        #' | 1   | `ads`        | EnergyPlus AirflowNetwork related output                              |
+        #' | 2   | `audit`      | EnergyPlus inputs echo                                                |
+        #' | 3   | `bnd`        | EnergyPlus branch node details                                        |
+        #' | 4   | `bsmt_audit` | Basement input Echo                                                   |
+        #' | 5   | `bsmt_csv`   | Basement CSV output                                                   |
+        #' | 6   | `bsmt_idf`   | Basement IDF output                                                   |
+        #' | 7   | `bsmt_out`   | Basement Output                                                       |
+        #' | 8   | `cbor`       | Energyplus CBOR binary output introduced since v9.5                   |
+        #' | 9   | `dbg`        | Energyplus debug output                                               |
+        #' | 10  | `delight`    | EnergyPlus DElight simulation inputs and outputs                      |
+        #' | 11  | `dfs`        | EnergyPlus daylighting factor for exterior windows                    |
+        #' | 12  | `dxf`        | EnergyPlus surface drawing output                                     |
+        #' | 13  | `edd`        | EnergyPlus EMS report                                                 |
+        #' | 14  | `eio`        | EnergyPlus standard and optional reports                              |
+        #' | 15  | `end`        | EnergyPlus simulation status in one line                              |
+        #' | 16  | `epjson`     | EnergyPlus epJSON input converted from IDF                            |
+        #' | 17  | `epmdet`     | EPMacro inputs echo                                                   |
+        #' | 18  | `epmidf`     | EPMacro IDF output                                                    |
+        #' | 19  | `epw`        | EnergyPlus Weather File input                                         |
+        #' | 20  | `err`        | EnergyPlus error summarry                                             |
+        #' | 21  | `eso`        | EnergyPlus standard output                                            |
+        #' | 22  | `experr`     | ExpandObjects error summary                                           |
+        #' | 23  | `expidf`     | ExpandObjects IDF output                                              |
+        #' | 24  | `glhe`       | EnergyPlus ground heat exchange file                                  |
+        #' | 25  | `idf`        | EnergyPlus IDF input                                                  |
+        #' | 26  | `imf`        | EPMacro IMF input                                                     |
+        #' | 27  | `iperr`      | convertESOMTR error summary                                           |
+        #' | 28  | `ipeso`      | convertESOMTR standard output in IP units                             |
+        #' | 29  | `ipmtr`      | convertESOMTR meter output in IP units                                |
+        #' | 30  | `json`       | EnergyPlus JSON time series output introduced since v9.5              |
+        #' | 31  | `log`        | EnergyPlus log output                                                 |
+        #' | 32  | `map`        | EnergyPlus daylighting intensity map output                           |
+        #' | 33  | `mdd`        | EnergyPlus meter list                                                 |
+        #' | 34  | `meter`      | EnergyPlus meter CSV output                                           |
+        #' | 35  | `msgpack`    | EnergyPlus MessagePack binary output introduced since v9.5            |
+        #' | 36  | `mtd`        | EnergyPlus meter details                                              |
+        #' | 37  | `mtr`        | EnergyPlus meter output                                               |
+        #' | 38  | `perflog`    | EnergyPlus log for `PerformancePrecisionTradeoffs                     |
+        #' | 39  | `rdd`        | EnergyPlus report variable names                                      |
+        #' | 40  | `rvaudit`    | ReadVarsESO input echo                                                |
+        #' | 41  | `sci`        | EnergyPlus cost benefit calculation information                       |
+        #' | 42  | `screen`     | EnergyPlus window scrren transmittance map output                     |
+        #' | 43  | `shading`    | EnergyPlus surface shading CSV output                                 |
+        #' | 44  | `shd`        | EnergyPlus surface shading combination report                         |
+        #' | 45  | `slab_ger`   | Slab error summary                                                    |
+        #' | 46  | `slab_gtp`   | Slab ground temperature output                                        |
+        #' | 47  | `slab_out`   | Slab IDF output                                                       |
+        #' | 48  | `sln`        | EnergyPlus `Output:Surfaces:List, Lines` output                       |
+        #' | 49  | `sqlite`     | EnergyPlus SQLite output                                              |
+        #' | 50  | `sqlite_err` | EnergyPlus SQLite error summary                                       |
+        #' | 51  | `ssz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 52  | `svg`        | HVAC-Diagram HVAC diagram output                                      |
+        #' | 53  | `table`      | EnergyPlus tabular outputs in CSV, TAB, TXT, HTM, or XML format       |
+        #' | 54  | `variable`   | EnergyPlus report variable CSV output                                 |
+        #' | 55  | `wrl`        | EnergyPlus `Output:Surfaces:List, VRML` output                        |
+        #' | 56  | `zsz`        | EnergyPlus system sizing outputs in CSV, TAB or TXT format            |
+        #' | 57  | `resource`   | External file resources used for the simulation, e.g. `Schedule:File` |
+        #'
+        #' @param simplify If `TRUE`, a character vector of EnergyPlus input
+        #' and output file names in the output directory is given. If `FALSE`, a
+        #' full named list of all possible input and output types is given. `NA`
+        #' is returned if no input or output files are found for that type.
+        #' Default: `FALSE`.
+        #'
+        #' @param full If `TRUE`, the full file paths in the output directory
+        #' are returned. Otherwise, only the file names are returned. Default:
+        #' `FALSE`.
+        #'
+        #' @return If `FALSE`, a character vector. Otherwise, a named list.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # list all files in the output directory
+        #' job$list_files(simplify = TRUE)
+        #'
+        #' # get a full list of all possible inputs and outputs even though they
+        #' # may not exist for current simulation
+        #' job$list_files()
+        #'
+        #' # return the full paths instead of just file names
+        #' job$locate_output(full = TRUE)
+        #' }
+        #'
+        list_files = function (simplify = FALSE, full = FALSE)
+            job_list_files(self, private, simplify, full),
         # }}}
 
         # locate_output {{{
@@ -801,7 +911,7 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 # }}}
 # job_run {{{
 job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
-                     echo = wait, copy_external = FALSE) {
+                     echo = wait, copy_external = FALSE, readvars = TRUE) {
     # stop if idf object has been changed accidentally
     if (!identical(private$seed_uuid(), private$cached_seed_uuid())) {
         abort(paste0("The Idf has been modified after job was created. ",
@@ -846,9 +956,8 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     }
 
     # check if the model is still running
-    old <- private$m_job
-    if (!is.null(old)) {
-        proc <- old$process
+    proc <- private$m_job
+    if (!is.null(proc)) {
         if (inherits(proc, "process") && proc$is_alive()) {
             pid <- proc$get_pid()
             if (force) {
@@ -864,18 +973,26 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
         }
     }
 
-    private$m_log$start_time <- Sys.time()
+    # reset status
+    private$m_log$start_time <- current()
     private$m_log$killed <- NULL
 
-    private$m_job <- run_idf(path_idf, path_epw,
-        output_dir = NULL, echo = echo, wait = wait, eplus = private$m_idf$version(),
-        design_day = is.null(private$m_epw_path),
-        expand_obj = idf_has_hvactemplate(private$m_idf)
+    resrc <- NULL
+    if (copy_external) {
+        # check if external file dependencies are found
+        resrc <- private$m_idf$external_deps()
+        if (!length(resrc)) resrc <- NULL
+    }
+
+    private$m_job <- energyplus(
+        model = path_idf, weather = path_epw, design_day = is.null(private$m_epw_path),
+        eso_to_ip = FALSE, readvars = readvars, echo = echo, wait = wait,
+        eplus = private$m_idf$version(), resources = resrc
     )
 
-    if (wait) private$m_log$end_time <- Sys.time()
-
     private$log_new_uuid()
+    if (wait) private$m_log$end_time <- current()
+
     self
 }
 # }}}
@@ -886,9 +1003,9 @@ job_kill <- function (self, private) {
         return(invisible(FALSE))
     }
 
-    proc <- private$m_job$process
+    proc <- private$m_job
 
-    if (!proc$is_alive()) {
+    if (!inherits(proc, "process") || !proc$is_alive()) {
         verbose_info("The job is not running.")
         return(invisible(FALSE))
     }
@@ -921,8 +1038,7 @@ job_status <- function (self, private) {
     # if the model has not been run before
     if (is.null(proc)) {
         if (!file.exists(private$m_idf$path())) {
-            warning("Could not find local idf file ", surround(private$m_idf$path()),
-                ".", call. = FALSE)
+            warn(sprintf("Could not find local idf file '%s'.", surround(private$m_idf$path())))
         }
         return(status)
     }
@@ -936,18 +1052,19 @@ job_status <- function (self, private) {
     }
 
     # check if the model is still running
-    if (proc$process$is_alive()) {
+    if (inherits(proc, "process") && proc$is_alive()) {
         status$alive <- TRUE
     } else {
         status$alive <- FALSE
 
         # in waiting mode
-        if (!is.null(proc$exit_status)) {
+        if (!inherits(proc, "process")) {
             exit_status <- proc$exit_status
         # in non-waiting mode
         } else {
-            proc$process$wait()
-            exit_status <- proc$process$get_exit_status()
+            proc$wait()
+            private$m_job <- proc$get_result()
+            exit_status <- private$m_job$exit_status
         }
 
         if (!is.na(exit_status) && exit_status == 0L) {
@@ -967,12 +1084,12 @@ job_status <- function (self, private) {
 # }}}
 # job_output_dir {{{
 job_output_dir <- function (self, private, open = FALSE) {
-    dir <- dirname(private$m_idf$path())
+    dir <- normalizePath(dirname(private$m_idf$path()), mustWork = FALSE)
     if (!open) return(dir)
     if (open) {
         if (is.null(dir)) {
             verbose_info("No simulation has been run yet.")
-            return(invisible())
+            return(invisible(dir))
         }
 
         # Reference:
@@ -988,6 +1105,49 @@ job_output_dir <- function (self, private, open = FALSE) {
         }
     }
     dir
+}
+# }}}
+# job_list_files {{{
+job_list_files <- function (self, private, simplify = FALSE, full = FALSE) {
+    assert_flag(simplify)
+    assert_flag(full)
+
+    status <- job_status(self, private)
+
+    if (!isTRUE(status$run_before)) {
+        stop("Simulation did not run before. Please run it using `$run()` ",
+            "before collect output", call. = FALSE)
+    }
+
+    if (isTRUE(status$terminated))
+        stop("Simulation was terminated before. Please solve ",
+            "the problems and re-run the simulation before collect ",
+            "output", call. = FALSE)
+
+    if (isTRUE(status$alive))
+        stop("Simulation is still running. Please wait simulation ",
+            "to finish before collecting results.", call. = FALSE)
+
+    files <- private$m_job$file
+    if (simplify) {
+        files <- unlist(files, FALSE, FALSE)
+        files <- files[!is.na(files)]
+
+        if (full) {
+            files <- file.path(job_output_dir(self, private), files)
+            files <- normalizePath(files, mustWork = FALSE)
+        }
+    } else if (full) {
+        files <- lapply(files, function(f) {
+            if (all(is.na(f))) {
+                f
+            } else {
+                normalizePath(file.path(job_output_dir(self, private), f), mustWork = FALSE)
+            }
+        })
+    }
+
+    files
 }
 # }}}
 # job_locate_output {{{
@@ -1133,24 +1293,18 @@ job_print <- function (self, private) {
             surround(private$m_log$start_time), " and ended unsuccessfully...",
             col = "white", background_col = "red")
     } else {
-        job_update_endtime(self, private)
-
-        if (!is.null(private$m_log$end_time)) {
-            run_time <- format(round(difftime(
-                private$m_log$end_time, private$m_log$start_time), digits = 2L)
-            )
-
-            cli::cat_line(" Simulation started at ",
-                surround(private$m_log$start_time), " and completed successfully after ",
-                run_time, ".",
-                col = "black", background_col = "green"
-            )
-        } else {
-            cli::cat_line(" Simulation started at ",
-                surround(private$m_log$start_time), " and completed successfully.",
-                col = "black", background_col = "green"
-            )
+        if (is.null(private$m_log$end_time)) {
+            private$m_log$end_time <- private$m_job$end_time
         }
+
+        run_time <- format(round(difftime(
+            private$m_log$end_time, private$m_log$start_time), digits = 2L)
+        )
+
+        cli::cat_line(" Simulation started at ",
+            surround(private$m_log$start_time), " and completed successfully after ",
+            run_time, ".", col = "black", background_col = "green"
+        )
     }
 }
 # }}}
@@ -1270,26 +1424,5 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
         paste0("* EnergyPlus Version: ", eplus_ver),
         str_trunc(paste0("* EnergyPlus Path: ", path_eplus))
     ))
-}
-# }}}
-# job_update_endtime {{{
-job_update_endtime <- function (self, private) {
-    if (is.null(private$m_log$end_time)) {
-
-        if (is.null(private$m_job$stdout)) {
-            private$m_job$stdout <- private$m_job$process$read_all_output_lines()
-        }
-
-        if (is.null(private$m_job$stderr)) {
-            private$m_job$stderr <- private$m_job$process$read_all_error_lines()
-        }
-
-        run_time <- get_run_time(private$m_job$stdout)
-
-        if (!is.null(run_time)) {
-            private$m_job$end_time <- run_time + private$m_job$start_time
-            private$m_log$end_time <- private$m_job$end_time
-        }
-    }
 }
 # }}}

@@ -116,6 +116,11 @@ reference:
       - avail_eplus
       - locate_eplus
       - is_avail_eplus
+      - path_eplus
+      - path_eplus_processor
+      - path_eplus_example
+      - path_eplus_weather
+      - path_eplus_dataset
 
   - title: Job
     desc: Run EnergyPlus and collect outputs
