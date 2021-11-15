@@ -439,12 +439,6 @@ copy_list <- function(x) {
 }
 # }}}
 
-with_wd <- function(wd, expr, env = parent.frame()) {
-    owd <- setwd(wd)
-    on.exit(setwd(owd), add = TRUE)
-    eval(expr, envir = env)
-}
-
 file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = NULL) {
     from <- normalizePath(from, mustWork = TRUE)
     to <- normalizePath(to, mustWork = FALSE)

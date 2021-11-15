@@ -710,18 +710,19 @@ EPMacro <- function(model,
         return(list(file = NULL, run = NULL))
     }
 
+    path_sim <- function(file) normalizePath(file.path(dirname(cmd$model), basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+
     # handle ouput file renaming
     file_callback <- function() {
         if (tools::file_ext(cmd$model) != "imf") unlink(cmd$idf)
         remove_eplus_in_files(cmd$model)
 
         file <- list()
-        file$imf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
-        with_wd(cmd$output_dir, {
-            wd <- dirname(cmd$model)
-            file$epmidf <- file_rename_if_exist(file.path(wd, "out.idf"), sprintf("%s.epmidf", cmd$output_prefix))
-            file$epmdet <- file_rename_if_exist(file.path(wd, "audit.out"), sprintf("%s.epmdet", cmd$output_prefix))
-        })
+        file$imf <- path_out(cmd$model)
+        file$epmidf <- file_rename_if_exist(path_sim("out.idf"), path_out2(".epmidf"))
+        file$epmdet <- file_rename_if_exist(path_sim("audit.out"), path_out2(".epmdet"))
         file
     }
 
@@ -756,6 +757,10 @@ ExpandObjects <- function(model,
     if (!is.null(idd)) assert_file_exists(idd, "r", "idd")
 
     wd <- dirname(cmd$idf)
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+
     create_energyplus_ini(cmd$energyplus, wd)
     copy_energyplus_idd(cmd$energyplus, wd, idd)
 
@@ -763,17 +768,16 @@ ExpandObjects <- function(model,
     file_callback <- function() {
         if (tools::file_ext(cmd$model) != "idf") unlink(cmd$idf)
         remove_eplus_in_files(cmd$model)
-        unlink(file.path(wd, "Energy+.ini"))
-        if (wd != dirname(cmd$energyplus)) unlink(file.path(wd, "Energy+.idd"))
+
+        unlink(path_sim("Energy+.ini"))
+        if (wd != dirname(cmd$energyplus)) unlink(path_sim("Energy+.idd"))
 
         file <- list()
-        file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
-        with_wd(cmd$output_dir, {
-            file$expidf <- file_rename_if_exist(file.path(wd, "expanded.idf"), sprintf("%s.expidf", cmd$output_prefix))
-            file$basement <- file_rename_if_exist(file.path(wd, "BasementGHTIn.idf"), "BasementGHTIn.idf")
-            file$slab <- file_rename_if_exist(file.path(wd, "GHTIn.idf"), "GHTIn.idf")
-            file$experr <- file_rename_if_exist(file.path(wd, "expandedidf.err"), sprintf("%s.experr", cmd$output_prefix))
-        })
+        file$idf <- path_out(cmd$model)
+        file$expidf <- file_rename_if_exist(path_sim("expanded.idf"), path_out2(".expidf"))
+        file$basement <- file_rename_if_exist(path_sim("BasementGHTIn.idf"), path_out("BasementGHTIn.idf"))
+        file$slab <- file_rename_if_exist(path_sim("GHTIn.idf"), path_out("GHTIn.idf"))
+        file$experr <- file_rename_if_exist(path_sim("expandedidf.err"), path_out2(".experr"))
         file
     }
 
@@ -807,22 +811,24 @@ Basement <- function(model, weather,
 
     if (!is.null(idd)) assert_file_exists(idd, "r", "idd")
 
-    cmd$idf <- file_rename_if_exist(cmd$idf, file.path(dirname(cmd$idf), "BasementGHTIn.idf"))
-
     wd <- dirname(cmd$idf)
-    with_wd(wd, {
-        unlink(c("EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
-            "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
-            "rundebugout.txt", "basementout.audit"))
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_sim2 <- function(suffix) normalizePath(file.path(wd, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
-        unlink(sprintf(
-            "%s%s", cmd$output_prefix,
-            c(
-                ".audit", ".out", "_out.idf", "_bsmt.csv", "_bsmt.audit",
-                "_bsmt.out", "_out_bsmt.idf"
-            )
-        ))
-    })
+    cmd$idf <- file_rename_if_exist(path_sim(cmd$idf), path_sim("BasementGHTIn.idf"))
+
+    unlink(path_sim(c(
+        "EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
+        "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
+        "rundebugout.txt", "basementout.audit"
+    )))
+
+    unlink(path_sim2(c(
+        ".audit", ".out", "_out.idf", "_bsmt.csv", "_bsmt.audit",
+        "_bsmt.out", "_out_bsmt.idf"
+    )))
 
     create_energyplus_ini(cmd$energyplus, wd)
 
@@ -832,35 +838,36 @@ Basement <- function(model, weather,
     # handle ouput file renaming
     file_callback <- function() {
         remove_eplus_in_files(cmd$model, cmd$weather)
-        if (attr(idd, "copied")) unlink(file.path(wd, "BasementGHT.idd"))
-        unlink(file.path(wd, "Energy+.ini"))
+        if (attr(idd, "copied")) unlink(path_sim("BasementGHT.idd"))
+        unlink(path_sim("Energy+.ini"))
 
         file <- list()
-        file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
-        file$epw <- normalizePath(file.path(cmd$output_dir, basename(cmd$weather)))
-        with_wd(wd, {
-            file$bsmt_idf <- file_rename_if_exist("EPObjects.txt", sprintf("%s_bsmt.idf", cmd$output_prefix))
-            file$bsmt_csv <- file_rename_if_exist("MonthlyResults.csv", sprintf("%s_bsmt.csv", cmd$output_prefix))
-            file$bsmt_out <- file_rename_if_exist("RunINPUT.TXT", sprintf("%s_bsmt.out", cmd$output_prefix))
+        file$idf <- normalizePath(path_out(cmd$model))
+        file$epw <- normalizePath(path_out(cmd$weather))
 
-            if (!file.exists("RunDEBUGOUT.TXT")) {
-                file$bsmt_audit <- normalizePath(sprintf("%s_bsmt.audit", cmd$output_prefix), mustWork = FALSE)
-                write_lines("Basement Audit File", file$bsmt_audit)
-            } else {
-                file$bsmt_audit <- file_rename("RunDEBUGOUT.TXT", sprintf("%s_bsmt.audit", cmd$output_prefix))
-            }
+        file$bsmt_idf <- file_rename_if_exist(path_sim("EPObjects.txt"), path_out2("_bsmt.idf"))
+        file$bsmt_csv <- file_rename_if_exist(path_sim("MonthlyResults.csv"), path_out2("_bsmt.csv"))
+        file$bsmt_out <- file_rename_if_exist(path_sim("RunINPUT.TXT"), path_out2("_bsmt.out"))
 
-            if (file.exists("audit.out")) {
-                write_lines(read_lines("audit.out"), file$bsmt_audit, append = TRUE)
-            }
-            if (file.exists("eplusout.err")) {
-                write_lines(read_lines("eplusout.err"), file$bsmt_audit, append = TRUE)
-            }
+        if (!file.exists(path_sim("RunDEBUGOUT.TXT"))) {
+            file$bsmt_audit <- path_out2("_bsmt.audit")
+            write_lines("Basement Audit File", file$bsmt_audit)
+        } else {
+            file$bsmt_audit <- file_rename(path_sim("RunDEBUGOUT.TXT"), path_out2("_bsmt.audit"))
+        }
 
-            unlink(c("EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
-                "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
-                "RunDEBUGOUT.TXT", "basementout.audit", "eplusout.err"))
-        })
+        if (file.exists(path_sim("audit.out"))) {
+            write_lines(read_lines(path_sim("audit.out")), file$bsmt_audit, append = TRUE)
+        }
+        if (file.exists(path_sim("eplusout.err"))) {
+            write_lines(read_lines(path_sim("eplusout.err")), file$bsmt_audit, append = TRUE)
+        }
+
+        unlink(path_sim(c(
+            "EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
+            "RunINPUT.TXT", "RunTGMAVG.TXT", "eplusout.end", "audit.out",
+            "RunDEBUGOUT.TXT", "basementout.audit", "eplusout.err")
+        ))
 
         file
     }
@@ -896,14 +903,17 @@ Slab <- function(model, weather,
     cmd$idf <- file_rename_if_exist(cmd$idf, file.path(dirname(cmd$idf), "GHTIn.idf"))
 
     wd <- dirname(cmd$idf)
-    with_wd(wd, {
-        unlink(c("EPObjects.TXT", "SLABDBOUT.TXT", "SLABINP.TXT",
-            "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"))
 
-        unlink(sprintf(
-            "%s%s", cmd$output_prefix, c(".gtp", ".ger", "_slab.gtp", "_slab.ger")
-        ))
-    })
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_sim2 <- function(suffix) normalizePath(file.path(wd, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+
+    unlink(path_sim(c(
+        "EPObjects.TXT", "SLABDBOUT.TXT", "SLABINP.TXT",
+        "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"
+    )))
+    unlink(path_sim2(c(".gtp", ".ger", "_slab.gtp", "_slab.ger")))
 
     create_energyplus_ini(cmd$energyplus, wd)
 
@@ -913,20 +923,21 @@ Slab <- function(model, weather,
     # handle ouput file renaming
     file_callback <- function() {
         remove_eplus_in_files(cmd$model, cmd$weather)
-        if (attr(idd, "copied")) unlink(file.path(wd, "SlabGHT.idd"))
-        unlink(file.path(wd, "Energy+.ini"))
+        if (attr(idd, "copied")) unlink(path_sim("SlabGHT.idd"))
+        unlink(path_sim("Energy+.ini"))
 
         file <- list()
-        file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
-        file$epw <- normalizePath(file.path(cmd$output_dir, basename(cmd$weather)))
-        with_wd(wd, {
-            file$slab_gtp <- file_rename_if_exist("SLABSurfaceTemps.txt", sprintf("%s_slab.gtp", cmd$output_prefix))
-            file$slab_out <- file_rename_if_exist("SLABINP.txt", sprintf("%s_slab.out", cmd$output_prefix))
-            file$slab_ger <- file_rename_if_exist("eplusout.err", sprintf("%s_slab.ger", cmd$output_prefix))
+        file$idf <- path_out(cmd$model)
+        file$epw <- path_out(cmd$weather)
 
-            unlink(c("EPObjects.TXT", "eplusout.err", "SLABDBOUT.TXT",
-                "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"))
-        })
+        file$slab_gtp <- file_rename_if_exist("SLABSurfaceTemps.txt", path_out2("_slab.gtp"))
+        file$slab_out <- file_rename_if_exist("SLABINP.txt", path_out2("_slab.out"))
+        file$slab_ger <- file_rename_if_exist("eplusout.err", path_out2("_slab.ger"))
+
+        unlink(path_sim(c(
+            "EPObjects.TXT", "eplusout.err", "SLABDBOUT.TXT",
+            "SLABSplit Surface Temps.TXT", "eplusout.end", "audit.out"
+        )))
 
         file
     }
@@ -967,7 +978,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
 
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
     # just for test purpose
-    legacy <- getOption("eplusr.eplus_83", eplus_ver < 8.3)
+    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < 8.3)
 
     # cannot set annual and design_day if energy
     if (any(annual, design_day) && legacy) {
@@ -1099,6 +1110,9 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
     )
 
     wd <- normalizePath(dirname(cmd$model))
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
     if (is.null(rules)) {
         rules <- normalizePath(file.path(dirname(cmd$exectuable), "convert.txt"), mustWork = TRUE)
@@ -1109,13 +1123,13 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
             normalizePath(dirname(rules)) != wd
     }
     # copy conversion rules into the working directory
-    rules <- file_copy(rules, file.path(wd, "convert.txt"))
+    rules <- file_copy(rules, path_sim("convert.txt"))
 
     # copy eso file
     ext <- tools::file_ext(cmd$model)
     eso <- sprintf("eplusout.%s", ext)
     if (eso_copied <- basename(cmd$model) != eso) {
-        eso <- file_copy(cmd$model, file.path(wd, sprintf("eplusout.%s", ext)))
+        eso <- file_copy(cmd$model, path_sim(sprintf("eplusout.%s", ext)))
     }
 
     # handle ouput file renaming
@@ -1128,28 +1142,26 @@ convertESOMTR <- function(eso, output_dir = NULL, output_prefix = NULL, rules = 
         file$iperr <- NA_character_
 
         if (ext == "eso") {
-            file$eso <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
+            file$eso <- path_out(cmd$model)
         } else {
-            file$mtr <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
+            file$mtr <- path_out(cmd$model)
         }
 
-        with_wd(wd, {
-            if (rules_copied) unlink(rules)
+        if (rules_copied) unlink(rules)
 
-            if (file.exists("ip.eso")) {
-                if (eso_copied) unlink("eplusout.eso")
-                file$ipeso <- file_rename("ip.eso", sprintf("%s.ipeso", cmd$output_prefix))
-            }
+        if (file.exists(path_sim("ip.eso"))) {
+            if (eso_copied) unlink(path_sim("eplusout.eso"))
+            file$ipeso <- file_rename(path_sim("ip.eso"), path_out2(".ipeso"))
+        }
 
-            if (file.exists("ip.mtr")) {
-                if (eso_copied) unlink("eplusout.mtr")
-                file$ipmtr <- file_rename("ip.mtr", sprintf("%s.ipmtr", cmd$output_prefix))
-            }
+        if (file.exists(path_sim("ip.mtr"))) {
+            if (eso_copied) unlink(path_sim("eplusout.mtr"))
+            file$ipmtr <- file_rename(path_sim("ip.mtr"), path_out2(".ipmtr"))
+        }
 
-            if (file.exists("ip.err")) {
-                file$iperr <- file_rename("ip.err", sprintf("%s.iperr", cmd$output_prefix))
-            }
-        })
+        if (file.exists(path_sim("ip.err"))) {
+            file$iperr <- file_rename(path_sim("ip.err"), path_out2(".iperr"))
+        }
 
         file
     }
@@ -1189,16 +1201,19 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     )
 
     wd <- dirname(cmd$model)
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
     # file name without extension
-    nm <- tools::file_path_sans_ext(basename(cmd$model))
+    nm <- tools::file_path_as_absolute(basename(cmd$model))
     ext_in <- tools::file_ext(cmd$model)
     # handle eso and mtr after convertESOMTR
     ext_in <- switch(ext_in, ipeso = "eso", ipmtr = "mtr", ext_in)
 
     # copy files
     if (copied <- basename(cmd$model) != sprintf("eplusout.%s", ext_in)) {
-        eso <- file_copy(cmd$model, file.path(wd, sprintf("eplusout.%s", ext_in)))
+        eso <- file_copy(cmd$model, path_sim(sprintf("eplusout.%s", ext_in)))
     }
 
     out <- get_eplus_output_name(cmd$output_prefix, output_suffix)
@@ -1214,11 +1229,11 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     }
 
     # copy inp file if exists
-    if (file.exists(inp_in <- file.path(wd, sprintf("%s.%s", nm, ext)))) {
-        inp <- file_copy(inp_in, file.path(wd, inp))
+    if (file.exists(inp_in <- path_sim(sprintf("%s.%s", nm, ext)))) {
+        inp <- file_copy(inp_in, path_sim(inp))
     # create a temporary rvi if eplusout.inp does not exist
     } else {
-        inp <- normalizePath(file.path(wd, inp), mustWork = FALSE)
+        inp <- path_sim(inp)
         write_lines(c(sprintf("eplusout.%s", ext_in), csv, ""), inp)
     }
 
@@ -1232,30 +1247,27 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
         file$rvaudit <- NA_character_
 
         if (ext_in == "eso") {
-            file$eso <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
+            file$eso <- path_out(cmd$model)
         } else {
-            file$mtr <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
+            file$mtr <- path_out(cmd$model)
         }
 
-        with_wd(wd, {
-            if (copied) unlink(eso)
+        if (copied) unlink(eso)
 
-            unlink(inp)
+        unlink(inp)
 
-            if (file.exists(csv)) {
-                csv <- file_rename(csv, file.path(cmd$output_dir, csv))
-                if (ext_in == "eso") {
-                    file$variable <- csv
-                } else {
-                    file$meter <- csv
-                }
-
+        if (file.exists(path_sim(csv))) {
+            csv <- file_rename(csv, path_out(csv))
+            if (ext_in == "eso") {
+                file$variable <- csv
+            } else {
+                file$meter <- csv
             }
+        }
 
-            if (file.exists("readvars.audit")) {
-                file$rvaudit <- file_rename("readvars.audit", file.path(cmd$output_dir, sprintf("%s.rvaudit", cmd$output_prefix)))
-            }
-        })
+        if (file.exists(path_sim("readvars.audit"))) {
+            file$rvaudit <- file_rename(path_sim("readvars.audit"), path_out2(".rvaudit"))
+        }
 
         file
     }
@@ -1290,24 +1302,25 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
     )
 
     wd <- dirname(cmd$model)
+    path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
+    path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
     if (copied <- basename(cmd$model) != "eplusout.bnd") {
-        bnd <- file_copy(cmd$model, file.path(wd, "eplusout.bnd"))
+        bnd <- file_copy(cmd$model, path_sim("eplusout.bnd"))
     }
 
     # handle ouput file renaming
     file_callback <- function() {
         file <- list()
-        file$bnd <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
+        file$bnd <- path_out(cmd$model)
         file$svg <- NA_character_
 
-        with_wd(wd, {
-            if (copied) unlink(bnd)
+        if (copied) unlink(bnd)
 
-            if (file.exists("eplusout.svg")) {
-                file$svg <- file_rename("eplusout.svg", file.path(cmd$output_dir, sprintf("%s.svg", cmd$output_prefix)))
-            }
-        })
+        if (file.exists(path_sim("eplusout.svg"))) {
+            file$svg <- file_rename(path_sim("eplusout.svg"), path_out2(".svg"))
+        }
 
         file
     }
@@ -1540,6 +1553,9 @@ run_energyplus <- function(
 
     path_sim <- function(file) normalizePath(file.path(cmd$sim_dir, basename(file)), mustWork = FALSE)
     path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
+    path_sim2 <- function(suffix) normalizePath(file.path(cmd$sim_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+    path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+
     temp_name <- function() basename(tempfile(tmpdir = cmd$sim_dir))
     file_temp <- function(file, ext = NULL) {
         res <- rep(NA_character_, length(file))
@@ -1641,7 +1657,7 @@ run_energyplus <- function(
             unlink(cmd$idf)
 
             # use the expanded model as the input for later simulation
-            cmd$idf <- file_copy(file$expidf, path_sim(sprintf("%s_expanded.idf", cmd$output_prefix)))
+            cmd$idf <- file_copy(file$expidf, path_sim2(("_expanded.idf")))
         }
 
         if (!is.na(res_expandobj$file$experr)) {
@@ -1891,7 +1907,7 @@ run_energyplus <- function(
         res_eplus$file$bnd <- file_rename(res_eplus$file$bnd, path_sim("eplusout.bnd"))
 
         # do not echo
-        res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$sim_dir, cmd$output_prefix,
+        res_diagram <- HVAC_Diagram(res_eplus$file$bnd, cmd$output_dir, cmd$output_prefix,
             wait = TRUE, echo = FALSE, eplus = eplus_ver)
         run$HVAC_Diagram <- res_diagram$run
 
