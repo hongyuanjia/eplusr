@@ -930,9 +930,9 @@ Slab <- function(model, weather,
         file$idf <- path_out(cmd$model)
         file$epw <- path_out(cmd$weather)
 
-        file$slab_gtp <- file_rename_if_exist("SLABSurfaceTemps.txt", path_out2("_slab.gtp"))
-        file$slab_out <- file_rename_if_exist("SLABINP.txt", path_out2("_slab.out"))
-        file$slab_ger <- file_rename_if_exist("eplusout.err", path_out2("_slab.ger"))
+        file$slab_gtp <- file_rename_if_exist(path_sim("SLABSurfaceTemps.txt"), path_out2("_slab.gtp"))
+        file$slab_out <- file_rename_if_exist(path_sim("SLABINP.txt"), path_out2("_slab.out"))
+        file$slab_ger <- file_rename_if_exist(path_sim("eplusout.err"), path_out2("_slab.ger"))
 
         unlink(path_sim(c(
             "EPObjects.TXT", "eplusout.err", "SLABDBOUT.TXT",
@@ -1206,7 +1206,7 @@ ReadVarsESO <- function(eso, output_dir = NULL, output_prefix = NULL,
     path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
     # file name without extension
-    nm <- tools::file_path_as_absolute(basename(cmd$model))
+    nm <- tools::file_path_sans_ext(basename(cmd$model))
     ext_in <- tools::file_ext(cmd$model)
     # handle eso and mtr after convertESOMTR
     ext_in <- switch(ext_in, ipeso = "eso", ipmtr = "mtr", ext_in)
