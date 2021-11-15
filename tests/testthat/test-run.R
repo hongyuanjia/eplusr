@@ -412,10 +412,11 @@ test_that("EnergyPlus()", {
     res_legacy <- EnergyPlus(path, weather, out_dir, output_suffix = "L", eplus = 8.8, echo = FALSE)
     files <- basename(unlist(res_legacy$file, FALSE, FALSE))
     files <- files[!is.na(files)]
-    expect_equal(sort(names(tbl <- table(tools::file_path_sans_ext(files)))),
+    expect_equal(setdiff(
+        names(tbl <- table(tools::file_path_sans_ext(files))),
         c("1ZoneUncontrolled", "eplusout", "eplustbl", "sqlite",
           "USA_CO_Golden-NREL.724666_TMY3")
-    )
+    ), character())
     expect_equal(sort(as.integer(tbl)), c(1L, 1L, 1L, 5L, 12L))
 
     # can run annual simulation with custom IDD
