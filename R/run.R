@@ -817,7 +817,7 @@ Basement <- function(model, weather,
     path_sim2 <- function(suffix) normalizePath(file.path(wd, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
     path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
 
-    cmd$idf <- file_rename_if_exist(path_sim(cmd$idf), path_sim("BasementGHTIn.idf"))
+    cmd$idf <- file_rename_if_exist(cmd$idf, path_sim("BasementGHTIn.idf"))
 
     unlink(path_sim(c(
         "EPObjects.TXT", "GrTemp.TXT", "TempInit.TXT", "RunSolar.TXT",
@@ -842,10 +842,10 @@ Basement <- function(model, weather,
         unlink(path_sim("Energy+.ini"))
 
         file <- list()
-        file$idf <- normalizePath(path_out(cmd$model))
-        file$epw <- normalizePath(path_out(cmd$weather))
+        file$idf <- path_out(cmd$model)
+        file$epw <- path_out(cmd$weather)
 
-        file$bsmt_idf <- file_rename_if_exist(path_sim("EPObjects.txt"), path_out2("_bsmt.idf"))
+        file$bsmt_idf <- file_rename_if_exist(path_sim("EPObjects.TXT"), path_out2("_bsmt.idf"))
         file$bsmt_csv <- file_rename_if_exist(path_sim("MonthlyResults.csv"), path_out2("_bsmt.csv"))
         file$bsmt_out <- file_rename_if_exist(path_sim("RunINPUT.TXT"), path_out2("_bsmt.out"))
 
@@ -900,14 +900,14 @@ Slab <- function(model, weather,
         wait = wait, echo = echo, eplus = eplus
     )
 
-    cmd$idf <- file_rename_if_exist(cmd$idf, file.path(dirname(cmd$idf), "GHTIn.idf"))
-
     wd <- dirname(cmd$idf)
 
     path_sim <- function(file) normalizePath(file.path(wd, basename(file)), mustWork = FALSE)
     path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
     path_sim2 <- function(suffix) normalizePath(file.path(wd, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
     path_out2 <- function(suffix) normalizePath(file.path(cmd$output_dir, sprintf("%s%s", cmd$output_prefix, suffix)), mustWork = FALSE)
+
+    cmd$idf <- file_rename_if_exist(cmd$idf, path_sim("GHTIn.idf"))
 
     unlink(path_sim(c(
         "EPObjects.TXT", "SLABDBOUT.TXT", "SLABINP.TXT",
@@ -930,8 +930,8 @@ Slab <- function(model, weather,
         file$idf <- path_out(cmd$model)
         file$epw <- path_out(cmd$weather)
 
-        file$slab_gtp <- file_rename_if_exist(path_sim("SLABSurfaceTemps.txt"), path_out2("_slab.gtp"))
-        file$slab_out <- file_rename_if_exist(path_sim("SLABINP.txt"), path_out2("_slab.out"))
+        file$slab_gtp <- file_rename_if_exist(path_sim("SLABSurfaceTemps.TXT"), path_out2("_slab.gtp"))
+        file$slab_out <- file_rename_if_exist(path_sim("SLABINP.TXT"), path_out2("_slab.out"))
         file$slab_ger <- file_rename_if_exist(path_sim("eplusout.err"), path_out2("_slab.ger"))
 
         unlink(path_sim(c(
