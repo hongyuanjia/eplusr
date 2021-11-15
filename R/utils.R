@@ -116,22 +116,18 @@ read_lines <- function(input, trim = TRUE, encoding = "unknown", ...) {
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
 
-    if (trim) {
-        tryCatch(set(dt, j = "string", value = stri_trim_both(dt[["string"]])),
-            error = function (e) {
-                if (!grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
-                    signalCondition(e)
-                }
-
-                # fix encoding issue in older versions of IDD files
-                dt[!stringi::stri_enc_isutf8(string), string :=
-                    stringi::stri_encode(string, "windows-1252", "UTF-8")
-                ]
-
-                set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
-            }
+    # stringi will silent convert every inputs to UTF-8 encoded
+    if (any(not_valid <- !stringi::stri_enc_isutf8(dt$string) & !stringi::stri_enc_isascii(dt$string))) {
+        # try to fix the problems using the most possible encoding guessed from
+        # stringi
+        enc <- vcapply(stringi::stri_enc_detect(dt$string[not_valid]),
+            function(l) .subset2(.subset2(l, "Encoding"), 1L)
         )
+        enc <- names(table(enc))[1L]
+        set(dt, which(not_valid), "string", stringi::stri_encode(dt$string[not_valid], enc, "UTF-8"))
     }
+
+    if (trim) set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
 
     setcolorder(dt, c("line", "string"))
 
