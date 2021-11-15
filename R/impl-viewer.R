@@ -481,16 +481,18 @@ add_surface_hole_vertices <- function (surface, subsurface, vertices) {
 
 # triangulate_geoms {{{
 triangulate_geoms <- function (geoms) {
-    if (!nrow(geoms$vertices)) return(geoms$vertices)
+    # In case there is no surface to triangulate and the original vertice
+    # data.table is directly returned. See #479
+    if (!nrow(geoms$vertices)) return(copy(geoms$vertices))
     if (nrow(geoms$subsurface)) {
         geoms$vertices <- add_surface_hole_vertices(geoms$surface, geoms$subsurface, geoms$vertices)
     }
     num_vert <- geoms$vertices[, by = "id", list(num = .N)]
 
-    if (!any(num_vert$num > 4L)) return(geoms$vertices)
+    if (!any(num_vert$num > 4L)) return(copy(geoms$vertices))
 
     rbindlist(list(
-        geoms$vertices[J(num_vert$id[num_vert$num <= 4L]), on = "id"],
+        copy(geoms$vertices[J(num_vert$id[num_vert$num <= 4L]), on = "id"]),
         triangulate_surfaces(geoms$vertices[J(num_vert$id[num_vert$num > 4L]), on = "id"])
     ))
 }
