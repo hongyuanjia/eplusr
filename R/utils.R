@@ -150,6 +150,7 @@ write_lines <- function (x, file = "", append = FALSE) {
 # }}}
 
 # os_type: Return operation system type {{{
+# nocov start
 os_type <- function () {
     if (.Platform$OS.type == 'windows') {
         "windows"
@@ -161,6 +162,7 @@ os_type <- function () {
         "unknown"
     }
 }
+# nocov end
 # }}}
 
 # standardize_ver {{{
@@ -291,20 +293,7 @@ lower_name <- function (name) {
 
 # underscore_name {{{
 underscore_name <- function (name, merge = TRUE) {
-    tryCatch(
-        stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge),
-        error = function (e) {
-            if (!grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
-                signalCondition(e)
-            }
-
-            # fix encoding issue in older versions of IDD files
-            name[!stringi::stri_enc_isutf8(name)] <-
-                stringi::stri_encode(name[!stringi::stri_enc_isutf8(name)], "windows-1252", "UTF-8")
-
-            stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
-        }
-    )
+    stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
 }
 # }}}
 
@@ -453,6 +442,7 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
 
     flag <- file.copy(from, to, copy.date = copy.date, copy.mode = copy.mode, overwrite = TRUE)
 
+    # nocov start
     if (any(!flag)) {
         failed_from <- normalizePath(from[!flag], mustWork = FALSE)
         failed_to <- normalizePath(to[!flag], mustWork = FALSE)
@@ -470,6 +460,7 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
             ))
         ))
     }
+    # nocov end
 
     to
 }
@@ -488,6 +479,7 @@ file_rename <- function(from, to, err_title = NULL) {
 
     flag <- file.rename(from, to)
 
+    # nocov start
     if (any(!flag)) {
         failed_from <- normalizePath(from[!flag], mustWork = FALSE)
         failed_to <- normalizePath(to[!flag], mustWork = FALSE)
@@ -505,6 +497,7 @@ file_rename <- function(from, to, err_title = NULL) {
             ))
         ))
     }
+    # nocov end
 
     to
 }

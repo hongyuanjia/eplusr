@@ -12,8 +12,12 @@ test_that("clean_wd()", {
     unlink(f)
 
     expect_true(file.create(f <- file.path(tempdir(), "in.idf")))
-    expect_silent({clean_wd(f); file.exists(f)})
-    unlink(f)
+    expect_true({clean_wd(f); file.exists(f)})
+
+    expect_true(file.create(fidf <- file.path(tempdir(), "test.idf")))
+    expect_true(file.create(fcsv <- file.path(tempdir(), "test.csv")))
+    expect_true({.clean_wd(fidf, "D", basename(fcsv)); file.exists(fcsv)})
+    unlink(c(fidf, fcsv))
 })
 
 test_that("path_eplus()", {
@@ -32,6 +36,24 @@ test_that("path_eplus()", {
 
     expect_true(is.character(path_eplus_dataset(8.8, "Boilers.idf")))
     expect_true(is.character(path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")))
+})
+
+test_that("copy_energyplus_idd()", {
+    skip_on_cran()
+
+    expect_silent(res <- copy_energyplus_idd(path_eplus(8.8, "energyplus"), tempdir()))
+    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+    expect_true(attr(res, "copied"))
+
+    expect_silent(res <- copy_energyplus_idd(NULL, tempdir(), res))
+    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+    expect_false(attr(res, "copied"))
+
+    unlink(file.path(tempdir(), "Energy+.idd"))
+
+    expect_silent(res <- copy_energyplus_idd(NULL, tempdir(), path_eplus(8.8, "Energy+.idd")))
+    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+    unlink(file.path(tempdir(), "Energy+.idd"))
 })
 
 test_that("EPMacro()", {
@@ -114,7 +136,7 @@ test_that("ExpandObjects()", {
         path
     )
 
-    res <- ExpandObjects(path, echo = FALSE)
+    res <- ExpandObjects(path, echo = FALSE, idd = path_eplus(8.8, "Energy+.idd"))
     expect_equal(names(res), c("file", "run"))
     expect_equal(names(res$file), c("idf", "expidf", "basement", "slab", "experr"))
     expect_true(file.exists(res$file$idf))
@@ -254,7 +276,7 @@ test_that("Basement()", {
     )
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- Basement(path, weather, echo = FALSE, eplus = 8.8)
+    res <- Basement(path, weather, echo = FALSE, eplus = 8.8, idd = path_eplus(8.8, "Energy+.idd"))
     expect_equal(names(res), c("file", "run"))
     expect_equal(names(res$file), c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit"))
     expect_true(file.exists(res$file$idf))
@@ -382,6 +404,23 @@ test_that("EnergyPlus()", {
         "stderr", "start_time", "end_time"))
     expect_false(is.null(res$run$stdout))
 
+    # can use legacy output name style
+    res_legacy <- EnergyPlus(path, weather, out_dir, output_suffix = "L", eplus = 8.8, echo = FALSE)
+    files <- basename(unlist(res_legacy$file, FALSE, FALSE))
+    files <- files[!is.na(files)]
+    expect_equal(names(tbl <- table(tools::file_path_sans_ext(files))),
+        c("1ZoneUncontrolled", "eplusout", "eplustbl", "sqlite",
+          "USA_CO_Golden-NREL.724666_TMY3")
+    )
+    expect_equal(as.integer(tbl), c(1L, 12L, 5L, 1L, 1L))
+
+    # can run annual simulation with custom IDD
+    expect_silent(
+        EnergyPlus(path, weather, out_dir, annual = TRUE, eplus = 8.8,
+            echo = FALSE, idd = path_eplus(8.8, "Energy+.idd")
+        )
+    )
+
     unlink(out_dir, recursive = TRUE)
     unlink(path)
 })
@@ -397,7 +436,9 @@ test_that("convertESOMTR()", {
 
     res <- EnergyPlus(path, weather, out_dir, eplus = 8.8, echo = FALSE)
 
-    eso <- convertESOMTR(res$file$eso, eplus = 8.8, echo = FALSE)
+    eso <- convertESOMTR(res$file$eso, eplus = 8.8, echo = FALSE,
+        rules = path_eplus(8.8, "PostProcess", "convertESOMTRpgm", "convert.txt")
+    )
     expect_equal(names(eso), c("file", "run"))
     expect_equal(names(eso$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
     expect_true(file.exists(eso$file$eso))
@@ -561,6 +602,7 @@ test_that("energyplus()", {
 
     # can run Basement
     path_base <- copy_eplus_example(8.8, "LgOffVAVusingBasement.idf")
+    expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
     # modify the input in order to reduce the simulation time
     l <- read_lines(path_base)
     l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
@@ -580,6 +622,7 @@ test_that("energyplus()", {
 
     # can run Slab
     path_slab <- copy_eplus_example(8.8, "5ZoneAirCooledWithSlab.idf")
+    expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
     # modify the input in order to reduce the simulation time
     l <- read_lines(path_slab)
     l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
@@ -620,6 +663,7 @@ test_that("energyplus()", {
     # can run with EnergyPlus < 8.3
     options("eplusr.eplus_legacy" = TRUE)
     path_legacy <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
+    expect_error(energyplus(path_legacy, weather, out_dir, design_day = TRUE, echo = FALSE))
     res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
     expect_equal(length(res_legacy$file), 57L)
     expect_equal({files <- unlist(res_legacy$file); files <- files[!is.na(files)]; length(files)}, 24L)
@@ -627,6 +671,7 @@ test_that("energyplus()", {
     expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
     unlink(out_dir, recursive = TRUE)
     options("eplusr.eplus_legacy" = NULL)
+    expect_error(energyplus(path_legacy, weather, out_dir, design_day = TRUE, annual = TRUE, echo = FALSE))
     res_norm <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
     expect_equal(res_legacy$file, res_norm$file)
 

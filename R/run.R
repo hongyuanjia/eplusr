@@ -396,9 +396,11 @@ copy_energyplus_idd <- function(eplus, output_dir, idd = NULL, name = "Energy+.i
     if (is.null(idd)) {
         # directly use the IDD file from EnergyPlus folder
         idd <- normalizePath(file.path(dirname(eplus), name), mustWork = FALSE)
+        # nocov start
         if (!file.exists(idd)) {
             abort(sprintf("'%s' file did not found in EnergyPlus installation folder: '%s'", name, dirname(idd)))
         }
+        # nocov end
     } else {
         assert_file_exists(idd, "r", "idd")
         idd <- normalizePath(idd)
@@ -487,6 +489,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             end_time = NULL
         )
     } else {
+        # nocov start
         callback <- function () {
             if (!proc$is_alive()) return(NULL)
 
@@ -501,6 +504,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
 
         # kill the process when  exits
         on.exit(callback(), add = TRUE)
+        # nocov end
 
         stdout <- c()
         stderr <- c()
@@ -608,9 +612,11 @@ pre_eplus_command <- function(exectuable,
 
     assert_string(output_dir, null.ok = TRUE)
     output_dir <- normalizePath(output_dir %||% dir_model, mustWork = FALSE)
+    # nocov start
     if (!dir.exists(output_dir) && !dir.create(output_dir, FALSE, TRUE)) {
         abort(sprintf("Failed to create output directory '%s'.", output_dir))
     }
+    # nocov end
 
     # always copy input files to the output directory
     if (output_dir != dir_model) {
@@ -712,7 +718,6 @@ EPMacro <- function(model,
 
     # handle ouput file renaming
     file_callback <- function() {
-        if (tools::file_ext(cmd$model) != "imf") unlink(cmd$idf)
         remove_eplus_in_files(cmd$model)
 
         file <- list()
@@ -1542,12 +1547,14 @@ run_energyplus <- function(
     #       e.g. FMU, schedule files. If this is the case, eplus_job() should be
     #       used.
     cmd$sim_dir <- normalizePath(tempfile("EPTEMP-", cmd$output_dir), mustWork = FALSE)
+    # nocov start
     while (dir.exists(cmd$sim_dir)) {
         cmd$sim_dir <- normalizePath(tempfile("EPTEMP-", cmd$output_dir), mustWork = FALSE)
     }
     if (!dir.create(cmd$sim_dir, FALSE)) {
         abort(sprintf("Failed to create simulation directory '%s'.", cmd$sim_dir))
     }
+    # nocov end
 
     path_sim <- function(file) normalizePath(file.path(cmd$sim_dir, basename(file)), mustWork = FALSE)
     path_out <- function(file) normalizePath(file.path(cmd$output_dir, basename(file)), mustWork = FALSE)
@@ -1990,6 +1997,7 @@ run_sim_event_loop <- function(state) {
     state
 }
 
+# nocov start
 kill_all_sims <- function(state) {
     # check if any running simulations
     is_running <- which(vlapply(state$jobs$process, function(p) inherits(p, "r_process") && p$is_alive()))
@@ -2036,6 +2044,7 @@ kill_all_sims <- function(state) {
 
     state
 }
+# nocov start
 
 schedule_next_sim <- function(state) {
     # cannot run more workers?
