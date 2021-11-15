@@ -677,7 +677,6 @@ test_that("run_idf()", {
     expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
     expect_equal(res$energyplus, normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE))
     expect_is(res$stdout, "character")
-    expect_is(res$stderr, "character")
     expect_null(res$process)
 })
 
