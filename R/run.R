@@ -1017,6 +1017,8 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     # handle EnergyPlus < v8.3 where there is no EnergyPlus command line
     # interface
     if (legacy) {
+        args <- NULL
+
         wd <- dirname(cmd$model)
 
         # create ini file in and copy idd
