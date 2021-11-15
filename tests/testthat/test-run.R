@@ -276,7 +276,9 @@ test_that("Basement()", {
     )
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- Basement(path, weather, echo = FALSE, eplus = 8.8, idd = path_eplus(8.8, "Energy+.idd"))
+    res <- Basement(path, weather, echo = FALSE, eplus = 8.8,
+        idd = path_eplus(8.8, "PreProcess", "GrndTempCalc", "BasementGHT.idd")
+    )
     expect_equal(names(res), c("file", "run"))
     expect_equal(names(res$file), c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit"))
     expect_true(file.exists(res$file$idf))
@@ -365,7 +367,9 @@ test_that("Slab()", {
     )
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    res <- Slab(path, weather, eplus = 8.8, echo = FALSE)
+    res <- Slab(path, weather, eplus = 8.8, echo = FALSE,
+        idd = path_eplus(8.8, "PreProcess", "GrndTempCalc", "SlabGHT.idd")
+    )
     expect_equal(names(res), c("file", "run"))
     expect_equal(names(res$file), c("idf", "epw", "slab_gtp", "slab_out", "slab_ger"))
     expect_true(file.exists(res$file$idf))

@@ -2044,7 +2044,7 @@ kill_all_sims <- function(state) {
 
     state
 }
-# nocov start
+# nocov end
 
 schedule_next_sim <- function(state) {
     # cannot run more workers?
