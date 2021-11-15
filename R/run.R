@@ -1901,7 +1901,7 @@ run_energyplus <- function(
         res_eplus$file$svg <- file_out(res_diagram$file$svg)
     }
 
-    file <- modifyList(res_eplus$file, file)
+    file <- utils::modifyList(res_eplus$file, file)
     file <- file[order(names(file))]
     file$idf <- NA_character_
     if (is.na(file$imf)) file$idf <- path_out(cmd$model)
