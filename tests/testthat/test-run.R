@@ -381,7 +381,6 @@ test_that("EnergyPlus()", {
     expect_equal(names(res$run), c("process", "exit_status", "stdout",
         "stderr", "start_time", "end_time"))
     expect_false(is.null(res$run$stdout))
-    expect_false(is.null(res$run$stderr))
 
     unlink(out_dir, recursive = TRUE)
     unlink(path)
@@ -733,7 +732,6 @@ test_that("run_multi()", {
     expect_is(res$end_time, "POSIXct")
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
-    checkmate::expect_list(res$stderr, "character")
 
     expect_silent(res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b")), wait = FALSE))
     expect_is(res, "r_process")
@@ -754,5 +752,4 @@ test_that("run_multi()", {
     expect_equal(res$output_dir, normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE))
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
-    checkmate::expect_list(res$stderr, "character")
 })

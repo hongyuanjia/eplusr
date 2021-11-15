@@ -2395,7 +2395,8 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
             file.path(res$energyplus, sprintf("energyplus%s", c(".exe", "")[c(is_windows(), !is_windows())]))
         )
         out$stdout <- unlist(res$run$stdout)
-        out$stderr <- unlist(res$run$stderr)
+        # in case there is no stderr message
+        out["stderr"] <- list(unlist(res$run$stderr))
         out
     }
 
