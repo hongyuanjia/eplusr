@@ -1778,6 +1778,8 @@ run_energyplus <- function(
 
     # 6. run convertESOMTR
     run$convertESOMTR <- list()
+    file$eso <- NA_character_
+    file$mtr <- NA_character_
     file$ipeso <- NA_character_
     file$ipmtr <- NA_character_
     file$iperr <- NA_character_
@@ -1800,9 +1802,12 @@ run_energyplus <- function(
             res_ip$file$iperr <- file_out(res_ip$file$iperr)
             file$iperr <- res_ip$file$iperr
 
+            # If no ReadVarsESO() is skippped, directly move to output directory
             if (!readvars) {
-                file$ipeso <- res_ip$file$ipeso
-                file$ipmtr <- res_ip$file$ipmtr
+                file$ipeso <- file_out(res_ip$file$ipeso)
+                file$ipmtr <- file_out(res_ip$file$ipmtr)
+                file$eso <- file_out(res_ip$file$eso)
+                file$mtr <- file_out(res_ip$file$mtr)
             # In order to avoid unnecessary file copy of the output eso/mtr file,
             # backup the original "eplusout.eso/mtr" to "eplusout.sieso/simtr"
             # and rename its IP version to the legacy name "eplusout.eso/mtr".
@@ -1820,8 +1825,6 @@ run_energyplus <- function(
     # 7. run ReadVarsESO
     run$ReadVarsESO_MTR <- list()
     run$ReadVarsESO_ESO <- list()
-    file$eso <- NA_character_
-    file$mtr <- NA_character_
     file$variable <- NA_character_
     file$meter <- NA_character_
     file$rvaudit <- NA_character_

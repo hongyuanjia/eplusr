@@ -607,7 +607,15 @@ test_that("energyplus()", {
     expect_true(file.exists(file.path(out_dir, files["ipeso"])))
     expect_true(file.exists(file.path(out_dir, files["ipmtr"])))
     expect_true(is.na(files["iperr"]))
-    unlink(c(path_ip, out_dir), recursive = TRUE)
+    unlink(out_dir, recursive = TRUE)
+    res_ip2 <- energyplus(path_ip, weather, out_dir, eso_to_ip = TRUE, readvars = FALSE, echo = FALSE)
+    expect_equal(length(res_ip2$file), 57L)
+    expect_equal({files2 <- unlist(res_ip2$file); files2 <- files2[!is.na(files2)]; length(files2)}, 23L)
+    expect_equal(sum(!file.exists(file.path(out_dir, files2))), 0L)
+    expect_true(file.exists(file.path(out_dir, files2["ipeso"])))
+    expect_true(file.exists(file.path(out_dir, files2["ipmtr"])))
+    expect_true(is.na(files2["iperr"]))
+    unlink(out_dir, recursive = TRUE)
 
     # can run with EnergyPlus < 8.3
     options("eplusr.eplus_legacy" = TRUE)
