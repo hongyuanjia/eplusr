@@ -504,7 +504,7 @@ test_that("HVAC_Diagram()", {
 test_that("energyplus()", {
     skip_on_cran()
 
-    out_dir <- file.path(tempdir(), "energyplus")
+    out_dir <- file.path(tempdir(), "run-energyplus")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
     weather <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
