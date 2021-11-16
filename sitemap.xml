@@ -82,6 +82,9 @@
     <loc>https://hongyuanjia.github.io/eplusr/reference/empty_idf.html</loc>
   </url>
   <url>
+    <loc>https://hongyuanjia.github.io/eplusr/reference/energyplus.html</loc>
+  </url>
+  <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/eplus_sql.html</loc>
   </url>
   <url>
@@ -170,6 +173,9 @@
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/parse_dots_value.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/reference/path_eplus.html</loc>
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/print.ErrFile.html</loc>

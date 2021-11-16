@@ -99,7 +99,7 @@ for running EnergyPlus simulation and collecting outputs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9014</span>
       </span>
     </div>
 
@@ -250,6 +250,7 @@ automatically created if it does not exists.</p>
 <li><p><a href='#method-status'><code>EplusJob$status()</code></a></p></li>
 <li><p><a href='#method-errors'><code>EplusJob$errors()</code></a></p></li>
 <li><p><a href='#method-output_dir'><code>EplusJob$output_dir()</code></a></p></li>
+<li><p><a href='#method-list_files'><code>EplusJob$list_files()</code></a></p></li>
 <li><p><a href='#method-locate_output'><code>EplusJob$locate_output()</code></a></p></li>
 <li><p><a href='#method-read_rdd'><code>EplusJob$read_rdd()</code></a></p></li>
 <li><p><a href='#method-read_mdd'><code>EplusJob$read_mdd()</code></a></p></li>
@@ -277,17 +278,17 @@ automatically created if it does not exists.</p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
 <p><div class="r example copy"></p><pre>\dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name &lt;- "1ZoneUncontrolled.idf"
-    epw_name &lt;-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    name_idf &lt;- "1ZoneUncontrolled.idf"
+    name_epw &lt;-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    idf_path &lt;- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path &lt;- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+    path_idf &lt;- path_eplus_example(8.8, name_idf)
+    path_epw &lt;- path_eplus_weather(8.8, name_epw)
 
     # create from local files
-    job &lt;- eplus_job(idf_path, epw_path)
+    job &lt;- eplus_job(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    job &lt;- eplus_job(read_idf(idf_path), read_epw(epw_path))
+    job &lt;- eplus_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 </pre><p></div></p>
@@ -352,9 +353,10 @@ job$path("epw")
 <p><div class="arguments"></p><dl>
 <dt><code>epw</code></dt><dd><p>A path to an <code>.epw</code> file or an <a href='Epw.html'>Epw</a> object. <code>epw</code> can
 also be <code>NULL</code> which will force design-day-only simulation.
-Note this needs at least one <code>Sizing:DesignDay</code> object exists
-in the <code>Idf</code>. If not given, the <code>epw</code> input used when creating
-this <code>EplusJob</code> object will be used.</p></dd>
+Note this needs EnergyPlus v8.3 and later, and at least one
+<code>Sizing:DesignDay</code> object exists in the <code>Idf</code>. If not given,
+the <code>epw</code> input used when creating this <code>EplusJob</code> object will
+be used.</p></dd>
 
 <dt><code>dir</code></dt><dd><p>The directory to save the simulation results. If <code>NULL</code>,
 the input <code>idf</code> folder will be used. Default: <code>NULL</code>.</p></dd>
@@ -379,6 +381,12 @@ output directory. The values of file paths in the Idf will be
 changed automatically. This ensures that the output directory
 will have all files needed for the model to run. Default is
 <code>FALSE</code>.</p></dd>
+
+<dt><code>readvars</code></dt><dd><p>If <code>TRUE</code>, the <code>ReadVarESO</code> post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to <code>FALSE</code> can speed up the simulation if there are
+hundreds of output variables or meters. Default: <code>TRUE</code>.</p></dd>
 
 </dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
@@ -512,6 +520,110 @@ job$output_dir()
 
 # Below will open output directory
 # job$output_dir(open = TRUE)
+}
+
+</pre><p></div></p>
+
+<p><hr>
+<a id="method-list_files"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>list_files()</code></h3>
+<p>List all output files in current simulation</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>EplusJob</span><span class='op'>$</span><span class='fu'>list_files</span><span class='op'>(</span>simplify <span class='op'>=</span> <span class='cn'>FALSE</span>, full <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>simplify</code></dt><dd><p>If <code>TRUE</code>, a character vector of EnergyPlus input
+and output file names in the output directory is given. If <code>FALSE</code>, a
+full named list of all possible input and output types is given. <code>NA</code>
+is returned if no input or output files are found for that type.
+Default: <code>FALSE</code>.</p></dd>
+
+<dt><code>full</code></dt><dd><p>If <code>TRUE</code>, the full file paths in the output directory
+are returned. Otherwise, only the file names are returned. Default:
+<code>FALSE</code>.</p></dd>
+
+</dl><p></div></p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
+<p><code>$list_files()</code> returns all input and output files for current
+EnergyPlus simulation.</p>
+<p>Description of all possible outputs from EnergyPlus can be found in
+EnergyPlus documentation "Output Details and Examples".</p>
+<p>Below gives a brief summary on the meaning of elements in the
+returned list.</p><table class='table'>
+<tr><td>#</td><td>Element</td><td>Description</td></tr>
+<tr><td>1</td><td><code>ads</code></td><td>EnergyPlus AirflowNetwork related output</td></tr>
+<tr><td>2</td><td><code>audit</code></td><td>EnergyPlus inputs echo</td></tr>
+<tr><td>3</td><td><code>bnd</code></td><td>EnergyPlus branch node details</td></tr>
+<tr><td>4</td><td><code>bsmt_audit</code></td><td>Basement input Echo</td></tr>
+<tr><td>5</td><td><code>bsmt_csv</code></td><td>Basement CSV output</td></tr>
+<tr><td>6</td><td><code>bsmt_idf</code></td><td>Basement IDF output</td></tr>
+<tr><td>7</td><td><code>bsmt_out</code></td><td>Basement Output</td></tr>
+<tr><td>8</td><td><code>cbor</code></td><td>Energyplus CBOR binary output introduced since v9.5</td></tr>
+<tr><td>9</td><td><code>dbg</code></td><td>Energyplus debug output</td></tr>
+<tr><td>10</td><td><code>delight</code></td><td>EnergyPlus DElight simulation inputs and outputs</td></tr>
+<tr><td>11</td><td><code>dfs</code></td><td>EnergyPlus daylighting factor for exterior windows</td></tr>
+<tr><td>12</td><td><code>dxf</code></td><td>EnergyPlus surface drawing output</td></tr>
+<tr><td>13</td><td><code>edd</code></td><td>EnergyPlus EMS report</td></tr>
+<tr><td>14</td><td><code>eio</code></td><td>EnergyPlus standard and optional reports</td></tr>
+<tr><td>15</td><td><code>end</code></td><td>EnergyPlus simulation status in one line</td></tr>
+<tr><td>16</td><td><code>epjson</code></td><td>EnergyPlus epJSON input converted from IDF</td></tr>
+<tr><td>17</td><td><code>epmdet</code></td><td>EPMacro inputs echo</td></tr>
+<tr><td>18</td><td><code>epmidf</code></td><td>EPMacro IDF output</td></tr>
+<tr><td>19</td><td><code>epw</code></td><td>EnergyPlus Weather File input</td></tr>
+<tr><td>20</td><td><code>err</code></td><td>EnergyPlus error summarry</td></tr>
+<tr><td>21</td><td><code>eso</code></td><td>EnergyPlus standard output</td></tr>
+<tr><td>22</td><td><code>experr</code></td><td>ExpandObjects error summary</td></tr>
+<tr><td>23</td><td><code>expidf</code></td><td>ExpandObjects IDF output</td></tr>
+<tr><td>24</td><td><code>glhe</code></td><td>EnergyPlus ground heat exchange file</td></tr>
+<tr><td>25</td><td><code>idf</code></td><td>EnergyPlus IDF input</td></tr>
+<tr><td>26</td><td><code>imf</code></td><td>EPMacro IMF input</td></tr>
+<tr><td>27</td><td><code>iperr</code></td><td>convertESOMTR error summary</td></tr>
+<tr><td>28</td><td><code>ipeso</code></td><td>convertESOMTR standard output in IP units</td></tr>
+<tr><td>29</td><td><code>ipmtr</code></td><td>convertESOMTR meter output in IP units</td></tr>
+<tr><td>30</td><td><code>json</code></td><td>EnergyPlus JSON time series output introduced since v9.5</td></tr>
+<tr><td>31</td><td><code>log</code></td><td>EnergyPlus log output</td></tr>
+<tr><td>32</td><td><code>map</code></td><td>EnergyPlus daylighting intensity map output</td></tr>
+<tr><td>33</td><td><code>mdd</code></td><td>EnergyPlus meter list</td></tr>
+<tr><td>34</td><td><code>meter</code></td><td>EnergyPlus meter CSV output</td></tr>
+<tr><td>35</td><td><code>msgpack</code></td><td>EnergyPlus MessagePack binary output introduced since v9.5</td></tr>
+<tr><td>36</td><td><code>mtd</code></td><td>EnergyPlus meter details</td></tr>
+<tr><td>37</td><td><code>mtr</code></td><td>EnergyPlus meter output</td></tr>
+<tr><td>38</td><td><code>perflog</code></td><td>EnergyPlus log for `PerformancePrecisionTradeoffs</td></tr>
+<tr><td>39</td><td><code>rdd</code></td><td>EnergyPlus report variable names</td></tr>
+<tr><td>40</td><td><code>rvaudit</code></td><td>ReadVarsESO input echo</td></tr>
+<tr><td>41</td><td><code>sci</code></td><td>EnergyPlus cost benefit calculation information</td></tr>
+<tr><td>42</td><td><code>screen</code></td><td>EnergyPlus window scrren transmittance map output</td></tr>
+<tr><td>43</td><td><code>shading</code></td><td>EnergyPlus surface shading CSV output</td></tr>
+<tr><td>44</td><td><code>shd</code></td><td>EnergyPlus surface shading combination report</td></tr>
+<tr><td>45</td><td><code>slab_ger</code></td><td>Slab error summary</td></tr>
+<tr><td>46</td><td><code>slab_gtp</code></td><td>Slab ground temperature output</td></tr>
+<tr><td>47</td><td><code>slab_out</code></td><td>Slab IDF output</td></tr>
+<tr><td>48</td><td><code>sln</code></td><td>EnergyPlus <code>Output:Surfaces:List, Lines</code> output</td></tr>
+<tr><td>49</td><td><code>sqlite</code></td><td>EnergyPlus SQLite output</td></tr>
+<tr><td>50</td><td><code>sqlite_err</code></td><td>EnergyPlus SQLite error summary</td></tr>
+<tr><td>51</td><td><code>ssz</code></td><td>EnergyPlus system sizing outputs in CSV, TAB or TXT format</td></tr>
+<tr><td>52</td><td><code>svg</code></td><td>HVAC-Diagram HVAC diagram output</td></tr>
+<tr><td>53</td><td><code>table</code></td><td>EnergyPlus tabular outputs in CSV, TAB, TXT, HTM, or XML format</td></tr>
+<tr><td>54</td><td><code>variable</code></td><td>EnergyPlus report variable CSV output</td></tr>
+<tr><td>55</td><td><code>wrl</code></td><td>EnergyPlus <code>Output:Surfaces:List, VRML</code> output</td></tr>
+<tr><td>56</td><td><code>zsz</code></td><td>EnergyPlus system sizing outputs in CSV, TAB or TXT format</td></tr>
+<tr><td>57</td><td><code>resource</code></td><td>External file resources used for the simulation, e.g. <code>Schedule:File</code></td></tr>
+</table>
+
+
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p>If <code>FALSE</code>, a character vector. Otherwise, a named list.</p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
+<p><div class="r example copy"></p><pre>\dontrun{
+# list all files in the output directory
+job$list_files(simplify = TRUE)
+
+# get a full list of all possible inputs and outputs even though they
+# may not exist for current simulation
+job$list_files()
+
+# return the full paths instead of just file names
+job$locate_output(full = TRUE)
 }
 
 </pre><p></div></p>
@@ -987,17 +1099,17 @@ job$print()
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'>    <span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span></span>
-<span class='r-in'>    <span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
+<span class='r-in'>    <span class='va'>name_idf</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span></span>
+<span class='r-in'>    <span class='va'>name_epw</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
 <span class='r-in'></span>
-<span class='r-in'>    <span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='va'>idf_name</span><span class='op'>)</span></span>
-<span class='r-in'>    <span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='va'>epw_name</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='path_eplus.html'>path_eplus_example</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='va'>name_idf</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>path_epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='path_eplus.html'>path_eplus_weather</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='va'>name_epw</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'>    <span class='co'># create from local files</span></span>
-<span class='r-in'>    <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='va'>path_epw</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'>    <span class='co'># create from an Idf and an Epw object</span></span>
-<span class='r-in'>    <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>epw_path</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'>eplus_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>}</span></span>
 <span class='r-in'><span class='co'># }</span></span>
 <span class='r-in'></span>
@@ -1103,6 +1215,26 @@ job$print()
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># Below will open output directory</span></span>
 <span class='r-in'><span class='co'># job$output_dir(open = TRUE)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `EplusJob$list_files`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># list all files in the output directory</span></span>
+<span class='r-in'><span class='va'>job</span><span class='op'>$</span><span class='fu'>list_files</span><span class='op'>(</span>simplify <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'job' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get a full list of all possible inputs and outputs even though they</span></span>
+<span class='r-in'><span class='co'># may not exist for current simulation</span></span>
+<span class='r-in'><span class='va'>job</span><span class='op'>$</span><span class='fu'>list_files</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'job' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># return the full paths instead of just file names</span></span>
+<span class='r-in'><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span>full <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'job' not found</span>
 <span class='r-in'><span class='co'># }</span></span>
 <span class='r-in'></span>
 <span class='r-in'></span>

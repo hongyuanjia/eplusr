@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9014</span>
       </span>
     </div>
 
@@ -202,6 +202,23 @@
 <li>Now force re-installation of EnergyPlus <code>install_eplus(force = TRUE)</code> has been updated to support all platforms, including macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
 <li>
 <code><a href="../reference/install_eplus.html">install_eplus()</a></code> has been updated to behave smarter on macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/477'>#477</a>).</li>
+<li>
+<code><a href="../reference/run_idf.html">run_idf()</a></code> and <code><a href="../reference/run_idf.html">run_multi()</a></code> have been refactored to mimick the <code>Epl-run.bat</code> procedure. It supports to call the <code>Basement</code> and <code>Slab</code> processors. Now the requirement of EnergyPlus &gt;=v8.3 for running simulations has been droppped Now simulations with FMU, including obFMU are supported. (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>
+<code>HVAC-Diagram</code> will be called when running simulations to make sure the <code>svg</code> output of HVAC diagram can be generated. Therefore, <code>hvac_diagram()</code> has been deprecated and will be removed in next major version (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>Functions <code><a href="../reference/path_eplus.html">path_eplus()</a></code> and <code>path_eplus_*()</code> have been added to help specify file paths under EnergyPlus installation directory (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>A new <code>Idf</code> method <code>$external_deps()</code> is added to extra any external file resources specified in the IDF that are needed for simulation, e.g. schedule files (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>Now <code>Idf$save(external = TRUE)</code> and <code>Idf$run(copy_external)</code> save external file dependencies based on the results of <code>Idf$external_deps()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>A new <code>EplusJob</code> method <code>$list_files()</code> is added to list all inputs and output files for current simulation (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>A new argument <code>readvars</code> can be specified in <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code>. Setting it to <code>FALSE</code> will disable to run ReadVarsESO post-processor and thus no CSVs will be generated for Report variables and meters. This can speed up simulations significantly if there are hundreds of outputs in the model. Setting it to <code>FALSE</code> will not affect any data extraction functionalities in eplusr, as it uses the SQLite output instead of the CSVs (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+</ul>
+</div>
+<div id="break-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#break-changes" class="anchor"></a>Break changes</h2>
+<ul>
+<li>
+<code>hvac_diagram()</code> has been deprecated as <code>HVAC-Diagram</code> will always be called after EnergyPlus simulation. If you still want to generate HVAC <code>svg</code> diagram manually, please use <code><a href="../reference/EPMacro.html">HVAC_Diagram()</a></code> instead (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
 </ul>
 </div>
 <div id="minor-changes" class="section level2">
@@ -209,6 +226,8 @@
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>When <code>type</code> is <code>"all"</code> in <code><a href="../reference/download_weather.html">download_weather()</a></code>, the ZIP file will be downloaded instead of downloading both <code>EPW</code> and <code>DDY</code> files (<a href='https://github.com/hongyuanjia/eplusr/issues/453'>#453</a>).</li>
+<li>
+<code>EplusJob$output_dir()</code> now use backslash in the returned path on Windows (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
@@ -218,6 +237,8 @@
 <li>Fix the year value calculation when first day of a run period is holiday (<a href='https://github.com/hongyuanjia/eplusr/issues/450'>#450</a>).</li>
 <li>Fix <code><a href="../reference/download_weather.html">download_weather()</a></code> file downloading URL (<a href='https://github.com/hongyuanjia/eplusr/issues/452'>#452</a>).</li>
 <li>Fix <code>EplusSql$report_data(..., wide = TRUE)</code> when <code>Do HVAC Sizing Simulation for Sizing Periods</code> is set to <code>Yes</code> in <code>SimulationControl</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/461'>#461</a>).</li>
+<li>Now <code><a href="../reference/read_idf.html">read_idf()</a></code> and other functions that read files from disk can use <code><a href="https://rdrr.io/pkg/stringi/man/stri_enc_detect.html">stringi::stri_enc_detect()</a></code> to fix encoding issue (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</li>
+<li>Now <code>ParametricJob$run(dir = NULL)</code> will always use the seed model directory (<a href='https://github.com/hongyuanjia/eplusr/issues/483'>#483</a>).</li>
 </ul>
 </div>
 </div>
@@ -238,9 +259,9 @@
 </li>
 </ul>
 </div>
-<div id="break-changes" class="section level2">
+<div id="break-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#break-changes" class="anchor"></a>Break changes</h2>
+<a href="#break-changes-1" class="anchor"></a>Break changes</h2>
 <ul>
 <li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/with_speed.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href='https://github.com/hongyuanjia/eplusr/issues/417'>#417</a>).</li>
 </ul>
@@ -906,9 +927,9 @@
 <h1 class="page-header" data-toc-text="0.9.2">
 <a href="#eplusr-092" class="anchor"></a>eplusr 0.9.2<small> 2018-09-30 </small>
 </h1>
-<div id="break-changes-1" class="section level2">
+<div id="break-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#break-changes-1" class="anchor"></a>Break changes</h2>
+<a href="#break-changes-2" class="anchor"></a>Break changes</h2>
 <ul>
 <li>Clean up the dirty code that manually modifies <code>$clone()</code> method in R6 in order to be compatible with (<a href='https://github.com/hongyuanjia/eplusr/issues/19'>#19</a>). After this, <code>deep</code> has to be set to <code>TRUE</code> if a completed cloned copy is desired. Also, documentations on <code>$clone()</code> method in <code>Epw</code>, <code>EplusJob</code>, <code>ParametricJob</code> have been added.</li>
 </ul>
@@ -961,9 +982,9 @@
 <h1 class="page-header" data-toc-text="0.9.0">
 <a href="#eplusr-090" class="anchor"></a>eplusr 0.9.0<small> 2018-08-27 </small>
 </h1>
-<div id="break-changes-2" class="section level2">
+<div id="break-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#break-changes-2" class="anchor"></a>Break Changes</h2>
+<a href="#break-changes-3" class="anchor"></a>Break Changes</h2>
 <ul>
 <li><p><code>parallel_backend</code> argument in <code><a href="../reference/run_idf.html">run_multi()</a></code> has been removed, due to the reason that supporting remote parallel computing is out of the scope of this package. This makes it possible to remove both <code>future</code> and <code>furrr</code> package dependencies. The default behavior of <code><a href="../reference/run_idf.html">run_multi()</a></code> does not change if running on local machine, as it still runs multiple EnergyPlus instances in parallel.</p></li>
 <li>

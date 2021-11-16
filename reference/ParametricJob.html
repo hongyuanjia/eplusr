@@ -99,7 +99,7 @@ For details on ParametricJob, please see ParametricJob class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9014</span>
       </span>
     </div>
 
@@ -249,6 +249,7 @@ automatically created if it does not exists, like <a href='Idf.html'>Idf</a> cla
 <ul>
 <li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors"><a href='../../eplusr/html/EplusGroupJob.html#method-errors'><code>eplusr::EplusGroupJob$errors()</code></a></span></p></li>
 <li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill"><a href='../../eplusr/html/EplusGroupJob.html#method-kill'><code>eplusr::EplusGroupJob$kill()</code></a></span></p></li>
+<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files"><a href='../../eplusr/html/EplusGroupJob.html#method-list_files'><code>eplusr::EplusGroupJob$list_files()</code></a></span></p></li>
 <li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table"><a href='../../eplusr/html/EplusGroupJob.html#method-list_table'><code>eplusr::EplusGroupJob$list_table()</code></a></span></p></li>
 <li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output"><a href='../../eplusr/html/EplusGroupJob.html#method-locate_output'><code>eplusr::EplusGroupJob$locate_output()</code></a></span></p></li>
 <li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir"><a href='../../eplusr/html/EplusGroupJob.html#method-output_dir'><code>eplusr::EplusGroupJob$output_dir()</code></a></span></p></li>
@@ -500,14 +501,16 @@ param$save(tempdir(), separate = FALSE)
   force <span class='op'>=</span> <span class='cn'>FALSE</span>,
   copy_external <span class='op'>=</span> <span class='cn'>FALSE</span>,
   echo <span class='op'>=</span> <span class='va'>wait</span>,
-  separate <span class='op'>=</span> <span class='cn'>TRUE</span>
+  separate <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  readvars <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
 <dt><code>dir</code></dt><dd><p>The parent output directory for specified simulations.
 Outputs of each simulation are placed in a separate folder
-under the parent directory.</p></dd>
+under the parent directory. If <code>NULL</code>, the directory of the
+seed model will be used. Default: <code>NULL</code>.</p></dd>
 
 <dt><code>wait</code></dt><dd><p>If <code>TRUE</code>, R will hang on and wait all EnergyPlus
 simulations finish. If <code>FALSE</code>, all EnergyPlus simulations are
@@ -533,6 +536,12 @@ simulation status. Default: same as <code>wait</code>.</p></dd>
 with each model's name under <code>dir</code> when simulation. If <code>FALSE</code>,
 all models are saved in <code>dir</code> when simulation. Default:
 <code>TRUE</code>.</p></dd>
+
+<dt><code>readvars</code></dt><dd><p>If <code>TRUE</code>, the <code>ReadVarESO</code> post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to <code>FALSE</code> can speed up the simulation if there are
+hundreds of output variables or meters. Default: <code>TRUE</code>.</p></dd>
 
 </dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
