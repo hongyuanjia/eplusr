@@ -197,7 +197,7 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
     if (is.null(path)) {
         without_ext <- "eplus"
     } else {
-        without_ext <- basename(tools::file_path_sans_ext(path))
+        without_ext <- basename(path)
         if (without_ext == "in") without_ext <- "eplus"
     }
 
@@ -1757,8 +1757,7 @@ run_energyplus <- function(
     res_eplus$file$epw <- NULL
     res_eplus$file <- lapply(res_eplus$file, function(f) {
         if (length(f) == 1L && is.na(f)) return(f)
-        ext <- gsub(cmd$output_prefix, "", basename(f), fixed = TRUE)
-        file_out(f, ext)
+        file_rename_if_exist(path_sim(f), path_out(f))
     })
 
     # In order to avoid unnecessary file copy of the output eso/mtr file,
