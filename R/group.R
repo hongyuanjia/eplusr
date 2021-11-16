@@ -974,8 +974,6 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
         design_day <- is.na(path_epw)
     }
 
-    expand_obj <- vlapply(private$m_idfs, idf_has_hvactemplate)
-
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
     else if (length(output_dir) == 1L) {
@@ -988,9 +986,11 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
     if (any(!dir.exists(uniq_dir <- unique(output_dir)))) {
         dir_to_create <- uniq_dir[!dir.exists(uniq_dir)]
         create_dir <- vlapply(dir_to_create, dir.create, showWarnings = FALSE, recursive = TRUE)
+        # nocov start
         if (any(!create_dir)) {
             abort(paste0("Failed to create output directory: ", collapse(dir_to_create)[!create_dir]))
         }
+        # nocov end
     }
 
     # check if the model is still running
