@@ -501,6 +501,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE,
     }
 
     private$log_new_uuid()
+    if (is.null(output_dir)) output_dir <- dirname(private$m_seed$path())
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
 }
 # }}}

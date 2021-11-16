@@ -63,6 +63,8 @@
   for Sizing Periods` is set to `Yes` in `SimulationControl` (#461).
 * Now `read_idf()` and other functions that read files from disk can use
   `stringi::stri_enc_detect()` to fix encoding issue (#467).
+* Now `ParametricJob$run(dir = NULL)` will always use the seed model directory
+  (#483).
 
 # eplusr 0.14.2
 
