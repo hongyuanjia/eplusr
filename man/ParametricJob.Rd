@@ -542,7 +542,8 @@ Run parametric simulations
   force = FALSE,
   copy_external = FALSE,
   echo = wait,
-  separate = TRUE
+  separate = TRUE,
+  readvars = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -551,7 +552,8 @@ Run parametric simulations
 \describe{
 \item{\code{dir}}{The parent output directory for specified simulations.
 Outputs of each simulation are placed in a separate folder
-under the parent directory.}
+under the parent directory. If \code{NULL}, the directory of the
+seed model will be used. Default: \code{NULL}.}
 
 \item{\code{wait}}{If \code{TRUE}, R will hang on and wait all EnergyPlus
 simulations finish. If \code{FALSE}, all EnergyPlus simulations are
@@ -577,6 +579,12 @@ simulation status. Default: same as \code{wait}.}
 with each model's name under \code{dir} when simulation. If \code{FALSE},
 all models are saved in \code{dir} when simulation. Default:
 \code{TRUE}.}
+
+\item{\code{readvars}}{If \code{TRUE}, the \code{ReadVarESO} post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to \code{FALSE} can speed up the simulation if there are
+hundreds of output variables or meters. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

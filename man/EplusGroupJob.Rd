@@ -394,6 +394,12 @@ simulation status. Default: same as \code{wait}.}
 with each model's name under \code{dir} when simulation. If \code{FALSE},
 all models are saved in \code{dir} when simulation. Default:
 \code{TRUE}.}
+
+\item{\code{readvars}}{If \code{TRUE}, the \code{ReadVarESO} post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to \code{FALSE} can speed up the simulation if there are
+hundreds of output variables or meters. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

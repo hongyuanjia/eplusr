@@ -104,6 +104,11 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'        with each model's name under `dir` when simulation. If `FALSE`,
         #'        all models are saved in `dir` when simulation. Default:
         #'        `TRUE`.
+        #' @param readvars If `TRUE`, the `ReadVarESO` post-processor will run
+        #'        to generate CSV files from the ESO output. Since those CSV
+        #'        files are never used when extracting simulation data in eplusr,
+        #'        setting it to `FALSE` can speed up the simulation if there are
+        #'        hundreds of output variables or meters. Default: `TRUE`.
         #'
         #' @return The `EplusGroupJob` object itself, invisibly.
         #'
