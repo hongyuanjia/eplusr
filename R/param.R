@@ -276,7 +276,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         #' @param dir The parent output directory for specified simulations.
         #'        Outputs of each simulation are placed in a separate folder
-        #'        under the parent directory.
+        #'        under the parent directory. If `NULL`, the directory of the
+        #'        seed model will be used. Default: `NULL`.
         #' @param wait If `TRUE`, R will hang on and wait all EnergyPlus
         #'        simulations finish. If `FALSE`, all EnergyPlus simulations are
         #'        run in the background.  Default: `TRUE`.
@@ -297,6 +298,11 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'        with each model's name under `dir` when simulation. If `FALSE`,
         #'        all models are saved in `dir` when simulation. Default:
         #'        `TRUE`.
+        #' @param readvars If `TRUE`, the `ReadVarESO` post-processor will run
+        #'        to generate CSV files from the ESO output. Since those CSV
+        #'        files are never used when extracting simulation data in eplusr,
+        #'        setting it to `FALSE` can speed up the simulation if there are
+        #'        hundreds of output variables or meters. Default: `TRUE`.
         #'
         #' @return The `ParametricJob` object itself, invisibly.
         #'
@@ -311,8 +317,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' print(param)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE)
-            param_run(self, private, dir, wait, force, copy_external, echo, separate),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE, readvars = TRUE)
+            param_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
         # }}}
 
         # print {{{
@@ -474,7 +480,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
 # param_run {{{
 param_run <- function (self, private, output_dir = NULL, wait = TRUE,
                        force = FALSE, copy_external = FALSE, echo = wait,
-                       separate = TRUE) {
+                       separate = TRUE, readvars = TRUE) {
     if (is.null(private$m_idfs)) {
         abort("No measure has been applied.")
     }
@@ -496,7 +502,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE,
 
     private$log_new_uuid()
     if (is.null(output_dir)) output_dir <- dirname(private$m_seed$path())
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate)
+    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
 }
 # }}}
 # param_save {{{
