@@ -993,9 +993,6 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
     # if is a variable, directly evaluate it
     while (i <= length(l)) {
         if (!is.symbol(l[[i]])) {
-            # for .()
-            if (l[[i]][[1L]] == ".") l[[i]][[1L]] <- as.name("list")
-
             ll[[j]] <- l[[i]]
             nm[[j]] <- name[[i]]
             i <- i + 1L
@@ -1068,6 +1065,10 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
         # if `-`, `{`, `(` and other special function calls, len will be 2
         } else {
             evaluated <- FALSE
+
+            # for .()
+            if (li[[1L]] == ".") li[[1L]] <- as.name("list")
+
             # 'Name = list()', '..ID = list()'
             if (li[[1L]] == "list") {
                 # stop if not named
@@ -1088,8 +1089,6 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                 }
             } else if (li[[1L]] == ":=") {
                 if (!.ref_assign) abort("Assertion on 'Input' failed: ':=' is not allowed in this context", "dots_ref")
-                # support 'ClassName := .()'
-                if (li[[3L]][[1L]] == ".") li[[3L]][[1L]] <- as.name("list")
                 # for 'ClassName := list()'
                 if (length(li[[2L]]) == 1L) {
                     set(dt_in, i, "name", list(as.character(li[[2L]])))
@@ -1119,8 +1118,12 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     abort("Assertion on 'Input' failed: LHS of ':=' must start with '.()', 'c()', or '..()'", "dots_ref_lhs")
                 }
 
-                li <- li[[3L]]
                 set(dt_in, i, "is_ref", TRUE)
+
+                li <- li[[3L]]
+
+                # for .()
+                if (!is.symbol(li) && li[[1L]] == ".") li[[1L]] <- as.name("list")
             }
         }
 
