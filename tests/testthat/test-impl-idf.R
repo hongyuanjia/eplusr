@@ -759,6 +759,11 @@ test_that("VALUE DOTS", {
         )
     )
 
+    expect_equal(
+        parse_dots_value(cls := .(..1 = "name")),
+        parse_dots_value(cls := list(..1 = "name"))
+    )
+
     # can use multiple inputs on LHS of ":="
     expect_equal(parse_dots_value(.(1:3) := list(..1 = "name")),
         list(object = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
