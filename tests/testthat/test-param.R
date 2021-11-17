@@ -152,6 +152,7 @@ test_that("$run()", {
 
     path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     param <- param_job(path, path_epw)
+    param$apply_measure(function(idf, num) idf, num = 1:2)
     expect_is(param$run(), "ParametricJob")
 })
 
