@@ -759,11 +759,6 @@ test_that("VALUE DOTS", {
         )
     )
 
-    expect_equal(
-        parse_dots_value(cls := .(..1 = "name")),
-        parse_dots_value(cls := list(..1 = "name"))
-    )
-
     # can use multiple inputs on LHS of ":="
     expect_equal(parse_dots_value(.(1:3) := list(..1 = "name")),
         list(object = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
@@ -794,6 +789,27 @@ test_that("VALUE DOTS", {
                  value_chr = NA_character_, value_num = NA_real_
              )
         )
+    )
+
+    expect_equal(
+        parse_dots_value(cls = .(), .empty = TRUE),
+        parse_dots_value(cls = list(), .empty = TRUE)
+    )
+
+    expect_equal(
+        parse_dots_value(cls := .(..1 = "name")),
+        parse_dots_value(cls := list(..1 = "name"))
+    )
+
+    expect_equal(
+        parse_dots_value(.(1:3) := .(..1 = "name")),
+        parse_dots_value(.(1:3) := list(..1 = "name"))
+    )
+
+    a <- "cls1"
+    expect_equal(
+        parse_dots_value(..(a) := .(), ..("cls2") := .(), .empty = TRUE),
+        parse_dots_value(..(a) := list(), ..("cls2") := list(), .empty = TRUE)
     )
 
     # can stop if multiple value for normal list when .pair is TRUE
