@@ -41,18 +41,15 @@ automatically created if it does not exists, like \link{Idf} class does.
 
 \dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+     path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
+     path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
-    param <- param_job(idf_path, epw_path)
-    param <- ParametricJob$new(idf_path, epw_path)
+    param <- param_job(path_idf, path_epw)
+    param <- ParametricJob$new(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    param_job(read_idf(idf_path), read_epw(epw_path))
+    param_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 
@@ -85,11 +82,37 @@ param$weather()
 
 
 ## ------------------------------------------------
-## Method `ParametricJob$models`
+## Method `ParametricJob$param`
 ## ------------------------------------------------
 
 \dontrun{
-param$models()
+
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+
+# specify parameter values
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .names = c("thickness", "conduct", "fan_eff")
+)
+
+# each parameter should have the same length of values
+try(
+param$param(
+    Material := list(Thickness = c(0.1, 0.2)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+)
+
+# use all combinations of parameters
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .cross = TRUE
+)
 }
 
 
@@ -137,6 +160,24 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30))
 param$apply_measure(rotate_building, degree = seq(30, 360, 30),
     .names = paste0("rotate_", seq(30, 360, 30))
 )
+}
+
+
+## ------------------------------------------------
+## Method `ParametricJob$models`
+## ------------------------------------------------
+
+\dontrun{
+param$models()
+}
+
+
+## ------------------------------------------------
+## Method `ParametricJob$cases`
+## ------------------------------------------------
+
+\dontrun{
+param$cases()
 }
 
 
@@ -196,8 +237,10 @@ Hongyuan Jia
 \item \href{#method-version}{\code{ParametricJob$version()}}
 \item \href{#method-seed}{\code{ParametricJob$seed()}}
 \item \href{#method-weather}{\code{ParametricJob$weather()}}
-\item \href{#method-models}{\code{ParametricJob$models()}}
+\item \href{#method-param}{\code{ParametricJob$param()}}
 \item \href{#method-apply_measure}{\code{ParametricJob$apply_measure()}}
+\item \href{#method-models}{\code{ParametricJob$models()}}
+\item \href{#method-cases}{\code{ParametricJob$cases()}}
 \item \href{#method-save}{\code{ParametricJob$save()}}
 \item \href{#method-run}{\code{ParametricJob$run()}}
 \item \href{#method-print}{\code{ParametricJob$print()}}
@@ -250,18 +293,15 @@ A \code{ParametricJob} object.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+     path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
+     path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
-    param <- param_job(idf_path, epw_path)
-    param <- ParametricJob$new(idf_path, epw_path)
+    param <- param_job(path_idf, path_epw)
+    param <- ParametricJob$new(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    param_job(read_idf(idf_path), read_epw(epw_path))
+    param_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 
@@ -351,34 +391,104 @@ param$weather()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-models"></a>}}
-\if{latex}{\out{\hypertarget{method-models}{}}}
-\subsection{Method \code{models()}}{
-Get created parametric \link{Idf} objects
+\if{html}{\out{<a id="method-param"></a>}}
+\if{latex}{\out{\hypertarget{method-param}{}}}
+\subsection{Method \code{param()}}{
+Set parameters for parametric simulations
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$models()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$param(..., .names = NULL, .cross = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Lists of paramter definitions. Please see above on the
+syntax.}
+
+\item{\code{.names}}{A character vector of the parameter names. If \code{NULL},
+the parameter will be named in format \code{param_X}, where
+\code{X} is the index of parameter. Default: \code{NULL}.}
+
+\item{\code{.cross}}{If \code{TRUE}, all combinations of parameter values will be
+used to create models. If \code{FALSE}, each parameter should have
+the same length of values. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
-\verb{$models()} returns a list of parametric models generated using input
-\link{Idf} object and
-\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
-method. Model names are assigned in the same way as the \code{.names}
-arugment in
-\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
-If no measure has been applied, \code{NULL} is returned. Note that it is
-not recommended to conduct any extra modification on those models
-directly, after they were created using
-\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
-as this may lead to an un-reproducible process. A warning message
-will be issued if any of those models has been modified when running
-simulations.
+\verb{$param()} takes parameter definitions in list format, which is
+similar to \link[=Idf]{Idf$set()} except that each field is not assigned
+with a single value, but a vector of any length, indicating the
+levels of each parameter.
+
+Similar like the way of modifying object field values in
+\link[=Idf]{Idf$set()}, there are 3 different ways of defining a parameter
+in epluspar:
+\itemize{
+\item \code{object = list(field = c(value1, value2, ...))}: Where \code{object} is
+a valid object ID or name. Note object ID should be denoted with
+two periods \code{..}, e.g. \code{..10} indicates the object with ID \code{10}, It
+will set that specific field in that object as one parameter.
+\item \code{.(object, object) := list(field = c(value1, value2, ...))}:
+Simimar like above, but note the use of \code{.()} in the left hand
+side.  You can put multiple object ID or names in \code{.()}. It will
+set the field of all specified objects as one parameter.
+\item \code{class := list(field = c(value1, value2, ...))}: Note the use of
+\verb{:=} instead of \code{=}. The main difference is that, unlike \code{=}, the
+left hand side of \verb{:=} should be a valid class name in current
+\link{Idf}. It will set that field of all objects in specified
+class as one parameter.
 }
 
+For example, the code block below defines 3 parameters:
+\itemize{
+\item Field \verb{Fan Total Efficiency} in object named \verb{Supply Fan 1} in class
+\code{Fan:VariableVolume} class, with 10 levels being 0.1 to 1.0 with a
+0.1 step.
+\item Field \code{Thickness} in all objects in class \code{Material}, with 10
+levels being 0.01 to 0.1 m with a 0.1 m step.
+\item Field \code{Conductivity} in all objects in class \code{Material}, with 10
+levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.
+}\preformatted{param$param(
+    `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
+    Material := list(Thickness = seq(0.01, 0.1, 0.1), Conductivity = seq(0.1, 1.0, 0.1))
+)
+}
+}
+
+\subsection{Returns}{
+The modified \code{ParametricJob} object invisibly.
+}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-param$models()
+
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+
+# specify parameter values
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .names = c("thickness", "conduct", "fan_eff")
+)
+
+# each parameter should have the same length of values
+try(
+param$param(
+    Material := list(Thickness = c(0.1, 0.2)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+)
+
+# use all combinations of parameters
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .cross = TRUE
+)
 }
 
 }
@@ -466,6 +576,96 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30))
 param$apply_measure(rotate_building, degree = seq(30, 360, 30),
     .names = paste0("rotate_", seq(30, 360, 30))
 )
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-models"></a>}}
+\if{latex}{\out{\hypertarget{method-models}{}}}
+\subsection{Method \code{models()}}{
+Get created parametric \link{Idf} objects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$models(names = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{names}}{A character vector of new names for parametric models.
+If a single string, it will be used as a prefix and all models
+will be named in pattern \code{names_X}, where \code{X} is the model
+index. If \code{NULL}, existing parametric models are directly
+returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$models()} returns a list of parametric models generated using input
+\link{Idf} object and
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
+method. Model names are assigned in the same way as the \code{.names}
+arugment in
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
+If no measure has been applied, \code{NULL} is returned. Note that it is
+not recommended to conduct any extra modification on those models
+directly, after they were created using
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
+as this may lead to an un-reproducible process. A warning message
+will be issued if any of those models has been modified when running
+simulations.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$models()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cases"></a>}}
+\if{latex}{\out{\hypertarget{method-cases}{}}}
+\subsection{Method \code{cases()}}{
+Get a summary of parametric models and parameters
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$cases()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$cases()} returns a \link[data.table:data.table]{data.table} giving a
+summary of parametric models and parameter values.
+
+The returned \code{data.table} has the following columns:
+\itemize{
+\item \code{index}: Integer type. The indices of parameter models
+\item \code{case}: Character type. The names of parameter models
+\item Parameters: Type depends on the parameter values. Each parameter
+stands in a separate column. For parametric models created using
+\code{ParametricJob$param()}, the column names will be the same as what
+you specified in \code{.names}. For the case of
+\code{ParametricJob$apply_measure()}, this will be the argument names of
+the measure functions.
+}
+}
+
+\subsection{Returns}{
+If no parametric models have been created, \code{NULL} is
+returned. Otherwise, a \link[data.table:data.table]{data.table}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$cases()
 }
 
 }
