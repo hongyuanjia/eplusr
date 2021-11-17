@@ -1,8 +1,7 @@
 test_that("Group methods", {
-    # skip_on_cran()
-    eplusr_option(verbose_info = FALSE)
+    skip_on_cran()
 
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    eplusr_option(verbose_info = FALSE)
 
     path_idfs <- path_eplus_example(8.8,
         c("1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf",

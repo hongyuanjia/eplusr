@@ -3,7 +3,7 @@ eplusr_option(verbose_info = FALSE)
 # PARSE_SCH_CMPT {{{
 test_that("parse_sch_cmpt()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
@@ -17,7 +17,7 @@ test_that("parse_sch_cmpt()", {
 
     expect_equal(names(l), c("type_limits", "meta", "value"))
     expect_equal(l$type_limits,
-        data.table(rleid = 1L, object_id = 595L, class_name = "Schedule:Compact", 
+        data.table(rleid = 1L, object_id = 595L, class_name = "Schedule:Compact",
             object_name = "BLDG_SWH_SCH", type_limits = "Fraction")
     )
     expect_equal(l$meta,
@@ -90,7 +90,7 @@ test_that("parse_sch_cmpt()", {
 # COMPOSE_SCH_CMPT {{{
 test_that("compose_sch_cmpt()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
@@ -283,7 +283,7 @@ test_that("expand_sch_time()", {
 # GET_SCH_TYPE_LIMITS {{{
 test_that("get_sch_type_limits()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()

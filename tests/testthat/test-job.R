@@ -1,7 +1,6 @@
 test_that("Job methods", {
     eplusr_option(verbose_info = FALSE)
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
     path_epw <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")

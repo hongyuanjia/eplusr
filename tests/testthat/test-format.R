@@ -188,7 +188,7 @@ test_that("Formatting", {
         )
     )
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     expect_is(idd88 <- parse_idd_file(file.path(eplus_config(8.8)$dir, "Energy+.idd")), "list")
     expect_equal(format_idd_relation(get_idd_relation(idd88, NULL, 21590, name = TRUE, class_ref = "all")[1:2])$fmt,
         c("Class: <AirLoopHVAC:OutdoorAirSystem:EquipmentList>",

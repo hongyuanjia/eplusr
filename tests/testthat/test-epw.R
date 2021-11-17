@@ -10,7 +10,7 @@ test_that("IDD", {
 # META {{{
 test_that("Meta info", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- read_epw(path_epw), "Epw")
@@ -28,7 +28,7 @@ test_that("Meta info", {
 # HEADER {{{
 test_that("Header getter and setter", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
@@ -170,7 +170,7 @@ test_that("Header getter and setter", {
 # CONSTANTS {{{
 test_that("Constant data", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
@@ -191,7 +191,7 @@ test_that("Constant data", {
 # SAVE {{{
 test_that("$save() & $is_unsaved()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
@@ -216,7 +216,7 @@ test_that("$save() & $is_unsaved()", {
 # DATA GETTER {{{
 test_that("Data Getter", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
@@ -271,7 +271,7 @@ test_that("Data Getter", {
 # DATA TAGGER {{{
 test_that("Data Tagger", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
@@ -321,7 +321,7 @@ test_that("Data Tagger", {
 # DATA SETTER {{{
 test_that("Data Setter", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- read_epw(path_epw), "Epw")
@@ -460,7 +460,7 @@ test_that("Data Setter", {
 # CLONE {{{
 test_that("$clone()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     expect_is(epw1 <- Epw$new(path_epw), "Epw")
 
@@ -474,7 +474,7 @@ test_that("$clone()", {
 # PRINT {{{
 test_that("$print()", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
@@ -488,7 +488,7 @@ test_that("$print()", {
 # S3 FORMAT {{{
 test_that("str.Epw & format.Epw", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
@@ -500,7 +500,7 @@ test_that("str.Epw & format.Epw", {
 # S3 EQUALITY {{{
 test_that("==.Epw & !=.Epw", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))

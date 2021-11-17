@@ -1,6 +1,5 @@
 test_that("Sql methods", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     example <- copy_example()
     idf <- read_idf(example$idf)

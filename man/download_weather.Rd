@@ -44,8 +44,8 @@ and design day files (DDY).
 
 There are 2 data sources:
 \itemize{
-\item \href{https://energyplus.net/weather}{EnergyPlus.net}
-\item \href{http://climate.onebuilding.org/}{OneBuilding.org}
+\item \href{https://energyplus.net/}{EnergyPlus.net}
+\item \href{https://climate.onebuilding.org/}{OneBuilding.org}
 }
 
 EnergyPlus sources allow downloading EPW, STAT, and DDY files separately

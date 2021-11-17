@@ -164,7 +164,10 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' ```
         #' param$param(
         #'     `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
-        #'     Material := list(Thickness = seq(0.01, 0.1, 0.1), Conductivity = seq(0.1, 1.0, 0.1))
+        #'     Material := list(
+        #'         Thickness = seq(0.01, 0.1, 0.1),
+        #'         Conductivity = seq(0.1, 1.0, 0.1)
+        #'     )
         #' )
         #' ```
         #'
@@ -185,13 +188,19 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' \dontrun{
         #'
         #' param$param(
-        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
-        #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+        #'     Material := .(
+        #'         Thickness = seq(0.1, 1, length.out = 3),
+        #'         Conductivity = seq(0.1, 0.6, length.out = 3)
+        #'     ),
+        #'    "Supply Fan 1" = .(fan_total_efficiency = c(0.1, 0.5, 0.8))
         #' )
         #'
         #' # specify parameter values
         #' param$param(
-        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+        #'     Material := .(
+        #'         Thickness = seq(0.1, 1, length.out = 3),
+        #'         Conductivity = seq(0.1, 0.6, length.out = 3)
+        #'      ),
         #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
         #'     .names = c("thickness", "conduct", "fan_eff")
         #' )
@@ -206,7 +215,10 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         #' # use all combinations of parameters
         #' param$param(
-        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+        #'     Material := list(
+        #'         Thickness = seq(0.1, 1, length.out = 3),
+        #'         Conductivity = seq(0.1, 0.6, length.out = 3)
+        #'     ),
         #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
         #'     .cross = TRUE
         #' )

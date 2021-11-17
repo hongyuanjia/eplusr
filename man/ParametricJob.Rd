@@ -88,13 +88,19 @@ param$weather()
 \dontrun{
 
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
-    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
+   "Supply Fan 1" = .(fan_total_efficiency = c(0.1, 0.5, 0.8))
 )
 
 # specify parameter values
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+     ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .names = c("thickness", "conduct", "fan_eff")
 )
@@ -109,7 +115,10 @@ param$param(
 
 # use all combinations of parameters
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := list(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .cross = TRUE
 )
@@ -451,7 +460,10 @@ levels being 0.01 to 0.1 m with a 0.1 m step.
 levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.
 }\preformatted{param$param(
     `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
-    Material := list(Thickness = seq(0.01, 0.1, 0.1), Conductivity = seq(0.1, 1.0, 0.1))
+    Material := list(
+        Thickness = seq(0.01, 0.1, 0.1),
+        Conductivity = seq(0.1, 1.0, 0.1)
+    )
 )
 }
 }
@@ -464,13 +476,19 @@ The modified \code{ParametricJob} object invisibly.
 \preformatted{\dontrun{
 
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
-    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
+   "Supply Fan 1" = .(fan_total_efficiency = c(0.1, 0.5, 0.8))
 )
 
 # specify parameter values
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+     ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .names = c("thickness", "conduct", "fan_eff")
 )
@@ -485,7 +503,10 @@ param$param(
 
 # use all combinations of parameters
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := list(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .cross = TRUE
 )

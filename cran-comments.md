@@ -1,9 +1,9 @@
-# Version 0.14.2
+# Version 0.15.0
 
 ## Initial submission
 
-Change the maintainer email from 'hoongyuan.jia@bears-berkeley.sg' to
-'hongyuanjia@outlook.com'.
+Change the maintainer email from 'hongyuanjia@outlook.com' to
+'hongyuanjia@cqust.edu.cn'.
 
 ### Test environments
 
@@ -13,7 +13,16 @@ Change the maintainer email from 'hoongyuan.jia@bears-berkeley.sg' to
 
 ### R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+There is one note saying that the maintainer email address has been changed
+
+```
+   New maintainer:
+     Hongyuan Jia <hongyuanjia@cqust.edu.cn>
+   Old maintainer(s):
+     Hongyuan Jia <hongyuanjia@outlook.com>
+```
 
 ### Reverse dependencies
 

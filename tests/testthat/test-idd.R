@@ -16,6 +16,7 @@ test_that("download_idd() can download IDD from EnergyPlus repo", {
 # use_idd() {{{
 test_that("can read IDD", {
     skip_on_cran()
+
     # remove all parsed IDD
     .globals$idd <- list()
 
@@ -36,7 +37,7 @@ test_that("can read IDD", {
     expect_is(use_idd(8.4), "Idd")
 
     # can use the IDD in EnergyPlus VersionUpdater folder
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     .globals$idd <- list()
     expect_is(use_idd(8.4), "Idd")
 

@@ -39,7 +39,7 @@ invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 
 <!-- badges: start -->
 [![R build status](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)](https://github.com/hongyuanjia/eplusr/actions)
-[![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2)](https://codecov.io/gh/hongyuanjia/eplusr)
+[![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2)](https://app.codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
 [![CRAN Download Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
@@ -188,9 +188,9 @@ Please see these vignettes and articles about {eplusr}
 I would like to thank many open source projects who have heavily inspired the
 development of eplusr package, especially these below:
 
-* [EnergyPlus](https://www.energyplus.net): A whole building energy simulation
+* [EnergyPlus](https://energyplus.net): A whole building energy simulation
   program.
-* [OpenStudio](https://www.openstudio.net): A cross-platform collection of
+* [OpenStudio](https://openstudio.net): A cross-platform collection of
   software tools to support whole building energy modeling using EnergyPlus and
   advanced daylight analysis using Radiance.
 * [eppy](https://github.com/santoshphilip/eppy): Scripting language for E+,

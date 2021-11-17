@@ -492,7 +492,7 @@ test_that("table", {
 
     # read a more complex model
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "5Zone_Transformer.idf")
     idf_env <- parse_idf_file(path_idf, 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
@@ -504,8 +504,6 @@ test_that("table", {
     # }}}
 
     # NODE RELATION {{{
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
-
     # read idf
     path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "5Zone_Transformer.idf")
     idf_env <- parse_idf_file(path_idf, 8.8)
@@ -1462,7 +1460,7 @@ test_that("OBJECT DOTS", {
 
     # can stop if version is not the same
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     expect_error(expand_idf_dots_object(idd_env, idf_env, empty_idf(8.7)), class = "eplusr_error_dots_format")
 
     # can proceed if version is not the same

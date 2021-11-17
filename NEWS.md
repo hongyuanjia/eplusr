@@ -3,7 +3,7 @@
 ## New features
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).
-* Add epw data sources from [climate.onebuilding.org](http://climate.onebuilding.org/)
+* Add epw data sources from [climate.onebuilding.org](https://climate.onebuilding.org/)
   for `download_weather()`. `type` will always be `"all"` for those sources (#453).
 * Add a new `"stat"` option in `type` in `download_weather()` (#453).
 * `Idf$is_valid_id()` and `Idf$is_valid_name()` gain a new argument named

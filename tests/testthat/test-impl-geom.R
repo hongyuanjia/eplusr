@@ -1,7 +1,6 @@
 # GEOMETRY EXTRACTION {{{
 test_that("Geometry Extraction", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     example <- copy_example()
     idf <- read_idf(example$idf)
@@ -164,7 +163,6 @@ test_that("Geometry Extraction", {
 # SIMPLE GEOMETRY CONVERSION {{{
 test_that("Simple Geometry Conversion", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple shading
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
@@ -196,7 +194,6 @@ test_that("Simple Geometry Conversion", {
 # ALIGN COORDINATE SYSTEM {{{
 test_that("Align coordinate system", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple shading
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
@@ -213,7 +210,6 @@ test_that("Align coordinate system", {
 # GEOMETRY SUBSET {{{
 test_that("subset_geom", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple shading
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))

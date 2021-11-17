@@ -1,7 +1,6 @@
 # IdfViewer {{{
 test_that("IdfViewer class", {
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # simple model
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))

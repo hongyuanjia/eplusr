@@ -310,7 +310,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' @details
         #' `$view()` uses the [rgl](https://cran.r-project.org/package=rgl)
         #' package to visualize the IDF geometry in 3D in a similar way as
-        #' [OpenStudio](https://www.openstudio.net).
+        #' [OpenStudio](https://openstudio.net/).
         #'
         #' `$view()` returns an [IdfViewer] object which can be used to further
         #' tweak the viewer scene.

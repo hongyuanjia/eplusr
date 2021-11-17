@@ -2035,8 +2035,8 @@ format.Epw <- function (x, ...) {
 #'
 #' There are 2 data sources:
 #'
-#' * [EnergyPlus.net](https://energyplus.net/weather)
-#' * [OneBuilding.org](http://climate.onebuilding.org/)
+#' * [EnergyPlus.net](https://energyplus.net/)
+#' * [OneBuilding.org](https://climate.onebuilding.org/)
 #'
 #' EnergyPlus sources allow downloading EPW, STAT, and DDY files separately
 #' while OneBuilding sources can only download them all through a ZIP file.

@@ -572,7 +572,7 @@ global origin. Default: \code{TRUE}.}
 \subsection{Details}{
 \verb{$view()} uses the \href{https://cran.r-project.org/package=rgl}{rgl}
 package to visualize the IDF geometry in 3D in a similar way as
-\href{https://www.openstudio.net}{OpenStudio}.
+\href{https://openstudio.net/}{OpenStudio}.
 
 \verb{$view()} returns an \link{IdfViewer} object which can be used to further
 tweak the viewer scene.

@@ -1,8 +1,7 @@
 test_that("HVAC Diagram", {
-    eplusr_option(verbose_info = FALSE)
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
+    eplusr_option(verbose_info = FALSE)
     example <- copy_example()
 
     expect_silent(job <- eplus_job(example$idf, example$epw))

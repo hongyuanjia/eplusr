@@ -1,5 +1,3 @@
-if (!is_avail_eplus(8.8)) install_eplus(8.8)
-
 test_that("clean_wd()", {
     skip_on_cran()
 

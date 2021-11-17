@@ -397,7 +397,7 @@ test_that("Epw Data", {
     expect_error(parse_epw_data(paste(hd, dh, val, sep = "\n")), class = "eplusr_error_parse_epw_data_type")
 
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(parsed <- parse_epw_file(path_epw), "list")
