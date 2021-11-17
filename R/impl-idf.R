@@ -1088,6 +1088,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                 }
             } else if (li[[1L]] == ":=") {
                 if (!.ref_assign) abort("Assertion on 'Input' failed: ':=' is not allowed in this context", "dots_ref")
+                # support 'ClassName := .()'
+                if (li[[3L]][[1L]] == ".") li[[3L]][[1L]] <- as.name("list")
                 # for 'ClassName := list()'
                 if (length(li[[2L]]) == 1L) {
                     set(dt_in, i, "name", list(as.character(li[[2L]])))
