@@ -42,12 +42,12 @@
   extraction functionalities in eplusr, as it uses the SQLite output instead of
   the CSVs (#467).
 * A new argument `names` can be specified in `ParametricJob$models()` to rename
-  the parametric models created.
+  the parametric models created (#487).
 * A new interface for creating parametric models has been introduced using
   `ParametricJob$param()`. It takes parameter definitions in list format, which
   is similar to `Idf$set()` except that each field is not assigned with a single
   value, but a vector of any length, indicating the levels of each parameter.
-  For example, the code block below defines 3 parameters:
+  For example, the code block below defines 3 parameters (#487):
 
   * Field `Fan Total Efficiency` in object named `Supply Fan 1` in class
     `Fan:VariableVolume` class, with 10 levels being 0.1 to 1.0 with a
@@ -69,10 +69,10 @@
   models.For parametric models created using `ParametricJob$param()`, the column
   names will be the same as what you specified in `.names`. For the case of
   `ParametricJob$apply_measure()`, this will be the argument names of the
-  measure functions.
+  measure functions (#487).
 * Now `.names` in `ParametricJob$apply_measure()` can be a single character. In
   this case, it will be used as the prefix of all parametric models. The models
-  will be named in the pattern `.names_X` where `X` is the model index.
+  will be named in the pattern `.names_X` where `X` is the model index (#487).
 
 ## Break changes
 
@@ -87,7 +87,7 @@
 * `EplusJob$output_dir()` now use backslash in the returned path on Windows
   (#467).
 * Better error message when no arguments are given to the measure function in
-  `ParametricJob$apply_measure()`.
+  `ParametricJob$apply_measure()` (#487).
 
 ## Bug fixes
 
