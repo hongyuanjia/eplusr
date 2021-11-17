@@ -41,18 +41,15 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @examples
         #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
-        #'     idf_name <- "1ZoneUncontrolled.idf"
-        #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-        #'
-        #'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-        #'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+        #'      path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
+        #'      path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
         #'
         #'     # create from an IDF and an EPW
-        #'     param <- param_job(idf_path, epw_path)
-        #'     param <- ParametricJob$new(idf_path, epw_path)
+        #'     param <- param_job(path_idf, path_epw)
+        #'     param <- ParametricJob$new(path_idf, path_epw)
         #'
         #'     # create from an Idf and an Epw object
-        #'     param_job(read_idf(idf_path), read_epw(epw_path))
+        #'     param_job(read_idf(path_idf), read_epw(path_epw))
         #' }
         #' }
         #'
@@ -126,32 +123,97 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             param_weather(self, private),
         # }}}
 
-        # models {{{
+        # param {{{
         #' @description
-        #' Get created parametric [Idf] objects
+        #' Set parameters for parametric simulations
         #'
         #' @details
-        #' `$models()` returns a list of parametric models generated using input
-        #' [Idf] object and
-        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
-        #' method. Model names are assigned in the same way as the `.names`
-        #' arugment in
-        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
-        #' If no measure has been applied, `NULL` is returned. Note that it is
-        #' not recommended to conduct any extra modification on those models
-        #' directly, after they were created using
-        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
-        #' as this may lead to an un-reproducible process. A warning message
-        #' will be issued if any of those models has been modified when running
-        #' simulations.
+        #' `$param()` takes parameter definitions in list format, which is
+        #' similar to [Idf$set()][Idf] except that each field is not assigned
+        #' with a single value, but a vector of any length, indicating the
+        #' levels of each parameter.
+        #'
+        #' Similar like the way of modifying object field values in
+        #' [Idf$set()][Idf], there are 3 different ways of defining a parameter
+        #' in epluspar:
+        #'
+        #' * `object = list(field = c(value1, value2, ...))`: Where `object` is
+        #'   a valid object ID or name. Note object ID should be denoted with
+        #'   two periods `..`, e.g. `..10` indicates the object with ID `10`, It
+        #'   will set that specific field in that object as one parameter.
+        #' * `.(object, object) := list(field = c(value1, value2, ...))`:
+        #'   Simimar like above, but note the use of `.()` in the left hand
+        #'   side.  You can put multiple object ID or names in `.()`. It will
+        #'   set the field of all specified objects as one parameter.
+        #' * `class := list(field = c(value1, value2, ...))`: Note the use of
+        #'   `:=` instead of `=`. The main difference is that, unlike `=`, the
+        #'   left hand side of `:=` should be a valid class name in current
+        #'   [Idf]. It will set that field of all objects in specified
+        #'   class as one parameter.
+        #'
+        #' For example, the code block below defines 3 parameters:
+        #'
+        #' * Field `Fan Total Efficiency` in object named `Supply Fan 1` in class
+        #'   `Fan:VariableVolume` class, with 10 levels being 0.1 to 1.0 with a
+        #'   0.1 step.
+        #' * Field `Thickness` in all objects in class `Material`, with 10
+        #'   levels being 0.01 to 0.1 m with a 0.1 m step.
+        #' * Field `Conductivity` in all objects in class `Material`, with 10
+        #'  levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.
+        #'
+        #' ```
+        #' param$param(
+        #'     `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
+        #'     Material := list(Thickness = seq(0.01, 0.1, 0.1), Conductivity = seq(0.1, 1.0, 0.1))
+        #' )
+        #' ```
+        #'
+        #' @param ... Lists of paramter definitions. Please see above on the
+        #'        syntax.
+        #'
+        #' @param .names A character vector of the parameter names. If `NULL`,
+        #'        the parameter will be named in format `param_X`, where
+        #'        `X` is the index of parameter. Default: `NULL`.
+        #'
+        #' @param .cross If `TRUE`, all combinations of parameter values will be
+        #'        used to create models. If `FALSE`, each parameter should have
+        #'        the same length of values. Default: `FALSE`.
+        #'
+        #' @return The modified `ParametricJob` object invisibly.
         #'
         #' @examples
         #' \dontrun{
-        #' param$models()
+        #'
+        #' param$param(
+        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+        #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+        #' )
+        #'
+        #' # specify parameter values
+        #' param$param(
+        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+        #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+        #'     .names = c("thickness", "conduct", "fan_eff")
+        #' )
+        #'
+        #' # each parameter should have the same length of values
+        #' try(
+        #' param$param(
+        #'     Material := list(Thickness = c(0.1, 0.2)),
+        #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+        #' )
+        #' )
+        #'
+        #' # use all combinations of parameters
+        #' param$param(
+        #'     Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+        #'     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+        #'     .cross = TRUE
+        #' )
         #' }
         #'
-        models = function ()
-            param_models(self, private),
+        param = function (..., .names = NULL, .cross = FALSE)
+            param_param(self, private, ..., .names = .names, .cross = .cross),
         # }}}
 
         # apply_measure {{{
@@ -221,6 +283,71 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         apply_measure = function (measure, ..., .names = NULL)
             param_apply_measure(self, private, measure, ..., .names = .names),
+        # }}}
+
+        # models {{{
+        #' @description
+        #' Get created parametric [Idf] objects
+        #'
+        #' @details
+        #' `$models()` returns a list of parametric models generated using input
+        #' [Idf] object and
+        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
+        #' method. Model names are assigned in the same way as the `.names`
+        #' arugment in
+        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
+        #' If no measure has been applied, `NULL` is returned. Note that it is
+        #' not recommended to conduct any extra modification on those models
+        #' directly, after they were created using
+        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
+        #' as this may lead to an un-reproducible process. A warning message
+        #' will be issued if any of those models has been modified when running
+        #' simulations.
+        #'
+        #' @param names A character vector of new names for parametric models.
+        #'        If a single string, it will be used as a prefix and all models
+        #'        will be named in pattern `names_X`, where `X` is the model
+        #'        index. If `NULL`, existing parametric models are directly
+        #'        returned. Default: `NULL`.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' param$models()
+        #' }
+        #'
+        models = function (names = NULL)
+            param_models(self, private, names),
+        # }}}
+
+        # cases {{{
+        #' @description
+        #' Get a summary of parametric models and parameters
+        #'
+        #' @details
+        #' `$cases()` returns a [data.table][data.table::data.table()] giving a
+        #' summary of parametric models and parameter values.
+        #'
+        #' The returned `data.table` has the following columns:
+        #'
+        #' * `index`: Integer type. The indices of parameter models
+        #' * `case`: Character type. The names of parameter models
+        #' * Parameters: Type depends on the parameter values. Each parameter
+        #'   stands in a separate column. For parametric models created using
+        #'   `ParametricJob$param()`, the column names will be the same as what
+        #'   you specified in `.names`. For the case of
+        #'   `ParametricJob$apply_measure()`, this will be the argument names of
+        #'   the measure functions.
+        #'
+        #' @return If no parametric models have been created, `NULL` is
+        #' returned. Otherwise, a [data.table][data.table::data.table()].
+        #'
+        #' @examples
+        #' \dontrun{
+        #' param$cases()
+        #' }
+        #'
+        cases = function ()
+            param_cases(self, private),
         # }}}
 
         # save {{{
@@ -394,7 +521,29 @@ param_seed <- function (self, private) {
 }
 # }}}
 # param_models {{{
-param_models <- function (self, private) {
+param_models <- function (self, private, names = NULL) {
+    assert_character(names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
+    if (!length(private$m_idfs)) {
+        verbose_info("No parametric models have been created.")
+        if (!is.null(names)) {
+            verbose_info("Nothing to rename.")
+        }
+        return(NULL)
+    }
+
+    if (!length(names)) return(private$m_idfs)
+
+    if (length(names) == 1L && length(private$m_idfs) > 1L) {
+        names <- paste0(names, sep = "_", lpad(seq_along(private$m_idfs), "0"))
+    } else if (length(names) != length(private$m_idfs)) {
+        abort(paste(
+            "Invalid parametric model names found.",
+            length(private$m_idfs), "models created but", length(names), "new names given"
+        ), "param_names")
+    }
+
+    setattr(private$m_idfs, "names", names)
+
     private$m_idfs
 }
 # }}}
@@ -403,19 +552,152 @@ param_weather <- function (self, private) {
     if (is.null(private$m_epws_path)) NULL else read_epw(private$m_epws_path)
 }
 # }}}
+# param_cases {{{
+param_cases <- function (self, private, param = NULL) {
+    if (is.null(private$m_idfs)) {
+        verbose_info("No parametric models have been created.")
+        return(NULL)
+    }
+
+    cases <- copy(private$m_log$params)
+
+    if (!private$m_log$simple) return(cases)
+
+    # add field type
+    add_field_property(get_priv_env(private$m_seed)$idd_env(), cases, "type_enum")
+    # get value list
+    set(cases, NULL, "value", get_value_list(cases))
+    # change to wide
+    cases <- data.table::dcast.data.table(cases, case_index ~ param_name, value.var = "value")
+    for (col in setdiff(names(cases), "case_index")) {
+        set(cases, NULL, col, unlist(cases[[col]], FALSE, FALSE))
+    }
+    setnames(cases, "case_index", "index")
+    set(cases, NULL, "case", names(private$m_idfs))
+    setcolorder(cases, c("index", "case"))
+
+    cases[]
+}
+# }}}
+# param_param {{{
+param_param <- function (self, private, ..., .names = NULL, .cross = FALSE, .env = parent.frame()) {
+    assert_flag(.cross)
+    assert_character(.names, null.ok = TRUE, any.missing = FALSE)
+
+    l <- expand_idf_dots_value(
+        get_priv_env(private$m_seed)$idd_env(), get_priv_env(private$m_seed)$idf_env(),
+        ..., .type = "object", .complete = FALSE, .unique = TRUE, .empty = FALSE,
+        .default = FALSE, .scalar = FALSE, .pair = FALSE, .env = .env)
+
+    # clean previous parameter data
+    private$m_log$params <- NULL
+
+    # extract parameters
+    params <- unique(l$value, by = c("rleid", "class_id", "field_id"))
+    # if no duplicates, param and l$value is the same
+    if (nrow(params) == nrow(l$value)) params <- copy(params)
+    # remove object scope data
+    set(params, NULL, c("object_name", "object_id", "value_id"), NULL)
+
+    # set parameter index
+    set(params, NULL, "param_index", seq_len(nrow(params)))
+
+    if (!.cross) {
+        # all parameters should have the same length
+        len <- viapply(params$value_chr, length)
+
+        if (length(unique(len)) > 1L) {
+            abort(paste0(
+                "When '.cross' is 'FALSE', all input parameter values should have the same length. ",
+                "But different value lengths were detected:\n",
+                params[, paste(sprintf(
+                    " #%s| Parameter '%s' in class '%s' --> Length: %i",
+                    lpad(param_index, "0"), field_name, class_name, len), collapse = "\n"
+                )]
+            ))
+        }
+    } else {
+        set(params, NULL, "value_chr", as.list(do.call(data.table::CJ, params$value_chr)))
+        set(params, NULL, "value_num", as.list(do.call(data.table::CJ, params$value_num)))
+    }
+
+    # add object and value mapping
+    params[
+        l$value[, by = c("rleid", "class_id", "field_id"),
+            list(param_index = .GRP, object_id = list(object_id), object_name = list(object_name), value_id = list(value_id))],
+        on = "param_index", `:=`(object_id = i.object_id, object_name = i.object_name, value_id = i.value_id)
+    ]
+
+    # get full parameter table
+    params <- params[,
+        by = c("param_index", "rleid", "class_id", "class_name", "field_id", "field_index", "field_name"),
+        {
+            len_obj <- length(object_id[[1L]])
+            len_val <- length(value_chr[[1L]])
+
+            object_id <- rep(object_id[[1L]], each = len_val)
+            object_name <- rep(object_name[[1L]], each = len_val)
+            case_index <- rep(seq.int(len_val), len_obj)
+            value_id <- rep(value_id[[1L]], each = len_val)
+            value_chr <- rep(value_chr[[1L]], len_obj)
+            value_num <- rep(value_num[[1L]], len_obj)
+            list(case_index = case_index,
+                object_id = object_id, object_name = object_name,
+                value_id = value_id, value_chr = value_chr, value_num = value_num
+            )
+        }
+    ]
+    cols <- c("param_index", "case_index", "object_id", "class_name",
+        "field_id", "field_index", "field_name", "value_chr", "value_num")
+    set(params, NULL, setdiff(names(params), cols), NULL)
+
+    # validate parameter names
+    if (is.null(.names)) {
+        set(params, NULL, "param_name", sprintf("param_%s", lpad(params$param_index, "0")))
+    } else {
+        if (length(.names) != max(params$param_index)) {
+            abort(sprintf(
+                paste("Invalid parameter names found.",
+                    "%s parameters specified but %i parameter names have been specified."
+                ),
+                max(params$param_index), length(.names)
+            ), "param_name")
+        }
+        nms <- make.unique(.names, sep = "_")
+        set(params, NULL, "param_name", nms[params$param_index])
+    }
+
+    # get inputs for Idf$update()
+    dt <- copy(params)
+    setnames(dt,
+        c("object_id", "class_name", "field_index", "value_chr"),
+        c("id", "class", "index", "value")
+    )
+    set(dt, NULL, c("param_index", "field_name", "value_num"), NULL)
+
+    # create fake measure
+    measure <- function(idf, dt) {idf$update(dt); idf}
+
+    # create parametric models
+    param_apply_measure(self, private, measure, split(dt, by = "case_index", keep.by = FALSE))
+
+    private$m_log$params <- params
+    private$m_log$simple <- TRUE
+
+    invisible(self)
+}
+# }}}
 # param_apply_measure {{{
 #' @importFrom checkmate assert_function
 param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame()) {
     checkmate::assert_function(measure)
+    assert_character(.names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
 
     if (length(formals(measure)) < 2L) {
-        stop("'measure' function must have at least two argument")
+        abort("'measure' function must have at least two argument", "param_measure")
     }
 
     measure_wrapper <- function (idf, ..., .__PROGRESS_BAR__) {
-        if (!is_idf(idf)) {
-            stop("Measure should take an 'Idf' object as input, not '", class(idf)[[1]], "'")
-        }
         .__PROGRESS_BAR__$tick()
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
@@ -425,6 +707,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         idf
     }
 
+    # in case 'function(idf, ...)' is specified as a measure
     if (is.name(substitute(measure, .env))) {
         bare <- FALSE
         mea_nm <- deparse(substitute(measure, .env))
@@ -433,6 +716,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         mea_nm <- "case"
     }
     private$m_log$measure_name <- mea_nm
+    private$m_log$bare <- bare
 
     # progress bar
     progress_bar <- progress::progress_bar$new(
@@ -440,20 +724,39 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         format = "[:current/:total | :percent] :bar [Elapsed: :elapsedfull]"
     )
 
+    # create models
     out <- mapply(measure_wrapper, ...,
         MoreArgs = list(idf = private$m_seed, .__PROGRESS_BAR__ = progress_bar),
         SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
+    # in case there are no argument specified to measure
+    if (!length(out)) abort("No arguments have been given to the input measure.")
+
+    # validate parametric model names
     if (is.null(.names)) {
         nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
-        if (length(out) != length(.names)) {
-            stop(paste0(length(out), " models created with only ", length(.names), " names given"))
+        if (length(.names) == 1L && length(out) > 1L) {
+            .names <- paste(.names, lpad(seq_along(out), "0"), sep = "_")
         }
-        nms <- make.unique(as.character(.names), sep = "_")
+        if (length(out) != length(.names)) {
+            abort(paste(
+                "Invalid parametric model names found.",
+                length(out), "models created but", length(.names), "names given"
+            ), "param_names")
+        }
+        nms <- make.unique(.names, sep = "_")
     }
-
     setattr(out, "names", nms)
+
+    # construct parameter table
+    cl <- as.call(c(measure, list(quote(idf)), list(...)))
+    cases <- as.data.table(as.list(match.call(measure, cl)[-c(1:2)]))
+    set(cases, NULL, "index", seq_along(out))
+    set(cases, NULL, "case", nms)
+    setcolorder(cases, c("index", "case"))
+    private$m_log$params <- cases
+    private$m_log$simple <- FALSE
 
     private$m_idfs <- out
 
@@ -462,17 +765,15 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     private$log_new_uuid()
     private$m_log$unsaved <- rep(TRUE, length(out))
 
-    if (eplusr_option("verbose_info")) {
-        if (bare) {
-            mea_nm <- "function"
-        } else {
-            mea_nm <- surround(mea_nm)
-        }
-        verbose_info("Measure ", mea_nm, " has been applied with ", length(out),
-            " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
-            nms, collapse = "\n")
-        )
+    if (bare) {
+        mea_nm <- "function"
+    } else {
+        mea_nm <- surround(mea_nm)
     }
+    verbose_info("Measure ", mea_nm, " has been applied with ", length(out),
+        " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
+        nms, collapse = "\n")
+    )
 
     invisible(self)
 }
@@ -493,7 +794,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE,
                 "Running these models will result in simulation outputs that may be not reproducible. ",
                 "It is recommended to re-apply your original measure using `$apply_measure()` and call `$run()` again. ",
                 "Models that have been modified are listed below:\n",
-                paste0(" # ", seq_along(uuid)[i], " | ", names(uuid)[i], collapse = "\n")
+                paste0(" #", lpad(seq_along(uuid)[i], "0"), " | ", names(uuid)[i], collapse = "\n")
             ),
             "param_model_modified"
         )
@@ -508,6 +809,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE,
 # param_save {{{
 #' @importFrom checkmate assert_string
 param_save <- function (self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
+    assert_string(dir, null.ok = TRUE)
     if (is.null(private$m_idfs)) {
         abort("No parametric models found since no measure has been applied.")
     }
@@ -517,19 +819,17 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 
     path_idf <- normalizePath(private$m_seed$path(), mustWork = TRUE)
 
-    if (is.null(dir))
-        dir <- dirname(path_idf)
-    else {
-        assert_string(dir)
-    }
+    if (is.null(dir)) dir <- dirname(path_idf)
 
     if (!dir.exists(dir)) {
+        # nocov start
         tryCatch(dir.create(dir, recursive = TRUE),
             warning = function (w) {
                 stop("Failed to create output directory: ",
                      surround(dir), call. = FALSE)
             }
         )
+        # nocov end
     }
 
     filename <- make_filename(names(private$m_idfs))
@@ -564,7 +864,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
         log$uuid <- uuid[[i]]
     }
 
-    data.table::data.table(model = path_param, weather = path_epw)
+    data.table(model = path_param, weather = path_epw)
 }
 # }}}
 # param_print {{{
@@ -579,13 +879,14 @@ param_print <- function (self, private) {
     if (is.null(private$m_idfs)) {
         cli::cat_line("<< No measure has been applied >>",
             col = "white", background_col = "blue")
-        return(invisible())
+        return(invisible(self))
     }
 
-    cli::cat_line(c(
-        paste0("Applied Measure: ", surround(private$m_log$measure_name)),
-        paste0("Parametric Models [", length(private$m_idfs), "]: ")
-    ))
+    if (!private$m_log$simple && !private$m_log$bare) {
+        cli::cat_line(paste0("Applied Measure: ", surround(private$m_log$measure_name)))
+    }
+
+    cli::cat_line(paste0("Parametric Models [", length(private$m_idfs), "]: "))
 
     epgroup_print_status(self, private, epw = FALSE)
 }
