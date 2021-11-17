@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9018</span>
       </span>
     </div>
 
@@ -205,6 +205,14 @@
 <li><p>Now <code>Idf$save(external = TRUE)</code> and <code>Idf$run(copy_external)</code> save external file dependencies based on the results of <code>Idf$external_deps()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</p></li>
 <li><p>A new <code>EplusJob</code> method <code>$list_files()</code> is added to list all inputs and output files for current simulation (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</p></li>
 <li><p>A new argument <code>readvars</code> can be specified in <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code>. Setting it to <code>FALSE</code> will disable to run ReadVarsESO post-processor and thus no CSVs will be generated for Report variables and meters. This can speed up simulations significantly if there are hundreds of outputs in the model. Setting it to <code>FALSE</code> will not affect any data extraction functionalities in eplusr, as it uses the SQLite output instead of the CSVs (<a href='https://github.com/hongyuanjia/eplusr/issues/467'>#467</a>).</p></li>
+<li>
+<p>Now <code>.()</code> can also be used as an alias as <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> in <code>Idf$add()</code> and <code>Idf$set()</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/445'>#445</a>).</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span>
+<span class="co"># is equivalent to</span>
+<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+</li>
 <li><p>A new argument <code>names</code> can be specified in <code>ParametricJob$models()</code> to rename the parametric models created (<a href='https://github.com/hongyuanjia/eplusr/issues/487'>#487</a>).</p></li>
 <li>
 <p>A new interface for creating parametric models has been introduced using <code>ParametricJob$param()</code>. It takes parameter definitions in list format, which is similar to <code>Idf$set()</code> except that each field is not assigned with a single value, but a vector of any length, indicating the levels of each parameter. For example, the code block below defines 3 parameters (<a href='https://github.com/hongyuanjia/eplusr/issues/487'>#487</a>):</p>
@@ -262,7 +270,7 @@
 <ul>
 <li>
 <p><code>IddObject$output()</code> is added to extract all possible outputs of current class. All outputs are extracted from the LaTeX source file of “Input Output Reference” for EnergyPlus v9.5.0 and later. So empty result will always be returned for <code>Idd</code> version lower than v9.5. It is possible that there are some mistakes introduced when extracting the output variables. Also, some outputs are only available if certain fields are set. Even they are listed in the results, it does not mean that the <code>Idf</code> can report all of them. It is strongly suggested to check the RDD and MDD file for correctness (<a href='https://github.com/hongyuanjia/eplusr/issues/427'>#427</a>). Example:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
 <span class="va">idd</span><span class="op">$</span><span class="va">Lights</span><span class="op">$</span><span class="fu">outputs</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -386,7 +394,7 @@
 <ul>
 <li>
 <p><code>Idf$add()</code> and <code>Idf$set()</code> have new features:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># refer to field using '..'</span>
 <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Material <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="st">"mat"</span>, ..7 <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span>
@@ -399,7 +407,7 @@
 <li><p><code>Idf$to_table()</code> gains a new parameter <code>force</code>. The default value is <code>FALSE</code>. If <code>TRUE</code>, you can convert object data from any classes into a wide data.table. This may be useful when you know that target classes have the exact same fields, e.g. <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/202'>#202</a>).</p></li>
 <li>
 <p>A new method <code>Idf$purge()</code> has been added (<a href='https://github.com/hongyuanjia/eplusr/issues/223'>#223</a>). It can be used to delete any resource objects that are not referenced by other objects. Here resource objects indicate all objects that can be referenced by other objects, e.g. all schedules. <code>$purge()</code> will ignore any inputs that are not resources. If inputs contain objects from multiple classes, references among them are also taken into account, which means purging is performed hierarchically. If both materials and constructions are specified, the latter will be purged first, because it is possible that input constructions reference input materials. <code>Idf$purge()</code> makes it quite straightforward to perform IDF cleaning. Actions like removing all materials, constructions and schedules can be easily achieved via</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">Idf</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></code></pre></div>
 </li>
@@ -445,7 +453,7 @@
 <li>
 <p>The algorithm of object/field/value relation extraction has been completed refactored. Now it can correctly detect object recursive-reference and it’s faster (<a href='https://github.com/hongyuanjia/eplusr/issues/222'>#222</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/223'>#223</a>).</p>
 <p>All relation-related methods now have an unified interface:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">X</span><span class="op">$</span><span class="fu">method</span><span class="op">(</span><span class="va">which</span>, <span class="va">direction</span>, object <span class="op">=</span> <span class="cn">NULL</span>, class <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
@@ -567,7 +575,7 @@
 <li><p>Now required objects and unique objects can be deleted in <code>$del()</code> when <code>.force</code> is set to <code>TRUE</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/149'>#149</a>).</p></li>
 <li>
 <p>Now for Windows and Linux, <code><a href="../reference/install_eplus.html">install_eplus()</a></code> supports to install EnergyPlus to your home directory or your customized directory without requiring administrator privileges (<a href='https://github.com/hongyuanjia/eplusr/issues/167'>#167</a>).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># install to your home directory</span>
 <span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
@@ -877,19 +885,19 @@
 <ul>
 <li>
 <p>Search locations that contains string <code>"los angeles"</code> and <code>"tmy"</code>, return a menu to select which one(s) to download. Once selected, download both corresponding weather file(s) and design day file(s):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </li>
 <li>
 <p>Same as above, expect that all files will be renamed to <code>la.epw(ddy)</code>, <code>la_1.epw(ddy)</code>, <code>la_2.epw(ddy)</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, filename <span class="op">=</span> <span class="st">"la"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </li>
 <li>
 <p>Search locations that contains string <code>"beijing"</code> and <code>"cswd"</code>. If no more than 3 results found, directly download all weather files and save them to temporary directory.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"beijing.*cswd"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"epw"</span>, ask <span class="op">=</span> <span class="cn">FALSE</span>, max_match <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 </li>

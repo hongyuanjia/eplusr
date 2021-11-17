@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9018</span>
       </span>
     </div>
 
@@ -811,7 +811,7 @@
 <code class="sourceCode R"><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">rp1</span>,
-  RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,
+  RunPeriod <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,
     ..4 <span class="op">=</span> <span class="fl">4</span>, ..5 <span class="op">=</span> <span class="fl">1</span>, .comment <span class="op">=</span> <span class="st">"Comment for new object 2"</span>
   <span class="op">)</span>
 <span class="op">)</span>
@@ -851,9 +851,10 @@
 <span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
 <span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
 <span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
+<p>Note that the use <code>.()</code> inside <code>$add()</code>. It is just an alias of <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
 <p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code>=</code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,
   <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Rough"</span>, <span class="st">"MediumSmooth"</span>, <span class="st">"Smooth"</span><span class="op">)</span>,
   <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,
@@ -895,9 +896,10 @@
 <h2 class="hasAnchor">
 <a href="#set-new-values-and-comments-using-lists-idfset" class="anchor"></a>Set new values and comments using lists (<code>Idf$set()</code>)</h2>
 <p>Changing values of existing objects can be conducted using <code>$set()</code> in <code>Idf</code> and <code>IdfObject</code>:</p>
+<p>Note that you can also use <code>.()</code> here as an alias of <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>
-  rp_test_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,
+  rp_test_1 <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,
     .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"begin day has been changed."</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">)</span>
@@ -921,7 +923,7 @@
 <span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
 <p>You can modify all objects in a class using <code>class := list(...)</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
   ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,
   ..8 <span class="op">=</span> <span class="st">"No"</span>
 <span class="op">)</span><span class="op">)</span>
@@ -996,7 +998,7 @@
 </blockquote>
 <p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $WinterDay</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -1445,10 +1447,10 @@
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmpag7Krc/file295433e0a729.idf"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmp1M0vSh/file29552e7e7d50.idf"</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpag7Krc/file295433e0a729.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmp1M0vSh/file29552e7e7d50.idf.</span></code></pre></div>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">

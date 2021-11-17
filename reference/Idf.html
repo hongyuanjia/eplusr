@@ -99,7 +99,7 @@ but with total different data structure under the hook." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9018</span>
       </span>
     </div>
 
@@ -1296,6 +1296,9 @@ there are required fields in that class and current validate level
 includes missing-required-field checking. For what kind of validation
 components will be performed during adding new objects, please see
 <code><a href='level_checks.html'>level_checks()</a></code>.</p>
+<p>Note that <code>.()</code> can be used as an alias as <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code>, e.g.
+<code>idf$add(Building = .())</code> is equivalent to
+<code>idf$add(Building = list())</code>.</p>
 <p>Field name matching is <strong>case-insensitive</strong>. For convenience,
 underscore-style field names are also allowed, e.g. <code>eNd_MoNtH</code> is
 equivalent to <code>End Month</code>. This behavior is consistent among all
@@ -1326,11 +1329,11 @@ specified using explicit field name.</p>
 <p><div class="r example copy"></p><pre>\dontrun{
 # add a new Building object with all default values
 empty &lt;- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list())
+empty$add(Building = .())
 
 # add a new Building object with all default values and comments
 empty &lt;- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list(.comment = c("this is", "a new building")))
+empty$add(Building = .(.comment = c("this is", "a new building")))
 
 # add a new RunPeriod object with all possible fields
 empty &lt;- empty_idf(8.8) # create an empty Idf
@@ -1378,6 +1381,9 @@ with ID <code>10</code>. Similar to
 special element <code>.comment</code> in each list will be used as the <strong>new</strong>
 comments for modified object, overwriting the old ones. Names in list
 element are treated as field names.</p>
+<p>Note that <code>.()</code> can be used as an alias as <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code>, e.g.
+<code>idf$set(Building = .(...))</code> is equivalent to
+<code>idf$set(Building = list(...))</code>.</p>
 <p>There is two special syntax in <code>$set()</code>, which is inspired by the
 <a href='https://cran.r-project.org/package=eplusr'>data.table</a> package:</p><ul>
 <li><p><code>class := list(field = value)</code>: Note the use of <code>:=</code> instead of
@@ -5722,7 +5728,7 @@ idf$print("field", order = FALSE)
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='co'># add a new Building object with all default values</span></span>
 <span class='r-in'><span class='va'>empty</span> <span class='op'>&lt;-</span> <span class='fu'><a href='empty_idf.html'>empty_idf</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span> <span class='co'># create an empty Idf</span></span>
-<span class='r-in'><span class='va'>empty</span><span class='op'>$</span><span class='fu'>add</span><span class='op'>(</span>Building <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>empty</span><span class='op'>$</span><span class='fu'>add</span><span class='op'>(</span>Building <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> $NONE</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IdfObject: 'Building'&gt; [ID:2] `NONE`</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Building&gt;</span>
@@ -5738,7 +5744,7 @@ idf$print("field", order = FALSE)
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># add a new Building object with all default values and comments</span></span>
 <span class='r-in'><span class='va'>empty</span> <span class='op'>&lt;-</span> <span class='fu'><a href='empty_idf.html'>empty_idf</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span> <span class='co'># create an empty Idf</span></span>
-<span class='r-in'><span class='va'>empty</span><span class='op'>$</span><span class='fu'>add</span><span class='op'>(</span>Building <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>.comment <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"this is"</span>, <span class='st'>"a new building"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>empty</span><span class='op'>$</span><span class='fu'>add</span><span class='op'>(</span>Building <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span>.comment <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"this is"</span>, <span class='st'>"a new building"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> $NONE</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IdfObject: 'Building'&gt; [ID:2] `NONE`</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
@@ -7494,11 +7500,11 @@ idf$print("field", order = FALSE)
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># save and overwrite current file</span></span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span>overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/Rtmpyc9nDP/file273e2ae26b63.idf.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/RtmpV2uhah/file274455d2235b.idf.</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># save the model with newly created and modified objects at the top</span></span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>save</span><span class='op'>(</span>overwrite <span class='op'>=</span> <span class='cn'>TRUE</span>, format <span class='op'>=</span> <span class='st'>"new_top"</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/Rtmpyc9nDP/file273e2ae26b63.idf.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/RtmpV2uhah/file274455d2235b.idf.</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># save the model to a new file and copy all external csv files used in</span></span>
 <span class='r-in'><span class='co'># "Schedule:File" class into the same folder</span></span>
@@ -7576,7 +7582,7 @@ idf$print("field", order = FALSE)
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>geometry</span><span class='op'>(</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Building: 'Simple One Zone (Wireframe DXF)'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * North Axis: 0°</span>
@@ -7610,7 +7616,7 @@ idf$print("field", order = FALSE)
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"group"</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [07&lt;C&gt;] Group: &lt;Simulation Parameters&gt;</span>
@@ -7623,7 +7629,7 @@ idf$print("field", order = FALSE)
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [22&lt;C&gt;] Group: &lt;Output Reporting&gt;</span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"class"</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
@@ -7670,7 +7676,7 @@ idf$print("field", order = FALSE)
 <span class='r-out co'><span class='r-pr'>#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"object"</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Version&gt;</span>
@@ -7833,7 +7839,7 @@ idf$print("field", order = FALSE)
 <span class='r-out co'><span class='r-pr'>#&gt;</span> └─ Object [ID:53] &lt;AlwaysOn&gt;</span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"field"</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Version&gt;</span>
@@ -8346,7 +8352,7 @@ idf$print("field", order = FALSE)
 <span class='r-in'><span class='co'># order objects by there classes</span></span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"object"</span>, order <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Version&gt;</span>
@@ -8457,7 +8463,7 @@ idf$print("field", order = FALSE)
 <span class='r-out co'><span class='r-pr'>#&gt;</span> └─ Object [ID:46]</span>
 <span class='r-in'><span class='va'>idf</span><span class='op'>$</span><span class='fu'>print</span><span class='op'>(</span><span class='st'>"field"</span>, order <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/Rtmpyc9nDP/test_run.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  * Path: '/tmp/RtmpV2uhah/test_run.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  * Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Class: &lt;Version&gt;</span>
