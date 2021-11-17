@@ -432,18 +432,20 @@ For example, here we add two new objects with comments in `RunPeriod` class:
 rp1 <- list(RunPeriod = list("rp_test_1", 1, 1, 2, 1, .comment = c("Comment for new object 1", "Another comment")))
 
 model$add(rp1,
-  RunPeriod = list(name = "rp_test_2", begin_month = 3, begin_day_of_month = 1,
+  RunPeriod = .(name = "rp_test_2", begin_month = 3, begin_day_of_month = 1,
     ..4 = 4, ..5 = 1, .comment = "Comment for new object 2"
   )
 )
 ```
+
+Note that the use `.()` inside `$add()`. It is just an alias of `list()`.
 
 If you want to create multiple objects in one go, you can use `:=`, instead of
 `=`. For instance, below we create 3 materials. Note that field values with
 shorter length are automatically recycled.
 
 ```{r}
-model$add(Material := list(
+model$add(Material := .(
   sprintf("mat%i", 1:3),
   c("Rough", "MediumSmooth", "Smooth"),
   c(0.05, 0.1, 0.2),
@@ -458,9 +460,11 @@ model$add(Material := list(
 Changing values of existing objects can be conducted using `$set()` in
 `Idf` and `IdfObject`:
 
+Note that you can also use `.()` here as an alias of `list()`.
+
 ```{r set_obj}
 model$set(
-  rp_test_1 = list(name = "rp_test_3", begin_day_of_month = 2,
+  rp_test_1 = .(name = "rp_test_3", begin_day_of_month = 2,
     .comment = c(format(Sys.Date()), "begin day has been changed.")
   )
 )
@@ -469,7 +473,7 @@ model$set(
 You can modify all objects in a class using `class := list(...)`:
 
 ```{r}
-model$set(RunPeriod := list(
+model$set(RunPeriod := .(
   ..6 = c("Monday", "Tuesday", "Wednesday", "Thursday"),
   ..8 = "No"
 ))
@@ -481,7 +485,7 @@ model$set(RunPeriod := list(
 Multiple objects can be grouped inside `.()` or `c()`:
 
 ```{r}
-model$set(.("WinterDay", "SummerDay") := list(..8 = "Yes"))
+model$set(.("WinterDay", "SummerDay") := .(..8 = "Yes"))
 ```
 
 For setting a single value on one object, you can write it in a chain:
