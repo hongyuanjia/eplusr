@@ -1026,6 +1026,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' components will be performed during adding new objects, please see
         #' [level_checks()].
         #'
+        #' Note that `.()` can be used as an alias as `list()`, e.g.
+        #' `idf$add(Building = .())` is equivalent to
+        #' `idf$add(Building = list())`.
+        #'
         #' Field name matching is **case-insensitive**. For convenience,
         #' underscore-style field names are also allowed, e.g. `eNd_MoNtH` is
         #' equivalent to `End Month`. This behavior is consistent among all
@@ -1070,11 +1074,11 @@ Idf <- R6::R6Class(classname = "Idf",
         #' \dontrun{
         #' # add a new Building object with all default values
         #' empty <- empty_idf(8.8) # create an empty Idf
-        #' empty$add(Building = list())
+        #' empty$add(Building = .())
         #'
         #' # add a new Building object with all default values and comments
         #' empty <- empty_idf(8.8) # create an empty Idf
-        #' empty$add(Building = list(.comment = c("this is", "a new building")))
+        #' empty$add(Building = .(.comment = c("this is", "a new building")))
         #'
         #' # add a new RunPeriod object with all possible fields
         #' empty <- empty_idf(8.8) # create an empty Idf
@@ -1107,6 +1111,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' special element `.comment` in each list will be used as the **new**
         #' comments for modified object, overwriting the old ones. Names in list
         #' element are treated as field names.
+        #'
+        #' Note that `.()` can be used as an alias as `list()`, e.g.
+        #' `idf$set(Building = .(...))` is equivalent to
+        #' `idf$set(Building = list(...))`.
         #'
         #' There is two special syntax in `$set()`, which is inspired by the
         #' [data.table](https://cran.r-project.org/package=eplusr) package:

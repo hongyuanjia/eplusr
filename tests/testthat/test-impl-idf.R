@@ -696,6 +696,11 @@ test_that("VALUE DOTS", {
         )
     )
 
+    expect_equal(
+        parse_dots_value(cls = .(..1 = "name", ..2 = 1L, NULL, NULL)),
+        parse_dots_value(cls = list(..1 = "name", ..2 = 1L, NULL, NULL))
+    )
+
     # can separate numeric and character value
     expect_equal(parse_dots_value(cls = list(..1 = "name", ..2 = 1L, NULL, NULL)),
         list(object = data.table(rleid = 1L, each_rleid = 1L, id = NA_integer_, name = "cls",

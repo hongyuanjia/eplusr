@@ -993,6 +993,9 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
     # if is a variable, directly evaluate it
     while (i <= length(l)) {
         if (!is.symbol(l[[i]])) {
+            # for .()
+            if (l[[i]][[1L]] == ".") l[[i]][[1L]] <- as.name("list")
+
             ll[[j]] <- l[[i]]
             nm[[j]] <- name[[i]]
             i <- i + 1L

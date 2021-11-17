@@ -376,11 +376,11 @@ idf$dup(floors_1, floors_2)
 \dontrun{
 # add a new Building object with all default values
 empty <- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list())
+empty$add(Building = .())
 
 # add a new Building object with all default values and comments
 empty <- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list(.comment = c("this is", "a new building")))
+empty$add(Building = .(.comment = c("this is", "a new building")))
 
 # add a new RunPeriod object with all possible fields
 empty <- empty_idf(8.8) # create an empty Idf
@@ -2237,6 +2237,10 @@ includes missing-required-field checking. For what kind of validation
 components will be performed during adding new objects, please see
 \code{\link[=level_checks]{level_checks()}}.
 
+Note that \code{.()} can be used as an alias as \code{list()}, e.g.
+\code{idf$add(Building = .())} is equivalent to
+\code{idf$add(Building = list())}.
+
 Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
 equivalent to \verb{End Month}. This behavior is consistent among all
@@ -2271,11 +2275,11 @@ A named list of \link{IdfObject} objects.
 \preformatted{\dontrun{
 # add a new Building object with all default values
 empty <- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list())
+empty$add(Building = .())
 
 # add a new Building object with all default values and comments
 empty <- empty_idf(8.8) # create an empty Idf
-empty$add(Building = list(.comment = c("this is", "a new building")))
+empty$add(Building = .(.comment = c("this is", "a new building")))
 
 # add a new RunPeriod object with all possible fields
 empty <- empty_idf(8.8) # create an empty Idf
@@ -2333,6 +2337,10 @@ with ID \code{10}. Similar to
 special element \code{.comment} in each list will be used as the \strong{new}
 comments for modified object, overwriting the old ones. Names in list
 element are treated as field names.
+
+Note that \code{.()} can be used as an alias as \code{list()}, e.g.
+\code{idf$set(Building = .(...))} is equivalent to
+\code{idf$set(Building = list(...))}.
 
 There is two special syntax in \verb{$set()}, which is inspired by the
 \href{https://cran.r-project.org/package=eplusr}{data.table} package:

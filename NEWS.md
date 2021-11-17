@@ -41,6 +41,14 @@
   outputs in the model. Setting it to `FALSE` will not affect any data
   extraction functionalities in eplusr, as it uses the SQLite output instead of
   the CSVs (#467).
+* Now `.()` can also be used as an alias as `list()` in `Idf$add()` and
+  `Idf$set()` (#445).
+
+  ```r
+  idf$add(Output_Variable = .("*", "zone mean air temperature"))
+  # is equivalent to
+  idf$add(Output_Variable = list("*", "zone mean air temperature"))
+  ```
 
 ## Break changes
 
