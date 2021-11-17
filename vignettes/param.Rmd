@@ -163,6 +163,13 @@ param$apply_measure(ecm,
 )
 ```
 
+After parametric models have been created, you can retrive the summary of the
+parameter values and model names using `$cases()`.
+
+```{r}
+param$cases()
+```
+
 # Run parametric simulations in parallel
 
 The `$run()` method will run all parametric simulations in parallel and place

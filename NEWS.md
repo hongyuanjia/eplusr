@@ -41,6 +41,38 @@
   outputs in the model. Setting it to `FALSE` will not affect any data
   extraction functionalities in eplusr, as it uses the SQLite output instead of
   the CSVs (#467).
+* A new argument `names` can be specified in `ParametricJob$models()` to rename
+  the parametric models created (#487).
+* A new interface for creating parametric models has been introduced using
+  `ParametricJob$param()`. It takes parameter definitions in list format, which
+  is similar to `Idf$set()` except that each field is not assigned with a single
+  value, but a vector of any length, indicating the levels of each parameter.
+  For example, the code block below defines 3 parameters (#487):
+
+  * Field `Fan Total Efficiency` in object named `Supply Fan 1` in class
+    `Fan:VariableVolume` class, with 10 levels being 0.1 to 1.0 with a
+    0.1 step.
+  * Field `Thickness` in all objects in class `Material`, with 10
+    levels being 0.01 to 0.1 m with a 0.1 m step.
+  * Field `Conductivity` in all objects in class `Material`, with 10
+   levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.
+
+  ```
+  param$param(
+      `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
+      Material := list(Thickness = seq(0.01, 0.1, 0.1), Conductivity = seq(0.1, 1.0, 0.1))
+  )
+  ```
+* `ParametricJob$cases()` is added to get a summary of parametric models and
+  parameter values. It returns a `data.table` giving you the indices and names
+  of the parametric models, and all parameter values used to create those
+  models.For parametric models created using `ParametricJob$param()`, the column
+  names will be the same as what you specified in `.names`. For the case of
+  `ParametricJob$apply_measure()`, this will be the argument names of the
+  measure functions (#487).
+* Now `.names` in `ParametricJob$apply_measure()` can be a single character. In
+  this case, it will be used as the prefix of all parametric models. The models
+  will be named in the pattern `.names_X` where `X` is the model index (#487).
 
 ## Break changes
 
@@ -54,6 +86,8 @@
   downloaded instead of downloading both `EPW` and `DDY` files (#453).
 * `EplusJob$output_dir()` now use backslash in the returned path on Windows
   (#467).
+* Better error message when no arguments are given to the measure function in
+  `ParametricJob$apply_measure()` (#487).
 
 ## Bug fixes
 
