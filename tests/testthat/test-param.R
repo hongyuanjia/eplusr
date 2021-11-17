@@ -149,6 +149,10 @@ test_that("$run()", {
     param$apply_measure(function(idf, num) idf, num = 1:2)
     param$models()[[1L]]$set(Material := list(thickness = 0.05))
     expect_warning(param$run())
+
+    path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    param <- param_job(path, path_epw)
+    expect_is(param$run(), "ParametricJob")
 })
 
 test_that("$save()", {
