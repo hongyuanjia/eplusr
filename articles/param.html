@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9014</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9015</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Parametric simulations</h1>
                         <h4 class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-16</h4>
+            <h4 class="date">2021-11-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/param.Rmd"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -242,27 +242,37 @@
 <span class="co">#&gt; [4]: 0.6Frac</span>
 <span class="co">#&gt; [5]: 0.2Frac</span>
 <span class="co">#&gt; [6]: LED+0.2Frac</span></code></pre></div>
+<p>After parametric models have been created, you can retrive the summary of the parameter values and model names using <code>$cases()</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt;    index        case lpd nightplug_frac</span>
+<span class="co">#&gt; 1:     1         Ori  NA             NA</span>
+<span class="co">#&gt; 2:     2          T5   7             NA</span>
+<span class="co">#&gt; 3:     3         LED   5             NA</span>
+<span class="co">#&gt; 4:     4     0.6Frac  NA            0.6</span>
+<span class="co">#&gt; 5:     5     0.2Frac  NA            0.2</span>
+<span class="co">#&gt; 6:     6 LED+0.2Frac   5            0.2</span></code></pre></div>
 </div>
 <div id="run-parametric-simulations-in-parallel" class="section level1">
 <h1 class="hasAnchor">
 <a href="#run-parametric-simulations-in-parallel" class="anchor"></a>Run parametric simulations in parallel</h1>
 <p>The <code>$run()</code> method will run all parametric simulations in parallel and place each simulation outputs in a separate folder. All simulation meta data will keep updating during the whole time and can be retrieved using the <code>$status()</code> method for further investigations.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
 <span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
-<span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
+<span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; ── EnergPlus Parametric Simulation Job ─────────────────────────────────────────</span>
-<span class="co">#&gt; * Seed: '/tmp/Rtmp8UdOKD/MediumOffice.idf'</span>
+<span class="co">#&gt; * Seed: '/tmp/Rtmp0HcfuU/MediumOffice.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
@@ -274,7 +284,7 @@
 <span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt;  Simulation started at '2021-11-16 04:32:10' and completed successfully after 2.88 mins.</span>
+<span class="co">#&gt;  Simulation started at '2021-11-17 09:49:25' and completed successfully after 3.65 mins.</span>
 
 <span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -294,12 +304,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $job_status</span>
 <span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/Rtmp8UdOKD/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/Rtmp8UdOKD/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/Rtmp8UdOKD/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/Rtmp8UdOKD/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/Rtmp8UdOKD/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/Rtmp8UdOKD/LED+0.2Frac/LED+0.2Frac.idf</span>
+<span class="co">#&gt; 1:     1 completed                 /tmp/Rtmp0HcfuU/Ori/Ori.idf</span>
+<span class="co">#&gt; 2:     2 completed                   /tmp/Rtmp0HcfuU/T5/T5.idf</span>
+<span class="co">#&gt; 3:     3 completed                 /tmp/Rtmp0HcfuU/LED/LED.idf</span>
+<span class="co">#&gt; 4:     4 completed         /tmp/Rtmp0HcfuU/0.6Frac/0.6Frac.idf</span>
+<span class="co">#&gt; 5:     5 completed         /tmp/Rtmp0HcfuU/0.2Frac/0.2Frac.idf</span>
+<span class="co">#&gt; 6:     6 completed /tmp/Rtmp0HcfuU/LED+0.2Frac/LED+0.2Frac.idf</span>
 <span class="co">#&gt;                                                                                              epw</span>
 <span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="co">#&gt; 2: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
@@ -313,7 +323,7 @@
 <h1 class="hasAnchor">
 <a href="#collect-results-in-one-go" class="anchor"></a>Collect results in one go</h1>
 <p>The <code>ParametricJob</code> class leverages the tidy data interface to retrieve parametric simulation results in a tidy format. For all resulting tidy tables, an extra column containing the simulation job identifiers is prepended in each table. It can be used as an index or key for further data transformations, analyses and visualization to compare results of different simulated design options.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># read building energy consumption from Standard Reports</span>
 <span class="va">param_end_use</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
 
@@ -356,7 +366,7 @@
 <p>After calling the <code>$run()</code> method to conduct parallel runs of simulations, the tidy data interface can be used to extract any simulation outputs of interest using <code>$report_data()</code>, <code>$tabular_data()</code>, etc.</p>
 <p>In this example, the building energy consumptions of all six models are extracted using one line of code. The resulting data format is the same as that of a single simulation and is equivalent to bind rows from six tables into one tidy table. A <code>case</code> column is prepended using the names specified in <code>$apply_measure()</code>. It works as an identifier to group the results by different parametric models using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> and <code>nest()</code> functions from the tidyverse package.</p>
 <p>This data structure makes it effortless to perform comparative analyses by taking the code snippets developed in data exploration for a single simulation and applying them to each of the parametric simulations.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># read building area from Standard Reports</span>
 <span class="va">area</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
 
@@ -453,7 +463,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">category</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Energy savings / %"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html">coord_flip</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="param_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="param_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="extensions-based-on-parametricjob-class" class="section level1">
 <h1 class="hasAnchor">

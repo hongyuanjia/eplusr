@@ -99,7 +99,7 @@ For details on ParametricJob, please see ParametricJob class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9014</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9015</span>
       </span>
     </div>
 
@@ -239,8 +239,10 @@ automatically created if it does not exists, like <a href='Idf.html'>Idf</a> cla
 <li><p><a href='#method-version'><code>ParametricJob$version()</code></a></p></li>
 <li><p><a href='#method-seed'><code>ParametricJob$seed()</code></a></p></li>
 <li><p><a href='#method-weather'><code>ParametricJob$weather()</code></a></p></li>
-<li><p><a href='#method-models'><code>ParametricJob$models()</code></a></p></li>
+<li><p><a href='#method-param'><code>ParametricJob$param()</code></a></p></li>
 <li><p><a href='#method-apply_measure'><code>ParametricJob$apply_measure()</code></a></p></li>
+<li><p><a href='#method-models'><code>ParametricJob$models()</code></a></p></li>
+<li><p><a href='#method-cases'><code>ParametricJob$cases()</code></a></p></li>
 <li><p><a href='#method-save'><code>ParametricJob$save()</code></a></p></li>
 <li><p><a href='#method-run'><code>ParametricJob$run()</code></a></p></li>
 <li><p><a href='#method-print'><code>ParametricJob$print()</code></a></p></li>
@@ -283,18 +285,15 @@ when <code>$run()</code> method is called. Note this needs at least one
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
 <p><div class="r example copy"></p><pre>\dontrun{
 if (is_avail_eplus(8.8)) {
-    idf_name &lt;- "1ZoneUncontrolled.idf"
-    epw_name &lt;-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-
-    idf_path &lt;- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path &lt;- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+     path_idf &lt;- path_eplus_example(8.8, "5Zone_Transformer.idf")
+     path_epw &lt;- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
-    param &lt;- param_job(idf_path, epw_path)
-    param &lt;- ParametricJob$new(idf_path, epw_path)
+    param &lt;- param_job(path_idf, path_epw)
+    param &lt;- ParametricJob$new(path_idf, path_epw)
 
     # create from an Idf and an Epw object
-    param_job(read_idf(idf_path), read_epw(epw_path))
+    param_job(read_idf(path_idf), read_epw(path_epw))
 }
 }
 
@@ -349,28 +348,93 @@ param$weather()
 </pre><p></div></p>
 
 <p><hr>
-<a id="method-models"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>models()</code></h3>
-<p>Get created parametric <a href='Idf.html'>Idf</a> objects</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>models</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+<a id="method-param"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>param()</code></h3>
+<p>Set parameters for parametric simulations</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span><span class='va'>...</span>, .names <span class='op'>=</span> <span class='cn'>NULL</span>, .cross <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre><p></div></p>
 
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>...</code></dt><dd><p>Lists of paramter definitions. Please see above on the
+syntax.</p></dd>
+
+<dt><code>.names</code></dt><dd><p>A character vector of the parameter names. If <code>NULL</code>,
+the parameter will be named in format <code>param_X</code>, where
+<code>X</code> is the index of parameter. Default: <code>NULL</code>.</p></dd>
+
+<dt><code>.cross</code></dt><dd><p>If <code>TRUE</code>, all combinations of parameter values will be
+used to create models. If <code>FALSE</code>, each parameter should have
+the same length of values. Default: <code>FALSE</code>.</p></dd>
+
+</dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
-<p><code>$models()</code> returns a list of parametric models generated using input
-<a href='Idf.html'>Idf</a> object and
-<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>
-method. Model names are assigned in the same way as the <code>.names</code>
-arugment in
-<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>.
-If no measure has been applied, <code>NULL</code> is returned. Note that it is
-not recommended to conduct any extra modification on those models
-directly, after they were created using
-<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>,
-as this may lead to an un-reproducible process. A warning message
-will be issued if any of those models has been modified when running
-simulations.</p>
+<p><code>$param()</code> takes parameter definitions in list format, which is
+similar to <a href='Idf.html'>Idf$set()</a> except that each field is not assigned
+with a single value, but a vector of any length, indicating the
+levels of each parameter.</p>
+<p>Similar like the way of modifying object field values in
+<a href='Idf.html'>Idf$set()</a>, there are 3 different ways of defining a parameter
+in epluspar:</p><ul>
+<li><p><code>object = list(field = c(value1, value2, ...))</code>: Where <code>object</code> is
+a valid object ID or name. Note object ID should be denoted with
+two periods <code>..</code>, e.g. <code>..10</code> indicates the object with ID <code>10</code>, It
+will set that specific field in that object as one parameter.</p></li>
+<li><p><code>.(object, object) := list(field = c(value1, value2, ...))</code>:
+Simimar like above, but note the use of <code>.()</code> in the left hand
+side.  You can put multiple object ID or names in <code>.()</code>. It will
+set the field of all specified objects as one parameter.</p></li>
+<li><p><code>class := list(field = c(value1, value2, ...))</code>: Note the use of
+<code>:=</code> instead of <code>=</code>. The main difference is that, unlike <code>=</code>, the
+left hand side of <code>:=</code> should be a valid class name in current
+<a href='Idf.html'>Idf</a>. It will set that field of all objects in specified
+class as one parameter.</p></li>
+</ul>
 
+<p>For example, the code block below defines 3 parameters:</p><ul>
+<li><p>Field <code>Fan Total Efficiency</code> in object named <code>Supply Fan 1</code> in class
+<code>Fan:VariableVolume</code> class, with 10 levels being 0.1 to 1.0 with a
+0.1 step.</p></li>
+<li><p>Field <code>Thickness</code> in all objects in class <code>Material</code>, with 10
+levels being 0.01 to 0.1 m with a 0.1 m step.</p></li>
+<li><p>Field <code>Conductivity</code> in all objects in class <code>Material</code>, with 10
+levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</p></li>
+</ul><pre><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span>
+    `Supply Fan 1` <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Fan_Total_Efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>,
+    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.01</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
+</pre>
+
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p>The modified <code>ParametricJob</code> object invisibly.</p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
 <p><div class="r example copy"></p><pre>\dontrun{
-param$models()
+
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+
+# specify parameter values
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .names = c("thickness", "conduct", "fan_eff")
+)
+
+# each parameter should have the same length of values
+try(
+param$param(
+    Material := list(Thickness = c(0.1, 0.2)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+)
+)
+
+# use all combinations of parameters
+param$param(
+    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
+    .cross = TRUE
+)
 }
 
 </pre><p></div></p>
@@ -445,6 +509,72 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30))
 param$apply_measure(rotate_building, degree = seq(30, 360, 30),
     .names = paste0("rotate_", seq(30, 360, 30))
 )
+}
+
+</pre><p></div></p>
+
+<p><hr>
+<a id="method-models"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>models()</code></h3>
+<p>Get created parametric <a href='Idf.html'>Idf</a> objects</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>models</span><span class='op'>(</span>names <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>names</code></dt><dd><p>A character vector of new names for parametric models.
+If a single string, it will be used as a prefix and all models
+will be named in pattern <code>names_X</code>, where <code>X</code> is the model
+index. If <code>NULL</code>, existing parametric models are directly
+returned. Default: <code>NULL</code>.</p></dd>
+
+</dl><p></div></p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
+<p><code>$models()</code> returns a list of parametric models generated using input
+<a href='Idf.html'>Idf</a> object and
+<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>
+method. Model names are assigned in the same way as the <code>.names</code>
+arugment in
+<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>.
+If no measure has been applied, <code>NULL</code> is returned. Note that it is
+not recommended to conduct any extra modification on those models
+directly, after they were created using
+<a href='../../eplusr/html/ParametricJob.html#method-apply_measure'><code>$apply_measure()</code></a>,
+as this may lead to an un-reproducible process. A warning message
+will be issued if any of those models has been modified when running
+simulations.</p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
+<p><div class="r example copy"></p><pre>\dontrun{
+param$models()
+}
+
+</pre><p></div></p>
+
+<p><hr>
+<a id="method-cases"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>cases()</code></h3>
+<p>Get a summary of parametric models and parameters</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>cases</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Details</h4>
+<p><code>$cases()</code> returns a <a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a> giving a
+summary of parametric models and parameter values.</p>
+<p>The returned <code>data.table</code> has the following columns:</p><ul>
+<li><p><code>index</code>: Integer type. The indices of parameter models</p></li>
+<li><p><code>case</code>: Character type. The names of parameter models</p></li>
+<li><p>Parameters: Type depends on the parameter values. Each parameter
+stands in a separate column. For parametric models created using
+<code>ParametricJob$param()</code>, the column names will be the same as what
+you specified in <code>.names</code>. For the case of
+<code>ParametricJob$apply_measure()</code>, this will be the argument names of
+the measure functions.</p></li>
+</ul>
+
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p>If no parametric models have been created, <code>NULL</code> is
+returned. Otherwise, a <a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a>.</p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Examples</h4>
+<p><div class="r example copy"></p><pre>\dontrun{
+param$cases()
 }
 
 </pre><p></div></p>
@@ -602,18 +732,15 @@ param$print()
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'>    <span class='va'>idf_name</span> <span class='op'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span></span>
-<span class='r-in'>    <span class='va'>epw_name</span> <span class='op'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
-<span class='r-in'></span>
-<span class='r-in'>    <span class='va'>idf_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='va'>idf_name</span><span class='op'>)</span></span>
-<span class='r-in'>    <span class='va'>epw_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='use_eplus.html'>eplus_config</a></span><span class='op'>(</span><span class='fl'>8.8</span><span class='op'>)</span><span class='op'>$</span><span class='va'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='va'>epw_name</span><span class='op'>)</span></span>
+<span class='r-in'>     <span class='va'>path_idf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='path_eplus.html'>path_eplus_example</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"5Zone_Transformer.idf"</span><span class='op'>)</span></span>
+<span class='r-in'>     <span class='va'>path_epw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='path_eplus.html'>path_eplus_weather</a></span><span class='op'>(</span><span class='fl'>8.8</span>, <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'>    <span class='co'># create from an IDF and an EPW</span></span>
-<span class='r-in'>    <span class='va'>param</span> <span class='op'>&lt;-</span> <span class='fu'>param_job</span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span></span>
-<span class='r-in'>    <span class='va'>param</span> <span class='op'>&lt;-</span> <span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>param</span> <span class='op'>&lt;-</span> <span class='fu'>param_job</span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='va'>path_epw</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>param</span> <span class='op'>&lt;-</span> <span class='va'>ParametricJob</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>path_idf</span>, <span class='va'>path_epw</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'>    <span class='co'># create from an Idf and an Epw object</span></span>
-<span class='r-in'>    <span class='fu'>param_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>idf_path</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>epw_path</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='fu'>param_job</span><span class='op'>(</span><span class='fu'><a href='read_idf.html'>read_idf</a></span><span class='op'>(</span><span class='va'>path_idf</span><span class='op'>)</span>, <span class='fu'><a href='read_epw.html'>read_epw</a></span><span class='op'>(</span><span class='va'>path_epw</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>}</span></span>
 <span class='r-in'><span class='co'># }</span></span>
 <span class='r-in'></span>
@@ -649,11 +776,41 @@ param$print()
 <span class='r-in'></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
-<span class='r-in'><span class='co'>## Method `ParametricJob$models`</span></span>
+<span class='r-in'><span class='co'>## Method `ParametricJob$param`</span></span>
 <span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># \dontrun{</span></span>
-<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>models</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># specify parameter values</span></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    .names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"thickness"</span>, <span class='st'>"conduct"</span>, <span class='st'>"fan_eff"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># each parameter should have the same length of values</span></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Error in try(param$param(`:=`(Material, list(Thickness = c(0.1, 0.2))),  : </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   object 'param' not found</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># use all combinations of parameters</span></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    .cross <span class='op'>=</span> <span class='cn'>TRUE</span></span>
+<span class='r-in'><span class='op'>)</span></span>
 <span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
 <span class='r-in'><span class='co'># }</span></span>
 <span class='r-in'></span>
@@ -703,6 +860,26 @@ param$print()
 <span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>apply_measure</span><span class='op'>(</span><span class='va'>rotate_building</span>, degree <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>30</span>, <span class='fl'>360</span>, <span class='fl'>30</span><span class='op'>)</span>,</span>
 <span class='r-in'>    .names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"rotate_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>30</span>, <span class='fl'>360</span>, <span class='fl'>30</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `ParametricJob$models`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>models</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'><span class='co'>## Method `ParametricJob$cases`</span></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>cases</span><span class='op'>(</span><span class='op'>)</span></span>
 <span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
 <span class='r-in'><span class='co'># }</span></span>
 <span class='r-in'></span>
