@@ -575,6 +575,8 @@ param_cases <- function (self, private, param = NULL) {
 
     if (!private$m_log$simple) return(cases)
 
+    # remove duplicates
+    cases <- unique(cases, by = c("case_index", "param_index"))
     # add field type
     add_field_property(get_priv_env(private$m_seed)$idd_env(), cases, "type_enum")
     # get value list

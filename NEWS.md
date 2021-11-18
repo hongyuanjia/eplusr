@@ -1,5 +1,12 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Fix `ParametricJob$cases()` when multiple objects are specified on the LHS in
+  `ParametricJob$param()` (#492)
+
+# eplusr v0.15.0
+
 ## New features
 
 * `Idd$path()` is added to show the path of IDD parsed (#442).

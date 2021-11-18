@@ -107,6 +107,7 @@ test_that("$cases()", {
     skip_on_cran()
 
     path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+
     param <- param_job(path, NULL)
 
     expect_null(param$cases())
@@ -115,11 +116,15 @@ test_that("$cases()", {
         "Supply Fan 1" = list(
             fan_total_efficiency = c(0.1, 0.2),
             availability_schedule_name = c("FanAvailSched", "Always On")
-        )
+        ),
+        c("GP01", "GP02") := .(thickness = c(0.01, 0.02))
     )
     expect_equivalent(param$cases(),
-        data.table(index = 1:2, case = c("case_1", "case_2"),
-            param_1 = c(0.1, 0.2), param_2 = c("FanAvailSched", "Always On")
+        data.table(
+            index = 1:2, case = c("case_1", "case_2"),
+            param_1 = c(0.1, 0.2),
+            param_2 = c("FanAvailSched", "Always On"),
+            param_3 = c(0.01, 0.02)
         )
     )
 
