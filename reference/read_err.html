@@ -243,12 +243,12 @@ otherwise.</p></li>
 <span class='r-in'><span class='va'>job</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EplusJob.html'>eplus_job</a></span><span class='op'>(</span><span class='va'>idf_path</span>, <span class='va'>epw_path</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
 <span class='r-in'><span class='va'>job</span><span class='op'>$</span><span class='fu'>run</span><span class='op'>(</span>dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/RtmpcAoplG/1ZoneUncontrolled.idf.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Replace the existing IDF located at /tmp/Rtmp3UIjAu/1ZoneUncontrolled.idf.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ExpandObjects Started.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> No expanded file generated.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ExpandObjects Finished. Time:     0.003</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus Starting</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.18 00:58</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2021.11.18 02:40</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Processing Data Dictionary</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Processing Input File</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Initializing Simulation</span>
@@ -358,25 +358,25 @@ otherwise.</p></li>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using HTML format.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Writing tabular output file results using XML format.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Writing final SQL reports</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus Run Time=00hr 00min  1.49sec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnergyPlus Run Time=00hr 00min  1.62sec</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program starting.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVars Run Time=00hr 00min  0.12sec</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program completed successfully.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program starting.</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVars Run Time=00hr 00min  0.23sec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVars Run Time=00hr 00min  0.26sec</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>  ReadVarsESO program completed successfully.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>──</span> <span style='color: #00BB00;'>EnergPlus Simulation Job</span> <span style='color: #00BB00;'>────────────────────────────────────────────────────</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> * Model: '/tmp/RtmpcAoplG/1ZoneUncontrolled.idf'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> * Model: '/tmp/Rtmp3UIjAu/1ZoneUncontrolled.idf'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Fra...</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> * EnergyPlus Version: '8.8.0'</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-11-18 00:58:32' and completed successfully after 1.98 secs.</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #000000; background-color: #00BB00;'> Simulation started at '2021-11-18 02:40:25' and completed successfully after 2.17 secs.</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># read the err file</span></span>
 <span class='r-in'><span class='fu'>read_err</span><span class='op'>(</span><span class='va'>job</span><span class='op'>$</span><span class='fu'>locate_output</span><span class='op'>(</span><span class='st'>".err"</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Simulation started: 2021-11-18 00:58:00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   * Simulation started: 2021-11-18 02:40:00</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   * Terminated: FALSE</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   * Successful: TRUE</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   * Warning[W]: 3</span>
