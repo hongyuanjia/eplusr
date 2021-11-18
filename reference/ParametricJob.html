@@ -99,7 +99,7 @@ For details on ParametricJob, please see ParametricJob class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.14.2.9018</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9000</span>
       </span>
     </div>
 
@@ -399,7 +399,10 @@ levels being 0.01 to 0.1 m with a 0.1 m step.</p></li>
 levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</p></li>
 </ul><pre><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span>
     `Supply Fan 1` <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Fan_Total_Efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>,
-    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.01</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+        Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.01</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span><span class='op'>)</span>,
+        Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span><span class='op'>)</span>
+    <span class='op'>)</span>
 <span class='op'>)</span>
 </pre>
 
@@ -410,13 +413,19 @@ levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</p></li>
 <p><div class="r example copy"></p><pre>\dontrun{
 
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
-    "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
+   "Supply Fan 1" = .(fan_total_efficiency = c(0.1, 0.5, 0.8))
 )
 
 # specify parameter values
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := .(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+     ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .names = c("thickness", "conduct", "fan_eff")
 )
@@ -431,7 +440,10 @@ param$param(
 
 # use all combinations of parameters
 param$param(
-    Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
+    Material := list(
+        Thickness = seq(0.1, 1, length.out = 3),
+        Conductivity = seq(0.1, 0.6, length.out = 3)
+    ),
     "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
     .cross = TRUE
 )
@@ -782,14 +794,20 @@ param$print()
 <span class='r-in'><span class='co'># \dontrun{</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
-<span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span></span>
+<span class='r-in'>        Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,</span>
+<span class='r-in'>        Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='op'>)</span>,</span>
+<span class='r-in'>   <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>)</span></span>
 <span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in eval(expr, envir, enclos):</span> object 'param' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># specify parameter values</span></span>
 <span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span></span>
+<span class='r-in'>        Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,</span>
+<span class='r-in'>        Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'>     <span class='op'>)</span>,</span>
 <span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,</span>
 <span class='r-in'>    .names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"thickness"</span>, <span class='st'>"conduct"</span>, <span class='st'>"fan_eff"</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>)</span></span>
@@ -807,7 +825,10 @@ param$print()
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># use all combinations of parameters</span></span>
 <span class='r-in'><span class='va'>param</span><span class='op'>$</span><span class='fu'>param</span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>, Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='va'>Material</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span></span>
+<span class='r-in'>        Thickness <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,</span>
+<span class='r-in'>        Conductivity <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.6</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='op'>)</span>,</span>
 <span class='r-in'>    <span class='st'>"Supply Fan 1"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fan_total_efficiency <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>,</span>
 <span class='r-in'>    .cross <span class='op'>=</span> <span class='cn'>TRUE</span></span>
 <span class='r-in'><span class='op'>)</span></span>
