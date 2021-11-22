@@ -3,7 +3,8 @@
 ## Bug fixes
 
 * Fix `ParametricJob$cases()` when multiple objects are specified on the LHS in
-  `ParametricJob$param()` (#492)
+  `ParametricJob$param()` (#492).
+* Fix `install_eplus(9.1)` on Linux ().
 
 # eplusr v0.15.0
 
