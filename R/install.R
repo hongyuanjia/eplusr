@@ -423,7 +423,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     if (ver == 9.1) {
         if (Sys.which("sed") != "") {
             # copy the original installer
-            temp_exec <- file.path(tempdir(), basename(exec))
+            temp_exec <- file.path(tempdir(), paste("patched-", basename(exec)))
             flag <- file.copy(exec, temp_exec, overwrite = TRUE, copy.date = TRUE)
             if (!flag) {
                 abort(paste0(
