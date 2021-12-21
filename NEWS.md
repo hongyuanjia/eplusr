@@ -5,6 +5,8 @@
 * Fix `ParametricJob$cases()` when multiple objects are specified on the LHS in
   `ParametricJob$param()` (#492).
 * Fix `install_eplus(9.1)` on Linux (#494, #495).
+* Now `ParametricJob$run()` can correctly use weather file when only one
+  parametric model exists (#497).
 
 # eplusr v0.15.0
 

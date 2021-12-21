@@ -2184,7 +2184,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
     ddy <- is.na(weather)
     weather <- as.list(weather)
     weather[ddy] <- list(NULL)
-    if (length(weather) == 1L) weather <- list()
+    if (any(ddy) && length(weather) == 1L) weather <- list()
     set(jobs, NULL, "weather", weather)
 
     # validate eplus
