@@ -34,6 +34,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -46,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
       </span>
     </div>
 
@@ -103,7 +105,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
+  <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -128,11 +130,11 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Work with weather files</h1>
-                        <h4 class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-23</h4>
+            <h4 data-toc-skip class="date">2021-12-21</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/epw.Rmd"><code>vignettes/epw.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/epw.Rmd" class="external-link"><code>vignettes/epw.Rmd</code></a></small>
       <div class="hidden name"><code>epw.Rmd</code></div>
 
     </div>
@@ -141,13 +143,13 @@
     
 <p>This vignette introduces the <code>Epw</code> class which is designed to read and modify EnergyPlus Weather Files (EPWs).</p>
 <hr>
-<div id="download-energyplus-weather-file-epw-and-design-day-file-ddy" class="section level1">
-<h1 class="hasAnchor">
-<a href="#download-energyplus-weather-file-epw-and-design-day-file-ddy" class="anchor"></a>Download EnergyPlus Weather File (EPW) and Design Day File (DDY)</h1>
-<p>eplusr contains a helper function <code><a href="../reference/download_weather.html">download_weather()</a></code> which can be used to download EnergyPlus EPW and DDY files from <a href="https://energyplus.net/weather">EnergyPlus weather website</a>.</p>
+<div class="section level1">
+<h1 id="download-energyplus-weather-file-epw-and-design-day-file-ddy">Download EnergyPlus Weather File (EPW) and Design Day File (DDY)<a class="anchor" aria-label="anchor" href="#download-energyplus-weather-file-epw-and-design-day-file-ddy"></a>
+</h1>
+<p>eplusr contains a helper function <code><a href="../reference/download_weather.html">download_weather()</a></code> which can be used to download EnergyPlus EPW and DDY files from <a href="https://energyplus.net/weather" class="external-link">EnergyPlus weather website</a>.</p>
 <p><code><a href="../reference/download_weather.html">download_weather()</a></code> takes a regular expression to search weather specifications and gives you a menu to choose files to download from matched results. Note that the matching is case-insensitive. Files downloaded will be renamed according to input <code>filename</code> argument.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles"</span>, filename <span class="op">=</span> <span class="st">"Los Angeles"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles"</span>, filename <span class="op">=</span> <span class="st">"Los Angeles"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">#&gt; 3 matched results found. Please select which one to download:</span>
 <span class="co">#&gt;</span>
@@ -186,14 +188,14 @@
 <span class="co">#&gt; Selection:</span></code></pre></div>
 <p>By default, it will download both EPW and DDY files of selected results. You can change that by modifying the <code>type</code> argument to only download either EPW files or DDY files.</p>
 </div>
-<div id="read-and-parse-epw" class="section level1">
-<h1 class="hasAnchor">
-<a href="#read-and-parse-epw" class="anchor"></a>Read and parse EPW</h1>
+<div class="section level1">
+<h1 id="read-and-parse-epw">Read and parse EPW<a class="anchor" aria-label="anchor" href="#read-and-parse-epw"></a>
+</h1>
 <p>Reading an EPW file starts with function <code><a href="../reference/read_epw.html">read_epw()</a></code>, which parses an EPW file and returns an <code>Epw</code> object. The parsing process is basically the same as <code>EnergyPlus/WeatherManager.cc</code> in EnergyPlus, with some simplifications.</p>
 <p>An EPW file can be divided into two parts, headers and weather data. The first eight lines of a standard EPW file are normally headers which contains data of location, design conditions, typical/extreme periods, ground temperatures, holidays/daylight savings, data periods and other comments.</p>
-<p><code>Epw</code> class provides methods to directly extract those data. For details on the data structure of EPW file, please see “Chapter 2 - Weather Converter Program” in EnergyPlus “Auxiliary Programs” documentation. An online version can be found <a href="https://bigladdersoftware.com/epx/docs/">here</a>.</p>
+<p><code>Epw</code> class provides methods to directly extract those data. For details on the data structure of EPW file, please see “Chapter 2 - Weather Converter Program” in EnergyPlus “Auxiliary Programs” documentation. An online version can be found <a href="https://bigladdersoftware.com/epx/docs/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span>
 
 <span class="va">epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
 <span class="va">epw</span>
@@ -212,9 +214,9 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></code></pre></div>
 </div>
-<div id="extract-and-modify-header-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extract-and-modify-header-data" class="anchor"></a>Extract and modify header data</h1>
+<div class="section level1">
+<h1 id="extract-and-modify-header-data">Extract and modify header data<a class="anchor" aria-label="anchor" href="#extract-and-modify-header-data"></a>
+</h1>
 <p><code>Epw</code> class provides 10 methods to extract and modify EPW header data, including:</p>
 <table class="table">
 <caption>Methods of <code>Epw</code> class to extract and modify headers</caption>
@@ -260,15 +262,15 @@
 </tbody>
 </table>
 </div>
-<div id="extract-weather-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extract-weather-data" class="anchor"></a>Extract weather data</h1>
-<div id="core-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#core-data" class="anchor"></a>Core data</h2>
+<div class="section level1">
+<h1 id="extract-weather-data">Extract weather data<a class="anchor" aria-label="anchor" href="#extract-weather-data"></a>
+</h1>
+<div class="section level2">
+<h2 id="core-data">Core data<a class="anchor" aria-label="anchor" href="#core-data"></a>
+</h2>
 <p><code>$data()</code> can be used to extract the core weather data. Usually, EPW file downloaded from EnergyPlus website contains TMY weather data. As years of weather data is not consecutive, it may be more convenient to align the year values to be consecutive, which will makes it possible to direct analyze and plot weather data. The <code>start_year</code> argument in <code>$data()</code> method can help to achieve this. However, randomly setting the <code>year</code> may result in a date time series that does not have the same start day of week as specified in the <code>DATA PERIODS</code> header. eplusr provides a simple solution for this. By setting <code>year</code> to <code>NULL</code> and <code>align_wday</code> to <code>TRUE</code>, eplusr will calculate a year value (from current year backwards) for each data period that compliance with the start day of week restriction.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Classes 'data.table' and 'data.frame':   6 obs. of  36 variables:</span>
 <span class="co">#&gt;  $ datetime                                        : POSIXct, format: "2017-01-01 01:00:00" "2017-01-01 02:00:00" ...</span>
 <span class="co">#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999</span>
@@ -308,13 +310,13 @@
 <span class="co">#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1</span>
 <span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></code></pre></div>
 </div>
-<div id="abnormal-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#abnormal-data" class="anchor"></a>Abnormal data</h2>
+<div class="section level2">
+<h2 id="abnormal-data">Abnormal data<a class="anchor" aria-label="anchor" href="#abnormal-data"></a>
+</h2>
 <p><code>$abnormal_data()</code> returns abnormal data of specific data period. Basically, there are 2 types of abnormal data in <code>Epw</code>, i.e. missing values and out-of-range values. Sometimes, it may be useful to extract and inspect those data especially when inserting measured weather data. <code>$abnormal_data()</code> does this.</p>
 <p>In the returned <code>data.table</code>, a column named <code>line</code> is created indicating the line numbers where abnormal data occur in the actual EPW file.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       line            datetime year month day hour minute albedo</span>
 <span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0    999</span>
 <span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0    999</span>
@@ -331,7 +333,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">epw</span><span class="op">$</span><span class="fu">make_na</span><span class="op">(</span>missing <span class="op">=</span> <span class="cn">TRUE</span>, out_of_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       line            datetime year month day hour minute albedo</span>
 <span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0     NA</span>
 <span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0     NA</span>
@@ -348,7 +350,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">epw</span><span class="op">$</span><span class="fu">fill_abnormal</span><span class="op">(</span>missing <span class="op">=</span> <span class="cn">TRUE</span>, out_of_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       line            datetime year month day hour minute albedo</span>
 <span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0    999</span>
 <span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0    999</span>
@@ -363,15 +365,15 @@
 <span class="co">#&gt; 2160: 5840 1985-09-01 00:00:00 1985     8  31   24      0    999</span></code></pre></div>
 </div>
 </div>
-<div id="modify-weather-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#modify-weather-data" class="anchor"></a>Modify weather data</h1>
+<div class="section level1">
+<h1 id="modify-weather-data">Modify weather data<a class="anchor" aria-label="anchor" href="#modify-weather-data"></a>
+</h1>
 <p><code>Epw</code> class provides <code>$add()</code>, <code>$set()</code> and <code>$del()</code> methods to add, update and delete a new data period, respectively.</p>
 <p>Below we extract weather data with automatically calculated year values, and replace the existing data and turn it into an AMY weather data.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">datetime</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">datetime</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;                  datetime</span>
 <span class="co">#&gt;    1: 2017-01-01 01:00:00</span>
 <span class="co">#&gt;    2: 2017-01-01 02:00:00</span>
@@ -386,7 +388,7 @@
 <span class="co">#&gt; 8760: 2018-01-01 00:00:00</span>
 
 <span class="va">epw</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">d</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; ── Info ────────────────────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span>
 <span class="co">#&gt; Data period #1 has been replaced with input data.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;      Name StartDayOfWeek   StartDay     EndDay</span>
@@ -399,7 +401,7 @@
 <span class="co">#&gt; 1/ 1 to 2017/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span>
 
 <span class="va">epw</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">d</span>, after <span class="op">=</span> <span class="fl">0L</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; ── Info ────────────────────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span>
 <span class="co">#&gt; New data period has been added successfully:</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;       Name StartDayOfWeek   StartDay     EndDay</span>
@@ -424,11 +426,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/hongyuanjia">Hongyuan Jia</a>, Adrian Chong.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a>, Adrian Chong.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

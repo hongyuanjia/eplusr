@@ -34,6 +34,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -46,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
       </span>
     </div>
 
@@ -103,7 +105,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
+  <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -128,22 +130,22 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Work with geometry</h1>
-                        <h4 class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-23</h4>
+            <h4 data-toc-skip class="date">2021-12-21</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/geom.Rmd"><code>vignettes/geom.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
       <div class="hidden name"><code>geom.Rmd</code></div>
 
     </div>
 
     
     
-<p>This vignette introduces the <code>IdfGeometry</code> and <code>IdfViewer</code> classes. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the <a href="https://cran.r-project.org/package=rgl">rgl</a> package in a similar way as OpenStudio SketchUp Plugin.</p>
+<p>This vignette introduces the <code>IdfGeometry</code> and <code>IdfViewer</code> classes. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the <a href="https://cran.r-project.org/package=rgl" class="external-link">rgl</a> package in a similar way as OpenStudio SketchUp Plugin.</p>
 <hr>
-<div id="extract-all-geometry-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extract-all-geometry-data" class="anchor"></a>Extract all geometry data</h1>
+<div class="section level1">
+<h1 id="extract-all-geometry-data">Extract all geometry data<a class="anchor" aria-label="anchor" href="#extract-all-geometry-data"></a>
+</h1>
 <p>All geometry data in an <code>Idf</code> object can be extracted using the <code>Idf$geometry()</code>. What it returns is an <code>IdfGeometry</code> which parses all geometry related objects, including:</p>
 <ul>
 <li><code>GlobalGeometryRules</code></li>
@@ -152,7 +154,7 @@
 <li>All geometry related classes in the <code>Thermal Zones and Surfaces</code> group and <code>Daylighting</code> group</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span>
 <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
@@ -176,12 +178,12 @@
 <span class="co">#&gt;    - Simple:   'Relative'</span>
 <span class="co">#&gt;    - Daylighting: 'Relative'</span></code></pre></div>
 </div>
-<div id="get-geometry-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#get-geometry-data" class="anchor"></a>Get geometry data</h1>
-<div id="get-geometry-rules" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-geometry-rules" class="anchor"></a>Get geometry rules</h2>
+<div class="section level1">
+<h1 id="get-geometry-data">Get geometry data<a class="anchor" aria-label="anchor" href="#get-geometry-data"></a>
+</h1>
+<div class="section level2">
+<h2 id="get-geometry-rules">Get geometry rules<a class="anchor" aria-label="anchor" href="#get-geometry-rules"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $starting_vertex_position</span>
@@ -199,9 +201,9 @@
 <span class="co">#&gt; $rectangular_surface_coordinate_system</span>
 <span class="co">#&gt; [1] "relative"</span></code></pre></div>
 </div>
-<div id="get-surface-area" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-surface-area" class="anchor"></a>Get surface area</h2>
+<div class="section level2">
+<h2 id="get-surface-area">Get surface area<a class="anchor" aria-label="anchor" href="#get-surface-area"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;        id                                               name</span>
@@ -296,9 +298,9 @@
 <span class="co">#&gt; 523: MOB Floor 5 Perimeter 3 Wall 89.18717</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div id="get-surface-azimuth-and-tilt" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-surface-azimuth-and-tilt" class="anchor"></a>Get surface azimuth and tilt</h2>
+<div class="section level2">
+<h2 id="get-surface-azimuth-and-tilt">Get surface azimuth and tilt<a class="anchor" aria-label="anchor" href="#get-surface-azimuth-and-tilt"></a>
+</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">azimuth</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;        id                                               name</span>
@@ -346,9 +348,9 @@
 <span class="va">....</span></code></pre></div>
 </div>
 </div>
-<div id="convert-simple-geometry" class="section level1">
-<h1 class="hasAnchor">
-<a href="#convert-simple-geometry" class="anchor"></a>Convert simple geometry</h1>
+<div class="section level1">
+<h1 id="convert-simple-geometry">Convert simple geometry<a class="anchor" aria-label="anchor" href="#convert-simple-geometry"></a>
+</h1>
 <p><code>$convert()</code> generate detailed vertices from simplified geometry specifications and replace the original object with its corresponding detailed class, including:</p>
 <ul>
 <li><code>BuildingSurface:Detailed</code></li>
@@ -358,7 +360,7 @@
 <li><code>Shading:Zone:Detailed</code></li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span>
 <span class="va">simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_simple</span><span class="op">)</span>
 
 <span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span>
@@ -380,7 +382,7 @@
 <span class="co">#&gt; [7] "Shading:Zone:Detailed"</span></code></pre></div>
 <p>An attribute named <code>mapping</code> is attached in the converted <code>Idf</code> object which contains the meta data of objects before and after the conversion.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">simple</span>, <span class="st">"mapping"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">simple</span>, <span class="st">"mapping"</span><span class="op">)</span>
 <span class="co">#&gt;     ori_id                       ori_name         ori_class new_id</span>
 <span class="co">#&gt;  1:     48                  Zn001:Wall001     Wall:Exterior     48</span>
 <span class="co">#&gt;  2:     54                  Zn001:Wall002     Wall:Exterior     54</span>
@@ -403,9 +405,9 @@
 <span class="co">#&gt; 19:     79                  Zn004:Wall001     Wall:Exterior     79</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div id="change-coordinate-systems" class="section level1">
-<h1 class="hasAnchor">
-<a href="#change-coordinate-systems" class="anchor"></a>Change coordinate systems</h1>
+<div class="section level1">
+<h1 id="change-coordinate-systems">Change coordinate systems<a class="anchor" aria-label="anchor" href="#change-coordinate-systems"></a>
+</h1>
 <p><code>$coord_system()</code> converts all vertices of geometries into specified coordinate systems, e.g. from absolute to relative, and vice versa. Besides, it also updates the <code>GlobalGeometryRules</code> in parent [Idf] accordingly.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span>
@@ -472,9 +474,9 @@
 <span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div id="round-vertices-decimal-digits" class="section level1">
-<h1 class="hasAnchor">
-<a href="#round-vertices-decimal-digits" class="anchor"></a>Round vertices decimal digits</h1>
+<div class="section level1">
+<h1 id="round-vertices-decimal-digits">Round vertices decimal digits<a class="anchor" aria-label="anchor" href="#round-vertices-decimal-digits"></a>
+</h1>
 <p><code>$round_digits()</code> performs number rounding on vertices of detailed geometry object vertices, e.g. <code>BuildingSurface:Detailed</code>, <code>FenestrationSurface:Detailed</code> and etc.</p>
 <p><code>$round_digits()</code> may be useful for clean up IDF files generated using OpenStudio which often gives vertices with long trailing digits.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -503,10 +505,10 @@
 <span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div id="view-geometry-in-3d" class="section level1">
-<h1 class="hasAnchor">
-<a href="#view-geometry-in-3d" class="anchor"></a>View geometry in 3D</h1>
-<p><code>$view()</code> uses the <a href="https://cran.r-project.org/package=rgl">rgl</a> package to visualize the IDF geometry in 3D in a similar way as <a href="https://www.openstudio.net">OpenStudio</a>.</p>
+<div class="section level1">
+<h1 id="view-geometry-in-3d">View geometry in 3D<a class="anchor" aria-label="anchor" href="#view-geometry-in-3d"></a>
+</h1>
+<p><code>$view()</code> uses the <a href="https://cran.r-project.org/package=rgl" class="external-link">rgl</a> package to visualize the IDF geometry in 3D in a similar way as <a href="https://www.openstudio.net" class="external-link">OpenStudio</a>.</p>
 <p><code>$view()</code> returns an [IdfViewer] object which can be used to further tweak the viewer scene.</p>
 <p>In the rgl window, the default mouse modes are:</p>
 <ul>
@@ -518,9 +520,9 @@
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">geom</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_default.png" style="display: block; margin: auto;"></p>
-<div id="tweak-the-view" class="section level2">
-<h2 class="hasAnchor">
-<a href="#tweak-the-view" class="anchor"></a>Tweak the view</h2>
+<div class="section level2">
+<h2 id="tweak-the-view">Tweak the view<a class="anchor" aria-label="anchor" href="#tweak-the-view"></a>
+</h2>
 <p>The <code>IdfViewer</code> class provides a number of methods to tweak the view in a similar style as the OpenStudio SketchUp Plugin:</p>
 <table class="table">
 <thead><tr class="header">
@@ -567,9 +569,9 @@
 </tbody>
 </table>
 <p>Below shows the effects of each method:</p>
-<div id="change-background" class="section level3">
-<h3 class="hasAnchor">
-<a href="#change-background" class="anchor"></a>Change background</h3>
+<div class="section level3">
+<h3 id="change-background">Change background<a class="anchor" aria-label="anchor" href="#change-background"></a>
+</h3>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>viewer<span class="op">$</span><span class="kw">background</span>(<span class="st">"grey50"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="st">``</span></span></code></pre></div>
 <p><img src="geom-viewer_background1.png" style="display: block; margin: auto;"></p>
@@ -577,9 +579,9 @@
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_background2.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="change-viewpoint" class="section level3">
-<h3 class="hasAnchor">
-<a href="#change-viewpoint" class="anchor"></a>Change viewpoint</h3>
+<div class="section level3">
+<h3 id="change-viewpoint">Change viewpoint<a class="anchor" aria-label="anchor" href="#change-viewpoint"></a>
+</h3>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"top"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_viewpoint1.png" style="display: block; margin: auto;"></p>
@@ -587,9 +589,9 @@
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"iso"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_viewpoint2.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="change-axis-style" class="section level3">
-<h3 class="hasAnchor">
-<a href="#change-axis-style" class="anchor"></a>Change axis style</h3>
+<div class="section level3">
+<h3 id="change-axis-style">Change axis style<a class="anchor" aria-label="anchor" href="#change-axis-style"></a>
+</h3>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_axis.png" style="display: block; margin: auto;"></p>
@@ -597,16 +599,16 @@
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_noaxis.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="change-ground-style" class="section level3">
-<h3 class="hasAnchor">
-<a href="#change-ground-style" class="anchor"></a>Change ground style</h3>
+<div class="section level3">
+<h3 id="change-ground-style">Change ground style<a class="anchor" aria-label="anchor" href="#change-ground-style"></a>
+</h3>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="turn-onoff-x-ray-style" class="section level3">
-<h3 class="hasAnchor">
-<a href="#turn-onoff-x-ray-style" class="anchor"></a>Turn on/off X-ray style</h3>
+<div class="section level3">
+<h3 id="turn-onoff-x-ray-style">Turn on/off X-ray style<a class="anchor" aria-label="anchor" href="#turn-onoff-x-ray-style"></a>
+</h3>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_xray.png" style="display: block; margin: auto;"></p>
@@ -614,9 +616,9 @@
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="change-render-style" class="section level3">
-<h3 class="hasAnchor">
-<a href="#change-render-style" class="anchor"></a>Change render style</h3>
+<div class="section level3">
+<h3 id="change-render-style">Change render style<a class="anchor" aria-label="anchor" href="#change-render-style"></a>
+</h3>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"zone"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_zone_color.png" style="display: block; margin: auto;"></p>
@@ -624,9 +626,9 @@
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"surface_type"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="turn-onoff-components" class="section level3">
-<h3 class="hasAnchor">
-<a href="#turn-onoff-components" class="anchor"></a>Turn on/off components</h3>
+<div class="section level3">
+<h3 id="turn-onoff-components">Turn on/off components<a class="anchor" aria-label="anchor" href="#turn-onoff-components"></a>
+</h3>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>zone <span class="op">=</span> <span class="st">"floor 7 clean"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_show_zone.png" style="display: block; margin: auto;"></p>
@@ -638,24 +640,24 @@
 <p><img src="geom-viewer_show_wall.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div id="save-the-snapshot" class="section level2">
-<h2 class="hasAnchor">
-<a href="#save-the-snapshot" class="anchor"></a>Save the snapshot</h2>
+<div class="section level2">
+<h2 id="save-the-snapshot">Save the snapshot<a class="anchor" aria-label="anchor" href="#save-the-snapshot"></a>
+</h2>
 <p><code>$snapshot()</code> captures the current rgl view and saves it as an image file to disk.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span>
 <span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="st">"view.png"</span><span class="op">)</span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
-<div id="work-with-the-rgl-window" class="section level2">
-<h2 class="hasAnchor">
-<a href="#work-with-the-rgl-window" class="anchor"></a>Work with the rgl window</h2>
+<div class="section level2">
+<h2 id="work-with-the-rgl-window">Work with the rgl window<a class="anchor" aria-label="anchor" href="#work-with-the-rgl-window"></a>
+</h2>
 <p><code>$win_size()</code> lets you control the size of the rgl window. <code>$focus()</code> brings the rgl window to the top. <code>$close()</code> closes the rgl window.</p>
 </div>
 </div>
-<div id="summary" class="section level1">
-<h1 class="hasAnchor">
-<a href="#summary" class="anchor"></a>Summary</h1>
+<div class="section level1">
+<h1 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h1>
 <p>The <code>IdfGeometry</code> and <code>IdfViewer</code> classes provide utilities to work and visualize model geometries.</p>
 <p>Currently, <code>IdfGeometry</code> is still evolving and more methods will be added to perform geometric transformations in the near future.</p>
 <p>Also, new methods will be added in <code>IdfViewer</code> to allow visualize simulation results dynamically.</p>
@@ -673,11 +675,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/hongyuanjia">Hongyuan Jia</a>, Adrian Chong.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a>, Adrian Chong.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

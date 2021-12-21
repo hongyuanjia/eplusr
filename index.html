@@ -39,6 +39,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -51,7 +53,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
       </span>
     </div>
 
@@ -108,7 +110,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
+  <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -131,22 +133,21 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="eplusr-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#eplusr-" class="anchor"></a>eplusr <img src="reference/figures/logo.svg" align="right">
+<div class="section level1">
+<div class="page-header"><h1 id="eplusr-">eplusr <img src="reference/figures/logo.svg" align="right"><a class="anchor" aria-label="anchor" href="#eplusr-"></a>
 </h1></div>
 <!-- badges: start -->
 
 <blockquote>
 <p>A Toolkit for Using EnergyPlus in R.</p>
 </blockquote>
-<p>eplusr provides a rich toolkit of using whole building energy simulation program <a href="https://energyplus.net">EnergyPlus</a> directly in R, which enables programmatic navigation, modification of EnergyPlus, conducts parametric simulations and retrieves outputs. More information about EnergyPlus can be found at <a href="https://energyplus.net">its website</a>.</p>
+<p>eplusr provides a rich toolkit of using whole building energy simulation program <a href="https://energyplus.net" class="external-link">EnergyPlus</a> directly in R, which enables programmatic navigation, modification of EnergyPlus, conducts parametric simulations and retrieves outputs. More information about EnergyPlus can be found at <a href="https://energyplus.net" class="external-link">its website</a>.</p>
 <p>A comprehensive introduction to eplusr can be found using <a href="https://hongyuanjia.github.io/eplusr/articles/eplusr.html"><code>vignette("eplusr")</code></a>. There is also an online slides here (<a href="https://hongyuanjia.github.io/eplusrIntro/">Interfacing EnergyPlus Using R</a>). You can learn more about eplusr at <a href="https://hongyuanjia.github.io/eplusr/" class="uri">https://hongyuanjia.github.io/eplusr/</a>, along with full package documentation.</p>
-<div id="how-to-cite" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-to-cite" class="anchor"></a>How to cite</h2>
+<div class="section level2">
+<h2 id="how-to-cite">How to cite<a class="anchor" aria-label="anchor" href="#how-to-cite"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/citation.html">citation</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; To cite eplusr in publications use:</span>
 <span class="co">#&gt; </span>
@@ -167,28 +168,28 @@
 <span class="co">#&gt;     doi = {10.1016/j.enbuild.2021.110757},</span>
 <span class="co">#&gt;   }</span></code></pre></div>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>You can install the latest stable release of eplusr from CRAN.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span></code></pre></div>
 <p>Alternatively, you can install the development version from GitHub.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span>, repos <span class="op">=</span> <span class="st">"https://hongyuanjia.r-universe.dev"</span><span class="op">)</span></code></pre></div>
-<p>Since running the IDF files requires EnergyPlus (<a href="https://energyplus.net" class="uri">https://energyplus.net</a>), EnergyPlus has to be installed if you want to run EnergyPlus models in R. There are helper functions in eplusr to download and install it automatically on major operating systems (Windows, macOS and Linux):</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span>, repos <span class="op">=</span> <span class="st">"https://hongyuanjia.r-universe.dev"</span><span class="op">)</span></code></pre></div>
+<p>Since running the IDF files requires EnergyPlus (<a href="https://energyplus.net" class="external-link uri">https://energyplus.net</a>), EnergyPlus has to be installed if you want to run EnergyPlus models in R. There are helper functions in eplusr to download and install it automatically on major operating systems (Windows, macOS and Linux):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install the latest version (currently v9.6.0)</span>
 <span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span>
 
 <span class="co"># OR download the latest version (currently v9.6.0) and run the installer</span>
 <span class="co"># manually by yourself</span>
-<span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">download_eplus</a></span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">download_eplus</a></span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Note that the installation process in <code><a href="reference/install_eplus.html">install_eplus()</a></code> requires <strong>administrative privileges</strong>. You have to run R with administrator (or with sudo if you are on macOS or Linux) to make it work if you are not in interactive mode.</p>
 </div>
-<div id="features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
 <ul>
 <li>Download, install EnergyPlus in R</li>
 <li>Read, parse and modify EnergyPlus:
@@ -218,23 +219,23 @@
 <p><strong>Query and modify weather file</strong><br><img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true" width="60%"></p>
 <p><strong>Query output via SQL in Tidy format which is much better for data analysis</strong><br><img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true" width="60%"></p>
 </div>
-<div id="resources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#resources" class="anchor"></a>Resources</h2>
-<div id="articles" class="section level3">
-<h3 class="hasAnchor">
-<a href="#articles" class="anchor"></a>Articles</h3>
+<div class="section level2">
+<h2 id="resources">Resources<a class="anchor" aria-label="anchor" href="#resources"></a>
+</h2>
+<div class="section level3">
+<h3 id="articles">Articles<a class="anchor" aria-label="anchor" href="#articles"></a>
+</h3>
 <ul>
 <li>Hongyuan Jia, Adrian Chong (2020). eplusr: A framework for integrating building energy simulation and data-driven analytics. doi: 10.13140/RG.2.2.34326.16966
 <ul>
-<li><a href="https://github.com/ideas-lab-nus/eplusr-paper">Source code and data to reproduce figures in the article</a></li>
+<li><a href="https://github.com/ideas-lab-nus/eplusr-paper" class="external-link">Source code and data to reproduce figures in the article</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<div id="vignettes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#vignettes" class="anchor"></a>Vignettes</h3>
+<div class="section level3">
+<h3 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
+</h3>
 <p>Please see these vignettes and articles about {eplusr}</p>
 <ul>
 <li><a href="https://hongyuanjia.github.io/eplusr/articles/eplusr.html">Introduction to eplusr</a></li>
@@ -247,119 +248,123 @@
 <li><a href="https://hongyuanjia.github.io/eplusr/articles/faq.html">Frequently asked questions</a></li>
 </ul>
 </div>
-<div id="slides" class="section level3">
-<h3 class="hasAnchor">
-<a href="#slides" class="anchor"></a>Slides</h3>
+<div class="section level3">
+<h3 id="slides">Slides<a class="anchor" aria-label="anchor" href="#slides"></a>
+</h3>
 <ul>
 <li><a href="https://hongyuanjia.github.io/eplusrIntro/">Slides: Interfacing EnergyPlus using R</a></li>
 </ul>
 </div>
 </div>
-<div id="additional-resources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#additional-resources" class="anchor"></a>Additional resources</h2>
+<div class="section level2">
+<h2 id="additional-resources">Additional resources<a class="anchor" aria-label="anchor" href="#additional-resources"></a>
+</h2>
 <ul>
 <li>eplusr manual: <a href="https://hongyuanjia.github.io/eplusr/" class="uri">https://hongyuanjia.github.io/eplusr/</a>
 </li>
-<li>eplusr Docker image: <a href="https://github.com/hongyuanjia/eplusr-docker" class="uri">https://github.com/hongyuanjia/eplusr-docker</a>
+<li>eplusr Docker image: <a href="https://github.com/hongyuanjia/eplusr-docker" class="external-link uri">https://github.com/hongyuanjia/eplusr-docker</a>
 </li>
 <li>
-<a href="https://CRAN.R-project.org/package=epwshiftr">epwshiftr</a> for creating future EnergyPlus weather files using CMIP6 data</li>
+<a href="https://CRAN.R-project.org/package=epwshiftr" class="external-link">epwshiftr</a> for creating future EnergyPlus weather files using CMIP6 data</li>
 <li>
-<a href="https://github.com/hongyuanjia/epluspar">epluspar</a> for conducting parametric analysis on EnergyPlus models, including sensitivity analysis, Bayesian calibration and optimization.</li>
+<a href="https://github.com/hongyuanjia/epluspar" class="external-link">epluspar</a> for conducting parametric analysis on EnergyPlus models, including sensitivity analysis, Bayesian calibration and optimization.</li>
 </ul>
 </div>
-<div id="acknowledgement" class="section level2">
-<h2 class="hasAnchor">
-<a href="#acknowledgement" class="anchor"></a>Acknowledgement</h2>
+<div class="section level2">
+<h2 id="acknowledgement">Acknowledgement<a class="anchor" aria-label="anchor" href="#acknowledgement"></a>
+</h2>
 <p>I would like to thank many open source projects who have heavily inspired the development of eplusr package, especially these below:</p>
 <ul>
 <li>
-<a href="https://energyplus.net">EnergyPlus</a>: A whole building energy simulation program.</li>
+<a href="https://energyplus.net" class="external-link">EnergyPlus</a>: A whole building energy simulation program.</li>
 <li>
-<a href="https://openstudio.net">OpenStudio</a>: A cross-platform collection of software tools to support whole building energy modeling using EnergyPlus and advanced daylight analysis using Radiance.</li>
+<a href="https://openstudio.net" class="external-link">OpenStudio</a>: A cross-platform collection of software tools to support whole building energy modeling using EnergyPlus and advanced daylight analysis using Radiance.</li>
 <li>
-<a href="https://github.com/santoshphilip/eppy">eppy</a>: Scripting language for E+, EnergyPlus.</li>
+<a href="https://github.com/santoshphilip/eppy" class="external-link">eppy</a>: Scripting language for E+, EnergyPlus.</li>
 <li>
-<a href="http://www.jeplus.org">JEplus</a>: An EnergyPlus simulation manager for parametrics.</li>
+<a href="http://www.jeplus.org" class="external-link">JEplus</a>: An EnergyPlus simulation manager for parametrics.</li>
 </ul>
 </div>
-<div id="author" class="section level2">
-<h2 class="hasAnchor">
-<a href="#author" class="anchor"></a>Author</h2>
+<div class="section level2">
+<h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a>
+</h2>
 <p>Hongyuan Jia and Adrian Chong</p>
 </div>
-<div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h2>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
 <p>The project is released under the terms of MIT License.</p>
 <p>Copyright © 2016-2021 Hongyuan Jia and Adrian Chong</p>
 <hr>
-<p>Please note that the ‘eplusr’ project is released with a <a href="https://github.com/hongyuanjia/eplusr/blob/master/.github/CODE_OF_CONDUCT.md">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<p>Please note that the ‘eplusr’ project is released with a <a href="https://github.com/hongyuanjia/eplusr/blob/master/.github/CODE_OF_CONDUCT.md" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=eplusr">https://​cloud.r-project.org/​package=eplusr</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/hongyuanjia/eplusr/">https://​github.com/​hongyuanjia/​eplusr/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/hongyuanjia/eplusr/issues">https://​github.com/​hongyuanjia/​eplusr/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=eplusr" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/hongyuanjia/eplusr/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/hongyuanjia/eplusr/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing eplusr</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://github.com/hongyuanjia">Hongyuan Jia</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0075-8183" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Adrian Chong <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9486-4728" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing eplusr</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/hongyuanjia/eplusr/actions"><img src="https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://app.codecov.io/gh/hongyuanjia/eplusr"><img src="https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2" alt="codecov"></a></li>
-<li><a href="https://cran.r-project.org/package=eplusr"><img src="http://www.r-pkg.org/badges/version/eplusr" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://cranchecks.info/pkgs/eplusr"><img src="https://cranchecks.info/badges/summary/eplusr" alt="CRAN Checks"></a></li>
-<li><a href="https://cran.r-project.org/package=eplusr"><img src="https://cranlogs.r-pkg.org/badges/eplusr" alt="CRAN Download Badge"></a></li>
+<li>
+<a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0075-8183" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Adrian Chong <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9486-4728" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/hongyuanjia/eplusr/actions" class="external-link"><img src="https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://app.codecov.io/gh/hongyuanjia/eplusr" class="external-link"><img src="https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2" alt="codecov"></a></li>
+<li><a href="https://cran.r-project.org/package=eplusr" class="external-link"><img src="http://www.r-pkg.org/badges/version/eplusr" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cranchecks.info/pkgs/eplusr" class="external-link"><img src="https://cranchecks.info/badges/summary/eplusr" alt="CRAN Checks"></a></li>
+<li><a href="https://cran.r-project.org/package=eplusr" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/eplusr" alt="CRAN Download Badge"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/hongyuanjia">Hongyuan Jia</a>, Adrian Chong.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a>, Adrian Chong.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

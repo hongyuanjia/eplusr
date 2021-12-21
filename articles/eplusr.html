@@ -34,6 +34,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -46,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
       </span>
     </div>
 
@@ -103,7 +105,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
+  <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -128,35 +130,35 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to eplusr</h1>
-                        <h4 class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-23</h4>
+            <h4 data-toc-skip class="date">2021-12-21</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd"><code>vignettes/eplusr.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
 
     </div>
 
     
     
-<p>This vignette introduces eplusr class structure, how to read EnergyPlus IDFs and perform modifications on them. Familiarity with <a href="https://cloud.r-project.org/package=data.table">data.table</a> is useful, but not essential to follow this vignette.</p>
+<p>This vignette introduces eplusr class structure, how to read EnergyPlus IDFs and perform modifications on them. Familiarity with <a href="https://cloud.r-project.org/package=data.table" class="external-link">data.table</a> is useful, but not essential to follow this vignette.</p>
 <hr>
-<div id="class-structure" class="section level1">
-<h1 class="hasAnchor">
-<a href="#class-structure" class="anchor"></a>Class structure</h1>
+<div class="section level1">
+<h1 id="class-structure">Class structure<a class="anchor" aria-label="anchor" href="#class-structure"></a>
+</h1>
 <p>Below shows the class structure in eplusr.</p>
 <p><img src="class_structure.png" style="display: block; margin: auto;"></p>
 <p>Basically, eplusr uses <code>Idf</code> class to present the whole IDF file and <code>IdfObject</code> class to present a single object in an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain member functions for helping modify the data in IDF so it complies with the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is wrapped into two classes, i.e. <code>Idd</code> and <code>IddObject</code>.</p>
 <p>Besides, <code>Epw</code> class is used to present EnergyPlus Weather files; <code>EplusJob</code> and <code>GroupEplusJob</code> to run single and multiple EnergyPlus simulations and collect outputs, <code>ParametricJob</code> to run parametric EnergyPlus simulations and collect all outputs.</p>
 <p>It is highly recommended to read the documentation to get a thorough understanding on each class.</p>
 </div>
-<div id="preparation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#preparation" class="anchor"></a>Preparation</h1>
+<div class="section level1">
+<h1 id="preparation">Preparation<a class="anchor" aria-label="anchor" href="#preparation"></a>
+</h1>
 <p>Parsing an IDF requires the IDD data of that version, which serves as the schema. The IDD file will be parsed first and an <code>Idd</code> object will be created and cached. That <code>Idd</code> object will be reused whenever parsing IDFs with that version. For more details, please see <code>?use_idd()</code> and <code>?idd</code>.</p>
-<div id="locate-energyplus" class="section level2">
-<h2 class="hasAnchor">
-<a href="#locate-energyplus" class="anchor"></a>Locate EnergyPlus</h2>
+<div class="section level2">
+<h2 id="locate-energyplus">Locate EnergyPlus<a class="anchor" aria-label="anchor" href="#locate-energyplus"></a>
+</h2>
 <p>Usually, when you try to edit an IDF, the corresponding EnergyPlus is likely to be installed already. If EnergyPlus is installed in standard location (<code>C:\EnergyPlusVX-Y-0</code> on Windows, <code>/usr/local/EnergyPlus-X-Y-0</code> on Linux and <code>/Applications/EnergyPlus-X-Y-0</code> on macOS), eplusr is able to find it and use the <code>Energy+.idd</code> file distributed with that release to parse the input IDF.</p>
 <p>You can get all detected EnergyPlus versions using <code><a href="../reference/use_eplus.html">avail_eplus()</a></code> and meta data of EnergyPlus configuration using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -179,26 +181,26 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">8.8</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="download-energyplus-idd" class="section level2">
-<h2 class="hasAnchor">
-<a href="#download-energyplus-idd" class="anchor"></a>Download EnergyPlus IDD</h2>
+<div class="section level2">
+<h2 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
+</h2>
 <p>Sometimes you may just want to edit the model without installing the whole EnergyPlus software. You can just download the IDD file of that version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code> to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will download IDD file for EnergyPlus v8.8.0, parse it and create an <code>Idd</code> object that will be used whenever parsing all EnergyPlus models of version v8.8.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span>
 
 <span class="co"># OR</span>
 <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="read-and-parse-idf" class="section level1">
-<h1 class="hasAnchor">
-<a href="#read-and-parse-idf" class="anchor"></a>Read and parse IDF</h1>
+<div class="section level1">
+<h1 id="read-and-parse-idf">Read and parse IDF<a class="anchor" aria-label="anchor" href="#read-and-parse-idf"></a>
+</h1>
 <p>All IDF reading process starts with function <code><a href="../reference/read_idf.html">read_idf()</a></code>, which returns an <code>Idf</code> object. The IDF will be printed in a similar style you see in IDF Editor, with additional heading lines showing the <code>Path</code>, <code>Version</code> of the model. The classes of objects in the model are ordered by groups and the number of objects in classes are shown in square bracket.</p>
 <p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we have already got the IDD, we can just ignore the <code>idd</code> argument.</p>
 <p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is successfully located, all IDFs with versions lower than <code>X.Y</code> can be parsed. For example, if you have EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using simply <code>read_idf(path)</code> without specifying <code>idd</code>. This is because eplusr will use IDD files distributed with EnergyPlus VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span>
 <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
@@ -219,9 +221,9 @@
 <span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div id="methods-in-idf-class" class="section level1">
-<h1 class="hasAnchor">
-<a href="#methods-in-idf-class" class="anchor"></a>Methods in <code>Idf</code> class</h1>
+<div class="section level1">
+<h1 id="methods-in-idf-class">Methods in <code>Idf</code> class<a class="anchor" aria-label="anchor" href="#methods-in-idf-class"></a>
+</h1>
 <p><code>Idf</code> class provides lots of methods to programmatically query and modify EnergyPlus models. See table below. This vignette will demonstrate some of them.</p>
 <table class="table">
 <caption>Methods of <code>Idf</code> class</caption>
@@ -465,9 +467,9 @@
 </table>
 <p>Below will show same example usage of methods listed above.</p>
 </div>
-<div id="basic-info" class="section level1">
-<h1 class="hasAnchor">
-<a href="#basic-info" class="anchor"></a>Basic Info</h1>
+<div class="section level1">
+<h1 id="basic-info">Basic Info<a class="anchor" aria-label="anchor" href="#basic-info"></a>
+</h1>
 <p>If you want to see what groups and classes exist in your model, use <code>$group_name()</code> and <code>$class_name()</code> respectively.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">group_name</span><span class="op">(</span><span class="op">)</span>
@@ -501,9 +503,9 @@
 <span class="va">model</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"ZoneInfiltration:DesignFlowRate"</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
-<div id="class-definition" class="section level1">
-<h1 class="hasAnchor">
-<a href="#class-definition" class="anchor"></a>Class definition</h1>
+<div class="section level1">
+<h1 id="class-definition">Class definition<a class="anchor" aria-label="anchor" href="#class-definition"></a>
+</h1>
 <p>You can get class definition using <code>$definition()</code>, which returns an <code>IddObject</code>. All required fields in each class are marked with <code>*</code>. For example, you can get the <code>IddObject</code> of class <code>Material</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">def_mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span>
@@ -545,7 +547,7 @@
 </blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">def_val</span> <span class="op">&lt;-</span> <span class="va">def_mat</span><span class="op">$</span><span class="fu">field_default</span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">def_val</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">def_val</span><span class="op">)</span>
 <span class="co">#&gt; List of 9</span>
 <span class="co">#&gt;  $ Name               : chr NA</span>
 <span class="co">#&gt;  $ Roughness          : chr NA</span>
@@ -558,12 +560,12 @@
 <span class="co">#&gt;  $ Visible Absorptance: num 0.7</span></code></pre></div>
 <p>Please see <code><a href="../reference/IddObject.html">?IddObject</a></code> for detailed documentation on <code>IddObject</code> class.</p>
 </div>
-<div id="get-object" class="section level1">
-<h1 class="hasAnchor">
-<a href="#get-object" class="anchor"></a>Get object</h1>
+<div class="section level1">
+<h1 id="get-object">Get object<a class="anchor" aria-label="anchor" href="#get-object"></a>
+</h1>
 <p>In an <code>Idf</code>, each object in the model is assigned with an unique <code>ID</code> according to its appearance sequence in the IDF file. You can find all valid <code>ID</code>s using <code>$object_id()</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_id</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_id</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $Material</span>
 <span class="co">#&gt;  [1] 43 44 45 46 47 48 49 50 51 52</span>
 <span class="co">#&gt; </span>
@@ -571,7 +573,7 @@
 <span class="co">#&gt; [1] 66 67 68 69 70 71 72</span></code></pre></div>
 <p>You can get all object names using <code>$object_name()</code>. If the class does not have name attribute, <code>NA</code> will returned.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Version"</span>, <span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Version"</span>, <span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $Version</span>
 <span class="co">#&gt; [1] NA</span>
 <span class="co">#&gt; </span>
@@ -584,14 +586,14 @@
 <span class="co">#&gt; [7] "Sgl Grey 3mm"</span></code></pre></div>
 <p>Object number in each class can be retrieved using <code>$object_num()</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_num</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BuildingSurface:Detailed"</span>, <span class="st">"Material"</span>, <span class="st">"Output:Variable"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_num</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BuildingSurface:Detailed"</span>, <span class="st">"Material"</span>, <span class="st">"Output:Variable"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [1] 40 10 13</span></code></pre></div>
 <p>Having the object ID or name, you can easily get any object using <code>$object()</code> which returns an <code>IdfObject</code> or using <code>$objects()</code> which returns a list of <code>IdfObject</code>s.</p>
 <blockquote>
 <p>NOTE: The matching of object names is case-insensitive. For instance, <code>model$object("rOoF")</code> is equivalent to <code>model$object("roof")</code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $WD10</span>
 <span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span>
 <span class="co">#&gt; Class: &lt;Material&gt;</span>
@@ -756,20 +758,20 @@
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">WinterDay</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span>
 <span class="co">#&gt; [1] 14</span></code></pre></div>
 </div>
-<div id="modify-object" class="section level1">
-<h1 class="hasAnchor">
-<a href="#modify-object" class="anchor"></a>Modify object</h1>
+<div class="section level1">
+<h1 id="modify-object">Modify object<a class="anchor" aria-label="anchor" href="#modify-object"></a>
+</h1>
 <p>There are two ways to modify objects in eplusr. One is using methods in <code>Idf</code> which works on multiple objects, and the other way is using methods in <code>IdfObject</code> which only works for a single object.</p>
 <blockquote>
 <p>NOTE: Validations are performed during object modifications under different strictness level (<code>none</code>, <code>draft</code>, <code>final</code> or custom yours using <code><a href="../reference/custom_validate.html">custom_validate()</a></code>). For detailed explanations, please see <code><a href="../reference/level_checks.html">?level_checks</a></code>.</p>
 </blockquote>
 <p>Object IDs will be appended after new objects are added, and the most-newly added object will always have the max ID. Object IDs will never be reused, even when their binded objects have been deleted.</p>
-<div id="duplicate-existing-objects-idfdup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#duplicate-existing-objects-idfdup" class="anchor"></a>Duplicate existing objects (<code>Idf$dup()</code>)</h2>
+<div class="section level2">
+<h2 id="duplicate-existing-objects-idfdup">Duplicate existing objects (<code>Idf$dup()</code>)<a class="anchor" aria-label="anchor" href="#duplicate-existing-objects-idfdup"></a>
+</h2>
 <p><code>$dup()</code> duplicates objects specified by object IDs or names. If the target classes have a name attribute, you can assign new names to the duplicated objects in form <code>new_name = "old_name"</code>. If new name is not given, the newly added object will have the same name as the original object except a appended suffix of “<code>1</code>”, “<code>2</code>” and etc.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">dup</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>my_roof <span class="op">=</span> <span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">dup</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>my_roof <span class="op">=</span> <span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; New names of duplicated objects not given are automatically generated:</span>
 <span class="co">#&gt;  #2| Object ID [324] in class 'Construction' --&gt; New object name 'ROOF-1 1'</span>
 <span class="co">#&gt;  #3| Object ID [325] in class 'Construction' --&gt; New object name 'WALL-1 1'</span>
@@ -800,15 +802,15 @@
 <span class="co">#&gt; │─ 4 : "IN02",     !- Layer 3</span>
 <span class="co">#&gt; └─ 5 : "GP01";     !- Layer 4</span></code></pre></div>
 </div>
-<div id="add-new-objects-using-lists-idfadd" class="section level2">
-<h2 class="hasAnchor">
-<a href="#add-new-objects-using-lists-idfadd" class="anchor"></a>Add new objects using lists (<code>Idf$add()</code>)</h2>
+<div class="section level2">
+<h2 id="add-new-objects-using-lists-idfadd">Add new objects using lists (<code>Idf$add()</code>)<a class="anchor" aria-label="anchor" href="#add-new-objects-using-lists-idfadd"></a>
+</h2>
 <p>You can add new objects using <code>$add()</code>. With <code>.default</code> being <code>TRUE</code>, the default behavior, all empty fields are filled with default values, if possible. Only minimum fields will be added by default. But you can change it by setting <code>.all</code> to <code>TRUE</code>.</p>
 <p>Fields can be given using either indices or names. Field index <code>X</code> is specified in format <code>..X</code>. Field name can be given in underscore-style, e.g. all <code>Begin Month</code>, <code>begin month</code> and <code>begin_month</code> refer to the same field.</p>
 <p>You can also add new comments alongside with new values using the special element <code>.comment</code>.</p>
 <p>For example, here we add two new objects with comments in <code>RunPeriod</code> class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">rp1</span>,
   RunPeriod <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,
@@ -851,15 +853,15 @@
 <span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
 <span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
 <span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
-<p>Note that the use <code>.()</code> inside <code>$add()</code>. It is just an alias of <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
+<p>Note that the use <code>.()</code> inside <code>$add()</code>. It is just an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code>=</code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Rough"</span>, <span class="st">"MediumSmooth"</span>, <span class="st">"Smooth"</span><span class="op">)</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rough"</span>, <span class="st">"MediumSmooth"</span>, <span class="st">"Smooth"</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,
   <span class="fl">0.72</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1800</span>, <span class="fl">1850</span>, <span class="fl">1800</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1800</span>, <span class="fl">1850</span>, <span class="fl">1800</span><span class="op">)</span>,
   <span class="fl">840</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $mat1</span>
@@ -892,21 +894,21 @@
 <span class="co">#&gt; │─ 5*: 1800,       !- Density {kg/m3}</span>
 <span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span></code></pre></div>
 </div>
-<div id="set-new-values-and-comments-using-lists-idfset" class="section level2">
-<h2 class="hasAnchor">
-<a href="#set-new-values-and-comments-using-lists-idfset" class="anchor"></a>Set new values and comments using lists (<code>Idf$set()</code>)</h2>
+<div class="section level2">
+<h2 id="set-new-values-and-comments-using-lists-idfset">Set new values and comments using lists (<code>Idf$set()</code>)<a class="anchor" aria-label="anchor" href="#set-new-values-and-comments-using-lists-idfset"></a>
+</h2>
 <p>Changing values of existing objects can be conducted using <code>$set()</code> in <code>Idf</code> and <code>IdfObject</code>:</p>
-<p>Note that you can also use <code>.()</code> here as an alias of <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
+<p>Note that you can also use <code>.()</code> here as an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>
   rp_test_1 <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,
-    .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"begin day has been changed."</span><span class="op">)</span>
+    .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"begin day has been changed."</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-11-23</span>
+<span class="co">#&gt; !2021-12-21</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -924,7 +926,7 @@
 <p>You can modify all objects in a class using <code>class := list(...)</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
-  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,
+  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,
   ..8 <span class="op">=</span> <span class="st">"No"</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $WinterDay</span>
@@ -960,7 +962,7 @@
 <span class="co">#&gt; $rp_test_3</span>
 <span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
 <span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2021-11-23</span>
+<span class="co">#&gt; !2021-12-21</span>
 <span class="co">#&gt; !begin day has been changed.</span>
 <span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
@@ -996,7 +998,7 @@
 <blockquote>
 <p>If the target class is store as a variable, e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside <code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
 </blockquote>
-<p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html">c()</a></code>:</p>
+<p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; $WinterDay</span>
@@ -1084,7 +1086,7 @@
 <span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
 <p>Sometimes, you may want to get all possible values of fields before you change them. You can achieve that by using <code>$value_possible()</code> method in <code>IdfObject</code> class.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; * Auto value: &lt;NA&gt;</span>
 <span class="co">#&gt; * Default: &lt;NA&gt;</span>
@@ -1103,13 +1105,13 @@
 <span class="co">#&gt; * Choice: &lt;NA&gt;</span>
 <span class="co">#&gt; * Source: &lt;NA&gt;</span></code></pre></div>
 </div>
-<div id="insert-objects-from-another-idf-idfinsert" class="section level2">
-<h2 class="hasAnchor">
-<a href="#insert-objects-from-another-idf-idfinsert" class="anchor"></a>Insert objects from another IDF (<code>Idf$insert()</code>)</h2>
+<div class="section level2">
+<h2 id="insert-objects-from-another-idf-idfinsert">Insert objects from another IDF (<code>Idf$insert()</code>)<a class="anchor" aria-label="anchor" href="#insert-objects-from-another-idf-idfinsert"></a>
+</h2>
 <p>Sometimes it may be useful to insert objects from other IDFs. For example, you may want to import some design days and update location data from a “.ddy” file. You can achieve that using <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># read ddy file as normal IDF</span>
-<span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,
+<span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,
   <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span>
 <span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
@@ -1148,12 +1150,12 @@
 <span class="co">#&gt; │─ 4 : -8,                 !- Time Zone {hr}</span>
 <span class="co">#&gt; └─ 5 : 2;                  !- Elevation {m}</span></code></pre></div>
 </div>
-<div id="load-objects-using-characters-or-data-frames-idfload" class="section level2">
-<h2 class="hasAnchor">
-<a href="#load-objects-using-characters-or-data-frames-idfload" class="anchor"></a>Load objects using characters or data.frames (<code>Idf$load()</code>)</h2>
+<div class="section level2">
+<h2 id="load-objects-using-characters-or-data-frames-idfload">Load objects using characters or data.frames (<code>Idf$load()</code>)<a class="anchor" aria-label="anchor" href="#load-objects-using-characters-or-data-frames-idfload"></a>
+</h2>
 <p>Here <code>load</code> means <strong>insert</strong>. You can use character vectors or data.frames to load new objects.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Construction,"</span>, <span class="st">"new_const1,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span>, <span class="st">";"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Construction,"</span>, <span class="st">"new_const1,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span>, <span class="st">";"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span>
 <span class="co">#&gt; $new_const1</span>
 <span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:349] `new_const1`</span>
@@ -1227,9 +1229,9 @@
 <span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
 </div>
-<div id="update-objects-using-characters-or-data-frames-idfupdate" class="section level2">
-<h2 class="hasAnchor">
-<a href="#update-objects-using-characters-or-data-frames-idfupdate" class="anchor"></a>Update objects using characters or data.frames (<code>Idf$update()</code>)</h2>
+<div class="section level2">
+<h2 id="update-objects-using-characters-or-data-frames-idfupdate">Update objects using characters or data.frames (<code>Idf$update()</code>)<a class="anchor" aria-label="anchor" href="#update-objects-using-characters-or-data-frames-idfupdate"></a>
+</h2>
 <p>Here <code>update</code> means <strong>set</strong>. You can use character vectors or data.frames to update existing objects.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">WD10</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span><span class="op">)</span>
@@ -1263,9 +1265,9 @@
 <span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span>
 <span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></code></pre></div>
 </div>
-<div id="delete-existing-objects-idfdel" class="section level2">
-<h2 class="hasAnchor">
-<a href="#delete-existing-objects-idfdel" class="anchor"></a>Delete existing objects (<code>Idf$del()</code>)</h2>
+<div class="section level2">
+<h2 id="delete-existing-objects-idfdel">Delete existing objects (<code>Idf$del()</code>)<a class="anchor" aria-label="anchor" href="#delete-existing-objects-idfdel"></a>
+</h2>
 <p><code>$del()</code> will delete objects specified by object IDs or names. For example, in current model, there is a material named <code>"MAT-CLNG-1"</code> in class <code>Material:NoMass</code>. Let’s see if it has been referred by other objects.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span><span class="op">$</span><span class="va">`MAT-CLNG-1`</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="op">)</span>
@@ -1316,9 +1318,9 @@
 <span class="co">#&gt;      </span>
 <span class="co">#&gt; </span></code></pre></div>
 </div>
-<div id="purge-unused-resource-objects-idfpurge" class="section level2">
-<h2 class="hasAnchor">
-<a href="#purge-unused-resource-objects-idfpurge" class="anchor"></a>Purge unused resource objects (<code>Idf$purge()</code>)</h2>
+<div class="section level2">
+<h2 id="purge-unused-resource-objects-idfpurge">Purge unused resource objects (<code>Idf$purge()</code>)<a class="anchor" aria-label="anchor" href="#purge-unused-resource-objects-idfpurge"></a>
+</h2>
 <p><code>$purge()</code> will delete resource objects specified that are not used by any objects. Resource objects refer to objects that can be referenced by other objects, e.g. <code>Material</code>, <code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
 <p>Below we remove all schedules that are not currently used.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
@@ -1327,12 +1329,12 @@
 <span class="co">#&gt;  #1| Object ID [18] (name 'On/Off') in class 'ScheduleTypeLimits'</span>
 <span class="co">#&gt;  #2| Object ID [19] (name 'FlowRate') in class 'ScheduleTypeLimits'</span></code></pre></div>
 </div>
-<div id="find-and-remove-duplicates-idfduplicated-idfunique" class="section level2">
-<h2 class="hasAnchor">
-<a href="#find-and-remove-duplicates-idfduplicated-idfunique" class="anchor"></a>Find and remove duplicates (<code>Idf$duplicated()</code> &amp; <code>Idf$unique()</code>)</h2>
+<div class="section level2">
+<h2 id="find-and-remove-duplicates-idfduplicated-idfunique">Find and remove duplicates (<code>Idf$duplicated()</code> &amp; <code>Idf$unique()</code>)<a class="anchor" aria-label="anchor" href="#find-and-remove-duplicates-idfduplicated-idfunique"></a>
+</h2>
 <p><code>$duplicatd()</code> and <code>$unique()</code> can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">duplicated</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">duplicated</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                  class id                               name duplicate</span>
 <span class="co">#&gt;  1: ScheduleTypeLimits 14                         Any Number        NA</span>
 <span class="co">#&gt;  2: ScheduleTypeLimits 15                           Fraction        NA</span>
@@ -1371,21 +1373,21 @@
 <span class="co">#&gt;   #1| Object ID [38] (name 'PlantOnSched')</span>
 <span class="co">#&gt;   #2| Object ID [42] (name 'Always On')</span></code></pre></div>
 </div>
-<div id="paste-objects-from-idf-editor-idfpaste" class="section level2">
-<h2 class="hasAnchor">
-<a href="#paste-objects-from-idf-editor-idfpaste" class="anchor"></a>Paste objects from IDF Editor (<code>Idf$paste()</code>)</h2>
+<div class="section level2">
+<h2 id="paste-objects-from-idf-editor-idfpaste">Paste objects from IDF Editor (<code>Idf$paste()</code>)<a class="anchor" aria-label="anchor" href="#paste-objects-from-idf-editor-idfpaste"></a>
+</h2>
 <p>Once an IDF file is opened in IDF Editor, you can copy objects by clicking the <code>Copy Obj</code> button in IDF Editor, and use <code>$paste()</code> to insert those objects into current <code>Idf</code>. Note that IDF Editor only exists on Windows, which means that <code>$paste()</code> will also work only on that platform.</p>
 </div>
 </div>
-<div id="check-possible-field-errors-idfvalidate" class="section level1">
-<h1 class="hasAnchor">
-<a href="#check-possible-field-errors-idfvalidate" class="anchor"></a>Check possible field errors (<code>Idf$validate()</code>)</h1>
+<div class="section level1">
+<h1 id="check-possible-field-errors-idfvalidate">Check possible field errors (<code>Idf$validate()</code>)<a class="anchor" aria-label="anchor" href="#check-possible-field-errors-idfvalidate"></a>
+</h1>
 <p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code>eplusr_option("validate_level")</code>.</p>
 <p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span>
 <span class="co">#&gt; [1] "final"</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/level_checks.html">level_checks</a></span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/level_checks.html">level_checks</a></span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; List of 10</span>
 <span class="co">#&gt;  $ required_object: logi TRUE</span>
 <span class="co">#&gt;  $ unique_object  : logi TRUE</span>
@@ -1441,20 +1443,20 @@
 <span class="co">#&gt; ├─ 1*: "CLNG-1",   !- Name</span>
 <span class="co">#&gt; └─ 2*: "WD10";     !- Outside Layer</span></code></pre></div>
 </div>
-<div id="save-to-an-idf-file-idfsave" class="section level1">
-<h1 class="hasAnchor">
-<a href="#save-to-an-idf-file-idfsave" class="anchor"></a>Save to an IDF file (<code>Idf$save()</code>)</h1>
+<div class="section level1">
+<h1 id="save-to-an-idf-file-idfsave">Save to an IDF file (<code>Idf$save()</code>)<a class="anchor" aria-label="anchor" href="#save-to-an-idf-file-idfsave"></a>
+</h1>
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmplGkCvs/file281a1b6dbe6b.idf"</span>
+<code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; [1] "/tmp/Rtmp8Egwl6/file3527414b6f78.idf"</span>
 
 <span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmplGkCvs/file281a1b6dbe6b.idf.</span></code></pre></div>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmp8Egwl6/file3527414b6f78.idf.</span></code></pre></div>
 </div>
-<div id="summary" class="section level1">
-<h1 class="hasAnchor">
-<a href="#summary" class="anchor"></a>Summary</h1>
+<div class="section level1">
+<h1 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h1>
 <p>So far we have went through core methods in <code>Idf</code> class to modify an IDF file and save the results.</p>
 <p>Let’s turn our attention to run EnergyPlus simulations in the next vignette <em>“Run simulation and data exploration”</em>.</p>
 </div>
@@ -1471,11 +1473,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/hongyuanjia">Hongyuan Jia</a>, Adrian Chong.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a>, Adrian Chong.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

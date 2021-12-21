@@ -1,7 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://hongyuanjia.github.io/eplusr/404.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/ISSUE_TEMPLATE.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/PULL_REQUEST_TEMPLATE.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/TODO.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/eplusr.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/epw.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/faq.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/geom.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/job.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/param.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/schedule.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/articles/transition.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/authors.html</loc>
+  </url>
+  <url>
     <loc>https://hongyuanjia.github.io/eplusr/index.html</loc>
+  </url>
+  <url>
+    <loc>https://hongyuanjia.github.io/eplusr/news/index.html</loc>
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/EplusGroupJob.html</loc>
@@ -157,6 +211,9 @@
     <loc>https://hongyuanjia.github.io/eplusr/reference/idf_object.html</loc>
   </url>
   <url>
+    <loc>https://hongyuanjia.github.io/eplusr/reference/index.html</loc>
+  </url>
+  <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/init_idf_object.html</loc>
   </url>
   <url>
@@ -245,29 +302,5 @@
   </url>
   <url>
     <loc>https://hongyuanjia.github.io/eplusr/reference/with_speed.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/eplusr.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/epw.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/faq.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/geom.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/job.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/param.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/schedule.html</loc>
-  </url>
-  <url>
-    <loc>https://hongyuanjia.github.io/eplusr/articles/transition.html</loc>
   </url>
 </urlset>

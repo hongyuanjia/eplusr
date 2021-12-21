@@ -34,6 +34,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -46,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.15.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
       </span>
     </div>
 
@@ -103,7 +105,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
+  <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -128,32 +130,31 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Update IDF version</h1>
-                        <h4 class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 class="date">2021-11-23</h4>
+            <h4 data-toc-skip class="date">2021-12-21</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/transition.Rmd"><code>vignettes/transition.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
 
     </div>
 
     
     
-<div id="motivation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#motivation" class="anchor"></a>Motivation</h1>
+<div class="section level1">
+<h1 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
+</h1>
 <p>EnergyPlus provides a preprocessor call <strong>IDFVersionUpdater</strong> to update IDF to the latest version. It is written in Fortran and the program itself evolves along with EnergyPlus. Once a new version of EnergyPlus is published, IDFVersionUpdater will add the support of that version.</p>
 <p>The original IDFVersionUpdater program is a GUI program and does not provide command line interface. This makes it hard to update lots of IDF files programmatically. The good news is that IDFVersionUpdater itself is a wrapper to call different standalone transition programs for each single version update. For example, when updating your model from EnergyPlus v8.7 to v8.9, <code>Transition-V8-7-0-to-V8-8-0</code> will be called, and then <code>Transition-V8-8-0-to-V8-9-0</code>.</p>
 </div>
-<div id="introduce-version_updater" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduce-version_updater" class="anchor"></a>Introduce <code>version_updater()</code>
+<div class="section level1">
+<h1 id="introduce-version_updater">Introduce <code>version_updater()</code><a class="anchor" aria-label="anchor" href="#introduce-version_updater"></a>
 </h1>
 <p><a href="https://hongyuanjia.github.io/eplusr/reference/version_updater.html"><code>version_updater()</code></a> is <a href="https://hongyuanjia.github.io/eplusr/index.html">eplusr</a>’s version of IDFVersionUpdater. <code><a href="../reference/version_updater.html">version_updater()</a></code> itself is not complicated. Compared to IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> has some improvements:</p>
 <ul>
 <li><p>IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01) fails to translate <code>FenesreationSurface:Detailed</code> objects. <code><a href="../reference/version_updater.html">version_updater()</a></code> will try to use the transition programs that come from the latest EnergyPlus installed on your computer, but will skip v9.0 if possible.</p></li>
 <li><p>Like IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> also renames all output file with suffix <code>VXY0</code>, where <code>X</code> and <code>Y</code> indicates the major and minor version of input IDF file. However, <code><a href="../reference/version_updater.html">version_updater()</a></code> always keep the original input file untouched and save a copy and rename it in the same pattern.</p></li>
-<li><p>All messages generated from each transition program are parsed, stored in a list and saved as an attributes named <code>errors</code>. So that you can easily extract all messages by <code>attr(results, "errors")</code>. The error messages are parsed and stored as <a href="http://r-datatable.com"><code>data.table</code>s</a> which make it easy for post-processing.</p></li>
+<li><p>All messages generated from each transition program are parsed, stored in a list and saved as an attributes named <code>errors</code>. So that you can easily extract all messages by <code>attr(results, "errors")</code>. The error messages are parsed and stored as <a href="http://r-datatable.com" class="external-link"><code>data.table</code>s</a> which make it easy for post-processing.</p></li>
 <li><p>A <code>dir</code> argument can be given to further specify where the updated models to be saved.</p></li>
 </ul>
 <p>Unfortunately, even though the transition programs are written in Fortran, it could still take several minutes to complete the update process</p>
@@ -169,7 +170,7 @@
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt; [1] '8.2.0'</span>
 
-<span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-9-6-0/PreProcess/IDFVersionUpdater</span>
 <span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span>
 <span class="co">#&gt;  From  Ver: 8.2.0</span>
@@ -279,16 +280,15 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 237.281   2.242 238.653</span></code></pre></div>
+<span class="co">#&gt; 291.596   2.689 293.419</span></code></pre></div>
 </div>
-<div id="introduce-transition" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduce-transition" class="anchor"></a>Introduce <code>transition()</code>
+<div class="section level1">
+<h1 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
 </h1>
 <p>Having a clear mental model on how the transition works, the most cumbersome work left is to translate all those actions written in Fortran into R and write tests to make sure that the R implement should be the same as IDFVersionUpdater.</p>
 <p><a href="https://hongyuanjia.github.io/eplusr/reference/transition.html"><code>transition()</code></a> is a pure R implementation of transition programs. It takes similar arguments as <code><a href="../reference/version_updater.html">version_updater()</a></code> except it has an additional argument <code>save</code> to control whether to save the resultant <code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;  From  Ver: 8.2.0</span>
 <span class="co">#&gt; Toward Ver: 8.3.0</span>
 <span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span>
@@ -320,11 +320,11 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   4.575   0.012   4.588</span></code></pre></div>
-<p>It is about 52 times faster.</p>
+<span class="co">#&gt;   4.470   0.023   4.495</span></code></pre></div>
+<p>It is about 65.3 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [1] "    Yes,                     !- Use Weather File Snow Indicators"</span>
 <span class="co">#&gt; [2] "    ;                        !- Treat Weather as Actual"</span></code></pre></div>
 <p>As we can see from below, there is only one difference between results from <code><a href="../reference/transition.html">transition()</a></code> and <code><a href="../reference/version_updater.html">version_updater()</a></code>:</p>
@@ -332,9 +332,9 @@
 <li>An empty field <code>Treat Weather as Actual</code> in <code>RunPeriod</code> exists in <code><a href="../reference/version_updater.html">version_updater()</a></code> version, but not in <code><a href="../reference/transition.html">transition()</a></code> version. This is because this field is not an required field and eplusr tried to only save minimum-necessary fields.</li>
 </ul>
 </div>
-<div id="how-the-transition-works" class="section level1">
-<h1 class="hasAnchor">
-<a href="#how-the-transition-works" class="anchor"></a>How the transition works</h1>
+<div class="section level1">
+<h1 id="how-the-transition-works">How the transition works<a class="anchor" aria-label="anchor" href="#how-the-transition-works"></a>
+</h1>
 <p>During version updates, some classes in the original IDF are removed, some classes are splitted into several classes, some fields are removed and there is no way to extract those information back. For example, from EnergyPlus v8.8 to v8.9, one single object in class <code>GroundHeatExchanger:Vertical</code> will be splitted into 4 different objects in class:</p>
 <ul>
 <li>
@@ -397,21 +397,21 @@
 <p>For example, the equivalent transition implemented in R for <code>Exterior:FuelEquipment</code> objects demonstrated in the <strong>Reset</strong> code block would be:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Insert</span>
-<span class="va">dt1</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"OtherEquipment"</span>, insert <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"None"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dt1</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"OtherEquipment"</span>, insert <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"None"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Reset</span>
 <span class="va">dt2</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Exterior:FuelEquipment"</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"Gas"</span>, <span class="st">"NaturalGas"</span><span class="op">)</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"LPG"</span>, <span class="st">"PropaneGas"</span><span class="op">)</span>
+    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"Gas"</span>, <span class="st">"NaturalGas"</span><span class="op">)</span>,
+    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"LPG"</span>, <span class="st">"PropaneGas"</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="co"># Delete</span>
-<span class="va">dt3</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"HVACTemplate:System:Unitary"</span>, delete <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">40L</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dt3</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"HVACTemplate:System:Unitary"</span>, delete <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">40L</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Offset</span>
 <span class="va">dt4</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Daylighting:Controls"</span>,
-    offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">20L</span>, <span class="fl">4L</span><span class="op">)</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"SplitFlux"</span><span class="op">)</span>
+    offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">20L</span>, <span class="fl">4L</span><span class="op">)</span>,
+    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"SplitFlux"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p>Having the updated IDF data, we can then easily insert them to the next new version of IDF by simply doing <code>new_idf$load(dt)</code>.</p>
 </div>
@@ -428,11 +428,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/hongyuanjia">Hongyuan Jia</a>, Adrian Chong.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/hongyuanjia" class="external-link">Hongyuan Jia</a>, Adrian Chong.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
