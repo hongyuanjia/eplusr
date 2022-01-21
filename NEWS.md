@@ -8,6 +8,10 @@
 * Now `ParametricJob$run()` can correctly use weather file when only one
   parametric model exists (#497).
 
+## Minor changes
+
+* Compatibility changes for incoming {units} v0.8 (#499).
+
 # eplusr v0.15.0
 
 ## New features
