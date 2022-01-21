@@ -2,6 +2,7 @@
 NULL
 
 # reg_custom_units {{{
+# nocov start
 reg_custom_units <- function () {
     tryCatch(
         {
@@ -24,6 +25,7 @@ reg_custom_units <- function () {
         error = function (e) NULL
     )
 }
+# nocov end
 # }}}
 
 # FIELD_UNIT_TABLE {{{
