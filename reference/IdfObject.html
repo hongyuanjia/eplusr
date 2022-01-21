@@ -1943,7 +1943,7 @@ mat$print(auto_sep = TRUE)
 <span class="r-in"><span class="co">## Method `IdfObject$new`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># example model shipped with eplusr from EnergyPlus v8.8</span></span>
 <span class="r-in"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span> <span class="co"># v8.8</span></span>
 <span class="r-in"><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span>, <span class="fu"><a href="use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1952,1114 +1952,358 @@ mat$print(auto_sep = TRUE)
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get the IdfObject of material named "C5 - 4 IN HW CONCRETE"</span></span>
 <span class="r-in"><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="st">"C5 - 4 IN HW CONCRETE"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$version`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get version</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘8.8.0’</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$parent`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  * Path: '/home/runner/work/_temp/Library/eplusr/extdata/1ZoneUncontrolled....</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  * Version: '8.8.0'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Simulation Parameters&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;HeatBalanceAlgorithm&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Timestep&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Location and Climate&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Site:Location&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;SizingPeriod:DesignDay&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;RunPeriod&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Schedules&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [02&lt;O&gt;] Class: &lt;ScheduleTypeLimits&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Schedule:Constant&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Surface Construction Elements&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Material&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [02&lt;O&gt;] Class: &lt;Material:NoMass&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Construction&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Thermal Zones and Surfaces&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;GlobalGeometryRules&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Zone&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [06&lt;O&gt;] Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Internal Gains&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [02&lt;O&gt;] Class: &lt;OtherEquipment&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Exterior Equipment&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [01&lt;O&gt;] Class: &lt;Exterior:Lights&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Group: &lt;Output Reporting&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ [01&lt;O&gt;] Class: &lt;Output:VariableDictionary&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Surfaces:Drawing&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Constructions&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;Output:Table:SummaryReports&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [01&lt;O&gt;] Class: &lt;OutputControl:Table:Style&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ [14&lt;O&gt;] Class: &lt;Output:Variable&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ [03&lt;O&gt;] Class: &lt;Output:Meter:MeterFileOnly&gt;</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$id`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">id</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 26</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$name`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Zn001:Roof001"</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># NA will be returned if the class does not have name attribute. For example,</span></span>
 <span class="r-in"><span class="co"># "Version" class</span></span>
 <span class="r-in"><span class="va">idf</span><span class="op">$</span><span class="va">Version</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$group_name`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">group_name</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Thermal Zones and Surfaces"</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$class_name`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "BuildingSurface:Detailed"</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$definition`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IddObject: 'BuildingSurface:Detailed'&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── MEMO ────────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "Allows for detailed entry of building heat transfer surfaces.  Does not include subsurfaces such as windows or doors."</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── PROPERTIES ──────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   * Group: 'Thermal Zones and Surfaces'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   * Unique: FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   * Required: FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   * Total fields: 370</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── FIELDS ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   01*: Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   02*: Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   03*: Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   04*: Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   05*: Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   06 : Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   07 : Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   08 : Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   09 : View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   10 : Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   11*: Vertex 1 X-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   12*: Vertex 1 Y-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   13*: Vertex 1 Z-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   14*: Vertex 2 X-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   15*: Vertex 2 Y-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   16*: Vertex 2 Z-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   17*: Vertex 3 X-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   18*: Vertex 3 Y-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   19*: Vertex 3 Z-coordinate &lt;↓&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ......</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$comment`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get object comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># add new object comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"This is a material named `WD01`"</span>, <span class="st">"This object has an ID of 47"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a material named `WD01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This object has an ID of 47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "This is a material named `WD01`" "This object has an ID of 47"    </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># append new comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="st">"This is an appended comment"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a material named `WD01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This object has an ID of 47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is an appended comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "This is a material named `WD01`" "This object has an ID of 47"    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "This is an appended comment"    </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># prepend new comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="st">"This is a prepended comment"</span>, append <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a prepended comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a material named `WD01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This object has an ID of 47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is an appended comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "This is a prepended comment"     "This is a material named `WD01`"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "This object has an ID of 47"     "This is an appended comment"    </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># wrap long comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="st">"This is a very long comment that is needed to be wrapped."</span>, width <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a prepended comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a material named `WD01`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This object has an ID of 47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is an appended comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is a very long comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !that is needed to be wrapped.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "This is a prepended comment"     "This is a material named `WD01`"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "This object has an ID of 47"     "This is an appended comment"    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "This is a very long comment"     "that is needed to be wrapped."  </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># delete old comments and add new one</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="st">"This is the only comment"</span>, append <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !This is the only comment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "This is the only comment"</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># delete all comments</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'BuildingSurface:Detailed'&gt; [ID:26] `Zn001:Roof001`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 01*: "Zn001:Roof001", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 02*: "Roof",          !- Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 03*: "ROOF31",        !- Construction Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 04*: "ZONE ONE",      !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 05*: "Outdoors",      !- Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 06 : &lt;"Blank"&gt;,       !- Outside Boundary Condition Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 07 : "SunExposed",    !- Sun Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 08 : "WindExposed",   !- Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 09 : 0,               !- View Factor to Ground</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 10 : 4,               !- Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 11*: 0,               !- Vertex 1 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 12*: 15.24,           !- Vertex 1 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 13*: 4.572,           !- Vertex 1 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 14*: 0,               !- Vertex 2 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 15*: 0,               !- Vertex 2 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 16*: 4.572,           !- Vertex 2 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 17*: 15.24,           !- Vertex 3 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 18*: 0,               !- Vertex 3 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 19*: 4.572,           !- Vertex 3 Z-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 20 : 15.24,           !- Vertex 4 X-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 21 : 15.24,           !- Vertex 4 Y-coordinate {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 22 : 4.572;           !- Vertex 4 Z-coordinate {m}</span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">comment</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$value`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get all existing field values</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Name               : chr "C5 - 4 IN HW CONCRETE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Roughness          : chr "MediumRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Thickness          : num 0.101</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Conductivity       : num 1.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Density            : num 2243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Specific Heat      : num 837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Thermal Absorptance: num 0.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Solar Absorptance  : num 0.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Visible Absorptance: num 0.65</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get values of field 1, 3, 5</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Name     : chr "C5 - 4 IN HW CONCRETE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Thickness: num 0.101</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Density  : num 2243</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get character format values instead of a named list</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "C5 - 4 IN HW CONCRETE" "0.1014984"             "2242.585"             </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get values of all field even those that are not set</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">roof</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Name                             : chr "Zn001:Roof001"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Surface Type                     : chr "Roof"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Construction Name                : chr "ROOF31"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Zone Name                        : chr "ZONE ONE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Outside Boundary Condition       : chr "Outdoors"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Outside Boundary Condition Object: chr NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Sun Exposure                     : chr "SunExposed"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Wind Exposure                    : chr "WindExposed"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ View Factor to Ground            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Number of Vertices               : num 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 X-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 Y-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 X-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 Y-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 X-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 Y-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 X-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 Y-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 Z-coordinate            : num 4.57</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">roof</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span>all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 370</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Name                             : chr "Zn001:Roof001"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Surface Type                     : chr "Roof"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Construction Name                : chr "ROOF31"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Zone Name                        : chr "ZONE ONE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Outside Boundary Condition       : chr "Outdoors"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Outside Boundary Condition Object: chr NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Sun Exposure                     : chr "SunExposed"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Wind Exposure                    : chr "WindExposed"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ View Factor to Ground            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Number of Vertices               : num 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 X-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 Y-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 1 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 X-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 Y-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 2 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 X-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 Y-coordinate            : num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 3 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 X-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 Y-coordinate            : num 15.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 4 Z-coordinate            : num 4.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 5 X-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 5 Y-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 5 Z-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 6 X-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 6 Y-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 6 Z-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 7 X-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 7 Y-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 7 Z-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 8 X-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 8 Y-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 8 Z-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 9 X-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 9 Y-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 9 Z-coordinate            : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 10 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 10 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 10 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 11 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 11 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 11 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 12 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 12 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 12 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 13 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 13 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 13 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 14 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 14 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 14 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 15 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 15 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 15 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 16 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 16 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 16 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 17 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 17 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 17 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 18 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 18 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 18 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 19 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 19 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 19 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 20 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 20 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 20 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 21 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 21 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 21 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 22 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 22 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 22 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 23 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 23 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 23 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 24 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 24 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 24 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 25 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 25 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 25 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 26 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 26 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 26 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 27 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 27 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 27 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 28 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 28 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 28 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 29 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 29 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 29 Z-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 30 X-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Vertex 30 Y-coordinate           : num NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [list output truncated]</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get field values using shortcuts</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="va">Roughness</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MediumRough"</span>
 <span class="r-in"><span class="va">mat</span><span class="op">[[</span><span class="st">"Specific_Heat"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-in"><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "C5 - 4 IN HW CONCRETE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MediumRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Name"</span>, <span class="st">"Density"</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "C5 - 4 IN HW CONCRETE"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Density</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2242.585</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$set`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># set field values</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"new_name"</span>, Thickness <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Material'&gt; [ID:14] `new_name`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Material&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "new_name",    !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 2*: "MediumRough", !- Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 3*: 0.02,          !- Thickness {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 4*: 1.729577,      !- Conductivity {W/m-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 5*: 2242.585,      !- Density {kg/m3}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 6*: 836.8,         !- Specific Heat {J/kg-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 7 : 0.9,           !- Thermal Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 8 : 0.65,          !- Solar Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 9 : 0.65;          !- Visible Absorptance</span>
 <span class="r-in"><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Name"</span>, <span class="st">"Thickness"</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "new_name"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Thickness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># When `default` argument is set to TRUE and input field values are empty, i.e.</span></span>
 <span class="r-in"><span class="co"># NULL, the field values will be reset to defaults.</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Thermal Absorptance"</span>, <span class="st">"Solar Absorptance"</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Thermal Absorptance`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Solar Absorptance`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>visible_absorptance <span class="op">=</span> <span class="cn">NULL</span>, Solar_Absorptance <span class="op">=</span> <span class="cn">NULL</span>, .default <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Material'&gt; [ID:14] `new_name`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Material&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "new_name",    !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 2*: "MediumRough", !- Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 3*: 0.02,          !- Thickness {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 4*: 1.729577,      !- Conductivity {W/m-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 5*: 2242.585,      !- Density {kg/m3}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 6*: 836.8,         !- Specific Heat {J/kg-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 7 : 0.9,           !- Thermal Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 8 : 0.7,           !- Solar Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 9 : 0.7;           !- Visible Absorptance</span>
 <span class="r-in"><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Visible Absorptance"</span>, <span class="st">"Solar Absorptance"</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Visible Absorptance`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Solar Absorptance`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># set field values using shortcuts</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="va">Name</span> <span class="op">&lt;-</span> <span class="st">"another_name"</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="va">Name</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "another_name"</span>
 <span class="r-in"><span class="va">mat</span><span class="op">[[</span><span class="st">"Thickness"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.019</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="va">Thickness</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.019</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$value_possible`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 1: Name ─────────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 2: Roughness ────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "VeryRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "Rough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "MediumRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "MediumSmooth"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "Smooth"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - "......"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 3: Thickness ────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 4: Conductivity ─────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 5: Density ──────────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 6: Specific Heat ────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 7: Thermal Absorptance ──────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: 0.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 8: Solar Absorptance ────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── 9: Visible Absorptance ──────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Auto value: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Default: 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Choice: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Source: &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$validate`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔ No error found.</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># check at predefined validate level</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔ No error found.</span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔ No error found.</span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔ No error found.</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># custom validate checking components</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu"><a href="custom_validate.html">custom_validate</a></span><span class="op">(</span>auto_field <span class="op">=</span> <span class="cn">TRUE</span>, choice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔ No error found.</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$is_valid`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">field_range</span><span class="op">(</span><span class="st">"Density"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (0, Inf) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="co"># have to set validate to "none" to do so</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $validate_level</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "none"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="va">Density</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span></span>
 <span class="r-in"><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="st">"final"</span><span class="op">)</span> <span class="co"># change back to "final" validate level</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $validate_level</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "final"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># check at predefined validate level</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># custom validate checking components</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="fu"><a href="custom_validate.html">custom_validate</a></span><span class="op">(</span>auto_field <span class="op">=</span> <span class="cn">TRUE</span>, choice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$value_relation`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># check each layer's reference of a construction named FLOOR</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"zone name"</span>, <span class="st">"ref_to"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Class: &lt;BuildingSurface:Detailed&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  └─ Object [ID:26] &lt;Zn001:Roof001&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      └─ 4: "ZONE ONE";    !- Zone Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         └─ Class: &lt;Zone&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            └─ Object [ID:18] &lt;ZONE ONE&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               └─ 1: "ZONE ONE";    !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># check where is this construction being used</span></span>
 <span class="r-in"><span class="va">roof</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"name"</span>, direction <span class="op">=</span> <span class="st">"ref_by"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Target(s) is not referred by any other field.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$ref_to_object`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get other objects that this object refereces</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">ref_to_object</span><span class="op">(</span><span class="op">)</span> <span class="co"># not referencing other objects</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Target object does not refer to any objects.</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$ref_by_object`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get other objects that reference this object</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">ref_by_object</span><span class="op">(</span><span class="op">)</span> <span class="co"># referenced by construction "FLOOR"</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $FLOOR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Construction'&gt; [ID:16] `FLOOR`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Construction&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "FLOOR",        !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 2*: "another_name"; !- Outside Layer</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$ref_to_node`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in">    <span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span class="r-in">    <span class="va">idf_5z</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span class="r-in">    <span class="va">idf_5z</span><span class="op">$</span><span class="va">NodeList</span><span class="op">$</span><span class="va">OutsideAirInletNodes</span><span class="op">$</span><span class="fu">ref_to_node</span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$has_ref_to`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">has_ref_to</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$has_ref_by`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">has_ref_by</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$has_ref_node`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">has_ref_node</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$has_ref`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># check if having any referenced objects or is referenced by other objects</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">has_ref</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$to_table`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get all object data in a data.table format without field units</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>unit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Classes ‘data.table’ and 'data.frame':	9 obs. of  6 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ id   : int  14 14 14 14 14 14 14 14 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ name : chr  "another_name" "another_name" "another_name" "another_name" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ class: chr  "Material" "Material" "Material" "Material" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ index: int  1 2 3 4 5 6 7 8 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ field: chr  "Name" "Roughness" "Thickness" "Conductivity" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ value: chr  "another_name" "MediumRough" "0.019" "1.729577" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get all object data in a data.table format where all field values are put in a</span></span>
 <span class="r-in"><span class="co"># list column and field names without unit</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>string_value <span class="op">=</span> <span class="cn">FALSE</span>, unit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Classes ‘data.table’ and 'data.frame':	9 obs. of  6 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ id   : int  14 14 14 14 14 14 14 14 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ name : chr  "another_name" "another_name" "another_name" "another_name" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ class: chr  "Material" "Material" "Material" "Material" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ index: int  1 2 3 4 5 6 7 8 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ field: chr  "Name" "Roughness" "Thickness" "Conductivity" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ value:List of 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : chr "another_name"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : chr "MediumRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 0.019</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 1.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num -1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 0.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num 0.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get all object data in a data.table format, including tailing empty fields</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">idf</span><span class="op">$</span><span class="va">Zone</span><span class="op">$</span><span class="va">`ZONE ONE`</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Classes ‘data.table’ and 'data.frame':	13 obs. of  6 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ id   : int  18 18 18 18 18 18 18 18 18 18 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ name : chr  "ZONE ONE" "ZONE ONE" "ZONE ONE" "ZONE ONE" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ class: chr  "Zone" "Zone" "Zone" "Zone" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ index: int  1 2 3 4 5 6 7 8 9 10 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ field: chr  "Name" "Direction of Relative North" "X Origin" "Y Origin" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ value: chr  "ZONE ONE" "0" "0" "0" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get all object data in a data.table format where each field becomes a column</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Classes ‘data.table’ and 'data.frame':	1 obs. of  12 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ id                 : int 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ name               : chr "another_name"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ class              : chr "Material"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Name               : chr "another_name"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Roughness          : chr "MediumRough"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Thickness          : chr "0.019"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Conductivity       : chr "1.729577"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Density            : chr "-1"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Specific Heat      : chr "836.8"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Thermal Absorptance: chr "0.9"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Solar Absorptance  : chr ".7"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Visible Absorptance: chr ".7"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># group extensible by extensible group number</span></span>
 <span class="r-in"><span class="va">surf</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="va">BuildingSurface_Detailed</span><span class="op">[[</span><span class="st">"Zn001:Roof001"</span><span class="op">]</span><span class="op">]</span></span>
 <span class="r-in"><span class="va">surf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>group_ext <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     id          name                    class index</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 26 Zn001:Roof001 BuildingSurface:Detailed     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2: 26 Zn001:Roof001 BuildingSurface:Detailed     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3: 26 Zn001:Roof001 BuildingSurface:Detailed     3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: 26 Zn001:Roof001 BuildingSurface:Detailed     4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5: 26 Zn001:Roof001 BuildingSurface:Detailed     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: 26 Zn001:Roof001 BuildingSurface:Detailed     6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7: 26 Zn001:Roof001 BuildingSurface:Detailed     7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: 26 Zn001:Roof001 BuildingSurface:Detailed     8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: 26 Zn001:Roof001 BuildingSurface:Detailed     9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: 26 Zn001:Roof001 BuildingSurface:Detailed    10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: 26 Zn001:Roof001 BuildingSurface:Detailed    11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: 26 Zn001:Roof001 BuildingSurface:Detailed    12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: 26 Zn001:Roof001 BuildingSurface:Detailed    13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14: 26 Zn001:Roof001 BuildingSurface:Detailed    14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 field             value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                              Name     Zn001:Roof001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                      Surface Type              Roof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                 Construction Name            ROOF31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                         Zone Name          ZONE ONE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:        Outside Boundary Condition          Outdoors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: Outside Boundary Condition Object                NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                      Sun Exposure        SunExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                     Wind Exposure       WindExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:             View Factor to Ground                 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                Number of Vertices                 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:  Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd     0,15.24,4.572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd         0,0,4.572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:  Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd     15.24,0,4.572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:  Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd 15.24,15.24,4.572</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># group extensible by extensible group number and convert into a wide table</span></span>
 <span class="r-in"><span class="va">surf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>group_ext <span class="op">=</span> <span class="st">"group"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id          name                    class          Name Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Construction Name Zone Name Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            ROOF31  ZONE ONE                   Outdoors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Outside Boundary Condition Object Sun Exposure Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                                NA   SunExposed   WindExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    View Factor to Ground Number of Vertices Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                     0                  4                    0,15.24,4.572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                        0,0,4.572                    15.24,0,4.572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                15.24,15.24,4.572</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># group extensible by extensible field index</span></span>
 <span class="r-in"><span class="va">surf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>group_ext <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     id          name                    class index</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 26 Zn001:Roof001 BuildingSurface:Detailed     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2: 26 Zn001:Roof001 BuildingSurface:Detailed     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3: 26 Zn001:Roof001 BuildingSurface:Detailed     3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: 26 Zn001:Roof001 BuildingSurface:Detailed     4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5: 26 Zn001:Roof001 BuildingSurface:Detailed     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: 26 Zn001:Roof001 BuildingSurface:Detailed     6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7: 26 Zn001:Roof001 BuildingSurface:Detailed     7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: 26 Zn001:Roof001 BuildingSurface:Detailed     8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: 26 Zn001:Roof001 BuildingSurface:Detailed     9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: 26 Zn001:Roof001 BuildingSurface:Detailed    10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: 26 Zn001:Roof001 BuildingSurface:Detailed    11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: 26 Zn001:Roof001 BuildingSurface:Detailed    12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: 26 Zn001:Roof001 BuildingSurface:Detailed    13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 field                   value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                              Name           Zn001:Roof001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                      Surface Type                    Roof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                 Construction Name                  ROOF31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                         Zone Name                ZONE ONE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:        Outside Boundary Condition                Outdoors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: Outside Boundary Condition Object                      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                      Sun Exposure              SunExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                     Wind Exposure             WindExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:             View Factor to Ground                       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                Number of Vertices                       4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:               Vertex X-coordinate         0,0,15.24,15.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:               Vertex Y-coordinate         15.24,0,0,15.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:               Vertex Z-coordinate 4.572,4.572,4.572,4.572</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># group extensible by extensible field index and convert into a wide table</span></span>
 <span class="r-in"><span class="va">surf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>group_ext <span class="op">=</span> <span class="st">"index"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id          name                    class          Name Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Construction Name Zone Name Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            ROOF31  ZONE ONE                   Outdoors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Outside Boundary Condition Object Sun Exposure Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                                NA   SunExposed   WindExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    View Factor to Ground Number of Vertices Vertex X-coordinate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                     0                  4     0,0,15.24,15.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Vertex Y-coordinate     Vertex Z-coordinate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     15.24,0,0,15.24 4.572,4.572,4.572,4.572</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># when grouping extensible, 'string_value' and 'unit' still take effect</span></span>
 <span class="r-in"><span class="va">surf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>group_ext <span class="op">=</span> <span class="st">"index"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span>, string_value <span class="op">=</span> <span class="cn">FALSE</span>, unit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id          name                    class          Name Surface Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 26 Zn001:Roof001 BuildingSurface:Detailed Zn001:Roof001         Roof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Construction Name Zone Name Outside Boundary Condition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            ROOF31  ZONE ONE                   Outdoors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Outside Boundary Condition Object Sun Exposure Wind Exposure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                              &lt;NA&gt;   SunExposed   WindExposed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    View Factor to Ground Number of Vertices</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                     0                  4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Vertex X-coordinate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  0.00 [m], 0.00 [m],15.24 [m],15.24 [m]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Vertex Y-coordinate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 15.24 [m], 0.00 [m], 0.00 [m],15.24 [m]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Vertex Z-coordinate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 4.572 [m],4.572 [m],4.572 [m],4.572 [m]</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$to_string`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get string format object</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "Material,"                                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] "    another_name,            !- Name"                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "    MediumRough,             !- Roughness"             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "    0.019,                   !- Thickness {m}"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "    1.729577,                !- Conductivity {W/m-K}"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "    -1,                      !- Density {kg/m3}"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "    836.8,                   !- Specific Heat {J/kg-K}"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "    0.9,                     !- Thermal Absorptance"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "    0.7,                     !- Solar Absorptance"     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] "    0.7;                     !- Visible Absorptance"   </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get string format of object, and decrease the space between field values and</span></span>
 <span class="r-in"><span class="co"># field names</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>sep_at <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "Material,"                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] "    another_name,  !- Name"              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "    MediumRough,  !- Roughness"          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "    0.019,     !- Thickness {m}"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "    1.729577,  !- Conductivity {W/m-K}"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "    -1,        !- Density {kg/m3}"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "    836.8,     !- Specific Heat {J/kg-K}"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "    0.9,       !- Thermal Absorptance"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "    0.7,       !- Solar Absorptance"     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] "    0.7;       !- Visible Absorptance"   </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get string format of object, and decrease the leading space of field values</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>leading <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "Material,"                                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] "another_name,                !- Name"                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "MediumRough,                 !- Roughness"             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "0.019,                       !- Thickness {m}"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "1.729577,                    !- Conductivity {W/m-K}"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "-1,                          !- Density {kg/m3}"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "836.8,                       !- Specific Heat {J/kg-K}"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "0.9,                         !- Thermal Absorptance"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "0.7,                         !- Solar Absorptance"     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] "0.7;                         !- Visible Absorptance"   </span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfObject$print`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># print the object without comment</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span>comment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Material'&gt; [ID:14] `another_name`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Material&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "another_name", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 2*: "MediumRough",  !- Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 3*: 0.019,          !- Thickness {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 4*: 1.729577,       !- Conductivity {W/m-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 5*: -1,             !- Density {kg/m3}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 6*: 836.8,          !- Specific Heat {J/kg-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 8 : 0.7,            !- Solar Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 9 : 0.7;            !- Visible Absorptance</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># print the object, and auto separate field values and field names at the</span></span>
 <span class="r-in"><span class="co"># largetst character length of field values</span></span>
 <span class="r-in"><span class="va">mat</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span>auto_sep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Material'&gt; [ID:14] `another_name`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Material&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "another_name", !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 2*: "MediumRough",  !- Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 3*: 0.019,          !- Thickness {m}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 4*: 1.729577,       !- Conductivity {W/m-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 5*: -1,             !- Density {kg/m3}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 6*: 836.8,          !- Specific Heat {J/kg-K}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 8 : 0.7,            !- Solar Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 9 : 0.7;            !- Visible Absorptance</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

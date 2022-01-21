@@ -170,7 +170,7 @@
 <h3 id="bug-fixes-0-15-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-15-0"></a></h3>
 <ul><li>Fix the year value calculation when first day of a run period is holiday (<a href="https://github.com/hongyuanjia/eplusr/issues/450" class="external-link">#450</a>).</li>
 <li>Fix <code><a href="../reference/download_weather.html">download_weather()</a></code> file downloading URL (<a href="https://github.com/hongyuanjia/eplusr/issues/452" class="external-link">#452</a>).</li>
-<li>Fix <code>EplusSql$report_data(..., wide = TRUE)</code> when <code>Do HVAC Sizing Simulation for Sizing Periods</code> is set to <code>Yes</code> in <code>SimulationControl</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/461" class="external-link">#461</a>).</li>
+<li>Fix <code>EplusSql$report_data(..., wide = TRUE)</code> when <code>Do HVAC Sizing Simulation   for Sizing Periods</code> is set to <code>Yes</code> in <code>SimulationControl</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/461" class="external-link">#461</a>).</li>
 <li>Now <code><a href="../reference/read_idf.html">read_idf()</a></code> and other functions that read files from disk can use <code><a href="https://rdrr.io/pkg/stringi/man/stri_enc_detect.html" class="external-link">stringi::stri_enc_detect()</a></code> to fix encoding issue (<a href="https://github.com/hongyuanjia/eplusr/issues/467" class="external-link">#467</a>).</li>
 <li>Now <code>ParametricJob$run(dir = NULL)</code> will always use the seed model directory (<a href="https://github.com/hongyuanjia/eplusr/issues/483" class="external-link">#483</a>).</li>
 </ul></div>
@@ -369,7 +369,7 @@
 <li>Fix the bug in <code><a href="../reference/install_eplus.html">install_eplus()</a></code> on Windows (<a href="https://github.com/hongyuanjia/eplusr/issues/230" class="external-link">#230</a>)</li>
 <li>Fix the error in <code>$&lt;-.Idf</code> when input list of <code>IdfObject</code>s are all from the same <code>Idf</code> on the LHS (<a href="https://github.com/hongyuanjia/eplusr/issues/238" class="external-link">#238</a>).</li>
 <li>Now <code>Idf$insert()</code> and <code>Idf$load()</code> can now successfully remove duplicated objects by comparing field values case-insensitively (<a href="https://github.com/hongyuanjia/eplusr/issues/243" class="external-link">#243</a>)</li>
-<li>Now <code>Epw$save()</code> can work with empty <code>DESIGN CONDITIONS</code>, <code>TYPICAL/EXTREME PERIODS</code> and <code>GROUND TEMPERATURES</code> headers. Thanks <a href="https://github.com/lukas-rokka" class="external-link">@lukas-rokka</a> for the bug report (<a href="https://github.com/hongyuanjia/eplusr/issues/263" class="external-link">#263</a>).</li>
+<li>Now <code>Epw$save()</code> can work with empty <code>DESIGN CONDITIONS</code>, <code>TYPICAL/EXTREME   PERIODS</code> and <code>GROUND TEMPERATURES</code> headers. Thanks <a href="https://github.com/lukas-rokka" class="external-link">@lukas-rokka</a> for the bug report (<a href="https://github.com/hongyuanjia/eplusr/issues/263" class="external-link">#263</a>).</li>
 <li>Fix output directory creation error in <code>EplusGroupJob</code>(<a href="https://github.com/hongyuanjia/eplusr/issues/270" class="external-link">#270</a>).</li>
 <li>Fix IDF header option parsing (<a href="https://github.com/hongyuanjia/eplusr/issues/278" class="external-link">#278</a>).</li>
 <li>Trailing spaces after class names in IDF can be handled correctly (<a href="https://github.com/hongyuanjia/eplusr/issues/294" class="external-link">#294</a>).</li>

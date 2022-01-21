@@ -126,7 +126,7 @@
 
       
 
-      </header><script src="geom_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Work with geometry</h1>
@@ -158,13 +158,13 @@
 <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-8-8-0/Energy+.idd'.</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span>
 <span class="va">geom</span>
 <span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  * Path: '/home/runner/.local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEner...</span>
+<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span>
 <span class="co">#&gt;  * Version: '8.8.0'</span>
 <span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span>
 <span class="co">#&gt;  * North Axis: 0°</span>
@@ -572,8 +572,8 @@
 <div class="section level4">
 <h4 id="change-background">Change background<a class="anchor" aria-label="anchor" href="#change-background"></a>
 </h4>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>viewer<span class="op">$</span><span class="kw">background</span>(<span class="st">"grey50"</span>)</span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="st">``</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>viewer<span class="sc">$</span><span class="fu">background</span>(<span class="st">"grey50"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span></code></pre></div>
 <p><img src="geom-viewer_background1.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></code></pre></div>

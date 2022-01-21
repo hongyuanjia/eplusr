@@ -146,7 +146,7 @@ contains all error messages from transition error (.VCpErr) files.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \dontrun{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">7.2</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in">    <span class="co"># create an empty IDF</span></span>
 <span class="r-in">    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="empty_idf.html">empty_idf</a></span><span class="op">(</span><span class="fl">7.2</span><span class="op">)</span></span>
@@ -162,8 +162,7 @@ contains all error messages from transition error (.VCpErr) files.</p>
 <span class="r-in">    <span class="co"># see transition error messages</span></span>
 <span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">updated</span>, <span class="st">"errors"</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in Summary.numeric_version(structure(list(c(8L, 8L, 0L), c(9L, 6L, 0L)), class = "numeric_version"), na.rm = FALSE):</span> any not defined for "numeric_version" objects</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

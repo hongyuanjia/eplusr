@@ -141,7 +141,7 @@ preserved and the <code>value</code> column of returned
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \dontrun{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># read an example distributed with eplusr</span></span>
 <span class="r-in"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
@@ -150,27 +150,7 @@ preserved and the <code>value</code> column of returned
 <span class="r-in"><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"Material"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu">dt_to_load</span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id                  name    class index               field</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 14 C5 - 4 IN HW CONCRETE Material     1                Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 14 C5 - 4 IN HW CONCRETE Material     2           Roughness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 14 C5 - 4 IN HW CONCRETE Material     3           Thickness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 14 C5 - 4 IN HW CONCRETE Material     4        Conductivity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 14 C5 - 4 IN HW CONCRETE Material     5             Density</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 14 C5 - 4 IN HW CONCRETE Material     6       Specific Heat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: 14 C5 - 4 IN HW CONCRETE Material     7 Thermal Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8: 14 C5 - 4 IN HW CONCRETE Material     8   Solar Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9: 14 C5 - 4 IN HW CONCRETE Material     9 Visible Absorptance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: C5 - 4 IN HW CONCRETE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           MediumRough</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:             0.1014984</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:              1.729577</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:              2242.585</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                 836.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                   0.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                  0.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:                  0.65</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

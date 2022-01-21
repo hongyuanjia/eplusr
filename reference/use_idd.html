@@ -178,51 +178,32 @@ EnergyPlus IDD file</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \dontrun{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># get all available Idd version</span></span>
 <span class="r-in"><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘8.8.0’</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># check if specific version of Idd is available</span></span>
 <span class="r-in"><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.5</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># download latest IDD file from EnergyPlus GitHub repo</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">download_idd</span><span class="op">(</span><span class="st">"latest"</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> EnergyPlus v9.6.0 IDD file 'V9-6-0-Energy+.idd' has been successfully downloaded into /tmp/RtmpCDUQGa.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  int 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "file")= chr "/tmp/RtmpCDUQGa/V9-6-0-Energy+.idd"</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># use specific version of Idd</span></span>
 <span class="r-in"><span class="co"># only works if EnergyPlus v8.8 has been found or Idd v8.8 exists</span></span>
 <span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── EnergyPlus Input Data Dictionary ────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Version: 8.8.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Build: 7c3bbe4830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Total Class: 789</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># If Idd object is currently not avail_idd, automatically download IDD file</span></span>
 <span class="r-in"><span class="co"># from EnergyPlus GitHub repo and parse it</span></span>
 <span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── EnergyPlus Input Data Dictionary ────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Version: 8.8.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Build: 7c3bbe4830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Total Class: 789</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># now Idd v8.8 should be available</span></span>
 <span class="r-in"><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get specific version of parsed Idd object</span></span>
 <span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── EnergyPlus Input Data Dictionary ────────────────────────────────────────────</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Version: 8.8.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Build: 7c3bbe4830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> * Total Class: 789</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span> <span class="co"># should contain "8.8.0"</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘8.8.0’</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

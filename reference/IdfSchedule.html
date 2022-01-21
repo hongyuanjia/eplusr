@@ -587,46 +587,35 @@ sch$extract(timestep = "30 mins")
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$new`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># create an empty 'Schedule:Compact'</span></span>
 <span class="r-in"><span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class: &lt;Schedule:Compact&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ├─ 1*: "sch",      !- Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get an existing 'Schedule:Compact'</span></span>
 <span class="r-in"><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Failed to locate 'Through:' fields for object ID [54] (name 'sch') in class 'Schedule:Compact'</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   --&gt; 3: "NA", !- Field 1</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$set`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"summerdesignday"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span class="r-in">    ..6 <span class="op">=</span> <span class="fl">0.2</span>, <span class="st">"8:00"</span> <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span class="r-in">    ..12 <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"13:30"</span> <span class="op">=</span> <span class="fl">0.6</span>, ..14 <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span class="r-in">    ..18 <span class="op">=</span> <span class="fl">0.95</span>, ..19 <span class="op">=</span> <span class="fl">0.2</span>, ..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
 <span class="r-in">    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$update`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
 <span class="r-in">    year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
@@ -640,48 +629,39 @@ sch$extract(timestep = "30 mins")
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$validate`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># check at predefined validate level</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$is_valid`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"><span class="co">## Method `IdfScheduleCompact$extract`</span></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># \dontrun{</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="st">"expand"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
 <span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"30 mins"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'sch' not found</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

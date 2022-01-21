@@ -126,7 +126,7 @@
 
       
 
-      </header><script src="param_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Parametric simulations</h1>
@@ -162,7 +162,7 @@
 <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span>
 <span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
 <span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-8-8-0/Energy+.idd'.</span>
+<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span>
@@ -267,17 +267,17 @@
 <span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
 <span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
+<span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Seed: '/tmp/RtmpExNMMV/MediumOffice.idf'</span>
-<span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago...</span>
+<span class="co">#&gt; * Seed: '/tmp/RtmpjOrGgC/MediumOffice.idf'</span>
+<span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.In...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
-<span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
+<span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
 <span class="co">#&gt; Applied Measure: 'ecm'</span>
 <span class="co">#&gt; Parametric Models [6]: </span>
 <span class="co">#&gt; [1]: 'Ori.idf'         &lt;-- SUCCEEDED</span>
@@ -286,7 +286,7 @@
 <span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 03:10:45' and completed successfully after 2.85 mins.</span></span>
+<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 03:58:40' and completed successfully after 2.94 mins.</span></span>
 
 <span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -306,19 +306,19 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $job_status</span>
 <span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpExNMMV/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpExNMMV/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpExNMMV/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/RtmpExNMMV/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/RtmpExNMMV/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/RtmpExNMMV/LED+0.2Frac/LED+0.2Frac.idf</span>
-<span class="co">#&gt;                                                                                              epw</span>
-<span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 2: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 3: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 4: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 5: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 6: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpjOrGgC/Ori/Ori.idf</span>
+<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpjOrGgC/T5/T5.idf</span>
+<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpjOrGgC/LED/LED.idf</span>
+<span class="co">#&gt; 4:     4 completed         /tmp/RtmpjOrGgC/0.6Frac/0.6Frac.idf</span>
+<span class="co">#&gt; 5:     5 completed         /tmp/RtmpjOrGgC/0.2Frac/0.2Frac.idf</span>
+<span class="co">#&gt; 6:     6 completed /tmp/RtmpjOrGgC/LED+0.2Frac/LED+0.2Frac.idf</span>
+<span class="co">#&gt;                                                                                     epw</span>
+<span class="co">#&gt; 1: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 2: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 3: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 4: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
+<span class="co">#&gt; 6: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="va">....</span></code></pre></div>
 </div>
 <div class="section level2">
