@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9004</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Work with ‘Schedule:Compact’ objects</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2021-12-21</h4>
+            <h4 data-toc-skip class="date">2022-01-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -141,9 +141,9 @@
 
     
     
-<div class="section level1">
-<h1 id="the-schedulecompact-class">The <code>Schedule:Compact</code> class<a class="anchor" aria-label="anchor" href="#the-schedulecompact-class"></a>
-</h1>
+<div class="section level2">
+<h2 id="the-schedulecompact-class">The <code>Schedule:Compact</code> class<a class="anchor" aria-label="anchor" href="#the-schedulecompact-class"></a>
+</h2>
 <p><code>Schedule:Compact</code> class is quite commonly used in EnergyPlus models. Unlike other classes in EnergyPlus, it is quite flexible in value specifications and does not follow the usual definitions for fields. Starting from <code>Field 1</code>, the number of fields and positions are not set, and cannot really be described in the usual <code>Field #</code> manner.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span>
@@ -261,9 +261,9 @@
 <span class="co">#&gt; 5: 54  sch Schedule:Compact     5                   Field 3   Until: 24:00</span>
 <span class="co">#&gt; 6: 54  sch Schedule:Compact     6                   Field 4            1.0</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="introduce-the-idfschedulecompact-class">Introduce the <code>IdfScheduleCompact</code> class<a class="anchor" aria-label="anchor" href="#introduce-the-idfschedulecompact-class"></a>
-</h1>
+<div class="section level2">
+<h2 id="introduce-the-idfschedulecompact-class">Introduce the <code>IdfScheduleCompact</code> class<a class="anchor" aria-label="anchor" href="#introduce-the-idfschedulecompact-class"></a>
+</h2>
 <p>In order to solve this inconvenience, eplusr introduces a new <code>IdfScheduleCompact</code> class which is designed to ease the processing of <code>Schedule:Compact</code> objects. A short description of the core methods is given below.</p>
 <table class="table">
 <caption>Core methods of <code>IdfScheduleCompact</code> class</caption>
@@ -299,9 +299,9 @@
 </tbody>
 </table>
 <p>Note that <code>IdfScheduleCompact</code> class inherits <code>IdfObject</code> class, which means that methods available for an <code>IdfObject</code> object are still available for an <code>IdfScheduleCompact</code> object.</p>
-<div class="section level2">
-<h2 id="create-an-idfschedulecompact-object">Create an <code>IdfScheduleCompact</code> object<a class="anchor" aria-label="anchor" href="#create-an-idfschedulecompact-object"></a>
-</h2>
+<div class="section level3">
+<h3 id="create-an-idfschedulecompact-object">Create an <code>IdfScheduleCompact</code> object<a class="anchor" aria-label="anchor" href="#create-an-idfschedulecompact-object"></a>
+</h3>
 <p>To create an <code>IdfScheduleCompact</code> object from an existing <code>Schedule:Compact</code> object, you can use the <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> constructor.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">idf</span>, name <span class="op">=</span> <span class="st">"sch"</span><span class="op">)</span>
@@ -325,9 +325,9 @@
 <span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
 <span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="get-type-limits">Get type limits<a class="anchor" aria-label="anchor" href="#get-type-limits"></a>
-</h2>
+<div class="section level3">
+<h3 id="get-type-limits">Get type limits<a class="anchor" aria-label="anchor" href="#get-type-limits"></a>
+</h3>
 <p><code>$type_limits()</code> is used to get the type limits of a schedule. It will be used to validate the schedule values to make sure they do not exceed the range specified. <code>$type_limits()</code> gives <code>NULL</code> if no type limits have been set yet.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -346,9 +346,9 @@
 <span class="co">#&gt; $range</span>
 <span class="co">#&gt; [0, 1]</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="set-schedule-values-using-lists">Set schedule values using lists<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-lists"></a>
-</h2>
+<div class="section level3">
+<h3 id="set-schedule-values-using-lists">Set schedule values using lists<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-lists"></a>
+</h3>
 <p>The <code>$set()</code> method provides a flexible interface to modify schedule values using lists:</p>
 <ul>
 <li>Day types can be grouped inside <code>c(...)</code> at the LHS of <code>:=</code>
@@ -404,9 +404,9 @@
 <span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="set-schedule-values-using-data-frame">Set schedule values using data.frame<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-data-frame"></a>
-</h2>
+<div class="section level3">
+<h3 id="set-schedule-values-using-data-frame">Set schedule values using data.frame<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-data-frame"></a>
+</h3>
 <p>The <code>$update()</code> method takes a data.frame and modify schedule values accordingly. It is designed to work together with <code>$extract()</code> method which will be described later. The input data.frame of <code>$upate()</code> should contain at least 4 columns:</p>
 <ul>
 <li>
@@ -516,9 +516,9 @@
 <span class="co">#&gt; │─ 24 : "Until: 24:00",     !- Field 22</span>
 <span class="co">#&gt; └─ 25 : "0";                !- Field 23</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="extract-schedule-values-into-a-data-table">Extract schedule values into a data.table<a class="anchor" aria-label="anchor" href="#extract-schedule-values-into-a-data-table"></a>
-</h2>
+<div class="section level3">
+<h3 id="extract-schedule-values-into-a-data-table">Extract schedule values into a data.table<a class="anchor" aria-label="anchor" href="#extract-schedule-values-into-a-data-table"></a>
+</h3>
 <p>Most of the time, we will be dealing with existing schedules instead of creating new ones from scratch. It would be quite handy if we could extract schedule data of given day types and time step. The <code>$extract()</code> is designed for this. It extracts schedule data into a data.table with 5 columns:</p>
 <ul>
 <li>
@@ -591,9 +591,9 @@
 <span class="co">#&gt; 39:    12/31  1          Friday 08:00:00  0.50</span>
 <span class="va">....</span>
 <span class="co"># OR sch$extract(daytype = "expand")</span></code></pre></div>
-<div class="section level3">
-<h3 id="compact-or-expand-day-types">Compact or expand day types<a class="anchor" aria-label="anchor" href="#compact-or-expand-day-types"></a>
-</h3>
+<div class="section level4">
+<h4 id="compact-or-expand-day-types">Compact or expand day types<a class="anchor" aria-label="anchor" href="#compact-or-expand-day-types"></a>
+</h4>
 <p>If you want to compact day types with same schedule values, set <code>daytype</code> to <code>FALSE</code> or <code>"compact"</code>. It will try to group weekdays into <code>Weekday</code>, weekends into <code>Weekend</code>, and put all <code>CustomDay1</code>, <code>CustomDay2</code> and <code>Holiday</code> into <code>AllOtherDay</code>, <strong>if possible</strong>. This is because, for most of the time, <code>Weekday</code>, <code>Weekend</code>, design days including <code>SummerDesignDay</code> and <code>WinterDesignDay</code> are the most commonly used day types. Please note that if it is not possible to compact those day types, for instance, schedules of <code>Monday</code> and <code>Friday</code> are different, the original day types are kept and no compact day types will be made.</p>
 <p>For this specific schedule, we can see from the following table that the original <code>AllOtherDay</code> has been divided into 3, i.e. <code>Weekend</code>, <code>WinterDesignDay</code> and <code>AllOtherDay</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -650,9 +650,9 @@
 <span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span>
 <span class="co">#&gt;     year_day id         daytype     time value</span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="compact-or-expand-schedule-times">Compact or expand schedule times<a class="anchor" aria-label="anchor" href="#compact-or-expand-schedule-times"></a>
-</h3>
+<div class="section level4">
+<h4 id="compact-or-expand-schedule-times">Compact or expand schedule times<a class="anchor" aria-label="anchor" href="#compact-or-expand-schedule-times"></a>
+</h4>
 <p>It is convenient to specify schedule values only at times when they change. However, it is useful to get schedule values at a given time step, e.g. 1-hour, especially when we try to visualize the schedule values.</p>
 <p>You can achieve this by passing a time step specification to <code>timestep</code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -761,7 +761,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

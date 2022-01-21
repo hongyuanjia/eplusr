@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9004</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Parametric simulations</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2021-12-21</h4>
+            <h4 data-toc-skip class="date">2022-01-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/param.Rmd" class="external-link"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -143,9 +143,9 @@
     
 <p>This vignette demonstrates the process of performing parametric simulation analyses using the <code>ParametricJob</code> class. The main focuses are on showcasing the capabilities of (1) creating parametric models by applying measures and (2) easing the comparative analysis by reusing code snippets developed in data exploration process.</p>
 <hr>
-<div class="section level1">
-<h1 id="parametric-prototype">Parametric prototype<a class="anchor" aria-label="anchor" href="#parametric-prototype"></a>
-</h1>
+<div class="section level2">
+<h2 id="parametric-prototype">Parametric prototype<a class="anchor" aria-label="anchor" href="#parametric-prototype"></a>
+</h2>
 <p>The <code>ParametricJob</code> class in eplusr is a parametric prototype that provides a set of abstractions to ease the process of parametric model generation, design alternative evaluation, and large parametric simulation management.</p>
 <p>An overview of the parametric prototype implementation is shown blow:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -172,9 +172,9 @@
 <span class="co"># create a parametric prototype of given model and weather file</span>
 <span class="va">param</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ParametricJob.html">param_job</a></span><span class="op">(</span><span class="va">idf</span>, <span class="va">path_weather</span><span class="op">)</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="specify-design-alternatives">Specify design alternatives<a class="anchor" aria-label="anchor" href="#specify-design-alternatives"></a>
-</h1>
+<div class="section level2">
+<h2 id="specify-design-alternatives">Specify design alternatives<a class="anchor" aria-label="anchor" href="#specify-design-alternatives"></a>
+</h2>
 <p>Design alternatives are specified by applying a <em>measure</em> function to the seed model. The concept of <em>measure</em> in the prototype is inspired by a similar concept in <a href="https://nrel.github.io/OpenStudio-user-documentation/getting_started/about_measures/" class="external-link">OpenStudio</a> but tailored for flexibility and extensibility.</p>
 <p>A measure is simply an R function that takes an <code>Idf</code> object and any other parameters as input, and returns a set of modified <code>Idf</code> objects as output, making it possible to leverage other modules in the framework and apply statistical methods and libraries existing in R to generate design options.</p>
 <p><code>set_lpd()</code> blow is a simple measure that modifies the LPD (Lighting Power Density), and <code>set_nightplug()</code> is a measure that modifies the off-work schedule values of plug loads by multiplying a specified reduction faction value.</p>
@@ -213,9 +213,9 @@
     <span class="va">idf</span>
 <span class="op">}</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="create-parametric-models">Create parametric models<a class="anchor" aria-label="anchor" href="#create-parametric-models"></a>
-</h1>
+<div class="section level2">
+<h2 id="create-parametric-models">Create parametric models<a class="anchor" aria-label="anchor" href="#create-parametric-models"></a>
+</h2>
 <p>After a measure is defined, the method <code>$apply_measure()</code> takes it and other parameter values specified to create a set of models. Different measures can be chained together.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># combine two measures into one</span>
@@ -255,26 +255,26 @@
 <span class="co">#&gt; 5:     5     0.2Frac  NA            0.2</span>
 <span class="co">#&gt; 6:     6 LED+0.2Frac   5            0.2</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="run-parametric-simulations-in-parallel">Run parametric simulations in parallel<a class="anchor" aria-label="anchor" href="#run-parametric-simulations-in-parallel"></a>
-</h1>
+<div class="section level2">
+<h2 id="run-parametric-simulations-in-parallel">Run parametric simulations in parallel<a class="anchor" aria-label="anchor" href="#run-parametric-simulations-in-parallel"></a>
+</h2>
 <p>The <code>$run()</code> method will run all parametric simulations in parallel and place each simulation outputs in a separate folder. All simulation meta data will keep updating during the whole time and can be retrieved using the <code>$status()</code> method for further investigations.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
+<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
 <span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
+<span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
+<span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
 <span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
 <span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
 <span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Seed: '/tmp/RtmpFiXoSB/MediumOffice.idf'</span>
+<span class="co">#&gt; * Seed: '/tmp/RtmpExNMMV/MediumOffice.idf'</span>
 <span class="co">#&gt; * Weather: '/home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/home/runner/.local/EnergyPlus-8-8-0'</span>
@@ -286,7 +286,7 @@
 <span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
 <span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2021-12-21 15:13:42' and completed successfully after 2.92 mins.</span></span>
+<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 03:10:45' and completed successfully after 2.85 mins.</span></span>
 
 <span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -306,12 +306,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $job_status</span>
 <span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpFiXoSB/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpFiXoSB/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpFiXoSB/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/RtmpFiXoSB/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/RtmpFiXoSB/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/RtmpFiXoSB/LED+0.2Frac/LED+0.2Frac.idf</span>
+<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpExNMMV/Ori/Ori.idf</span>
+<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpExNMMV/T5/T5.idf</span>
+<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpExNMMV/LED/LED.idf</span>
+<span class="co">#&gt; 4:     4 completed         /tmp/RtmpExNMMV/0.6Frac/0.6Frac.idf</span>
+<span class="co">#&gt; 5:     5 completed         /tmp/RtmpExNMMV/0.2Frac/0.2Frac.idf</span>
+<span class="co">#&gt; 6:     6 completed /tmp/RtmpExNMMV/LED+0.2Frac/LED+0.2Frac.idf</span>
 <span class="co">#&gt;                                                                                              epw</span>
 <span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="co">#&gt; 2: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
@@ -321,9 +321,9 @@
 <span class="co">#&gt; 6: /home/runner/.local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="collect-results-in-one-go">Collect results in one go<a class="anchor" aria-label="anchor" href="#collect-results-in-one-go"></a>
-</h1>
+<div class="section level2">
+<h2 id="collect-results-in-one-go">Collect results in one go<a class="anchor" aria-label="anchor" href="#collect-results-in-one-go"></a>
+</h2>
 <p>The <code>ParametricJob</code> class leverages the tidy data interface to retrieve parametric simulation results in a tidy format. For all resulting tidy tables, an extra column containing the simulation job identifiers is prepended in each table. It can be used as an index or key for further data transformations, analyses and visualization to compare results of different simulated design options.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># read building energy consumption from Standard Reports</span>
@@ -362,9 +362,9 @@
 <span class="co">#&gt; 29:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
 <span class="va">....</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="data-exploration">Data exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a>
-</h1>
+<div class="section level2">
+<h2 id="data-exploration">Data exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a>
+</h2>
 <p>After calling the <code>$run()</code> method to conduct parallel runs of simulations, the tidy data interface can be used to extract any simulation outputs of interest using <code>$report_data()</code>, <code>$tabular_data()</code>, etc.</p>
 <p>In this example, the building energy consumptions of all six models are extracted using one line of code. The resulting data format is the same as that of a single simulation and is equivalent to bind rows from six tables into one tidy table. A <code>case</code> column is prepended using the names specified in <code>$apply_measure()</code>. It works as an identifier to group the results by different parametric models using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code> and <code>nest()</code> functions from the tidyverse package.</p>
 <p>This data structure makes it effortless to perform comparative analyses by taking the code snippets developed in data exploration for a single simulation and applying them to each of the parametric simulations.</p>
@@ -467,9 +467,9 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="param_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level1">
-<h1 id="extensions-based-on-parametricjob-class">Extensions based on <code>ParametricJob</code> class<a class="anchor" aria-label="anchor" href="#extensions-based-on-parametricjob-class"></a>
-</h1>
+<div class="section level2">
+<h2 id="extensions-based-on-parametricjob-class">Extensions based on <code>ParametricJob</code> class<a class="anchor" aria-label="anchor" href="#extensions-based-on-parametricjob-class"></a>
+</h2>
 <p>The <code>ParametricJob</code> class is designed to be simple yet flexible and extensible. One good example of its extensibility is the <a href="https://github.com/hongyuanjia/epluspar" class="external-link">epluspar</a> R package, which provides new classes for conducting specific parametric analyses on EnergyPlus models, including sensitivity analysis, Bayesian calibration and optimization using Generic algorithm.</p>
 <p>All the new classes introduced are based on the <code>ParametricJob</code> class. The main difference mainly lies in the specific statistical method used for sampling parameter values when calling <code>$apply_measure()</code> method.</p>
 </div>
@@ -492,7 +492,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

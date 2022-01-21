@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.0.9004</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Update IDF version</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2021-12-21</h4>
+            <h4 data-toc-skip class="date">2022-01-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -141,15 +141,15 @@
 
     
     
-<div class="section level1">
-<h1 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
-</h1>
+<div class="section level2">
+<h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
+</h2>
 <p>EnergyPlus provides a preprocessor call <strong>IDFVersionUpdater</strong> to update IDF to the latest version. It is written in Fortran and the program itself evolves along with EnergyPlus. Once a new version of EnergyPlus is published, IDFVersionUpdater will add the support of that version.</p>
 <p>The original IDFVersionUpdater program is a GUI program and does not provide command line interface. This makes it hard to update lots of IDF files programmatically. The good news is that IDFVersionUpdater itself is a wrapper to call different standalone transition programs for each single version update. For example, when updating your model from EnergyPlus v8.7 to v8.9, <code>Transition-V8-7-0-to-V8-8-0</code> will be called, and then <code>Transition-V8-8-0-to-V8-9-0</code>.</p>
 </div>
-<div class="section level1">
-<h1 id="introduce-version_updater">Introduce <code>version_updater()</code><a class="anchor" aria-label="anchor" href="#introduce-version_updater"></a>
-</h1>
+<div class="section level2">
+<h2 id="introduce-version_updater">Introduce <code>version_updater()</code><a class="anchor" aria-label="anchor" href="#introduce-version_updater"></a>
+</h2>
 <p><a href="https://hongyuanjia.github.io/eplusr/reference/version_updater.html"><code>version_updater()</code></a> is <a href="https://hongyuanjia.github.io/eplusr/index.html">eplusr</a>’s version of IDFVersionUpdater. <code><a href="../reference/version_updater.html">version_updater()</a></code> itself is not complicated. Compared to IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> has some improvements:</p>
 <ul>
 <li><p>IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01) fails to translate <code>FenesreationSurface:Detailed</code> objects. <code><a href="../reference/version_updater.html">version_updater()</a></code> will try to use the transition programs that come from the latest EnergyPlus installed on your computer, but will skip v9.0 if possible.</p></li>
@@ -280,11 +280,11 @@
 <span class="co">#&gt; Start parsing...</span>
 <span class="co">#&gt; Parsing completed.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 291.596   2.689 293.419</span></code></pre></div>
+<span class="co">#&gt; 274.700   2.361 276.242</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
-</h1>
+<div class="section level2">
+<h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
+</h2>
 <p>Having a clear mental model on how the transition works, the most cumbersome work left is to translate all those actions written in Fortran into R and write tests to make sure that the R implement should be the same as IDFVersionUpdater.</p>
 <p><a href="https://hongyuanjia.github.io/eplusr/reference/transition.html"><code>transition()</code></a> is a pure R implementation of transition programs. It takes similar arguments as <code><a href="../reference/version_updater.html">version_updater()</a></code> except it has an additional argument <code>save</code> to control whether to save the resultant <code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -320,8 +320,8 @@
 <span class="co">#&gt; Toward Ver: 9.2.0</span>
 <span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   4.470   0.023   4.495</span></code></pre></div>
-<p>It is about 65.3 times faster.</p>
+<span class="co">#&gt;   4.721   0.035   4.758</span></code></pre></div>
+<p>It is about 58.1 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
@@ -332,9 +332,9 @@
 <li>An empty field <code>Treat Weather as Actual</code> in <code>RunPeriod</code> exists in <code><a href="../reference/version_updater.html">version_updater()</a></code> version, but not in <code><a href="../reference/transition.html">transition()</a></code> version. This is because this field is not an required field and eplusr tried to only save minimum-necessary fields.</li>
 </ul>
 </div>
-<div class="section level1">
-<h1 id="how-the-transition-works">How the transition works<a class="anchor" aria-label="anchor" href="#how-the-transition-works"></a>
-</h1>
+<div class="section level2">
+<h2 id="how-the-transition-works">How the transition works<a class="anchor" aria-label="anchor" href="#how-the-transition-works"></a>
+</h2>
 <p>During version updates, some classes in the original IDF are removed, some classes are splitted into several classes, some fields are removed and there is no way to extract those information back. For example, from EnergyPlus v8.8 to v8.9, one single object in class <code>GroundHeatExchanger:Vertical</code> will be splitted into 4 different objects in class:</p>
 <ul>
 <li>
@@ -434,7 +434,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
