@@ -324,3 +324,17 @@ test_that("VALIDATE", {
     expect_equal(valid$invalid_range$value_num, 2)
 })
 # }}}
+
+# $<-.IdfSchedule {{{
+test_that("$<-.IdfSchedule", {
+    skip_on_cran()
+
+    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+
+    expect_is(idf <- read_idf(path_idf), "Idf")
+    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+
+    expect_silent(sch$`Schedule Type Limits Name` <- "Fraction")
+    expect_equal(sch$`Schedule Type Limits Name`, "Fraction")
+})
+# }}}
