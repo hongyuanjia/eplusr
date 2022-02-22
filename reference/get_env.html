@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9003</span>
       </span>
     </div>
 
@@ -106,7 +106,9 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_self_env</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 
-<span class="fu">get_priv_env</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+<span class="fu">get_priv_env</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+
+<span class="fu">get_super_env</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -120,7 +122,9 @@
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p><code>get_self_env()</code> returns the <code>self</code> enclosed environment of an <code><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6::R6Class()</a></code>
+    <p><code>get_super_env()</code> returns the <code>super</code> enclosed environment of an <code><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6::R6Class()</a></code>
+object.</p>
+<p><code>get_self_env()</code> returns the <code>self</code> enclosed environment of an <code><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6::R6Class()</a></code>
 object.</p>
 <p><code>get_priv_env()</code> returns the <code>private</code> enclosed environment of an <code><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6::R6Class()</a></code>
 object.</p>
