@@ -1,5 +1,14 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Now `IdfGeometry$coord_system()` can correctly work. The coordinate system
+  type can also be `"world"`. `"absolute"` input now is automatically converted
+  to `"world"` to be compatible with EnergyPlus. `IdfGeometry$coord_system()`
+  now returns itself by default, instead of the parent `Idf` object. This
+  enables to check the modified coordinate systems by printing the `IdfGeometry`
+  (#506 #507).
+
 # eplusr 0.15.1
 
 ## Bug fixes
