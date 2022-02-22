@@ -202,8 +202,8 @@ test_that("Align coordinate system", {
     expect_is(geoms <- extract_geom(idf), "list")
     expect_is(geoms <- align_coord_system(geoms, "relative", "relative", "relative"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))
-    expect_is(geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute"), "list")
-    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("absolute", 3L))
+    expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
+    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("world", 3L))
 })
 # }}}
 
