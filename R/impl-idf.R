@@ -2194,7 +2194,8 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         }
 
         chr <- unlist(chr, FALSE, FALSE)
-        chr_one <- paste0(chr, collapse = "\n")
+        # auto append a new line. See #510
+        chr_one <- paste0(chr, "\n", collapse = "\n")
 
         # indicate whether trying to add different Version object
         same_ver <- TRUE
