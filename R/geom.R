@@ -484,7 +484,7 @@ idfgeom_rules <- function (self, private) {
 # }}}
 # idfgeom_coord_system {{{
 idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL, daylighting = NULL) {
-    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(invisible(private$m_parent))
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(self)
 
     assert_choice(detailed, c("world", "absolute", "relative"), null.ok = TRUE)
     assert_choice(simple, c("world", "absolute", "relative"), null.ok = TRUE)
@@ -534,7 +534,7 @@ idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL,
     private$log_parent_order()
     private$log_geom_class()
 
-    invisible(private$m_parent)
+    self
 }
 # }}}
 # idfgeom_convert {{{
