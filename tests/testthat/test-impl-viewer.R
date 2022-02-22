@@ -6,7 +6,7 @@ test_that("IdfViewer Implemention", {
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
 
     expect_is(geoms <- extract_geom(idf), "list")
-    expect_is(geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute"), "list")
+    expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
     expect_is(geoms$vertices2 <- triangulate_geoms(geoms), "data.table")
 
     rgl_init <- function (clear = TRUE) {
@@ -63,8 +63,8 @@ test_that("IdfViewer Implemention", {
     expect_is(geoms <- extract_geom(idf), "list")
     expect_is(geoms <- align_coord_system(geoms, "relative", "relative", "relative"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))
-    expect_is(geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute"), "list")
-    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("absolute", 3L))
+    expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
+    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("world", 3L))
     expect_is(geoms$vertices2 <- triangulate_geoms(geoms), "data.table")
 
     expect_is(dev <- rgl_init(), "integer")

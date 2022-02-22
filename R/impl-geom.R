@@ -69,7 +69,7 @@ get_global_geom_rules <- function (idf) {
                 rules[[i]] <- stri_trans_tolower(rules[[i]])
             }
 
-            if (rules[[i]] == "world") rules[[i]] <- "absolute"
+            if (rules[[i]] == "absolute") rules[[i]] <- "world"
         }
 
         setattr(rules, "names", lower_name(names(rules)))
@@ -355,13 +355,9 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
     setnames(meta, c("object_id", "class_name"), c("id", "class"))
 
     # vertices
-    if (idf$version() < 9.0) {
-        vertices <- dt[J(11:22), on = "field_index"][, by = "object_id",
-            list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
-    } else {
-        vertices <- dt[J(10:21), on = "field_index"][, by = "object_id",
-            list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
-    }
+    fldid_start <- dt[stri_startswith_fixed(field_name, "Vertex 1"), min(field_index)]
+    vertices <- dt[J(fldid_start:(fldid_start + 11)), on = "field_index"][, by = "object_id",
+        list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
     vertices <- dcast.data.table(vertices, object_id + index ~ field, value.var = "value_num")
     setnames(vertices, "object_id", "id")
 
@@ -1271,9 +1267,9 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
 
 # align_coord_system {{{
 align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighting = NULL) {
-    assert_choice(detailed, c("absolute", "relative"), null.ok = TRUE)
-    assert_choice(simple, c("absolute", "relative"), null.ok = TRUE)
-    assert_choice(daylighting, c("absolute", "relative"), null.ok = TRUE)
+    assert_choice(detailed, c("world", "relative"), null.ok = TRUE)
+    assert_choice(simple, c("world", "relative"), null.ok = TRUE)
+    assert_choice(daylighting, c("world", "relative"), null.ok = TRUE)
 
     if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(geoms)
     if (!nrow(geoms$zone)) return(geoms)
@@ -1287,28 +1283,24 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         on.exit(set(geoms$surface, NULL, "mult", NULL), add = TRUE)
     } else {
         geoms$surface <- empty
-        on.exit(geoms$surface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$subsurface)) {
         set(geoms$subsurface, NULL, "mult", 0L)
         on.exit(set(geoms$subsurface, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$subsurface <- empty
-        on.exit(geoms$subsurface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$shading)) {
         set(geoms$shading, NULL, "mult", 0L)
         on.exit(set(geoms$shading, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$shading <- empty
-        on.exit(geoms$shading <- data.table(), add = TRUE)
     }
     if (nrow(geoms$daylighting_point)) {
         set(geoms$daylighting_point, NULL, "mult", 0L)
         on.exit(set(geoms$daylighting_point, NULL, "mult", NULL), add = TRUE)
     } else {
         geoms$daylighting_point <- empty
-        on.exit(geoms$daylighting_point <- data.table(), add = TRUE)
     }
 
     # indicates whether detailed/simple class names have been checked
@@ -1326,7 +1318,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         # update rules
         geoms$rules$coordinate_system <- detailed
 
-        # -1 for absolute to relative and 1 for relative to absolute
+        # -1 for world to relative and 1 for relative to world
         mult <- if (detailed == "relative") -1L else 1L
 
         if (any(is_det_surf)) {
@@ -1355,7 +1347,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         # update rules
         geoms$rules$rectangular_surface_coordinate_system <- simple
 
-        # -1 for absolute to relative and 1 for relative to absolute
+        # -1 for world to relative and 1 for relative to world
         mult <- if (simple == "relative") -1L else 1L
 
         if (any(is_sim_surf)) {
@@ -1375,7 +1367,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         geoms$rules$daylighting_reference_point_coordinate_system <- daylighting
 
         if (nrow(geoms$daylighting_point)) {
-            # -1 for absolute to relative and 1 for relative to absolute
+            # -1 for world to relative and 1 for relative to world
             mult <- if (daylighting == "relative") -1L else 1L
             set(geoms$daylighting_point, NULL, "mult", mult)
         }
@@ -1417,6 +1409,10 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
 
     set(geoms$vertices, NULL, c("zone_name", "mult"), NULL)
 
+    if (!nrow(geoms$surface)) geoms$surface <- data.table()
+    if (!nrow(geoms$subsurface)) geoms$subsurface <- data.table()
+    if (!nrow(geoms$shading)) geoms$shading <- data.table()
+    if (!nrow(geoms$daylighting_point)) geoms$daylighting_point <- data.table()
     geoms
 }
 # }}}

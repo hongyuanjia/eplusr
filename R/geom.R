@@ -162,20 +162,21 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #'
         #' @details
         #' `$coord_system()` converts all vertices of geometries into specified
-        #' coordinate systems, e.g. from absolute to relative, and vice versa.
+        #' coordinate systems, e.g. from world to relative, and vice versa.
         #' Besides, it also updates the `GlobalGeometryRules` in parent [Idf]
         #' accordingly.
         #'
         #' @param detailed,simple,daylighting A string specifying the coordinate
         #'        system for detailed geometries, simple (rectangular surface)
         #'        geometries, and daylighting reference points. Should be one of
-        #'        `"relative"` and `"absolute"`.
+        #'        `"relative"`, `"world"` and `"absolute"`. `"absolute"` is the
+        #'        same as `"world"` and converted to it.
         #'
         #' @return The modified [Idf] object.
         #'
         #' @examples
         #' \dontrun{
-        #' geom$coord_system("absolute", "absolute", "absolute")
+        #' geom$coord_system("world", "world", "world")
         #' }
         coord_system = function (detailed = NULL, simple = NULL, daylighting = NULL)
             idfgeom_coord_system(self, private, detailed, simple, daylighting),
@@ -483,7 +484,15 @@ idfgeom_rules <- function (self, private) {
 # }}}
 # idfgeom_coord_system {{{
 idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL, daylighting = NULL) {
-    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(invisible(private$m_parent))
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(self)
+
+    assert_choice(detailed, c("world", "absolute", "relative"), null.ok = TRUE)
+    assert_choice(simple, c("world", "absolute", "relative"), null.ok = TRUE)
+    assert_choice(daylighting, c("world", "absolute", "relative"), null.ok = TRUE)
+
+    if (!is.null(detailed) && detailed == "absolute") detailed <- "world"
+    if (!is.null(simple) && simple == "absolute") simple <- "world"
+    if (!is.null(daylighting) && daylighting == "absolute") daylighting <- "world"
 
     rules <- private$geoms()$rules
 
@@ -510,9 +519,9 @@ idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL,
     # update vertices of detailed geometries
     if (rules$coordinate_system != private$m_geoms$rules$coordinate_system) {
         meta <- rbindlist(list(
-            fast_subset(private$m_geoms$surface, c("id", "class")),
-            fast_subset(private$m_geoms$subsurface, c("id", "class")),
-            fast_subset(private$m_geoms$shading, c("id", "class"))
+            if (nrow(private$m_geoms$surface)) fast_subset(private$m_geoms$surface, c("id", "class")),
+            if (nrow(private$m_geoms$subsurface)) fast_subset(private$m_geoms$subsurface, c("id", "class")),
+            if (nrow(private$m_geoms$shading)) fast_subset(private$m_geoms$shading, c("id", "class"))
         ))
         set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
     }
@@ -525,7 +534,7 @@ idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL,
     private$log_parent_order()
     private$log_geom_class()
 
-    invisible(private$m_parent)
+    self
 }
 # }}}
 # idfgeom_convert {{{
@@ -717,9 +726,9 @@ idfgeom_print <- function (self, private) {
     cli::cat_line(sprintf(" * Dayl Ref Pnt Num: %s", NROW(geoms$daylighting_point)))
     cli::cat_line(" * Coordinate System:")
     cli::cat_line(c(
-        sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "absolute", "Absolute", "Relative")),
-        sprintf("   - Simple:   '%s'", ifelse(geoms$rules$rectangular_surface_coordinate_system == "absolute", "Absolute", "Relative")),
-        sprintf("   - Daylighting: '%s'", ifelse(geoms$rules$daylighting_reference_point_coordinate_system == "absolute", "Absolute", "Relative"))
+        sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "world", "World", "Relative")),
+        sprintf("   - Simple:   '%s'", ifelse(geoms$rules$rectangular_surface_coordinate_system == "world", "World", "Relative")),
+        sprintf("   - Daylighting: '%s'", ifelse(geoms$rules$daylighting_reference_point_coordinate_system == "world", "World", "Relative"))
     ))
 }
 # }}}

@@ -141,7 +141,7 @@ attr(simple, "mapping")
 # Change coordinate systems
 
 `$coord_system()` converts all vertices of geometries into specified
-coordinate systems, e.g. from absolute to relative, and vice versa.
+coordinate systems, e.g. from world to relative, and vice versa.
 Besides, it also updates the `GlobalGeometryRules` in parent [Idf]
 accordingly.
 
@@ -150,7 +150,7 @@ geom$rules()
 
 geom$parent()$to_table("Floor 1 Cafe Slab")
 
-geom$coord_system("absolute")
+geom$coord_system("world")
 
 geom$parent()$to_table("Floor 1 Cafe Slab")
 ```

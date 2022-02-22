@@ -35,11 +35,23 @@ test_that("Geometry Extraction", {
             rectangular_surface_coordinate_system = "relative"
         )
     )
+    idf$GlobalGeometryRules$Coordinate_System <- "Absolute"
+    expect_equal(get_global_geom_rules(idf)$coordinate_system, "world")
+    ## can handle malformed global geometry rules
+    without_checking(idf$GlobalGeometryRules$set(..3 = NULL, ..4 = NULL, ..5 = NULL, .default = FALSE, .empty = TRUE))
+    expect_warning(rules <- get_global_geom_rules(idf))
+    expect_equal(unlist(rules, FALSE, FALSE)[3:5], rep("relative", 3))
+    without_checking(idf$GlobalGeometryRules$set(..3 = "Invalid", ..4 = "Invalid", ..5 = "Invalid", .default = FALSE, .empty = TRUE))
+    expect_warning(rules <- get_global_geom_rules(idf))
+    expect_equal(unlist(rules, FALSE, FALSE)[3:5], rep("relative", 3))
 
     # building transformation
     expect_equal(get_building_transformation(idf),
         list(id = 3L, name = "Building", north_axis = 30)
     )
+    ## can handle malformed building object
+    without_checking(idf$Building$North_Axis <- NULL)
+    expect_equal(expect_warning(get_building_transformation(idf))$north_axis, 0)
 
     # zone transformation
     expect_equal(d <- get_zone_transformation(idf),
@@ -200,10 +212,14 @@ test_that("Align coordinate system", {
     cls <- get_geom_class(idf)
 
     expect_is(geoms <- extract_geom(idf), "list")
+    expect_is(geoms <- align_coord_system(geoms), "list")
     expect_is(geoms <- align_coord_system(geoms, "relative", "relative", "relative"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))
-    expect_is(geoms <- align_coord_system(geoms, "absolute", "absolute", "absolute"), "list")
-    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("absolute", 3L))
+    expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
+    expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("world", 3L))
+
+    expect_warning(geoms <- extract_geom(empty_idf(8.8)))
+    expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
 })
 # }}}
 
