@@ -825,7 +825,7 @@ viewer$close()
 \subsection{Method \code{snapshot()}}{
 Capture and save current rgl view as an image
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfViewer$snapshot(filename)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfViewer$snapshot(filename, webshot = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -834,12 +834,18 @@ Capture and save current rgl view as an image
 \item{\code{filename}}{A single string specifying the file name. Current
 supported formats are \code{png}, \code{pdf}, \code{svg}, \code{ps}, \code{eps}, \code{tex}
 and \code{pgf}.}
+
+\item{\code{webshot}}{Whether to use the 'webshot2' package to take the
+snapshot. For more details, please see \code{\link[rgl:snapshot]{rgl::snapshot3d()}}.
+Default: \code{FALSE}.}
+
+\item{\code{...}}{Arguments to pass to \code{webshot2::webshot()}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 \verb{$snapshot()} captures the current rgl view and saves it as an image
-file to disk.
+file to disk using \code{\link[rgl:snapshot]{rgl::snapshot3d()}} and \code{\link[rgl:postscript]{rgl::rgl.postscript()}}.
 }
 
 \subsection{Returns}{
