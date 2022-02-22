@@ -10,7 +10,7 @@
   (#506 #507).
 * Fix `IdfViewer$snapshot()` for PNG output. A new parameter `webshot` has been
   added in `IdfViewer$snapshot()` with default value being `FALSE`. (#509).
-* Now `IdfSchedule$... <- val` works (#510).
+* Now `IdfSchedule$... <- val` works (#512).
 
 # eplusr 0.15.1
 
