@@ -355,13 +355,9 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
     setnames(meta, c("object_id", "class_name"), c("id", "class"))
 
     # vertices
-    if (idf$version() < 9.0) {
-        vertices <- dt[J(11:22), on = "field_index"][, by = "object_id",
-            list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
-    } else {
-        vertices <- dt[J(10:21), on = "field_index"][, by = "object_id",
-            list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
-    }
+    fldid_start <- dt[stri_startswith_fixed(field_name, "Vertex 1"), min(field_index)]
+    vertices <- dt[J(fldid_start:(fldid_start + 11)), on = "field_index"][, by = "object_id",
+        list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
     vertices <- dcast.data.table(vertices, object_id + index ~ field, value.var = "value_num")
     setnames(vertices, "object_id", "id")
 

@@ -13,7 +13,9 @@ test_that("IdfGeometry", {
 
     expect_is(geom$parent(), "Idf")
     expect_is(geom$rules(), "list")
+    expect_is(geom$coord_system(), "IdfGeometry")
     expect_is(geom$coord_system("world", "world", "world"), "IdfGeometry")
+    expect_is(geom$coord_system("absolute", "absolute", "absolute"), "IdfGeometry")
     expect_equal(unlist(geom$rules()[3:5], use.names = FALSE), rep("world", 3L))
     expect_equal(unlist(idf$GlobalGeometryRules$value(3:5), use.names = FALSE), rep("World", 3L))
 
