@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9002</span>
       </span>
     </div>
 
@@ -102,7 +102,8 @@
 <h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>Now <code>IdfGeometry$coord_system()</code> can correctly work. The coordinate system type can also be <code>"world"</code>. <code>"absolute"</code> input now is automatically converted to <code>"world"</code> to be compatible with EnergyPlus. <code>IdfGeometry$coord_system()</code> now returns itself by default, instead of the parent <code>Idf</code> object. This enables to check the modified coordinate systems by printing the <code>IdfGeometry</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/506" class="external-link">#506</a> <a href="https://github.com/hongyuanjia/eplusr/issues/507" class="external-link">#507</a>).</li>
+<ul><li><p>Now <code>IdfGeometry$coord_system()</code> can correctly work. The coordinate system type can also be <code>"world"</code>. <code>"absolute"</code> input now is automatically converted to <code>"world"</code> to be compatible with EnergyPlus. <code>IdfGeometry$coord_system()</code> now returns itself by default, instead of the parent <code>Idf</code> object. This enables to check the modified coordinate systems by printing the <code>IdfGeometry</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/506" class="external-link">#506</a> <a href="https://github.com/hongyuanjia/eplusr/issues/507" class="external-link">#507</a>).</p></li>
+<li><p>Fix <code>IdfViewer$snapshot()</code> for PNG output. A new parameter <code>webshot</code> has been added in <code>IdfViewer$snapshot()</code> with default value being <code>FALSE</code>. (<a href="https://github.com/hongyuanjia/eplusr/issues/509" class="external-link">#509</a>).</p></li>
 </ul></div>
 </div>
     <div class="section level2">
