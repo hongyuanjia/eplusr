@@ -454,11 +454,15 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'
         #' @details
         #' `$snapshot()` captures the current rgl view and saves it as an image
-        #' file to disk.
+        #' file to disk using [rgl::snapshot3d()] and [rgl::rgl.postscript()].
         #'
         #' @param filename A single string specifying the file name. Current
         #'        supported formats are `png`, `pdf`, `svg`, `ps`, `eps`, `tex`
         #'        and `pgf`.
+        #' @param webshot Whether to use the 'webshot2' package to take the
+        #'        snapshot. For more details, please see [rgl::snapshot3d()].
+        #'        Default: `FALSE`.
+        #' @param ... Arguments to pass to `webshot2::webshot()`.
         #'
         #' @return A single string of the file path.
         #'
@@ -468,8 +472,8 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' viewer$snapshot(tempfile(fileext = ".png"))
         #' }
         #'
-        snapshot = function (filename)
-            idfviewer_snapshot(self, private, filename),
+        snapshot = function (filename, webshot = FALSE, ...)
+            idfviewer_snapshot(self, private, filename, webshot, ...),
         # }}}
 
         # print {{{
@@ -865,12 +869,12 @@ idfviewer_close <- function (self, private) {
 }
 # }}}
 # idfviewer_snapshot {{{
-idfviewer_snapshot <- function (self, private, filename) {
+idfviewer_snapshot <- function (self, private, filename, webshot = FALSE, ...) {
     if (!rgl::rgl.useNULL() && !length(self$device())) {
         abort("No viewer window currently open. Please run '$show()' first.")
     }
 
-    rgl_snapshot(private$m_device, filename)
+    rgl_snapshot(private$m_device, filename, webshot, ...)
 }
 # }}}
 # idfviewer_print {{{

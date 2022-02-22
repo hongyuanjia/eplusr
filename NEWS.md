@@ -9,6 +9,9 @@
   enables to check the modified coordinate systems by printing the `IdfGeometry`
   (#506 #507).
 
+* Fix `IdfViewer$snapshot()` for PNG output. A new parameter `webshot` has been
+  added in `IdfViewer$snapshot()` with default value being `FALSE`. (#509).
+
 # eplusr 0.15.1
 
 ## Bug fixes

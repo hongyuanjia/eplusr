@@ -374,7 +374,7 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
 # }}}
 
 # rgl_snapshot {{{
-rgl_snapshot <- function (dev, filename) {
+rgl_snapshot <- function (dev, filename, webshot = FALSE, ...) {
     assert_string(filename)
 
     # set the last plot device as active
@@ -383,7 +383,7 @@ rgl_snapshot <- function (dev, filename) {
     if (!dir.exists(dirname(filename))) dir.create(dirname(filename), recursive = TRUE)
 
     if (has_ext(filename, "png")) {
-        rgl::snapshot3d(filename, "png", top = FALSE)
+        rgl::snapshot3d(filename, "png", top = FALSE, webshot = webshot, ...)
     } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
         rgl::rgl.postscript(filename, tools::file_ext(filename))
     } else {

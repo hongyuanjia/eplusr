@@ -3,7 +3,7 @@ test_that("IdfViewer class", {
     skip_on_cran()
 
     # simple model
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(path_eplus_example(8.8, "4ZoneWithShading_Simple_1.idf"))
 
     expect_is(viewer <- idf_viewer(idf), "IdfViewer")
     expect_is(viewer$parent(), "Idf")
@@ -53,8 +53,13 @@ test_that("IdfViewer class", {
 
     expect_is(f <- viewer$snapshot(tempfile(fileext = ".pdf")), "character")
     expect_true(file.exists(f))
-    expect_is(f <- viewer$snapshot(tempfile(fileext = ".png")), "character")
-    expect_true(file.exists(f))
+    if (testthat:::on_ci()) {
+        expect_is(f <- viewer$snapshot(tempfile(fileext = ".png"), webshot = TRUE), "character")
+        expect_true(file.exists(f))
+    } else {
+        expect_is(f <- viewer$snapshot(tempfile(fileext = ".png")), "character")
+        expect_true(file.exists(f))
+    }
     expect_null(viewer$focus())
     expect_null(viewer$close())
 
