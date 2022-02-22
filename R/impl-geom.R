@@ -69,7 +69,7 @@ get_global_geom_rules <- function (idf) {
                 rules[[i]] <- stri_trans_tolower(rules[[i]])
             }
 
-            if (rules[[i]] == "world") rules[[i]] <- "absolute"
+            if (rules[[i]] == "absolute") rules[[i]] <- "world"
         }
 
         setattr(rules, "names", lower_name(names(rules)))
@@ -1271,9 +1271,9 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
 
 # align_coord_system {{{
 align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighting = NULL) {
-    assert_choice(detailed, c("absolute", "relative"), null.ok = TRUE)
-    assert_choice(simple, c("absolute", "relative"), null.ok = TRUE)
-    assert_choice(daylighting, c("absolute", "relative"), null.ok = TRUE)
+    assert_choice(detailed, c("world", "relative"), null.ok = TRUE)
+    assert_choice(simple, c("world", "relative"), null.ok = TRUE)
+    assert_choice(daylighting, c("world", "relative"), null.ok = TRUE)
 
     if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(geoms)
     if (!nrow(geoms$zone)) return(geoms)
@@ -1326,7 +1326,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         # update rules
         geoms$rules$coordinate_system <- detailed
 
-        # -1 for absolute to relative and 1 for relative to absolute
+        # -1 for world to relative and 1 for relative to world
         mult <- if (detailed == "relative") -1L else 1L
 
         if (any(is_det_surf)) {
@@ -1355,7 +1355,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         # update rules
         geoms$rules$rectangular_surface_coordinate_system <- simple
 
-        # -1 for absolute to relative and 1 for relative to absolute
+        # -1 for world to relative and 1 for relative to world
         mult <- if (simple == "relative") -1L else 1L
 
         if (any(is_sim_surf)) {
@@ -1375,7 +1375,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         geoms$rules$daylighting_reference_point_coordinate_system <- daylighting
 
         if (nrow(geoms$daylighting_point)) {
-            # -1 for absolute to relative and 1 for relative to absolute
+            # -1 for world to relative and 1 for relative to world
             mult <- if (daylighting == "relative") -1L else 1L
             set(geoms$daylighting_point, NULL, "mult", mult)
         }

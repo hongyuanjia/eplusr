@@ -526,7 +526,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
 
                 # change all vertices to world coordinate system
                 private$m_log$geoms <- align_coord_system(
-                    private$m_log$geoms, "absolute", "absolute", "absolute"
+                    private$m_log$geoms, "world", "world", "world"
                 )
 
                 # vertices2 for triangulation

@@ -73,7 +73,7 @@ geom$convert()
 ## ------------------------------------------------
 
 \dontrun{
-geom$coord_system("absolute", "absolute", "absolute")
+geom$coord_system("world", "world", "world")
 }
 
 ## ------------------------------------------------
@@ -310,13 +310,14 @@ Convert vertices to specified coordinate systems
 \item{\code{detailed, simple, daylighting}}{A string specifying the coordinate
 system for detailed geometries, simple (rectangular surface)
 geometries, and daylighting reference points. Should be one of
-\code{"relative"} and \code{"absolute"}.}
+\code{"relative"}, \code{"world"} and \code{"absolute"}. \code{"absolute"} is the
+same as \code{"world"} and converted to it.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 \verb{$coord_system()} converts all vertices of geometries into specified
-coordinate systems, e.g. from absolute to relative, and vice versa.
+coordinate systems, e.g. from world to relative, and vice versa.
 Besides, it also updates the \code{GlobalGeometryRules} in parent \link{Idf}
 accordingly.
 }
@@ -327,7 +328,7 @@ The modified \link{Idf} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-geom$coord_system("absolute", "absolute", "absolute")
+geom$coord_system("world", "world", "world")
 }
 }
 \if{html}{\out{</div>}}
