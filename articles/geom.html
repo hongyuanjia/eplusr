@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9001</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Work with geometry</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-01-21</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
       <div class="hidden name"><code>geom.Rmd</code></div>
@@ -408,7 +408,7 @@
 <div class="section level2">
 <h2 id="change-coordinate-systems">Change coordinate systems<a class="anchor" aria-label="anchor" href="#change-coordinate-systems"></a>
 </h2>
-<p><code>$coord_system()</code> converts all vertices of geometries into specified coordinate systems, e.g. from absolute to relative, and vice versa. Besides, it also updates the <code>GlobalGeometryRules</code> in parent [Idf] accordingly.</p>
+<p><code>$coord_system()</code> converts all vertices of geometries into specified coordinate systems, e.g. from world to relative, and vice versa. Besides, it also updates the <code>GlobalGeometryRules</code> in parent [Idf] accordingly.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $starting_vertex_position</span>
@@ -449,7 +449,21 @@
 <span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
 <span class="va">....</span>
 
-<span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"absolute"</span><span class="op">)</span>
+<span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span>
+<span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
+<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span>
+<span class="co">#&gt;  * Version: '8.8.0'</span>
+<span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span>
+<span class="co">#&gt;  * North Axis: 0°</span>
+<span class="co">#&gt;  * Zone Num: 130</span>
+<span class="co">#&gt;  * Surface Num: 795</span>
+<span class="co">#&gt;  * SubSurface Num: 125</span>
+<span class="co">#&gt;  * Shading Num: 25</span>
+<span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span>
+<span class="co">#&gt;  * Coordinate System:</span>
+<span class="co">#&gt;    - Detailed: 'World'</span>
+<span class="co">#&gt;    - Simple:   'Relative'</span>
+<span class="co">#&gt;    - Daylighting: 'Relative'</span>
 
 <span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span>
 <span class="co">#&gt;      id              name                    class index</span>

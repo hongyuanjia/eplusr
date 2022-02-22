@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9001</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Run simulation and data exploration</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-01-21</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -167,9 +167,9 @@
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
 <span class="co">#&gt; ExpandObjects Started.</span>
 <span class="co">#&gt; No expanded file generated.</span>
-<span class="co">#&gt; ExpandObjects Finished. Time:     0.017</span>
+<span class="co">#&gt; ExpandObjects Finished. Time:     0.023</span>
 <span class="co">#&gt; EnergyPlus Starting</span>
-<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.01.21 09:01</span>
+<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.02.22 07:00</span>
 <span class="co">#&gt; Processing Data Dictionary</span>
 <span class="co">#&gt; Processing Input File</span>
 <span class="co">#&gt; Initializing Response Factors</span>
@@ -182,21 +182,21 @@
 
 <span class="va">job</span>
 <span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/RtmpntYaBY/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpwP6X4A/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 09:01:10' and completed successfully after 0.8 secs.</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-02-22 07:00:47' and completed successfully after 1.22 secs.</span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
 <p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/RtmpntYaBY/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpwP6X4A/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 09:01:10' and completed successfully after 0.8 secs.</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-02-22 07:00:47' and completed successfully after 1.22 secs.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -205,14 +205,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpntYaBY/5Zone_Transformer.idf.</span>
+<span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpwP6X4A/5Zone_Transformer.idf.</span>
 <span class="va">job</span>
 <span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/RtmpntYaBY/5Zone_Transformer.idf'</span>
+<span class="co">#&gt; * Model: '/tmp/RtmpwP6X4A/5Zone_Transformer.idf'</span>
 <span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.In...</span>
 <span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
 <span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-01-21 09:01:11' and is still running...</span></span>
+<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-02-22 07:00:49' and is still running...</span></span>
 
 <span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; $run_before</span>
@@ -238,7 +238,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
 <span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class="co">#&gt;   * Simulation started: 2022-01-21 09:01:00</span>
+<span class="co">#&gt;   * Simulation started: 2022-02-22 07:00:00</span>
 <span class="co">#&gt;   * Terminated: FALSE</span>
 <span class="co">#&gt;   * Successful: TRUE</span>
 <span class="co">#&gt;   * Warning[W]: 1</span>
@@ -870,7 +870,8 @@ An example of tidy BES output data representation where Table (a) is the standar
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the `.groups` argument.</span>
+<span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the</span>
+<span class="co">#&gt; `.groups` argument.</span>
 
 <span class="co"># plot a column chart to show the heating and cooling demand profile</span>
 <span class="va">aircon_out_mon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>

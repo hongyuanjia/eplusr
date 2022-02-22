@@ -26,7 +26,7 @@ rgl package."><meta property="og:image" content="https://hongyuanjia.github.io/e
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9001</span>
       </span>
     </div>
 
@@ -303,7 +303,8 @@ geom$convert()
 <dd><p>A string specifying the coordinate
 system for detailed geometries, simple (rectangular surface)
 geometries, and daylighting reference points. Should be one of
-<code>"relative"</code> and <code>"absolute"</code>.</p></dd>
+<code>"relative"</code>, <code>"world"</code> and <code>"absolute"</code>. <code>"absolute"</code> is the
+same as <code>"world"</code> and converted to it.</p></dd>
 
 
 </dl><p></p></div>
@@ -311,7 +312,7 @@ geometries, and daylighting reference points. Should be one of
 <div class="section">
 <h4 id="details-3">Details<a class="anchor" aria-label="anchor" href="#details-3"></a></h4>
 <p><code>$coord_system()</code> converts all vertices of geometries into specified
-coordinate systems, e.g. from absolute to relative, and vice versa.
+coordinate systems, e.g. from world to relative, and vice versa.
 Besides, it also updates the <code>GlobalGeometryRules</code> in parent <a href="Idf.html">Idf</a>
 accordingly.</p>
 </div>
@@ -323,7 +324,7 @@ accordingly.</p>
 <div class="section">
 <h4 id="examples-4">Examples<a class="anchor" aria-label="anchor" href="#examples-4"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-geom$coord_system("absolute", "absolute", "absolute")
+geom$coord_system("world", "world", "world")
 }
 </code></pre></div><p></p></div>
 </div>
@@ -665,7 +666,7 @@ geom$print()
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"absolute"</span>, <span class="st">"absolute"</span>, <span class="st">"absolute"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span>, <span class="st">"world"</span>, <span class="st">"world"</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## ------------------------------------------------</span></span>

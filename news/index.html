@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9001</span>
       </span>
     </div>
 
@@ -100,6 +100,10 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>Now <code>IdfGeometry$coord_system()</code> can correctly work. The coordinate system type can also be <code>"world"</code>. <code>"absolute"</code> input now is automatically converted to <code>"world"</code> to be compatible with EnergyPlus. <code>IdfGeometry$coord_system()</code> now returns itself by default, instead of the parent <code>Idf</code> object. This enables to check the modified coordinate systems by printing the <code>IdfGeometry</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/506" class="external-link">#506</a> <a href="https://github.com/hongyuanjia/eplusr/issues/507" class="external-link">#507</a>).</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.15.1" id="eplusr-0151">eplusr 0.15.1<small>2022-01-21</small><a class="anchor" aria-label="anchor" href="#eplusr-0151"></a></h2>
