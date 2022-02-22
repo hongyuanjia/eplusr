@@ -556,3 +556,21 @@ idfsch_cmpt_is_valid <- function (super, self, private, level = eplusr_option("v
     count_check_error(idfsch_cmpt_validate(super, self, private, level)) == 0L
 }
 # }}}
+
+#' @export
+# $<-.IdfSchedule {{{
+`$<-.IdfSchedule` <- function (x, name, value) {
+    # all field names start with a capital letter
+    if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
+
+    unlockBinding("set", x)
+    ori <- x$set
+    on.exit(add = TRUE, {
+        x$set <- ori
+        lockBinding("set", x)
+    })
+    x$set <- get_super_env(x)$set
+
+    NextMethod()
+}
+# }}}

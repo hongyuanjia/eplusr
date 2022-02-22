@@ -10,9 +10,9 @@
   (#506 #507).
 * Fix `Idf$load()` when input is a single string without any new line (`\n`)
   (#510).
-
 * Fix `IdfViewer$snapshot()` for PNG output. A new parameter `webshot` has been
   added in `IdfViewer$snapshot()` with default value being `FALSE`. (#509).
+* Now `IdfSchedule$... <- val` works (#512).
 
 # eplusr 0.15.1
 
