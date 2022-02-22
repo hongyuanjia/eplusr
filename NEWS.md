@@ -8,6 +8,8 @@
   now returns itself by default, instead of the parent `Idf` object. This
   enables to check the modified coordinate systems by printing the `IdfGeometry`
   (#506 #507).
+* Fix `Idf$load()` when input is a single string without any new line (`\n`)
+  (#510).
 * Fix `IdfViewer$snapshot()` for PNG output. A new parameter `webshot` has been
   added in `IdfViewer$snapshot()` with default value being `FALSE`. (#509).
 * Now `IdfSchedule$... <- val` works (#512).
