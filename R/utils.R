@@ -62,6 +62,9 @@ surround <- function (x, out = "'") {
 #'
 #' @details
 #'
+#' `get_super_env()` returns the `super` enclosed environment of an [R6::R6Class()]
+#' object.
+#'
 #' `get_self_env()` returns the `self` enclosed environment of an [R6::R6Class()]
 #' object.
 #'
@@ -86,6 +89,15 @@ get_self_env <- function (x) {
 #' @name get_env
 get_priv_env <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
+}
+# }}}
+
+# get_super_env{{{
+#' @keywords internal
+#' @export
+#' @name get_env
+get_super_env <- function (x) {
+    .subset2(.subset2(x, ".__enclos_env__"), "super")
 }
 # }}}
 
