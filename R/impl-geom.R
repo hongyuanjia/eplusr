@@ -1287,28 +1287,24 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
         on.exit(set(geoms$surface, NULL, "mult", NULL), add = TRUE)
     } else {
         geoms$surface <- empty
-        on.exit(geoms$surface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$subsurface)) {
         set(geoms$subsurface, NULL, "mult", 0L)
         on.exit(set(geoms$subsurface, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$subsurface <- empty
-        on.exit(geoms$subsurface <- data.table(), add = TRUE)
     }
     if (nrow(geoms$shading)) {
         set(geoms$shading, NULL, "mult", 0L)
         on.exit(set(geoms$shading, NULL, c("mult", "zone_name"), NULL), add = TRUE)
     } else {
         geoms$shading <- empty
-        on.exit(geoms$shading <- data.table(), add = TRUE)
     }
     if (nrow(geoms$daylighting_point)) {
         set(geoms$daylighting_point, NULL, "mult", 0L)
         on.exit(set(geoms$daylighting_point, NULL, "mult", NULL), add = TRUE)
     } else {
         geoms$daylighting_point <- empty
-        on.exit(geoms$daylighting_point <- data.table(), add = TRUE)
     }
 
     # indicates whether detailed/simple class names have been checked
@@ -1417,6 +1413,10 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
 
     set(geoms$vertices, NULL, c("zone_name", "mult"), NULL)
 
+    if (!nrow(geoms$surface)) geoms$surface <- data.table()
+    if (!nrow(geoms$subsurface)) geoms$subsurface <- data.table()
+    if (!nrow(geoms$shading)) geoms$shading <- data.table()
+    if (!nrow(geoms$daylighting_point)) geoms$daylighting_point <- data.table()
     geoms
 }
 # }}}

@@ -519,9 +519,9 @@ idfgeom_coord_system <- function (self, private, detailed = NULL, simple = NULL,
     # update vertices of detailed geometries
     if (rules$coordinate_system != private$m_geoms$rules$coordinate_system) {
         meta <- rbindlist(list(
-            fast_subset(private$m_geoms$surface, c("id", "class")),
-            fast_subset(private$m_geoms$subsurface, c("id", "class")),
-            fast_subset(private$m_geoms$shading, c("id", "class"))
+            if (nrow(private$m_geoms$surface)) fast_subset(private$m_geoms$surface, c("id", "class")),
+            if (nrow(private$m_geoms$subsurface)) fast_subset(private$m_geoms$subsurface, c("id", "class")),
+            if (nrow(private$m_geoms$shading)) fast_subset(private$m_geoms$shading, c("id", "class"))
         ))
         set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
     }
