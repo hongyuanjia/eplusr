@@ -1,5 +1,11 @@
 # eplusr (development version)
 
+## New features
+
+* A new `encoding` parameter has been added in `read_idf()`, `use_idd()` and
+  `read_epw()`. The default value is `unknown` which indicates that the input
+  file is native encoded (#515).
+
 ## Bug fixes
 
 * Now `IdfGeometry$coord_system()` can correctly work. The coordinate system
