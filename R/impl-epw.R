@@ -176,12 +176,12 @@ get_epw_idd_env <- function () {
 #    01:00:00, Hour of 2 corresponds to the period between 01:00:01 to 02:00:00,
 #    and etc. The minute column is **not used** to determine currently sub-hour
 #    time.
-parse_epw_file <- function (path, idd = NULL) {
+parse_epw_file <- function (path, idd = NULL, encoding = "unknown") {
     # read and parse header
-    epw_header <- parse_epw_header(path)
+    epw_header <- parse_epw_header(path, encoding = encoding)
 
     # read core weather data
-    epw_data <- parse_epw_data(path)
+    epw_data <- parse_epw_data(path, encoding = encoding)
 
     # add line indicator
     set(epw_data, NULL, "line", seq_len(nrow(epw_data)))
@@ -201,10 +201,10 @@ parse_epw_file <- function (path, idd = NULL) {
 # }}}
 ## HEADER
 # parse_epw_header {{{
-parse_epw_header <- function (path, strict = FALSE) {
+parse_epw_header <- function (path, strict = FALSE, encoding = "unknown") {
     idd_env <- get_epw_idd_env()
 
-    dt_in <- read_lines(path, nrows = 8L)
+    dt_in <- read_lines(path, nrows = 8L, encoding = encoding)
 
     # in case header does not any fields, e.g. "LOCATION\n"
     dt_in[!stri_detect_fixed(string, ","), string := paste0(string, ",")]
@@ -1194,7 +1194,7 @@ as.POSIXct.EpwDate <- function (x, ...) {
 # }}}
 ## DATA
 # parse_epw_data {{{
-parse_epw_data <- function (path) {
+parse_epw_data <- function (path, encoding = "unknown") {
     num_header <- 8L
 
     idd_env <- get_epw_idd_env()
@@ -1205,7 +1205,7 @@ parse_epw_data <- function (path) {
     # colnames refers to column "Long Name" in Table 2.8 in
     # "AuxiliaryPrograms.pdf" of EnergyPlus 8.6
     # TODO: fread will directly skip those few abnormal rows
-    header_epw_data <- fread(path, sep = ",", skip = num_header, nrows = 0L, header = FALSE)
+    header_epw_data <- fread(path, sep = ",", skip = num_header, nrows = 0L, header = FALSE, encoding = encoding)
     if (ncol(header_epw_data) != cls$min_fields) {
         parse_error("epw", "Invalid weather data column", num = 1L,
             post = sprintf("Expected %i fields in EPW weather data instead of '%i' in current file",
