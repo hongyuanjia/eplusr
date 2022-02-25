@@ -1326,8 +1326,8 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' @author Hongyuan Jia
 #' @export
 # read_epw {{{
-read_epw <- function (path) {
-    Epw$new(path)
+read_epw <- function (path, encoding = "unknown") {
+    Epw$new(path, encoding = encoding)
 }
 # }}}
 
