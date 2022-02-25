@@ -7,7 +7,7 @@
 \alias{is_avail_idd}
 \title{Use a specific EnergyPlus Input Data Dictionary (IDD) file}
 \usage{
-use_idd(idd, download = FALSE)
+use_idd(idd, download = FALSE, encoding = "unknown")
 
 download_idd(ver = "latest", dir = ".")
 
@@ -29,6 +29,10 @@ automatically download corresponding IDD file if the Idd object is
 currently not available. It is useful in case when you only want to edit
 an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is \code{FALSE}.}
+
+\item{encoding}{The file encoding of input IDD. Should be one of \code{"unknown"},
+\verb{"Latin-1" and }"UTF-8"\verb{. The default is }"unknown"` which means that the
+file is encoded in the native encoding.}
 
 \item{ver}{A valid EnergyPlus version, e.g. \code{8}, \code{8.7}, \code{"8.7"} or \code{"8.7.0"}.
 For \code{download_idd()}, the special value \code{"latest"}, which is default,

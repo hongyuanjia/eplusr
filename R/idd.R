@@ -1010,6 +1010,9 @@ read_idd <- function (path) {
 #'     means the latest version.
 #' @param dir A directory to indicate where to save the IDD file. Default:
 #'     current working directory.
+#' @param encoding The file encoding of input IDD. Should be one of `"unknown"`,
+#'     `"Latin-1" and `"UTF-8"`. The default is `"unknown"` which means that the
+#'     file is encoded in the native encoding.
 #'
 #' @details
 #' `use_idd()` takes a valid version or a path of an EnergyPlus Input Data
@@ -1077,14 +1080,14 @@ read_idd <- function (path) {
 #' @export
 #' @author Hongyuan Jia
 # use_idd {{{
-use_idd <- function (idd, download = FALSE) {
+use_idd <- function (idd, download = FALSE, encoding = "unknown") {
     if (is_idd(idd)) return(idd)
 
     assert_vector(idd, len = 1L)
 
     # if input is a file path or literal IDD string
     if (!is_idd_ver(idd)) {
-        return(tryCatch(read_idd(idd), eplusr_error_read_lines = function (e) {
+        return(tryCatch(read_idd(idd, encoding = encoding), eplusr_error_read_lines = function (e) {
             abort(paste0("Parameter 'idd' should be a valid version, a path, or ",
                 "a single character string of an EnergyPlus Input Data ",
                 "Dictionary (IDD) file (usually named 'Energy+.idd'). ",
@@ -1171,7 +1174,7 @@ use_idd <- function (idd, download = FALSE) {
 
     verbose_info("IDD file found: ", surround(idd), ".")
     verbose_info("Start parsing...")
-    idd <- read_idd(idd)
+    idd <- read_idd(idd, encoding = encoding)
     verbose_info("Parsing completed.")
     idd
 }

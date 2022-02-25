@@ -4,17 +4,21 @@
 \alias{read_idf}
 \title{Read an EnergyPlus Input Data File (IDF)}
 \usage{
-read_idf(path, idd = NULL)
+read_idf(path, idd = NULL, encoding = "unknown")
 }
 \arguments{
 \item{path}{Either a path, a connection, or literal data (either a single
-string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
-path, that file usually has a extension \code{.idf}.}
+string or a raw vector) to an EnergyPlus Input Data File (IDF). If a
+file path, that file usually has a extension \code{.idf}.}
 
 \item{idd}{Any acceptable input of \code{\link[=use_idd]{use_idd()}}. If \code{NULL}, which is the
-default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input is an
-\code{.ddy} file which does not have a version field, the latest version of \link{Idf}
-cached will be used.}
+default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the
+input is an \code{.ddy} file which does not have a version field, the
+latest version of \link{Idf} cached will be used.}
+
+\item{encoding}{The file encoding of input IDD. Should be one of \code{"unknown"},
+\verb{"Latin-1" and }"UTF-8"\verb{. The default is }"unknown"` which means that
+the file is encoded in the native encoding.}
 }
 \value{
 An \link{Idf} object.

@@ -100,9 +100,9 @@ FIELD_COLS <- list(
 # }}}
 
 # parse_idd_file {{{
-parse_idd_file <- function(path, epw = FALSE) {
+parse_idd_file <- function(path, epw = FALSE, encoding = "unknown") {
     # read idd string, get idd version and build
-    idd_dt <- read_lines(path)
+    idd_dt <- read_lines(path, encoding = encoding)
 
     idd_version <- get_idd_ver(idd_dt)
     idd_build <- get_idd_build(idd_dt)
@@ -183,9 +183,9 @@ parse_idd_file <- function(path, epw = FALSE) {
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
+parse_idf_file <- function (path, idd = NULL, ref = TRUE, encoding = "unknown") {
     # read IDF string and get version first to get corresponding IDD
-    idf_dt <- read_lines(path)
+    idf_dt <- read_lines(path, encoding = encoding)
     # delete blank lines
     idf_dt <- idf_dt[!stri_isempty(string)]
 
