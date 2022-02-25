@@ -1174,6 +1174,8 @@ use_idd <- function (idd, download = FALSE, encoding = "unknown") {
                 }
             }
         }
+
+        if (ver <= 8.3) encoding <- "Latin-1"
     }
 
     verbose_info("IDD file found: ", surround(idd), ".")
