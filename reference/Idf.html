@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9005</span>
       </span>
     </div>
 
@@ -199,7 +199,7 @@ stored in three tables:</p><ul><li><p><code>object</code>: contains object IDs, 
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create an <code>Idf</code> object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/Idf.html">Idf</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path</span>, idd <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/Idf.html">Idf</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path</span>, idd <span class="op">=</span> <span class="cn">NULL</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -216,6 +216,12 @@ string or a raw vector) to an EnergyPlus Input Data File
 default, the version of IDF will be passed to <code><a href="use_idd.html">use_idd()</a></code>. If
 the input is an <code>.ddy</code> file which does not have a version
 field, the latest version of Idf cached will be used.</p></dd>
+
+
+<dt><code>encoding</code></dt>
+<dd><p>The file encoding of input IDF. Should be one of
+<code>"unknown"</code>, <code>"Latin-1" and </code>"UTF-8"<code>. The default is </code>"unknown"` which means that the file is encoded in the native
+encoding.</p></dd>
 
 
 </dl><p></p></div>

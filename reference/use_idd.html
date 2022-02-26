@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9005</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">use_idd</span><span class="op">(</span><span class="va">idd</span>, download <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">use_idd</span><span class="op">(</span><span class="va">idd</span>, download <span class="op">=</span> <span class="cn">FALSE</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span>
 
 <span class="fu">download_idd</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, dir <span class="op">=</span> <span class="st">"."</span><span class="op">)</span>
 
@@ -129,6 +129,10 @@ automatically download corresponding IDD file if the Idd object is
 currently not available. It is useful in case when you only want to edit
 an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is <code>FALSE</code>.</p></dd>
+<dt>encoding</dt>
+<dd><p>The file encoding of input IDD. Should be one of <code>"unknown"</code>,
+<code>"Latin-1" and </code>"UTF-8"<code>. The default is </code>"unknown"` which means that the
+file is encoded in the native encoding.</p></dd>
 <dt>ver</dt>
 <dd><p>A valid EnergyPlus version, e.g. <code>8</code>, <code>8.7</code>, <code>"8.7"</code> or <code>"8.7.0"</code>.
 For <code>download_idd()</code>, the special value <code>"latest"</code>, which is default,
