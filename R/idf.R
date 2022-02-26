@@ -72,6 +72,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        default, the version of IDF will be passed to [use_idd()]. If
         #'        the input is an `.ddy` file which does not have a version
         #'        field, the latest version of [Idf] cached will be used.
+        #' @param encoding The file encoding of input IDF. Should be one of
+        #'        `"unknown"`, `"Latin-1" and `"UTF-8"`. The default is
+        #'        `"unknown"` which means that the file is encoded in the native
+        #'        encoding.
         #'
         #' @return An `Idf` object.
         #'
@@ -104,13 +108,13 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Idf$new(string_idf, use_idd(8.8, download = "auto"))
         #' }
         #'
-        initialize = function (path, idd = NULL) {
+        initialize = function (path, idd = NULL, encoding = "unknown") {
             # only store if input is a path
             if (is.character(path) && length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- normalizePath(path)
             }
 
-            idf_file <- parse_idf_file(path, idd)
+            idf_file <- parse_idf_file(path, idd, encoding = encoding)
             idd <- use_idd(idf_file$version)
 
             # in case there is no version field in input IDF
@@ -3578,12 +3582,15 @@ idf_has_hvactemplate <- function (idf) {
 #' `Idf` object. For more details on `Idf` object, please see [Idf] class.
 #'
 #' @param path Either a path, a connection, or literal data (either a single
-#' string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
-#' path, that file usually has a extension `.idf`.
+#'        string or a raw vector) to an EnergyPlus Input Data File (IDF). If a
+#'        file path, that file usually has a extension `.idf`.
 #' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
-#' default, the version of IDF will be passed to [use_idd()]. If the input is an
-#' `.ddy` file which does not have a version field, the latest version of [Idf]
-#' cached will be used.
+#'        default, the version of IDF will be passed to [use_idd()]. If the
+#'        input is an `.ddy` file which does not have a version field, the
+#'        latest version of [Idf] cached will be used.
+#' @param encoding The file encoding of input IDD. Should be one of `"unknown"`,
+#'        `"Latin-1" and `"UTF-8"`. The default is `"unknown"` which means that
+#'        the file is encoded in the native encoding.
 #'
 #' @details
 #' Currently, Imf file is not fully supported. All EpMacro lines will be treated
@@ -3631,8 +3638,8 @@ idf_has_hvactemplate <- function (idf) {
 #' @export
 #' @author Hongyuan Jia
 # read_idf {{{
-read_idf <- function (path, idd = NULL) {
-    Idf$new(path, idd)
+read_idf <- function (path, idd = NULL, encoding = "unknown") {
+    Idf$new(path, idd, encoding = encoding)
 }
 # }}}
 

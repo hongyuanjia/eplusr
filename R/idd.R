@@ -77,6 +77,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #'        string or a raw vector) to an EnergyPlus Input Data Dictionary
         #'        (IDD). If a file path, that file usually has a extension
         #'        `.idd`.
+        #' @param encoding The file encoding of input IDD. Should be one of
+        #'        `"unknown"`, `"Latin-1" and `"UTF-8"`. The default is
+        #'        `"unknown"` which means that the file is encoded in the native
+        #'        encoding.
         #'
         #' @return An `Idd` object.
         #'
@@ -87,7 +91,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd <- use_idd(8.8, download = "auto")
         #' }
         #'
-        initialize = function (path) {
+        initialize = function (path, encoding = "unknown") {
             # only store if input is a path
             if (is.character(path) && length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- normalizePath(path)
@@ -97,7 +101,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$uuid <- unique_id()
 
-            idd_file <- parse_idd_file(path)
+            idd_file <- parse_idd_file(path, encoding = encoding)
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
@@ -986,8 +990,8 @@ format.Idd <- function (x, ...) {
 # }}}
 
 # read_idd {{{
-read_idd <- function (path) {
-    Idd$new(path)
+read_idd <- function (path, encoding = "unknown") {
+    Idd$new(path, encoding = encoding)
 }
 # }}}
 
@@ -1010,6 +1014,9 @@ read_idd <- function (path) {
 #'     means the latest version.
 #' @param dir A directory to indicate where to save the IDD file. Default:
 #'     current working directory.
+#' @param encoding The file encoding of input IDD. Should be one of `"unknown"`,
+#'     `"Latin-1" and `"UTF-8"`. The default is `"unknown"` which means that the
+#'     file is encoded in the native encoding.
 #'
 #' @details
 #' `use_idd()` takes a valid version or a path of an EnergyPlus Input Data
@@ -1077,14 +1084,14 @@ read_idd <- function (path) {
 #' @export
 #' @author Hongyuan Jia
 # use_idd {{{
-use_idd <- function (idd, download = FALSE) {
+use_idd <- function (idd, download = FALSE, encoding = "unknown") {
     if (is_idd(idd)) return(idd)
 
     assert_vector(idd, len = 1L)
 
     # if input is a file path or literal IDD string
     if (!is_idd_ver(idd)) {
-        return(tryCatch(read_idd(idd), eplusr_error_read_lines = function (e) {
+        return(tryCatch(read_idd(idd, encoding = encoding), eplusr_error_read_lines = function (e) {
             abort(paste0("Parameter 'idd' should be a valid version, a path, or ",
                 "a single character string of an EnergyPlus Input Data ",
                 "Dictionary (IDD) file (usually named 'Energy+.idd'). ",
@@ -1167,11 +1174,13 @@ use_idd <- function (idd, download = FALSE) {
                 }
             }
         }
+
+        if (ver <= 8.3) encoding <- "Latin-1"
     }
 
     verbose_info("IDD file found: ", surround(idd), ".")
     verbose_info("Start parsing...")
-    idd <- read_idd(idd)
+    idd <- read_idd(idd, encoding = encoding)
     verbose_info("Parsing completed.")
     idd
 }

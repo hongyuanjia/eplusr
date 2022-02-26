@@ -13,12 +13,12 @@ NULL
 EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = FALSE, lock_objects = FALSE,
     inherit = Idd,
     public = list(
-        initialize = function (path) {
+        initialize = function (path, encoding = "unknown") {
             # add a uuid
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$uuid <- unique_id()
 
-            idd_file <- parse_idd_file(path, epw = TRUE)
+            idd_file <- parse_idd_file(path, epw = TRUE, encoding = encoding)
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
@@ -129,6 +129,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        single string or a raw vector) to an EnergyPlus Weather File
         #'        (EPW).  If a file path, that file usually has a extension
         #'        `.epw`.
+        #' @param encoding The file encoding of input IDD. Should be one of
+        #'        `"unknown"`, `"Latin-1" and `"UTF-8"`. The default is
+        #'        `"unknown"` which means that the file is encoded in the native
+        #'        encoding.
         #'
         #' @return An `Epw` object.
         #'
@@ -152,14 +156,14 @@ Epw <- R6::R6Class(classname = "Epw",
         #' }
         #' }
         #'
-        initialize = function (path) {
+        initialize = function (path, encoding = "unknown") {
             if (checkmate::test_file_exists(path, "r")) {
                 private$m_path <- normalizePath(path)
             }
 
             private$m_idd <- get_epw_idd()
 
-            epw_file <- parse_epw_file(path, idd = private$m_idd)
+            epw_file <- parse_epw_file(path, idd = private$m_idd, encoding = encoding)
 
             private$m_idf_env <- list2env(epw_file$header, parent = emptyenv())
             private$m_data <- epw_file$data
@@ -1294,6 +1298,9 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' simplifications. For more details on `Epw`, please see [Epw] class.
 #'
 #' @param path A path of an EnergyPlus `EPW` file.
+#' @param encoding The file encoding of input IDD. Should be one of `"unknown"`,
+#'        `"Latin-1" and `"UTF-8"`. The default is `"unknown"` which means that
+#'        the file is encoded in the native encoding.
 #' @return An `Epw` object.
 #' @examples
 #' \dontrun{
@@ -1319,8 +1326,8 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' @author Hongyuan Jia
 #' @export
 # read_epw {{{
-read_epw <- function (path) {
-    Epw$new(path)
+read_epw <- function (path, encoding = "unknown") {
+    Epw$new(path, encoding = encoding)
 }
 # }}}
 

@@ -563,7 +563,7 @@ idfsch_cmpt_is_valid <- function (super, self, private, level = eplusr_option("v
     # all field names start with a capital letter
     if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
 
-    unlockBinding("set", x)
+    utils::getFromNamespace("unlockBinding", ns = "base")("set", x)
     ori <- x$set
     on.exit(add = TRUE, {
         x$set <- ori

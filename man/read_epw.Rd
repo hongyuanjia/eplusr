@@ -4,10 +4,14 @@
 \alias{read_epw}
 \title{Read and Parse EnergyPlus Weather File (EPW)}
 \usage{
-read_epw(path)
+read_epw(path, encoding = "unknown")
 }
 \arguments{
 \item{path}{A path of an EnergyPlus \code{EPW} file.}
+
+\item{encoding}{The file encoding of input IDD. Should be one of \code{"unknown"},
+\verb{"Latin-1" and }"UTF-8"\verb{. The default is }"unknown"` which means that
+the file is encoded in the native encoding.}
 }
 \value{
 An \code{Epw} object.

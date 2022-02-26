@@ -330,7 +330,7 @@ Hongyuan Jia
 \subsection{Method \code{new()}}{
 Create an \code{Idd} object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idd$new(path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idd$new(path, encoding = "unknown")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -340,6 +340,10 @@ Create an \code{Idd} object
 string or a raw vector) to an EnergyPlus Input Data Dictionary
 (IDD). If a file path, that file usually has a extension
 \code{.idd}.}
+
+\item{\code{encoding}}{The file encoding of input IDD. Should be one of
+\code{"unknown"}, \verb{"Latin-1" and }"UTF-8"\verb{. The default is }"unknown"` which means that the file is encoded in the native
+encoding.}
 }
 \if{html}{\out{</div>}}
 }
