@@ -4,7 +4,7 @@
 \alias{read_epw}
 \title{Read and Parse EnergyPlus Weather File (EPW)}
 \usage{
-read_epw(path)
+read_epw(path, encoding = "unknown")
 }
 \arguments{
 \item{path}{A path of an EnergyPlus \code{EPW} file.}
