@@ -5,6 +5,12 @@
 * A new `encoding` parameter has been added in `read_idf()`, `use_idd()` and
   `read_epw()`. The default value is `unknown` which indicates that the input
   file is native encoded (#515).
+* Now `validate_level` option is respected when parsing EPW files. This makes it
+  possible to parse EPW files with non-standard EPW header values, which is
+  useful when only the core EPW data is needed (#520). E.g:
+  ```
+  with_option(list(validate_level = "none"), read_epw(YOUR_EPW_PATH))
+  ```
 
 ## Bug fixes
 
