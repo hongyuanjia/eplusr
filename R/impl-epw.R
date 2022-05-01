@@ -659,7 +659,7 @@ validate_epw_header <- function (header, strict = FALSE) {
 # }}}
 # validate_epw_header_basic {{{
 validate_epw_header_basic <- function (header, class = NULL, field = NULL) {
-    chk <- level_checks("final")
+    chk <- level_checks()
     chk$auto_field <- FALSE
     chk$reference <- FALSE
 
