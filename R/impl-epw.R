@@ -1650,6 +1650,14 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
                 lubridate::year(Sys.Date()), leapyear)
             year <- get_epw_datetime_year(start_year, p$start_day, p$end_day, m$num, 60 / interval)
             start_year <- year[1L]
+            # If Feb 28 is from a leap year, the datetime here will fall on Feb
+            # 29th instead of Mar 1st. Here reset the date to Mar 1st manually
+            # to avoid invalid date if derived start year is a non-leap year
+            # See #552
+            if (!leapyear && length(is_feb28 <- which(d$month == 2L & d$day == 28L)) && mday(datetime[max(is_feb28)]) == 29L) {
+                lubridate::month(datetime[max(is_feb28)]) <- 3L
+                lubridate::mday(datetime[max(is_feb28)]) <- 1L
+            }
             lubridate::year(datetime) <- year
         }
 
