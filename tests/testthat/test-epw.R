@@ -248,6 +248,14 @@ test_that("Data Getter", {
     # can change the time zone of datetime column in the returned weather data
     expect_error(attr(epw$data(tz = "America/Chicago")$datetime, "tzone"), class = "eplusr_error_epw_data")
     expect_equal(attr(epw$data(start_year = 2019, tz = "Etc/GMT+8")$datetime, "tzone"), "Etc/GMT+8")
+
+    # can detect if Feb 28 data is from a leap year. See #552
+    get_priv_env(epw)$m_data[month == 2 & day == 28, year := 1988]
+    get_priv_env(epw)$m_data[month == 2 & day == 28,
+        datetime := lubridate::make_datetime(
+            year, month, day, hour, minute
+    )]
+    expect_equal(nrow(epw$data()), 8760)
     # }}}
 
     # $abnormal_data() {{{
