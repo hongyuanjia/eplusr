@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.1.9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
       </span>
     </div>
 
@@ -99,9 +99,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<h2 class="page-header" data-toc-text="0.15.2" id="eplusr-0152">eplusr 0.15.2<a class="anchor" aria-label="anchor" href="#eplusr-0152"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-15-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-15-2"></a></h3>
 <ul><li><p>A new <code>encoding</code> parameter has been added in <code><a href="../reference/read_idf.html">read_idf()</a></code>, <code><a href="../reference/use_idd.html">use_idd()</a></code> and <code><a href="../reference/read_epw.html">read_epw()</a></code>. The default value is <code>unknown</code> which indicates that the input file is native encoded (<a href="https://github.com/hongyuanjia/eplusr/issues/515" class="external-link">#515</a>).</p></li>
 <li>
 <p>Now <code>validate_level</code> option is respected when parsing EPW files. This makes it possible to parse EPW files with non-standard EPW header values, which is useful when only the core EPW data is needed (<a href="https://github.com/hongyuanjia/eplusr/issues/520" class="external-link">#520</a>). E.g:</p>
@@ -109,7 +109,7 @@
 </li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-15-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-15-2"></a></h3>
 <ul><li>Now <code>IdfGeometry$coord_system()</code> can correctly work. The coordinate system type can also be <code>"world"</code>. <code>"absolute"</code> input now is automatically converted to <code>"world"</code> to be compatible with EnergyPlus. <code>IdfGeometry$coord_system()</code> now returns itself by default, instead of the parent <code>Idf</code> object. This enables to check the modified coordinate systems by printing the <code>IdfGeometry</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/506" class="external-link">#506</a> <a href="https://github.com/hongyuanjia/eplusr/issues/507" class="external-link">#507</a>).</li>
 <li>Fix <code>Idf$load()</code> when input is a single string without any new line (<code>\n</code>) (<a href="https://github.com/hongyuanjia/eplusr/issues/510" class="external-link">#510</a>).</li>
 <li>Fix <code>IdfViewer$snapshot()</code> for PNG output. A new parameter <code>webshot</code> has been added in <code>IdfViewer$snapshot()</code> with default value being <code>FALSE</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/509" class="external-link">#509</a>).</li>
@@ -117,7 +117,7 @@
 <li>Fix the error of invalid datetime in <code>Epw$data()</code> when data of Feb 28 is from a leap year while the EPW did not contain any leap year data (<a href="https://github.com/hongyuanjia/eplusr/issues/552" class="external-link">#552</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<h3 id="documentation-0-15-2">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-15-2"></a></h3>
 <ul><li>Regenerate package documentation to fix CRAN NOTES on HTML manuals (<a href="https://github.com/hongyuanjia/eplusr/issues/525" class="external-link">#525</a>).</li></ul></div>
 </div>
     <div class="section level2">
