@@ -108,14 +108,14 @@ acceptable format for <code>$load()</code> method in <a href="Idf.html">Idf</a> 
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd</span>, <span class="va">key_value</span>, <span class="va">reporting_frequency</span><span class="op">)</span>
-
-<span class="fu">mdd_to_load</span><span class="op">(</span>
-  <span class="va">mdd</span>,
-  <span class="va">reporting_frequency</span>,
-  class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Output:Meter"</span>, <span class="st">"Output:Meter:MeterFileOnly"</span>, <span class="st">"Output:Meter:Cumulative"</span>,
-    <span class="st">"Output:Meter:Cumulative:MeterFileOnly"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd</span>, <span class="va">key_value</span>, <span class="va">reporting_frequency</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">mdd_to_load</span><span class="op">(</span></span>
+<span>  <span class="va">mdd</span>,</span>
+<span>  <span class="va">reporting_frequency</span>,</span>
+<span>  class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Output:Meter"</span>, <span class="st">"Output:Meter:MeterFileOnly"</span>, <span class="st">"Output:Meter:Cumulative"</span>,</span>
+<span>    <span class="st">"Output:Meter:Cumulative:MeterFileOnly"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -123,10 +123,14 @@ acceptable format for <code>$load()</code> method in <a href="Idf.html">Idf</a> 
     <dl><dt>rdd, mdd</dt>
 <dd><p>A <code>RddFile</code> object created using <code><a href="rdd.html">read_rdd()</a></code> and a <code>MddFile</code>
 object created using <code><a href="rdd.html">read_mdd()</a></code>, respectively.</p></dd>
+
+
 <dt>key_value</dt>
 <dd><p>Key value name for <strong>all</strong> variables. If not specified and
 the <code>key_value</code> column in the input <code>RddFile</code> object will be used. If
 <code>key_value</code> column does not exist, <code>"*"</code> are used for all variables.</p></dd>
+
+
 <dt>reporting_frequency</dt>
 <dd><p>Variable value reporting frequency for <strong>all</strong>
 variables. If not specified and the <code>reporting_freqency</code> column in the input
@@ -134,15 +138,20 @@ variables. If not specified and the <code>reporting_freqency</code> column in th
 <code>"Timestep"</code> are used for all variables. All possible values: <code>"Detailed"</code>,
 <code>"Timestep"</code>, <code>"Hourly"</code>, <code>"Daily"</code>, <code>"Monthly"</code>, <code>"RunPeriod"</code>,
 <code>"Environment"</code>, and <code>"Annual"</code>.</p></dd>
+
+
 <dt>class</dt>
 <dd><p>Class name for meter output. All possible values:
 <code>"Output:Meter"</code>, <code>"Output:Meter:MeterFileOnly"</code>,
 <code>"Output:Meter:Cumulative"</code>, and <code>"Output:Meter:Cumulative:MeterFileOnly"</code>.
 Default: <code>"Output:Meter"</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 5 columns with an additional
+    
+
+<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 5 columns with an additional
 attribute named <code>eplus_version</code> extracted from the original <code>RddFile</code> and
 <code>MddFile</code>:</p><ul><li><p><code>id</code>: Integer type. Used to distinguish each object definition.</p></li>
 <li><p><code>class</code>: Character type. Class names, e.g. <code>Output:Variable</code> and
@@ -154,51 +163,51 @@ attribute named <code>eplus_version</code> extracted from the original <code>Rdd
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># read an example distributed with eplusr</span></span>
-<span class="r-in"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># run Design-Day-Only simulation silently</span></span>
-<span class="r-in"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># read RDD and MDD</span></span>
-<span class="r-in"><span class="va">rdd</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">mdd</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perform subsetting on the variables</span></span>
-<span class="r-in"><span class="co"># e.g.:</span></span>
-<span class="r-in"><span class="va">rdd_sub</span> <span class="op">&lt;-</span> <span class="va">rdd</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Site"</span>, <span class="va">variable</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-in"><span class="va">mdd_sub</span> <span class="op">&lt;-</span> <span class="va">mdd</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Electricity"</span>, <span class="va">variable</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># use newly added helper `rdd_to_load()` and `mdd_to_load()` and `$load()` to</span></span>
-<span class="r-in"><span class="co"># add `Output:Variable` and `Output:Meter*`</span></span>
-<span class="r-in"><span class="va">idf</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">idf</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="fu">mdd_to_load</span><span class="op">(</span><span class="va">mdd_sub</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># default `Key Value` is `"*"` and `Reporting Frequency` is `Timestep`</span></span>
-<span class="r-in"><span class="co"># can overwrite using `key_value` and `reporting_freqency` arg</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span>, key_value <span class="op">=</span> <span class="st">"Environment"</span>, reporting_frequency <span class="op">=</span> <span class="st">"hourly"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># if input has column `key_value`, default is to use it, unless `key_value` is</span></span>
-<span class="r-in"><span class="co"># explicitly specified</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span>, key_value <span class="op">=</span> <span class="st">"*"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># `reporting_frequency` arg works in the same way as `key_value` arg, i.e.:</span></span>
-<span class="r-in"><span class="co"># if input has column `reporting_frequency`, use it, unless</span></span>
-<span class="r-in"><span class="co"># `reporting_frequency` is explicitly specified</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>,  <span class="va">reporting_frequency</span> <span class="op">:=</span> <span class="st">"monthly"</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>,  <span class="va">reporting_frequency</span> <span class="op">:=</span> <span class="st">"monthly"</span><span class="op">]</span>, reporting_frequency <span class="op">=</span> <span class="st">"detailed"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># if input has column `key_value`, default is to use it, unless `key_value` is</span></span>
-<span class="r-in"><span class="co"># explicitly specified</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span>, key_value <span class="op">=</span> <span class="st">"*"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># meter class can be further specified using `class` arg</span></span>
-<span class="r-in"><span class="fu">mdd_to_load</span><span class="op">(</span><span class="va">mdd_sub</span>, class <span class="op">=</span> <span class="st">"Output:Meter:MeterFileOnly"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># read an example distributed with eplusr</span></span></span>
+<span class="r-in"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run Design-Day-Only simulation silently</span></span></span>
+<span class="r-in"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># read RDD and MDD</span></span></span>
+<span class="r-in"><span><span class="va">rdd</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mdd</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perform subsetting on the variables</span></span></span>
+<span class="r-in"><span><span class="co"># e.g.:</span></span></span>
+<span class="r-in"><span><span class="va">rdd_sub</span> <span class="op">&lt;-</span> <span class="va">rdd</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Site"</span>, <span class="va">variable</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">mdd_sub</span> <span class="op">&lt;-</span> <span class="va">mdd</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Electricity"</span>, <span class="va">variable</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use newly added helper `rdd_to_load()` and `mdd_to_load()` and `$load()` to</span></span></span>
+<span class="r-in"><span><span class="co"># add `Output:Variable` and `Output:Meter*`</span></span></span>
+<span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="fu">mdd_to_load</span><span class="op">(</span><span class="va">mdd_sub</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># default `Key Value` is `"*"` and `Reporting Frequency` is `Timestep`</span></span></span>
+<span class="r-in"><span><span class="co"># can overwrite using `key_value` and `reporting_freqency` arg</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span>, key_value <span class="op">=</span> <span class="st">"Environment"</span>, reporting_frequency <span class="op">=</span> <span class="st">"hourly"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># if input has column `key_value`, default is to use it, unless `key_value` is</span></span></span>
+<span class="r-in"><span><span class="co"># explicitly specified</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span>, key_value <span class="op">=</span> <span class="st">"*"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># `reporting_frequency` arg works in the same way as `key_value` arg, i.e.:</span></span></span>
+<span class="r-in"><span><span class="co"># if input has column `reporting_frequency`, use it, unless</span></span></span>
+<span class="r-in"><span><span class="co"># `reporting_frequency` is explicitly specified</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>,  <span class="va">reporting_frequency</span> <span class="op">:=</span> <span class="st">"monthly"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>,  <span class="va">reporting_frequency</span> <span class="op">:=</span> <span class="st">"monthly"</span><span class="op">]</span>, reporting_frequency <span class="op">=</span> <span class="st">"detailed"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># if input has column `key_value`, default is to use it, unless `key_value` is</span></span></span>
+<span class="r-in"><span><span class="co"># explicitly specified</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rdd_to_load</span><span class="op">(</span><span class="va">rdd_sub</span><span class="op">[</span>, <span class="va">key_value</span> <span class="op">:=</span> <span class="st">"Environment"</span><span class="op">]</span>, key_value <span class="op">=</span> <span class="st">"*"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># meter class can be further specified using `class` arg</span></span></span>
+<span class="r-in"><span><span class="fu">mdd_to_load</span><span class="op">(</span><span class="va">mdd_sub</span>, class <span class="op">=</span> <span class="st">"Output:Meter:MeterFileOnly"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -213,7 +222,7 @@ attribute named <code>eplus_version</code> extracted from the original <code>Rdd
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

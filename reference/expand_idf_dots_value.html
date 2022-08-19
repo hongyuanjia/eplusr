@@ -104,21 +104,21 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">expand_idf_dots_value</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  <span class="va">...</span>,
-  .type <span class="op">=</span> <span class="st">"class"</span>,
-  .complete <span class="op">=</span> <span class="cn">TRUE</span>,
-  .all <span class="op">=</span> <span class="cn">FALSE</span>,
-  .scalar <span class="op">=</span> <span class="cn">TRUE</span>,
-  .pair <span class="op">=</span> <span class="cn">FALSE</span>,
-  .ref_assign <span class="op">=</span> <span class="cn">TRUE</span>,
-  .unique <span class="op">=</span> <span class="cn">TRUE</span>,
-  .empty <span class="op">=</span> <span class="cn">TRUE</span>,
-  .default <span class="op">=</span> <span class="cn">TRUE</span>,
-  .env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">expand_idf_dots_value</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .type <span class="op">=</span> <span class="st">"class"</span>,</span>
+<span>  .complete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .scalar <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .pair <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .ref_assign <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .unique <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .empty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .default <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -126,9 +126,13 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Lists of object definitions. Each list should be named
 with a valid class/object id/name. ID should be denoted in style
@@ -140,45 +144,68 @@ wrapped by <code>.()</code>, <code><a href="https://rdrr.io/r/base/c.html" class
 wrapped by <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>. LHS <strong>SINGLE</strong> class name should be
 wrapped by <code>..()</code>.</p></li>
 </ul></dd>
+
+
 <dt>.type</dt>
 <dd><p>Should be either <code>"class"</code> or <code>"object"</code>. If <code>"class"</code>,
 id/name of each input will be treated as class index/name. If <code>"object"</code>,
 id/name of each input will be treated as object id/name.</p></dd>
+
+
 <dt>.complete</dt>
 <dd><p>If <code>TRUE</code>, make sure the returned field number meets the
 <code>\min-fields</code> requirement. Default: <code>TRUE</code></p></dd>
+
+
 <dt>.all</dt>
 <dd><p>If <code>TRUE</code>, make sure the all possible fields are returned.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>.scalar</dt>
 <dd><p>If <code>TRUE</code>, make sure the value of each field in the object is a
 scalar value. If <code>FALSE</code>, <code>value_chr</code> and <code>value_num</code> column will be
 list type. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>.pair</dt>
 <dd><p>Only works when <code>.scalar</code> is <code>FALSE</code>. If <code>.pair</code> is <code>TRUE</code>,
 vector field values will be paired to each id/name on the LHS. In this
 case, <code>value_chr</code> and <code>value_num</code> will be character type and double
 type, respectively. When there is only one id/name on the LHS, it will
 be replicated to match the length of the value vector. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>.ref_assign</dt>
 <dd><p>If <code>TRUE</code>, allow using <code>:=</code> to gather multiple
 classes/objects on the LHS when defining the objects. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>.unique</dt>
 <dd><p>If <code>TRUE</code>, make sure there are no duplicated classes/objects in
 the input. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>.empty</dt>
 <dd><p>If <code>TRUE</code>, allow using an empty list, i.e. <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> to define an
 object with all default values. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>.default</dt>
 <dd><p>If <code>TRUE</code>, all empty fields will be filled with default
 values if possible. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>.env</dt>
 <dd><p>An environment specifying the environment to evaluate the <code>...</code>.
 Default: <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list of 2 element <code>object</code> and <code>value</code> which is a
+    
+
+<p>A named list of 2 element <code>object</code> and <code>value</code> which is a
 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with object data and value data respectively.</p>
     </div>
 
@@ -194,7 +221,7 @@ Default: <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

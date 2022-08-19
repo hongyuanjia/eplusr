@@ -104,16 +104,16 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_idd_field</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">class</span>,
-  field <span class="op">=</span> <span class="cn">NULL</span>,
-  property <span class="op">=</span> <span class="cn">NULL</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  underscore <span class="op">=</span> <span class="cn">TRUE</span>,
-  no_ext <span class="op">=</span> <span class="cn">FALSE</span>,
-  complete <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_idd_field</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">class</span>,</span>
+<span>  field <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  property <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  underscore <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  no_ext <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  complete <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -121,31 +121,46 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>class</dt>
 <dd><p>An integer vector of valid class indexes or a character vector
 of valid class names.</p></dd>
+
+
 <dt>field</dt>
 <dd><p>An integer vector of valid field indexes or a character
 vector of valid field names (can be in in underscore style).  <code>class</code>
 and <code>field</code> should have the same length.</p></dd>
+
+
 <dt>property</dt>
 <dd><p>A character vector of column names in field table to return.</p></dd>
+
+
 <dt>underscore</dt>
 <dd><p>If <code>TRUE</code>, input class name and field names will be
 converted into underscore style name first and column <code>class_name_us</code>
 and <code>field_name_us</code> will be used for matching.</p></dd>
+
+
 <dt>no_ext</dt>
 <dd><p>If <code>TRUE</code>, no new extensible groups will be added even if there
 are no matched input found and an error will be issued right away.</p></dd>
+
+
 <dt>complete</dt>
 <dd><p>If <code>TRUE</code>, at least fields till the current whole extensible
 group will be returned. A new column named "matched_rleid" will be
 created (when <code>property</code> is NULL) indicating if given field has been
 matched or not.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.table containing specified columns.</p>
+    
+
+<p>A data.table containing specified columns.</p>
     </div>
 
   </div>
@@ -160,7 +175,7 @@ matched or not.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

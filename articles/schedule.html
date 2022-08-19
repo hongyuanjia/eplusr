@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Work with ‘Schedule:Compact’ objects</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -146,120 +146,120 @@
 </h2>
 <p><code>Schedule:Compact</code> class is quite commonly used in EnergyPlus models. Unlike other classes in EnergyPlus, it is quite flexible in value specifications and does not follow the usual definitions for fields. Starting from <code>Field 1</code>, the number of fields and positions are not set, and cannot really be described in the usual <code>Field #</code> manner.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span>
-<span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IddObject: 'Schedule:Compact'&gt;</span>
-<span class="co">#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   "Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:</span>
-<span class="co">#&gt; Through: Date</span>
-<span class="co">#&gt; For: Applicable days (ref: Schedule:Week:Compact)</span>
-<span class="co">#&gt; Interpolate: Yes/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"</span>
-<span class="co">#&gt; Until: &lt;Time&gt; (ref: Schedule:Day:Interval)</span>
-<span class="co">#&gt; &lt;numeric value&gt;</span>
-<span class="co">#&gt; words "Through","For","Interpolate","Until" must be included."</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   * Group: 'Schedules'</span>
-<span class="co">#&gt;   * Unique: FALSE</span>
-<span class="co">#&gt;   * Required: FALSE</span>
-<span class="co">#&gt;   * Total fields: 4500</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   1*: Name</span>
-<span class="co">#&gt;   2 : Schedule Type Limits Name</span>
-<span class="co">#&gt;   3 : Field 1 &lt;↓&gt;</span>
-<span class="co">#&gt;    ......</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
+<span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IddObject: 'Schedule:Compact'&gt;</span></span>
+<span><span class="co">#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   "Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:</span></span>
+<span><span class="co">#&gt; Through: Date</span></span>
+<span><span class="co">#&gt; For: Applicable days (ref: Schedule:Week:Compact)</span></span>
+<span><span class="co">#&gt; Interpolate: Yes/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"</span></span>
+<span><span class="co">#&gt; Until: &lt;Time&gt; (ref: Schedule:Day:Interval)</span></span>
+<span><span class="co">#&gt; &lt;numeric value&gt;</span></span>
+<span><span class="co">#&gt; words "Through","For","Interpolate","Until" must be included."</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   * Group: 'Schedules'</span></span>
+<span><span class="co">#&gt;   * Unique: FALSE</span></span>
+<span><span class="co">#&gt;   * Required: FALSE</span></span>
+<span><span class="co">#&gt;   * Total fields: 4500</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   1*: Name</span></span>
+<span><span class="co">#&gt;   2 : Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt;   3 : Field 1 &lt;↓&gt;</span></span>
+<span><span class="co">#&gt;    ......</span></span></code></pre></div>
 <p>Thus, starting from the 3rd field, all fields in <code>Schedule:Compact</code> class are tagged as “alpha” (string) in IDD.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span><span class="op">$</span><span class="fu">field_type</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt; [1] "alpha"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span><span class="op">$</span><span class="fu">field_type</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "alpha"</span></span></code></pre></div>
 <p>This makes it hard to add, modify, extract and validate schedule values solely based its definitions. For example, an empty <code>Schedule:Compact</code> object is still “valid”, even through it does not contain any schedule data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Schedule_Compact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"sch"</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
-<span class="va">sch</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 1*: "sch",      !- Name</span>
-<span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span>
-<span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
-<span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;  ✔ No error found.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Schedule_Compact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"sch"</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">sch</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "sch",      !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span></span>
+<span><span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  ✔ No error found.</span></span></code></pre></div>
 <p>Wrong schedule specifications cannot directly be caught by <code>IdfObject$validate()</code> since all fields are treated as arbitrary strings.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: -1"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 1*: "sch",         !- Name</span>
-<span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,     !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 3 : "Through: -1", !- Field 1</span>
-<span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,     !- Field 2</span>
-<span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;     !- Field 3</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;  ✔ No error found.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: -1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "sch",         !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,     !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 3 : "Through: -1", !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,     !- Field 2</span></span>
+<span><span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;     !- Field 3</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  ✔ No error found.</span></span></code></pre></div>
 <p>Moreover, every field value should be given as a string, even for schedule values.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span>
-<span class="co">#&gt; Error: Failed to set object(s).</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;  ✖ [1] Errors found during validation.</span>
-<span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── [1] Invalid Character ─────────────────────────────────────────────────────</span>
-<span class="co">#&gt;    Fields below should be characters but are not:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt;     └─ Object [ID:54] &lt;sch&gt;</span>
-<span class="co">#&gt;        └─ 6: "1";           !- Field 4</span>
-<span class="co">#&gt; </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: Failed to set object(s).</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
+<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── [1] Invalid Character ─────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;    Fields below should be characters but are not:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt;     └─ Object [ID:54] &lt;sch&gt;</span></span>
+<span><span class="co">#&gt;        └─ 6: "1";           !- Field 4</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
 <p>As a result, the output from <code>$value()</code> and <code>$to_table()</code> method is not very useful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="st">"1.0"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 1*: "sch",            !- Name</span>
-<span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 3 : "Through: 12/31", !- Field 1</span>
-<span class="co">#&gt; │─ 4 : "For: AllDays",   !- Field 2</span>
-<span class="co">#&gt; │─ 5 : "Until: 24:00",   !- Field 3</span>
-<span class="co">#&gt; └─ 6 : "1.0";            !- Field 4</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; $Name</span>
-<span class="co">#&gt; [1] "sch"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`Schedule Type Limits Name`</span>
-<span class="co">#&gt; [1] NA</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`Field 1`</span>
-<span class="co">#&gt; [1] "Through: 12/31"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`Field 2`</span>
-<span class="co">#&gt; [1] "For: AllDays"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`Field 3`</span>
-<span class="co">#&gt; [1] "Until: 24:00"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`Field 4`</span>
-<span class="co">#&gt; [1] "1.0"</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;    id name            class index                     field          value</span>
-<span class="co">#&gt; 1: 54  sch Schedule:Compact     1                      Name            sch</span>
-<span class="co">#&gt; 2: 54  sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span>
-<span class="co">#&gt; 3: 54  sch Schedule:Compact     3                   Field 1 Through: 12/31</span>
-<span class="co">#&gt; 4: 54  sch Schedule:Compact     4                   Field 2   For: AllDays</span>
-<span class="co">#&gt; 5: 54  sch Schedule:Compact     5                   Field 3   Until: 24:00</span>
-<span class="co">#&gt; 6: 54  sch Schedule:Compact     6                   Field 4            1.0</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="st">"1.0"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "sch",            !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 3 : "Through: 12/31", !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 4 : "For: AllDays",   !- Field 2</span></span>
+<span><span class="co">#&gt; │─ 5 : "Until: 24:00",   !- Field 3</span></span>
+<span><span class="co">#&gt; └─ 6 : "1.0";            !- Field 4</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $Name</span></span>
+<span><span class="co">#&gt; [1] "sch"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Schedule Type Limits Name`</span></span>
+<span><span class="co">#&gt; [1] NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Field 1`</span></span>
+<span><span class="co">#&gt; [1] "Through: 12/31"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Field 2`</span></span>
+<span><span class="co">#&gt; [1] "For: AllDays"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Field 3`</span></span>
+<span><span class="co">#&gt; [1] "Until: 24:00"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Field 4`</span></span>
+<span><span class="co">#&gt; [1] "1.0"</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    id name            class index                     field          value</span></span>
+<span><span class="co">#&gt; 1: 54  sch Schedule:Compact     1                      Name            sch</span></span>
+<span><span class="co">#&gt; 2: 54  sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3: 54  sch Schedule:Compact     3                   Field 1 Through: 12/31</span></span>
+<span><span class="co">#&gt; 4: 54  sch Schedule:Compact     4                   Field 2   For: AllDays</span></span>
+<span><span class="co">#&gt; 5: 54  sch Schedule:Compact     5                   Field 3   Until: 24:00</span></span>
+<span><span class="co">#&gt; 6: 54  sch Schedule:Compact     6                   Field 4            1.0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-the-idfschedulecompact-class">Introduce the <code>IdfScheduleCompact</code> class<a class="anchor" aria-label="anchor" href="#introduce-the-idfschedulecompact-class"></a>
@@ -304,47 +304,47 @@
 </h3>
 <p>To create an <code>IdfScheduleCompact</code> object from an existing <code>Schedule:Compact</code> object, you can use the <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> constructor.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">idf</span>, name <span class="op">=</span> <span class="st">"sch"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 1*: "sch",            !- Name</span>
-<span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 3 : "Through: 12/31", !- Field 1</span>
-<span class="co">#&gt; │─ 4 : "For: AllDays",   !- Field 2</span>
-<span class="co">#&gt; │─ 5 : "Until: 24:00",   !- Field 3</span>
-<span class="co">#&gt; └─ 6 : "1.0";            !- Field 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">idf</span>, name <span class="op">=</span> <span class="st">"sch"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "sch",            !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 3 : "Through: 12/31", !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 4 : "For: AllDays",   !- Field 2</span></span>
+<span><span class="co">#&gt; │─ 5 : "Until: 24:00",   !- Field 3</span></span>
+<span><span class="co">#&gt; └─ 6 : "1.0";            !- Field 4</span></span></code></pre></div>
 <p>To directly create a new <code>Schedule:Compact</code> object in the parent <code>Idf</code>, set <code>new</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span><span class="va">idf</span>, <span class="st">"sch1"</span>, new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 1*: "sch1",     !- Name</span>
-<span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span>
-<span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span>
-<span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span><span class="va">idf</span>, <span class="st">"sch1"</span>, new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "sch1",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 3 : &lt;"Blank"&gt;,  !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;"Blank"&gt;,  !- Field 2</span></span>
+<span><span class="co">#&gt; └─ 5 : &lt;"Blank"&gt;;  !- Field 3</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get-type-limits">Get type limits<a class="anchor" aria-label="anchor" href="#get-type-limits"></a>
 </h3>
 <p><code>$type_limits()</code> is used to get the type limits of a schedule. It will be used to validate the schedule values to make sure they do not exceed the range specified. <code>$type_limits()</code> gives <code>NULL</code> if no type limits have been set yet.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Schedule Type Limits have not been set yet.</span>
-<span class="co">#&gt; NULL</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Schedule Type Limits have not been set yet.</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>To set the type limits, direct give the name of an existing <code>ScheduleTypeLimits</code> object.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">idf</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"ScheduleTypeLimits"</span><span class="op">)</span>
-<span class="co">#&gt; $ScheduleTypeLimits</span>
-<span class="co">#&gt; [1] "Fraction" "On/Off"</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="st">"fraction"</span><span class="op">)</span>
-<span class="co">#&gt; $name</span>
-<span class="co">#&gt; [1] "Fraction"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $range</span>
-<span class="co">#&gt; [0, 1]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">idf</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"ScheduleTypeLimits"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $ScheduleTypeLimits</span></span>
+<span><span class="co">#&gt; [1] "Fraction" "On/Off"</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="st">"fraction"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $name</span></span>
+<span><span class="co">#&gt; [1] "Fraction"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $range</span></span>
+<span><span class="co">#&gt; [0, 1]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="set-schedule-values-using-lists">Set schedule values using lists<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-lists"></a>
@@ -360,49 +360,49 @@
 <p>Please note that currently <code>$set()</code> does not support specifying the <code>Through:</code> fields and <code>Interpolate:</code> fields. All schedules will be applied for all days in a year (.i.e. <code>Through: 12/31</code>). For detailed modifications, please use <code>$update()</code> method which will be described later. For now, neither <code>$set()</code> nor <code>$update()</code> supports interpolation specifications. <code>Interpolate: No</code> is assumed for all input. However, <code>IdfScheduleCompact</code> does support other <code>Interpolate</code> option when parsing and data extraction using <code>$extract()</code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"summerdesignday"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-    ..6 <span class="op">=</span> <span class="fl">0.2</span>, <span class="st">"8:00"</span> <span class="op">=</span> <span class="fl">0.5</span>,
-    ..12 <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"13:30"</span> <span class="op">=</span> <span class="fl">0.6</span>, ..14 <span class="op">=</span> <span class="fl">0.8</span>,
-    ..18 <span class="op">=</span> <span class="fl">0.95</span>, ..19 <span class="op">=</span> <span class="fl">0.2</span>, ..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
-    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
-    .check_range <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span>
-<span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 03 : "Through: 12/31",   !- Field 1</span>
-<span class="co">#&gt; │─ 04 : "For: Weekdays SummerDesignDay",  !- Field 2</span>
-<span class="co">#&gt; │─ 05 : "Until: 06:00",     !- Field 3</span>
-<span class="co">#&gt; │─ 06 : "0.2",              !- Field 4</span>
-<span class="co">#&gt; │─ 07 : "Until: 08:00",     !- Field 5</span>
-<span class="co">#&gt; │─ 08 : "0.5",              !- Field 6</span>
-<span class="co">#&gt; │─ 09 : "Until: 12:00",     !- Field 7</span>
-<span class="co">#&gt; │─ 10 : "0.95",             !- Field 8</span>
-<span class="co">#&gt; │─ 11 : "Until: 13:30",     !- Field 9</span>
-<span class="co">#&gt; │─ 12 : "0.6",              !- Field 10</span>
-<span class="co">#&gt; │─ 13 : "Until: 14:00",     !- Field 11</span>
-<span class="co">#&gt; │─ 14 : "0.8",              !- Field 12</span>
-<span class="co">#&gt; │─ 15 : "Until: 18:00",     !- Field 13</span>
-<span class="co">#&gt; │─ 16 : "0.95",             !- Field 14</span>
-<span class="co">#&gt; │─ 17 : "Until: 19:00",     !- Field 15</span>
-<span class="co">#&gt; │─ 18 : "0.2",              !- Field 16</span>
-<span class="co">#&gt; │─ 19 : "Until: 24:00",     !- Field 17</span>
-<span class="co">#&gt; │─ 20 : "0",                !- Field 18</span>
-<span class="co">#&gt; │─ 21 : "For: AllOtherDays",!- Field 19</span>
-<span class="co">#&gt; │─ 22 : "Until: 24:00",     !- Field 20</span>
-<span class="co">#&gt; └─ 23 : "0";                !- Field 21</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"summerdesignday"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    ..6 <span class="op">=</span> <span class="fl">0.2</span>, <span class="st">"8:00"</span> <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>    ..12 <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"13:30"</span> <span class="op">=</span> <span class="fl">0.6</span>, ..14 <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>    ..18 <span class="op">=</span> <span class="fl">0.95</span>, ..19 <span class="op">=</span> <span class="fl">0.2</span>, ..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    .check_range <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span></span>
+<span><span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 03 : "Through: 12/31",   !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 04 : "For: Weekdays SummerDesignDay",  !- Field 2</span></span>
+<span><span class="co">#&gt; │─ 05 : "Until: 06:00",     !- Field 3</span></span>
+<span><span class="co">#&gt; │─ 06 : "0.2",              !- Field 4</span></span>
+<span><span class="co">#&gt; │─ 07 : "Until: 08:00",     !- Field 5</span></span>
+<span><span class="co">#&gt; │─ 08 : "0.5",              !- Field 6</span></span>
+<span><span class="co">#&gt; │─ 09 : "Until: 12:00",     !- Field 7</span></span>
+<span><span class="co">#&gt; │─ 10 : "0.95",             !- Field 8</span></span>
+<span><span class="co">#&gt; │─ 11 : "Until: 13:30",     !- Field 9</span></span>
+<span><span class="co">#&gt; │─ 12 : "0.6",              !- Field 10</span></span>
+<span><span class="co">#&gt; │─ 13 : "Until: 14:00",     !- Field 11</span></span>
+<span><span class="co">#&gt; │─ 14 : "0.8",              !- Field 12</span></span>
+<span><span class="co">#&gt; │─ 15 : "Until: 18:00",     !- Field 13</span></span>
+<span><span class="co">#&gt; │─ 16 : "0.95",             !- Field 14</span></span>
+<span><span class="co">#&gt; │─ 17 : "Until: 19:00",     !- Field 15</span></span>
+<span><span class="co">#&gt; │─ 18 : "0.2",              !- Field 16</span></span>
+<span><span class="co">#&gt; │─ 19 : "Until: 24:00",     !- Field 17</span></span>
+<span><span class="co">#&gt; │─ 20 : "0",                !- Field 18</span></span>
+<span><span class="co">#&gt; │─ 21 : "For: AllOtherDays",!- Field 19</span></span>
+<span><span class="co">#&gt; │─ 22 : "Until: 24:00",     !- Field 20</span></span>
+<span><span class="co">#&gt; └─ 23 : "0";                !- Field 21</span></span></code></pre></div>
 <p>If schedule type limit is set, you can set <code>.check_range</code> to <code>TRUE</code> to validate schedule values during modification.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>allday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Error: Invalid schedule value found ('2'). Should be in range [0, 1] as defined in ScheduleTypeLimits 'Fraction'.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>allday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: Invalid schedule value found ('2'). Should be in range [0, 1] as defined in ScheduleTypeLimits 'Fraction'.</span></span></code></pre></div>
 <p>You can also use <code>$validate()</code> and <code>$is_valid()</code> method to check existing schedule values.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;  ✔ No error found.</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  ✔ No error found.</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="set-schedule-values-using-data-frame">Set schedule values using data.frame<a class="anchor" aria-label="anchor" href="#set-schedule-values-using-data-frame"></a>
@@ -467,54 +467,54 @@
 <code>value</code>: Numeric type. Used for the actual schedule values</li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,
-    daytype <span class="op">=</span> <span class="st">"weekday, summerdesignday"</span>,
-    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"7:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,
-    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span>
-<span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">val</span>
-<span class="co">#&gt;     year_day                  daytype  time value</span>
-<span class="co">#&gt;  1:    12/31 weekday, summerdesignday  6:00  0.20</span>
-<span class="co">#&gt;  2:    12/31 weekday, summerdesignday  7:00  0.50</span>
-<span class="co">#&gt;  3:    12/31 weekday, summerdesignday  8:00  0.50</span>
-<span class="co">#&gt;  4:    12/31 weekday, summerdesignday 12:00  0.95</span>
-<span class="co">#&gt;  5:    12/31 weekday, summerdesignday 13:30  0.60</span>
-<span class="co">#&gt;  6:    12/31 weekday, summerdesignday 14:00  0.80</span>
-<span class="co">#&gt;  7:    12/31 weekday, summerdesignday 18:00  0.95</span>
-<span class="co">#&gt;  8:    12/31 weekday, summerdesignday 19:00  0.20</span>
-<span class="co">#&gt;  9:    12/31 weekday, summerdesignday 24:00  0.00</span>
-<span class="co">#&gt; 10:    12/31              allotherday 24:00  0.00</span>
-
-<span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span>
-<span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span>
-<span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span>
-<span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span>
-<span class="co">#&gt; │─ 03 : "Through: 12/31",   !- Field 1</span>
-<span class="co">#&gt; │─ 04 : "For: Weekdays SummerDesignDay",  !- Field 2</span>
-<span class="co">#&gt; │─ 05 : "Until: 06:00",     !- Field 3</span>
-<span class="co">#&gt; │─ 06 : "0.2",              !- Field 4</span>
-<span class="co">#&gt; │─ 07 : "Until: 07:00",     !- Field 5</span>
-<span class="co">#&gt; │─ 08 : "0.5",              !- Field 6</span>
-<span class="co">#&gt; │─ 09 : "Until: 08:00",     !- Field 7</span>
-<span class="co">#&gt; │─ 10 : "0.5",              !- Field 8</span>
-<span class="co">#&gt; │─ 11 : "Until: 12:00",     !- Field 9</span>
-<span class="co">#&gt; │─ 12 : "0.95",             !- Field 10</span>
-<span class="co">#&gt; │─ 13 : "Until: 13:30",     !- Field 11</span>
-<span class="co">#&gt; │─ 14 : "0.6",              !- Field 12</span>
-<span class="co">#&gt; │─ 15 : "Until: 14:00",     !- Field 13</span>
-<span class="co">#&gt; │─ 16 : "0.8",              !- Field 14</span>
-<span class="co">#&gt; │─ 17 : "Until: 18:00",     !- Field 15</span>
-<span class="co">#&gt; │─ 18 : "0.95",             !- Field 16</span>
-<span class="co">#&gt; │─ 19 : "Until: 19:00",     !- Field 17</span>
-<span class="co">#&gt; │─ 20 : "0.2",              !- Field 18</span>
-<span class="co">#&gt; │─ 21 : "Until: 24:00",     !- Field 19</span>
-<span class="co">#&gt; │─ 22 : "0",                !- Field 20</span>
-<span class="co">#&gt; │─ 23 : "For: AllOtherDays",!- Field 21</span>
-<span class="co">#&gt; │─ 24 : "Until: 24:00",     !- Field 22</span>
-<span class="co">#&gt; └─ 25 : "0";                !- Field 23</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
+<span>    daytype <span class="op">=</span> <span class="st">"weekday, summerdesignday"</span>,</span>
+<span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"7:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span>
+<span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span>
+<span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">val</span></span>
+<span><span class="co">#&gt;     year_day                  daytype  time value</span></span>
+<span><span class="co">#&gt;  1:    12/31 weekday, summerdesignday  6:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31 weekday, summerdesignday  7:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31 weekday, summerdesignday  8:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31 weekday, summerdesignday 12:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31 weekday, summerdesignday 13:30  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31 weekday, summerdesignday 14:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31 weekday, summerdesignday 18:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31 weekday, summerdesignday 19:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31 weekday, summerdesignday 24:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31              allotherday 24:00  0.00</span></span>
+<span></span>
+<span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span></span>
+<span><span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span></span>
+<span><span class="co">#&gt; │─ 03 : "Through: 12/31",   !- Field 1</span></span>
+<span><span class="co">#&gt; │─ 04 : "For: Weekdays SummerDesignDay",  !- Field 2</span></span>
+<span><span class="co">#&gt; │─ 05 : "Until: 06:00",     !- Field 3</span></span>
+<span><span class="co">#&gt; │─ 06 : "0.2",              !- Field 4</span></span>
+<span><span class="co">#&gt; │─ 07 : "Until: 07:00",     !- Field 5</span></span>
+<span><span class="co">#&gt; │─ 08 : "0.5",              !- Field 6</span></span>
+<span><span class="co">#&gt; │─ 09 : "Until: 08:00",     !- Field 7</span></span>
+<span><span class="co">#&gt; │─ 10 : "0.5",              !- Field 8</span></span>
+<span><span class="co">#&gt; │─ 11 : "Until: 12:00",     !- Field 9</span></span>
+<span><span class="co">#&gt; │─ 12 : "0.95",             !- Field 10</span></span>
+<span><span class="co">#&gt; │─ 13 : "Until: 13:30",     !- Field 11</span></span>
+<span><span class="co">#&gt; │─ 14 : "0.6",              !- Field 12</span></span>
+<span><span class="co">#&gt; │─ 15 : "Until: 14:00",     !- Field 13</span></span>
+<span><span class="co">#&gt; │─ 16 : "0.8",              !- Field 14</span></span>
+<span><span class="co">#&gt; │─ 17 : "Until: 18:00",     !- Field 15</span></span>
+<span><span class="co">#&gt; │─ 18 : "0.95",             !- Field 16</span></span>
+<span><span class="co">#&gt; │─ 19 : "Until: 19:00",     !- Field 17</span></span>
+<span><span class="co">#&gt; │─ 20 : "0.2",              !- Field 18</span></span>
+<span><span class="co">#&gt; │─ 21 : "Until: 24:00",     !- Field 19</span></span>
+<span><span class="co">#&gt; │─ 22 : "0",                !- Field 20</span></span>
+<span><span class="co">#&gt; │─ 23 : "For: AllOtherDays",!- Field 21</span></span>
+<span><span class="co">#&gt; │─ 24 : "Until: 24:00",     !- Field 22</span></span>
+<span><span class="co">#&gt; └─ 25 : "0";                !- Field 23</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="extract-schedule-values-into-a-data-table">Extract schedule values into a data.table<a class="anchor" aria-label="anchor" href="#extract-schedule-values-into-a-data-table"></a>
@@ -533,122 +533,122 @@
 <code>value</code>: Numeric type. Actual schedule values.</li>
 </ul>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id                 daytype     time value</span>
-<span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span>
-<span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span>
-<span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span>
-<span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span>
-<span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span>
-<span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span>
-<span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span>
-<span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span>
-<span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 10:    12/31  2             AllOtherDay 24:00:00  0.00</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id                 daytype     time value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31  2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
 <p>By default, grouped day types are concatenated together using <code>,</code>. The compacted day types, e.g. <code>Weekday</code> and <code>AllOtherDay</code> are kept. If you want to expand all possible day types, set <code>daytype</code> to <code>TRUE</code> or <code>"expand"</code>. This becomes handy when you want to specifically extract data of a certain day type.</p>
 <p>We can see from the following table that all 12 day types are extracted, with the <code>id</code> column showing their original group.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id         daytype     time value</span>
-<span class="co">#&gt;  1:    12/31  1          Monday 06:00:00  0.20</span>
-<span class="co">#&gt;  2:    12/31  1          Monday 07:00:00  0.50</span>
-<span class="co">#&gt;  3:    12/31  1          Monday 08:00:00  0.50</span>
-<span class="co">#&gt;  4:    12/31  1          Monday 12:00:00  0.95</span>
-<span class="co">#&gt;  5:    12/31  1          Monday 13:30:00  0.60</span>
-<span class="co">#&gt;  6:    12/31  1          Monday 14:00:00  0.80</span>
-<span class="co">#&gt;  7:    12/31  1          Monday 18:00:00  0.95</span>
-<span class="co">#&gt;  8:    12/31  1          Monday 19:00:00  0.20</span>
-<span class="co">#&gt;  9:    12/31  1          Monday 24:00:00  0.00</span>
-<span class="co">#&gt; 10:    12/31  1         Tuesday 06:00:00  0.20</span>
-<span class="co">#&gt; 11:    12/31  1         Tuesday 07:00:00  0.50</span>
-<span class="co">#&gt; 12:    12/31  1         Tuesday 08:00:00  0.50</span>
-<span class="co">#&gt; 13:    12/31  1         Tuesday 12:00:00  0.95</span>
-<span class="co">#&gt; 14:    12/31  1         Tuesday 13:30:00  0.60</span>
-<span class="co">#&gt; 15:    12/31  1         Tuesday 14:00:00  0.80</span>
-<span class="co">#&gt; 16:    12/31  1         Tuesday 18:00:00  0.95</span>
-<span class="co">#&gt; 17:    12/31  1         Tuesday 19:00:00  0.20</span>
-<span class="co">#&gt; 18:    12/31  1         Tuesday 24:00:00  0.00</span>
-<span class="co">#&gt; 19:    12/31  1       Wednesday 06:00:00  0.20</span>
-<span class="co">#&gt; 20:    12/31  1       Wednesday 07:00:00  0.50</span>
-<span class="co">#&gt; 21:    12/31  1       Wednesday 08:00:00  0.50</span>
-<span class="co">#&gt; 22:    12/31  1       Wednesday 12:00:00  0.95</span>
-<span class="co">#&gt; 23:    12/31  1       Wednesday 13:30:00  0.60</span>
-<span class="co">#&gt; 24:    12/31  1       Wednesday 14:00:00  0.80</span>
-<span class="co">#&gt; 25:    12/31  1       Wednesday 18:00:00  0.95</span>
-<span class="co">#&gt; 26:    12/31  1       Wednesday 19:00:00  0.20</span>
-<span class="co">#&gt; 27:    12/31  1       Wednesday 24:00:00  0.00</span>
-<span class="co">#&gt; 28:    12/31  1        Thursday 06:00:00  0.20</span>
-<span class="co">#&gt; 29:    12/31  1        Thursday 07:00:00  0.50</span>
-<span class="co">#&gt; 30:    12/31  1        Thursday 08:00:00  0.50</span>
-<span class="co">#&gt; 31:    12/31  1        Thursday 12:00:00  0.95</span>
-<span class="co">#&gt; 32:    12/31  1        Thursday 13:30:00  0.60</span>
-<span class="co">#&gt; 33:    12/31  1        Thursday 14:00:00  0.80</span>
-<span class="co">#&gt; 34:    12/31  1        Thursday 18:00:00  0.95</span>
-<span class="co">#&gt; 35:    12/31  1        Thursday 19:00:00  0.20</span>
-<span class="co">#&gt; 36:    12/31  1        Thursday 24:00:00  0.00</span>
-<span class="co">#&gt; 37:    12/31  1          Friday 06:00:00  0.20</span>
-<span class="co">#&gt; 38:    12/31  1          Friday 07:00:00  0.50</span>
-<span class="co">#&gt; 39:    12/31  1          Friday 08:00:00  0.50</span>
-<span class="va">....</span>
-<span class="co"># OR sch$extract(daytype = "expand")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1          Monday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31  1          Monday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31  1          Monday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31  1          Monday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31  1          Monday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31  1          Monday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31  1          Monday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31  1          Monday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31  1          Monday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31  1         Tuesday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31  1         Tuesday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31  1         Tuesday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31  1         Tuesday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31  1         Tuesday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31  1         Tuesday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31  1         Tuesday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31  1         Tuesday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31  1         Tuesday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31  1       Wednesday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 20:    12/31  1       Wednesday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 21:    12/31  1       Wednesday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 22:    12/31  1       Wednesday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 23:    12/31  1       Wednesday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 24:    12/31  1       Wednesday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 25:    12/31  1       Wednesday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 26:    12/31  1       Wednesday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 27:    12/31  1       Wednesday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 28:    12/31  1        Thursday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 29:    12/31  1        Thursday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 30:    12/31  1        Thursday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 31:    12/31  1        Thursday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 32:    12/31  1        Thursday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 33:    12/31  1        Thursday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 34:    12/31  1        Thursday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 35:    12/31  1        Thursday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 36:    12/31  1        Thursday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 37:    12/31  1          Friday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 38:    12/31  1          Friday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 39:    12/31  1          Friday 08:00:00  0.50</span></span>
+<span><span class="va">....</span></span>
+<span><span class="co"># OR sch$extract(daytype = "expand")</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="compact-or-expand-day-types">Compact or expand day types<a class="anchor" aria-label="anchor" href="#compact-or-expand-day-types"></a>
 </h4>
 <p>If you want to compact day types with same schedule values, set <code>daytype</code> to <code>FALSE</code> or <code>"compact"</code>. It will try to group weekdays into <code>Weekday</code>, weekends into <code>Weekend</code>, and put all <code>CustomDay1</code>, <code>CustomDay2</code> and <code>Holiday</code> into <code>AllOtherDay</code>, <strong>if possible</strong>. This is because, for most of the time, <code>Weekday</code>, <code>Weekend</code>, design days including <code>SummerDesignDay</code> and <code>WinterDesignDay</code> are the most commonly used day types. Please note that if it is not possible to compact those day types, for instance, schedules of <code>Monday</code> and <code>Friday</code> are different, the original day types are kept and no compact day types will be made.</p>
 <p>For this specific schedule, we can see from the following table that the original <code>AllOtherDay</code> has been divided into 3, i.e. <code>Weekend</code>, <code>WinterDesignDay</code> and <code>AllOtherDay</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id         daytype     time value</span>
-<span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span>
-<span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span>
-<span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span>
-<span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span>
-<span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span>
-<span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span>
-<span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span>
-<span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span>
-<span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span>
-<span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span>
-<span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span>
-<span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span>
-<span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span>
-<span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span>
-<span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span>
-<span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span>
-<span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span>
-<span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 19:    12/31  2         Weekend 24:00:00  0.00</span>
-<span class="co">#&gt; 20:    12/31  2 WinterDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span>
-<span class="co">#&gt;     year_day id         daytype     time value</span>
-<span class="co"># OR sch$extract(daytype = "compact")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31  2         Weekend 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 20:    12/31  2 WinterDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
+<span><span class="co"># OR sch$extract(daytype = "compact")</span></span></code></pre></div>
 <p>If you want to specify your own grouped day types, you can directly pass a character vector to <code>daytype</code>. All other days except specified ones will be classified into <code>AllOtherDay</code>, if possible.</p>
 <p>Let’s say we want to compact the weekdays, but keep the weekends separately. We can achieve it by:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"saturday"</span>, <span class="st">"sunday"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id         daytype     time value</span>
-<span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span>
-<span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span>
-<span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span>
-<span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span>
-<span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span>
-<span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span>
-<span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span>
-<span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span>
-<span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span>
-<span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span>
-<span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span>
-<span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span>
-<span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span>
-<span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span>
-<span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span>
-<span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span>
-<span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span>
-<span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 19:    12/31  2        Saturday 24:00:00  0.00</span>
-<span class="co">#&gt; 20:    12/31  2          Sunday 24:00:00  0.00</span>
-<span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span>
-<span class="co">#&gt;     year_day id         daytype     time value</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"saturday"</span>, <span class="st">"sunday"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31  2        Saturday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 20:    12/31  2          Sunday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day id         daytype     time value</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="compact-or-expand-schedule-times">Compact or expand schedule times<a class="anchor" aria-label="anchor" href="#compact-or-expand-schedule-times"></a>
@@ -656,89 +656,89 @@
 <p>It is convenient to specify schedule values only at times when they change. However, it is useful to get schedule values at a given time step, e.g. 1-hour, especially when we try to visualize the schedule values.</p>
 <p>You can achieve this by passing a time step specification to <code>timestep</code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"3 hour"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id                 daytype     time      value</span>
-<span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 03:00:00 0.20000000</span>
-<span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 06:00:00 0.20000000</span>
-<span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 09:00:00 0.65000000</span>
-<span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00 0.95000000</span>
-<span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 15:00:00 0.75000000</span>
-<span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 18:00:00 0.95000000</span>
-<span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 21:00:00 0.06666667</span>
-<span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 24:00:00 0.00000000</span>
-<span class="co">#&gt;  9:    12/31  2             AllOtherDay 03:00:00 0.00000000</span>
-<span class="co">#&gt; 10:    12/31  2             AllOtherDay 06:00:00 0.00000000</span>
-<span class="co">#&gt; 11:    12/31  2             AllOtherDay 09:00:00 0.00000000</span>
-<span class="co">#&gt; 12:    12/31  2             AllOtherDay 12:00:00 0.00000000</span>
-<span class="co">#&gt; 13:    12/31  2             AllOtherDay 15:00:00 0.00000000</span>
-<span class="co">#&gt; 14:    12/31  2             AllOtherDay 18:00:00 0.00000000</span>
-<span class="co">#&gt; 15:    12/31  2             AllOtherDay 21:00:00 0.00000000</span>
-<span class="co">#&gt; 16:    12/31  2             AllOtherDay 24:00:00 0.00000000</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     year_day id                 daytype     time value</span>
-<span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 01:00:00  0.20</span>
-<span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 02:00:00  0.20</span>
-<span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 03:00:00  0.20</span>
-<span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 04:00:00  0.20</span>
-<span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 05:00:00  0.20</span>
-<span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span>
-<span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span>
-<span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span>
-<span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 09:00:00  0.95</span>
-<span class="co">#&gt; 10:    12/31  1 Weekday,SummerDesignDay 10:00:00  0.95</span>
-<span class="co">#&gt; 11:    12/31  1 Weekday,SummerDesignDay 11:00:00  0.95</span>
-<span class="co">#&gt; 12:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span>
-<span class="co">#&gt; 13:    12/31  1 Weekday,SummerDesignDay 13:00:00  0.60</span>
-<span class="co">#&gt; 14:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.70</span>
-<span class="co">#&gt; 15:    12/31  1 Weekday,SummerDesignDay 15:00:00  0.95</span>
-<span class="co">#&gt; 16:    12/31  1 Weekday,SummerDesignDay 16:00:00  0.95</span>
-<span class="co">#&gt; 17:    12/31  1 Weekday,SummerDesignDay 17:00:00  0.95</span>
-<span class="co">#&gt; 18:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span>
-<span class="co">#&gt; 19:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span>
-<span class="co">#&gt; 20:    12/31  1 Weekday,SummerDesignDay 20:00:00  0.00</span>
-<span class="co">#&gt; 21:    12/31  1 Weekday,SummerDesignDay 21:00:00  0.00</span>
-<span class="co">#&gt; 22:    12/31  1 Weekday,SummerDesignDay 22:00:00  0.00</span>
-<span class="co">#&gt; 23:    12/31  1 Weekday,SummerDesignDay 23:00:00  0.00</span>
-<span class="co">#&gt; 24:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 25:    12/31  2             AllOtherDay 01:00:00  0.00</span>
-<span class="co">#&gt; 26:    12/31  2             AllOtherDay 02:00:00  0.00</span>
-<span class="co">#&gt; 27:    12/31  2             AllOtherDay 03:00:00  0.00</span>
-<span class="co">#&gt; 28:    12/31  2             AllOtherDay 04:00:00  0.00</span>
-<span class="co">#&gt; 29:    12/31  2             AllOtherDay 05:00:00  0.00</span>
-<span class="co">#&gt; 30:    12/31  2             AllOtherDay 06:00:00  0.00</span>
-<span class="co">#&gt; 31:    12/31  2             AllOtherDay 07:00:00  0.00</span>
-<span class="co">#&gt; 32:    12/31  2             AllOtherDay 08:00:00  0.00</span>
-<span class="co">#&gt; 33:    12/31  2             AllOtherDay 09:00:00  0.00</span>
-<span class="co">#&gt; 34:    12/31  2             AllOtherDay 10:00:00  0.00</span>
-<span class="co">#&gt; 35:    12/31  2             AllOtherDay 11:00:00  0.00</span>
-<span class="co">#&gt; 36:    12/31  2             AllOtherDay 12:00:00  0.00</span>
-<span class="co">#&gt; 37:    12/31  2             AllOtherDay 13:00:00  0.00</span>
-<span class="co">#&gt; 38:    12/31  2             AllOtherDay 14:00:00  0.00</span>
-<span class="co">#&gt; 39:    12/31  2             AllOtherDay 15:00:00  0.00</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"3 hour"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id                 daytype     time      value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 03:00:00 0.20000000</span></span>
+<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 06:00:00 0.20000000</span></span>
+<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 09:00:00 0.65000000</span></span>
+<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00 0.95000000</span></span>
+<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 15:00:00 0.75000000</span></span>
+<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 18:00:00 0.95000000</span></span>
+<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 21:00:00 0.06666667</span></span>
+<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 24:00:00 0.00000000</span></span>
+<span><span class="co">#&gt;  9:    12/31  2             AllOtherDay 03:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 10:    12/31  2             AllOtherDay 06:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 11:    12/31  2             AllOtherDay 09:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 12:    12/31  2             AllOtherDay 12:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 13:    12/31  2             AllOtherDay 15:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 14:    12/31  2             AllOtherDay 18:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 15:    12/31  2             AllOtherDay 21:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 16:    12/31  2             AllOtherDay 24:00:00 0.00000000</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     year_day id                 daytype     time value</span></span>
+<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 01:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 02:00:00  0.20</span></span>
+<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 03:00:00  0.20</span></span>
+<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 04:00:00  0.20</span></span>
+<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 05:00:00  0.20</span></span>
+<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 09:00:00  0.95</span></span>
+<span><span class="co">#&gt; 10:    12/31  1 Weekday,SummerDesignDay 10:00:00  0.95</span></span>
+<span><span class="co">#&gt; 11:    12/31  1 Weekday,SummerDesignDay 11:00:00  0.95</span></span>
+<span><span class="co">#&gt; 12:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 13:    12/31  1 Weekday,SummerDesignDay 13:00:00  0.60</span></span>
+<span><span class="co">#&gt; 14:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.70</span></span>
+<span><span class="co">#&gt; 15:    12/31  1 Weekday,SummerDesignDay 15:00:00  0.95</span></span>
+<span><span class="co">#&gt; 16:    12/31  1 Weekday,SummerDesignDay 16:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31  1 Weekday,SummerDesignDay 17:00:00  0.95</span></span>
+<span><span class="co">#&gt; 18:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 19:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 20:    12/31  1 Weekday,SummerDesignDay 20:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31  1 Weekday,SummerDesignDay 21:00:00  0.00</span></span>
+<span><span class="co">#&gt; 22:    12/31  1 Weekday,SummerDesignDay 22:00:00  0.00</span></span>
+<span><span class="co">#&gt; 23:    12/31  1 Weekday,SummerDesignDay 23:00:00  0.00</span></span>
+<span><span class="co">#&gt; 24:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 25:    12/31  2             AllOtherDay 01:00:00  0.00</span></span>
+<span><span class="co">#&gt; 26:    12/31  2             AllOtherDay 02:00:00  0.00</span></span>
+<span><span class="co">#&gt; 27:    12/31  2             AllOtherDay 03:00:00  0.00</span></span>
+<span><span class="co">#&gt; 28:    12/31  2             AllOtherDay 04:00:00  0.00</span></span>
+<span><span class="co">#&gt; 29:    12/31  2             AllOtherDay 05:00:00  0.00</span></span>
+<span><span class="co">#&gt; 30:    12/31  2             AllOtherDay 06:00:00  0.00</span></span>
+<span><span class="co">#&gt; 31:    12/31  2             AllOtherDay 07:00:00  0.00</span></span>
+<span><span class="co">#&gt; 32:    12/31  2             AllOtherDay 08:00:00  0.00</span></span>
+<span><span class="co">#&gt; 33:    12/31  2             AllOtherDay 09:00:00  0.00</span></span>
+<span><span class="co">#&gt; 34:    12/31  2             AllOtherDay 10:00:00  0.00</span></span>
+<span><span class="co">#&gt; 35:    12/31  2             AllOtherDay 11:00:00  0.00</span></span>
+<span><span class="co">#&gt; 36:    12/31  2             AllOtherDay 12:00:00  0.00</span></span>
+<span><span class="co">#&gt; 37:    12/31  2             AllOtherDay 13:00:00  0.00</span></span>
+<span><span class="co">#&gt; 38:    12/31  2             AllOtherDay 14:00:00  0.00</span></span>
+<span><span class="co">#&gt; 39:    12/31  2             AllOtherDay 15:00:00  0.00</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <p>As described above, the <code>time</code> column is a <code>hms</code> vector. It is handy for plotting since <code>hms</code> object is directly supported by the scale system of <a href="https://cran.r-project.org/package=ggplot2" class="external-link">ggplot2</a> package.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="cn">FALSE</span>, <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">value</span>, fill <span class="op">=</span> <span class="va">daytype</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">daytype</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="cn">FALSE</span>, <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">value</span>, fill <span class="op">=</span> <span class="va">daytype</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">daytype</span><span class="op">)</span></span></code></pre></div>
 <p><img src="schedule_files/figure-html/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>If your schedule contains multiple time periods that have the same schedule value, you can compact the schedule times and values by setting <code>timestep</code> to <code>"auto"</code>.</p>
 <p>For this example, time periods 06:00 – 07:00 and 07:00 – 08:00 have the same schedule value (0.5). The following table has compact these 2 time periods together into one (06:00 – 08:00).</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;    year_day id                 daytype     time value</span>
-<span class="co">#&gt; 1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span>
-<span class="co">#&gt; 2:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span>
-<span class="co">#&gt; 3:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span>
-<span class="co">#&gt; 4:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span>
-<span class="co">#&gt; 5:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span>
-<span class="co">#&gt; 6:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span>
-<span class="co">#&gt; 7:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span>
-<span class="co">#&gt; 8:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span>
-<span class="co">#&gt; 9:    12/31  2             AllOtherDay 24:00:00  0.00</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    year_day id                 daytype     time value</span></span>
+<span><span class="co">#&gt; 1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 2:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 3:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 4:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 5:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 6:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 7:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 8:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 9:    12/31  2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -761,7 +761,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

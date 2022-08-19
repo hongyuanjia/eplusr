@@ -104,20 +104,20 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_idf_table</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  class <span class="op">=</span> <span class="cn">NULL</span>,
-  object <span class="op">=</span> <span class="cn">NULL</span>,
-  string_value <span class="op">=</span> <span class="cn">TRUE</span>,
-  unit <span class="op">=</span> <span class="cn">FALSE</span>,
-  wide <span class="op">=</span> <span class="cn">FALSE</span>,
-  align <span class="op">=</span> <span class="cn">FALSE</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  group_ext <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"group"</span>, <span class="st">"index"</span><span class="op">)</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  init <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_idf_table</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  string_value <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  unit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  wide <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  align <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  group_ext <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"group"</span>, <span class="st">"index"</span><span class="op">)</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  init <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -125,15 +125,23 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>class</dt>
 <dd><p>An integer vector of valid class indexes or a character vector
 of valid class names. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>object</dt>
 <dd><p>An integer vector of valid object IDs or a character vector
 of valid object names. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>string_value</dt>
 <dd><p>If <code>TRUE</code>, all field values are returned as
 character. If <code>FALSE</code>, <code>value</code> column in returned
@@ -142,10 +150,14 @@ each value stored as corresponding type. Note that if the
 value of numeric field is set to <code>"Autosize"</code> or
 <code>"Autocalculate"</code>, it is left as it is, leaving the returned
 type being a string instead of a number. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>unit</dt>
 <dd><p>Only applicable when <code>string_value</code> is <code>FALSE</code>. If
 <code>TRUE</code>, values of numeric fields are assigned with units using
 <code><a href="https://rdrr.io/pkg/units/man/units.html" class="external-link">units::set_units()</a></code> if applicable. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>wide</dt>
 <dd><p>Only applicable if target objects belong to a same class.
 If <code>TRUE</code>, a wide table will be returned, i.e. first three
@@ -153,15 +165,21 @@ columns are always <code>id</code>, <code>name</code> and <code>class</code>, an
 field in a separate column. Note that this requires all
 objects specified must from the same class.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>align</dt>
 <dd><p>If <code>TRUE</code>, all objects in the same class will have the
 same field number. The number of fields is the same as the
 object that have the most fields among objects specified.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>all</dt>
 <dd><p>If <code>TRUE</code>, all available fields defined in IDD for the
 class that objects belong to will be returned. Default:
 <code>FALSE</code>.</p></dd>
+
+
 <dt>group_ext</dt>
 <dd><p>Should be one of <code>"none"</code>, <code>"group"</code> or <code>"index"</code>.
 If not <code>"none"</code>, <code>value</code> column in returned
@@ -174,23 +192,32 @@ will be grouped by the extensible field indice they belong to.
 For example, coordinate values of all x coordinates will be
 put into a list. If <code>"none"</code>, nothing special will be done.
 Default: <code>"none"</code>.</p></dd>
+
+
 <dt>force</dt>
 <dd><p>If <code>TRUE</code>, <code>wide</code> can be <code>TRUE</code> even though there are
 multiple classes in input. This can result in a data.table
 with lots of columns. But may be useful when you know that
 target classes have the exact same fields, e.g.
 <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code>. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>init</dt>
 <dd><p>If <code>TRUE</code>, a table for new object input will be returned
 with all values filled with defaults. In this case, <code>object</code>
 input will be ignored. The <code>id</code> column will be filled with
 possible new object IDs. Default: <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
-<code>wide</code> is <code>FALSE</code>) or at least 5 columns (if <code>wide</code> is <code>TRUE</code>).
-When <code>wide</code> is <code>FALSE</code>, the 5 columns are:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
+    
+
+<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
+<code>wide</code> is <code>FALSE</code>) or at least 5 columns (if <code>wide</code> is <code>TRUE</code>).</p>
+
+
+<p>When <code>wide</code> is <code>FALSE</code>, the 5 columns are:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
 <li><p><code>name</code>: Character type. Object names.</p></li>
 <li><p><code>class</code>: Character type. Current class name.</p></li>
 <li><p><code>index</code>: Integer type. Field indexes.</p></li>
@@ -211,7 +238,7 @@ When <code>wide</code> is <code>FALSE</code>, the 5 columns are:</p><ul><li><p><
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

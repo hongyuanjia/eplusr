@@ -104,19 +104,19 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_idd_relation</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  class_id <span class="op">=</span> <span class="cn">NULL</span>,
-  field_id <span class="op">=</span> <span class="cn">NULL</span>,
-  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ref_to"</span>, <span class="st">"ref_by"</span><span class="op">)</span>,
-  depth <span class="op">=</span> <span class="fl">0L</span>,
-  name <span class="op">=</span> <span class="cn">FALSE</span>,
-  class <span class="op">=</span> <span class="cn">NULL</span>,
-  group <span class="op">=</span> <span class="cn">NULL</span>,
-  keep_all <span class="op">=</span> <span class="cn">FALSE</span>,
-  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span>,
-  match_all <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_idd_relation</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  class_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  field_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ref_to"</span>, <span class="st">"ref_by"</span><span class="op">)</span>,</span>
+<span>  depth <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
+<span>  match_all <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -124,24 +124,38 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>class_id</dt>
 <dd><p>An integer vector of valid class indexes. Should be <code>NULL</code> if
 <code>field_id</code> is given.</p></dd>
+
+
 <dt>field_id</dt>
 <dd><p>An integer vector of valid field id. Should be <code>NULL</code> if
 <code>class_id</code> is given.</p></dd>
+
+
 <dt>direction</dt>
 <dd><p>The relation direction to extract. Should be one of
 <code>"ref_to"</code> or <code>"ref_by"</code>.</p></dd>
+
+
 <dt>depth</dt>
 <dd><p>If &gt; 0, the relation is searched recursively. If <code>NULL</code>,
 all possible recursive relations are returned. Default: <code>0</code>.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>If <code>TRUE</code>, additional formatting columns are added and an
 <code>IddRelation</code> object is returned. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>class, group</dt>
 <dd><p>A character vector of group names used for searching
 relations. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>class_ref</dt>
 <dd><p>Specify how to handle class-name-references. There are 3
 options in total, i.e. <code>"none"</code>, <code>"both"</code> and <code>"all"</code>, with <code>"both"</code>
@@ -152,22 +166,31 @@ also reference field values of the same one. This is the default
 option.
 * <code>"all"</code>: include all class-name-references. This is the most aggressive
 option.</p></dd>
+
+
 <dt>match_all</dt>
 <dd><p>If <code>TRUE</code>, relation search will continue even though one
 relation has been found. If <code>FALSE</code>, searching is stopped whenever one
 relation is found in specified classes/groups. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>underscore</dt>
 <dd><p>If <code>TRUE</code>, input class name and field names will be
 converted into underscore style name first and column <code>class_name_us</code>
 and <code>field_name_us</code> will be used for matching.</p></dd>
+
+
 <dt>keep</dt>
 <dd><p>If <code>TRUE</code>, all inputs are returned regardless they have any
 relations with other fields or not. If <code>FALSE</code>, only input that have
 relations with other fields are returned. Default: <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.table.</p>
+    
+
+<p>A data.table.</p>
     </div>
 
   </div>
@@ -182,7 +205,7 @@ relations with other fields are returned. Default: <code>FALSE</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

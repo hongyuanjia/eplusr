@@ -104,17 +104,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">expand_idf_regex</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  <span class="va">pattern</span>,
-  replacement <span class="op">=</span> <span class="cn">NULL</span>,
-  class <span class="op">=</span> <span class="cn">NULL</span>,
-  ignore.case <span class="op">=</span> <span class="cn">FALSE</span>,
-  perl <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixed <span class="op">=</span> <span class="cn">FALSE</span>,
-  useBytes <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">expand_idf_regex</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  <span class="va">pattern</span>,</span>
+<span>  replacement <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ignore.case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  perl <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useBytes <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -122,22 +122,33 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>pattern</dt>
 <dd><p>A single string of regular expression used to match field
 values</p></dd>
+
+
 <dt>class</dt>
 <dd><p>A character vector specifying the target class names</p></dd>
+
+
 <dt>pattern, ignore.case, perl, fixed, useBytes</dt>
 <dd><p>All of them are
 directly passed to <a href="https://rdrr.io/r/base/grep.html" class="external-link">base::grepl</a> and
 <a href="https://rdrr.io/r/base/grep.html" class="external-link">base::gsub</a> with the same default values.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list of 2 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>: <code>object</code> and <code>value</code>.</p>
+    
+
+<p>A named list of 2 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>: <code>object</code> and <code>value</code>.</p>
     </div>
 
   </div>
@@ -152,7 +163,7 @@ directly passed to <a href="https://rdrr.io/r/base/grep.html" class="external-li
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

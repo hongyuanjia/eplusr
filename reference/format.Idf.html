@@ -104,40 +104,55 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for Idf</span>
-<span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span>
-  <span class="va">x</span>,
-  comment <span class="op">=</span> <span class="cn">TRUE</span>,
-  header <span class="op">=</span> <span class="cn">TRUE</span>,
-  format <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"save_format"</span><span class="op">)</span>,
-  leading <span class="op">=</span> <span class="fl">4L</span>,
-  sep_at <span class="op">=</span> <span class="fl">29L</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for Idf</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  comment <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  header <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  format <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"save_format"</span><span class="op">)</span>,</span>
+<span>  leading <span class="op">=</span> <span class="fl">4L</span>,</span>
+<span>  sep_at <span class="op">=</span> <span class="fl">29L</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>An <a href="Idf.html">Idf</a> object.</p></dd>
+
+
 <dt>comment</dt>
 <dd><p>If <code>FALSE</code>, all comments will not be included. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>header</dt>
 <dd><p>If <code>FALSE</code>, the header will not be included. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>format</dt>
 <dd><p>Specific format used when formatting. For details, please see
 <code>$save()</code>. Default: <code>eplusr_option("save_format")</code></p></dd>
+
+
 <dt>leading</dt>
 <dd><p>Leading spaces added to each field. Default: <code>4L</code>.</p></dd>
+
+
 <dt>sep_at</dt>
 <dd><p>The character width to separate value string and field string.
 Default: <code>29L</code> which is the same as IDF Editor.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed to or from other methods.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A single length string.</p>
+    
+
+<p>A single length string.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -146,10 +161,10 @@ Default: <code>29L</code> which is the same as IDF Editor.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">idf_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">idf_path</span>, <span class="fu"><a href="use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span>, leading <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">idf_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">idf_path</span>, <span class="fu"><a href="use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span>, leading <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -164,7 +179,7 @@ Default: <code>29L</code> which is the same as IDF Editor.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

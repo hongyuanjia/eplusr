@@ -104,71 +104,100 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">validate_objects</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  dt_object <span class="op">=</span> <span class="cn">NULL</span>,
-  dt_value <span class="op">=</span> <span class="cn">NULL</span>,
-  required_object <span class="op">=</span> <span class="cn">FALSE</span>,
-  unique_object <span class="op">=</span> <span class="cn">FALSE</span>,
-  unique_name <span class="op">=</span> <span class="cn">FALSE</span>,
-  extensible <span class="op">=</span> <span class="cn">FALSE</span>,
-  required_field <span class="op">=</span> <span class="cn">FALSE</span>,
-  auto_field <span class="op">=</span> <span class="cn">FALSE</span>,
-  type <span class="op">=</span> <span class="cn">FALSE</span>,
-  choice <span class="op">=</span> <span class="cn">FALSE</span>,
-  range <span class="op">=</span> <span class="cn">FALSE</span>,
-  reference <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">validate_objects</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  dt_object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dt_value <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  required_object <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unique_object <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unique_name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  extensible <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  required_field <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  auto_field <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  type <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  choice <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  range <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  reference <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>idd_env</dt>
 <dd><p>An environment that contains IDD data</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment that contains IDF data</p></dd>
+
+
 <dt>dt_object</dt>
 <dd><p>A data.table that contains object data to validate. If
 <code>NULL</code>, the object data from <code>idf_env</code> will be used, which means to
 validate the whole IDF.</p></dd>
+
+
 <dt>dt_value</dt>
 <dd><p>A data.table that contains value data to validate. If
 <code>NULL</code>, the value data from <code>idf_env</code> will be used, which means to
 validate the whole IDF.</p></dd>
+
+
 <dt>required_object</dt>
 <dd><p>Whether to check if required objects are missing. This
 will only be applied when checking the whole IDF.</p></dd>
+
+
 <dt>unique_object</dt>
 <dd><p>Whether to check if there are multiple instances of
 unique object.</p></dd>
+
+
 <dt>unique_name</dt>
 <dd><p>Whether to check if there are objects having the same name
 in same class.</p></dd>
+
+
 <dt>extensible</dt>
 <dd><p>Whether to check if there are incomplete extensible.</p></dd>
+
+
 <dt>required_field</dt>
 <dd><p>Whether to check if there are missing value for
 required fields.</p></dd>
+
+
 <dt>auto_field</dt>
 <dd><p>Whether to check if there are non-autosizable or
 non-autocalculatable fields that are assigned "autosize" or
 "autocalculate".</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Whether to check if there are input values whose type are not
 consistent with definitions in IDD.</p></dd>
+
+
 <dt>choice</dt>
 <dd><p>Whether to check if there are invalid choice values.</p></dd>
+
+
 <dt>range</dt>
 <dd><p>Whether to check if there are numeric values that are out of
 ranges specified in IDD.</p></dd>
+
+
 <dt>reference</dt>
 <dd><p>Whether to check if there are values that have invalid
 references.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An IdfValidity object.</p>
+    
+
+<p>An IdfValidity object.</p>
     </div>
 
   </div>
@@ -183,7 +212,7 @@ references.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

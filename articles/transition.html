@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Update IDF version</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -159,128 +159,128 @@
 </ul>
 <p>Unfortunately, even though the transition programs are written in Fortran, it could still take several minutes to complete the update process</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"RefBldgLargeOfficeNew2004_Chicago.idf"</span>
-<span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.2.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.2.0 installation folder '/usr/local/EnergyPlus-8-2-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.2.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; [1] '8.2.0'</span>
-
-<span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span>
-<span class="co">#&gt;  From  Ver: 8.2.0</span>
-<span class="co">#&gt; Toward Ver: 8.3.0</span>
-<span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.3.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.3.0 installation folder '/usr/local/EnergyPlus-8-3-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.3.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV830.idf</span>
-<span class="co">#&gt;  From  Ver: 8.3.0</span>
-<span class="co">#&gt; Toward Ver: 8.4.0</span>
-<span class="co">#&gt; [8.3.0 --&gt; 8.4.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.4.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.4.0 installation folder '/usr/local/EnergyPlus-8-4-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.4.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV840.idf</span>
-<span class="co">#&gt;  From  Ver: 8.4.0</span>
-<span class="co">#&gt; Toward Ver: 8.5.0</span>
-<span class="co">#&gt; [8.4.0 --&gt; 8.5.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.5.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.5.0 installation folder '/usr/local/EnergyPlus-8-5-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.5.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV850.idf</span>
-<span class="co">#&gt;  From  Ver: 8.5.0</span>
-<span class="co">#&gt; Toward Ver: 8.6.0</span>
-<span class="co">#&gt; [8.5.0 --&gt; 8.6.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.6.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.6.0 installation folder '/usr/local/EnergyPlus-8-6-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.6.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV860.idf</span>
-<span class="co">#&gt;  From  Ver: 8.6.0</span>
-<span class="co">#&gt; Toward Ver: 8.7.0</span>
-<span class="co">#&gt; [8.6.0 --&gt; 8.7.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.7.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.7.0 installation folder '/usr/local/EnergyPlus-8-7-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.7.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV870.idf</span>
-<span class="co">#&gt;  From  Ver: 8.7.0</span>
-<span class="co">#&gt; Toward Ver: 8.8.0</span>
-<span class="co">#&gt; [8.7.0 --&gt; 8.8.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV880.idf</span>
-<span class="co">#&gt;  From  Ver: 8.8.0</span>
-<span class="co">#&gt; Toward Ver: 8.9.0</span>
-<span class="co">#&gt; [8.8.0 --&gt; 8.9.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v8.9.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.9.0 installation folder '/usr/local/EnergyPlus-8-9-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.9.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV890.idf</span>
-<span class="co">#&gt;  From  Ver: 8.9.0</span>
-<span class="co">#&gt; Toward Ver: 9.0.0</span>
-<span class="co">#&gt; [8.9.0 --&gt; 9.0.0] SUCCEEDED.</span>
-<span class="co">#&gt; Multiple versions found for IDD v9.0: 'v9.0.1'. The last patched version v9.0.1 will be used. Please explicitly give the full version if you want to use the other versions.</span>
-<span class="co">#&gt; IDD v9.0.1 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.0.1 installation folder '/usr/local/EnergyPlus-9-0-1'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.0.1 is not available.</span>
-<span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV900.idf</span>
-<span class="co">#&gt;  From  Ver: 9.0.1</span>
-<span class="co">#&gt; Toward Ver: 9.1.0</span>
-<span class="co">#&gt; [9.0.1 --&gt; 9.1.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v9.1.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.1.0 installation folder '/usr/local/EnergyPlus-9-1-0'.</span>
-<span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.1.0 is not available.</span>
-<span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV910.idf</span>
-<span class="co">#&gt;  From  Ver: 9.1.0</span>
-<span class="co">#&gt; Toward Ver: 9.2.0</span>
-<span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
-<span class="co">#&gt; IDD v9.2.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.2.0 installation folder '/usr/local/EnergyPlus-9-2-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 106.910   1.831 108.461</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"RefBldgLargeOfficeNew2004_Chicago.idf"</span></span>
+<span><span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.2.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.2.0 installation folder '/usr/local/EnergyPlus-8-2-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.2.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; [1] '8.2.0'</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.3.0</span></span>
+<span><span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.3.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.3.0 installation folder '/usr/local/EnergyPlus-8-3-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.3.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV830.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.3.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.4.0</span></span>
+<span><span class="co">#&gt; [8.3.0 --&gt; 8.4.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.4.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.4.0 installation folder '/usr/local/EnergyPlus-8-4-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.4.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV840.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.4.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.5.0</span></span>
+<span><span class="co">#&gt; [8.4.0 --&gt; 8.5.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.5.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.5.0 installation folder '/usr/local/EnergyPlus-8-5-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.5.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV850.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.5.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.6.0</span></span>
+<span><span class="co">#&gt; [8.5.0 --&gt; 8.6.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.6.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.6.0 installation folder '/usr/local/EnergyPlus-8-6-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.6.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV860.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.6.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.7.0</span></span>
+<span><span class="co">#&gt; [8.6.0 --&gt; 8.7.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.7.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.7.0 installation folder '/usr/local/EnergyPlus-8-7-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.7.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV870.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.7.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.8.0</span></span>
+<span><span class="co">#&gt; [8.7.0 --&gt; 8.8.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV880.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.8.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.9.0</span></span>
+<span><span class="co">#&gt; [8.8.0 --&gt; 8.9.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v8.9.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.9.0 installation folder '/usr/local/EnergyPlus-8-9-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.9.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV890.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.9.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.0.0</span></span>
+<span><span class="co">#&gt; [8.9.0 --&gt; 9.0.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; Multiple versions found for IDD v9.0: 'v9.0.1'. The last patched version v9.0.1 will be used. Please explicitly give the full version if you want to use the other versions.</span></span>
+<span><span class="co">#&gt; IDD v9.0.1 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.0.1 installation folder '/usr/local/EnergyPlus-9-0-1'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.0.1 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV900.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.0.1</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.1.0</span></span>
+<span><span class="co">#&gt; [9.0.1 --&gt; 9.1.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.1.0 installation folder '/usr/local/EnergyPlus-9-1-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.1.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v9.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV910.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.1.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.2.0</span></span>
+<span><span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.2.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.2.0 installation folder '/usr/local/EnergyPlus-9-2-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;  77.070   1.689  78.584</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
@@ -288,45 +288,45 @@
 <p>Having a clear mental model on how the transition works, the most cumbersome work left is to translate all those actions written in Fortran into R and write tests to make sure that the R implement should be the same as IDFVersionUpdater.</p>
 <p><a href="https://hongyuanjia.github.io/eplusr/reference/transition.html"><code>transition()</code></a> is a pure R implementation of transition programs. It takes similar arguments as <code><a href="../reference/version_updater.html">version_updater()</a></code> except it has an additional argument <code>save</code> to control whether to save the resultant <code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;  From  Ver: 8.2.0</span>
-<span class="co">#&gt; Toward Ver: 8.3.0</span>
-<span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.3.0</span>
-<span class="co">#&gt; Toward Ver: 8.4.0</span>
-<span class="co">#&gt; [8.3.0 --&gt; 8.4.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.4.0</span>
-<span class="co">#&gt; Toward Ver: 8.5.0</span>
-<span class="co">#&gt; [8.4.0 --&gt; 8.5.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.5.0</span>
-<span class="co">#&gt; Toward Ver: 8.6.0</span>
-<span class="co">#&gt; [8.5.0 --&gt; 8.6.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.6.0</span>
-<span class="co">#&gt; Toward Ver: 8.7.0</span>
-<span class="co">#&gt; [8.6.0 --&gt; 8.7.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.7.0</span>
-<span class="co">#&gt; Toward Ver: 8.8.0</span>
-<span class="co">#&gt; [8.7.0 --&gt; 8.8.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.8.0</span>
-<span class="co">#&gt; Toward Ver: 8.9.0</span>
-<span class="co">#&gt; [8.8.0 --&gt; 8.9.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 8.9.0</span>
-<span class="co">#&gt; Toward Ver: 9.0.0</span>
-<span class="co">#&gt; [8.9.0 --&gt; 9.0.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 9.0.0</span>
-<span class="co">#&gt; Toward Ver: 9.1.0</span>
-<span class="co">#&gt; [9.0.0 --&gt; 9.1.0] SUCCEEDED.</span>
-<span class="co">#&gt;  From  Ver: 9.1.0</span>
-<span class="co">#&gt; Toward Ver: 9.2.0</span>
-<span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span>
-<span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   5.953   0.048   6.002</span></code></pre></div>
-<p>It is about 18.1 times faster.</p>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.3.0</span></span>
+<span><span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.3.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.4.0</span></span>
+<span><span class="co">#&gt; [8.3.0 --&gt; 8.4.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.4.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.5.0</span></span>
+<span><span class="co">#&gt; [8.4.0 --&gt; 8.5.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.5.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.6.0</span></span>
+<span><span class="co">#&gt; [8.5.0 --&gt; 8.6.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.6.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.7.0</span></span>
+<span><span class="co">#&gt; [8.6.0 --&gt; 8.7.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.7.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.8.0</span></span>
+<span><span class="co">#&gt; [8.7.0 --&gt; 8.8.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.8.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 8.9.0</span></span>
+<span><span class="co">#&gt; [8.8.0 --&gt; 8.9.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 8.9.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.0.0</span></span>
+<span><span class="co">#&gt; [8.9.0 --&gt; 9.0.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.0.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.1.0</span></span>
+<span><span class="co">#&gt; [9.0.0 --&gt; 9.1.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.1.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.2.0</span></span>
+<span><span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;   4.561   0.028   4.589</span></span></code></pre></div>
+<p>It is about 17.1 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "    Yes,                     !- Use Weather File Snow Indicators"</span>
-<span class="co">#&gt; [2] "    ;                        !- Treat Weather as Actual"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "    Yes,                     !- Use Weather File Snow Indicators"</span></span>
+<span><span class="co">#&gt; [2] "    ;                        !- Treat Weather as Actual"</span></span></code></pre></div>
 <p>As we can see from below, there is only one difference between results from <code><a href="../reference/transition.html">transition()</a></code> and <code><a href="../reference/version_updater.html">version_updater()</a></code>:</p>
 <ul>
 <li>An empty field <code>Treat Weather as Actual</code> in <code>RunPeriod</code> exists in <code><a href="../reference/version_updater.html">version_updater()</a></code> version, but not in <code><a href="../reference/transition.html">transition()</a></code> version. This is because this field is not an required field and eplusr tried to only save minimum-necessary fields.</li>
@@ -396,23 +396,23 @@
 <p>In eplusr, all IDF data are stored as data.tables. So transition means to write a function to perform the similar actions on field values stored in data.tables. <code>trans_action()</code> is designed for this purpose.</p>
 <p>For example, the equivalent transition implemented in R for <code>Exterior:FuelEquipment</code> objects demonstrated in the <strong>Reset</strong> code block would be:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Insert</span>
-<span class="va">dt1</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"OtherEquipment"</span>, insert <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"None"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># Reset</span>
-<span class="va">dt2</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Exterior:FuelEquipment"</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"Gas"</span>, <span class="st">"NaturalGas"</span><span class="op">)</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"LPG"</span>, <span class="st">"PropaneGas"</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="co"># Delete</span>
-<span class="va">dt3</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"HVACTemplate:System:Unitary"</span>, delete <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">40L</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># Offset</span>
-<span class="va">dt4</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Daylighting:Controls"</span>,
-    offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">20L</span>, <span class="fl">4L</span><span class="op">)</span>,
-    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"SplitFlux"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Insert</span></span>
+<span><span class="va">dt1</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"OtherEquipment"</span>, insert <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"None"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Reset</span></span>
+<span><span class="va">dt2</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Exterior:FuelEquipment"</span>,</span>
+<span>    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"Gas"</span>, <span class="st">"NaturalGas"</span><span class="op">)</span>,</span>
+<span>    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"LPG"</span>, <span class="st">"PropaneGas"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Delete</span></span>
+<span><span class="va">dt3</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"HVACTemplate:System:Unitary"</span>, delete <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">40L</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Offset</span></span>
+<span><span class="va">dt4</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"Daylighting:Controls"</span>,</span>
+<span>    offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">20L</span>, <span class="fl">4L</span><span class="op">)</span>,</span>
+<span>    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"SplitFlux"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Having the updated IDF data, we can then easily insert them to the next new version of IDF by simply doing <code>new_idf$load(dt)</code>.</p>
 </div>
   </div>
@@ -434,7 +434,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -108,18 +108,18 @@ should be included during IDF object modifications using <code>$dup()</code>, <c
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">custom_validate</span><span class="op">(</span>
-  required_object <span class="op">=</span> <span class="cn">FALSE</span>,
-  unique_object <span class="op">=</span> <span class="cn">FALSE</span>,
-  unique_name <span class="op">=</span> <span class="cn">FALSE</span>,
-  extensible <span class="op">=</span> <span class="cn">FALSE</span>,
-  required_field <span class="op">=</span> <span class="cn">FALSE</span>,
-  auto_field <span class="op">=</span> <span class="cn">FALSE</span>,
-  type <span class="op">=</span> <span class="cn">FALSE</span>,
-  choice <span class="op">=</span> <span class="cn">FALSE</span>,
-  range <span class="op">=</span> <span class="cn">FALSE</span>,
-  reference <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">custom_validate</span><span class="op">(</span></span>
+<span>  required_object <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unique_object <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unique_name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  extensible <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  required_field <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  auto_field <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  type <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  choice <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  range <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  reference <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -127,38 +127,59 @@ should be included during IDF object modifications using <code>$dup()</code>, <c
     <dl><dt>required_object</dt>
 <dd><p>Check if required objects are missing in current
 model. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>unique_object</dt>
 <dd><p>Check if there are multiple objects in one unique-object
 class. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>unique_name</dt>
 <dd><p>Check if all objects in every class have unique names.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>extensible</dt>
 <dd><p>Check if all fields in an extensible group have values.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>required_field</dt>
 <dd><p>Check if all required fields have values. Default:
 <code>FALSE</code>.</p></dd>
+
+
 <dt>auto_field</dt>
 <dd><p>Check if all fields with value <code>"Autosize"</code> and
 <code>"Autocalculate"</code> are valid or not. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Check if all fields have values with valid types, i.e.
 character, numeric and integer fields should be filled with corresponding
 type of values. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>choice</dt>
 <dd><p>Check if all choice fields have valid choice values. Default:
 <code>FALSE</code>.</p></dd>
+
+
 <dt>range</dt>
 <dd><p>Check if all numeric fields have values within defined ranges.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>reference</dt>
 <dd><p>Check if all fields whose values refer to other fields are
 valid. Default: <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list with 10 elements.</p>
+    
+
+<p>A named list with 10 elements.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -169,7 +190,7 @@ what validation components those levels contain, see <code><a href="level_checks
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">custom_validate</span><span class="op">(</span>unique_object <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">custom_validate</span><span class="op">(</span>unique_object <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -200,9 +221,9 @@ what validation components those levels contain, see <code><a href="level_checks
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># only check unique name during validation</span></span>
-<span class="r-in"><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="fu">custom_validate</span><span class="op">(</span>unique_name <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># only check unique name during validation</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="fu">custom_validate</span><span class="op">(</span>unique_name <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $validate_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $validate_level$required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
@@ -249,7 +270,7 @@ what validation components those levels contain, see <code><a href="level_checks
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

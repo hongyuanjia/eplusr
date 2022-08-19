@@ -105,17 +105,20 @@
 <ul><li><p>A new <code>encoding</code> parameter has been added in <code><a href="../reference/read_idf.html">read_idf()</a></code>, <code><a href="../reference/use_idd.html">use_idd()</a></code> and <code><a href="../reference/read_epw.html">read_epw()</a></code>. The default value is <code>unknown</code> which indicates that the input file is native encoded (<a href="https://github.com/hongyuanjia/eplusr/issues/515" class="external-link">#515</a>).</p></li>
 <li>
 <p>Now <code>validate_level</code> option is respected when parsing EPW files. This makes it possible to parse EPW files with non-standard EPW header values, which is useful when only the core EPW data is needed (<a href="https://github.com/hongyuanjia/eplusr/issues/520" class="external-link">#520</a>). E.g:</p>
-<pre><code><span class="fu"><a href="../reference/with_option.html">with_option</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span>, <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">YOUR_EPW_PATH</span><span class="op">)</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="fu"><a href="../reference/with_option.html">with_option</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>validate_level <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span>, <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">YOUR_EPW_PATH</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>Now <code>IdfGeometry$coord_system()</code> can correctly work. The coordinate system type can also be <code>"world"</code>. <code>"absolute"</code> input now is automatically converted to <code>"world"</code> to be compatible with EnergyPlus. <code>IdfGeometry$coord_system()</code> now returns itself by default, instead of the parent <code>Idf</code> object. This enables to check the modified coordinate systems by printing the <code>IdfGeometry</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/506" class="external-link">#506</a> <a href="https://github.com/hongyuanjia/eplusr/issues/507" class="external-link">#507</a>).</li>
 <li>Fix <code>Idf$load()</code> when input is a single string without any new line (<code>\n</code>) (<a href="https://github.com/hongyuanjia/eplusr/issues/510" class="external-link">#510</a>).</li>
-<li>Fix <code>IdfViewer$snapshot()</code> for PNG output. A new parameter <code>webshot</code> has been added in <code>IdfViewer$snapshot()</code> with default value being <code>FALSE</code>. (<a href="https://github.com/hongyuanjia/eplusr/issues/509" class="external-link">#509</a>).</li>
+<li>Fix <code>IdfViewer$snapshot()</code> for PNG output. A new parameter <code>webshot</code> has been added in <code>IdfViewer$snapshot()</code> with default value being <code>FALSE</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/509" class="external-link">#509</a>).</li>
 <li>Now <code>IdfSchedule$... &lt;- val</code> works (<a href="https://github.com/hongyuanjia/eplusr/issues/512" class="external-link">#512</a>).</li>
 <li>Fix the error of invalid datetime in <code>Epw$data()</code> when data of Feb 28 is from a leap year while the EPW did not contain any leap year data (<a href="https://github.com/hongyuanjia/eplusr/issues/552" class="external-link">#552</a>).</li>
 </ul></div>
+<div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li>Regenerate package documentation to fix CRAN NOTES on HTML manuals (<a href="https://github.com/hongyuanjia/eplusr/issues/525" class="external-link">#525</a>).</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.15.1" id="eplusr-0151">eplusr 0.15.1<small>2022-01-21</small><a class="anchor" aria-label="anchor" href="#eplusr-0151"></a></h2>
@@ -153,10 +156,10 @@
 <li>
 <p>Now <code>.()</code> can also be used as an alias as <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> in <code>Idf$add()</code> and <code>Idf$set()</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/445" class="external-link">#445</a>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span>
-<span class="co"># is equivalent to</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># is equivalent to</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Output_Variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"zone mean air temperature"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li><p>A new argument <code>names</code> can be specified in <code>ParametricJob$models()</code> to rename the parametric models created (<a href="https://github.com/hongyuanjia/eplusr/issues/487" class="external-link">#487</a>).</p></li>
 <li>
@@ -164,10 +167,10 @@
 <ul><li>Field <code>Fan Total Efficiency</code> in object named <code>Supply Fan 1</code> in class <code>Fan:VariableVolume</code> class, with 10 levels being 0.1 to 1.0 with a 0.1 step.</li>
 <li>Field <code>Thickness</code> in all objects in class <code>Material</code>, with 10 levels being 0.01 to 0.1 m with a 0.1 m step.</li>
 <li>Field <code>Conductivity</code> in all objects in class <code>Material</code>, with 10 levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</li>
-</ul><pre><code><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span>
-    `Supply Fan 1` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Fan_Total_Efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,
-    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>, Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>
-<span class="op">)</span></code></pre>
+</ul><pre><code><span><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span>
+<span>    `Supply Fan 1` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Fan_Total_Efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>, Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre>
 </li>
 <li><p><code>ParametricJob$cases()</code> is added to get a summary of parametric models and parameter values. It returns a <code>data.table</code> giving you the indices and names of the parametric models, and all parameter values used to create those models.For parametric models created using <code>ParametricJob$param()</code>, the column names will be the same as what you specified in <code>.names</code>. For the case of <code>ParametricJob$apply_measure()</code>, this will be the argument names of the measure functions (<a href="https://github.com/hongyuanjia/eplusr/issues/487" class="external-link">#487</a>).</p></li>
 <li><p>Now <code>.names</code> in <code>ParametricJob$apply_measure()</code> can be a single character. In this case, it will be used as the prefix of all parametric models. The models will be named in the pattern <code>.names_X</code> where <code>X</code> is the model index (<a href="https://github.com/hongyuanjia/eplusr/issues/487" class="external-link">#487</a>).</p></li>
@@ -199,9 +202,9 @@
 <ul><li>
 <p><code>IddObject$output()</code> is added to extract all possible outputs of current class. All outputs are extracted from the LaTeX source file of “Input Output Reference” for EnergyPlus v9.5.0 and later. So empty result will always be returned for <code>Idd</code> version lower than v9.5. It is possible that there are some mistakes introduced when extracting the output variables. Also, some outputs are only available if certain fields are set. Even they are listed in the results, it does not mean that the <code>Idf</code> can report all of them. It is strongly suggested to check the RDD and MDD file for correctness (<a href="https://github.com/hongyuanjia/eplusr/issues/427" class="external-link">#427</a>). Example:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
-<span class="va">idd</span><span class="op">$</span><span class="va">Lights</span><span class="op">$</span><span class="fu">outputs</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<span><span class="va">idd</span><span class="op">$</span><span class="va">Lights</span><span class="op">$</span><span class="fu">outputs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </li></ul></div>
 <div class="section level3">
 <h3 id="break-changes-0-14-2">Break changes<a class="anchor" aria-label="anchor" href="#break-changes-0-14-2"></a></h3>
@@ -286,21 +289,21 @@
 <ul><li>
 <p><code>Idf$add()</code> and <code>Idf$set()</code> have new features:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># refer to field using '..'</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Material <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="st">"mat"</span>, ..7 <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..6 <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># using vector field values</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># refer to field using '..'</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Material <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="st">"mat"</span>, ..7 <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..6 <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># using vector field values</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li><p><code>Idf$to_table()</code> gains a new parameter <code>force</code>. The default value is <code>FALSE</code>. If <code>TRUE</code>, you can convert object data from any classes into a wide data.table. This may be useful when you know that target classes have the exact same fields, e.g. <code>Ceiling:Adiabatic</code> and <code>Floor:Adiabatic</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/202" class="external-link">#202</a>).</p></li>
 <li>
 <p>A new method <code>Idf$purge()</code> has been added (<a href="https://github.com/hongyuanjia/eplusr/issues/223" class="external-link">#223</a>). It can be used to delete any resource objects that are not referenced by other objects. Here resource objects indicate all objects that can be referenced by other objects, e.g. all schedules. <code>$purge()</code> will ignore any inputs that are not resources. If inputs contain objects from multiple classes, references among them are also taken into account, which means purging is performed hierarchically. If both materials and constructions are specified, the latter will be purged first, because it is possible that input constructions reference input materials. <code>Idf$purge()</code> makes it quite straightforward to perform IDF cleaning. Actions like removing all materials, constructions and schedules can be easily achieved via</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">Idf</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">Idf</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li><p>New methods <code>Idf$duplicatd()</code> and <code>Idf$unique()</code> have been added. They can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning (<a href="https://github.com/hongyuanjia/eplusr/issues/227" class="external-link">#227</a>).</p></li>
 <li><p>Now if <code>class</code> is set to <code>NULL</code> in <code>Idf$definition()</code>, the underlying <code>Idd</code> object is returned (<a href="https://github.com/hongyuanjia/eplusr/issues/237" class="external-link">#237</a>).</p></li>
@@ -340,8 +343,8 @@
 <p>The algorithm of object/field/value relation extraction has been completed refactored. Now it can correctly detect object recursive-reference and it’s faster (<a href="https://github.com/hongyuanjia/eplusr/issues/222" class="external-link">#222</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/223" class="external-link">#223</a>).</p>
 <p>All relation-related methods now have an unified interface:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">X</span><span class="op">$</span><span class="fu">method</span><span class="op">(</span><span class="va">which</span>, <span class="va">direction</span>, object <span class="op">=</span> <span class="cn">NULL</span>, class <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">X</span><span class="op">$</span><span class="fu">method</span><span class="op">(</span><span class="va">which</span>, <span class="va">direction</span>, object <span class="op">=</span> <span class="cn">NULL</span>, class <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Where <code>which</code> is a class index or object ID, <code>direction</code> is the target relation direction to extract. All results can be further constrained via 3 extra arguments, i.e. <code>object</code>, <code>class</code> and <code>object</code>. <code>object</code> only applicable to <code>Idf</code> and <code>IdfObject</code>. The <code>depth</code> argument is used to control the depth for searching recursive relations. Default value is <code>0L</code>, which means no recursive relations will be detected, while <code>NULL</code> means to search all possible recursive relations.</p>
 <p>A new <code>keep</code> parameter with default value <code>FALSE</code> has been added. If <code>TRUE</code>, all input fields will be returned, even they may not have any relations. This is the default behavior of v0.12.0 and before. In this version, only fields that have relation with other objects will be returned.</p>
 <p>With this update, it is possible, for example, to directly know the structure of an air loop by using <code>idf$object_relation("AnAirLoop", depth = NULL)</code></p>
@@ -441,11 +444,11 @@
 <li>
 <p>Now for Windows and Linux, <code><a href="../reference/install_eplus.html">install_eplus()</a></code> supports to install EnergyPlus to your home directory or your customized directory without requiring administrator privileges (<a href="https://github.com/hongyuanjia/eplusr/issues/167" class="external-link">#167</a>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># install to your home directory</span>
-<span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co"># install to custom directory</span>
-<span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># install to your home directory</span></span>
+<span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># install to custom directory</span></span>
+<span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span><span class="op">)</span></span></code></pre></div>
 <p>Please see <code><a href="../reference/install_eplus.html">?install_eplus</a></code> for details.</p>
 </li>
 <li><p>All documentation in R6 classes have been update thanks to roxygen2 R6 support (<a href="https://github.com/hongyuanjia/eplusr/issues/156" class="external-link">#156</a>).</p></li>
@@ -693,20 +696,20 @@
 <ul><li>Now you can directly download EnergyPlus Weather File (.epw) and Design Day File (.ddy) using new function <code><a href="../reference/download_weather.html">download_weather()</a></code>. It takes a regular expression as input, searches through EnergyPlus weather data base (stored in this package), download corresponding files and return the saved paths. Below are some examples:<ul><li>
 <p>Search locations that contains string <code>"los angeles"</code> and <code>"tmy"</code>, return a menu to select which one(s) to download. Once selected, download both corresponding weather file(s) and design day file(s):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li>
 <p>Same as above, expect that all files will be renamed to <code>la.epw(ddy)</code>, <code>la_1.epw(ddy)</code>, <code>la_2.epw(ddy)</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, filename <span class="op">=</span> <span class="st">"la"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"los angeles.*tmy"</span>, filename <span class="op">=</span> <span class="st">"la"</span>, type <span class="op">=</span> <span class="st">"all"</span>, ask <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li>
 <p>Search locations that contains string <code>"beijing"</code> and <code>"cswd"</code>. If no more than 3 results found, directly download all weather files and save them to temporary directory.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"beijing.*cswd"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"epw"</span>, ask <span class="op">=</span> <span class="cn">FALSE</span>, max_match <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"beijing.*cswd"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"epw"</span>, ask <span class="op">=</span> <span class="cn">FALSE</span>, max_match <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 </li>
 </ul></li></ul></div>
 <div class="section level3">
@@ -866,7 +869,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

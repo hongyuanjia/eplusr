@@ -114,22 +114,29 @@ schedule values.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">schedule_compact</span><span class="op">(</span><span class="va">parent</span>, <span class="va">name</span>, new <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">schedule_compact</span><span class="op">(</span><span class="va">parent</span>, <span class="va">name</span>, new <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>parent</dt>
 <dd><p>An <a href="Idf.html">Idf</a> object.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>A valid name (a string) for a <code>Schedule:Compact</code> object.</p></dd>
+
+
 <dt>new</dt>
 <dd><p>If <code>TRUE</code>, a new empty IdfScheduleCompact is created. Default:
 <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An IdfScheduleCompact object.</p>
+    
+
+<p>An IdfScheduleCompact object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -158,40 +165,40 @@ field values.</p>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>IdfScheduleCompact$new()</code></a></p></li>
-<li><p><a href="#method-type_limits"><code>IdfScheduleCompact$type_limits()</code></a></p></li>
-<li><p><a href="#method-set"><code>IdfScheduleCompact$set()</code></a></p></li>
-<li><p><a href="#method-update"><code>IdfScheduleCompact$update()</code></a></p></li>
-<li><p><a href="#method-validate"><code>IdfScheduleCompact$validate()</code></a></p></li>
-<li><p><a href="#method-is_valid"><code>IdfScheduleCompact$is_valid()</code></a></p></li>
-<li><p><a href="#method-extract"><code>IdfScheduleCompact$extract()</code></a></p></li>
-<li><p><a href="#method-clone"><code>IdfScheduleCompact$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="class_name"><a href="IdfObject.html#method-class_name"><code>eplusr::IdfObject$class_name()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="comment"><a href="IdfObject.html#method-comment"><code>eplusr::IdfObject$comment()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="definition"><a href="IdfObject.html#method-definition"><code>eplusr::IdfObject$definition()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="group_name"><a href="IdfObject.html#method-group_name"><code>eplusr::IdfObject$group_name()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref"><a href="IdfObject.html#method-has_ref"><code>eplusr::IdfObject$has_ref()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_by"><a href="IdfObject.html#method-has_ref_by"><code>eplusr::IdfObject$has_ref_by()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node"><a href="IdfObject.html#method-has_ref_node"><code>eplusr::IdfObject$has_ref_node()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to"><a href="IdfObject.html#method-has_ref_to"><code>eplusr::IdfObject$has_ref_to()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id"><a href="IdfObject.html#method-id"><code>eplusr::IdfObject$id()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name"><a href="IdfObject.html#method-name"><code>eplusr::IdfObject$name()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent"><a href="IdfObject.html#method-parent"><code>eplusr::IdfObject$parent()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print"><a href="IdfObject.html#method-print"><code>eplusr::IdfObject$print()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_by_object"><a href="IdfObject.html#method-ref_by_object"><code>eplusr::IdfObject$ref_by_object()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_node"><a href="IdfObject.html#method-ref_to_node"><code>eplusr::IdfObject$ref_to_node()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_object"><a href="IdfObject.html#method-ref_to_object"><code>eplusr::IdfObject$ref_to_object()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_string"><a href="IdfObject.html#method-to_string"><code>eplusr::IdfObject$to_string()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_table"><a href="IdfObject.html#method-to_table"><code>eplusr::IdfObject$to_table()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value"><a href="IdfObject.html#method-value"><code>eplusr::IdfObject$value()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_possible"><a href="IdfObject.html#method-value_possible"><code>eplusr::IdfObject$value_possible()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_relation"><a href="IdfObject.html#method-value_relation"><code>eplusr::IdfObject$value_relation()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="version"><a href="IdfObject.html#method-version"><code>eplusr::IdfObject$version()</code></a></span></p></li>
-</ul></details></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-IdfScheduleCompact-new"><code>IdfScheduleCompact$new()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-type_limits"><code>IdfScheduleCompact$type_limits()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-set"><code>IdfScheduleCompact$set()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-update"><code>IdfScheduleCompact$update()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-validate"><code>IdfScheduleCompact$validate()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-is_valid"><code>IdfScheduleCompact$is_valid()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-extract"><code>IdfScheduleCompact$extract()</code></a></p></li>
+<li><p><a href="#method-IdfScheduleCompact-clone"><code>IdfScheduleCompact$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="class_name"><a href="IdfObject.html#method-class_name"><code>eplusr::IdfObject$class_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="comment"><a href="IdfObject.html#method-comment"><code>eplusr::IdfObject$comment()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="definition"><a href="IdfObject.html#method-definition"><code>eplusr::IdfObject$definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="group_name"><a href="IdfObject.html#method-group_name"><code>eplusr::IdfObject$group_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref"><a href="IdfObject.html#method-has_ref"><code>eplusr::IdfObject$has_ref()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_by"><a href="IdfObject.html#method-has_ref_by"><code>eplusr::IdfObject$has_ref_by()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node"><a href="IdfObject.html#method-has_ref_node"><code>eplusr::IdfObject$has_ref_node()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to"><a href="IdfObject.html#method-has_ref_to"><code>eplusr::IdfObject$has_ref_to()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id"><a href="IdfObject.html#method-id"><code>eplusr::IdfObject$id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name"><a href="IdfObject.html#method-name"><code>eplusr::IdfObject$name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent"><a href="IdfObject.html#method-parent"><code>eplusr::IdfObject$parent()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print"><a href="IdfObject.html#method-print"><code>eplusr::IdfObject$print()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_by_object"><a href="IdfObject.html#method-ref_by_object"><code>eplusr::IdfObject$ref_by_object()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_node"><a href="IdfObject.html#method-ref_to_node"><code>eplusr::IdfObject$ref_to_node()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_object"><a href="IdfObject.html#method-ref_to_object"><code>eplusr::IdfObject$ref_to_object()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_string"><a href="IdfObject.html#method-to_string"><code>eplusr::IdfObject$to_string()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_table"><a href="IdfObject.html#method-to_table"><code>eplusr::IdfObject$to_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value"><a href="IdfObject.html#method-value"><code>eplusr::IdfObject$value()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_possible"><a href="IdfObject.html#method-value_possible"><code>eplusr::IdfObject$value_possible()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_relation"><a href="IdfObject.html#method-value_relation"><code>eplusr::IdfObject$value_relation()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="version"><a href="IdfObject.html#method-version"><code>eplusr::IdfObject$version()</code></a></span></li>
+</ul></details></p><hr><a id="method-IdfScheduleCompact-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create an <code>IdfScheduleCompact</code> object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/IdfSchedule.html">IdfScheduleCompact</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">object</span>, <span class="va">parent</span>, new <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/IdfSchedule.html">IdfScheduleCompact</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">object</span>, <span class="va">parent</span>, new <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -230,11 +237,11 @@ sch &lt;- schedule_compact(model, "sch")
 </div>
 
 
-</div><p></p><hr><a id="method-type_limits"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-type_limits"></a><div class="section">
 <h3 id="method-type-limits-">Method <code>type_limits()</code><a class="anchor" aria-label="anchor" href="#method-type-limits-"></a></h3>
 <p>Get or set the schedule type limits</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">type_limits</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -253,11 +260,11 @@ be used.</p></dd>
 <li><p><code>range</code>: The range of current schedule values</p></li>
 </ul></div>
 
-</div><p></p><hr><a id="method-set"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-set"></a><div class="section">
 <h3 id="method-set-">Method <code>set()</code><a class="anchor" aria-label="anchor" href="#method-set-"></a></h3>
 <p>Set schedule values</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">...</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">...</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -302,11 +309,11 @@ sch$set(c("weekday", "summerdesignday") := list(
 </div>
 
 
-</div><p></p><hr><a id="method-update"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-update"></a><div class="section">
 <h3 id="method-update-">Method <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code><a class="anchor" aria-label="anchor" href="#method-update-"></a></h3>
 <p>Update schedule values using data.frame</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">data</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span>, compact <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">data</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span>, compact <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -400,11 +407,11 @@ sch$update(val)
 </div>
 
 
-</div><p></p><hr><a id="method-validate"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-validate"></a><div class="section">
 <h3 id="method-validate-">Method <code>validate()</code><a class="anchor" aria-label="anchor" href="#method-validate-"></a></h3>
 <p>Check possible object field value errors</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -448,11 +455,11 @@ sch$validate("final")
 </div>
 
 
-</div><p></p><hr><a id="method-is_valid"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-is_valid"></a><div class="section">
 <h3 id="method-is-valid-">Method <code>is_valid()</code><a class="anchor" aria-label="anchor" href="#method-is-valid-"></a></h3>
 <p>Check if there is any error in current object</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -493,11 +500,11 @@ sch$is_valid()
 </div>
 
 
-</div><p></p><hr><a id="method-extract"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-extract"></a><div class="section">
 <h3 id="method-extract-">Method <code>extract()</code><a class="anchor" aria-label="anchor" href="#method-extract-"></a></h3>
 <p>Extract schedule values</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">NULL</span>, timestep <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">NULL</span>, timestep <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -560,11 +567,11 @@ sch$extract(timestep = "30 mins")
 </div>
 
 
-</div><p></p><hr><a id="method-clone"></a><div class="section">
+</div><p></p><hr><a id="method-IdfScheduleCompact-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfScheduleCompact</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -582,86 +589,86 @@ sch$extract(timestep = "30 mins")
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$new`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># create an empty 'Schedule:Compact'</span></span>
-<span class="r-in"><span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get an existing 'Schedule:Compact'</span></span>
-<span class="r-in"><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$set`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"summerdesignday"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">    ..6 <span class="op">=</span> <span class="fl">0.2</span>, <span class="st">"8:00"</span> <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span class="r-in">    ..12 <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"13:30"</span> <span class="op">=</span> <span class="fl">0.6</span>, ..14 <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span class="r-in">    ..18 <span class="op">=</span> <span class="fl">0.95</span>, ..19 <span class="op">=</span> <span class="fl">0.2</span>, ..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
-<span class="r-in">    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$update`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
-<span class="r-in">    year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
-<span class="r-in">    daytype <span class="op">=</span> <span class="st">"weekday,summerdesignday"</span>,</span>
-<span class="r-in">    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span>
-<span class="r-in">    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
-<span class="r-in">    year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>,</span>
-<span class="r-in">    time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$validate`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># check at predefined validate level</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$is_valid`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfScheduleCompact$extract`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="st">"expand"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"30 mins"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$new`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># create an empty 'Schedule:Compact'</span></span></span>
+<span class="r-in"><span><span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span>, <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get an existing 'Schedule:Compact'</span></span></span>
+<span class="r-in"><span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu">schedule_compact</span><span class="op">(</span><span class="va">model</span>, <span class="st">"sch"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$set`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"summerdesignday"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    ..6 <span class="op">=</span> <span class="fl">0.2</span>, <span class="st">"8:00"</span> <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>    ..12 <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"13:30"</span> <span class="op">=</span> <span class="fl">0.6</span>, ..14 <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>    ..18 <span class="op">=</span> <span class="fl">0.95</span>, ..19 <span class="op">=</span> <span class="fl">0.2</span>, ..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$update`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span></span>
+<span class="r-in"><span>    daytype <span class="op">=</span> <span class="st">"weekday,summerdesignday"</span>,</span></span>
+<span class="r-in"><span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>,</span></span>
+<span class="r-in"><span>    time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$validate`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># check at predefined validate level</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"none"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$is_valid`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfScheduleCompact$extract`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="st">"expand"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"30 mins"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -676,7 +683,7 @@ sch$extract(timestep = "30 mins")
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

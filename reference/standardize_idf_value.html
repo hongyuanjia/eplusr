@@ -104,13 +104,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">standardize_idf_value</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  <span class="va">dt_value</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"choice"</span>, <span class="st">"reference"</span><span class="op">)</span>,
-  keep <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">standardize_idf_value</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  <span class="va">dt_value</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"choice"</span>, <span class="st">"reference"</span><span class="op">)</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -118,22 +118,33 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>dt_value</dt>
 <dd><p>An data.table of object field values.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>A character vector to specify what type of values to be
 standardized. Should be a subset of <code>c("choice", "reference")</code>.
 Default: <code>c("choice", "reference")</code>.</p></dd>
+
+
 <dt>keep</dt>
 <dd><p>If <code>TRUE</code>, the original value will be kept even if it is invalid.
 If <code>FALSE</code>, invalid values will be converted into NAs. Default: <code>TRUE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.table</p>
+    
+
+<p>A data.table</p>
     </div>
 
   </div>
@@ -148,7 +159,7 @@ If <code>FALSE</code>, invalid values will be converted into NAs. Default: <code
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

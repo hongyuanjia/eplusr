@@ -108,32 +108,43 @@ specified version.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="va">ver</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, dir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="va">ver</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, dir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>idf</dt>
 <dd><p>An <a href="Idf.html">Idf</a> object or a path of IDF file.</p></dd>
+
+
 <dt>ver</dt>
 <dd><p>A valid EnergyPlus IDD version, e.g. <code>9</code>, <code>8.8</code>, or <code>"8.8.0"</code>.</p></dd>
+
+
 <dt>keep_all</dt>
 <dd><p>If <code>TRUE</code>, a list will be return which contains all
 <a href="Idf.html">Idf</a> objects of intermediate versions. The list will be named using first
 two number of that version, e.g. <code>8.1</code>, <code>8.2</code>. If <code>FALSE</code>, only the <a href="Idf.html">Idf</a>
 object of the version specified by <code>ver</code> will be returned. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>save</dt>
 <dd><p>If <code>TRUE</code>, the models will be saved into specified directory.
 Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>dir</dt>
 <dd><p>Only applicable when <code>save</code> is <code>TRUE</code>. The directory to save the
 new IDF files. If the directory does not exist, it will be created before
 save. If <code>NULL</code>, the directory of input <a href="Idf.html">Idf</a> object or IDF file will be
 used. Default: <code>NULL</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <a href="Idf.html">Idf</a> object if <code>keep_all</code> is <code>FALSE</code> or a list of <a href="Idf.html">Idf</a> objects
+    
+
+<p>An <a href="Idf.html">Idf</a> object if <code>keep_all</code> is <code>FALSE</code> or a list of <a href="Idf.html">Idf</a> objects
 if <code>keep_all</code> is <code>TRUE</code>.</p>
     </div>
     <div id="see-also">
@@ -148,26 +159,26 @@ if <code>keep_all</code> is <code>TRUE</code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">7.2</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="co"># create an empty IDF</span></span>
-<span class="r-in">    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="empty_idf.html">empty_idf</a></span><span class="op">(</span><span class="fl">7.2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed</span></span>
-<span class="r-in">    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed and keep all</span></span>
-<span class="r-in">    <span class="co"># intermediate versions</span></span>
-<span class="r-in">    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed and keep all</span></span>
-<span class="r-in">    <span class="co"># intermediate versions and save all them</span></span>
-<span class="r-in">    <span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, keep_all <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">        save <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">7.2</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="co"># create an empty IDF</span></span></span>
+<span class="r-in"><span>    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="empty_idf.html">empty_idf</a></span><span class="op">(</span><span class="fl">7.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed</span></span></span>
+<span class="r-in"><span>    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed and keep all</span></span></span>
+<span class="r-in"><span>    <span class="co"># intermediate versions</span></span></span>
+<span class="r-in"><span>    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed and keep all</span></span></span>
+<span class="r-in"><span>    <span class="co"># intermediate versions and save all them</span></span></span>
+<span class="r-in"><span>    <span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">transition</span><span class="op">(</span><span class="va">idf</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, keep_all <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>        save <span class="op">=</span> <span class="cn">TRUE</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -182,7 +193,7 @@ if <code>keep_all</code> is <code>TRUE</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

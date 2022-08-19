@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Parametric simulations</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/param.Rmd" class="external-link"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -149,28 +149,28 @@
 <p>The <code>ParametricJob</code> class in eplusr is a parametric prototype that provides a set of abstractions to ease the process of parametric model generation, design alternative evaluation, and large parametric simulation management.</p>
 <p>An overview of the parametric prototype implementation is shown blow:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"parametric.png"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"parametric.png"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="parametric.png" width="70%" style="display: block; margin: auto;"></p>
 <p>A parametric simulation is initialized using <code><a href="../reference/ParametricJob.html">param_job()</a></code> giving a seed model and a weather file.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hongyuanjia.github.io/eplusr/">eplusr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-
-<span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span>
-<span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span>
-
-<span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span>
-<span class="va">idf</span><span class="op">$</span><span class="va">OutputControl_Table_Style</span><span class="op">$</span><span class="va">Unit_Conversion</span> <span class="op">&lt;-</span> <span class="st">"JtoKWH"</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"MediumOffice.idf"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># create a parametric prototype of given model and weather file</span>
-<span class="va">param</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ParametricJob.html">param_job</a></span><span class="op">(</span><span class="va">idf</span>, <span class="va">path_weather</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hongyuanjia.github.io/eplusr/">eplusr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="va">OutputControl_Table_Style</span><span class="op">$</span><span class="va">Unit_Conversion</span> <span class="op">&lt;-</span> <span class="st">"JtoKWH"</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"MediumOffice.idf"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create a parametric prototype of given model and weather file</span></span>
+<span><span class="va">param</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ParametricJob.html">param_job</a></span><span class="op">(</span><span class="va">idf</span>, <span class="va">path_weather</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="specify-design-alternatives">Specify design alternatives<a class="anchor" aria-label="anchor" href="#specify-design-alternatives"></a>
@@ -179,188 +179,188 @@
 <p>A measure is simply an R function that takes an <code>Idf</code> object and any other parameters as input, and returns a set of modified <code>Idf</code> objects as output, making it possible to leverage other modules in the framework and apply statistical methods and libraries existing in R to generate design options.</p>
 <p><code>set_lpd()</code> blow is a simple measure that modifies the LPD (Lighting Power Density), and <code>set_nightplug()</code> is a measure that modifies the off-work schedule values of plug loads by multiplying a specified reduction faction value.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># create a measure for modifying LPD</span>
-<span class="va">set_lpd</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">{</span>
-    <span class="co"># keep the original if applicable</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">lpd</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">idf</span><span class="op">)</span>
-
-    <span class="co"># set 'Watts per Zone Floor Area' in all 'Lights' objects as input LPD</span>
-    <span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">Lights</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>watts_per_zone_floor_area <span class="op">=</span> <span class="va">lpd</span><span class="op">)</span><span class="op">)</span>
-
-    <span class="co"># return the modified model</span>
-    <span class="va">idf</span>
-<span class="op">}</span>
-
-<span class="co"># create a measure for reducing plug loads during off-work time</span>
-<span class="va">set_nightplug</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">frac</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">{</span>
-    <span class="co"># keep the original if applicable</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">frac</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">idf</span><span class="op">)</span>
-
-    <span class="co"># extract the plug load schedule into a tidy table</span>
-    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"bldg_equip_sch"</span><span class="op">)</span>
-
-    <span class="co"># modify certain schedule value specified using field names</span>
-    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">sch</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
-            <span class="va">field</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Field"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">14</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">*</span> <span class="va">frac</span><span class="op">)</span>,
-            <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">value</span>
-        <span class="op">)</span><span class="op">)</span>
-
-    <span class="co"># update schedule object using the tidy table</span>
-    <span class="va">idf</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">)</span>
-
-    <span class="co"># return the modified model</span>
-    <span class="va">idf</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># create a measure for modifying LPD</span></span>
+<span><span class="va">set_lpd</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># keep the original if applicable</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">lpd</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># set 'Watts per Zone Floor Area' in all 'Lights' objects as input LPD</span></span>
+<span>    <span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">Lights</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>watts_per_zone_floor_area <span class="op">=</span> <span class="va">lpd</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># return the modified model</span></span>
+<span>    <span class="va">idf</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># create a measure for reducing plug loads during off-work time</span></span>
+<span><span class="va">set_nightplug</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">frac</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># keep the original if applicable</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">frac</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># extract the plug load schedule into a tidy table</span></span>
+<span>    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"bldg_equip_sch"</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># modify certain schedule value specified using field names</span></span>
+<span>    <span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">sch</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>            <span class="va">field</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Field"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">14</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">*</span> <span class="va">frac</span><span class="op">)</span>,</span>
+<span>            <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">value</span></span>
+<span>        <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># update schedule object using the tidy table</span></span>
+<span>    <span class="va">idf</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># return the modified model</span></span>
+<span>    <span class="va">idf</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="create-parametric-models">Create parametric models<a class="anchor" aria-label="anchor" href="#create-parametric-models"></a>
 </h2>
 <p>After a measure is defined, the method <code>$apply_measure()</code> takes it and other parameter values specified to create a set of models. Different measures can be chained together.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># combine two measures into one</span>
-<span class="va">ecm</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span>, <span class="va">nightplug_frac</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu">set_lpd</span><span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span><span class="op">)</span>
-    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu">set_nightplug</span><span class="op">(</span><span class="va">idf</span>, <span class="va">nightplug_frac</span><span class="op">)</span>
-    <span class="va">idf</span>
-<span class="op">}</span>
-
-<span class="co"># apply measures and create parametric models</span>
-<span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">ecm</span>,
-                  lpd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>   <span class="cn">NA</span>,  <span class="fl">7.0</span>,   <span class="fl">5.0</span>,        <span class="cn">NA</span>,        <span class="cn">NA</span>,           <span class="fl">5.0</span><span class="op">)</span>,
-       nightplug_frac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>   <span class="cn">NA</span>,   <span class="cn">NA</span>,    <span class="cn">NA</span>,       <span class="fl">0.6</span>,       <span class="fl">0.2</span>,           <span class="fl">0.2</span><span class="op">)</span>,
-               <span class="co"># name of each case</span>
-               .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ori"</span>, <span class="st">"T5"</span>, <span class="st">"LED"</span>, <span class="st">"0.6Frac"</span>, <span class="st">"0.2Frac"</span>, <span class="st">"LED+0.2Frac"</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span>
-
-<span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span>
-
-<span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span>
-<span class="co">#&gt; Measure 'ecm' has been applied with 6 new models created:</span>
-<span class="co">#&gt; [1]: Ori</span>
-<span class="co">#&gt; [2]: T5</span>
-<span class="co">#&gt; [3]: LED</span>
-<span class="co">#&gt; [4]: 0.6Frac</span>
-<span class="co">#&gt; [5]: 0.2Frac</span>
-<span class="co">#&gt; [6]: LED+0.2Frac</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># combine two measures into one</span></span>
+<span><span class="va">ecm</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span>, <span class="va">nightplug_frac</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu">set_lpd</span><span class="op">(</span><span class="va">idf</span>, <span class="va">lpd</span><span class="op">)</span></span>
+<span>    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu">set_nightplug</span><span class="op">(</span><span class="va">idf</span>, <span class="va">nightplug_frac</span><span class="op">)</span></span>
+<span>    <span class="va">idf</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># apply measures and create parametric models</span></span>
+<span><span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">ecm</span>,</span>
+<span>                  lpd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>   <span class="cn">NA</span>,  <span class="fl">7.0</span>,   <span class="fl">5.0</span>,        <span class="cn">NA</span>,        <span class="cn">NA</span>,           <span class="fl">5.0</span><span class="op">)</span>,</span>
+<span>       nightplug_frac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>   <span class="cn">NA</span>,   <span class="cn">NA</span>,    <span class="cn">NA</span>,       <span class="fl">0.6</span>,       <span class="fl">0.2</span>,           <span class="fl">0.2</span><span class="op">)</span>,</span>
+<span>               <span class="co"># name of each case</span></span>
+<span>               .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ori"</span>, <span class="st">"T5"</span>, <span class="st">"LED"</span>, <span class="st">"0.6Frac"</span>, <span class="st">"0.2Frac"</span>, <span class="st">"LED+0.2Frac"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in sprintf("%.2f", as.numeric(value) * frac): NAs introduced by coercion</span></span>
+<span><span class="co">#&gt; Measure 'ecm' has been applied with 6 new models created:</span></span>
+<span><span class="co">#&gt; [1]: Ori</span></span>
+<span><span class="co">#&gt; [2]: T5</span></span>
+<span><span class="co">#&gt; [3]: LED</span></span>
+<span><span class="co">#&gt; [4]: 0.6Frac</span></span>
+<span><span class="co">#&gt; [5]: 0.2Frac</span></span>
+<span><span class="co">#&gt; [6]: LED+0.2Frac</span></span></code></pre></div>
 <p>After parametric models have been created, you can retrive the summary of the parameter values and model names using <code>$cases()</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;    index        case lpd nightplug_frac</span>
-<span class="co">#&gt; 1:     1         Ori  NA             NA</span>
-<span class="co">#&gt; 2:     2          T5   7             NA</span>
-<span class="co">#&gt; 3:     3         LED   5             NA</span>
-<span class="co">#&gt; 4:     4     0.6Frac  NA            0.6</span>
-<span class="co">#&gt; 5:     5     0.2Frac  NA            0.2</span>
-<span class="co">#&gt; 6:     6 LED+0.2Frac   5            0.2</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">param</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    index        case lpd nightplug_frac</span></span>
+<span><span class="co">#&gt; 1:     1         Ori  NA             NA</span></span>
+<span><span class="co">#&gt; 2:     2          T5   7             NA</span></span>
+<span><span class="co">#&gt; 3:     3         LED   5             NA</span></span>
+<span><span class="co">#&gt; 4:     4     0.6Frac  NA            0.6</span></span>
+<span><span class="co">#&gt; 5:     5     0.2Frac  NA            0.2</span></span>
+<span><span class="co">#&gt; 6:     6 LED+0.2Frac   5            0.2</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-parametric-simulations-in-parallel">Run parametric simulations in parallel<a class="anchor" aria-label="anchor" href="#run-parametric-simulations-in-parallel"></a>
 </h2>
 <p>The <code>$run()</code> method will run all parametric simulations in parallel and place each simulation outputs in a separate folder. All simulation meta data will keep updating during the whole time and can be retrieved using the <code>$status()</code> method for further investigations.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span>
-<span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span>
-<span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
-<span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span>
-<span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span>
-<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Seed: '/tmp/RtmpvS7iNC/MediumOffice.idf'</span>
-<span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.In...</span>
-<span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
-<span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; Applied Measure: 'ecm'</span>
-<span class="co">#&gt; Parametric Models [6]: </span>
-<span class="co">#&gt; [1]: 'Ori.idf'         &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; [2]: 'T5.idf'          &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; [3]: 'LED.idf'         &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-05-11 16:01:51' and completed successfully after 3.79 mins.</span></span>
-
-<span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; $run_before</span>
-<span class="co">#&gt; [1] TRUE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $alive</span>
-<span class="co">#&gt; [1] FALSE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $terminated</span>
-<span class="co">#&gt; [1] FALSE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $successful</span>
-<span class="co">#&gt; [1] TRUE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $changed_after</span>
-<span class="co">#&gt; [1] FALSE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $job_status</span>
-<span class="co">#&gt;    index    status                                         idf</span>
-<span class="co">#&gt; 1:     1 completed                 /tmp/RtmpvS7iNC/Ori/Ori.idf</span>
-<span class="co">#&gt; 2:     2 completed                   /tmp/RtmpvS7iNC/T5/T5.idf</span>
-<span class="co">#&gt; 3:     3 completed                 /tmp/RtmpvS7iNC/LED/LED.idf</span>
-<span class="co">#&gt; 4:     4 completed         /tmp/RtmpvS7iNC/0.6Frac/0.6Frac.idf</span>
-<span class="co">#&gt; 5:     5 completed         /tmp/RtmpvS7iNC/0.2Frac/0.2Frac.idf</span>
-<span class="co">#&gt; 6:     6 completed /tmp/RtmpvS7iNC/LED+0.2Frac/LED+0.2Frac.idf</span>
-<span class="co">#&gt;                                                                                     epw</span>
-<span class="co">#&gt; 1: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 2: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 3: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 4: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="co">#&gt; 6: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 1|RUNNING    --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
+<span><span class="co">#&gt; 2|RUNNING    --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span></span>
+<span><span class="co">#&gt; 2|COMPLETED  --&gt; [IDF]'T5.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_...</span></span>
+<span><span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
+<span><span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
+<span><span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
+<span><span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
+<span><span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
+<span><span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
+<span><span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span></span>
+<span><span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span></span>
+<span><span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; * Seed: '/tmp/RtmpEsFzWD/MediumOffice.idf'</span></span>
+<span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.In...</span></span>
+<span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
+<span><span class="co">#&gt; Applied Measure: 'ecm'</span></span>
+<span><span class="co">#&gt; Parametric Models [6]: </span></span>
+<span><span class="co">#&gt; [1]: 'Ori.idf'         &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; [2]: 'T5.idf'          &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; [3]: 'LED.idf'         &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 09:42:49' and completed successfully after 2.52 mins.</span></span></span>
+<span></span>
+<span><span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $run_before</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $alive</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $terminated</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $successful</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $changed_after</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $job_status</span></span>
+<span><span class="co">#&gt;    index    status                                         idf</span></span>
+<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpEsFzWD/Ori/Ori.idf</span></span>
+<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpEsFzWD/T5/T5.idf</span></span>
+<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpEsFzWD/LED/LED.idf</span></span>
+<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpEsFzWD/0.6Frac/0.6Frac.idf</span></span>
+<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpEsFzWD/0.2Frac/0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpEsFzWD/LED+0.2Frac/LED+0.2Frac.idf</span></span>
+<span><span class="co">#&gt;                                                                                     epw</span></span>
+<span><span class="co">#&gt; 1: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 2: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 3: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 4: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 6: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="collect-results-in-one-go">Collect results in one go<a class="anchor" aria-label="anchor" href="#collect-results-in-one-go"></a>
 </h2>
 <p>The <code>ParametricJob</code> class leverages the tidy data interface to retrieve parametric simulation results in a tidy format. For all resulting tidy tables, an extra column containing the simulation job identifiers is prepended in each table. It can be used as an index or key for further data transformations, analyses and visualization to compare results of different simulated design options.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># read building energy consumption from Standard Reports</span>
-<span class="va">param_end_use</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_end_use</span><span class="op">)</span>
-<span class="co">#&gt;     index        case                             report_name      report_for</span>
-<span class="co">#&gt;  1:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  2:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  3:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  4:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  5:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  6:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  7:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  8:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  9:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 10:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 11:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 12:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 13:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 14:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 15:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 16:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 17:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 18:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 19:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 20:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 21:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 22:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 23:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 24:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 25:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 26:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 27:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 28:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 29:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># read building energy consumption from Standard Reports</span></span>
+<span><span class="va">param_end_use</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_end_use</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     index        case                             report_name      report_for</span></span>
+<span><span class="co">#&gt;  1:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  2:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  3:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  4:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  5:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  6:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  7:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  8:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  9:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 10:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 11:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 12:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 13:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 14:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 15:     1         Ori AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 16:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 17:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 18:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 19:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 20:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 21:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 22:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 23:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 24:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 25:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 26:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 27:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 28:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 29:     2          T5 AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="data-exploration">Data exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a>
@@ -369,102 +369,102 @@
 <p>In this example, the building energy consumptions of all six models are extracted using one line of code. The resulting data format is the same as that of a single simulation and is equivalent to bind rows from six tables into one tidy table. A <code>case</code> column is prepended using the names specified in <code>$apply_measure()</code>. It works as an identifier to group the results by different parametric models using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code> and <code>nest()</code> functions from the tidyverse package.</p>
 <p>This data structure makes it effortless to perform comparative analyses by taking the code snippets developed in data exploration for a single simulation and applying them to each of the parametric simulations.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># read building area from Standard Reports</span>
-<span class="va">area</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
-
-<span class="co"># calculate EUI breakdown</span>
-<span class="va">param_eui</span> <span class="op">&lt;-</span> <span class="va">param_end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">case</span>, category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">category</span>, <span class="va">eui</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># exclude categories that did not change</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Pumps"</span>, <span class="va">category</span> <span class="op">!=</span> <span class="st">"Exterior Lighting"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_eui</span><span class="op">)</span>
-<span class="co">#&gt;            case           category    eui</span>
-<span class="co">#&gt;  1:         Ori     Total End Uses 152.18</span>
-<span class="co">#&gt;  2:     0.6Frac     Total End Uses 147.62</span>
-<span class="co">#&gt;  3:     0.2Frac     Total End Uses 143.35</span>
-<span class="co">#&gt;  4:          T5     Total End Uses 140.83</span>
-<span class="co">#&gt;  5:         LED     Total End Uses 134.81</span>
-<span class="co">#&gt;  6: LED+0.2Frac     Total End Uses 126.40</span>
-<span class="co">#&gt;  7:         Ori Interior Equipment  59.46</span>
-<span class="co">#&gt;  8:          T5 Interior Equipment  59.46</span>
-<span class="co">#&gt;  9:         LED Interior Equipment  59.46</span>
-<span class="co">#&gt; 10:     0.6Frac Interior Equipment  52.74</span>
-<span class="co">#&gt; 11:     0.2Frac Interior Equipment  46.01</span>
-<span class="co">#&gt; 12: LED+0.2Frac Interior Equipment  46.01</span>
-<span class="co">#&gt; 13: LED+0.2Frac            Heating  35.94</span>
-<span class="co">#&gt; 14:         Ori  Interior Lighting  33.80</span>
-<span class="co">#&gt; 15:     0.6Frac  Interior Lighting  33.80</span>
-<span class="co">#&gt; 16:     0.2Frac  Interior Lighting  33.80</span>
-<span class="co">#&gt; 17:     0.2Frac            Heating  33.09</span>
-<span class="co">#&gt; 18:     0.6Frac            Heating  30.30</span>
-<span class="co">#&gt; 19:         LED            Heating  30.22</span>
-<span class="co">#&gt; 20:          T5            Heating  29.34</span>
-<span class="co">#&gt; 21:         Ori            Heating  27.73</span>
-<span class="co">#&gt; 22:          T5  Interior Lighting  21.99</span>
-<span class="co">#&gt; 23:         LED  Interior Lighting  15.71</span>
-<span class="co">#&gt; 24: LED+0.2Frac  Interior Lighting  15.71</span>
-<span class="co">#&gt; 25:         Ori            Cooling  14.44</span>
-<span class="co">#&gt; 26:     0.6Frac            Cooling  14.08</span>
-<span class="co">#&gt; 27:     0.2Frac            Cooling  13.77</span>
-<span class="co">#&gt; 28:          T5            Cooling  13.51</span>
-<span class="co">#&gt; 29:         LED            Cooling  13.01</span>
-<span class="va">....</span>
-
-<span class="co"># extract the seed model, i.e. "Ori" case as the baseline</span>
-<span class="va">ori_eui</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">==</span> <span class="st">"Ori"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span>
-
-<span class="co"># calculate energy savings based on the baseline EUI</span>
-<span class="va">param_savings</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">right_join</a></span><span class="op">(</span><span class="va">ori_eui</span>, by <span class="op">=</span> <span class="st">"category"</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"_ori"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>savings <span class="op">=</span> <span class="op">(</span><span class="va">eui_ori</span> <span class="op">-</span> <span class="va">eui</span><span class="op">)</span> <span class="op">/</span> <span class="va">eui_ori</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">!=</span> <span class="st">"Ori"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_savings</span><span class="op">)</span>
-<span class="co">#&gt;            case           category    eui eui_ori    savings</span>
-<span class="co">#&gt;  1:     0.6Frac     Total End Uses 147.62  152.18   2.996452</span>
-<span class="co">#&gt;  2:     0.2Frac     Total End Uses 143.35  152.18   5.802339</span>
-<span class="co">#&gt;  3:          T5     Total End Uses 140.83  152.18   7.458273</span>
-<span class="co">#&gt;  4:         LED     Total End Uses 134.81  152.18  11.414115</span>
-<span class="co">#&gt;  5: LED+0.2Frac     Total End Uses 126.40  152.18  16.940465</span>
-<span class="co">#&gt;  6:          T5 Interior Equipment  59.46   59.46   0.000000</span>
-<span class="co">#&gt;  7:         LED Interior Equipment  59.46   59.46   0.000000</span>
-<span class="co">#&gt;  8:     0.6Frac Interior Equipment  52.74   59.46  11.301715</span>
-<span class="co">#&gt;  9:     0.2Frac Interior Equipment  46.01   59.46  22.620249</span>
-<span class="co">#&gt; 10: LED+0.2Frac Interior Equipment  46.01   59.46  22.620249</span>
-<span class="co">#&gt; 11: LED+0.2Frac            Heating  35.94   27.73 -29.606924</span>
-<span class="co">#&gt; 12:     0.6Frac  Interior Lighting  33.80   33.80   0.000000</span>
-<span class="co">#&gt; 13:     0.2Frac  Interior Lighting  33.80   33.80   0.000000</span>
-<span class="co">#&gt; 14:     0.2Frac            Heating  33.09   27.73 -19.329246</span>
-<span class="co">#&gt; 15:     0.6Frac            Heating  30.30   27.73  -9.267941</span>
-<span class="co">#&gt; 16:         LED            Heating  30.22   27.73  -8.979445</span>
-<span class="co">#&gt; 17:          T5            Heating  29.34   27.73  -5.805986</span>
-<span class="co">#&gt; 18:          T5  Interior Lighting  21.99   33.80  34.940828</span>
-<span class="co">#&gt; 19:         LED  Interior Lighting  15.71   33.80  53.520710</span>
-<span class="co">#&gt; 20: LED+0.2Frac  Interior Lighting  15.71   33.80  53.520710</span>
-<span class="co">#&gt; 21:     0.6Frac            Cooling  14.08   14.44   2.493075</span>
-<span class="co">#&gt; 22:     0.2Frac            Cooling  13.77   14.44   4.639889</span>
-<span class="co">#&gt; 23:          T5            Cooling  13.51   14.44   6.440443</span>
-<span class="co">#&gt; 24:         LED            Cooling  13.01   14.44   9.903047</span>
-<span class="co">#&gt; 25: LED+0.2Frac            Cooling  12.41   14.44  14.058172</span>
-<span class="co">#&gt; 26:     0.6Frac               Fans   3.72    3.77   1.326260</span>
-<span class="co">#&gt; 27:     0.2Frac               Fans   3.68    3.77   2.387268</span>
-<span class="co">#&gt; 28:          T5               Fans   3.55    3.77   5.835544</span>
-<span class="co">#&gt; 29:         LED               Fans   3.43    3.77   9.018568</span>
-<span class="va">....</span>
-
-<span class="co"># plot a bar chart to show the energy savings</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-<span class="va">param_savings</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">case</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">savings</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span>, stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">0.6</span>, color <span class="op">=</span> <span class="st">"black"</span>,
-        show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">category</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Energy savings / %"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># read building area from Standard Reports</span></span>
+<span><span class="va">area</span> <span class="op">&lt;-</span> <span class="va">param</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># calculate EUI breakdown</span></span>
+<span><span class="va">param_eui</span> <span class="op">&lt;-</span> <span class="va">param_end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">case</span>, category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">category</span>, <span class="va">eui</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># exclude categories that did not change</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Pumps"</span>, <span class="va">category</span> <span class="op">!=</span> <span class="st">"Exterior Lighting"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_eui</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            case           category    eui</span></span>
+<span><span class="co">#&gt;  1:         Ori     Total End Uses 152.18</span></span>
+<span><span class="co">#&gt;  2:     0.6Frac     Total End Uses 147.62</span></span>
+<span><span class="co">#&gt;  3:     0.2Frac     Total End Uses 143.35</span></span>
+<span><span class="co">#&gt;  4:          T5     Total End Uses 140.83</span></span>
+<span><span class="co">#&gt;  5:         LED     Total End Uses 134.81</span></span>
+<span><span class="co">#&gt;  6: LED+0.2Frac     Total End Uses 126.40</span></span>
+<span><span class="co">#&gt;  7:         Ori Interior Equipment  59.46</span></span>
+<span><span class="co">#&gt;  8:          T5 Interior Equipment  59.46</span></span>
+<span><span class="co">#&gt;  9:         LED Interior Equipment  59.46</span></span>
+<span><span class="co">#&gt; 10:     0.6Frac Interior Equipment  52.74</span></span>
+<span><span class="co">#&gt; 11:     0.2Frac Interior Equipment  46.01</span></span>
+<span><span class="co">#&gt; 12: LED+0.2Frac Interior Equipment  46.01</span></span>
+<span><span class="co">#&gt; 13: LED+0.2Frac            Heating  35.94</span></span>
+<span><span class="co">#&gt; 14:         Ori  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 15:     0.6Frac  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 16:     0.2Frac  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 17:     0.2Frac            Heating  33.09</span></span>
+<span><span class="co">#&gt; 18:     0.6Frac            Heating  30.30</span></span>
+<span><span class="co">#&gt; 19:         LED            Heating  30.22</span></span>
+<span><span class="co">#&gt; 20:          T5            Heating  29.34</span></span>
+<span><span class="co">#&gt; 21:         Ori            Heating  27.73</span></span>
+<span><span class="co">#&gt; 22:          T5  Interior Lighting  21.99</span></span>
+<span><span class="co">#&gt; 23:         LED  Interior Lighting  15.71</span></span>
+<span><span class="co">#&gt; 24: LED+0.2Frac  Interior Lighting  15.71</span></span>
+<span><span class="co">#&gt; 25:         Ori            Cooling  14.44</span></span>
+<span><span class="co">#&gt; 26:     0.6Frac            Cooling  14.08</span></span>
+<span><span class="co">#&gt; 27:     0.2Frac            Cooling  13.77</span></span>
+<span><span class="co">#&gt; 28:          T5            Cooling  13.51</span></span>
+<span><span class="co">#&gt; 29:         LED            Cooling  13.01</span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="co"># extract the seed model, i.e. "Ori" case as the baseline</span></span>
+<span><span class="va">ori_eui</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">==</span> <span class="st">"Ori"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># calculate energy savings based on the baseline EUI</span></span>
+<span><span class="va">param_savings</span> <span class="op">&lt;-</span> <span class="va">param_eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">right_join</a></span><span class="op">(</span><span class="va">ori_eui</span>, by <span class="op">=</span> <span class="st">"category"</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"_ori"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>savings <span class="op">=</span> <span class="op">(</span><span class="va">eui_ori</span> <span class="op">-</span> <span class="va">eui</span><span class="op">)</span> <span class="op">/</span> <span class="va">eui_ori</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">!=</span> <span class="st">"Ori"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_savings</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            case           category    eui eui_ori    savings</span></span>
+<span><span class="co">#&gt;  1:     0.6Frac     Total End Uses 147.62  152.18   2.996452</span></span>
+<span><span class="co">#&gt;  2:     0.2Frac     Total End Uses 143.35  152.18   5.802339</span></span>
+<span><span class="co">#&gt;  3:          T5     Total End Uses 140.83  152.18   7.458273</span></span>
+<span><span class="co">#&gt;  4:         LED     Total End Uses 134.81  152.18  11.414115</span></span>
+<span><span class="co">#&gt;  5: LED+0.2Frac     Total End Uses 126.40  152.18  16.940465</span></span>
+<span><span class="co">#&gt;  6:          T5 Interior Equipment  59.46   59.46   0.000000</span></span>
+<span><span class="co">#&gt;  7:         LED Interior Equipment  59.46   59.46   0.000000</span></span>
+<span><span class="co">#&gt;  8:     0.6Frac Interior Equipment  52.74   59.46  11.301715</span></span>
+<span><span class="co">#&gt;  9:     0.2Frac Interior Equipment  46.01   59.46  22.620249</span></span>
+<span><span class="co">#&gt; 10: LED+0.2Frac Interior Equipment  46.01   59.46  22.620249</span></span>
+<span><span class="co">#&gt; 11: LED+0.2Frac            Heating  35.94   27.73 -29.606924</span></span>
+<span><span class="co">#&gt; 12:     0.6Frac  Interior Lighting  33.80   33.80   0.000000</span></span>
+<span><span class="co">#&gt; 13:     0.2Frac  Interior Lighting  33.80   33.80   0.000000</span></span>
+<span><span class="co">#&gt; 14:     0.2Frac            Heating  33.09   27.73 -19.329246</span></span>
+<span><span class="co">#&gt; 15:     0.6Frac            Heating  30.30   27.73  -9.267941</span></span>
+<span><span class="co">#&gt; 16:         LED            Heating  30.22   27.73  -8.979445</span></span>
+<span><span class="co">#&gt; 17:          T5            Heating  29.34   27.73  -5.805986</span></span>
+<span><span class="co">#&gt; 18:          T5  Interior Lighting  21.99   33.80  34.940828</span></span>
+<span><span class="co">#&gt; 19:         LED  Interior Lighting  15.71   33.80  53.520710</span></span>
+<span><span class="co">#&gt; 20: LED+0.2Frac  Interior Lighting  15.71   33.80  53.520710</span></span>
+<span><span class="co">#&gt; 21:     0.6Frac            Cooling  14.08   14.44   2.493075</span></span>
+<span><span class="co">#&gt; 22:     0.2Frac            Cooling  13.77   14.44   4.639889</span></span>
+<span><span class="co">#&gt; 23:          T5            Cooling  13.51   14.44   6.440443</span></span>
+<span><span class="co">#&gt; 24:         LED            Cooling  13.01   14.44   9.903047</span></span>
+<span><span class="co">#&gt; 25: LED+0.2Frac            Cooling  12.41   14.44  14.058172</span></span>
+<span><span class="co">#&gt; 26:     0.6Frac               Fans   3.72    3.77   1.326260</span></span>
+<span><span class="co">#&gt; 27:     0.2Frac               Fans   3.68    3.77   2.387268</span></span>
+<span><span class="co">#&gt; 28:          T5               Fans   3.55    3.77   5.835544</span></span>
+<span><span class="co">#&gt; 29:         LED               Fans   3.43    3.77   9.018568</span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="co"># plot a bar chart to show the energy savings</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">param_savings</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">case</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">case</span>, <span class="va">savings</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span>, stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">0.6</span>, color <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>        show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">category</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Energy savings / %"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="param_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
@@ -492,7 +492,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

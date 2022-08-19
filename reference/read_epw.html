@@ -108,21 +108,26 @@ simplifications. For more details on <code>Epw</code>, please see <a href="Epw.h
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_epw</span><span class="op">(</span><span class="va">path</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_epw</span><span class="op">(</span><span class="va">path</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>path</dt>
 <dd><p>A path of an EnergyPlus <code>EPW</code> file.</p></dd>
+
+
 <dt>encoding</dt>
 <dd><p>The file encoding of input IDD. Should be one of <code>"unknown"</code>,
 <code>"Latin-1" and </code>"UTF-8"<code>. The default is </code>"unknown"` which means that
 the file is encoded in the native encoding.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>Epw</code> object.</p>
+    
+
+<p>An <code>Epw</code> object.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -135,25 +140,25 @@ the file is encoded in the native encoding.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># read an EPW file from EnergyPlus v8.8 installation folder</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span></span>
-<span class="r-in">        <span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>,</span>
-<span class="r-in">        <span class="st">"WeatherData"</span>,</span>
-<span class="r-in">        <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
-<span class="r-in">   <span class="op">)</span></span>
-<span class="r-in">   <span class="fu">read_epw</span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># read an EPW file from EnergyPlus website</span></span>
-<span class="r-in"><span class="va">path_base</span> <span class="op">&lt;-</span> <span class="st">"https://energyplus.net/weather-download"</span></span>
-<span class="r-in"><span class="va">path_region</span> <span class="op">&lt;-</span> <span class="st">"north_and_central_america_wmo_region_4/USA/CA"</span></span>
-<span class="r-in"><span class="va">path_file</span> <span class="op">&lt;-</span> <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
-<span class="r-in"><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path_base</span>, <span class="va">path_region</span>, <span class="va">path_file</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">read_epw</span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># read an EPW file from EnergyPlus v8.8 installation folder</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"WeatherData"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span></span>
+<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span>   <span class="fu">read_epw</span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># read an EPW file from EnergyPlus website</span></span></span>
+<span class="r-in"><span><span class="va">path_base</span> <span class="op">&lt;-</span> <span class="st">"https://energyplus.net/weather-download"</span></span></span>
+<span class="r-in"><span><span class="va">path_region</span> <span class="op">&lt;-</span> <span class="st">"north_and_central_america_wmo_region_4/USA/CA"</span></span></span>
+<span class="r-in"><span><span class="va">path_file</span> <span class="op">&lt;-</span> <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span></span>
+<span class="r-in"><span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path_base</span>, <span class="va">path_region</span>, <span class="va">path_file</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">read_epw</span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -168,7 +173,7 @@ the file is encoded in the native encoding.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

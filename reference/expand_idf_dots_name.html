@@ -104,13 +104,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">expand_idf_dots_name</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  <span class="va">...</span>,
-  .keep_name <span class="op">=</span> <span class="cn">TRUE</span>,
-  .property <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">expand_idf_dots_name</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .keep_name <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .property <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -118,21 +118,32 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Lists of object ID or name pair, e.g. <code>c(Name1, Name2)</code>, <code>c(ID1, ID2)</code>, <code>NewName = OldName</code> and <code>NewName = ID</code>. <code>NewName</code> is optional.</p></dd>
+
+
 <dt>.keep_name</dt>
 <dd><p>If <code>TRUE</code>, input new names will be kept in a column named
 <code>new_object_name</code>, otherwise they will be dropped. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>.property</dt>
 <dd><p>A character vector of column names in class table to return.
 Default: <code>NULL</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> containing extracted object data.</p>
+    
+
+<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> containing extracted object data.</p>
     </div>
 
   </div>
@@ -147,7 +158,7 @@ Default: <code>NULL</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

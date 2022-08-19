@@ -104,15 +104,15 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">path_eplus</span><span class="op">(</span><span class="va">ver</span>, <span class="va">...</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">path_eplus_processor</span><span class="op">(</span><span class="va">ver</span>, <span class="va">...</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">path_eplus_example</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">path_eplus_weather</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">path_eplus</span><span class="op">(</span><span class="va">ver</span>, <span class="va">...</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">path_eplus_processor</span><span class="op">(</span><span class="va">ver</span>, <span class="va">...</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">path_eplus_example</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">path_eplus_weather</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="va">ver</span>, <span class="va">file</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -120,13 +120,20 @@
     <dl><dt>ver</dt>
 <dd><p>An acceptable EnergyPlus version or an EnergyPlus installation
 directory</p></dd>
+
+
 <dt>...</dt>
 <dd><p>File paths passed to <code><a href="https://rdrr.io/r/base/file.path.html" class="external-link">base::file.path()</a></code>.</p></dd>
+
+
 <dt>strict</dt>
 <dd><p>If <code>TRUE</code>, an error will be issued if the specified file does
 not exist</p></dd>
+
+
 <dt>file</dt>
 <dd><p>A single string of file name.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -150,20 +157,20 @@ folder in EnergyPlus installation directory.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">path_eplus</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"Energy+.idd"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">path_eplus_processor</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"EPMacro"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">path_eplus_processor</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"PreProcess"</span>, <span class="st">"GrndTempCalc"</span>, <span class="st">"Slab"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">path_eplus_example</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"1ZoneUncontrolled.idf"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">path_eplus_example</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"BasicFiles/Exercise1A.idf"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">path_eplus_weather</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"Boilers.idf"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"FMUs/MoistAir.fmu"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"Energy+.idd"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_processor</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"EPMacro"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_processor</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"PreProcess"</span>, <span class="st">"GrndTempCalc"</span>, <span class="st">"Slab"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_example</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"1ZoneUncontrolled.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_example</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"BasicFiles/Exercise1A.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_weather</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"Boilers.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">path_eplus_dataset</span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"FMUs/MoistAir.fmu"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -178,7 +185,7 @@ folder in EnergyPlus installation directory.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

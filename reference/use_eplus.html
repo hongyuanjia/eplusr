@@ -104,15 +104,15 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">use_eplus</span><span class="op">(</span><span class="va">eplus</span><span class="op">)</span>
-
-<span class="fu">eplus_config</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span>
-
-<span class="fu">avail_eplus</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">is_avail_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span>
-
-<span class="fu">locate_eplus</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">use_eplus</span><span class="op">(</span><span class="va">eplus</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">eplus_config</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">avail_eplus</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">locate_eplus</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -120,12 +120,17 @@
     <dl><dt>eplus</dt>
 <dd><p>An acceptable EnergyPlus version or an EnergyPlus installation
 path.</p></dd>
+
+
 <dt>ver</dt>
 <dd><p>An acceptable EnergyPlus version.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <ul><li><p>For <code>use_eplus()</code> and <code>eplus_config()</code>, an (invisible for
+    
+
+<ul><li><p>For <code>use_eplus()</code> and <code>eplus_config()</code>, an (invisible for
 <code>use_eplus()</code>) list of three contains EnergyPlus version, directory and
 EnergyPlus executable.  version of EnergyPlus;</p></li>
 <li><p>For <code>avail_eplus()</code>, a <a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">numeric_version</a> vector or <code>NULL</code> if no
@@ -156,25 +161,25 @@ installing EnergyPlus</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># add specific version of EnergyPlus</span></span>
-<span class="r-in"><span class="fu">use_eplus</span><span class="op">(</span><span class="fl">8.9</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">use_eplus</span><span class="op">(</span><span class="st">"8.8.0"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get configure data of specific EnergyPlus version if avaiable</span></span>
-<span class="r-in"><span class="fu">eplus_config</span><span class="op">(</span><span class="fl">8.6</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get all versions of avaiable EnergyPlus</span></span>
-<span class="r-in"><span class="fu">avail_eplus</span><span class="op">(</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># add specific version of EnergyPlus</span></span></span>
+<span class="r-in"><span><span class="fu">use_eplus</span><span class="op">(</span><span class="fl">8.9</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">use_eplus</span><span class="op">(</span><span class="st">"8.8.0"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get configure data of specific EnergyPlus version if avaiable</span></span></span>
+<span class="r-in"><span><span class="fu">eplus_config</span><span class="op">(</span><span class="fl">8.6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get all versions of avaiable EnergyPlus</span></span></span>
+<span class="r-in"><span><span class="fu">avail_eplus</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># check if specific version of EnergyPlus is available</span></span>
-<span class="r-in"><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="fl">8.5</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># check if specific version of EnergyPlus is available</span></span></span>
+<span class="r-in"><span><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="fl">8.5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -189,7 +194,7 @@ installing EnergyPlus</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -104,16 +104,16 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">add_idf_object</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  <span class="va">dt_object</span>,
-  <span class="va">dt_value</span>,
-  default <span class="op">=</span> <span class="cn">TRUE</span>,
-  unique <span class="op">=</span> <span class="cn">FALSE</span>,
-  empty <span class="op">=</span> <span class="cn">FALSE</span>,
-  level <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_idf_object</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  <span class="va">dt_object</span>,</span>
+<span>  <span class="va">dt_value</span>,</span>
+<span>  default <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  unique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  empty <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  level <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -121,28 +121,45 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>dt_object</dt>
 <dd><p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> that contains object data.</p></dd>
+
+
 <dt>dt_value</dt>
 <dd><p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> that contains value data.</p></dd>
+
+
 <dt>default</dt>
 <dd><p>If <code>TRUE</code>, default values are used for those blank
 fields if possible. If <code>FALSE</code>, empty fields are kept blank.
 Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>unique</dt>
 <dd><p>If <code>TRUE</code>, there are same objects in current <a href="Idf.html">Idf</a> as input,
 duplications in input are removed. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>empty</dt>
 <dd><p>If <code>TRUE</code>, trailing empty fields are kept. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>level</dt>
 <dd><p>Validate level. Default: <code>eplusr_option("validate_level")</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The modified <a href="Idf.html">Idf</a> data in a named list of 5 elements, i.e. <code>object</code>,
+    
+
+<p>The modified <a href="Idf.html">Idf</a> data in a named list of 5 elements, i.e. <code>object</code>,
 <code>value</code>, <code>reference</code>, <code>changed</code> and <code>updated</code>. First 3 elements are
 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s containing the actual updated <a href="Idf.html">Idf</a> data while
 <code>changed</code> and <code>updated</code> are integer vectors containing IDs of objects that
@@ -162,7 +179,7 @@ respectively.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

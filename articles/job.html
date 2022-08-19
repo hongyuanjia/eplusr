@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Run simulation and data exploration</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -149,109 +149,109 @@
 <p>The <code>Idf</code> class provides a <code>$run()</code> method to call EnergyPlus and run simulations. Underneath, eplusr uses the EnergyPlus command line interface which was introduced since EnergyPlus v8.3.0, which means that <code>$run()</code> only supports models with version higher than v8.3.0.</p>
 <p><code>Idf$run()</code> will run the current model with specified weather using corresponding version of EnergyPlus. The model and the weather used will be copied to the output directory. An <code>EplusJob</code> object will be returned which provides detailed information of the simulation and methods to collect simulation output. Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for details.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span>
-<span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span>
-
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="run-only-design-day-simulation">Run only design day simulation<a class="anchor" aria-label="anchor" href="#run-only-design-day-simulation"></a>
 </h3>
 <p>Sometime, you may only want to run a design day simulation. <code>Idf$run()</code> provides a convenient way to do this by setting the <code>weather</code> argument to <code>NULL</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; ExpandObjects Started.</span>
-<span class="co">#&gt; No expanded file generated.</span>
-<span class="co">#&gt; ExpandObjects Finished. Time:     0.022</span>
-<span class="co">#&gt; EnergyPlus Starting</span>
-<span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.05.11 16:00</span>
-<span class="co">#&gt; Processing Data Dictionary</span>
-<span class="co">#&gt; Processing Input File</span>
-<span class="co">#&gt; Initializing Response Factors</span>
-<span class="co">#&gt; Calculating CTFs for "ROOF-1", Construction # 1</span>
-<span class="co">#&gt; Calculating CTFs for "WALL-1", Construction # 2</span>
-<span class="va">....</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">job</span><span class="op">)</span>
-<span class="co">#&gt; [1] "EplusJob" "R6"</span>
-
-<span class="va">job</span>
-<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpqb4IHL/5Zone_Transformer.idf'</span>
-<span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
-<span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
-<span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-05-11 16:00:41' and completed successfully after 1.14 secs.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
+<span><span class="co">#&gt; ExpandObjects Started.</span></span>
+<span><span class="co">#&gt; No expanded file generated.</span></span>
+<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.020</span></span>
+<span><span class="co">#&gt; EnergyPlus Starting</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.08.19 09:42</span></span>
+<span><span class="co">#&gt; Processing Data Dictionary</span></span>
+<span><span class="co">#&gt; Processing Input File</span></span>
+<span><span class="co">#&gt; Initializing Response Factors</span></span>
+<span><span class="co">#&gt; Calculating CTFs for "ROOF-1", Construction # 1</span></span>
+<span><span class="co">#&gt; Calculating CTFs for "WALL-1", Construction # 2</span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">job</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "EplusJob" "R6"</span></span>
+<span></span>
+<span><span class="va">job</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpaw3JPk/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 09:42:01' and completed successfully after 1.3 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
 <p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpqb4IHL/5Zone_Transformer.idf'</span>
-<span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span>
-<span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
-<span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-05-11 16:00:41' and completed successfully after 1.14 secs.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpaw3JPk/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 09:42:01' and completed successfully after 1.3 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
 </h3>
 <p>By default, when calling <code>Idf$run()</code> method, R will hang on and wait for the simulation to complete. EnergyPlus standard output (stdout) and error (stderr) is printed to R console. You can make EnergyPlus run in the background by setting <code>wait</code> to <code>FALSE</code>. The simulation job status can be shown by printing the <code>EplusJob</code> object or using the <code>EplusJob$status()</code> method.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpqb4IHL/5Zone_Transformer.idf.</span>
-<span class="va">job</span>
-<span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span>
-<span class="co">#&gt; * Model: '/tmp/Rtmpqb4IHL/5Zone_Transformer.idf'</span>
-<span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.In...</span>
-<span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span>
-<span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span>
-<span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-05-11 16:00:43' and is still running...</span></span>
-
-<span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; $run_before</span>
-<span class="co">#&gt; [1] TRUE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $alive</span>
-<span class="co">#&gt; [1] TRUE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $terminated</span>
-<span class="co">#&gt; [1] FALSE</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $successful</span>
-<span class="co">#&gt; [1] NA</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $changed_after</span>
-<span class="co">#&gt; [1] FALSE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpaw3JPk/5Zone_Transformer.idf.</span></span>
+<span><span class="va">job</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpaw3JPk/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.In...</span></span>
+<span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 09:42:03' and is still running...</span></span></span>
+<span></span>
+<span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $run_before</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $alive</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $terminated</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $successful</span></span>
+<span><span class="co">#&gt; [1] NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $changed_after</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="print-simulation-errors">Print simulation errors<a class="anchor" aria-label="anchor" href="#print-simulation-errors"></a>
 </h3>
 <p>You can get simulation errors using <code>EplusJob$errors()</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span>
-<span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span>
-<span class="co">#&gt;   * Simulation started: 2022-05-11 16:00:00</span>
-<span class="co">#&gt;   * Terminated: FALSE</span>
-<span class="co">#&gt;   * Successful: TRUE</span>
-<span class="co">#&gt;   * Warning[W]: 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── During Zone Sizing Calculations ─────────────────────────────────────────────</span>
-<span class="co">#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location</span>
-<span class="co">#&gt;         object.</span>
-<span class="co">#&gt;         ..Location object=CHICAGO_IL_USA TMY2-94846</span>
-<span class="co">#&gt;         ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940</span>
-<span class="co">#&gt;         ..due to location differences, Latitude difference=[4.16] degrees,</span>
-<span class="co">#&gt;         Longitude difference=[34.65] degrees.</span>
-<span class="co">#&gt;         ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95]</span>
-<span class="co">#&gt;         percent, [188.00] meters.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span></span>
+<span><span class="co">#&gt;   * Simulation started: 2022-08-19 09:42:00</span></span>
+<span><span class="co">#&gt;   * Terminated: FALSE</span></span>
+<span><span class="co">#&gt;   * Successful: TRUE</span></span>
+<span><span class="co">#&gt;   * Warning[W]: 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── During Zone Sizing Calculations ─────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; [W 1/1] Weather file location will be used rather than entered (IDF) Location</span></span>
+<span><span class="co">#&gt;         object.</span></span>
+<span><span class="co">#&gt;         ..Location object=CHICAGO_IL_USA TMY2-94846</span></span>
+<span><span class="co">#&gt;         ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940</span></span>
+<span><span class="co">#&gt;         ..due to location differences, Latitude difference=[4.16] degrees,</span></span>
+<span><span class="co">#&gt;         Longitude difference=[34.65] degrees.</span></span>
+<span><span class="co">#&gt;         ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95]</span></span>
+<span><span class="co">#&gt;         percent, [188.00] meters.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -289,141 +289,141 @@ An example of tidy BES output data representation where Table (a) is the standar
 <code>units</code>: The data units</li>
 </ul>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     report_data_dictionary_index is_meter type</span>
-<span class="co">#&gt;  1:                            6        0  Avg</span>
-<span class="co">#&gt;  2:                            8        1  Sum</span>
-<span class="co">#&gt;  3:                           18        1  Sum</span>
-<span class="co">#&gt;  4:                           38        1  Sum</span>
-<span class="co">#&gt;  5:                          238        1  Sum</span>
-<span class="co">#&gt;  6:                          459        0  Avg</span>
-<span class="co">#&gt;  7:                          460        0  Avg</span>
-<span class="co">#&gt;  8:                          461        0  Sum</span>
-<span class="co">#&gt;  9:                          462        0  Avg</span>
-<span class="co">#&gt; 10:                          463        0  Sum</span>
-<span class="co">#&gt; 11:                          464        0  Avg</span>
-<span class="co">#&gt; 12:                          465        0  Sum</span>
-<span class="co">#&gt; 13:                          466        0  Avg</span>
-<span class="co">#&gt; 14:                          467        0  Sum</span>
-<span class="co">#&gt; 15:                          468        0  Avg</span>
-<span class="co">#&gt; 16:                          469        0  Sum</span>
-<span class="co">#&gt; 17:                          470        0  Sum</span>
-<span class="co">#&gt; 18:                          471        1  Sum</span>
-<span class="co">#&gt; 19:                          703        1  Sum</span>
-<span class="co">#&gt; 20:                          786        1  Sum</span>
-<span class="co">#&gt;                             index_group timestep_type     key_value</span>
-<span class="co">#&gt;  1:                                Zone   HVAC System   Environment</span>
-<span class="co">#&gt;  2:                Facility:Electricity   HVAC System              </span>
-<span class="co">#&gt;  3:                Building:Electricity   HVAC System              </span>
-<span class="co">#&gt;  4: Facility:Electricity:InteriorLights   HVAC System              </span>
-<span class="co">#&gt;  5:             Building:EnergyTransfer   HVAC System              </span>
-<span class="co">#&gt;  6:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt;  7:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt;  8:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt;  9:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 10:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 11:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 12:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 13:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 14:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 15:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 16:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 17:                              System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt; 18:                    HVAC:Electricity   HVAC System              </span>
-<span class="co">#&gt; 19:           Facility:Electricity:Fans   HVAC System              </span>
-<span class="co">#&gt; 20:                   Plant:Electricity   HVAC System              </span>
-<span class="co">#&gt;                                              name reporting_frequency</span>
-<span class="co">#&gt;  1:          Site Outdoor Air Drybulb Temperature       Zone Timestep</span>
-<span class="co">#&gt;  2:                          Electricity:Facility       Zone Timestep</span>
-<span class="co">#&gt;  3:                          Electricity:Building       Zone Timestep</span>
-<span class="co">#&gt;  4:                    InteriorLights:Electricity       Zone Timestep</span>
-<span class="co">#&gt;  5:                       EnergyTransfer:Building       Zone Timestep</span>
-<span class="co">#&gt;  6:                        Transformer Efficiency       Zone Timestep</span>
-<span class="co">#&gt;  7:              Transformer Input Electric Power       Zone Timestep</span>
-<span class="co">#&gt;  8:             Transformer Input Electric Energy       Zone Timestep</span>
-<span class="co">#&gt;  9:             Transformer Output Electric Power       Zone Timestep</span>
-<span class="co">#&gt; 10:            Transformer Output Electric Energy       Zone Timestep</span>
-<span class="co">#&gt; 11:                 Transformer No Load Loss Rate       Zone Timestep</span>
-<span class="co">#&gt; 12:               Transformer No Load Loss Energy       Zone Timestep</span>
-<span class="co">#&gt; 13:                    Transformer Load Loss Rate       Zone Timestep</span>
-<span class="co">#&gt; 14:                  Transformer Load Loss Energy       Zone Timestep</span>
-<span class="co">#&gt; 15:                 Transformer Thermal Loss Rate       Zone Timestep</span>
-<span class="co">#&gt; 16:               Transformer Thermal Loss Energy       Zone Timestep</span>
-<span class="co">#&gt; 17: Transformer Distribution Electric Loss Energy       Zone Timestep</span>
-<span class="co">#&gt; 18:                              Electricity:HVAC       Zone Timestep</span>
-<span class="co">#&gt; 19:                              Fans:Electricity       Zone Timestep</span>
-<span class="co">#&gt; 20:                             Electricity:Plant       Zone Timestep</span>
-<span class="co">#&gt;     schedule_name units</span>
-<span class="co">#&gt;  1:          &lt;NA&gt;     C</span>
-<span class="co">#&gt;  2:          &lt;NA&gt;     J</span>
-<span class="co">#&gt;  3:          &lt;NA&gt;     J</span>
-<span class="co">#&gt;  4:          &lt;NA&gt;     J</span>
-<span class="co">#&gt;  5:          &lt;NA&gt;     J</span>
-<span class="co">#&gt;  6:          &lt;NA&gt;      </span>
-<span class="co">#&gt;  7:          &lt;NA&gt;     W</span>
-<span class="co">#&gt;  8:          &lt;NA&gt;     J</span>
-<span class="co">#&gt;  9:          &lt;NA&gt;     W</span>
-<span class="co">#&gt; 10:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 11:          &lt;NA&gt;     W</span>
-<span class="co">#&gt; 12:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 13:          &lt;NA&gt;     W</span>
-<span class="co">#&gt; 14:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 15:          &lt;NA&gt;     W</span>
-<span class="co">#&gt; 16:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 17:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 18:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 19:          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 20:          &lt;NA&gt;     J</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     report_data_dictionary_index is_meter type</span></span>
+<span><span class="co">#&gt;  1:                            6        0  Avg</span></span>
+<span><span class="co">#&gt;  2:                            8        1  Sum</span></span>
+<span><span class="co">#&gt;  3:                           18        1  Sum</span></span>
+<span><span class="co">#&gt;  4:                           38        1  Sum</span></span>
+<span><span class="co">#&gt;  5:                          238        1  Sum</span></span>
+<span><span class="co">#&gt;  6:                          459        0  Avg</span></span>
+<span><span class="co">#&gt;  7:                          460        0  Avg</span></span>
+<span><span class="co">#&gt;  8:                          461        0  Sum</span></span>
+<span><span class="co">#&gt;  9:                          462        0  Avg</span></span>
+<span><span class="co">#&gt; 10:                          463        0  Sum</span></span>
+<span><span class="co">#&gt; 11:                          464        0  Avg</span></span>
+<span><span class="co">#&gt; 12:                          465        0  Sum</span></span>
+<span><span class="co">#&gt; 13:                          466        0  Avg</span></span>
+<span><span class="co">#&gt; 14:                          467        0  Sum</span></span>
+<span><span class="co">#&gt; 15:                          468        0  Avg</span></span>
+<span><span class="co">#&gt; 16:                          469        0  Sum</span></span>
+<span><span class="co">#&gt; 17:                          470        0  Sum</span></span>
+<span><span class="co">#&gt; 18:                          471        1  Sum</span></span>
+<span><span class="co">#&gt; 19:                          703        1  Sum</span></span>
+<span><span class="co">#&gt; 20:                          786        1  Sum</span></span>
+<span><span class="co">#&gt;                             index_group timestep_type     key_value</span></span>
+<span><span class="co">#&gt;  1:                                Zone   HVAC System   Environment</span></span>
+<span><span class="co">#&gt;  2:                Facility:Electricity   HVAC System              </span></span>
+<span><span class="co">#&gt;  3:                Building:Electricity   HVAC System              </span></span>
+<span><span class="co">#&gt;  4: Facility:Electricity:InteriorLights   HVAC System              </span></span>
+<span><span class="co">#&gt;  5:             Building:EnergyTransfer   HVAC System              </span></span>
+<span><span class="co">#&gt;  6:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt;  7:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt;  8:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt;  9:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 10:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 11:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 12:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 13:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 14:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 15:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 16:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 17:                              System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt; 18:                    HVAC:Electricity   HVAC System              </span></span>
+<span><span class="co">#&gt; 19:           Facility:Electricity:Fans   HVAC System              </span></span>
+<span><span class="co">#&gt; 20:                   Plant:Electricity   HVAC System              </span></span>
+<span><span class="co">#&gt;                                              name reporting_frequency</span></span>
+<span><span class="co">#&gt;  1:          Site Outdoor Air Drybulb Temperature       Zone Timestep</span></span>
+<span><span class="co">#&gt;  2:                          Electricity:Facility       Zone Timestep</span></span>
+<span><span class="co">#&gt;  3:                          Electricity:Building       Zone Timestep</span></span>
+<span><span class="co">#&gt;  4:                    InteriorLights:Electricity       Zone Timestep</span></span>
+<span><span class="co">#&gt;  5:                       EnergyTransfer:Building       Zone Timestep</span></span>
+<span><span class="co">#&gt;  6:                        Transformer Efficiency       Zone Timestep</span></span>
+<span><span class="co">#&gt;  7:              Transformer Input Electric Power       Zone Timestep</span></span>
+<span><span class="co">#&gt;  8:             Transformer Input Electric Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt;  9:             Transformer Output Electric Power       Zone Timestep</span></span>
+<span><span class="co">#&gt; 10:            Transformer Output Electric Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt; 11:                 Transformer No Load Loss Rate       Zone Timestep</span></span>
+<span><span class="co">#&gt; 12:               Transformer No Load Loss Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt; 13:                    Transformer Load Loss Rate       Zone Timestep</span></span>
+<span><span class="co">#&gt; 14:                  Transformer Load Loss Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt; 15:                 Transformer Thermal Loss Rate       Zone Timestep</span></span>
+<span><span class="co">#&gt; 16:               Transformer Thermal Loss Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt; 17: Transformer Distribution Electric Loss Energy       Zone Timestep</span></span>
+<span><span class="co">#&gt; 18:                              Electricity:HVAC       Zone Timestep</span></span>
+<span><span class="co">#&gt; 19:                              Fans:Electricity       Zone Timestep</span></span>
+<span><span class="co">#&gt; 20:                             Electricity:Plant       Zone Timestep</span></span>
+<span><span class="co">#&gt;     schedule_name units</span></span>
+<span><span class="co">#&gt;  1:          &lt;NA&gt;     C</span></span>
+<span><span class="co">#&gt;  2:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;  3:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;  4:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;  5:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;  6:          &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt;  7:          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt;  8:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;  9:          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt; 10:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 11:          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt; 12:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 13:          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt; 14:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 15:          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt; 16:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 17:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 18:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 19:          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 20:          &lt;NA&gt;     J</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="retrieve-report-data">Retrieve report data<a class="anchor" aria-label="anchor" href="#retrieve-report-data"></a>
 </h3>
 <p><code>EplusJob$report_data()</code> extracts the report data using key values and variable names. Just for demonstration, let’s get the transformer input electric power at 11 a.m for the first day of RunPeriod named <code>SUMMERDAY</code>, tag this simulation as case <code>example</code>, and return all possible output columns.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">power</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="st">"transformer 1"</span>, <span class="st">"transformer input electric power"</span>, case <span class="op">=</span> <span class="st">"example"</span>,
-  all <span class="op">=</span> <span class="cn">TRUE</span>, simulation_days <span class="op">=</span> <span class="fl">1</span>, environment_name <span class="op">=</span> <span class="st">"summerday"</span>, hour <span class="op">=</span> <span class="fl">11</span>, minute <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">power</span><span class="op">)</span>
-<span class="co">#&gt;       case            datetime month day hour minute dst interval</span>
-<span class="co">#&gt; 1: example 2015-07-07 11:00:00     7   7   11      0   0       15</span>
-<span class="co">#&gt;    simulation_days day_type environment_name environment_period_index is_meter</span>
-<span class="co">#&gt; 1:               1  Tuesday        SUMMERDAY                        4        0</span>
-<span class="co">#&gt;    type index_group timestep_type     key_value</span>
-<span class="co">#&gt; 1:  Avg      System          Zone TRANSFORMER 1</span>
-<span class="co">#&gt;                                name reporting_frequency schedule_name units</span>
-<span class="co">#&gt; 1: Transformer Input Electric Power       Zone Timestep          &lt;NA&gt;     W</span>
-<span class="co">#&gt;       value</span>
-<span class="co">#&gt; 1: 12273.17</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">power</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="st">"transformer 1"</span>, <span class="st">"transformer input electric power"</span>, case <span class="op">=</span> <span class="st">"example"</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">TRUE</span>, simulation_days <span class="op">=</span> <span class="fl">1</span>, environment_name <span class="op">=</span> <span class="st">"summerday"</span>, hour <span class="op">=</span> <span class="fl">11</span>, minute <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">power</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       case            datetime month day hour minute dst interval</span></span>
+<span><span class="co">#&gt; 1: example 2015-07-07 11:00:00     7   7   11      0   0       15</span></span>
+<span><span class="co">#&gt;    simulation_days day_type environment_name environment_period_index is_meter</span></span>
+<span><span class="co">#&gt; 1:               1  Tuesday        SUMMERDAY                        4        0</span></span>
+<span><span class="co">#&gt;    type index_group timestep_type     key_value</span></span>
+<span><span class="co">#&gt; 1:  Avg      System          Zone TRANSFORMER 1</span></span>
+<span><span class="co">#&gt;                                name reporting_frequency schedule_name units</span></span>
+<span><span class="co">#&gt; 1: Transformer Input Electric Power       Zone Timestep          &lt;NA&gt;     W</span></span>
+<span><span class="co">#&gt;       value</span></span>
+<span><span class="co">#&gt; 1: 12273.17</span></span></code></pre></div>
 <p>Please note that by default the report data of design day simulations are always put at the top. If you are only interested in results of specific run periods, there are 2 ways to do so:</p>
 <ul>
 <li>Set <code>environment_name</code> to the run periods you are interested, e.g.:</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>environment_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summerday"</span>, <span class="st">"winterday"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                    case            datetime   key_value</span>
-<span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
-<span class="co">#&gt;   ---                                                  </span>
-<span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span>
-<span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span>
-<span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span>
-<span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span>
-<span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span>
-<span class="co">#&gt;                                       name units value</span>
-<span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span>
-<span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span>
-<span class="co">#&gt;    3: Site Outdoor Air Drybulb Temperature     C 8.500</span>
-<span class="co">#&gt;    4: Site Outdoor Air Drybulb Temperature     C 7.800</span>
-<span class="co">#&gt;    5: Site Outdoor Air Drybulb Temperature     C 8.075</span>
-<span class="co">#&gt;   ---                                                 </span>
-<span class="co">#&gt; 3836:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3837:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3838:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>environment_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summerday"</span>, <span class="st">"winterday"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                    case            datetime   key_value</span></span>
+<span><span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span></span>
+<span><span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span></span>
+<span><span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span></span>
+<span><span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span></span>
+<span><span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span></span>
+<span><span class="co">#&gt;   ---                                                  </span></span>
+<span><span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span></span>
+<span><span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span></span>
+<span><span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span></span>
+<span><span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span></span>
+<span><span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span></span>
+<span><span class="co">#&gt;                                       name units value</span></span>
+<span><span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span></span>
+<span><span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span></span>
+<span><span class="co">#&gt;    3: Site Outdoor Air Drybulb Temperature     C 8.500</span></span>
+<span><span class="co">#&gt;    4: Site Outdoor Air Drybulb Temperature     C 7.800</span></span>
+<span><span class="co">#&gt;    5: Site Outdoor Air Drybulb Temperature     C 8.075</span></span>
+<span><span class="co">#&gt;   ---                                                 </span></span>
+<span><span class="co">#&gt; 3836:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3837:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3838:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></span></code></pre></div>
 <ul>
 <li>Set <code>day_type</code> to specific day types you are interested. A few grouped options are also provided:
 <ul>
@@ -449,58 +449,58 @@ An example of tidy BES output data representation where Table (a) is the standar
 </li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>day_type <span class="op">=</span> <span class="st">"normalday"</span><span class="op">)</span>
-<span class="co">#&gt;                    case            datetime   key_value</span>
-<span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
-<span class="co">#&gt;   ---                                                  </span>
-<span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span>
-<span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span>
-<span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span>
-<span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span>
-<span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span>
-<span class="co">#&gt;                                       name units value</span>
-<span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span>
-<span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span>
-<span class="co">#&gt;    3: Site Outdoor Air Drybulb Temperature     C 8.500</span>
-<span class="co">#&gt;    4: Site Outdoor Air Drybulb Temperature     C 7.800</span>
-<span class="co">#&gt;    5: Site Outdoor Air Drybulb Temperature     C 8.075</span>
-<span class="co">#&gt;   ---                                                 </span>
-<span class="co">#&gt; 3836:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3837:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3838:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span>
-<span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>day_type <span class="op">=</span> <span class="st">"normalday"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                    case            datetime   key_value</span></span>
+<span><span class="co">#&gt;    1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span></span>
+<span><span class="co">#&gt;    2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span></span>
+<span><span class="co">#&gt;    3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span></span>
+<span><span class="co">#&gt;    4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span></span>
+<span><span class="co">#&gt;    5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span></span>
+<span><span class="co">#&gt;   ---                                                  </span></span>
+<span><span class="co">#&gt; 3836: 5Zone_Transformer 2015-07-07 23:00:00            </span></span>
+<span><span class="co">#&gt; 3837: 5Zone_Transformer 2015-07-07 23:15:00            </span></span>
+<span><span class="co">#&gt; 3838: 5Zone_Transformer 2015-07-07 23:30:00            </span></span>
+<span><span class="co">#&gt; 3839: 5Zone_Transformer 2015-07-07 23:45:00            </span></span>
+<span><span class="co">#&gt; 3840: 5Zone_Transformer 2015-07-08 00:00:00            </span></span>
+<span><span class="co">#&gt;                                       name units value</span></span>
+<span><span class="co">#&gt;    1: Site Outdoor Air Drybulb Temperature     C 9.900</span></span>
+<span><span class="co">#&gt;    2: Site Outdoor Air Drybulb Temperature     C 9.200</span></span>
+<span><span class="co">#&gt;    3: Site Outdoor Air Drybulb Temperature     C 8.500</span></span>
+<span><span class="co">#&gt;    4: Site Outdoor Air Drybulb Temperature     C 7.800</span></span>
+<span><span class="co">#&gt;    5: Site Outdoor Air Drybulb Temperature     C 8.075</span></span>
+<span><span class="co">#&gt;   ---                                                 </span></span>
+<span><span class="co">#&gt; 3836:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3837:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3838:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span></span>
+<span><span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></span></code></pre></div>
 <p><code>$report_data()</code> can also directly take the whole or subset results of <code>$report_data_dict()</code> to extract report data. In some case this may be quite handy. Let’s get all report variable with Celsius degree unit.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                   case            datetime   key_value</span>
-<span class="co">#&gt;   1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span>
-<span class="co">#&gt;   2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span>
-<span class="co">#&gt;   3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span>
-<span class="co">#&gt;   4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span>
-<span class="co">#&gt;   5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span>
-<span class="co">#&gt;  ---                                                  </span>
-<span class="co">#&gt; 188: 5Zone_Transformer 2015-07-07 23:00:00 Environment</span>
-<span class="co">#&gt; 189: 5Zone_Transformer 2015-07-07 23:15:00 Environment</span>
-<span class="co">#&gt; 190: 5Zone_Transformer 2015-07-07 23:30:00 Environment</span>
-<span class="co">#&gt; 191: 5Zone_Transformer 2015-07-07 23:45:00 Environment</span>
-<span class="co">#&gt; 192: 5Zone_Transformer 2015-07-08 00:00:00 Environment</span>
-<span class="co">#&gt;                                      name units  value</span>
-<span class="co">#&gt;   1: Site Outdoor Air Drybulb Temperature     C  9.900</span>
-<span class="co">#&gt;   2: Site Outdoor Air Drybulb Temperature     C  9.200</span>
-<span class="co">#&gt;   3: Site Outdoor Air Drybulb Temperature     C  8.500</span>
-<span class="co">#&gt;   4: Site Outdoor Air Drybulb Temperature     C  7.800</span>
-<span class="co">#&gt;   5: Site Outdoor Air Drybulb Temperature     C  8.075</span>
-<span class="co">#&gt;  ---                                                  </span>
-<span class="co">#&gt; 188: Site Outdoor Air Drybulb Temperature     C 15.200</span>
-<span class="co">#&gt; 189: Site Outdoor Air Drybulb Temperature     C 15.100</span>
-<span class="co">#&gt; 190: Site Outdoor Air Drybulb Temperature     C 15.000</span>
-<span class="co">#&gt; 191: Site Outdoor Air Drybulb Temperature     C 14.900</span>
-<span class="co">#&gt; 192: Site Outdoor Air Drybulb Temperature     C 14.800</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   case            datetime   key_value</span></span>
+<span><span class="co">#&gt;   1: 5Zone_Transformer 2014-01-14 00:15:00 Environment</span></span>
+<span><span class="co">#&gt;   2: 5Zone_Transformer 2014-01-14 00:30:00 Environment</span></span>
+<span><span class="co">#&gt;   3: 5Zone_Transformer 2014-01-14 00:45:00 Environment</span></span>
+<span><span class="co">#&gt;   4: 5Zone_Transformer 2014-01-14 01:00:00 Environment</span></span>
+<span><span class="co">#&gt;   5: 5Zone_Transformer 2014-01-14 01:15:00 Environment</span></span>
+<span><span class="co">#&gt;  ---                                                  </span></span>
+<span><span class="co">#&gt; 188: 5Zone_Transformer 2015-07-07 23:00:00 Environment</span></span>
+<span><span class="co">#&gt; 189: 5Zone_Transformer 2015-07-07 23:15:00 Environment</span></span>
+<span><span class="co">#&gt; 190: 5Zone_Transformer 2015-07-07 23:30:00 Environment</span></span>
+<span><span class="co">#&gt; 191: 5Zone_Transformer 2015-07-07 23:45:00 Environment</span></span>
+<span><span class="co">#&gt; 192: 5Zone_Transformer 2015-07-08 00:00:00 Environment</span></span>
+<span><span class="co">#&gt;                                      name units  value</span></span>
+<span><span class="co">#&gt;   1: Site Outdoor Air Drybulb Temperature     C  9.900</span></span>
+<span><span class="co">#&gt;   2: Site Outdoor Air Drybulb Temperature     C  9.200</span></span>
+<span><span class="co">#&gt;   3: Site Outdoor Air Drybulb Temperature     C  8.500</span></span>
+<span><span class="co">#&gt;   4: Site Outdoor Air Drybulb Temperature     C  7.800</span></span>
+<span><span class="co">#&gt;   5: Site Outdoor Air Drybulb Temperature     C  8.075</span></span>
+<span><span class="co">#&gt;  ---                                                  </span></span>
+<span><span class="co">#&gt; 188: Site Outdoor Air Drybulb Temperature     C 15.200</span></span>
+<span><span class="co">#&gt; 189: Site Outdoor Air Drybulb Temperature     C 15.100</span></span>
+<span><span class="co">#&gt; 190: Site Outdoor Air Drybulb Temperature     C 15.000</span></span>
+<span><span class="co">#&gt; 191: Site Outdoor Air Drybulb Temperature     C 14.900</span></span>
+<span><span class="co">#&gt; 192: Site Outdoor Air Drybulb Temperature     C 14.800</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="retrieve-tabular-data">Retrieve tabular data<a class="anchor" aria-label="anchor" href="#retrieve-tabular-data"></a>
@@ -508,17 +508,17 @@ An example of tidy BES output data representation where Table (a) is the standar
 <p><code>EplusJob$tabular_data()</code> extracts tabular data of current simulation. For details on the meaning of each columns, please see <em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
 <p>Now let’s get the total site energy per total building area. Note that the <code>value</code> column in the returned <code>data.table</code> is character types, as some table store not just numbers. We need to convert it by setting <code>string_value</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">site_energy</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>
-    column_name <span class="op">=</span> <span class="st">"energy per total building area"</span>, row_name <span class="op">=</span> <span class="st">"total site energy"</span>,
-    wide <span class="op">=</span> <span class="cn">TRUE</span>, string_value <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">site_energy</span><span class="op">)</span>
-<span class="co">#&gt;                 case                             report_name      report_for</span>
-<span class="co">#&gt; 1: 5Zone_Transformer AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;                table_name          row_name</span>
-<span class="co">#&gt; 1: Site and Source Energy Total Site Energy</span>
-<span class="co">#&gt;    Energy Per Total Building Area [MJ/m2]</span>
-<span class="co">#&gt; 1:                                   1.44</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">site_energy</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span>
+<span>    column_name <span class="op">=</span> <span class="st">"energy per total building area"</span>, row_name <span class="op">=</span> <span class="st">"total site energy"</span>,</span>
+<span>    wide <span class="op">=</span> <span class="cn">TRUE</span>, string_value <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">site_energy</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 case                             report_name      report_for</span></span>
+<span><span class="co">#&gt; 1: 5Zone_Transformer AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;                table_name          row_name</span></span>
+<span><span class="co">#&gt; 1: Site and Source Energy Total Site Energy</span></span>
+<span><span class="co">#&gt;    Energy Per Total Building Area [MJ/m2]</span></span>
+<span><span class="co">#&gt; 1:                                   1.44</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -533,22 +533,22 @@ An example of tidy BES output data representation where Table (a) is the standar
 <h3 id="run-annual-simulation">Run annual simulation<a class="anchor" aria-label="anchor" href="#run-annual-simulation"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span>
-<span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span>
-
-<span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span>
-
-<span class="co"># make sure weather file input is respected</span>
-<span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span>
-
-<span class="co"># make sure energy consumption is presented in kWh</span>
-<span class="va">idf</span><span class="op">$</span><span class="va">OutputControl_Table_Style</span><span class="op">$</span><span class="va">Unit_Conversion</span> <span class="op">&lt;-</span> <span class="st">"JtoKWH"</span>
-
-<span class="co"># save the modified model into a temporary folder</span>
-<span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"MediumOffice.idf"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># run annual simulation</span>
-<span class="va">job</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_weather</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make sure weather file input is respected</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span></span>
+<span></span>
+<span><span class="co"># make sure energy consumption is presented in kWh</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="va">OutputControl_Table_Style</span><span class="op">$</span><span class="va">Unit_Conversion</span> <span class="op">&lt;-</span> <span class="st">"JtoKWH"</span></span>
+<span></span>
+<span><span class="co"># save the modified model into a temporary folder</span></span>
+<span><span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"MediumOffice.idf"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># run annual simulation</span></span>
+<span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_weather</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="extract-simulation-results">Extract simulation results<a class="anchor" aria-label="anchor" href="#extract-simulation-results"></a>
@@ -556,249 +556,249 @@ An example of tidy BES output data representation where Table (a) is the standar
 <p>Code below shows how to use methods <code>tabular_data()</code>, <code>read_table()</code> and <code>report_data()</code> provided by the tidy data interface in <code>EplusJob</code> to extract building area and building energy consumption, zone meta data, and cooling and heating demands, with all formatted in a tidy representation.</p>
 <p>Note that instead of presenting the simulated date and time as strings, the <code>report_data()</code> adds a time-series column <code>datetime</code> in <code>POSIXct</code> based on a derived year value. Moreover, the tidy data interface also provides a number of additional columns, which makes it quite convenient and straightforward to directly perform further data transformations.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># read building area from Standard Reports</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt;            case                             report_name      report_for</span>
-<span class="co">#&gt; 1: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 2: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 3: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;       table_name                      row_name Area [m2]</span>
-<span class="co">#&gt; 1: Building Area           Total Building Area   4982.19</span>
-<span class="co">#&gt; 2: Building Area Net Conditioned Building Area   4982.19</span>
-<span class="co">#&gt; 3: Building Area   Unconditioned Building Area      0.00</span>
-
-<span class="co"># read building energy consumption from Standard Reports</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">end_use</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt;             case                             report_name      report_for</span>
-<span class="co">#&gt;  1: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  2: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  3: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  4: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  5: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  6: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  7: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  8: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;  9: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 10: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 11: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 12: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 13: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 14: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt; 15: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span>
-<span class="co">#&gt;     table_name           row_name Electricity [kWh] Natural Gas [kWh]</span>
-<span class="co">#&gt;  1:   End Uses            Heating         138167.50          57334.62</span>
-<span class="co">#&gt;  2:   End Uses            Cooling          71922.07              0.00</span>
-<span class="co">#&gt;  3:   End Uses  Interior Lighting         168399.82              0.00</span>
-<span class="co">#&gt;  4:   End Uses  Exterior Lighting          64602.19              0.00</span>
-<span class="co">#&gt;  5:   End Uses Interior Equipment         296256.25              0.00</span>
-<span class="co">#&gt;  6:   End Uses Exterior Equipment              0.00              0.00</span>
-<span class="co">#&gt;  7:   End Uses               Fans          18786.52              0.00</span>
-<span class="co">#&gt;  8:   End Uses              Pumps             73.94              0.00</span>
-<span class="co">#&gt;  9:   End Uses     Heat Rejection              0.00              0.00</span>
-<span class="co">#&gt; 10:   End Uses     Humidification              0.00              0.00</span>
-<span class="co">#&gt; 11:   End Uses      Heat Recovery              0.00              0.00</span>
-<span class="co">#&gt; 12:   End Uses      Water Systems              0.00          10030.79</span>
-<span class="co">#&gt; 13:   End Uses      Refrigeration              0.00              0.00</span>
-<span class="co">#&gt; 14:   End Uses         Generators              0.00              0.00</span>
-<span class="co">#&gt; 15:   End Uses     Total End Uses         758208.29          67365.41</span>
-<span class="co">#&gt;     Additional Fuel [kWh] District Cooling [kWh] District Heating [kWh]</span>
-<span class="co">#&gt;  1:                     0                      0                      0</span>
-<span class="co">#&gt;  2:                     0                      0                      0</span>
-<span class="co">#&gt;  3:                     0                      0                      0</span>
-<span class="co">#&gt;  4:                     0                      0                      0</span>
-<span class="co">#&gt;  5:                     0                      0                      0</span>
-<span class="co">#&gt;  6:                     0                      0                      0</span>
-<span class="co">#&gt;  7:                     0                      0                      0</span>
-<span class="co">#&gt;  8:                     0                      0                      0</span>
-<span class="co">#&gt;  9:                     0                      0                      0</span>
-<span class="co">#&gt; 10:                     0                      0                      0</span>
-<span class="co">#&gt; 11:                     0                      0                      0</span>
-<span class="co">#&gt; 12:                     0                      0                      0</span>
-<span class="co">#&gt; 13:                     0                      0                      0</span>
-<span class="co">#&gt; 14:                     0                      0                      0</span>
-<span class="co">#&gt; 15:                     0                      0                      0</span>
-<span class="co">#&gt;     Water [m3]</span>
-<span class="co">#&gt;  1:       0.00</span>
-<span class="co">#&gt;  2:       0.00</span>
-<span class="co">#&gt;  3:       0.00</span>
-<span class="co">#&gt;  4:       0.00</span>
-<span class="co">#&gt;  5:       0.00</span>
-<span class="co">#&gt;  6:       0.00</span>
-<span class="co">#&gt;  7:       0.00</span>
-<span class="co">#&gt;  8:       0.00</span>
-<span class="co">#&gt;  9:       0.00</span>
-<span class="co">#&gt; 10:       0.00</span>
-<span class="co">#&gt; 11:       0.00</span>
-<span class="co">#&gt; 12:     174.59</span>
-<span class="co">#&gt; 13:       0.00</span>
-<span class="co">#&gt; 14:       0.00</span>
-<span class="co">#&gt; 15:     174.59</span>
-
-<span class="co"># read zone metadata from Standard Input and Output</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">zones</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;     zone_index          zone_name rel_north origin_x origin_y origin_z</span>
-<span class="co">#&gt;  1:          1        CORE_BOTTOM         0        0        0        0</span>
-<span class="co">#&gt;  2:          2           CORE_MID         0        0        0        0</span>
-<span class="co">#&gt;  3:          3           CORE_TOP         0        0        0        0</span>
-<span class="co">#&gt;  4:          4  FIRSTFLOOR_PLENUM         0        0        0        0</span>
-<span class="co">#&gt;  5:          5    MIDFLOOR_PLENUM         0        0        0        0</span>
-<span class="co">#&gt;  6:          6 PERIMETER_BOT_ZN_1         0        0        0        0</span>
-<span class="co">#&gt;  7:          7 PERIMETER_BOT_ZN_2         0        0        0        0</span>
-<span class="co">#&gt;  8:          8 PERIMETER_BOT_ZN_3         0        0        0        0</span>
-<span class="co">#&gt;  9:          9 PERIMETER_BOT_ZN_4         0        0        0        0</span>
-<span class="co">#&gt; 10:         10 PERIMETER_MID_ZN_1         0        0        0        0</span>
-<span class="co">#&gt; 11:         11 PERIMETER_MID_ZN_2         0        0        0        0</span>
-<span class="co">#&gt; 12:         12 PERIMETER_MID_ZN_3         0        0        0        0</span>
-<span class="co">#&gt; 13:         13 PERIMETER_MID_ZN_4         0        0        0        0</span>
-<span class="co">#&gt; 14:         14 PERIMETER_TOP_ZN_1         0        0        0        0</span>
-<span class="co">#&gt; 15:         15 PERIMETER_TOP_ZN_2         0        0        0        0</span>
-<span class="co">#&gt; 16:         16 PERIMETER_TOP_ZN_3         0        0        0        0</span>
-<span class="co">#&gt; 17:         17 PERIMETER_TOP_ZN_4         0        0        0        0</span>
-<span class="co">#&gt; 18:         18    TOPFLOOR_PLENUM         0        0        0        0</span>
-<span class="co">#&gt;     centroid_x centroid_y centroid_z of_type multiplier list_multiplier</span>
-<span class="co">#&gt;  1:  24.955350  16.636900     1.3716       1          1               1</span>
-<span class="co">#&gt;  2:  24.955350  16.636900     5.3340       1          1               1</span>
-<span class="co">#&gt;  3:  24.955350  16.636900     9.2964       1          1               1</span>
-<span class="co">#&gt;  4:  24.955500  16.636900     3.3528       1          1               1</span>
-<span class="co">#&gt;  5:  24.955500  16.636900     7.3152       1          1               1</span>
-<span class="co">#&gt;  6:  24.955448   2.158891     1.3716       1          1               1</span>
-<span class="co">#&gt;  7:  47.820225  16.636900     1.3716       1          1               1</span>
-<span class="co">#&gt;  8:  24.955448  31.114909     1.3716       1          1               1</span>
-<span class="co">#&gt;  9:   2.090634  16.636900     1.3716       1          1               1</span>
-<span class="co">#&gt; 10:  24.955448   2.158891     5.3340       1          1               1</span>
-<span class="co">#&gt; 11:  47.820225  16.636900     5.3340       1          1               1</span>
-<span class="co">#&gt; 12:  24.955448  31.114909     5.3340       1          1               1</span>
-<span class="co">#&gt; 13:   2.090634  16.636900     5.3340       1          1               1</span>
-<span class="co">#&gt; 14:  24.955448   2.158891     9.2964       1          1               1</span>
-<span class="co">#&gt; 15:  47.820225  16.636900     9.2964       1          1               1</span>
-<span class="co">#&gt; 16:  24.955448  31.114909     9.2964       1          1               1</span>
-<span class="co">#&gt; 17:   2.090634  16.636900     9.2964       1          1               1</span>
-<span class="co">#&gt; 18:  24.955500  16.636900    11.2776       1          1               1</span>
-<span class="co">#&gt;     minimum_x maximum_x minimum_y maximum_y minimum_z maximum_z ceiling_height</span>
-<span class="co">#&gt;  1:    4.5732   45.3375    4.5732   28.7006    0.0000    2.7432         2.7432</span>
-<span class="co">#&gt;  2:    4.5732   45.3375    4.5732   28.7006    3.9624    6.7056         2.7432</span>
-<span class="co">#&gt;  3:    4.5732   45.3375    4.5732   28.7006    7.9248   10.6680         2.7432</span>
-<span class="co">#&gt;  4:    0.0000   49.9110    0.0000   33.2738    2.7432    3.9624         1.2192</span>
-<span class="co">#&gt;  5:    0.0000   49.9110    0.0000   33.2738    6.7056    7.9248         1.2192</span>
-<span class="co">#&gt;  6:    0.0000   49.9110    0.0000    4.5732    0.0000    2.7432         2.7432</span>
-<span class="co">#&gt;  7:   45.3375   49.9110    0.0000   33.2738    0.0000    2.7432         2.7432</span>
-<span class="co">#&gt;  8:    0.0000   49.9110   28.7006   33.2738    0.0000    2.7432         2.7432</span>
-<span class="co">#&gt;  9:    0.0000    4.5732    0.0000   33.2738    0.0000    2.7432         2.7432</span>
-<span class="co">#&gt; 10:    0.0000   49.9110    0.0000    4.5732    3.9624    6.7056         2.7432</span>
-<span class="co">#&gt; 11:   45.3375   49.9110    0.0000   33.2738    3.9624    6.7056         2.7432</span>
-<span class="co">#&gt; 12:    0.0000   49.9110   28.7006   33.2738    3.9624    6.7056         2.7432</span>
-<span class="co">#&gt; 13:    0.0000    4.5732    0.0000   33.2738    3.9624    6.7056         2.7432</span>
-<span class="co">#&gt; 14:    0.0000   49.9110    0.0000    4.5732    7.9248   10.6680         2.7432</span>
-<span class="co">#&gt; 15:   45.3375   49.9110    0.0000   33.2738    7.9248   10.6680         2.7432</span>
-<span class="co">#&gt; 16:    0.0000   49.9110   28.7006   33.2738    7.9248   10.6680         2.7432</span>
-<span class="co">#&gt; 17:    0.0000    4.5732    0.0000   33.2738    7.9248   10.6680         2.7432</span>
-<span class="co">#&gt; 18:    0.0000   49.9110    0.0000   33.2738   10.6680   11.8872         1.2192</span>
-<span class="co">#&gt;        volume inside_convection_algo outside_convection_algo floor_area</span>
-<span class="co">#&gt;  1: 2698.0375                      2                       7   983.5366</span>
-<span class="co">#&gt;  2: 2698.0375                      2                       7   983.5366</span>
-<span class="co">#&gt;  3: 2698.0375                      2                       7   983.5366</span>
-<span class="co">#&gt;  4: 2024.7603                      2                       7  1660.7286</span>
-<span class="co">#&gt;  5: 2024.7603                      2                       7  1660.7286</span>
-<span class="co">#&gt;  6:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt;  7:  360.0785                      2                       7   131.2622</span>
-<span class="co">#&gt;  8:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt;  9:  360.0548                      2                       7   131.2536</span>
-<span class="co">#&gt; 10:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt; 11:  360.0785                      2                       7   131.2622</span>
-<span class="co">#&gt; 12:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt; 13:  360.0548                      2                       7   131.2536</span>
-<span class="co">#&gt; 14:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt; 15:  360.0785                      2                       7   131.2622</span>
-<span class="co">#&gt; 16:  568.7700                      2                       7   207.3381</span>
-<span class="co">#&gt; 17:  360.0548                      2                       7   131.2536</span>
-<span class="co">#&gt; 18: 2024.7603                      2                       7  1660.7286</span>
-<span class="co">#&gt;     ext_gross_wall_area ext_net_wall_area ext_window_area is_part_of_total_area</span>
-<span class="co">#&gt;  1:             0.00000           0.00000         0.00000                     1</span>
-<span class="co">#&gt;  2:             0.00000           0.00000         0.00000                     1</span>
-<span class="co">#&gt;  3:             0.00000           0.00000         0.00000                     1</span>
-<span class="co">#&gt;  4:           202.83782         202.83782         0.00000                     0</span>
-<span class="co">#&gt;  5:           202.83782         202.83782         0.00000                     0</span>
-<span class="co">#&gt;  6:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt;  7:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt;  8:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt;  9:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt; 10:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt; 11:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt; 12:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt; 13:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt; 14:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt; 15:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt; 16:           136.91586          71.63358        65.28228                     1</span>
-<span class="co">#&gt; 17:            91.27669          47.75469        43.52200                     1</span>
-<span class="co">#&gt; 18:           202.83782         202.83782         0.00000                     0</span>
-
-<span class="co"># read hourly air-conditioning system output with all additional metadata for</span>
-<span class="co"># the annual simulation from Variable Output</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">aircon_out</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>
-    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"air system total %s energy"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"heating"</span>, <span class="st">"cooling"</span><span class="op">)</span><span class="op">)</span>,
-    environment_name <span class="op">=</span> <span class="st">"annual"</span>,
-    all <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                case            datetime month day hour minute dst interval</span>
-<span class="co">#&gt;     1: MediumOffice 2017-01-01 01:00:00     1   1    1      0   0       60</span>
-<span class="co">#&gt;     2: MediumOffice 2017-01-01 02:00:00     1   1    2      0   0       60</span>
-<span class="co">#&gt;     3: MediumOffice 2017-01-01 03:00:00     1   1    3      0   0       60</span>
-<span class="co">#&gt;     4: MediumOffice 2017-01-01 04:00:00     1   1    4      0   0       60</span>
-<span class="co">#&gt;     5: MediumOffice 2017-01-01 05:00:00     1   1    5      0   0       60</span>
-<span class="co">#&gt;    ---                                                                    </span>
-<span class="co">#&gt; 52556: MediumOffice 2017-12-31 20:00:00    12  31   20      0   0       60</span>
-<span class="co">#&gt; 52557: MediumOffice 2017-12-31 21:00:00    12  31   21      0   0       60</span>
-<span class="co">#&gt; 52558: MediumOffice 2017-12-31 22:00:00    12  31   22      0   0       60</span>
-<span class="co">#&gt; 52559: MediumOffice 2017-12-31 23:00:00    12  31   23      0   0       60</span>
-<span class="co">#&gt; 52560: MediumOffice 2018-01-01 00:00:00    12  31   24      0   0       60</span>
-<span class="co">#&gt;        simulation_days day_type environment_name environment_period_index</span>
-<span class="co">#&gt;     1:               1  Holiday           ANNUAL                        3</span>
-<span class="co">#&gt;     2:               1  Holiday           ANNUAL                        3</span>
-<span class="co">#&gt;     3:               1  Holiday           ANNUAL                        3</span>
-<span class="co">#&gt;     4:               1  Holiday           ANNUAL                        3</span>
-<span class="co">#&gt;     5:               1  Holiday           ANNUAL                        3</span>
-<span class="co">#&gt;    ---                                                                   </span>
-<span class="co">#&gt; 52556:             365   Sunday           ANNUAL                        3</span>
-<span class="co">#&gt; 52557:             365   Sunday           ANNUAL                        3</span>
-<span class="co">#&gt; 52558:             365   Sunday           ANNUAL                        3</span>
-<span class="co">#&gt; 52559:             365   Sunday           ANNUAL                        3</span>
-<span class="co">#&gt; 52560:             365   Sunday           ANNUAL                        3</span>
-<span class="co">#&gt;        is_meter type index_group timestep_type key_value</span>
-<span class="co">#&gt;     1:        0  Sum        HVAC          Zone     VAV_1</span>
-<span class="co">#&gt;     2:        0  Sum        HVAC          Zone     VAV_1</span>
-<span class="co">#&gt;     3:        0  Sum        HVAC          Zone     VAV_1</span>
-<span class="co">#&gt;     4:        0  Sum        HVAC          Zone     VAV_1</span>
-<span class="co">#&gt;     5:        0  Sum        HVAC          Zone     VAV_1</span>
-<span class="co">#&gt;    ---                                                  </span>
-<span class="co">#&gt; 52556:        0  Sum        HVAC          Zone     VAV_3</span>
-<span class="co">#&gt; 52557:        0  Sum        HVAC          Zone     VAV_3</span>
-<span class="co">#&gt; 52558:        0  Sum        HVAC          Zone     VAV_3</span>
-<span class="co">#&gt; 52559:        0  Sum        HVAC          Zone     VAV_3</span>
-<span class="co">#&gt; 52560:        0  Sum        HVAC          Zone     VAV_3</span>
-<span class="co">#&gt;                                   name reporting_frequency schedule_name units</span>
-<span class="co">#&gt;     1: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;     2: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;     3: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;     4: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;     5: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;    ---                                                                        </span>
-<span class="co">#&gt; 52556: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 52557: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 52558: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 52559: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt; 52560: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span>
-<span class="co">#&gt;           value</span>
-<span class="co">#&gt;     1: 32721496</span>
-<span class="co">#&gt;     2: 35026830</span>
-<span class="co">#&gt;     3: 46498023</span>
-<span class="co">#&gt;     4: 35878580</span>
-<span class="co">#&gt;     5: 47932856</span>
-<span class="co">#&gt;    ---         </span>
-<span class="co">#&gt; 52556:        0</span>
-<span class="co">#&gt; 52557:        0</span>
-<span class="co">#&gt; 52558:        0</span>
-<span class="co">#&gt; 52559:        0</span>
-<span class="co">#&gt; 52560:        0</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># read building area from Standard Reports</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            case                             report_name      report_for</span></span>
+<span><span class="co">#&gt; 1: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 2: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 3: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;       table_name                      row_name Area [m2]</span></span>
+<span><span class="co">#&gt; 1: Building Area           Total Building Area   4982.19</span></span>
+<span><span class="co">#&gt; 2: Building Area Net Conditioned Building Area   4982.19</span></span>
+<span><span class="co">#&gt; 3: Building Area   Unconditioned Building Area      0.00</span></span>
+<span></span>
+<span><span class="co"># read building energy consumption from Standard Reports</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">end_use</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"End Uses"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             case                             report_name      report_for</span></span>
+<span><span class="co">#&gt;  1: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  2: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  3: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  4: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  5: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  6: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  7: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  8: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;  9: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 10: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 11: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 12: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 13: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 14: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt; 15: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
+<span><span class="co">#&gt;     table_name           row_name Electricity [kWh] Natural Gas [kWh]</span></span>
+<span><span class="co">#&gt;  1:   End Uses            Heating         138167.50          57334.62</span></span>
+<span><span class="co">#&gt;  2:   End Uses            Cooling          71922.07              0.00</span></span>
+<span><span class="co">#&gt;  3:   End Uses  Interior Lighting         168399.82              0.00</span></span>
+<span><span class="co">#&gt;  4:   End Uses  Exterior Lighting          64602.19              0.00</span></span>
+<span><span class="co">#&gt;  5:   End Uses Interior Equipment         296256.25              0.00</span></span>
+<span><span class="co">#&gt;  6:   End Uses Exterior Equipment              0.00              0.00</span></span>
+<span><span class="co">#&gt;  7:   End Uses               Fans          18786.52              0.00</span></span>
+<span><span class="co">#&gt;  8:   End Uses              Pumps             73.94              0.00</span></span>
+<span><span class="co">#&gt;  9:   End Uses     Heat Rejection              0.00              0.00</span></span>
+<span><span class="co">#&gt; 10:   End Uses     Humidification              0.00              0.00</span></span>
+<span><span class="co">#&gt; 11:   End Uses      Heat Recovery              0.00              0.00</span></span>
+<span><span class="co">#&gt; 12:   End Uses      Water Systems              0.00          10030.79</span></span>
+<span><span class="co">#&gt; 13:   End Uses      Refrigeration              0.00              0.00</span></span>
+<span><span class="co">#&gt; 14:   End Uses         Generators              0.00              0.00</span></span>
+<span><span class="co">#&gt; 15:   End Uses     Total End Uses         758208.29          67365.41</span></span>
+<span><span class="co">#&gt;     Additional Fuel [kWh] District Cooling [kWh] District Heating [kWh]</span></span>
+<span><span class="co">#&gt;  1:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  2:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  3:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  4:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  5:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  6:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  7:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  8:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;  9:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 10:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 11:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 12:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 13:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 14:                     0                      0                      0</span></span>
+<span><span class="co">#&gt; 15:                     0                      0                      0</span></span>
+<span><span class="co">#&gt;     Water [m3]</span></span>
+<span><span class="co">#&gt;  1:       0.00</span></span>
+<span><span class="co">#&gt;  2:       0.00</span></span>
+<span><span class="co">#&gt;  3:       0.00</span></span>
+<span><span class="co">#&gt;  4:       0.00</span></span>
+<span><span class="co">#&gt;  5:       0.00</span></span>
+<span><span class="co">#&gt;  6:       0.00</span></span>
+<span><span class="co">#&gt;  7:       0.00</span></span>
+<span><span class="co">#&gt;  8:       0.00</span></span>
+<span><span class="co">#&gt;  9:       0.00</span></span>
+<span><span class="co">#&gt; 10:       0.00</span></span>
+<span><span class="co">#&gt; 11:       0.00</span></span>
+<span><span class="co">#&gt; 12:     174.59</span></span>
+<span><span class="co">#&gt; 13:       0.00</span></span>
+<span><span class="co">#&gt; 14:       0.00</span></span>
+<span><span class="co">#&gt; 15:     174.59</span></span>
+<span></span>
+<span><span class="co"># read zone metadata from Standard Input and Output</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">zones</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     zone_index          zone_name rel_north origin_x origin_y origin_z</span></span>
+<span><span class="co">#&gt;  1:          1        CORE_BOTTOM         0        0        0        0</span></span>
+<span><span class="co">#&gt;  2:          2           CORE_MID         0        0        0        0</span></span>
+<span><span class="co">#&gt;  3:          3           CORE_TOP         0        0        0        0</span></span>
+<span><span class="co">#&gt;  4:          4  FIRSTFLOOR_PLENUM         0        0        0        0</span></span>
+<span><span class="co">#&gt;  5:          5    MIDFLOOR_PLENUM         0        0        0        0</span></span>
+<span><span class="co">#&gt;  6:          6 PERIMETER_BOT_ZN_1         0        0        0        0</span></span>
+<span><span class="co">#&gt;  7:          7 PERIMETER_BOT_ZN_2         0        0        0        0</span></span>
+<span><span class="co">#&gt;  8:          8 PERIMETER_BOT_ZN_3         0        0        0        0</span></span>
+<span><span class="co">#&gt;  9:          9 PERIMETER_BOT_ZN_4         0        0        0        0</span></span>
+<span><span class="co">#&gt; 10:         10 PERIMETER_MID_ZN_1         0        0        0        0</span></span>
+<span><span class="co">#&gt; 11:         11 PERIMETER_MID_ZN_2         0        0        0        0</span></span>
+<span><span class="co">#&gt; 12:         12 PERIMETER_MID_ZN_3         0        0        0        0</span></span>
+<span><span class="co">#&gt; 13:         13 PERIMETER_MID_ZN_4         0        0        0        0</span></span>
+<span><span class="co">#&gt; 14:         14 PERIMETER_TOP_ZN_1         0        0        0        0</span></span>
+<span><span class="co">#&gt; 15:         15 PERIMETER_TOP_ZN_2         0        0        0        0</span></span>
+<span><span class="co">#&gt; 16:         16 PERIMETER_TOP_ZN_3         0        0        0        0</span></span>
+<span><span class="co">#&gt; 17:         17 PERIMETER_TOP_ZN_4         0        0        0        0</span></span>
+<span><span class="co">#&gt; 18:         18    TOPFLOOR_PLENUM         0        0        0        0</span></span>
+<span><span class="co">#&gt;     centroid_x centroid_y centroid_z of_type multiplier list_multiplier</span></span>
+<span><span class="co">#&gt;  1:  24.955350  16.636900     1.3716       1          1               1</span></span>
+<span><span class="co">#&gt;  2:  24.955350  16.636900     5.3340       1          1               1</span></span>
+<span><span class="co">#&gt;  3:  24.955350  16.636900     9.2964       1          1               1</span></span>
+<span><span class="co">#&gt;  4:  24.955500  16.636900     3.3528       1          1               1</span></span>
+<span><span class="co">#&gt;  5:  24.955500  16.636900     7.3152       1          1               1</span></span>
+<span><span class="co">#&gt;  6:  24.955448   2.158891     1.3716       1          1               1</span></span>
+<span><span class="co">#&gt;  7:  47.820225  16.636900     1.3716       1          1               1</span></span>
+<span><span class="co">#&gt;  8:  24.955448  31.114909     1.3716       1          1               1</span></span>
+<span><span class="co">#&gt;  9:   2.090634  16.636900     1.3716       1          1               1</span></span>
+<span><span class="co">#&gt; 10:  24.955448   2.158891     5.3340       1          1               1</span></span>
+<span><span class="co">#&gt; 11:  47.820225  16.636900     5.3340       1          1               1</span></span>
+<span><span class="co">#&gt; 12:  24.955448  31.114909     5.3340       1          1               1</span></span>
+<span><span class="co">#&gt; 13:   2.090634  16.636900     5.3340       1          1               1</span></span>
+<span><span class="co">#&gt; 14:  24.955448   2.158891     9.2964       1          1               1</span></span>
+<span><span class="co">#&gt; 15:  47.820225  16.636900     9.2964       1          1               1</span></span>
+<span><span class="co">#&gt; 16:  24.955448  31.114909     9.2964       1          1               1</span></span>
+<span><span class="co">#&gt; 17:   2.090634  16.636900     9.2964       1          1               1</span></span>
+<span><span class="co">#&gt; 18:  24.955500  16.636900    11.2776       1          1               1</span></span>
+<span><span class="co">#&gt;     minimum_x maximum_x minimum_y maximum_y minimum_z maximum_z ceiling_height</span></span>
+<span><span class="co">#&gt;  1:    4.5732   45.3375    4.5732   28.7006    0.0000    2.7432         2.7432</span></span>
+<span><span class="co">#&gt;  2:    4.5732   45.3375    4.5732   28.7006    3.9624    6.7056         2.7432</span></span>
+<span><span class="co">#&gt;  3:    4.5732   45.3375    4.5732   28.7006    7.9248   10.6680         2.7432</span></span>
+<span><span class="co">#&gt;  4:    0.0000   49.9110    0.0000   33.2738    2.7432    3.9624         1.2192</span></span>
+<span><span class="co">#&gt;  5:    0.0000   49.9110    0.0000   33.2738    6.7056    7.9248         1.2192</span></span>
+<span><span class="co">#&gt;  6:    0.0000   49.9110    0.0000    4.5732    0.0000    2.7432         2.7432</span></span>
+<span><span class="co">#&gt;  7:   45.3375   49.9110    0.0000   33.2738    0.0000    2.7432         2.7432</span></span>
+<span><span class="co">#&gt;  8:    0.0000   49.9110   28.7006   33.2738    0.0000    2.7432         2.7432</span></span>
+<span><span class="co">#&gt;  9:    0.0000    4.5732    0.0000   33.2738    0.0000    2.7432         2.7432</span></span>
+<span><span class="co">#&gt; 10:    0.0000   49.9110    0.0000    4.5732    3.9624    6.7056         2.7432</span></span>
+<span><span class="co">#&gt; 11:   45.3375   49.9110    0.0000   33.2738    3.9624    6.7056         2.7432</span></span>
+<span><span class="co">#&gt; 12:    0.0000   49.9110   28.7006   33.2738    3.9624    6.7056         2.7432</span></span>
+<span><span class="co">#&gt; 13:    0.0000    4.5732    0.0000   33.2738    3.9624    6.7056         2.7432</span></span>
+<span><span class="co">#&gt; 14:    0.0000   49.9110    0.0000    4.5732    7.9248   10.6680         2.7432</span></span>
+<span><span class="co">#&gt; 15:   45.3375   49.9110    0.0000   33.2738    7.9248   10.6680         2.7432</span></span>
+<span><span class="co">#&gt; 16:    0.0000   49.9110   28.7006   33.2738    7.9248   10.6680         2.7432</span></span>
+<span><span class="co">#&gt; 17:    0.0000    4.5732    0.0000   33.2738    7.9248   10.6680         2.7432</span></span>
+<span><span class="co">#&gt; 18:    0.0000   49.9110    0.0000   33.2738   10.6680   11.8872         1.2192</span></span>
+<span><span class="co">#&gt;        volume inside_convection_algo outside_convection_algo floor_area</span></span>
+<span><span class="co">#&gt;  1: 2698.0375                      2                       7   983.5366</span></span>
+<span><span class="co">#&gt;  2: 2698.0375                      2                       7   983.5366</span></span>
+<span><span class="co">#&gt;  3: 2698.0375                      2                       7   983.5366</span></span>
+<span><span class="co">#&gt;  4: 2024.7603                      2                       7  1660.7286</span></span>
+<span><span class="co">#&gt;  5: 2024.7603                      2                       7  1660.7286</span></span>
+<span><span class="co">#&gt;  6:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt;  7:  360.0785                      2                       7   131.2622</span></span>
+<span><span class="co">#&gt;  8:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt;  9:  360.0548                      2                       7   131.2536</span></span>
+<span><span class="co">#&gt; 10:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt; 11:  360.0785                      2                       7   131.2622</span></span>
+<span><span class="co">#&gt; 12:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt; 13:  360.0548                      2                       7   131.2536</span></span>
+<span><span class="co">#&gt; 14:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt; 15:  360.0785                      2                       7   131.2622</span></span>
+<span><span class="co">#&gt; 16:  568.7700                      2                       7   207.3381</span></span>
+<span><span class="co">#&gt; 17:  360.0548                      2                       7   131.2536</span></span>
+<span><span class="co">#&gt; 18: 2024.7603                      2                       7  1660.7286</span></span>
+<span><span class="co">#&gt;     ext_gross_wall_area ext_net_wall_area ext_window_area is_part_of_total_area</span></span>
+<span><span class="co">#&gt;  1:             0.00000           0.00000         0.00000                     1</span></span>
+<span><span class="co">#&gt;  2:             0.00000           0.00000         0.00000                     1</span></span>
+<span><span class="co">#&gt;  3:             0.00000           0.00000         0.00000                     1</span></span>
+<span><span class="co">#&gt;  4:           202.83782         202.83782         0.00000                     0</span></span>
+<span><span class="co">#&gt;  5:           202.83782         202.83782         0.00000                     0</span></span>
+<span><span class="co">#&gt;  6:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt;  7:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt;  8:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt;  9:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt; 10:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt; 11:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt; 12:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt; 13:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt; 14:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt; 15:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt; 16:           136.91586          71.63358        65.28228                     1</span></span>
+<span><span class="co">#&gt; 17:            91.27669          47.75469        43.52200                     1</span></span>
+<span><span class="co">#&gt; 18:           202.83782         202.83782         0.00000                     0</span></span>
+<span></span>
+<span><span class="co"># read hourly air-conditioning system output with all additional metadata for</span></span>
+<span><span class="co"># the annual simulation from Variable Output</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">aircon_out</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"air system total %s energy"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"heating"</span>, <span class="st">"cooling"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    environment_name <span class="op">=</span> <span class="st">"annual"</span>,</span>
+<span>    all <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                case            datetime month day hour minute dst interval</span></span>
+<span><span class="co">#&gt;     1: MediumOffice 2017-01-01 01:00:00     1   1    1      0   0       60</span></span>
+<span><span class="co">#&gt;     2: MediumOffice 2017-01-01 02:00:00     1   1    2      0   0       60</span></span>
+<span><span class="co">#&gt;     3: MediumOffice 2017-01-01 03:00:00     1   1    3      0   0       60</span></span>
+<span><span class="co">#&gt;     4: MediumOffice 2017-01-01 04:00:00     1   1    4      0   0       60</span></span>
+<span><span class="co">#&gt;     5: MediumOffice 2017-01-01 05:00:00     1   1    5      0   0       60</span></span>
+<span><span class="co">#&gt;    ---                                                                    </span></span>
+<span><span class="co">#&gt; 52556: MediumOffice 2017-12-31 20:00:00    12  31   20      0   0       60</span></span>
+<span><span class="co">#&gt; 52557: MediumOffice 2017-12-31 21:00:00    12  31   21      0   0       60</span></span>
+<span><span class="co">#&gt; 52558: MediumOffice 2017-12-31 22:00:00    12  31   22      0   0       60</span></span>
+<span><span class="co">#&gt; 52559: MediumOffice 2017-12-31 23:00:00    12  31   23      0   0       60</span></span>
+<span><span class="co">#&gt; 52560: MediumOffice 2018-01-01 00:00:00    12  31   24      0   0       60</span></span>
+<span><span class="co">#&gt;        simulation_days day_type environment_name environment_period_index</span></span>
+<span><span class="co">#&gt;     1:               1  Holiday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;     2:               1  Holiday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;     3:               1  Holiday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;     4:               1  Holiday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;     5:               1  Holiday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;    ---                                                                   </span></span>
+<span><span class="co">#&gt; 52556:             365   Sunday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt; 52557:             365   Sunday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt; 52558:             365   Sunday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt; 52559:             365   Sunday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt; 52560:             365   Sunday           ANNUAL                        3</span></span>
+<span><span class="co">#&gt;        is_meter type index_group timestep_type key_value</span></span>
+<span><span class="co">#&gt;     1:        0  Sum        HVAC          Zone     VAV_1</span></span>
+<span><span class="co">#&gt;     2:        0  Sum        HVAC          Zone     VAV_1</span></span>
+<span><span class="co">#&gt;     3:        0  Sum        HVAC          Zone     VAV_1</span></span>
+<span><span class="co">#&gt;     4:        0  Sum        HVAC          Zone     VAV_1</span></span>
+<span><span class="co">#&gt;     5:        0  Sum        HVAC          Zone     VAV_1</span></span>
+<span><span class="co">#&gt;    ---                                                  </span></span>
+<span><span class="co">#&gt; 52556:        0  Sum        HVAC          Zone     VAV_3</span></span>
+<span><span class="co">#&gt; 52557:        0  Sum        HVAC          Zone     VAV_3</span></span>
+<span><span class="co">#&gt; 52558:        0  Sum        HVAC          Zone     VAV_3</span></span>
+<span><span class="co">#&gt; 52559:        0  Sum        HVAC          Zone     VAV_3</span></span>
+<span><span class="co">#&gt; 52560:        0  Sum        HVAC          Zone     VAV_3</span></span>
+<span><span class="co">#&gt;                                   name reporting_frequency schedule_name units</span></span>
+<span><span class="co">#&gt;     1: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;     2: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;     3: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;     4: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;     5: Air System Total Heating Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;    ---                                                                        </span></span>
+<span><span class="co">#&gt; 52556: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 52557: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 52558: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 52559: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt; 52560: Air System Total Cooling Energy              Hourly          &lt;NA&gt;     J</span></span>
+<span><span class="co">#&gt;           value</span></span>
+<span><span class="co">#&gt;     1: 32721496</span></span>
+<span><span class="co">#&gt;     2: 35026830</span></span>
+<span><span class="co">#&gt;     3: 46498023</span></span>
+<span><span class="co">#&gt;     4: 35878580</span></span>
+<span><span class="co">#&gt;     5: 47932856</span></span>
+<span><span class="co">#&gt;    ---         </span></span>
+<span><span class="co">#&gt; 52556:        0</span></span>
+<span><span class="co">#&gt; 52557:        0</span></span>
+<span><span class="co">#&gt; 52558:        0</span></span>
+<span><span class="co">#&gt; 52559:        0</span></span>
+<span><span class="co">#&gt; 52560:        0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="data-exploration-using-tidyverse">Data exploration using tidyverse<a class="anchor" aria-label="anchor" href="#data-exploration-using-tidyverse"></a>
@@ -808,82 +808,82 @@ An example of tidy BES output data representation where Table (a) is the standar
 <h4 id="get-eui-breakdown">Get EUI breakdown<a class="anchor" aria-label="anchor" href="#get-eui-breakdown"></a>
 </h4>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-
-<span class="co"># calculate Energy Use Intensity (EUI) for electricity</span>
-<span class="va">eui</span> <span class="op">&lt;-</span> <span class="va">end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># only select columns of interest</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># get rid of category with empty energy consumption</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># order by value</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># calculate EUI</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># calculate proportion of each category</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>proportion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">eui</span> <span class="op">/</span> <span class="va">eui</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># remove electricity column</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span>
-
-<span class="co"># plot a pie chart to show EUI breakdown</span>
-<span class="va">eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Total End Uses"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s [%.2f%%]"</span>, <span class="va">category</span>, <span class="va">proportion</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="st">""</span>, <span class="va">proportion</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning in sprintf("%s [%.2f%%]", category, proportion, "%"): one argument not</span>
-<span class="co">#&gt; used by format '%s [%.2f%%]'</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># calculate Energy Use Intensity (EUI) for electricity</span></span>
+<span><span class="va">eui</span> <span class="op">&lt;-</span> <span class="va">end_use</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># only select columns of interest</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>category <span class="op">=</span> <span class="va">row_name</span>, electricity <span class="op">=</span> <span class="va">`Electricity [kWh]`</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># get rid of category with empty energy consumption</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># order by value</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># calculate EUI</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>eui <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">electricity</span> <span class="op">/</span> <span class="va">area</span><span class="op">$</span><span class="st">'Area [m2]'</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># calculate proportion of each category</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>proportion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">eui</span> <span class="op">/</span> <span class="va">eui</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># remove electricity column</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">electricity</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot a pie chart to show EUI breakdown</span></span>
+<span><span class="va">eui</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Total End Uses"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s [%.2f%%]"</span>, <span class="va">category</span>, <span class="va">proportion</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="st">""</span>, <span class="va">proportion</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in sprintf("%s [%.2f%%]", category, proportion, "%"): one argument not</span></span>
+<span><span class="co">#&gt; used by format '%s [%.2f%%]'</span></span></code></pre></div>
 <p><img src="job_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="get-heating-and-cooling-demand-profile">Get heating and cooling demand profile<a class="anchor" aria-label="anchor" href="#get-heating-and-cooling-demand-profile"></a>
 </h4>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># calculate air-conditioned floor area per storey</span>
-<span class="va">storey</span> <span class="op">&lt;-</span> <span class="va">zones</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># exclude plenum zones</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_part_of_total_area</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># group by centroid height</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span>centroid_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">centroid_z</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># calculate total floor area</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>floor_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">floor_area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># add storey index</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">centroid_height</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>storey <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, air_system <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"VAV"</span>, <span class="va">storey</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">air_system</span>, <span class="va">floor_area</span><span class="op">)</span>
-
-<span class="co"># get monthly heating and cooling demands per served area</span>
-<span class="va">aircon_out_mon</span> <span class="op">&lt;-</span> <span class="va">aircon_out</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># only consider weekdays</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">day_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Holiday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># add an identifier column to indicate cooling and heating condition</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Heating"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Heating"</span>,
-        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Cooling"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Cooling"</span>
-    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># add floor area served by each air-conditioning system</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">storey</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"key_value"</span> <span class="op">=</span> <span class="st">"air_system"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="co"># calculate the monthly averaged heating and cooling demands in MJ/m2</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the</span>
-<span class="co">#&gt; `.groups` argument.</span>
-
-<span class="co"># plot a column chart to show the heating and cooling demand profile</span>
-<span class="va">aircon_out_mon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
-        <span class="va">type</span> <span class="op">==</span> <span class="st">"Heating"</span> <span class="op">~</span> <span class="op">-</span><span class="va">system_output</span>,
-        <span class="va">type</span> <span class="op">==</span> <span class="st">"Cooling"</span> <span class="op">~</span> <span class="va">system_output</span>
-    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">system_output</span>, group <span class="op">=</span> <span class="va">type</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">air_system</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">""</span>, y <span class="op">=</span> <span class="st">"Heating and cooling demands / MJ m-2"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># calculate air-conditioned floor area per storey</span></span>
+<span><span class="va">storey</span> <span class="op">&lt;-</span> <span class="va">zones</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># exclude plenum zones</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_part_of_total_area</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># group by centroid height</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span>centroid_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">centroid_z</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># calculate total floor area</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>floor_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">floor_area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># add storey index</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">centroid_height</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>storey <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, air_system <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"VAV"</span>, <span class="va">storey</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">air_system</span>, <span class="va">floor_area</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># get monthly heating and cooling demands per served area</span></span>
+<span><span class="va">aircon_out_mon</span> <span class="op">&lt;-</span> <span class="va">aircon_out</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># only consider weekdays</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">day_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Holiday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># add an identifier column to indicate cooling and heating condition</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Heating"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Heating"</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Cooling"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Cooling"</span></span>
+<span>    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># add floor area served by each air-conditioning system</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">storey</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"key_value"</span> <span class="op">=</span> <span class="st">"air_system"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># calculate the monthly averaged heating and cooling demands in MJ/m2</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the</span></span>
+<span><span class="co">#&gt; `.groups` argument.</span></span>
+<span></span>
+<span><span class="co"># plot a column chart to show the heating and cooling demand profile</span></span>
+<span><span class="va">aircon_out_mon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="va">type</span> <span class="op">==</span> <span class="st">"Heating"</span> <span class="op">~</span> <span class="op">-</span><span class="va">system_output</span>,</span>
+<span>        <span class="va">type</span> <span class="op">==</span> <span class="st">"Cooling"</span> <span class="op">~</span> <span class="va">system_output</span></span>
+<span>    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">system_output</span>, group <span class="op">=</span> <span class="va">type</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">air_system</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">""</span>, y <span class="op">=</span> <span class="st">"Heating and cooling demands / MJ m-2"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="job_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -913,7 +913,7 @@ An example of tidy BES output data representation where Table (a) is the standar
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

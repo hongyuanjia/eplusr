@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Work with geometry</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
       <div class="hidden name"><code>geom.Rmd</code></div>
@@ -154,29 +154,29 @@
 <li>All geometry related classes in the <code>Thermal Zones and Surfaces</code> group and <code>Daylighting</code> group</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span>
-<span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-<span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span>
-<span class="va">geom</span>
-<span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span>
-<span class="co">#&gt;  * Version: '8.8.0'</span>
-<span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span>
-<span class="co">#&gt;  * North Axis: 0°</span>
-<span class="co">#&gt;  * Zone Num: 130</span>
-<span class="co">#&gt;  * Surface Num: 795</span>
-<span class="co">#&gt;  * SubSurface Num: 125</span>
-<span class="co">#&gt;  * Shading Num: 25</span>
-<span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span>
-<span class="co">#&gt;  * Coordinate System:</span>
-<span class="co">#&gt;    - Detailed: 'Relative'</span>
-<span class="co">#&gt;    - Simple:   'Relative'</span>
-<span class="co">#&gt;    - Daylighting: 'Relative'</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span></span>
+<span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">geom</span></span>
+<span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
+<span><span class="co">#&gt;  * Version: '8.8.0'</span></span>
+<span><span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span></span>
+<span><span class="co">#&gt;  * North Axis: 0°</span></span>
+<span><span class="co">#&gt;  * Zone Num: 130</span></span>
+<span><span class="co">#&gt;  * Surface Num: 795</span></span>
+<span><span class="co">#&gt;  * SubSurface Num: 125</span></span>
+<span><span class="co">#&gt;  * Shading Num: 25</span></span>
+<span><span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span></span>
+<span><span class="co">#&gt;  * Coordinate System:</span></span>
+<span><span class="co">#&gt;    - Detailed: 'Relative'</span></span>
+<span><span class="co">#&gt;    - Simple:   'Relative'</span></span>
+<span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="get-geometry-data">Get geometry data<a class="anchor" aria-label="anchor" href="#get-geometry-data"></a>
@@ -185,167 +185,167 @@
 <h3 id="get-geometry-rules">Get geometry rules<a class="anchor" aria-label="anchor" href="#get-geometry-rules"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; $starting_vertex_position</span>
-<span class="co">#&gt; [1] "upperleftcorner"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $vertex_entry_direction</span>
-<span class="co">#&gt; [1] "counterclockwise"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $daylighting_reference_point_coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $rectangular_surface_coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $starting_vertex_position</span></span>
+<span><span class="co">#&gt; [1] "upperleftcorner"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $vertex_entry_direction</span></span>
+<span><span class="co">#&gt; [1] "counterclockwise"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $daylighting_reference_point_coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rectangular_surface_coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get-surface-area">Get surface area<a class="anchor" aria-label="anchor" href="#get-surface-area"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;        id                                               name</span>
-<span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span>
-<span class="co">#&gt;   2:  155                                             25C85A</span>
-<span class="co">#&gt;   3:  156                                             22EE43</span>
-<span class="co">#&gt;   4:  157                                             FCF93A</span>
-<span class="co">#&gt;   5:  158                                             D30CFB</span>
-<span class="co">#&gt;  ---                                                        </span>
-<span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt;                         class                      zone        type      area</span>
-<span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor 373.28441</span>
-<span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall  45.52249</span>
-<span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall  45.52249</span>
-<span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling 373.28441</span>
-<span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall  76.18049</span>
-<span class="co">#&gt;  ---                                                                         </span>
-<span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading  37.16112</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        id                                               name</span></span>
+<span><span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span></span>
+<span><span class="co">#&gt;   2:  155                                             25C85A</span></span>
+<span><span class="co">#&gt;   3:  156                                             22EE43</span></span>
+<span><span class="co">#&gt;   4:  157                                             FCF93A</span></span>
+<span><span class="co">#&gt;   5:  158                                             D30CFB</span></span>
+<span><span class="co">#&gt;  ---                                                        </span></span>
+<span><span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;                         class                      zone        type      area</span></span>
+<span><span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor 373.28441</span></span>
+<span><span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall  45.52249</span></span>
+<span><span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall  45.52249</span></span>
+<span><span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling 373.28441</span></span>
+<span><span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall  76.18049</span></span>
+<span><span class="co">#&gt;  ---                                                                         </span></span>
+<span><span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading  37.16112</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <p>By default, <code>$area()</code> returns areas of all surfaces in current <code>Idf</code>. You can specify <code>class</code> and <code>object</code> to only calculate objects of interest. This is also true for the <code>$azimuth()</code> and <code>$tilt()</code> methods.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"Shading:Zone:Detailed"</span><span class="op">)</span>
-<span class="co">#&gt;       id                                                    name</span>
-<span class="co">#&gt;  1:  261             Floor 1 Conference Ext Wall:shading_south_1</span>
-<span class="co">#&gt;  2:  354               Floor 1 Elevator Ext Wall:shading_south_1</span>
-<span class="co">#&gt;  3: 1144 Floor 1 Office 3 Perimeter 3 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt;  4: 1502               Floor 2 Chapel Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt;  5: 1662               Floor 2 Elevator Ext Wall:shading_south_1</span>
-<span class="co">#&gt;  6: 1711               Floor 2 Exam 1 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt;  7: 1867              Floor 2 Gift Shop Ext Wall:shading_south_1</span>
-<span class="co">#&gt;  8: 1949              Floor 2 Imaging 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt;  9: 2202             Floor 2 Lounge 2 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 10: 2457             Floor 2 Office 4 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 11: 2747              Floor 2 Reception Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 12: 2836             Floor 2 Restroom 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 13: 3104                 Floor 2 Triage Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 14: 3235             Floor 3 Elevator Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 15: 3575            Floor 3 Patient 1 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 16: 3708            Floor 3 Patient 4 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 17: 4082           Floor 4-6 Elevator Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 18: 4222          Floor 4-6 Patient 1 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 19: 4346          Floor 4-6 Patient 4 Ext Wall 2:shading_south_1</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"Shading:Zone:Detailed"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       id                                                    name</span></span>
+<span><span class="co">#&gt;  1:  261             Floor 1 Conference Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;  2:  354               Floor 1 Elevator Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;  3: 1144 Floor 1 Office 3 Perimeter 3 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt;  4: 1502               Floor 2 Chapel Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt;  5: 1662               Floor 2 Elevator Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;  6: 1711               Floor 2 Exam 1 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt;  7: 1867              Floor 2 Gift Shop Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;  8: 1949              Floor 2 Imaging 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;  9: 2202             Floor 2 Lounge 2 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 10: 2457             Floor 2 Office 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 11: 2747              Floor 2 Reception Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 12: 2836             Floor 2 Restroom 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 13: 3104                 Floor 2 Triage Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 14: 3235             Floor 3 Elevator Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 15: 3575            Floor 3 Patient 1 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 16: 3708            Floor 3 Patient 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 17: 4082           Floor 4-6 Elevator Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 18: 4222          Floor 4-6 Patient 1 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 19: 4346          Floor 4-6 Patient 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <p>With <code>net</code> being <code>TRUE</code>, the window and door areas will be excluded in the results of surfaces.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span>
-<span class="co">#&gt;        id                             name                    class</span>
-<span class="co">#&gt;   1:  155                           25C85A BuildingSurface:Detailed</span>
-<span class="co">#&gt;   2:  156                           22EE43 BuildingSurface:Detailed</span>
-<span class="co">#&gt;   3:  158                           D30CFB BuildingSurface:Detailed</span>
-<span class="co">#&gt;   4:  159                           63D572 BuildingSurface:Detailed</span>
-<span class="co">#&gt;   5:  222                           3C19D3 BuildingSurface:Detailed</span>
-<span class="co">#&gt;  ---                                                               </span>
-<span class="co">#&gt; 523: 5579 MOB Floor 5 Perimeter 3 Ext Wall BuildingSurface:Detailed</span>
-<span class="co">#&gt; 524: 5620                           FCB84A BuildingSurface:Detailed</span>
-<span class="co">#&gt; 525: 5621                           843462 BuildingSurface:Detailed</span>
-<span class="co">#&gt; 526: 5622                           F6C992 BuildingSurface:Detailed</span>
-<span class="co">#&gt; 527: 5623 MOB Floor 5 Perimeter 4 Ext Wall BuildingSurface:Detailed</span>
-<span class="co">#&gt;                         zone type      area</span>
-<span class="co">#&gt;   1:            Floor 1 Cafe Wall  45.52249</span>
-<span class="co">#&gt;   2:            Floor 1 Cafe Wall  45.52249</span>
-<span class="co">#&gt;   3:            Floor 1 Cafe Wall  76.18049</span>
-<span class="co">#&gt;   4:            Floor 1 Cafe Wall  76.18049</span>
-<span class="co">#&gt;   5:           Floor 1 Clean Wall  18.58061</span>
-<span class="co">#&gt;  ---                                       </span>
-<span class="co">#&gt; 523: MOB Floor 5 Perimeter 3 Wall 148.64486</span>
-<span class="va">....</span>
-<span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>net <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span>
-<span class="co">#&gt;        id                             name                    class</span>
-<span class="co">#&gt;   1:  155                           25C85A BuildingSurface:Detailed</span>
-<span class="co">#&gt;   2:  156                           22EE43 BuildingSurface:Detailed</span>
-<span class="co">#&gt;   3:  158                           D30CFB BuildingSurface:Detailed</span>
-<span class="co">#&gt;   4:  159                           63D572 BuildingSurface:Detailed</span>
-<span class="co">#&gt;   5:  222                           3C19D3 BuildingSurface:Detailed</span>
-<span class="co">#&gt;  ---                                                               </span>
-<span class="co">#&gt; 523: 5579 MOB Floor 5 Perimeter 3 Ext Wall BuildingSurface:Detailed</span>
-<span class="co">#&gt; 524: 5620                           FCB84A BuildingSurface:Detailed</span>
-<span class="co">#&gt; 525: 5621                           843462 BuildingSurface:Detailed</span>
-<span class="co">#&gt; 526: 5622                           F6C992 BuildingSurface:Detailed</span>
-<span class="co">#&gt; 527: 5623 MOB Floor 5 Perimeter 4 Ext Wall BuildingSurface:Detailed</span>
-<span class="co">#&gt;                         zone type     area</span>
-<span class="co">#&gt;   1:            Floor 1 Cafe Wall 45.52249</span>
-<span class="co">#&gt;   2:            Floor 1 Cafe Wall 45.52249</span>
-<span class="co">#&gt;   3:            Floor 1 Cafe Wall 76.18049</span>
-<span class="co">#&gt;   4:            Floor 1 Cafe Wall 76.18049</span>
-<span class="co">#&gt;   5:           Floor 1 Clean Wall 18.58061</span>
-<span class="co">#&gt;  ---                                      </span>
-<span class="co">#&gt; 523: MOB Floor 5 Perimeter 3 Wall 89.18717</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span></span>
+<span><span class="co">#&gt;        id                             name                    class</span></span>
+<span><span class="co">#&gt;   1:  155                           25C85A BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   2:  156                           22EE43 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   3:  158                           D30CFB BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   4:  159                           63D572 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   5:  222                           3C19D3 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;  ---                                                               </span></span>
+<span><span class="co">#&gt; 523: 5579 MOB Floor 5 Perimeter 3 Ext Wall BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 524: 5620                           FCB84A BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 525: 5621                           843462 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 526: 5622                           F6C992 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 527: 5623 MOB Floor 5 Perimeter 4 Ext Wall BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;                         zone type      area</span></span>
+<span><span class="co">#&gt;   1:            Floor 1 Cafe Wall  45.52249</span></span>
+<span><span class="co">#&gt;   2:            Floor 1 Cafe Wall  45.52249</span></span>
+<span><span class="co">#&gt;   3:            Floor 1 Cafe Wall  76.18049</span></span>
+<span><span class="co">#&gt;   4:            Floor 1 Cafe Wall  76.18049</span></span>
+<span><span class="co">#&gt;   5:           Floor 1 Clean Wall  18.58061</span></span>
+<span><span class="co">#&gt;  ---                                       </span></span>
+<span><span class="co">#&gt; 523: MOB Floor 5 Perimeter 3 Wall 148.64486</span></span>
+<span><span class="va">....</span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>net <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span></span>
+<span><span class="co">#&gt;        id                             name                    class</span></span>
+<span><span class="co">#&gt;   1:  155                           25C85A BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   2:  156                           22EE43 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   3:  158                           D30CFB BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   4:  159                           63D572 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;   5:  222                           3C19D3 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;  ---                                                               </span></span>
+<span><span class="co">#&gt; 523: 5579 MOB Floor 5 Perimeter 3 Ext Wall BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 524: 5620                           FCB84A BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 525: 5621                           843462 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 526: 5622                           F6C992 BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt; 527: 5623 MOB Floor 5 Perimeter 4 Ext Wall BuildingSurface:Detailed</span></span>
+<span><span class="co">#&gt;                         zone type     area</span></span>
+<span><span class="co">#&gt;   1:            Floor 1 Cafe Wall 45.52249</span></span>
+<span><span class="co">#&gt;   2:            Floor 1 Cafe Wall 45.52249</span></span>
+<span><span class="co">#&gt;   3:            Floor 1 Cafe Wall 76.18049</span></span>
+<span><span class="co">#&gt;   4:            Floor 1 Cafe Wall 76.18049</span></span>
+<span><span class="co">#&gt;   5:           Floor 1 Clean Wall 18.58061</span></span>
+<span><span class="co">#&gt;  ---                                      </span></span>
+<span><span class="co">#&gt; 523: MOB Floor 5 Perimeter 3 Wall 89.18717</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get-surface-azimuth-and-tilt">Get surface azimuth and tilt<a class="anchor" aria-label="anchor" href="#get-surface-azimuth-and-tilt"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">azimuth</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;        id                                               name</span>
-<span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span>
-<span class="co">#&gt;   2:  155                                             25C85A</span>
-<span class="co">#&gt;   3:  156                                             22EE43</span>
-<span class="co">#&gt;   4:  157                                             FCF93A</span>
-<span class="co">#&gt;   5:  158                                             D30CFB</span>
-<span class="co">#&gt;  ---                                                        </span>
-<span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt;                         class                      zone        type azimuth</span>
-<span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor      90</span>
-<span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall       0</span>
-<span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall     180</span>
-<span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling      90</span>
-<span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall     270</span>
-<span class="co">#&gt;  ---                                                                       </span>
-<span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading      90</span>
-<span class="va">....</span>
-<span class="va">geom</span><span class="op">$</span><span class="fu">tilt</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;        id                                               name</span>
-<span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span>
-<span class="co">#&gt;   2:  155                                             25C85A</span>
-<span class="co">#&gt;   3:  156                                             22EE43</span>
-<span class="co">#&gt;   4:  157                                             FCF93A</span>
-<span class="co">#&gt;   5:  158                                             D30CFB</span>
-<span class="co">#&gt;  ---                                                        </span>
-<span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span>
-<span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span>
-<span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span>
-<span class="co">#&gt;                         class                      zone        type tilt</span>
-<span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor  180</span>
-<span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall   90</span>
-<span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall   90</span>
-<span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling    0</span>
-<span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall  270</span>
-<span class="co">#&gt;  ---                                                                    </span>
-<span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading  180</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">azimuth</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        id                                               name</span></span>
+<span><span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span></span>
+<span><span class="co">#&gt;   2:  155                                             25C85A</span></span>
+<span><span class="co">#&gt;   3:  156                                             22EE43</span></span>
+<span><span class="co">#&gt;   4:  157                                             FCF93A</span></span>
+<span><span class="co">#&gt;   5:  158                                             D30CFB</span></span>
+<span><span class="co">#&gt;  ---                                                        </span></span>
+<span><span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;                         class                      zone        type azimuth</span></span>
+<span><span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor      90</span></span>
+<span><span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall       0</span></span>
+<span><span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall     180</span></span>
+<span><span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling      90</span></span>
+<span><span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall     270</span></span>
+<span><span class="co">#&gt;  ---                                                                       </span></span>
+<span><span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading      90</span></span>
+<span><span class="va">....</span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">tilt</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        id                                               name</span></span>
+<span><span class="co">#&gt;   1:  154                                  Floor 1 Cafe Slab</span></span>
+<span><span class="co">#&gt;   2:  155                                             25C85A</span></span>
+<span><span class="co">#&gt;   3:  156                                             22EE43</span></span>
+<span><span class="co">#&gt;   4:  157                                             FCF93A</span></span>
+<span><span class="co">#&gt;   5:  158                                             D30CFB</span></span>
+<span><span class="co">#&gt;  ---                                                        </span></span>
+<span><span class="co">#&gt; 941: 4732       Floor 7 Patient 1 Ext Wall 1:shading_south_1</span></span>
+<span><span class="co">#&gt; 942: 4856       Floor 7 Patient 4 Ext Wall 2:shading_south_1</span></span>
+<span><span class="co">#&gt; 943: 5143   MOB Floor 1 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 944: 5319 MOB Floor 2-4 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt; 945: 5535   MOB Floor 5 Perimeter 2 Ext Wall:shading_south_1</span></span>
+<span><span class="co">#&gt;                         class                      zone        type tilt</span></span>
+<span><span class="co">#&gt;   1: BuildingSurface:Detailed              Floor 1 Cafe       Floor  180</span></span>
+<span><span class="co">#&gt;   2: BuildingSurface:Detailed              Floor 1 Cafe        Wall   90</span></span>
+<span><span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe        Wall   90</span></span>
+<span><span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe     Ceiling    0</span></span>
+<span><span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe        Wall  270</span></span>
+<span><span class="co">#&gt;  ---                                                                    </span></span>
+<span><span class="co">#&gt; 941:    Shading:Zone:Detailed         Floor 7 Patient 1 ZoneShading  180</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -360,133 +360,133 @@
 <li><code>Shading:Zone:Detailed</code></li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span>
-<span class="va">simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_simple</span><span class="op">)</span>
-
-<span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span>
-<span class="co">#&gt; $`Thermal Zones and Surfaces`</span>
-<span class="co">#&gt;  [1] "GlobalGeometryRules" "Zone"                "Wall:Exterior"      </span>
-<span class="co">#&gt;  [4] "Wall:Adiabatic"      "Wall:Interzone"      "Roof"               </span>
-<span class="co">#&gt;  [7] "Ceiling:Interzone"   "Floor:Adiabatic"     "Floor:Interzone"    </span>
-<span class="co">#&gt; [10] "Window"              "Door"                "Window:Interzone"   </span>
-<span class="co">#&gt; [13] "Shading:Site"        "Shading:Building"    "Shading:Overhang"   </span>
-<span class="co">#&gt; [16] "Shading:Fin"</span>
-
-<span class="va">simple</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">convert</span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span>
-<span class="co">#&gt; $`Thermal Zones and Surfaces`</span>
-<span class="co">#&gt; [1] "GlobalGeometryRules"          "Zone"                        </span>
-<span class="co">#&gt; [3] "BuildingSurface:Detailed"     "FenestrationSurface:Detailed"</span>
-<span class="co">#&gt; [5] "Shading:Site:Detailed"        "Shading:Building:Detailed"   </span>
-<span class="co">#&gt; [7] "Shading:Zone:Detailed"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span></span>
+<span><span class="va">simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_simple</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; $`Thermal Zones and Surfaces`</span></span>
+<span><span class="co">#&gt;  [1] "GlobalGeometryRules" "Zone"                "Wall:Exterior"      </span></span>
+<span><span class="co">#&gt;  [4] "Wall:Adiabatic"      "Wall:Interzone"      "Roof"               </span></span>
+<span><span class="co">#&gt;  [7] "Ceiling:Interzone"   "Floor:Adiabatic"     "Floor:Interzone"    </span></span>
+<span><span class="co">#&gt; [10] "Window"              "Door"                "Window:Interzone"   </span></span>
+<span><span class="co">#&gt; [13] "Shading:Site"        "Shading:Building"    "Shading:Overhang"   </span></span>
+<span><span class="co">#&gt; [16] "Shading:Fin"</span></span>
+<span></span>
+<span><span class="va">simple</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">convert</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; $`Thermal Zones and Surfaces`</span></span>
+<span><span class="co">#&gt; [1] "GlobalGeometryRules"          "Zone"                        </span></span>
+<span><span class="co">#&gt; [3] "BuildingSurface:Detailed"     "FenestrationSurface:Detailed"</span></span>
+<span><span class="co">#&gt; [5] "Shading:Site:Detailed"        "Shading:Building:Detailed"   </span></span>
+<span><span class="co">#&gt; [7] "Shading:Zone:Detailed"</span></span></code></pre></div>
 <p>An attribute named <code>mapping</code> is attached in the converted <code>Idf</code> object which contains the meta data of objects before and after the conversion.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">simple</span>, <span class="st">"mapping"</span><span class="op">)</span>
-<span class="co">#&gt;     ori_id                       ori_name         ori_class new_id</span>
-<span class="co">#&gt;  1:     48                  Zn001:Wall001     Wall:Exterior     48</span>
-<span class="co">#&gt;  2:     54                  Zn001:Wall002     Wall:Exterior     54</span>
-<span class="co">#&gt;  3:     55                  Zn001:Wall003     Wall:Exterior     55</span>
-<span class="co">#&gt;  4:     56                  Zn001:Wall004    Wall:Adiabatic     56</span>
-<span class="co">#&gt;  5:     57                   Zn001:Flr001   Floor:Adiabatic     57</span>
-<span class="co">#&gt;  6:     58                  Zn001:Roof001 Ceiling:Interzone     58</span>
-<span class="co">#&gt;  7:     59                  Zn002:Wall001     Wall:Exterior     59</span>
-<span class="co">#&gt;  8:     63                  Zn002:Wall002     Wall:Exterior     63</span>
-<span class="co">#&gt;  9:     67                  Zn002:Wall003     Wall:Exterior     67</span>
-<span class="co">#&gt; 10:     68                  Zn002:Wall004    Wall:Adiabatic     68</span>
-<span class="co">#&gt; 11:     69                   Zn002:Flr001   Floor:Adiabatic     69</span>
-<span class="co">#&gt; 12:     70                  Zn002:Roof001 Ceiling:Interzone     70</span>
-<span class="co">#&gt; 13:     71                  Zn003:Wall001     Wall:Exterior     71</span>
-<span class="co">#&gt; 14:     73                  Zn003:Wall002     Wall:Exterior     73</span>
-<span class="co">#&gt; 15:     74                  Zn003:Wall003     Wall:Exterior     74</span>
-<span class="co">#&gt; 16:     75                  Zn003:Wall004    Wall:Interzone     75</span>
-<span class="co">#&gt; 17:     77                   Zn003:Flr001   Floor:Interzone     77</span>
-<span class="co">#&gt; 18:     78                  Zn003:Roof001              Roof     78</span>
-<span class="co">#&gt; 19:     79                  Zn004:Wall001     Wall:Exterior     79</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">simple</span>, <span class="st">"mapping"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     ori_id                       ori_name         ori_class new_id</span></span>
+<span><span class="co">#&gt;  1:     48                  Zn001:Wall001     Wall:Exterior     48</span></span>
+<span><span class="co">#&gt;  2:     54                  Zn001:Wall002     Wall:Exterior     54</span></span>
+<span><span class="co">#&gt;  3:     55                  Zn001:Wall003     Wall:Exterior     55</span></span>
+<span><span class="co">#&gt;  4:     56                  Zn001:Wall004    Wall:Adiabatic     56</span></span>
+<span><span class="co">#&gt;  5:     57                   Zn001:Flr001   Floor:Adiabatic     57</span></span>
+<span><span class="co">#&gt;  6:     58                  Zn001:Roof001 Ceiling:Interzone     58</span></span>
+<span><span class="co">#&gt;  7:     59                  Zn002:Wall001     Wall:Exterior     59</span></span>
+<span><span class="co">#&gt;  8:     63                  Zn002:Wall002     Wall:Exterior     63</span></span>
+<span><span class="co">#&gt;  9:     67                  Zn002:Wall003     Wall:Exterior     67</span></span>
+<span><span class="co">#&gt; 10:     68                  Zn002:Wall004    Wall:Adiabatic     68</span></span>
+<span><span class="co">#&gt; 11:     69                   Zn002:Flr001   Floor:Adiabatic     69</span></span>
+<span><span class="co">#&gt; 12:     70                  Zn002:Roof001 Ceiling:Interzone     70</span></span>
+<span><span class="co">#&gt; 13:     71                  Zn003:Wall001     Wall:Exterior     71</span></span>
+<span><span class="co">#&gt; 14:     73                  Zn003:Wall002     Wall:Exterior     73</span></span>
+<span><span class="co">#&gt; 15:     74                  Zn003:Wall003     Wall:Exterior     74</span></span>
+<span><span class="co">#&gt; 16:     75                  Zn003:Wall004    Wall:Interzone     75</span></span>
+<span><span class="co">#&gt; 17:     77                   Zn003:Flr001   Floor:Interzone     77</span></span>
+<span><span class="co">#&gt; 18:     78                  Zn003:Roof001              Roof     78</span></span>
+<span><span class="co">#&gt; 19:     79                  Zn004:Wall001     Wall:Exterior     79</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="change-coordinate-systems">Change coordinate systems<a class="anchor" aria-label="anchor" href="#change-coordinate-systems"></a>
 </h2>
 <p><code>$coord_system()</code> converts all vertices of geometries into specified coordinate systems, e.g. from world to relative, and vice versa. Besides, it also updates the <code>GlobalGeometryRules</code> in parent [Idf] accordingly.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; $starting_vertex_position</span>
-<span class="co">#&gt; [1] "upperleftcorner"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $vertex_entry_direction</span>
-<span class="co">#&gt; [1] "counterclockwise"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $daylighting_reference_point_coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $rectangular_surface_coordinate_system</span>
-<span class="co">#&gt; [1] "relative"</span>
-
-<span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span>
-<span class="co">#&gt;      id              name                    class index</span>
-<span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span>
-<span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span>
-<span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span>
-<span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span>
-<span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span>
-<span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span>
-<span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span>
-<span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span>
-<span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span>
-<span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span>
-<span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span>
-<span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span>
-<span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span>
-<span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span>
-<span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span>
-<span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span>
-<span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span>
-<span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span>
-<span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
-<span class="va">....</span>
-
-<span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span>
-<span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span>
-<span class="co">#&gt;  * Version: '8.8.0'</span>
-<span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span>
-<span class="co">#&gt;  * North Axis: 0°</span>
-<span class="co">#&gt;  * Zone Num: 130</span>
-<span class="co">#&gt;  * Surface Num: 795</span>
-<span class="co">#&gt;  * SubSurface Num: 125</span>
-<span class="co">#&gt;  * Shading Num: 25</span>
-<span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span>
-<span class="co">#&gt;  * Coordinate System:</span>
-<span class="co">#&gt;    - Detailed: 'World'</span>
-<span class="co">#&gt;    - Simple:   'Relative'</span>
-<span class="co">#&gt;    - Daylighting: 'Relative'</span>
-
-<span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span>
-<span class="co">#&gt;      id              name                    class index</span>
-<span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span>
-<span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span>
-<span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span>
-<span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span>
-<span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span>
-<span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span>
-<span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span>
-<span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span>
-<span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span>
-<span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span>
-<span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span>
-<span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span>
-<span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span>
-<span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span>
-<span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span>
-<span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span>
-<span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span>
-<span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span>
-<span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $starting_vertex_position</span></span>
+<span><span class="co">#&gt; [1] "upperleftcorner"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $vertex_entry_direction</span></span>
+<span><span class="co">#&gt; [1] "counterclockwise"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $daylighting_reference_point_coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rectangular_surface_coordinate_system</span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      id              name                    class index</span></span>
+<span><span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span></span>
+<span><span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span></span>
+<span><span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span></span>
+<span><span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span></span>
+<span><span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span></span>
+<span><span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span></span>
+<span><span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span></span>
+<span><span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span></span>
+<span><span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span></span>
+<span><span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span></span>
+<span><span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span></span>
+<span><span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span></span>
+<span><span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span></span>
+<span><span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span></span>
+<span><span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span></span>
+<span><span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span></span>
+<span><span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span></span>
+<span><span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span></span>
+<span><span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
+<span><span class="co">#&gt;  * Version: '8.8.0'</span></span>
+<span><span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span></span>
+<span><span class="co">#&gt;  * North Axis: 0°</span></span>
+<span><span class="co">#&gt;  * Zone Num: 130</span></span>
+<span><span class="co">#&gt;  * Surface Num: 795</span></span>
+<span><span class="co">#&gt;  * SubSurface Num: 125</span></span>
+<span><span class="co">#&gt;  * Shading Num: 25</span></span>
+<span><span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span></span>
+<span><span class="co">#&gt;  * Coordinate System:</span></span>
+<span><span class="co">#&gt;    - Detailed: 'World'</span></span>
+<span><span class="co">#&gt;    - Simple:   'Relative'</span></span>
+<span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span>
+<span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      id              name                    class index</span></span>
+<span><span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span></span>
+<span><span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span></span>
+<span><span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span></span>
+<span><span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span></span>
+<span><span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span></span>
+<span><span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span></span>
+<span><span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span></span>
+<span><span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span></span>
+<span><span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span></span>
+<span><span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span></span>
+<span><span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span></span>
+<span><span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span></span>
+<span><span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span></span>
+<span><span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span></span>
+<span><span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span></span>
+<span><span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span></span>
+<span><span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span></span>
+<span><span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span></span>
+<span><span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="round-vertices-decimal-digits">Round vertices decimal digits<a class="anchor" aria-label="anchor" href="#round-vertices-decimal-digits"></a>
@@ -494,30 +494,30 @@
 <p><code>$round_digits()</code> performs number rounding on vertices of detailed geometry object vertices, e.g. <code>BuildingSurface:Detailed</code>, <code>FenestrationSurface:Detailed</code> and etc.</p>
 <p><code>$round_digits()</code> may be useful for clean up IDF files generated using OpenStudio which often gives vertices with long trailing digits.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">geom</span><span class="op">$</span><span class="fu">round_digits</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>
-
-<span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span>
-<span class="co">#&gt;      id              name                    class index</span>
-<span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span>
-<span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span>
-<span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span>
-<span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span>
-<span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span>
-<span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span>
-<span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span>
-<span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span>
-<span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span>
-<span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span>
-<span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span>
-<span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span>
-<span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span>
-<span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span>
-<span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span>
-<span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span>
-<span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span>
-<span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span>
-<span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">round_digits</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      id              name                    class index</span></span>
+<span><span class="co">#&gt;  1: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     1</span></span>
+<span><span class="co">#&gt;  2: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     2</span></span>
+<span><span class="co">#&gt;  3: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     3</span></span>
+<span><span class="co">#&gt;  4: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     4</span></span>
+<span><span class="co">#&gt;  5: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     5</span></span>
+<span><span class="co">#&gt;  6: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     6</span></span>
+<span><span class="co">#&gt;  7: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     7</span></span>
+<span><span class="co">#&gt;  8: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     8</span></span>
+<span><span class="co">#&gt;  9: 154 Floor 1 Cafe Slab BuildingSurface:Detailed     9</span></span>
+<span><span class="co">#&gt; 10: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    10</span></span>
+<span><span class="co">#&gt; 11: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    11</span></span>
+<span><span class="co">#&gt; 12: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    12</span></span>
+<span><span class="co">#&gt; 13: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    13</span></span>
+<span><span class="co">#&gt; 14: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    14</span></span>
+<span><span class="co">#&gt; 15: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    15</span></span>
+<span><span class="co">#&gt; 16: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span></span>
+<span><span class="co">#&gt; 17: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span></span>
+<span><span class="co">#&gt; 18: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span></span>
+<span><span class="co">#&gt; 19: 154 Floor 1 Cafe Slab BuildingSurface:Detailed    19</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="view-geometry-in-3d">View geometry in 3D<a class="anchor" aria-label="anchor" href="#view-geometry-in-3d"></a>
@@ -532,7 +532,7 @@
 <li>Wheel: Zoom</li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">geom</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">geom</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_default.png" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="tweak-the-view">Tweak the view<a class="anchor" aria-label="anchor" href="#tweak-the-view"></a>
@@ -590,67 +590,67 @@
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span></code></pre></div>
 <p><img src="geom-viewer_background1.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_background2.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-viewpoint">Change viewpoint<a class="anchor" aria-label="anchor" href="#change-viewpoint"></a>
 </h4>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"top"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"top"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_viewpoint1.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"iso"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"iso"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_viewpoint2.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-axis-style">Change axis style<a class="anchor" aria-label="anchor" href="#change-axis-style"></a>
 </h4>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_axis.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_noaxis.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-ground-style">Change ground style<a class="anchor" aria-label="anchor" href="#change-ground-style"></a>
 </h4>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="turn-onoff-x-ray-style">Turn on/off X-ray style<a class="anchor" aria-label="anchor" href="#turn-onoff-x-ray-style"></a>
 </h4>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_xray.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-render-style">Change render style<a class="anchor" aria-label="anchor" href="#change-render-style"></a>
 </h4>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"zone"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"zone"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_zone_color.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"surface_type"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"surface_type"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="turn-onoff-components">Turn on/off components<a class="anchor" aria-label="anchor" href="#turn-onoff-components"></a>
 </h4>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>zone <span class="op">=</span> <span class="st">"floor 7 clean"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>zone <span class="op">=</span> <span class="st">"floor 7 clean"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_zone.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>surface <span class="op">=</span> <span class="st">"MOB Floor 5 Perimeter 2 Ext Wall"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>surface <span class="op">=</span> <span class="st">"MOB Floor 5 Perimeter 2 Ext Wall"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_surface.png" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"wall"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"wall"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_wall.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -659,8 +659,8 @@
 </h3>
 <p><code>$snapshot()</code> captures the current rgl view and saves it as an image file to disk.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span>
-<span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="st">"view.png"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="st">"view.png"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -695,7 +695,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

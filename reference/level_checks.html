@@ -108,7 +108,7 @@ contains.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">level_checks</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">level_checks</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -116,10 +116,13 @@ contains.</p>
     <dl><dt>level</dt>
 <dd><p>Should be one of <code>"none"</code>, <code>"draft"</code>, <code>"final"</code> or an output of
 <code><a href="custom_validate.html">custom_validate()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list with 10 elements, e.g. <code>required_object</code>,
+    
+
+<p>A named list with 10 elements, e.g. <code>required_object</code>,
 <code>unique_object</code>, <code>unique_name</code>, <code>extensible</code>, <code>required_field</code>, <code>auto_field</code>,
 <code>type</code>, <code>choice</code>, <code>range</code> and <code>reference</code>. For the meaning of each validation
 component, see<code><a href="custom_validate.html">custom_validate()</a></code>.</p>
@@ -127,7 +130,7 @@ component, see<code><a href="custom_validate.html">custom_validate()</a></code>.
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">level_checks</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">level_checks</span><span class="op">(</span><span class="st">"draft"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -158,7 +161,7 @@ component, see<code><a href="custom_validate.html">custom_validate()</a></code>.
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">level_checks</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">level_checks</span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -189,7 +192,7 @@ component, see<code><a href="custom_validate.html">custom_validate()</a></code>.
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">level_checks</span><span class="op">(</span><span class="fu"><a href="custom_validate.html">custom_validate</a></span><span class="op">(</span>auto_field <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">level_checks</span><span class="op">(</span><span class="fu"><a href="custom_validate.html">custom_validate</a></span><span class="op">(</span>auto_field <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -220,7 +223,7 @@ component, see<code><a href="custom_validate.html">custom_validate()</a></code>.
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">level_checks</span><span class="op">(</span><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">level_checks</span><span class="op">(</span><span class="fu"><a href="eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -265,7 +268,7 @@ component, see<code><a href="custom_validate.html">custom_validate()</a></code>.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

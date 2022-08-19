@@ -104,29 +104,29 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">run_idf</span><span class="op">(</span>
-  <span class="va">model</span>,
-  <span class="va">weather</span>,
-  <span class="va">output_dir</span>,
-  design_day <span class="op">=</span> <span class="cn">FALSE</span>,
-  annual <span class="op">=</span> <span class="cn">FALSE</span>,
-  expand_obj <span class="op">=</span> <span class="cn">TRUE</span>,
-  wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  echo <span class="op">=</span> <span class="cn">TRUE</span>,
-  eplus <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="fu">run_multi</span><span class="op">(</span>
-  <span class="va">model</span>,
-  <span class="va">weather</span>,
-  <span class="va">output_dir</span>,
-  design_day <span class="op">=</span> <span class="cn">FALSE</span>,
-  annual <span class="op">=</span> <span class="cn">FALSE</span>,
-  expand_obj <span class="op">=</span> <span class="cn">TRUE</span>,
-  wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  echo <span class="op">=</span> <span class="cn">TRUE</span>,
-  eplus <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_idf</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">weather</span>,</span>
+<span>  <span class="va">output_dir</span>,</span>
+<span>  design_day <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  annual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  expand_obj <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  echo <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eplus <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">run_multi</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">weather</span>,</span>
+<span>  <span class="va">output_dir</span>,</span>
+<span>  design_day <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  annual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  expand_obj <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  echo <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eplus <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -134,6 +134,8 @@
     <dl><dt>model</dt>
 <dd><p>A path (for <code>run_idf()</code>) or a vector of paths (for
 <code>run_multi()</code>) of EnergyPlus IDF or IMF files.</p></dd>
+
+
 <dt>weather</dt>
 <dd><p>A path (for <code>run_idf()</code>) or a vector of paths (for
 <code>run_multi()</code>) of EnergyPlus EPW weather files.
@@ -144,47 +146,67 @@ this case, that weather will be used for all simulations; otherwise,
 <code>model</code> and <code>weather</code> should have the same length. You can set to
 design-day-only simulation to some specific simulations by setting the
 corresponding weather to <code>NA</code>.</p></dd>
+
+
 <dt>output_dir</dt>
 <dd><p>Output directory path (for <code>rum_idf()</code>) or paths (for
 <code>run_mult()</code>). If NULL, the directory of input model is used. For
 <code>run_multi()</code>, <code>output_dir</code>, if not <code>NULL</code>, should have the same
 length as <code>model</code>. Any duplicated combination of <code>model</code> and
 <code>output_dir</code> is prohibited.</p></dd>
+
+
 <dt>design_day</dt>
 <dd><p>Force design-day-only simulation. For <code>rum_multi()</code>,
 <code>design_day</code> can also be a logical vector which has the same length as
 <code>model</code>. Note that <code>design_day</code> and <code>annual</code> cannot be all <code>TRUE</code> at
 the same time. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>annual</dt>
 <dd><p>Force annual simulation. For <code>rum_multi()</code>,
 <code>annual</code> can also be a logical vector which has the same length as
 <code>model</code>. Note that <code>design_day</code> and <code>annual</code> cannot be all <code>TRUE</code> at
 the same time. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>expand_obj</dt>
 <dd><p>Whether to run ExpandObject preprocessor before simulation.
 Default: TRUE.</p></dd>
+
+
 <dt>wait</dt>
 <dd><p>If <code>TRUE</code>, R will hang on and wait all EnergyPlus simulations
 finish. If <code>FALSE</code>, all EnergyPlus simulations are run in the
 background, and a <a href="http://processx.r-lib.org/reference/process.html" class="external-link">process</a> object is returned.</p></dd>
+
+
 <dt>echo</dt>
 <dd><p>Only applicable when <code>wait</code> is <code>TRUE</code>. Whether to show standard
 output and error from EnergyPlus for <code>run_idf()</code> and simulation status
 for <code>run_multi()</code>. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>eplus</dt>
 <dd><p>An acceptable input (for <code>run_idf()</code>) or inputs (for
 <code>run_multi()</code>) of <code><a href="use_eplus.html">use_eplus()</a></code> and <code><a href="use_eplus.html">eplus_config()</a></code>. If <code>NULL</code>, which
 is the default, the version of EnergyPlus to use is determined by the
 version of input model. For <code>run_multi()</code>, <code>eplus</code>, if not <code>NULL</code>,
 should have the same length as <code>model</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <ul><li><p>For <code>run_idf()</code>, if <code>wait</code> is <code>TRUE</code>, a named list of 11 elements:</p></li>
+    
+
+<ul><li><p>For <code>run_idf()</code>, if <code>wait</code> is <code>TRUE</code>, a named list of 11 elements:</p></li>
 </ul><table class="table table"><tr><td>No.</td><td>Column</td><td>Type</td><td>Description</td></tr><tr><td>1</td><td><code>idf</code></td><td><code>character(1)</code></td><td>Full path of input IDF file</td></tr><tr><td>2</td><td><code>epw</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Full path of input EPW file</td></tr><tr><td>3</td><td><code>version</code></td><td><code>character(1)</code></td><td>Version of called EnergyPlus</td></tr><tr><td>4</td><td><code>exit_status</code></td><td><code>integer(1)</code> or <code>NULL</code></td><td>Exit status of EnergyPlus. <code>NULL</code> if terminated or <code>wait</code> is <code>FALSE</code></td></tr><tr><td>5</td><td><code>start_time</code></td><td><code>POSIXct(1)</code></td><td>Start of time of simulation</td></tr><tr><td>6</td><td><code>end_time</code></td><td><code>POSIXct(1)</code> or <code>NULL</code></td><td>End of time of simulation. <code>NULL</code> if <code>wait</code> is <code>FALSE</code></td></tr><tr><td>7</td><td><code>output_dir</code></td><td><code>character(1)</code></td><td>Full path of simulation output directory</td></tr><tr><td>8</td><td><code>energyplus</code></td><td><code>character(1)</code></td><td>Full path of called EnergyPlus executable</td></tr><tr><td>9</td><td><code>stdout</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Standard output of EnergyPlus during simulation</td></tr><tr><td>10</td><td><code>stderr</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Standard error of EnergyPlus during simulation</td></tr><tr><td>11</td><td><code>process</code></td><td><a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">r_process</a></td><td>A process object which called EnergyPlus and ran the simulation</td></tr></table><p>If <code>wait</code> is <code>FALSE</code>, the <a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">R process</a> is directly returned.
 You can get the results by calling <code>result &lt;- proc$get_result()</code> (<code>proc</code> is
 the returned process). Please note that in this case, <code>result$process</code> will
-alwasy be <code>NULL</code>. But you can easily assign it by running <code>result$process &lt;- proc</code></p><ul><li><p>For <code>rum_multi()</code>, if <code>wait</code> is TRUE, a
+alwasy be <code>NULL</code>. But you can easily assign it by running <code>result$process &lt;- proc</code></p>
+
+
+<ul><li><p>For <code>rum_multi()</code>, if <code>wait</code> is TRUE, a
 <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> of 12 columns:</p><table class="table table"><tr><td>No.</td><td>Column</td><td>Type</td><td>Description</td></tr><tr><td>1</td><td><code>index</code></td><td><code>integer</code></td><td>Index of simulation</td></tr><tr><td>2</td><td><code>status</code></td><td><code>character</code></td><td>Simulation status</td></tr><tr><td>3</td><td><code>idf</code></td><td><code>character</code></td><td>Full path of input IDF file</td></tr><tr><td>4</td><td><code>epw</code></td><td><code>character</code></td><td>Full path of input EPW file. <code>NA</code> for design-day-only simulation</td></tr><tr><td>5</td><td><code>version</code></td><td><code>character</code></td><td>Version of EnergyPlus</td></tr><tr><td>6</td><td><code>exit_status</code></td><td><code>integer</code></td><td>Exit status of EnergyPlus. <code>NA</code> if terminated</td></tr><tr><td>7</td><td><code>start_time</code></td><td><code>POSIXct</code></td><td>Start of time of simulation</td></tr><tr><td>8</td><td><code>end_time</code></td><td><code>POSIXct</code></td><td>End of time of simulation.</td></tr><tr><td>9</td><td><code>output_dir</code></td><td><code>character</code></td><td>Full path of simulation output directory</td></tr><tr><td>10</td><td><code>energyplus</code></td><td><code>character</code></td><td>Full path of called EnergyPlus executable</td></tr><tr><td>11</td><td><code>stdout</code></td><td><code>list</code></td><td>Standard output of EnergyPlus during simulation</td></tr><tr><td>12</td><td><code>stderr</code></td><td><code>list</code></td><td>Standard error of EnergyPlus during simulation</td></tr></table><p>For column <code>status</code>, there are 4 possible values:</p><ul><li><p><code>"completed"</code>: the simulation job is completed successfully</p></li>
 <li><p><code>"failed"</code>: the simulation job ended with error</p></li>
 <li><p><code>"terminated"</code>: the simulation job started but was terminated</p></li>
@@ -231,28 +253,28 @@ interface to run EnergyPlus simulations and collect outputs.</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">idf_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="co"># run a single model</span></span>
-<span class="r-in">    <span class="va">epw_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span></span>
-<span class="r-in">        <span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>,</span>
-<span class="r-in">        <span class="st">"WeatherData"</span>,</span>
-<span class="r-in">        <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="fu">run_idf</span><span class="op">(</span><span class="va">idf_path</span>, <span class="va">epw_path</span>, output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># run multiple model in parallel</span></span>
-<span class="r-in">    <span class="va">idf_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles"</span>,</span>
-<span class="r-in">        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1ZoneUncontrolled.idf"</span>, <span class="st">"1ZoneUncontrolledFourAlgorithms.idf"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in">    <span class="va">epw_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">epw_path</span>, times <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">output_dirs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_path_sans_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">idf_paths</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">run_multi</span><span class="op">(</span><span class="va">idf_paths</span>, <span class="va">epw_paths</span>, output_dir <span class="op">=</span> <span class="va">output_dirs</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">idf_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="co"># run a single model</span></span></span>
+<span class="r-in"><span>    <span class="va">epw_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"WeatherData"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="fu">run_idf</span><span class="op">(</span><span class="va">idf_path</span>, <span class="va">epw_path</span>, output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># run multiple model in parallel</span></span></span>
+<span class="r-in"><span>    <span class="va">idf_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles"</span>,</span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1ZoneUncontrolled.idf"</span>, <span class="st">"1ZoneUncontrolledFourAlgorithms.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">epw_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">epw_path</span>, times <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">output_dirs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_path_sans_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">idf_paths</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">run_multi</span><span class="op">(</span><span class="va">idf_paths</span>, <span class="va">epw_paths</span>, output_dir <span class="op">=</span> <span class="va">output_dirs</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -267,7 +289,7 @@ interface to run EnergyPlus simulations and collect outputs.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

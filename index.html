@@ -144,44 +144,44 @@
 <h2 id="how-to-cite">How to cite<a class="anchor" aria-label="anchor" href="#how-to-cite"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; To cite eplusr in publications use:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   Hongyuan Jia, Adrian Chong (2021). eplusr: A framework for</span>
-<span class="co">#&gt;   integrating building energy simulation and data-driven analytics.</span>
-<span class="co">#&gt;   Energy and Buildings 237: 110757.</span>
-<span class="co">#&gt;   https://doi.org/10.1016/j.enbuild.2021.110757</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; A BibTeX entry for LaTeX users is</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   @Article{,</span>
-<span class="co">#&gt;     title = {eplusr: A framework for integrating building energy simulation and data-driven analytics},</span>
-<span class="co">#&gt;     author = {Hongyuan Jia and Adrian Chong},</span>
-<span class="co">#&gt;     year = {2020},</span>
-<span class="co">#&gt;     journal = {Energy and Buildings},</span>
-<span class="co">#&gt;     volume = {237},</span>
-<span class="co">#&gt;     url = {https://CRAN.R-project.org/package=eplusr},</span>
-<span class="co">#&gt;     doi = {10.1016/j.enbuild.2021.110757},</span>
-<span class="co">#&gt;   }</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; To cite eplusr in publications use:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Hongyuan Jia, Adrian Chong (2021). eplusr: A framework for</span></span>
+<span><span class="co">#&gt;   integrating building energy simulation and data-driven analytics.</span></span>
+<span><span class="co">#&gt;   Energy and Buildings 237: 110757.</span></span>
+<span><span class="co">#&gt;   https://doi.org/10.1016/j.enbuild.2021.110757</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   @Article{,</span></span>
+<span><span class="co">#&gt;     title = {eplusr: A framework for integrating building energy simulation and data-driven analytics},</span></span>
+<span><span class="co">#&gt;     author = {Hongyuan Jia and Adrian Chong},</span></span>
+<span><span class="co">#&gt;     year = {2020},</span></span>
+<span><span class="co">#&gt;     journal = {Energy and Buildings},</span></span>
+<span><span class="co">#&gt;     volume = {237},</span></span>
+<span><span class="co">#&gt;     url = {https://CRAN.R-project.org/package=eplusr},</span></span>
+<span><span class="co">#&gt;     doi = {10.1016/j.enbuild.2021.110757},</span></span>
+<span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the latest stable release of eplusr from CRAN.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span><span class="op">)</span></span></code></pre></div>
 <p>Alternatively, you can install the development version from GitHub.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span>, repos <span class="op">=</span> <span class="st">"https://hongyuanjia.r-universe.dev"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"eplusr"</span>, repos <span class="op">=</span> <span class="st">"https://hongyuanjia.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
 <p>Since running the IDF files requires EnergyPlus (<a href="https://energyplus.net" class="external-link uri">https://energyplus.net</a>), EnergyPlus has to be installed if you want to run EnergyPlus models in R. There are helper functions in eplusr to download and install it automatically on major operating systems (Windows, macOS and Linux):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install the latest version (currently v9.6.0)</span>
-<span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span>
-
-<span class="co"># OR download the latest version (currently v9.6.0) and run the installer</span>
-<span class="co"># manually by yourself</span>
-<span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">download_eplus</a></span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install the latest version (currently v9.6.0)</span></span>
+<span><span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">install_eplus</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># OR download the latest version (currently v9.6.0) and run the installer</span></span>
+<span><span class="co"># manually by yourself</span></span>
+<span><span class="fu">eplusr</span><span class="fu">::</span><span class="fu"><a href="reference/install_eplus.html">download_eplus</a></span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Note that the installation process in <code><a href="reference/install_eplus.html">install_eplus()</a></code> requires <strong>administrative privileges</strong>. You have to run R with administrator (or with sudo if you are on macOS or Linux) to make it work if you are not in interactive mode.</p>
 </div>
 <div class="section level2">
@@ -352,7 +352,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

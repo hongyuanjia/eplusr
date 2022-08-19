@@ -104,19 +104,19 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_idf_value</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  class <span class="op">=</span> <span class="cn">NULL</span>,
-  object <span class="op">=</span> <span class="cn">NULL</span>,
-  field <span class="op">=</span> <span class="cn">NULL</span>,
-  property <span class="op">=</span> <span class="cn">NULL</span>,
-  underscore <span class="op">=</span> <span class="cn">FALSE</span>,
-  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,
-  align <span class="op">=</span> <span class="cn">FALSE</span>,
-  complete <span class="op">=</span> <span class="cn">FALSE</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_idf_value</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  field <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  property <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  underscore <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  align <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  complete <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -124,46 +124,69 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>class</dt>
 <dd><p>An integer vector of valid class indexes or a character vector
 of valid class names. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>object</dt>
 <dd><p>An integer vector of valid object IDs or a character vector
 of valid object names. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>field</dt>
 <dd><p>An integer vector of valid field indexes or a character
 vector of valid field names (can be in in underscore style). <code>class</code>
 and <code>field</code> should have the same length.</p></dd>
+
+
 <dt>property</dt>
 <dd><p>A character vector of column names in field table to return.</p></dd>
+
+
 <dt>underscore</dt>
 <dd><p>If <code>TRUE</code>, input class name will be converted into
 underscore style name first and column <code>class_name_us</code> will be used
 for matching. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>ignore_case</dt>
 <dd><p>If <code>TRUE</code>, input object name will be converted into lower
 case and column <code>object_name_lower</code> will be used for matching.
 converted into underscore style name first and column <code>class_name_us</code>
 and <code>field_name_us</code> will be used for matching. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>align</dt>
 <dd><p>If <code>TRUE</code>, all objects in the same class will have the same
 field number. The number of fields is the same as the object that have
 the most fields among objects specified.  Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>complete</dt>
 <dd><p>If <code>TRUE</code>, at least fields till the current whole extensible
 group will be returned. A new column named "matched_rleid" will be
 created (when <code>property</code> is NULL) indicating if given field has been
 matched or not.</p></dd>
+
+
 <dt>all</dt>
 <dd><p>If <code>TRUE</code>, all available fields defined in IDD for the class that
 objects belong to will be returned. Default: <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.table containing specified columns.</p>
+    
+
+<p>A data.table containing specified columns.</p>
     </div>
 
   </div>
@@ -178,7 +201,7 @@ objects belong to will be returned. Default: <code>FALSE</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

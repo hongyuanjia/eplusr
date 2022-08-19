@@ -106,7 +106,7 @@ simulation results to the geometries.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">idf_viewer</span><span class="op">(</span><span class="va">geometry</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">idf_viewer</span><span class="op">(</span><span class="va">geometry</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -115,10 +115,13 @@ simulation results to the geometries.</p>
 <dd><p>An <a href="IdfGeometry.html">IdfGeometry</a> object. <code>geometry</code> can also be a
 path to an IDF file or an <a href="Idf.html">Idf</a> object. In this case, an
 <code>IdfGeometry</code> is created based on input <a href="Idf.html">Idf</a>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>IdfViewer</code> object.</p>
+    
+
+<p>An <code>IdfViewer</code> object.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -134,29 +137,29 @@ path to an IDF file or an <a href="Idf.html">Idf</a> object. In this case, an
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>IdfViewer$new()</code></a></p></li>
-<li><p><a href="#method-parent"><code>IdfViewer$parent()</code></a></p></li>
-<li><p><a href="#method-geometry"><code>IdfViewer$geometry()</code></a></p></li>
-<li><p><a href="#method-device"><code>IdfViewer$device()</code></a></p></li>
-<li><p><a href="#method-background"><code>IdfViewer$background()</code></a></p></li>
-<li><p><a href="#method-viewpoint"><code>IdfViewer$viewpoint()</code></a></p></li>
-<li><p><a href="#method-win_size"><code>IdfViewer$win_size()</code></a></p></li>
-<li><p><a href="#method-mouse_mode"><code>IdfViewer$mouse_mode()</code></a></p></li>
-<li><p><a href="#method-axis"><code>IdfViewer$axis()</code></a></p></li>
-<li><p><a href="#method-ground"><code>IdfViewer$ground()</code></a></p></li>
-<li><p><a href="#method-wireframe"><code>IdfViewer$wireframe()</code></a></p></li>
-<li><p><a href="#method-x_ray"><code>IdfViewer$x_ray()</code></a></p></li>
-<li><p><a href="#method-render_by"><code>IdfViewer$render_by()</code></a></p></li>
-<li><p><a href="#method-show"><code>IdfViewer$show()</code></a></p></li>
-<li><p><a href="#method-focus"><code>IdfViewer$focus()</code></a></p></li>
-<li><p><a href="#method-close"><code>IdfViewer$close()</code></a></p></li>
-<li><p><a href="#method-snapshot"><code>IdfViewer$snapshot()</code></a></p></li>
-<li><p><a href="#method-print"><code>IdfViewer$print()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-IdfViewer-new"><code>IdfViewer$new()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-parent"><code>IdfViewer$parent()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-geometry"><code>IdfViewer$geometry()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-device"><code>IdfViewer$device()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-background"><code>IdfViewer$background()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-viewpoint"><code>IdfViewer$viewpoint()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-win_size"><code>IdfViewer$win_size()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-mouse_mode"><code>IdfViewer$mouse_mode()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-axis"><code>IdfViewer$axis()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-ground"><code>IdfViewer$ground()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-wireframe"><code>IdfViewer$wireframe()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-x_ray"><code>IdfViewer$x_ray()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-render_by"><code>IdfViewer$render_by()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-show"><code>IdfViewer$show()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-focus"><code>IdfViewer$focus()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-close"><code>IdfViewer$close()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-snapshot"><code>IdfViewer$snapshot()</code></a></p></li>
+<li><p><a href="#method-IdfViewer-print"><code>IdfViewer$print()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-IdfViewer-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create an <code>IdfViewer</code> object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/IdfViewer.html">IdfViewer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">geometry</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/IdfViewer.html">IdfViewer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">geometry</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -192,11 +195,11 @@ viewer &lt;- IdfViewer$new(path_idf)
 </div>
 
 
-</div><p></p><hr><a id="method-parent"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-parent"></a><div class="section">
 <h3 id="method-parent-">Method <code>parent()</code><a class="anchor" aria-label="anchor" href="#method-parent-"></a></h3>
 <p>Get parent <a href="Idf.html">Idf</a> object</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -218,11 +221,11 @@ viewer$parent()
 </div>
 
 
-</div><p></p><hr><a id="method-geometry"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-geometry"></a><div class="section">
 <h3 id="method-geometry-">Method <code>geometry()</code><a class="anchor" aria-label="anchor" href="#method-geometry-"></a></h3>
 <p>Get parent <a href="IdfGeometry.html">IdfGeometry</a> object</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -243,11 +246,11 @@ viewer$geometry()
 </div>
 
 
-</div><p></p><hr><a id="method-device"></a><div class="section">
-<h3 id="method-device-">Method <code><a href="https://rdrr.io/r/grDevices/Devices.html" class="external-link">device()</a></code><a class="anchor" aria-label="anchor" href="#method-device-"></a></h3>
+</div><p></p><hr><a id="method-IdfViewer-device"></a><div class="section">
+<h3 id="method-device-">Method <code>device()</code><a class="anchor" aria-label="anchor" href="#method-device-"></a></h3>
 <p>Get Rgl device ID</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">device</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">device</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -270,11 +273,11 @@ viewer$device()
 </div>
 
 
-</div><p></p><hr><a id="method-background"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-background"></a><div class="section">
 <h3 id="method-background-">Method <code>background()</code><a class="anchor" aria-label="anchor" href="#method-background-"></a></h3>
 <p>Set the background color of the scene</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -295,18 +298,18 @@ viewer$background("blue")
 </div>
 
 
-</div><p></p><hr><a id="method-viewpoint"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-viewpoint"></a><div class="section">
 <h3 id="method-viewpoint-">Method <code>viewpoint()</code><a class="anchor" aria-label="anchor" href="#method-viewpoint-"></a></h3>
 <p>Set the viewpoint orientation of the scene</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span>
-  look_at <span class="op">=</span> <span class="st">"iso"</span>,
-  theta <span class="op">=</span> <span class="cn">NULL</span>,
-  phi <span class="op">=</span> <span class="cn">NULL</span>,
-  fov <span class="op">=</span> <span class="cn">NULL</span>,
-  zoom <span class="op">=</span> <span class="cn">NULL</span>,
-  scale <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span></span>
+<span>  look_at <span class="op">=</span> <span class="st">"iso"</span>,</span>
+<span>  theta <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  phi <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fov <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zoom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scale <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -356,11 +359,11 @@ viewer$viewpoint()
 </div>
 
 
-</div><p></p><hr><a id="method-win_size"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-win_size"></a><div class="section">
 <h3 id="method-win-size-">Method <code>win_size()</code><a class="anchor" aria-label="anchor" href="#method-win-size-"></a></h3>
 <p>Set the window size</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">win_size</span><span class="op">(</span>left <span class="op">=</span> <span class="fl">0</span>, top <span class="op">=</span> <span class="fl">0</span>, right <span class="op">=</span> <span class="fl">600</span>, bottom <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">win_size</span><span class="op">(</span>left <span class="op">=</span> <span class="fl">0</span>, top <span class="op">=</span> <span class="fl">0</span>, right <span class="op">=</span> <span class="fl">600</span>, bottom <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -382,16 +385,16 @@ viewer$win_size(0, 0, 400, 500)
 </div>
 
 
-</div><p></p><hr><a id="method-mouse_mode"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-mouse_mode"></a><div class="section">
 <h3 id="method-mouse-mode-">Method <code>mouse_mode()</code><a class="anchor" aria-label="anchor" href="#method-mouse-mode-"></a></h3>
 <p>Set the handlers of mouse control</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">mouse_mode</span><span class="op">(</span>
-  left <span class="op">=</span> <span class="st">"trackball"</span>,
-  right <span class="op">=</span> <span class="st">"pan"</span>,
-  middle <span class="op">=</span> <span class="st">"fov"</span>,
-  wheel <span class="op">=</span> <span class="st">"pull"</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">mouse_mode</span><span class="op">(</span></span>
+<span>  left <span class="op">=</span> <span class="st">"trackball"</span>,</span>
+<span>  right <span class="op">=</span> <span class="st">"pan"</span>,</span>
+<span>  middle <span class="op">=</span> <span class="st">"fov"</span>,</span>
+<span>  wheel <span class="op">=</span> <span class="st">"pull"</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -422,17 +425,17 @@ viewer$mouse_mode()
 </div>
 
 
-</div><p></p><hr><a id="method-axis"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-axis"></a><div class="section">
 <h3 id="method-axis-">Method <code><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis()</a></code><a class="anchor" aria-label="anchor" href="#method-axis-"></a></h3>
 <p>Toggle axis in the scene</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span>
-  add <span class="op">=</span> <span class="cn">TRUE</span>,
-  expand <span class="op">=</span> <span class="fl">2</span>,
-  width <span class="op">=</span> <span class="fl">1.5</span>,
-  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>, <span class="st">"orange"</span><span class="op">)</span>,
-  alpha <span class="op">=</span> <span class="fl">1</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span></span>
+<span>  add <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  expand <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">1.5</span>,</span>
+<span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>, <span class="st">"orange"</span><span class="op">)</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -481,11 +484,11 @@ viewer$axis()
 </div>
 
 
-</div><p></p><hr><a id="method-ground"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-ground"></a><div class="section">
 <h3 id="method-ground-">Method <code>ground()</code><a class="anchor" aria-label="anchor" href="#method-ground-"></a></h3>
 <p>Toggle ground in the scene</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span>add <span class="op">=</span> <span class="cn">TRUE</span>, expand <span class="op">=</span> <span class="fl">1.02</span>, color <span class="op">=</span> <span class="st">"#EDEDEB"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span>add <span class="op">=</span> <span class="cn">TRUE</span>, expand <span class="op">=</span> <span class="fl">1.02</span>, color <span class="op">=</span> <span class="st">"#EDEDEB"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -528,11 +531,11 @@ viewer$ground()
 </div>
 
 
-</div><p></p><hr><a id="method-wireframe"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-wireframe"></a><div class="section">
 <h3 id="method-wireframe-">Method <code>wireframe()</code><a class="anchor" aria-label="anchor" href="#method-wireframe-"></a></h3>
 <p>Toggle wireframe</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">wireframe</span><span class="op">(</span>add <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="fl">1.5</span>, color <span class="op">=</span> <span class="st">"black"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">wireframe</span><span class="op">(</span>add <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="fl">1.5</span>, color <span class="op">=</span> <span class="st">"black"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -575,11 +578,11 @@ viewer$wireframe()
 </div>
 
 
-</div><p></p><hr><a id="method-x_ray"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-x_ray"></a><div class="section">
 <h3 id="method-x-ray-">Method <code>x_ray()</code><a class="anchor" aria-label="anchor" href="#method-x-ray-"></a></h3>
 <p>Toggle X-ray face style</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span>on <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span>on <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -609,11 +612,11 @@ viewer$x_ray()
 </div>
 
 
-</div><p></p><hr><a id="method-render_by"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-render_by"></a><div class="section">
 <h3 id="method-render-by-">Method <code>render_by()</code><a class="anchor" aria-label="anchor" href="#method-render-by-"></a></h3>
 <p>Set render style</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"surface_type"</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"surface_type"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -654,18 +657,18 @@ viewer$render_by()
 </div>
 
 
-</div><p></p><hr><a id="method-show"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-show"></a><div class="section">
 <h3 id="method-show-">Method <code>show()</code><a class="anchor" aria-label="anchor" href="#method-show-"></a></h3>
 <p>Show <a href="Idf.html">Idf</a> geometry</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>
-  type <span class="op">=</span> <span class="st">"all"</span>,
-  zone <span class="op">=</span> <span class="cn">NULL</span>,
-  surface <span class="op">=</span> <span class="cn">NULL</span>,
-  width <span class="op">=</span> <span class="fl">1.5</span>,
-  dayl_color <span class="op">=</span> <span class="st">"red"</span>,
-  dayl_size <span class="op">=</span> <span class="fl">5</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span></span>
+<span>  type <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  zone <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  surface <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">1.5</span>,</span>
+<span>  dayl_color <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  dayl_size <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -722,11 +725,11 @@ viewer$show()
 </div>
 
 
-</div><p></p><hr><a id="method-focus"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-focus"></a><div class="section">
 <h3 id="method-focus-">Method <code>focus()</code><a class="anchor" aria-label="anchor" href="#method-focus-"></a></h3>
 <p>Bring the scene window to the top</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">focus</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">focus</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -738,11 +741,11 @@ viewer$top()
 </div>
 
 
-</div><p></p><hr><a id="method-close"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-close"></a><div class="section">
 <h3 id="method-close-">Method <code><a href="https://rdrr.io/r/base/connections.html" class="external-link">close()</a></code><a class="anchor" aria-label="anchor" href="#method-close-"></a></h3>
 <p>Close the scene window</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">close</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">close</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -754,11 +757,11 @@ viewer$close()
 </div>
 
 
-</div><p></p><hr><a id="method-snapshot"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-snapshot"></a><div class="section">
 <h3 id="method-snapshot-">Method <code>snapshot()</code><a class="anchor" aria-label="anchor" href="#method-snapshot-"></a></h3>
 <p>Capture and save current rgl view as an image</p><div class="section">
 <h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="va">filename</span>, webshot <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="va">filename</span>, webshot <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -802,11 +805,11 @@ viewer$snapshot(tempfile(fileext = ".png"))
 </div>
 
 
-</div><p></p><hr><a id="method-print"></a><div class="section">
+</div><p></p><hr><a id="method-IdfViewer-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print an <code>IdfViewer</code> object</p><div class="section">
 <h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -828,162 +831,162 @@ viewer$print()
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$new`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># example model shipped with eplusr from EnergyPlus v8.8</span></span>
-<span class="r-in"><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span> <span class="co"># v8.8</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># create from an Idf object</span></span>
-<span class="r-in"><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span>, <span class="fu"><a href="use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="fu">idf_viewer</span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">IdfViewer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># create from an IDF file</span></span>
-<span class="r-in"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="fu">idf_viewer</span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">IdfViewer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$parent`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$geometry`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$device`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">device</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$background`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"blue"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$viewpoint`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$win_size`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">win_size</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">400</span>, <span class="fl">500</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$mouse_mode`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">mouse_mode</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$axis`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$ground`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$wireframe`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">wireframe</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$x_ray`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$render_by`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$show`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$focus`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">top</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$close`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">close</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$snapshot`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".png"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `IdfViewer$print`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">viewer</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$new`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># example model shipped with eplusr from EnergyPlus v8.8</span></span></span>
+<span class="r-in"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span> <span class="co"># v8.8</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># create from an Idf object</span></span></span>
+<span class="r-in"><span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span>, <span class="fu"><a href="use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="fu">idf_viewer</span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">IdfViewer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># create from an IDF file</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="fu">idf_viewer</span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">IdfViewer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$parent`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$geometry`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$device`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">device</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$background`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"blue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$viewpoint`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$win_size`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">win_size</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">400</span>, <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$mouse_mode`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">mouse_mode</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$axis`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$ground`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$wireframe`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">wireframe</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$x_ray`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$render_by`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$show`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$focus`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">top</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$close`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">close</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$snapshot`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".png"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfViewer$print`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -998,7 +1001,7 @@ viewer$print()
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

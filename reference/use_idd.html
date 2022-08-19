@@ -104,13 +104,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">use_idd</span><span class="op">(</span><span class="va">idd</span>, download <span class="op">=</span> <span class="cn">FALSE</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span>
-
-<span class="fu">download_idd</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, dir <span class="op">=</span> <span class="st">"."</span><span class="op">)</span>
-
-<span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">is_avail_idd</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">use_idd</span><span class="op">(</span><span class="va">idd</span>, download <span class="op">=</span> <span class="cn">FALSE</span>, encoding <span class="op">=</span> <span class="st">"unknown"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">download_idd</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, dir <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">is_avail_idd</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -120,6 +120,8 @@
 string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
 file, usually named as <code>Energy+.idd</code>, or a valid version of IDD, e.g.
 <code>8.9</code>, <code>"8.9.0"</code>.</p></dd>
+
+
 <dt>download</dt>
 <dd><p>If <code>TRUE</code> and argument <code>idd</code>, the IDD file will be
 downloaded from <a href="https://github.com/NREL/EnergyPlus" class="external-link">EnergyPlus GitHub Repository</a>,
@@ -129,21 +131,30 @@ automatically download corresponding IDD file if the Idd object is
 currently not available. It is useful in case when you only want to edit
 an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt>encoding</dt>
 <dd><p>The file encoding of input IDD. Should be one of <code>"unknown"</code>,
 <code>"Latin-1" and </code>"UTF-8"<code>. The default is </code>"unknown"` which means that the
 file is encoded in the native encoding.</p></dd>
+
+
 <dt>ver</dt>
 <dd><p>A valid EnergyPlus version, e.g. <code>8</code>, <code>8.7</code>, <code>"8.7"</code> or <code>"8.7.0"</code>.
 For <code>download_idd()</code>, the special value <code>"latest"</code>, which is default,
 means the latest version.</p></dd>
+
+
 <dt>dir</dt>
 <dd><p>A directory to indicate where to save the IDD file. Default:
 current working directory.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <ul><li><p><code>use_idd()</code> returns an <code>Idd</code> object</p></li>
+    
+
+<ul><li><p><code>use_idd()</code> returns an <code>Idd</code> object</p></li>
 <li><p><code>download_idd()</code> returns an invisible integer <code>0</code> if succeed. Also an
 attribute named <code>file</code> which is the full path of the downloaded IDD file;</p></li>
 <li><p><code>avail_idd()</code> returns a <a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">numeric_version</a> vector
@@ -182,32 +193,32 @@ EnergyPlus IDD file</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># get all available Idd version</span></span>
-<span class="r-in"><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># check if specific version of Idd is available</span></span>
-<span class="r-in"><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.5</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># download latest IDD file from EnergyPlus GitHub repo</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">download_idd</span><span class="op">(</span><span class="st">"latest"</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># use specific version of Idd</span></span>
-<span class="r-in"><span class="co"># only works if EnergyPlus v8.8 has been found or Idd v8.8 exists</span></span>
-<span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># If Idd object is currently not avail_idd, automatically download IDD file</span></span>
-<span class="r-in"><span class="co"># from EnergyPlus GitHub repo and parse it</span></span>
-<span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># now Idd v8.8 should be available</span></span>
-<span class="r-in"><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get specific version of parsed Idd object</span></span>
-<span class="r-in"><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span> <span class="co"># should contain "8.8.0"</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># get all available Idd version</span></span></span>
+<span class="r-in"><span><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># check if specific version of Idd is available</span></span></span>
+<span class="r-in"><span><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># download latest IDD file from EnergyPlus GitHub repo</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">download_idd</span><span class="op">(</span><span class="st">"latest"</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use specific version of Idd</span></span></span>
+<span class="r-in"><span><span class="co"># only works if EnergyPlus v8.8 has been found or Idd v8.8 exists</span></span></span>
+<span class="r-in"><span><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># If Idd object is currently not avail_idd, automatically download IDD file</span></span></span>
+<span class="r-in"><span><span class="co"># from EnergyPlus GitHub repo and parse it</span></span></span>
+<span class="r-in"><span><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># now Idd v8.8 should be available</span></span></span>
+<span class="r-in"><span><span class="fu">is_avail_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get specific version of parsed Idd object</span></span></span>
+<span class="r-in"><span><span class="fu">use_idd</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">avail_idd</span><span class="op">(</span><span class="op">)</span> <span class="co"># should contain "8.8.0"</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -222,7 +233,7 @@ EnergyPlus IDD file</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

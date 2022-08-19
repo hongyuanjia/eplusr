@@ -104,44 +104,59 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_object_info</span><span class="op">(</span>
-  <span class="va">dt_object</span>,
-  component <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"class"</span><span class="op">)</span>,
-  by_class <span class="op">=</span> <span class="cn">FALSE</span>,
-  numbered <span class="op">=</span> <span class="cn">TRUE</span>,
-  collapse <span class="op">=</span> <span class="cn">NULL</span>,
-  prefix <span class="op">=</span> <span class="cn">NULL</span>,
-  name_prefix <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_object_info</span><span class="op">(</span></span>
+<span>  <span class="va">dt_object</span>,</span>
+<span>  component <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"class"</span><span class="op">)</span>,</span>
+<span>  by_class <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  numbered <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  collapse <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  name_prefix <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dt_object</dt>
 <dd><p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of object data</p></dd>
+
+
 <dt>component</dt>
 <dd><p>A character vector specifying what information to be
 formatted. Should be a subset of <code>"id"</code>, <code>"name"</code> and <code>"class"</code>.
 Defaults are all of them.</p></dd>
+
+
 <dt>by_class</dt>
 <dd><p>If <code>TRUE</code>, multiple objects in the same class will be
 concatenated. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>numbered</dt>
 <dd><p>If <code>TRUE</code>, a index number will be prepended. If <code>rleid</code>
 column exists in <code>dt_object</code>, its values will be used as the index
 numbers.</p></dd>
+
+
 <dt>collapse</dt>
 <dd><p>A single string used to collapse the results into a single
 string. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>prefix</dt>
 <dd><p>A character vector used to add at the beginning of object
 information. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>name_prefix</dt>
 <dd><p>If <code>TRUE</code>, Default: <code>TRUE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A character vector of the same length as the row number of input
+    
+
+<p>A character vector of the same length as the row number of input
 <code>dt_object</code> if <code>collapse</code> is <code>NULL</code>. Otherwise a single string.</p>
     </div>
 
@@ -157,7 +172,7 @@ information. Default: <code>NULL</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

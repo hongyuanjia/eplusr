@@ -110,22 +110,27 @@ For details on <code>ParametricJob</code>, please see ParametricJob class.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">param_job</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">param_job</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>idf</dt>
 <dd><p>A path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></dd>
+
+
 <dt>epw</dt>
 <dd><p>A path to EnergyPlus EPW file or an <code>Epw</code> object. <code>epw</code> can also
 be <code>NULL</code> which will force design-day-only simulation when
 <code>$run()</code> method is called. Note this needs at least
 one <code>Sizing:DesignDay</code> object exists in the <a href="Idf.html">Idf</a>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>ParametricJob</code> object.</p>
+    
+
+<p>A <code>ParametricJob</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -153,35 +158,35 @@ automatically created if it does not exists, like <a href="Idf.html">Idf</a> cla
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>ParametricJob$new()</code></a></p></li>
-<li><p><a href="#method-version"><code>ParametricJob$version()</code></a></p></li>
-<li><p><a href="#method-seed"><code>ParametricJob$seed()</code></a></p></li>
-<li><p><a href="#method-weather"><code>ParametricJob$weather()</code></a></p></li>
-<li><p><a href="#method-param"><code>ParametricJob$param()</code></a></p></li>
-<li><p><a href="#method-apply_measure"><code>ParametricJob$apply_measure()</code></a></p></li>
-<li><p><a href="#method-models"><code>ParametricJob$models()</code></a></p></li>
-<li><p><a href="#method-cases"><code>ParametricJob$cases()</code></a></p></li>
-<li><p><a href="#method-save"><code>ParametricJob$save()</code></a></p></li>
-<li><p><a href="#method-run"><code>ParametricJob$run()</code></a></p></li>
-<li><p><a href="#method-print"><code>ParametricJob$print()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors"><a href="EplusGroupJob.html#method-errors"><code>eplusr::EplusGroupJob$errors()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill"><a href="EplusGroupJob.html#method-kill"><code>eplusr::EplusGroupJob$kill()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files"><a href="EplusGroupJob.html#method-list_files"><code>eplusr::EplusGroupJob$list_files()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table"><a href="EplusGroupJob.html#method-list_table"><code>eplusr::EplusGroupJob$list_table()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output"><a href="EplusGroupJob.html#method-locate_output"><code>eplusr::EplusGroupJob$locate_output()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir"><a href="EplusGroupJob.html#method-output_dir"><code>eplusr::EplusGroupJob$output_dir()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_mdd"><a href="EplusGroupJob.html#method-read_mdd"><code>eplusr::EplusGroupJob$read_mdd()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_rdd"><a href="EplusGroupJob.html#method-read_rdd"><code>eplusr::EplusGroupJob$read_rdd()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_table"><a href="EplusGroupJob.html#method-read_table"><code>eplusr::EplusGroupJob$read_table()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data"><a href="EplusGroupJob.html#method-report_data"><code>eplusr::EplusGroupJob$report_data()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data_dict"><a href="EplusGroupJob.html#method-report_data_dict"><code>eplusr::EplusGroupJob$report_data_dict()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="status"><a href="EplusGroupJob.html#method-status"><code>eplusr::EplusGroupJob$status()</code></a></span></p></li>
-<li><p><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="tabular_data"><a href="EplusGroupJob.html#method-tabular_data"><code>eplusr::EplusGroupJob$tabular_data()</code></a></span></p></li>
-</ul></details></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-ParametricJob-new"><code>ParametricJob$new()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-version"><code>ParametricJob$version()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-seed"><code>ParametricJob$seed()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-weather"><code>ParametricJob$weather()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-param"><code>ParametricJob$param()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-apply_measure"><code>ParametricJob$apply_measure()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-models"><code>ParametricJob$models()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-cases"><code>ParametricJob$cases()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-save"><code>ParametricJob$save()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-run"><code>ParametricJob$run()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-print"><code>ParametricJob$print()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors"><a href="EplusGroupJob.html#method-errors"><code>eplusr::EplusGroupJob$errors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill"><a href="EplusGroupJob.html#method-kill"><code>eplusr::EplusGroupJob$kill()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files"><a href="EplusGroupJob.html#method-list_files"><code>eplusr::EplusGroupJob$list_files()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table"><a href="EplusGroupJob.html#method-list_table"><code>eplusr::EplusGroupJob$list_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output"><a href="EplusGroupJob.html#method-locate_output"><code>eplusr::EplusGroupJob$locate_output()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir"><a href="EplusGroupJob.html#method-output_dir"><code>eplusr::EplusGroupJob$output_dir()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_mdd"><a href="EplusGroupJob.html#method-read_mdd"><code>eplusr::EplusGroupJob$read_mdd()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_rdd"><a href="EplusGroupJob.html#method-read_rdd"><code>eplusr::EplusGroupJob$read_rdd()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_table"><a href="EplusGroupJob.html#method-read_table"><code>eplusr::EplusGroupJob$read_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data"><a href="EplusGroupJob.html#method-report_data"><code>eplusr::EplusGroupJob$report_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data_dict"><a href="EplusGroupJob.html#method-report_data_dict"><code>eplusr::EplusGroupJob$report_data_dict()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="status"><a href="EplusGroupJob.html#method-status"><code>eplusr::EplusGroupJob$status()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="tabular_data"><a href="EplusGroupJob.html#method-tabular_data"><code>eplusr::EplusGroupJob$tabular_data()</code></a></span></li>
+</ul></details></p><hr><a id="method-ParametricJob-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create a <code>ParametricJob</code> object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/ParametricJob.html">ParametricJob</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/ParametricJob.html">ParametricJob</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -223,11 +228,11 @@ if (is_avail_eplus(8.8)) {
 </div>
 
 
-</div><p></p><hr><a id="method-version"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-version"></a><div class="section">
 <h3 id="method-version-">Method <code><a href="https://rdrr.io/r/base/Version.html" class="external-link">version()</a></code><a class="anchor" aria-label="anchor" href="#method-version-"></a></h3>
 <p>Get the version of seed IDF</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -249,11 +254,11 @@ param$version()
 </div>
 
 
-</div><p></p><hr><a id="method-seed"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-seed"></a><div class="section">
 <h3 id="method-seed-">Method <code>seed()</code><a class="anchor" aria-label="anchor" href="#method-seed-"></a></h3>
 <p>Get the seed <a href="Idf.html">Idf</a> object</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -271,11 +276,11 @@ param$seed()
 </div>
 
 
-</div><p></p><hr><a id="method-weather"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-weather"></a><div class="section">
 <h3 id="method-weather-">Method <code>weather()</code><a class="anchor" aria-label="anchor" href="#method-weather-"></a></h3>
 <p>Get the <a href="Epw.html">Epw</a> object</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">weather</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">weather</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -294,11 +299,11 @@ param$weather()
 </div>
 
 
-</div><p></p><hr><a id="method-param"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-param"></a><div class="section">
 <h3 id="method-param-">Method <code>param()</code><a class="anchor" aria-label="anchor" href="#method-param-"></a></h3>
 <p>Set parameters for parametric simulations</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span><span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span>, .cross <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span><span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span>, .cross <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -350,14 +355,13 @@ class as one parameter.</p></li>
 levels being 0.01 to 0.1 m with a 0.1 m step.</p></li>
 <li><p>Field <code>Conductivity</code> in all objects in class <code>Material</code>, with 10
 levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</p></li>
-</ul><div class="sourceCode"><pre><code><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span>
-    `Supply Fan 1` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Fan_Total_Efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,
-    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,
-        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span><span class="op">)</span>
-    <span class="op">)</span>
-<span class="op">)</span></code></pre></div>
-
+</ul><p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>param<span class="sc">$</span><span class="fu">param</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Supply Fan 1</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="at">Fan_Total_Efficiency =</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>)),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Material :=</span> <span class="fu">list</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">Thickness =</span> <span class="fu">seq</span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">Conductivity =</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre><p></p></div>
 </div>
 
 <div class="section">
@@ -409,11 +413,11 @@ param$param(
 </div>
 
 
-</div><p></p><hr><a id="method-apply_measure"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-apply_measure"></a><div class="section">
 <h3 id="method-apply-measure-">Method <code>apply_measure()</code><a class="anchor" aria-label="anchor" href="#method-apply-measure-"></a></h3>
 <p>Create parametric models</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">measure</span>, <span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">measure</span>, <span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -499,11 +503,11 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30),
 </div>
 
 
-</div><p></p><hr><a id="method-models"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-models"></a><div class="section">
 <h3 id="method-models-">Method <code>models()</code><a class="anchor" aria-label="anchor" href="#method-models-"></a></h3>
 <p>Get created parametric <a href="Idf.html">Idf</a> objects</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span>names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span>names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -545,11 +549,11 @@ param$models()
 </div>
 
 
-</div><p></p><hr><a id="method-cases"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-cases"></a><div class="section">
 <h3 id="method-cases-">Method <code>cases()</code><a class="anchor" aria-label="anchor" href="#method-cases-"></a></h3>
 <p>Get a summary of parametric models and parameters</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -581,11 +585,11 @@ param$cases()
 </div>
 
 
-</div><p></p><hr><a id="method-save"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-save"></a><div class="section">
 <h3 id="method-save-">Method <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code><a class="anchor" aria-label="anchor" href="#method-save-"></a></h3>
 <p>Save parametric models</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>dir <span class="op">=</span> <span class="cn">NULL</span>, separate <span class="op">=</span> <span class="cn">TRUE</span>, copy_external <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>dir <span class="op">=</span> <span class="cn">NULL</span>, separate <span class="op">=</span> <span class="cn">TRUE</span>, copy_external <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -637,19 +641,19 @@ param$save(tempdir(), separate = FALSE)
 </div>
 
 
-</div><p></p><hr><a id="method-run"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-run"></a><div class="section">
 <h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
 <p>Run parametric simulations</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>
-  dir <span class="op">=</span> <span class="cn">NULL</span>,
-  wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  copy_external <span class="op">=</span> <span class="cn">FALSE</span>,
-  echo <span class="op">=</span> <span class="va">wait</span>,
-  separate <span class="op">=</span> <span class="cn">TRUE</span>,
-  readvars <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span></span>
+<span>  dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  copy_external <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  echo <span class="op">=</span> <span class="va">wait</span>,</span>
+<span>  separate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  readvars <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -735,11 +739,11 @@ print(param)
 </div>
 
 
-</div><p></p><hr><a id="method-print"></a><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print <code>ParametricJob</code> object</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -775,201 +779,201 @@ param$print()
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$new`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">     <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span>
-<span class="r-in">     <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># create from an IDF and an EPW</span></span>
-<span class="r-in">    <span class="va">param</span> <span class="op">&lt;-</span> <span class="fu">param_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">param</span> <span class="op">&lt;-</span> <span class="va">ParametricJob</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># create from an Idf and an Epw object</span></span>
-<span class="r-in">    <span class="fu">param_job</span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>, <span class="fu"><a href="read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$version`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$seed`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$weather`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">weather</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$param`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
-<span class="r-in">        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in">        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span>,</span>
-<span class="r-in">   <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># specify parameter values</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
-<span class="r-in">        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in">        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in">     <span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">    .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"thickness"</span>, <span class="st">"conduct"</span>, <span class="st">"fan_eff"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># each parameter should have the same length of values</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># use all combinations of parameters</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in">        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">    .cross <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$apply_measure`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># create a measure to change the orientation of the building</span></span>
-<span class="r-in"><span class="va">rotate_building</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">degree</span> <span class="op">=</span> <span class="fl">0L</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">idf</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">       <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input model does not have a Building object"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="kw">if</span> <span class="op">(</span><span class="va">degree</span> <span class="op">&gt;</span> <span class="fl">360</span> <span class="op">||</span> <span class="va">degree</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">360</span> <span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input degree should in range [-360, 360]"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">cur</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="va">Building</span><span class="op">$</span><span class="va">North_Axis</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">cur</span> <span class="op">+</span> <span class="va">degree</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="kw">if</span> <span class="op">(</span><span class="va">new</span> <span class="op">&gt;</span> <span class="fl">360</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">new</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span></span>
-<span class="r-in">        <span class="kw"><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning</a></span><span class="op">(</span><span class="st">"Calculated new north axis is greater than 360. "</span>,</span>
-<span class="r-in">            <span class="st">"Final north axis will be "</span>, <span class="va">new</span></span>
-<span class="r-in">        <span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">new</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">360</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">new</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="op">-</span><span class="fl">360</span></span>
-<span class="r-in">        <span class="kw"><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning</a></span><span class="op">(</span><span class="st">"Calculated new north axis is smaller than -360. "</span>,</span>
-<span class="r-in">            <span class="st">"Final north axis will be "</span>, <span class="va">new</span></span>
-<span class="r-in">        <span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">idf</span><span class="op">$</span><span class="va">Building</span><span class="op">$</span><span class="va">North_Axis</span> <span class="op">&lt;-</span> <span class="va">new</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">idf</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># apply measure</span></span>
-<span class="r-in"><span class="co"># this will create 12 models</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">rotate_building</span>, degree <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># apply measure with new names specified</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">rotate_building</span>, degree <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span>,</span>
-<span class="r-in">    .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"rotate_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$models`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$cases`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$save`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># save all parametric models with each model in a separate folder</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># save all parametric models with all models in the same folder</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, separate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$run`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># run parametric simulations</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">TRUE</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># run in background</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># get detailed job status by printing</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `ParametricJob$print`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">param</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$new`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>     <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>     <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># create from an IDF and an EPW</span></span></span>
+<span class="r-in"><span>    <span class="va">param</span> <span class="op">&lt;-</span> <span class="fu">param_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">param</span> <span class="op">&lt;-</span> <span class="va">ParametricJob</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># create from an Idf and an Epw object</span></span></span>
+<span class="r-in"><span>    <span class="fu">param_job</span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>, <span class="fu"><a href="read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$version`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$seed`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$weather`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">weather</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$param`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>   <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># specify parameter values</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>     <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"thickness"</span>, <span class="st">"conduct"</span>, <span class="st">"fan_eff"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># each parameter should have the same length of values</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use all combinations of parameters</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        Thickness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        Conductivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.6</span>, length.out <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"Supply Fan 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fan_total_efficiency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    .cross <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$apply_measure`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># create a measure to change the orientation of the building</span></span></span>
+<span class="r-in"><span><span class="va">rotate_building</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">degree</span> <span class="op">=</span> <span class="fl">0L</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">idf</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>       <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input model does not have a Building object"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="va">degree</span> <span class="op">&gt;</span> <span class="fl">360</span> <span class="op">||</span> <span class="va">degree</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">360</span> <span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input degree should in range [-360, 360]"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">cur</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="va">Building</span><span class="op">$</span><span class="va">North_Axis</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">cur</span> <span class="op">+</span> <span class="va">degree</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="va">new</span> <span class="op">&gt;</span> <span class="fl">360</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">new</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span></span></span>
+<span class="r-in"><span>        <span class="kw"><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning</a></span><span class="op">(</span><span class="st">"Calculated new north axis is greater than 360. "</span>,</span></span>
+<span class="r-in"><span>            <span class="st">"Final north axis will be "</span>, <span class="va">new</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">new</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">360</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="va">new</span> <span class="op">&lt;-</span> <span class="va">new</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="op">-</span><span class="fl">360</span></span></span>
+<span class="r-in"><span>        <span class="kw"><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning</a></span><span class="op">(</span><span class="st">"Calculated new north axis is smaller than -360. "</span>,</span></span>
+<span class="r-in"><span>            <span class="st">"Final north axis will be "</span>, <span class="va">new</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">idf</span><span class="op">$</span><span class="va">Building</span><span class="op">$</span><span class="va">North_Axis</span> <span class="op">&lt;-</span> <span class="va">new</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">idf</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># apply measure</span></span></span>
+<span class="r-in"><span><span class="co"># this will create 12 models</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">rotate_building</span>, degree <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># apply measure with new names specified</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">rotate_building</span>, degree <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    .names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"rotate_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">360</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$models`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$cases`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$save`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># save all parametric models with each model in a separate folder</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># save all parametric models with all models in the same folder</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, separate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$run`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># run parametric simulations</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">TRUE</span>, echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run in background</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># get detailed job status by printing</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$print`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -984,7 +988,7 @@ param$print()
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

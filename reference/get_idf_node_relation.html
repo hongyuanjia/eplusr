@@ -104,18 +104,18 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_idf_node_relation</span><span class="op">(</span>
-  <span class="va">idd_env</span>,
-  <span class="va">idf_env</span>,
-  object_id <span class="op">=</span> <span class="cn">NULL</span>,
-  value_id <span class="op">=</span> <span class="cn">NULL</span>,
-  object <span class="op">=</span> <span class="cn">NULL</span>,
-  class <span class="op">=</span> <span class="cn">NULL</span>,
-  group <span class="op">=</span> <span class="cn">NULL</span>,
-  name <span class="op">=</span> <span class="cn">FALSE</span>,
-  keep_all <span class="op">=</span> <span class="cn">FALSE</span>,
-  depth <span class="op">=</span> <span class="fl">0L</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_idf_node_relation</span><span class="op">(</span></span>
+<span>  <span class="va">idd_env</span>,</span>
+<span>  <span class="va">idf_env</span>,</span>
+<span>  object_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  value_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  keep_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  depth <span class="op">=</span> <span class="fl">0L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -123,40 +123,61 @@
     <dl><dt>idd_env</dt>
 <dd><p>An environment or list contains IDD tables including class,
 field, and reference.</p></dd>
+
+
 <dt>idf_env</dt>
 <dd><p>An environment or list contains IDF tables including object,
 value, and reference.</p></dd>
+
+
 <dt>object_id</dt>
 <dd><p>An integer vector of valid object IDs. If <code>NULL</code>, all object
 IDs in current IDF will be used.</p></dd>
+
+
 <dt>value_id</dt>
 <dd><p>An integer vector of valid value IDs. If <code>NULL</code>, all value
 IDs in current IDF will be used.</p></dd>
+
+
 <dt>object</dt>
 <dd><p>An integer vector of valid object IDs or a character vector
 of valid object names to specify the targeting relation objects.
 Default: <code>NULL</code>.</p></dd>
+
+
 <dt>class</dt>
 <dd><p>An integer vector of valid class indexes or a character vector
 of valid class names to specify the targeting relation classes.
 Default: <code>NULL</code>.</p></dd>
+
+
 <dt>group</dt>
 <dd><p>A character vector of valid group names to specify the targeting
 relation groups. Default: <code>NULL</code>.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>If <code>TRUE</code>, all class, object, field value ID and name columns
 will be added and a <code>IdfRelationTo</code> or <code>IdfRelationBy</code> object is
 returned with customized printing method. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>keep_all</dt>
 <dd><p>If <code>TRUE</code>, all input ID are kept. Otherwise, only input IDs
 that have relations are kept. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>depth</dt>
 <dd><p>Recursive reference relation depth. <code>NULL</code> means infinite.
 Default: <code>0L</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.table.</p>
+    
+
+<p>A data.table.</p>
     </div>
 
   </div>
@@ -171,7 +192,7 @@ Default: <code>0L</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

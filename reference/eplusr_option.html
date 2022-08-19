@@ -106,7 +106,7 @@ displays its results.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">eplusr_option</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">eplusr_option</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -115,10 +115,13 @@ displays its results.</p>
 <dd><p>Any available options to define, using <code>name = value</code>. All
 available options are shown below. If no options are given, all values of
 current options are returned. If a single option name, its value is returned.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If called directly, a named list of input option values. If input is
+    
+
+<p>If called directly, a named list of input option values. If input is
 a single option name, a length-one vector whose type is determined by
 that option. If input is new option values, a named list of newly set
 option values.</p>
@@ -153,8 +156,8 @@ and field names. Now autocompletion is enabled all the time.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># list all current options</span></span>
-<span class="r-in"><span class="fu">eplusr_option</span><span class="op">(</span><span class="op">)</span> <span class="co"># a named list</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># list all current options</span></span></span>
+<span class="r-in"><span><span class="fu">eplusr_option</span><span class="op">(</span><span class="op">)</span> <span class="co"># a named list</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $num_parallel</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -199,13 +202,13 @@ and field names. Now autocompletion is enabled all the time.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $view_in_ip</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get a specific option value</span></span>
-<span class="r-in"><span class="fu">eplusr_option</span><span class="op">(</span><span class="st">"verbose_info"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get a specific option value</span></span></span>
+<span class="r-in"><span><span class="fu">eplusr_option</span><span class="op">(</span><span class="st">"verbose_info"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># set options</span></span>
-<span class="r-in"><span class="fu">eplusr_option</span><span class="op">(</span>verbose_info <span class="op">=</span> <span class="cn">TRUE</span>, view_in_ip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># set options</span></span></span>
+<span class="r-in"><span><span class="fu">eplusr_option</span><span class="op">(</span>verbose_info <span class="op">=</span> <span class="cn">TRUE</span>, view_in_ip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $verbose_info</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -226,7 +229,7 @@ and field names. Now autocompletion is enabled all the time.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

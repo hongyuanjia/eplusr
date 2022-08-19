@@ -132,7 +132,7 @@
       <h1 data-toc-skip>Introduction to eplusr</h1>
                         <h4 data-toc-skip class="author">Hongyuan Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-05-11</h4>
+            <h4 data-toc-skip class="date">2022-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -162,35 +162,35 @@
 <p>Usually, when you try to edit an IDF, the corresponding EnergyPlus is likely to be installed already. If EnergyPlus is installed in standard location (<code>C:\EnergyPlusVX-Y-0</code> on Windows, <code>/usr/local/EnergyPlus-X-Y-0</code> on Linux and <code>/Applications/EnergyPlus-X-Y-0</code> on macOS), eplusr is able to find it and use the <code>Energy+.idd</code> file distributed with that release to parse the input IDF.</p>
 <p>You can get all detected EnergyPlus versions using <code><a href="../reference/use_eplus.html">avail_eplus()</a></code> and meta data of EnergyPlus configuration using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] '8.8.0'</span>
-
-<span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
-<span class="co">#&gt; $version</span>
-<span class="co">#&gt; [1] '8.8.0'</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $dir</span>
-<span class="co">#&gt; [1] "/usr/local/EnergyPlus-8-8-0"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $exe</span>
-<span class="co">#&gt; [1] "energyplus"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] '8.8.0'</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $version</span></span>
+<span><span class="co">#&gt; [1] '8.8.0'</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $dir</span></span>
+<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-8-8-0"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $exe</span></span>
+<span><span class="co">#&gt; [1] "energyplus"</span></span></code></pre></div>
 <p>If your EnergyPlus was not installed in standard location, you can add that location using <code><a href="../reference/use_eplus.html">use_eplus()</a></code>. After adding, all models of that version will use this path to call EnergyPlus.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV8-8-0"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV8-8-0"</span><span class="op">)</span></span></code></pre></div>
 <p>If the needed version of EnergyPlus was not installed, you can use <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">8.8</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">8.8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
 </h3>
 <p>Sometimes you may just want to edit the model without installing the whole EnergyPlus software. You can just download the IDD file of that version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code> to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will download IDD file for EnergyPlus v8.8.0, parse it and create an <code>Idd</code> object that will be used whenever parsing all EnergyPlus models of version v8.8.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span>
-
-<span class="co"># OR</span>
-<span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># OR</span></span>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -200,26 +200,26 @@
 <p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we have already got the IDD, we can just ignore the <code>idd</code> argument.</p>
 <p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is successfully located, all IDFs with versions lower than <code>X.Y</code> can be parsed. For example, if you have EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using simply <code>read_idf(path)</code> without specifying <code>idd</code>. This is because eplusr will use IDD files distributed with EnergyPlus VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
-<span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span>
-<span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
-<span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span>
-<span class="co">#&gt; Start parsing...</span>
-<span class="co">#&gt; Parsing completed.</span>
-
-<span class="va">model</span>
-<span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span>
-<span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transformer.idf'</span>
-<span class="co">#&gt;  * Version: '8.8.0'</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span>
-<span class="co">#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span>
-<span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span>
-<span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span>
-<span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span>
-<span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span></span>
+<span><span class="va">model</span></span>
+<span><span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  * Version: '8.8.0'</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span></span>
+<span><span class="co">#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span></span>
+<span><span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SimulationControl&gt;</span></span>
+<span><span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;Building&gt;</span></span>
+<span><span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Inside&gt;</span></span>
+<span><span class="co">#&gt; │─ [01&lt;O&gt;] Class: &lt;SurfaceConvectionAlgorithm:Outside&gt;</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="methods-in-idf-class">Methods in <code>Idf</code> class<a class="anchor" aria-label="anchor" href="#methods-in-idf-class"></a>
@@ -472,92 +472,92 @@
 </h2>
 <p>If you want to see what groups and classes exist in your model, use <code>$group_name()</code> and <code>$class_name()</code> respectively.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">group_name</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "Simulation Parameters"                        </span>
-<span class="co">#&gt;  [2] "Location and Climate"                         </span>
-<span class="co">#&gt;  [3] "Schedules"                                    </span>
-<span class="co">#&gt;  [4] "Surface Construction Elements"                </span>
-<span class="co">#&gt;  [5] "Thermal Zones and Surfaces"                   </span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">group_name</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "Simulation Parameters"                        </span></span>
+<span><span class="co">#&gt;  [2] "Location and Climate"                         </span></span>
+<span><span class="co">#&gt;  [3] "Schedules"                                    </span></span>
+<span><span class="co">#&gt;  [4] "Surface Construction Elements"                </span></span>
+<span><span class="co">#&gt;  [5] "Thermal Zones and Surfaces"                   </span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "Version"                                   </span>
-<span class="co">#&gt;  [2] "SimulationControl"                         </span>
-<span class="co">#&gt;  [3] "Building"                                  </span>
-<span class="co">#&gt;  [4] "SurfaceConvectionAlgorithm:Inside"         </span>
-<span class="co">#&gt;  [5] "SurfaceConvectionAlgorithm:Outside"        </span>
-<span class="va">....</span>
-
-<span class="co"># categorize by group names</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; $`Simulation Parameters`</span>
-<span class="co">#&gt; [1] "Version"                            "SimulationControl"                 </span>
-<span class="co">#&gt; [3] "Building"                           "SurfaceConvectionAlgorithm:Inside" </span>
-<span class="co">#&gt; [5] "SurfaceConvectionAlgorithm:Outside" "HeatBalanceAlgorithm"              </span>
-<span class="co">#&gt; [7] "Timestep"                          </span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "Version"                                   </span></span>
+<span><span class="co">#&gt;  [2] "SimulationControl"                         </span></span>
+<span><span class="co">#&gt;  [3] "Building"                                  </span></span>
+<span><span class="co">#&gt;  [4] "SurfaceConvectionAlgorithm:Inside"         </span></span>
+<span><span class="co">#&gt;  [5] "SurfaceConvectionAlgorithm:Outside"        </span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="co"># categorize by group names</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`Simulation Parameters`</span></span>
+<span><span class="co">#&gt; [1] "Version"                            "SimulationControl"                 </span></span>
+<span><span class="co">#&gt; [3] "Building"                           "SurfaceConvectionAlgorithm:Inside" </span></span>
+<span><span class="co">#&gt; [5] "SurfaceConvectionAlgorithm:Outside" "HeatBalanceAlgorithm"              </span></span>
+<span><span class="co">#&gt; [7] "Timestep"                          </span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <p>You can use <code>$is_valid_group()</code> and <code>$is_valid_class()</code> to check if curtain groups or names exist in current model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">is_valid_group</span><span class="op">(</span><span class="st">"Schedules"</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"ZoneInfiltration:DesignFlowRate"</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">is_valid_group</span><span class="op">(</span><span class="st">"Schedules"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"ZoneInfiltration:DesignFlowRate"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="class-definition">Class definition<a class="anchor" aria-label="anchor" href="#class-definition"></a>
 </h2>
 <p>You can get class definition using <code>$definition()</code>, which returns an <code>IddObject</code>. All required fields in each class are marked with <code>*</code>. For example, you can get the <code>IddObject</code> of class <code>Material</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">def_mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span>
-<span class="va">def_mat</span>
-<span class="co">#&gt; &lt;IddObject: 'Material'&gt;</span>
-<span class="co">#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   "Regular materials described with full set of thermal properties"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   * Group: 'Surface Construction Elements'</span>
-<span class="co">#&gt;   * Unique: FALSE</span>
-<span class="co">#&gt;   * Required: FALSE</span>
-<span class="co">#&gt;   * Total fields: 9</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   1*: Name</span>
-<span class="co">#&gt;   2*: Roughness</span>
-<span class="co">#&gt;   3*: Thickness</span>
-<span class="co">#&gt;   4*: Conductivity</span>
-<span class="co">#&gt;   5*: Density</span>
-<span class="co">#&gt;   6*: Specific Heat</span>
-<span class="co">#&gt;   7 : Thermal Absorptance</span>
-<span class="co">#&gt;   8 : Solar Absorptance</span>
-<span class="co">#&gt;   9 : Visible Absorptance</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">def_mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span></span>
+<span><span class="va">def_mat</span></span>
+<span><span class="co">#&gt; &lt;IddObject: 'Material'&gt;</span></span>
+<span><span class="co">#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   "Regular materials described with full set of thermal properties"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── PROPERTIES ──────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   * Group: 'Surface Construction Elements'</span></span>
+<span><span class="co">#&gt;   * Unique: FALSE</span></span>
+<span><span class="co">#&gt;   * Required: FALSE</span></span>
+<span><span class="co">#&gt;   * Total fields: 9</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   1*: Name</span></span>
+<span><span class="co">#&gt;   2*: Roughness</span></span>
+<span><span class="co">#&gt;   3*: Thickness</span></span>
+<span><span class="co">#&gt;   4*: Conductivity</span></span>
+<span><span class="co">#&gt;   5*: Density</span></span>
+<span><span class="co">#&gt;   6*: Specific Heat</span></span>
+<span><span class="co">#&gt;   7 : Thermal Absorptance</span></span>
+<span><span class="co">#&gt;   8 : Solar Absorptance</span></span>
+<span><span class="co">#&gt;   9 : Visible Absorptance</span></span></code></pre></div>
 <p>You can also achieve this using methods in <code>Idd</code> class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span>
-<span class="va">idd</span><span class="op">$</span><span class="va">Material</span>
-
-<span class="co"># OR</span>
-<span class="co"># idd$object("Material")</span>
-
-<span class="co"># OR</span>
-<span class="co"># idd_object(8.8, "Material")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
+<span></span>
+<span><span class="co"># OR</span></span>
+<span><span class="co"># idd$object("Material")</span></span>
+<span></span>
+<span><span class="co"># OR</span></span>
+<span><span class="co"># idd_object(8.8, "Material")</span></span></code></pre></div>
 <p>With the <code>IddObject</code>, you can easily get class and field properties using methods it has.</p>
 <p>For example, you can get all default field values using <code>$field_default()</code>. As we did not give any field index or name, a list is returned containing default values of all fields. The type of each value will be consistent with field definition.</p>
 <blockquote>
 <p>NOTE: For numeric fields with default values being <code>"autosize"</code> or <code>"autocalculate"</code>, the type of returned values will be “character”.</p>
 </blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">def_val</span> <span class="op">&lt;-</span> <span class="va">def_mat</span><span class="op">$</span><span class="fu">field_default</span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">def_val</span><span class="op">)</span>
-<span class="co">#&gt; List of 9</span>
-<span class="co">#&gt;  $ Name               : chr NA</span>
-<span class="co">#&gt;  $ Roughness          : chr NA</span>
-<span class="co">#&gt;  $ Thickness          : num NA</span>
-<span class="co">#&gt;  $ Conductivity       : num NA</span>
-<span class="co">#&gt;  $ Density            : num NA</span>
-<span class="co">#&gt;  $ Specific Heat      : num NA</span>
-<span class="co">#&gt;  $ Thermal Absorptance: num 0.9</span>
-<span class="co">#&gt;  $ Solar Absorptance  : num 0.7</span>
-<span class="co">#&gt;  $ Visible Absorptance: num 0.7</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">def_val</span> <span class="op">&lt;-</span> <span class="va">def_mat</span><span class="op">$</span><span class="fu">field_default</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">def_val</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 9</span></span>
+<span><span class="co">#&gt;  $ Name               : chr NA</span></span>
+<span><span class="co">#&gt;  $ Roughness          : chr NA</span></span>
+<span><span class="co">#&gt;  $ Thickness          : num NA</span></span>
+<span><span class="co">#&gt;  $ Conductivity       : num NA</span></span>
+<span><span class="co">#&gt;  $ Density            : num NA</span></span>
+<span><span class="co">#&gt;  $ Specific Heat      : num NA</span></span>
+<span><span class="co">#&gt;  $ Thermal Absorptance: num 0.9</span></span>
+<span><span class="co">#&gt;  $ Solar Absorptance  : num 0.7</span></span>
+<span><span class="co">#&gt;  $ Visible Absorptance: num 0.7</span></span></code></pre></div>
 <p>Please see <code><a href="../reference/IddObject.html">?IddObject</a></code> for detailed documentation on <code>IddObject</code> class.</p>
 </div>
 <div class="section level2">
@@ -565,198 +565,198 @@
 </h2>
 <p>In an <code>Idf</code>, each object in the model is assigned with an unique <code>ID</code> according to its appearance sequence in the IDF file. You can find all valid <code>ID</code>s using <code>$object_id()</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_id</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $Material</span>
-<span class="co">#&gt;  [1] 43 44 45 46 47 48 49 50 51 52</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Construction</span>
-<span class="co">#&gt; [1] 66 67 68 69 70 71 72</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_id</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $Material</span></span>
+<span><span class="co">#&gt;  [1] 43 44 45 46 47 48 49 50 51 52</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $Construction</span></span>
+<span><span class="co">#&gt; [1] 66 67 68 69 70 71 72</span></span></code></pre></div>
 <p>You can get all object names using <code>$object_name()</code>. If the class does not have name attribute, <code>NA</code> will returned.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Version"</span>, <span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $Version</span>
-<span class="co">#&gt; [1] NA</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Material</span>
-<span class="co">#&gt;  [1] "WD10" "RG01" "BR01" "IN46" "WD01" "PW03" "IN02" "GP01" "GP02" "CC03"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Construction</span>
-<span class="co">#&gt; [1] "ROOF-1"               "WALL-1"               "CLNG-1"              </span>
-<span class="co">#&gt; [4] "FLOOR-SLAB-1"         "INT-WALL-1"           "Dbl Clr 3mm/13mm Air"</span>
-<span class="co">#&gt; [7] "Sgl Grey 3mm"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Version"</span>, <span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $Version</span></span>
+<span><span class="co">#&gt; [1] NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $Material</span></span>
+<span><span class="co">#&gt;  [1] "WD10" "RG01" "BR01" "IN46" "WD01" "PW03" "IN02" "GP01" "GP02" "CC03"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $Construction</span></span>
+<span><span class="co">#&gt; [1] "ROOF-1"               "WALL-1"               "CLNG-1"              </span></span>
+<span><span class="co">#&gt; [4] "FLOOR-SLAB-1"         "INT-WALL-1"           "Dbl Clr 3mm/13mm Air"</span></span>
+<span><span class="co">#&gt; [7] "Sgl Grey 3mm"</span></span></code></pre></div>
 <p>Object number in each class can be retrieved using <code>$object_num()</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_num</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BuildingSurface:Detailed"</span>, <span class="st">"Material"</span>, <span class="st">"Output:Variable"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 40 10 13</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_num</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BuildingSurface:Detailed"</span>, <span class="st">"Material"</span>, <span class="st">"Output:Variable"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 40 10 13</span></span></code></pre></div>
 <p>Having the object ID or name, you can easily get any object using <code>$object()</code> which returns an <code>IdfObject</code> or using <code>$objects()</code> which returns a list of <code>IdfObject</code>s.</p>
 <blockquote>
 <p>NOTE: The matching of object names is case-insensitive. For instance, <code>model$object("rOoF")</code> is equivalent to <code>model$object("roof")</code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $WD10</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span>
-<span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 513,            !- Density {kg/m3}</span>
-<span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`ROOF-1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:66] `ROOF-1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "ROOF-1",   !- Name</span>
-<span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $WD10</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 513,            !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`ROOF-1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:66] `ROOF-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "ROOF-1",   !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></span></code></pre></div>
 <p>If you want to get all objects in a single class, use <code>$objects_in_class()</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">objects_in_class</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span>
-<span class="co">#&gt; $WD10</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span>
-<span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 513,            !- Density {kg/m3}</span>
-<span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $RG01</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:44] `RG01`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "RG01",     !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.0127,     !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 1.442,      !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 881,        !- Density {kg/m3}</span>
-<span class="co">#&gt; │─ 6*: 1674,       !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; │─ 7 : 0.9,        !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 8 : 0.65,       !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 9 : 0.65;       !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $BR01</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:45] `BR01`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "BR01",         !- Name</span>
-<span class="va">....</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">objects_in_class</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $WD10</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 513,            !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $RG01</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:44] `RG01`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "RG01",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.0127,     !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 1.442,      !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 881,        !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; │─ 6*: 1674,       !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; │─ 7 : 0.9,        !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 8 : 0.65,       !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 9 : 0.65;       !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $BR01</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:45] `BR01`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "BR01",         !- Name</span></span>
+<span><span class="va">....</span></span></code></pre></div>
 <p>Also, you can get all objects in a single class using <code>"$"</code> or <code>"[["</code>. Class names can be given in underscore-style. For example, you can just use <code>model$Material_NoMass</code> instead of <code>model$`Material:Nomass`</code> to save some typings.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span>
-<span class="co">#&gt; $CP01</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:53] `CP01`</span>
-<span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt; ├─ 1*: "CP01",     !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.367,      !- Thermal Resistance {m2-K/W}</span>
-<span class="co">#&gt; │─ 4 : 0.9,        !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 5 : 0.75,       !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 6 : 0.75;       !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`MAT-SB-U`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:54] `MAT-SB-U`</span>
-<span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt; ├─ 1*: "MAT-SB-U",    !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",       !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.117406666,   !- Thermal Resistance {m2-K/W}</span>
-<span class="co">#&gt; │─ 4 : 0.65,          !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 5 : 0.65,          !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 6 : 0.65;          !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`MAT-CLNG-1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:55] `MAT-CLNG-1`</span>
-<span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt; ├─ 1*: "MAT-CLNG-1", !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",      !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.65225929,   !- Thermal Resistance {m2-K/W}</span>
-<span class="co">#&gt; │─ 4 : 0.65,         !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 5 : 0.65,         !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 6 : 0.65;         !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="va">....</span>
-<span class="co"># OR</span>
-<span class="co"># model[["Material_NoMass"]]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span></span>
+<span><span class="co">#&gt; $CP01</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:53] `CP01`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "CP01",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.367,      !- Thermal Resistance {m2-K/W}</span></span>
+<span><span class="co">#&gt; │─ 4 : 0.9,        !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 5 : 0.75,       !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 6 : 0.75;       !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`MAT-SB-U`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:54] `MAT-SB-U`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "MAT-SB-U",    !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",       !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.117406666,   !- Thermal Resistance {m2-K/W}</span></span>
+<span><span class="co">#&gt; │─ 4 : 0.65,          !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 5 : 0.65,          !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 6 : 0.65;          !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`MAT-CLNG-1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:55] `MAT-CLNG-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "MAT-CLNG-1", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",      !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.65225929,   !- Thermal Resistance {m2-K/W}</span></span>
+<span><span class="co">#&gt; │─ 4 : 0.65,         !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 5 : 0.65,         !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 6 : 0.65;         !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="va">....</span></span>
+<span><span class="co"># OR</span></span>
+<span><span class="co"># model[["Material_NoMass"]]</span></span></code></pre></div>
 <p>Based on the above, if you want to get the first object in class <code>RunPeriod</code>, you can simply run:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rp</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">rp</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <p>For unique object, such like <code>SimulationControl</code> and <code>Building</code>, you can use <code>$object_unique()</code> which returns a single <code>IdfObject</code> object.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_unique</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Building'&gt; [ID:3] `Building`</span>
-<span class="co">#&gt; Class: &lt;Building&gt;</span>
-<span class="co">#&gt; ├─ 1: "Building",     !- Name</span>
-<span class="co">#&gt; │─ 2: 30,             !- North Axis {deg}</span>
-<span class="co">#&gt; │─ 3: "City",         !- Terrain</span>
-<span class="co">#&gt; │─ 4: 0.04,           !- Loads Convergence Tolerance Value</span>
-<span class="co">#&gt; │─ 5: 0.4,            !- Temperature Convergence Tolerance Value {deltaC}</span>
-<span class="co">#&gt; │─ 6: "FullExterior", !- Solar Distribution</span>
-<span class="co">#&gt; │─ 7: 25,             !- Maximum Number of Warmup Days</span>
-<span class="co">#&gt; └─ 8: 6;              !- Minimum Number of Warmup Days</span>
-
-<span class="co"># OR just</span>
-<span class="co"># model$Building</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_unique</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Building'&gt; [ID:3] `Building`</span></span>
+<span><span class="co">#&gt; Class: &lt;Building&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1: "Building",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2: 30,             !- North Axis {deg}</span></span>
+<span><span class="co">#&gt; │─ 3: "City",         !- Terrain</span></span>
+<span><span class="co">#&gt; │─ 4: 0.04,           !- Loads Convergence Tolerance Value</span></span>
+<span><span class="co">#&gt; │─ 5: 0.4,            !- Temperature Convergence Tolerance Value {deltaC}</span></span>
+<span><span class="co">#&gt; │─ 6: "FullExterior", !- Solar Distribution</span></span>
+<span><span class="co">#&gt; │─ 7: 25,             !- Maximum Number of Warmup Days</span></span>
+<span><span class="co">#&gt; └─ 8: 6;              !- Minimum Number of Warmup Days</span></span>
+<span></span>
+<span><span class="co"># OR just</span></span>
+<span><span class="co"># model$Building</span></span></code></pre></div>
 <p>Many fields in a model can be referred by others. For example, the <code>Outside Layer</code> and other fields in <code>Construction</code> class refer to the <code>Name</code> field in <code>Material</code> class and other material related classes. Here it means that the <code>Outside Layer</code> field <strong>refers to</strong> the <code>Name</code> field and the <code>Name</code> field is <strong>referred by</strong> the <code>Outside Layer</code>. <code>$object_relation()</code> provides a simple interface to get this kind of relation. It takes a single object ID or name and also a relation direction, and returns an <code>IdfRelation</code> object which contains data presenting such relation above.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"Material:NoMass"</span><span class="op">)</span>
-<span class="co">#&gt; $`Material:NoMass`</span>
-<span class="co">#&gt; [1] "CP01"        "MAT-SB-U"    "MAT-CLNG-1"  "MAT-FLOOR-1"</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) does not refer to any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span>
-<span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span>
-<span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span>
-<span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"Material:NoMass"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`Material:NoMass`</span></span>
+<span><span class="co">#&gt; [1] "CP01"        "MAT-SB-U"    "MAT-CLNG-1"  "MAT-FLOOR-1"</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span></span>
+<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
 <p>Above shows that no-mass material <code>MAT-CLNG-1</code> is used at the outside layer of a construction named <code>CLNG-1</code>. You can extract both of them using <code>$objects_in_relation()</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat_const</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">objects_in_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, <span class="st">"ref_by"</span><span class="op">)</span>
-<span class="va">mat_const</span>
-<span class="co">#&gt; $`MAT-CLNG-1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:55] `MAT-CLNG-1`</span>
-<span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt; ├─ 1*: "MAT-CLNG-1", !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",      !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.65225929,   !- Thermal Resistance {m2-K/W}</span>
-<span class="co">#&gt; │─ 4 : 0.65,         !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 5 : 0.65,         !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 6 : 0.65;         !- Visible Absorptance</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`CLNG-1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span>
-<span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mat_const</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">objects_in_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, <span class="st">"ref_by"</span><span class="op">)</span></span>
+<span><span class="va">mat_const</span></span>
+<span><span class="co">#&gt; $`MAT-CLNG-1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material:NoMass'&gt; [ID:55] `MAT-CLNG-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "MAT-CLNG-1", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",      !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.65225929,   !- Thermal Resistance {m2-K/W}</span></span>
+<span><span class="co">#&gt; │─ 4 : 0.65,         !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 5 : 0.65,         !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 6 : 0.65;         !- Visible Absorptance</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`CLNG-1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span></span>
+<span><span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></span></code></pre></div>
 <p>After you get the objects, you can perform detailed modifications on them using methods <code>$set()</code> in both <code>Idf</code> and <code>IdfObject</code> class.</p>
 <p>Similarly, you can use <code>"$"</code> and <code>"[["</code> to get a single value in an <code>IdfObject</code> class or <code>"["</code> to get multiple values just like normal lists in R.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rp</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span>
-<span class="co">#&gt; [1] 14</span>
-
-<span class="co"># OR</span>
-<span class="co"># rp[["Begin Day of Month"]]</span>
-<span class="co"># rp[[3]]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">rp</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span></span>
+<span><span class="co">#&gt; [1] 14</span></span>
+<span></span>
+<span><span class="co"># OR</span></span>
+<span><span class="co"># rp[["Begin Day of Month"]]</span></span>
+<span><span class="co"># rp[[3]]</span></span></code></pre></div>
 <p>You can also make a chain.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">WinterDay</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span>
-<span class="co">#&gt; [1] 14</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">WinterDay</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span></span>
+<span><span class="co">#&gt; [1] 14</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="modify-object">Modify object<a class="anchor" aria-label="anchor" href="#modify-object"></a>
@@ -771,36 +771,36 @@
 </h3>
 <p><code>$dup()</code> duplicates objects specified by object IDs or names. If the target classes have a name attribute, you can assign new names to the duplicated objects in form <code>new_name = "old_name"</code>. If new name is not given, the newly added object will have the same name as the original object except a appended suffix of “<code>1</code>”, “<code>2</code>” and etc.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">dup</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>my_roof <span class="op">=</span> <span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; New names of duplicated objects not given are automatically generated:</span>
-<span class="co">#&gt;  #2| Object ID [324] in class 'Construction' --&gt; New object name 'ROOF-1 1'</span>
-<span class="co">#&gt;  #3| Object ID [325] in class 'Construction' --&gt; New object name 'WALL-1 1'</span>
-<span class="co">#&gt; $my_roof</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:323] `my_roof`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "my_roof",  !- Name</span>
-<span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`ROOF-1 1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:324] `ROOF-1 1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "ROOF-1 1", !- Name</span>
-<span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $`WALL-1 1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:325] `WALL-1 1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "WALL-1 1", !- Name</span>
-<span class="co">#&gt; │─ 2*: "WD01",     !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "PW03",     !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN02",     !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "GP01";     !- Layer 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">dup</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>my_roof <span class="op">=</span> <span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; New names of duplicated objects not given are automatically generated:</span></span>
+<span><span class="co">#&gt;  #2| Object ID [324] in class 'Construction' --&gt; New object name 'ROOF-1 1'</span></span>
+<span><span class="co">#&gt;  #3| Object ID [325] in class 'Construction' --&gt; New object name 'WALL-1 1'</span></span>
+<span><span class="co">#&gt; $my_roof</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:323] `my_roof`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "my_roof",  !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`ROOF-1 1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:324] `ROOF-1 1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "ROOF-1 1", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`WALL-1 1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:325] `WALL-1 1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "WALL-1 1", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "WD01",     !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "PW03",     !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN02",     !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "GP01";     !- Layer 4</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="add-new-objects-using-lists-idfadd">Add new objects using lists (<code>Idf$add()</code>)<a class="anchor" aria-label="anchor" href="#add-new-objects-using-lists-idfadd"></a>
@@ -810,89 +810,89 @@
 <p>You can also add new comments alongside with new values using the special element <code>.comment</code>.</p>
 <p>For example, here we add two new objects with comments in <code>RunPeriod</code> class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">rp1</span>,
-  RunPeriod <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,
-    ..4 <span class="op">=</span> <span class="fl">4</span>, ..5 <span class="op">=</span> <span class="fl">1</span>, .comment <span class="op">=</span> <span class="st">"Comment for new object 2"</span>
-  <span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt; $rp_test_1</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_1`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !Comment for new object 1</span>
-<span class="co">#&gt; !Another comment</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "rp_test_1",      !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 2,                !- End Month</span>
-<span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $rp_test_2</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !Comment for new object 2</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "rp_test_2",      !- Name</span>
-<span class="co">#&gt; │─ 02*: 3,                !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 4,                !- End Month</span>
-<span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">rp1</span>,</span>
+<span>  RunPeriod <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    ..4 <span class="op">=</span> <span class="fl">4</span>, ..5 <span class="op">=</span> <span class="fl">1</span>, .comment <span class="op">=</span> <span class="st">"Comment for new object 2"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; $rp_test_1</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_1`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; !Comment for new object 1</span></span>
+<span><span class="co">#&gt; !Another comment</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "rp_test_1",      !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 2,                !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rp_test_2</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; !Comment for new object 2</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "rp_test_2",      !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 3,                !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 4,                !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <p>Note that the use <code>.()</code> inside <code>$add()</code>. It is just an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code>=</code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rough"</span>, <span class="st">"MediumSmooth"</span>, <span class="st">"Smooth"</span><span class="op">)</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,
-  <span class="fl">0.72</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1800</span>, <span class="fl">1850</span>, <span class="fl">1800</span><span class="op">)</span>,
-  <span class="fl">840</span>
-<span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $mat1</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:328] `mat1`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "mat1",     !- Name</span>
-<span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.05,       !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.72,       !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 1800,       !- Density {kg/m3}</span>
-<span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $mat2</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:329] `mat2`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "mat2",         !- Name</span>
-<span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.1,            !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.72,           !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 1850,           !- Density {kg/m3}</span>
-<span class="co">#&gt; └─ 6*: 840;            !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $mat3</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:330] `mat3`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "mat3",     !- Name</span>
-<span class="co">#&gt; │─ 2*: "Smooth",   !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.2,        !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.72,       !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 1800,       !- Density {kg/m3}</span>
-<span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rough"</span>, <span class="st">"MediumSmooth"</span>, <span class="st">"Smooth"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
+<span>  <span class="fl">0.72</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1800</span>, <span class="fl">1850</span>, <span class="fl">1800</span><span class="op">)</span>,</span>
+<span>  <span class="fl">840</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $mat1</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:328] `mat1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "mat1",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Rough",    !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.05,       !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.72,       !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 1800,       !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mat2</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:329] `mat2`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "mat2",         !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.1,            !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.72,           !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 1850,           !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; └─ 6*: 840;            !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mat3</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:330] `mat3`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "mat3",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "Smooth",   !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.2,        !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.72,       !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 1800,       !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="set-new-values-and-comments-using-lists-idfset">Set new values and comments using lists (<code>Idf$set()</code>)<a class="anchor" aria-label="anchor" href="#set-new-values-and-comments-using-lists-idfset"></a>
@@ -900,423 +900,423 @@
 <p>Changing values of existing objects can be conducted using <code>$set()</code> in <code>Idf</code> and <code>IdfObject</code>:</p>
 <p>Note that you can also use <code>.()</code> here as an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>
-  rp_test_1 <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,
-    .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"begin day has been changed."</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt; $rp_test_3</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2022-05-11</span>
-<span class="co">#&gt; !begin day has been changed.</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "rp_test_3",      !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 2,                !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 2,                !- End Month</span>
-<span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
+<span>  rp_test_1 <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>    .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"begin day has been changed."</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; $rp_test_3</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; !2022-08-19</span></span>
+<span><span class="co">#&gt; !begin day has been changed.</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "rp_test_3",      !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 2,                !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 2,                !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <p>You can modify all objects in a class using <code>class := list(...)</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>
-  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,
-  ..8 <span class="op">=</span> <span class="st">"No"</span>
-<span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $WinterDay</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 1,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $SummerDay</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span>
-<span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 7,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $rp_test_3</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !2022-05-11</span>
-<span class="co">#&gt; !begin day has been changed.</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "rp_test_3", !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 2,           !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 2,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Wednesday", !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $rp_test_2</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; !Comment for new object 2</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "rp_test_2", !- Name</span>
-<span class="co">#&gt; │─ 02*: 3,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 1,           !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 4,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Thursday",  !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
+<span>  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,</span>
+<span>  ..8 <span class="op">=</span> <span class="st">"No"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $WinterDay</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 1,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $SummerDay</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 7,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rp_test_3</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; !2022-08-19</span></span>
+<span><span class="co">#&gt; !begin day has been changed.</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "rp_test_3", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 2,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 2,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Wednesday", !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rp_test_2</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; !Comment for new object 2</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "rp_test_2", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 3,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 1,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 4,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Thursday",  !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <blockquote>
 <p>If the target class is store as a variable, e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside <code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
 </blockquote>
 <p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; $WinterDay</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 1,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $SummerDay</span>
-<span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span>
-<span class="co">#&gt; Class: &lt;RunPeriod&gt;</span>
-<span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span>
-<span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span>
-<span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span>
-<span class="co">#&gt; │─ 04*: 7,           !- End Month</span>
-<span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span>
-<span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span>
-<span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span>
-<span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span>
-<span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span>
-<span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span>
-<span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $WinterDay</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 1,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $SummerDay</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span></span>
+<span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: 7,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <p>For setting a single value on one object, you can write it in a chain:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">rp_test_2</span><span class="op">$</span><span class="va">End_Day_of_Month</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; [1] 2</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">rp_test_2</span><span class="op">$</span><span class="va">End_Day_of_Month</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
 <p>Also, if the modified fields are referenced by fields in other objects, the corresponding fields will also be updated.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">CC03</span>
-
-<span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) does not refer to any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Material&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:52] &lt;CC03&gt;</span>
-<span class="co">#&gt;      └─ 1: "CC03";        !- Name</span>
-<span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span>
-<span class="co">#&gt;               └─ 2: "CC03";        !- Outside Layer</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span>
-
-<span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"CC03_renamed"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:52] `CC03_renamed`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "CC03_renamed", !- Name</span>
-<span class="co">#&gt; │─ 2*: "MediumRough",  !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.1016,         !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 1.31,           !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 2243,           !- Density {kg/m3}</span>
-<span class="co">#&gt; │─ 6*: 837,            !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 8 : 0.65,           !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 9 : 0.65;           !- Visible Absorptance</span>
-
-<span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) does not refer to any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Material&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:52] &lt;CC03_renamed&gt;</span>
-<span class="co">#&gt;      └─ 1: "CC03_renamed";!- Name</span>
-<span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span>
-<span class="co">#&gt;               └─ 2: "CC03_renamed";!- Outside Layer</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">CC03</span></span>
+<span></span>
+<span><span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:52] &lt;CC03&gt;</span></span>
+<span><span class="co">#&gt;      └─ 1: "CC03";        !- Name</span></span>
+<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span></span>
+<span><span class="co">#&gt;               └─ 2: "CC03";        !- Outside Layer</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span>
+<span></span>
+<span><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"CC03_renamed"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:52] `CC03_renamed`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "CC03_renamed", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "MediumRough",  !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.1016,         !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 1.31,           !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 2243,           !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; │─ 6*: 837,            !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 8 : 0.65,           !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 9 : 0.65;           !- Visible Absorptance</span></span>
+<span></span>
+<span><span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:52] &lt;CC03_renamed&gt;</span></span>
+<span><span class="co">#&gt;      └─ 1: "CC03_renamed";!- Name</span></span>
+<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span></span>
+<span><span class="co">#&gt;               └─ 2: "CC03_renamed";!- Outside Layer</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
 <p>Sometimes, you may want to get all possible values of fields before you change them. You can achieve that by using <code>$value_possible()</code> method in <code>IdfObject</code> class.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Auto value: &lt;NA&gt;</span>
-<span class="co">#&gt; * Default: &lt;NA&gt;</span>
-<span class="co">#&gt; * Choice:</span>
-<span class="co">#&gt;   - "VeryRough"</span>
-<span class="co">#&gt;   - "Rough"</span>
-<span class="co">#&gt;   - "MediumRough"</span>
-<span class="co">#&gt;   - "MediumSmooth"</span>
-<span class="co">#&gt;   - "Smooth"</span>
-<span class="co">#&gt;   - "......"</span>
-<span class="co">#&gt; * Source: &lt;NA&gt;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── 7: Thermal Absorptance ──────────────────────────────────────────────────────</span>
-<span class="co">#&gt; * Auto value: &lt;NA&gt;</span>
-<span class="co">#&gt; * Default: 0.9</span>
-<span class="co">#&gt; * Choice: &lt;NA&gt;</span>
-<span class="co">#&gt; * Source: &lt;NA&gt;</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; * Auto value: &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; * Default: &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; * Choice:</span></span>
+<span><span class="co">#&gt;   - "VeryRough"</span></span>
+<span><span class="co">#&gt;   - "Rough"</span></span>
+<span><span class="co">#&gt;   - "MediumRough"</span></span>
+<span><span class="co">#&gt;   - "MediumSmooth"</span></span>
+<span><span class="co">#&gt;   - "Smooth"</span></span>
+<span><span class="co">#&gt;   - "......"</span></span>
+<span><span class="co">#&gt; * Source: &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── 7: Thermal Absorptance ──────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; * Auto value: &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; * Default: 0.9</span></span>
+<span><span class="co">#&gt; * Choice: &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; * Source: &lt;NA&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="insert-objects-from-another-idf-idfinsert">Insert objects from another IDF (<code>Idf$insert()</code>)<a class="anchor" aria-label="anchor" href="#insert-objects-from-another-idf-idfinsert"></a>
 </h3>
 <p>Sometimes it may be useful to insert objects from other IDFs. For example, you may want to import some design days and update location data from a “.ddy” file. You can achieve that using <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># read ddy file as normal IDF</span>
-<span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,
-  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span>
-<span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">model</span><span class="op">$</span><span class="fu">insert</span><span class="op">(</span><span class="va">ddy</span><span class="op">$</span><span class="va">SizingPeriod_DesignDay</span><span class="op">)</span>
-<span class="co">#&gt; $`San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span>
-<span class="co">#&gt; &lt;IdfObject: 'SizingPeriod:DesignDay'&gt; [ID:331] `San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span>
-<span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"</span>
-<span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Wind Speeds, 1%=12.8m/s, 2.5%...</span>
-<span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Temperatures, Max Drybulb=1.8...</span>
-<span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating Design Conditions Wind Speed=...</span>
-<span class="co">#&gt; ! Coldest Month=JAN</span>
-<span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating 99.6%, MaxDB=3.8�C</span>
-<span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Class: &lt;SizingPeriod:DesignDay&gt;</span>
-<span class="co">#&gt; ├─ 01*: "San Francisco Intl Ap Ann Htg 99.6% Condns DB",  !- Name</span>
-<span class="co">#&gt; │─ 02*: 1,                  !- Month</span>
-<span class="co">#&gt; │─ 03*: 21,                 !- Day of Month</span>
-<span class="co">#&gt; │─ 04*: "WinterDesignDay",  !- Day Type</span>
-<span class="co">#&gt; │─ 05 : 3.8,                !- Maximum Dry-Bulb Temperature {C}</span>
-<span class="co">#&gt; │─ 06 : 0,                  !- Daily Dry-Bulb Temperature Range {deltaC}</span>
-<span class="co">#&gt; │─ 07 : "DefaultMultipliers",  !- Dry-Bulb Temperature Range Modifier Type</span>
-<span class="co">#&gt; │─ 08 : &lt;"Blank"&gt;,          !- Dry-Bulb Temperature Range Modifier Day Sche...</span>
-<span class="co">#&gt; │─ 09 : "Wetbulb",          !- Humidity Condition Type</span>
-<span class="va">....</span>
-
-<span class="co"># get location data</span>
-<span class="va">loc</span> <span class="op">&lt;-</span> <span class="va">ddy</span><span class="op">$</span><span class="va">Site_Location</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">model</span><span class="op">$</span><span class="va">Site_Location</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">loc</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Site:Location'&gt; [ID:10] `San Francisco Intl Ap_CA_USA Design_Conditions`</span>
-<span class="co">#&gt; Class: &lt;Site:Location&gt;</span>
-<span class="co">#&gt; ├─ 1*: "San Francisco Intl Ap_CA_USA Design_Conditions",  !- Name</span>
-<span class="co">#&gt; │─ 2 : 37.62,              !- Latitude {deg}</span>
-<span class="co">#&gt; │─ 3 : -122.4,             !- Longitude {deg}</span>
-<span class="co">#&gt; │─ 4 : -8,                 !- Time Zone {hr}</span>
-<span class="co">#&gt; └─ 5 : 2;                  !- Elevation {m}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
+<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
+<span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
+<span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">insert</span><span class="op">(</span><span class="va">ddy</span><span class="op">$</span><span class="va">SizingPeriod_DesignDay</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'SizingPeriod:DesignDay'&gt; [ID:331] `San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span></span>
+<span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Wind Speeds, 1%=12.8m/s, 2.5%...</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Temperatures, Max Drybulb=1.8...</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating Design Conditions Wind Speed=...</span></span>
+<span><span class="co">#&gt; ! Coldest Month=JAN</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating 99.6%, MaxDB=3.8�C</span></span>
+<span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Class: &lt;SizingPeriod:DesignDay&gt;</span></span>
+<span><span class="co">#&gt; ├─ 01*: "San Francisco Intl Ap Ann Htg 99.6% Condns DB",  !- Name</span></span>
+<span><span class="co">#&gt; │─ 02*: 1,                  !- Month</span></span>
+<span><span class="co">#&gt; │─ 03*: 21,                 !- Day of Month</span></span>
+<span><span class="co">#&gt; │─ 04*: "WinterDesignDay",  !- Day Type</span></span>
+<span><span class="co">#&gt; │─ 05 : 3.8,                !- Maximum Dry-Bulb Temperature {C}</span></span>
+<span><span class="co">#&gt; │─ 06 : 0,                  !- Daily Dry-Bulb Temperature Range {deltaC}</span></span>
+<span><span class="co">#&gt; │─ 07 : "DefaultMultipliers",  !- Dry-Bulb Temperature Range Modifier Type</span></span>
+<span><span class="co">#&gt; │─ 08 : &lt;"Blank"&gt;,          !- Dry-Bulb Temperature Range Modifier Day Sche...</span></span>
+<span><span class="co">#&gt; │─ 09 : "Wetbulb",          !- Humidity Condition Type</span></span>
+<span><span class="va">....</span></span>
+<span></span>
+<span><span class="co"># get location data</span></span>
+<span><span class="va">loc</span> <span class="op">&lt;-</span> <span class="va">ddy</span><span class="op">$</span><span class="va">Site_Location</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="va">Site_Location</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">loc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Site:Location'&gt; [ID:10] `San Francisco Intl Ap_CA_USA Design_Conditions`</span></span>
+<span><span class="co">#&gt; Class: &lt;Site:Location&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "San Francisco Intl Ap_CA_USA Design_Conditions",  !- Name</span></span>
+<span><span class="co">#&gt; │─ 2 : 37.62,              !- Latitude {deg}</span></span>
+<span><span class="co">#&gt; │─ 3 : -122.4,             !- Longitude {deg}</span></span>
+<span><span class="co">#&gt; │─ 4 : -8,                 !- Time Zone {hr}</span></span>
+<span><span class="co">#&gt; └─ 5 : 2;                  !- Elevation {m}</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="load-objects-using-characters-or-data-frames-idfload">Load objects using characters or data.frames (<code>Idf$load()</code>)<a class="anchor" aria-label="anchor" href="#load-objects-using-characters-or-data-frames-idfload"></a>
 </h3>
 <p>Here <code>load</code> means <strong>insert</strong>. You can use character vectors or data.frames to load new objects.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Construction,"</span>, <span class="st">"new_const1,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span>, <span class="st">";"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span>
-<span class="co">#&gt; $new_const1</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:349] `new_const1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "new_const1", !- Name</span>
-<span class="co">#&gt; └─ 2*: "WD10";       !- Outside Layer</span>
-
-<span class="co"># extract first construction data in a data.table</span>
-<span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span>
-<span class="co"># modify value</span>
-<span class="va">dt</span><span class="op">[</span><span class="fl">1</span>, <span class="va">value</span> <span class="op">:=</span> <span class="st">"new_const2"</span><span class="op">]</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">dt</span><span class="op">)</span>
-<span class="co">#&gt; $new_const2</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:350] `new_const2`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "new_const2", !- Name</span>
-<span class="co">#&gt; │─ 2*: "RG01",       !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "BR01",       !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN46",       !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "WD01";       !- Layer 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Construction,"</span>, <span class="st">"new_const1,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span>, <span class="st">";"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $new_const1</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:349] `new_const1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "new_const1", !- Name</span></span>
+<span><span class="co">#&gt; └─ 2*: "WD10";       !- Outside Layer</span></span>
+<span></span>
+<span><span class="co"># extract first construction data in a data.table</span></span>
+<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># modify value</span></span>
+<span><span class="va">dt</span><span class="op">[</span><span class="fl">1</span>, <span class="va">value</span> <span class="op">:=</span> <span class="st">"new_const2"</span><span class="op">]</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $new_const2</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:350] `new_const2`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "new_const2", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "RG01",       !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "BR01",       !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN46",       !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "WD01";       !- Layer 4</span></span></code></pre></div>
 <p>The relation is automatically generated whenever new fields are added or modified.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const1"</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:349] &lt;new_const1&gt;</span>
-<span class="co">#&gt;      └─ 2: "WD10";        !- Outside Layer</span>
-<span class="co">#&gt;         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;         └─ Class: &lt;Material&gt;</span>
-<span class="co">#&gt;            └─ Object [ID:43] &lt;WD10&gt;</span>
-<span class="co">#&gt;               └─ 1: "WD10";        !- Name</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) is not referred by any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const2"</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:350] &lt;new_const2&gt;</span>
-<span class="co">#&gt;     ├─ 2: "RG01",        !- Outside Layer</span>
-<span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span>
-<span class="co">#&gt;     │     └─ Object [ID:44] &lt;RG01&gt;</span>
-<span class="co">#&gt;     │        └─ 1: "RG01";        !- Name</span>
-<span class="co">#&gt;     │  </span>
-<span class="co">#&gt;     ├─ 3: "BR01",        !- Layer 2</span>
-<span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span>
-<span class="co">#&gt;     │     └─ Object [ID:45] &lt;BR01&gt;</span>
-<span class="co">#&gt;     │        └─ 1: "BR01";        !- Name</span>
-<span class="co">#&gt;     │  </span>
-<span class="co">#&gt;     ├─ 4: "IN46",        !- Layer 3</span>
-<span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span>
-<span class="co">#&gt;     │     └─ Object [ID:46] &lt;IN46&gt;</span>
-<span class="co">#&gt;     │        └─ 1: "IN46";        !- Name</span>
-<span class="co">#&gt;     │  </span>
-<span class="co">#&gt;     └─ 5: "WD01";        !- Layer 4</span>
-<span class="co">#&gt;        v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;        └─ Class: &lt;Material&gt;</span>
-<span class="co">#&gt;           └─ Object [ID:47] &lt;WD01&gt;</span>
-<span class="co">#&gt;              └─ 1: "WD01";        !- Name</span>
-<span class="co">#&gt;        </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) is not referred by any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:349] &lt;new_const1&gt;</span></span>
+<span><span class="co">#&gt;      └─ 2: "WD10";        !- Outside Layer</span></span>
+<span><span class="co">#&gt;         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;         └─ Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;            └─ Object [ID:43] &lt;WD10&gt;</span></span>
+<span><span class="co">#&gt;               └─ 1: "WD10";        !- Name</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) is not referred by any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const2"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:350] &lt;new_const2&gt;</span></span>
+<span><span class="co">#&gt;     ├─ 2: "RG01",        !- Outside Layer</span></span>
+<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;     │     └─ Object [ID:44] &lt;RG01&gt;</span></span>
+<span><span class="co">#&gt;     │        └─ 1: "RG01";        !- Name</span></span>
+<span><span class="co">#&gt;     │  </span></span>
+<span><span class="co">#&gt;     ├─ 3: "BR01",        !- Layer 2</span></span>
+<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;     │     └─ Object [ID:45] &lt;BR01&gt;</span></span>
+<span><span class="co">#&gt;     │        └─ 1: "BR01";        !- Name</span></span>
+<span><span class="co">#&gt;     │  </span></span>
+<span><span class="co">#&gt;     ├─ 4: "IN46",        !- Layer 3</span></span>
+<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;     │     └─ Object [ID:46] &lt;IN46&gt;</span></span>
+<span><span class="co">#&gt;     │        └─ 1: "IN46";        !- Name</span></span>
+<span><span class="co">#&gt;     │  </span></span>
+<span><span class="co">#&gt;     └─ 5: "WD01";        !- Layer 4</span></span>
+<span><span class="co">#&gt;        v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;        └─ Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt;           └─ Object [ID:47] &lt;WD01&gt;</span></span>
+<span><span class="co">#&gt;              └─ 1: "WD01";        !- Name</span></span>
+<span><span class="co">#&gt;        </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) is not referred by any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="update-objects-using-characters-or-data-frames-idfupdate">Update objects using characters or data.frames (<code>Idf$update()</code>)<a class="anchor" aria-label="anchor" href="#update-objects-using-characters-or-data-frames-idfupdate"></a>
 </h3>
 <p>Here <code>update</code> means <strong>set</strong>. You can use character vectors or data.frames to update existing objects.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">WD10</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span><span class="op">)</span>
-<span class="co"># change material density</span>
-<span class="va">mat_chr</span><span class="op">[</span><span class="fl">6</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"600,"</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span>
-<span class="co">#&gt; $WD10</span>
-<span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span>
-<span class="co">#&gt; Class: &lt;Material&gt;</span>
-<span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span>
-<span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span>
-<span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span>
-<span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span>
-<span class="co">#&gt; │─ 5*: 600,            !- Density {kg/m3}</span>
-<span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span>
-<span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span>
-<span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span>
-<span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span>
-
-<span class="co"># extract roof construction data in a data.table</span>
-<span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">$</span><span class="va">`ROOF-1`</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span>
-<span class="co"># modify value</span>
-<span class="va">dt</span><span class="op">[</span><span class="fl">1</span>, <span class="va">value</span> <span class="op">:=</span> <span class="st">"ROOF"</span><span class="op">]</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">dt</span><span class="op">)</span>
-<span class="co">#&gt; $ROOF</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:66] `ROOF`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "ROOF",     !- Name</span>
-<span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span>
-<span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span>
-<span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span>
-<span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">WD10</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># change material density</span></span>
+<span><span class="va">mat_chr</span><span class="op">[</span><span class="fl">6</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"600,"</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $WD10</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:43] `WD10`</span></span>
+<span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "WD10",         !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "MediumSmooth", !- Roughness</span></span>
+<span><span class="co">#&gt; │─ 3*: 0.667,          !- Thickness {m}</span></span>
+<span><span class="co">#&gt; │─ 4*: 0.115,          !- Conductivity {W/m-K}</span></span>
+<span><span class="co">#&gt; │─ 5*: 600,            !- Density {kg/m3}</span></span>
+<span><span class="co">#&gt; │─ 6*: 1381,           !- Specific Heat {J/kg-K}</span></span>
+<span><span class="co">#&gt; │─ 7 : 0.9,            !- Thermal Absorptance</span></span>
+<span><span class="co">#&gt; │─ 8 : 0.78,           !- Solar Absorptance</span></span>
+<span><span class="co">#&gt; └─ 9 : 0.78;           !- Visible Absorptance</span></span>
+<span></span>
+<span><span class="co"># extract roof construction data in a data.table</span></span>
+<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Construction</span><span class="op">$</span><span class="va">`ROOF-1`</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># modify value</span></span>
+<span><span class="va">dt</span><span class="op">[</span><span class="fl">1</span>, <span class="va">value</span> <span class="op">:=</span> <span class="st">"ROOF"</span><span class="op">]</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $ROOF</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:66] `ROOF`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "ROOF",     !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: "RG01",     !- Outside Layer</span></span>
+<span><span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span></span>
+<span><span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span></span>
+<span><span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="delete-existing-objects-idfdel">Delete existing objects (<code>Idf$del()</code>)<a class="anchor" aria-label="anchor" href="#delete-existing-objects-idfdel"></a>
 </h3>
 <p><code>$del()</code> will delete objects specified by object IDs or names. For example, in current model, there is a material named <code>"MAT-CLNG-1"</code> in class <code>Material:NoMass</code>. Let’s see if it has been referred by other objects.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span><span class="op">$</span><span class="va">`MAT-CLNG-1`</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) does not refer to any other field.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span>
-<span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span>
-<span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span>
-<span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span>
-<span class="co">#&gt;     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span>
-<span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span><span class="op">$</span><span class="va">`MAT-CLNG-1`</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span></span>
+<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
+<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
 <p>As we can see, <code>MAT-CLNG-1</code> has been referred by a construction named <code>"CLNG-1"</code>.</p>
 <p>First, let’s try to direct delete Material <code>MAT-CLNG-1</code>.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span>
-<span class="co">#&gt; Error: Cannot delete object(s) that are referred by others:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt;   └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span>
-<span class="co">#&gt;       └─ 1: "MAT-CLNG-1";  !- Name</span>
-<span class="co">#&gt;          ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;          └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;             └─ Object [ID:68] &lt;CLNG-1&gt;</span>
-<span class="co">#&gt;                └─ 2: "MAT-CLNG-1";  !- Outside Layer</span>
-<span class="co">#&gt; </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: Cannot delete object(s) that are referred by others:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt;   └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;       └─ 1: "MAT-CLNG-1";  !- Name</span></span>
+<span><span class="co">#&gt;          ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;          └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;             └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;                └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
 <p>We got an error, because directly deleting <code>MAT-CLNG-1</code> will introduce invalid reference in Construction <code>CLNG-1</code>.</p>
 <p>In some cases, you may still want to delete that object. You can achieve this by setting <code>.force</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, .force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Deleting object(s) [ID: 55]</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Object relation is shown below:</span>
-<span class="co">#&gt;  ── Referred by Others ──────────────────────────────────────────────────────────</span>
-<span class="co">#&gt;   Class: &lt;Material:NoMass&gt;</span>
-<span class="co">#&gt;   └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span>
-<span class="co">#&gt;       └─ 1: "MAT-CLNG-1";  !- Name</span>
-<span class="co">#&gt;          ^~~~~~~~~~~~~~~~~~~~~~~~~</span>
-<span class="co">#&gt;          └─ Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;             └─ Object [ID:68] &lt;CLNG-1&gt;</span>
-<span class="co">#&gt;                └─ 2: "MAT-CLNG-1";  !- Outside Layer</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt; </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, .force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Deleting object(s) [ID: 55]</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Object relation is shown below:</span></span>
+<span><span class="co">#&gt;  ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   Class: &lt;Material:NoMass&gt;</span></span>
+<span><span class="co">#&gt;   └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;       └─ 1: "MAT-CLNG-1";  !- Name</span></span>
+<span><span class="co">#&gt;          ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
+<span><span class="co">#&gt;          └─ Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;             └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;                └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
+<span><span class="co">#&gt;      </span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="purge-unused-resource-objects-idfpurge">Purge unused resource objects (<code>Idf$purge()</code>)<a class="anchor" aria-label="anchor" href="#purge-unused-resource-objects-idfpurge"></a>
@@ -1324,54 +1324,54 @@
 <p><code>$purge()</code> will delete resource objects specified that are not used by any objects. Resource objects refer to objects that can be referenced by other objects, e.g. <code>Material</code>, <code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
 <p>Below we remove all schedules that are not currently used.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span>
-<span class="co">#&gt; Object(s) below have been purged:</span>
-<span class="co">#&gt;  #1| Object ID [18] (name 'On/Off') in class 'ScheduleTypeLimits'</span>
-<span class="co">#&gt;  #2| Object ID [19] (name 'FlowRate') in class 'ScheduleTypeLimits'</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Object(s) below have been purged:</span></span>
+<span><span class="co">#&gt;  #1| Object ID [18] (name 'On/Off') in class 'ScheduleTypeLimits'</span></span>
+<span><span class="co">#&gt;  #2| Object ID [19] (name 'FlowRate') in class 'ScheduleTypeLimits'</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="find-and-remove-duplicates-idfduplicated-idfunique">Find and remove duplicates (<code>Idf$duplicated()</code> &amp; <code>Idf$unique()</code>)<a class="anchor" aria-label="anchor" href="#find-and-remove-duplicates-idfduplicated-idfunique"></a>
 </h3>
 <p><code>$duplicatd()</code> and <code>$unique()</code> can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">duplicated</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                  class id                               name duplicate</span>
-<span class="co">#&gt;  1: ScheduleTypeLimits 14                         Any Number        NA</span>
-<span class="co">#&gt;  2: ScheduleTypeLimits 15                           Fraction        NA</span>
-<span class="co">#&gt;  3: ScheduleTypeLimits 16                        Temperature        NA</span>
-<span class="co">#&gt;  4: ScheduleTypeLimits 17                       Control Type        NA</span>
-<span class="co">#&gt;  5:   Schedule:Compact 20                           OCCUPY-1        NA</span>
-<span class="co">#&gt;  6:   Schedule:Compact 21                           LIGHTS-1        NA</span>
-<span class="co">#&gt;  7:   Schedule:Compact 22                            EQUIP-1        NA</span>
-<span class="co">#&gt;  8:   Schedule:Compact 23                          INFIL-SCH        NA</span>
-<span class="co">#&gt;  9:   Schedule:Compact 24                            ActSchd        NA</span>
-<span class="co">#&gt; 10:   Schedule:Compact 25                      ShadeTransSch        NA</span>
-<span class="co">#&gt; 11:   Schedule:Compact 26                       Htg-SetP-Sch        NA</span>
-<span class="co">#&gt; 12:   Schedule:Compact 27                 PlenumHtg-SetP-Sch        NA</span>
-<span class="co">#&gt; 13:   Schedule:Compact 28                       Clg-SetP-Sch        NA</span>
-<span class="co">#&gt; 14:   Schedule:Compact 29                 PlenumClg-SetP-Sch        NA</span>
-<span class="co">#&gt; 15:   Schedule:Compact 30            Zone Control Type Sched        NA</span>
-<span class="co">#&gt; 16:   Schedule:Compact 31                       Min OA Sched        NA</span>
-<span class="co">#&gt; 17:   Schedule:Compact 32                      FanAvailSched        NA</span>
-<span class="co">#&gt; 18:   Schedule:Compact 33              CoolingCoilAvailSched        NA</span>
-<span class="co">#&gt; 19:   Schedule:Compact 34              CoolingPumpAvailSched        NA</span>
-<span class="co">#&gt; 20:   Schedule:Compact 35               ReheatCoilAvailSched        32</span>
-<span class="co">#&gt; 21:   Schedule:Compact 36              CW Loop Temp Schedule        NA</span>
-<span class="co">#&gt; 22:   Schedule:Compact 37              HW Loop Temp Schedule        NA</span>
-<span class="co">#&gt; 23:   Schedule:Compact 38                       PlantOnSched        34</span>
-<span class="co">#&gt; 24:   Schedule:Compact 39 Seasonal Reset Supply Air Temp Sch        NA</span>
-<span class="co">#&gt; 25:   Schedule:Compact 40     OA Cooling Supply Air Temp Sch        NA</span>
-<span class="co">#&gt; 26:   Schedule:Compact 41     OA Heating Supply Air Temp Sch        NA</span>
-<span class="co">#&gt; 27:   Schedule:Compact 42                          Always On        34</span>
-<span class="co">#&gt;                  class id                               name duplicate</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">duplicated</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  class id                               name duplicate</span></span>
+<span><span class="co">#&gt;  1: ScheduleTypeLimits 14                         Any Number        NA</span></span>
+<span><span class="co">#&gt;  2: ScheduleTypeLimits 15                           Fraction        NA</span></span>
+<span><span class="co">#&gt;  3: ScheduleTypeLimits 16                        Temperature        NA</span></span>
+<span><span class="co">#&gt;  4: ScheduleTypeLimits 17                       Control Type        NA</span></span>
+<span><span class="co">#&gt;  5:   Schedule:Compact 20                           OCCUPY-1        NA</span></span>
+<span><span class="co">#&gt;  6:   Schedule:Compact 21                           LIGHTS-1        NA</span></span>
+<span><span class="co">#&gt;  7:   Schedule:Compact 22                            EQUIP-1        NA</span></span>
+<span><span class="co">#&gt;  8:   Schedule:Compact 23                          INFIL-SCH        NA</span></span>
+<span><span class="co">#&gt;  9:   Schedule:Compact 24                            ActSchd        NA</span></span>
+<span><span class="co">#&gt; 10:   Schedule:Compact 25                      ShadeTransSch        NA</span></span>
+<span><span class="co">#&gt; 11:   Schedule:Compact 26                       Htg-SetP-Sch        NA</span></span>
+<span><span class="co">#&gt; 12:   Schedule:Compact 27                 PlenumHtg-SetP-Sch        NA</span></span>
+<span><span class="co">#&gt; 13:   Schedule:Compact 28                       Clg-SetP-Sch        NA</span></span>
+<span><span class="co">#&gt; 14:   Schedule:Compact 29                 PlenumClg-SetP-Sch        NA</span></span>
+<span><span class="co">#&gt; 15:   Schedule:Compact 30            Zone Control Type Sched        NA</span></span>
+<span><span class="co">#&gt; 16:   Schedule:Compact 31                       Min OA Sched        NA</span></span>
+<span><span class="co">#&gt; 17:   Schedule:Compact 32                      FanAvailSched        NA</span></span>
+<span><span class="co">#&gt; 18:   Schedule:Compact 33              CoolingCoilAvailSched        NA</span></span>
+<span><span class="co">#&gt; 19:   Schedule:Compact 34              CoolingPumpAvailSched        NA</span></span>
+<span><span class="co">#&gt; 20:   Schedule:Compact 35               ReheatCoilAvailSched        32</span></span>
+<span><span class="co">#&gt; 21:   Schedule:Compact 36              CW Loop Temp Schedule        NA</span></span>
+<span><span class="co">#&gt; 22:   Schedule:Compact 37              HW Loop Temp Schedule        NA</span></span>
+<span><span class="co">#&gt; 23:   Schedule:Compact 38                       PlantOnSched        34</span></span>
+<span><span class="co">#&gt; 24:   Schedule:Compact 39 Seasonal Reset Supply Air Temp Sch        NA</span></span>
+<span><span class="co">#&gt; 25:   Schedule:Compact 40     OA Cooling Supply Air Temp Sch        NA</span></span>
+<span><span class="co">#&gt; 26:   Schedule:Compact 41     OA Heating Supply Air Temp Sch        NA</span></span>
+<span><span class="co">#&gt; 27:   Schedule:Compact 42                          Always On        34</span></span>
+<span><span class="co">#&gt;                  class id                               name duplicate</span></span></code></pre></div>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">unique</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span>
-<span class="co">#&gt; Duplications for object ID [32] (name 'FanAvailSched') in class 'Schedule:Compact' have been removed:</span>
-<span class="co">#&gt;   #1| Object ID [35] (name 'ReheatCoilAvailSched')</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Duplications for object ID [34] (name 'CoolingPumpAvailSched') in class 'Schedule:Compact' have been removed:</span>
-<span class="co">#&gt;   #1| Object ID [38] (name 'PlantOnSched')</span>
-<span class="co">#&gt;   #2| Object ID [42] (name 'Always On')</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">unique</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Duplications for object ID [32] (name 'FanAvailSched') in class 'Schedule:Compact' have been removed:</span></span>
+<span><span class="co">#&gt;   #1| Object ID [35] (name 'ReheatCoilAvailSched')</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Duplications for object ID [34] (name 'CoolingPumpAvailSched') in class 'Schedule:Compact' have been removed:</span></span>
+<span><span class="co">#&gt;   #1| Object ID [38] (name 'PlantOnSched')</span></span>
+<span><span class="co">#&gt;   #2| Object ID [42] (name 'Always On')</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="paste-objects-from-idf-editor-idfpaste">Paste objects from IDF Editor (<code>Idf$paste()</code>)<a class="anchor" aria-label="anchor" href="#paste-objects-from-idf-editor-idfpaste"></a>
@@ -1385,74 +1385,74 @@
 <p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code>eplusr_option("validate_level")</code>.</p>
 <p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span>
-<span class="co">#&gt; [1] "final"</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/level_checks.html">level_checks</a></span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; List of 10</span>
-<span class="co">#&gt;  $ required_object: logi TRUE</span>
-<span class="co">#&gt;  $ unique_object  : logi TRUE</span>
-<span class="co">#&gt;  $ unique_name    : logi TRUE</span>
-<span class="co">#&gt;  $ extensible     : logi TRUE</span>
-<span class="co">#&gt;  $ required_field : logi TRUE</span>
-<span class="co">#&gt;  $ auto_field     : logi TRUE</span>
-<span class="co">#&gt;  $ type           : logi TRUE</span>
-<span class="co">#&gt;  $ choice         : logi TRUE</span>
-<span class="co">#&gt;  $ range          : logi TRUE</span>
-<span class="co">#&gt;  $ reference      : logi TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "final"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/level_checks.html">level_checks</a></span><span class="op">(</span><span class="st">"final"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 10</span></span>
+<span><span class="co">#&gt;  $ required_object: logi TRUE</span></span>
+<span><span class="co">#&gt;  $ unique_object  : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ unique_name    : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ extensible     : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ required_field : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ auto_field     : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ type           : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ choice         : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ range          : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ reference      : logi TRUE</span></span></code></pre></div>
 <p>In the previous section, we deleted a material named <code>MAT-CLNG-1</code>.</p>
 <p>The <code>final</code> validation level turns all checking components on. We can just trigger invalid reference checking using <code><a href="../reference/custom_validate.html">custom_validate()</a></code> function.</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu"><a href="../reference/custom_validate.html">custom_validate</a></span><span class="op">(</span>reference <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;  ✖ [1] Errors found during validation.</span>
-<span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ── [1] Invalid Reference ─────────────────────────────────────────────────────</span>
-<span class="co">#&gt;    Fields below are not one of valid references:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Class: &lt;Construction&gt;</span>
-<span class="co">#&gt;     └─ Object [ID:68] &lt;CLNG-1&gt;</span>
-<span class="co">#&gt;        └─ 2: "MAT-CLNG-1";  !- Outside Layer</span>
-<span class="co">#&gt; </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu"><a href="../reference/custom_validate.html">custom_validate</a></span><span class="op">(</span>reference <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
+<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── [1] Invalid Reference ─────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;    Fields below are not one of valid references:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt;     └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
+<span><span class="co">#&gt;        └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
 <p>As we can see, the invalid reference in construction <code>CLNG-1</code> is successfully detected.</p>
 <p>In this example, we already knows that <code>CLNG-1</code> is the invalid object. In many cases, we don’t know that information in advance. As <code>$validate()</code> returns a list of <code>data.table</code>s, we can extract invalid objects for different types directly using <code>$validate()</code>. Below we extract all objects that have invalid reference errors.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">invalid_reference</span><span class="op">$</span><span class="va">object_id</span><span class="op">)</span>
-<span class="co">#&gt; [1] 68</span>
-<span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
-<span class="co">#&gt; $`CLNG-1`</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span>
-<span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">invalid_reference</span><span class="op">$</span><span class="va">object_id</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 68</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`CLNG-1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span></span>
+<span><span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></span></code></pre></div>
 <p>Then we can use <code>$set()</code> to correct them. We can get all possible values for field <code>Outside Layer</code> using <code>$value_possible()</code> method in <code>IdfObject</code> class.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="st">"Outside Layer"</span><span class="op">)</span><span class="op">$</span><span class="va">source</span>
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt;  [1] "WD10"          "RG01"          "BR01"          "IN46"         </span>
-<span class="co">#&gt;  [5] "WD01"          "PW03"          "IN02"          "GP01"         </span>
-<span class="co">#&gt;  [9] "GP02"          "CC03_renamed"  "mat1"          "mat2"         </span>
-<span class="co">#&gt; [13] "mat3"          "CP01"          "MAT-SB-U"      "MAT-FLOOR-1"  </span>
-<span class="co">#&gt; [17] "AL21"          "AL23"          "CLEAR 3MM"     "GREY 3MM"     </span>
-<span class="co">#&gt; [21] "CLEAR 6MM"     "LoE CLEAR 6MM" "AIR 6MM"       "AIR 13MM"     </span>
-<span class="co">#&gt; [25] "ARGON 13MM"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="st">"Outside Layer"</span><span class="op">)</span><span class="op">$</span><span class="va">source</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt;  [1] "WD10"          "RG01"          "BR01"          "IN46"         </span></span>
+<span><span class="co">#&gt;  [5] "WD01"          "PW03"          "IN02"          "GP01"         </span></span>
+<span><span class="co">#&gt;  [9] "GP02"          "CC03_renamed"  "mat1"          "mat2"         </span></span>
+<span><span class="co">#&gt; [13] "mat3"          "CP01"          "MAT-SB-U"      "MAT-FLOOR-1"  </span></span>
+<span><span class="co">#&gt; [17] "AL21"          "AL23"          "CLEAR 3MM"     "GREY 3MM"     </span></span>
+<span><span class="co">#&gt; [21] "CLEAR 6MM"     "LoE CLEAR 6MM" "AIR 6MM"       "AIR 13MM"     </span></span>
+<span><span class="co">#&gt; [25] "ARGON 13MM"</span></span></code></pre></div>
 <p>Now let’s change the construction’s <code>Outside Layer</code> to <code>WD10</code>.</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>Outside_Layer <span class="op">=</span> <span class="st">"WD10"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span>
-<span class="co">#&gt; Class: &lt;Construction&gt;</span>
-<span class="co">#&gt; ├─ 1*: "CLNG-1",   !- Name</span>
-<span class="co">#&gt; └─ 2*: "WD10";     !- Outside Layer</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>Outside_Layer <span class="op">=</span> <span class="st">"WD10"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span></span>
+<span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
+<span><span class="co">#&gt; ├─ 1*: "CLNG-1",   !- Name</span></span>
+<span><span class="co">#&gt; └─ 2*: "WD10";     !- Outside Layer</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="save-to-an-idf-file-idfsave">Save to an IDF file (<code>Idf$save()</code>)<a class="anchor" aria-label="anchor" href="#save-to-an-idf-file-idfsave"></a>
 </h2>
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmpa07ftL/file36a27d688370.idf"</span>
-
-<span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpa07ftL/file36a27d688370.idf.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpXaDuXx/file385410068f28.idf"</span></span>
+<span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpXaDuXx/file385410068f28.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -1479,7 +1479,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

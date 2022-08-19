@@ -106,11 +106,11 @@ install it.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">install_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, local <span class="op">=</span> <span class="cn">FALSE</span>, dir <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">uninstall_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span>
-
-<span class="fu">download_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, <span class="va">dir</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, local <span class="op">=</span> <span class="cn">FALSE</span>, dir <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">uninstall_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">download_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, <span class="va">dir</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -119,6 +119,8 @@ install it.</p>
 <dd><p>The EnergyPlus version number, e.g., <code>8.7</code>. For <code>download_eplus()</code>
 and <code>install_eplus()</code>, the special value <code>"latest"</code>, which is the
 default, means the latest version supported by eplusr.</p></dd>
+
+
 <dt>local</dt>
 <dd><p>Whether to install EnergyPlus only for current user. For Windows
 and Linux, if <code>FALSE</code>, administrative privileges are required to
@@ -127,6 +129,8 @@ install EnergyPlus to the default system-level location. See details.
 access to the directory specified via <code>dir</code>. Default: <code>FALSE</code>. For
 macOS, administrative privileges are always required no matter you
 want EnergyPlus to be install at <code>/Applications</code> or <code>~/Applications</code>.</p></dd>
+
+
 <dt>dir</dt>
 <dd><p>A single string of directory.</p><ul><li><p>For <code>download_eplus()</code>, where to save EnergyPlus installer file.
 Default: <code>"."</code>.</p></li>
@@ -139,22 +143,29 @@ See details for more information. Please note that <code>dir</code> does not wor
 on macOS and EnergyPlus will always be installed into the default
 location. Default: <code>NULL</code>.</p></li>
 </ul></dd>
+
+
 <dt>force</dt>
 <dd><p>Whether to install EnergyPlus even if it has already been
 installed. Setting to <code>TRUE</code> if you want to install the downloaded
 EnergyPlus anyway. Please note that this may results in multiple
 EnergyPlus installations of the same version at different locations.
 eplusr will only use the first EnergyPlus installation. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments to be passed to the installer. Current only one
 additional argument exists and is only for Linux:</p><ul><li><p><code>dir_bin</code>: A path where symbolic links will be created to the software
 executables. The default is <code>/usr/local/bin</code> if <code>local</code> is <code>FALSE</code>
 and <code>~/.local/bin</code> if <code>local</code> is <code>TRUE</code>.</p></li>
 </ul></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An invisible integer <code>0</code> if succeed. Moreover, some attributes will
+    
+
+<p>An invisible integer <code>0</code> if succeed. Moreover, some attributes will
 also be returned:</p><ul><li><p>For <code>install_eplus()</code>:</p><ul><li><p><code>path</code>: the EnergyPlus installation path</p></li>
 <li><p><code>installer</code>: the path of downloaded EnergyPlus installer file</p></li>
 </ul></li>
@@ -196,26 +207,26 @@ may be required.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download the latest version of EnergyPlus</span></span>
-<span class="r-in"><span class="fu">download_eplus</span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># install the latest version of EnergyPlus system-wide which is the default</span></span>
-<span class="r-in"><span class="co"># and requires administrative privileges</span></span>
-<span class="r-in"><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># for a specific version of EnergyPlus</span></span>
-<span class="r-in"><span class="fu">download_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># force to reinstall</span></span>
-<span class="r-in"><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># install EnergyPlus in your home directory</span></span>
-<span class="r-in"><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># custom EnergyPlus install home directory</span></span>
-<span class="r-in"><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download the latest version of EnergyPlus</span></span></span>
+<span class="r-in"><span><span class="fu">download_eplus</span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># install the latest version of EnergyPlus system-wide which is the default</span></span></span>
+<span class="r-in"><span><span class="co"># and requires administrative privileges</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># for a specific version of EnergyPlus</span></span></span>
+<span class="r-in"><span><span class="fu">download_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># force to reinstall</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># install EnergyPlus in your home directory</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># custom EnergyPlus install home directory</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -230,7 +241,7 @@ may be required.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

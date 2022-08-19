@@ -110,22 +110,27 @@ for running EnergyPlus simulation and collecting outputs.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">eplus_job</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">eplus_job</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>idf</dt>
 <dd><p>A path to an local EnergyPlus IDF file or an <code>Idf</code> object.</p></dd>
+
+
 <dt>epw</dt>
 <dd><p>A path to an local EnergyPlus EPW file or an <code>Epw</code> object. <code>epw</code>
 can also be <code>NULL</code> which will force design-day-only simulation when
 <code>$run()</code> method is called. Note this needs at least one
 <code>Sizing:DesignDay</code> object exists in the <a href="Idf.html">Idf</a>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>EplusJob</code> object.</p>
+    
+
+<p>An <code>EplusJob</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -159,29 +164,29 @@ automatically created if it does not exists.</p>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>EplusJob$new()</code></a></p></li>
-<li><p><a href="#method-version"><code>EplusJob$version()</code></a></p></li>
-<li><p><a href="#method-path"><code>EplusJob$path()</code></a></p></li>
-<li><p><a href="#method-run"><code>EplusJob$run()</code></a></p></li>
-<li><p><a href="#method-kill"><code>EplusJob$kill()</code></a></p></li>
-<li><p><a href="#method-status"><code>EplusJob$status()</code></a></p></li>
-<li><p><a href="#method-errors"><code>EplusJob$errors()</code></a></p></li>
-<li><p><a href="#method-output_dir"><code>EplusJob$output_dir()</code></a></p></li>
-<li><p><a href="#method-list_files"><code>EplusJob$list_files()</code></a></p></li>
-<li><p><a href="#method-locate_output"><code>EplusJob$locate_output()</code></a></p></li>
-<li><p><a href="#method-read_rdd"><code>EplusJob$read_rdd()</code></a></p></li>
-<li><p><a href="#method-read_mdd"><code>EplusJob$read_mdd()</code></a></p></li>
-<li><p><a href="#method-list_table"><code>EplusJob$list_table()</code></a></p></li>
-<li><p><a href="#method-read_table"><code>EplusJob$read_table()</code></a></p></li>
-<li><p><a href="#method-report_data_dict"><code>EplusJob$report_data_dict()</code></a></p></li>
-<li><p><a href="#method-report_data"><code>EplusJob$report_data()</code></a></p></li>
-<li><p><a href="#method-tabular_data"><code>EplusJob$tabular_data()</code></a></p></li>
-<li><p><a href="#method-print"><code>EplusJob$print()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-EplusJob-new"><code>EplusJob$new()</code></a></p></li>
+<li><p><a href="#method-EplusJob-version"><code>EplusJob$version()</code></a></p></li>
+<li><p><a href="#method-EplusJob-path"><code>EplusJob$path()</code></a></p></li>
+<li><p><a href="#method-EplusJob-run"><code>EplusJob$run()</code></a></p></li>
+<li><p><a href="#method-EplusJob-kill"><code>EplusJob$kill()</code></a></p></li>
+<li><p><a href="#method-EplusJob-status"><code>EplusJob$status()</code></a></p></li>
+<li><p><a href="#method-EplusJob-errors"><code>EplusJob$errors()</code></a></p></li>
+<li><p><a href="#method-EplusJob-output_dir"><code>EplusJob$output_dir()</code></a></p></li>
+<li><p><a href="#method-EplusJob-list_files"><code>EplusJob$list_files()</code></a></p></li>
+<li><p><a href="#method-EplusJob-locate_output"><code>EplusJob$locate_output()</code></a></p></li>
+<li><p><a href="#method-EplusJob-read_rdd"><code>EplusJob$read_rdd()</code></a></p></li>
+<li><p><a href="#method-EplusJob-read_mdd"><code>EplusJob$read_mdd()</code></a></p></li>
+<li><p><a href="#method-EplusJob-list_table"><code>EplusJob$list_table()</code></a></p></li>
+<li><p><a href="#method-EplusJob-read_table"><code>EplusJob$read_table()</code></a></p></li>
+<li><p><a href="#method-EplusJob-report_data_dict"><code>EplusJob$report_data_dict()</code></a></p></li>
+<li><p><a href="#method-EplusJob-report_data"><code>EplusJob$report_data()</code></a></p></li>
+<li><p><a href="#method-EplusJob-tabular_data"><code>EplusJob$tabular_data()</code></a></p></li>
+<li><p><a href="#method-EplusJob-print"><code>EplusJob$print()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-EplusJob-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create an <code>EplusJob</code> object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va"><a href="../reference/EplusJob.html">EplusJob</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/EplusJob.html">EplusJob</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">idf</span>, <span class="va">epw</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -221,11 +226,11 @@ if (is_avail_eplus(8.8)) {
 </div>
 
 
-</div><p></p><hr><a id="method-version"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-version"></a><div class="section">
 <h3 id="method-version-">Method <code><a href="https://rdrr.io/r/base/Version.html" class="external-link">version()</a></code><a class="anchor" aria-label="anchor" href="#method-version-"></a></h3>
 <p>Get the version of IDF in current job</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -247,11 +252,11 @@ job$version()
 </div>
 
 
-</div><p></p><hr><a id="method-path"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-path"></a><div class="section">
 <h3 id="method-path-">Method <code>path()</code><a class="anchor" aria-label="anchor" href="#method-path-"></a></h3>
 <p>Get the paths of file that current <code>EpwSql</code> uses</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"idf"</span>, <span class="st">"epw"</span><span class="op">)</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"idf"</span>, <span class="st">"epw"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -286,18 +291,18 @@ job$path("epw")
 </div>
 
 
-</div><p></p><hr><a id="method-run"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-run"></a><div class="section">
 <h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
 <p>Run simulationA</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>
-  <span class="va">epw</span>,
-  dir <span class="op">=</span> <span class="cn">NULL</span>,
-  wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  echo <span class="op">=</span> <span class="va">wait</span>,
-  copy_external <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span></span>
+<span>  <span class="va">epw</span>,</span>
+<span>  dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  echo <span class="op">=</span> <span class="va">wait</span>,</span>
+<span>  copy_external <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -399,11 +404,11 @@ job$run(copy_external = TRUE)
 </div>
 
 
-</div><p></p><hr><a id="method-kill"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-kill"></a><div class="section">
 <h3 id="method-kill-">Method <code>kill()</code><a class="anchor" aria-label="anchor" href="#method-kill-"></a></h3>
 <p>Kill current running job</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -426,11 +431,11 @@ job$kill()
 </div>
 
 
-</div><p></p><hr><a id="method-status"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-status"></a><div class="section">
 <h3 id="method-status-">Method <code>status()</code><a class="anchor" aria-label="anchor" href="#method-status-"></a></h3>
 <p>Get the job status</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -461,11 +466,11 @@ job$status()
 </div>
 
 
-</div><p></p><hr><a id="method-errors"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-errors"></a><div class="section">
 <h3 id="method-errors-">Method <code>errors()</code><a class="anchor" aria-label="anchor" href="#method-errors-"></a></h3>
 <p>Read simulation errors</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span>info <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span>info <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -501,11 +506,11 @@ job$errors(info = TRUE)
 </div>
 
 
-</div><p></p><hr><a id="method-output_dir"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-output_dir"></a><div class="section">
 <h3 id="method-output-dir-">Method <code>output_dir()</code><a class="anchor" aria-label="anchor" href="#method-output-dir-"></a></h3>
 <p>Get simulation output directory</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">output_dir</span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">output_dir</span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -534,11 +539,11 @@ job$output_dir()
 </div>
 
 
-</div><p></p><hr><a id="method-list_files"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-list_files"></a><div class="section">
 <h3 id="method-list-files-">Method <code>list_files()</code><a class="anchor" aria-label="anchor" href="#method-list-files-"></a></h3>
 <p>List all output files in current simulation</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span>simplify <span class="op">=</span> <span class="cn">FALSE</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span>simplify <span class="op">=</span> <span class="cn">FALSE</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -590,11 +595,11 @@ job$locate_output(full = TRUE)
 </div>
 
 
-</div><p></p><hr><a id="method-locate_output"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-locate_output"></a><div class="section">
 <h3 id="method-locate-output-">Method <code>locate_output()</code><a class="anchor" aria-label="anchor" href="#method-locate-output-"></a></h3>
 <p>Get path of output file</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">".err"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">".err"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -632,11 +637,11 @@ job$locate_output(".expidf", strict = TRUE)
 </div>
 
 
-</div><p></p><hr><a id="method-read_rdd"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-read_rdd"></a><div class="section">
 <h3 id="method-read-rdd-">Method <code><a href="rdd.html">read_rdd()</a></code><a class="anchor" aria-label="anchor" href="#method-read-rdd-"></a></h3>
 <p>Read Report Data Dictionary (RDD) file</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -659,11 +664,11 @@ job$read_rdd()
 </div>
 
 
-</div><p></p><hr><a id="method-read_mdd"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-read_mdd"></a><div class="section">
 <h3 id="method-read-mdd-">Method <code><a href="rdd.html">read_mdd()</a></code><a class="anchor" aria-label="anchor" href="#method-read-mdd-"></a></h3>
 <p>Read Report Data Dictionary (RDD) file</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -686,11 +691,11 @@ job$read_mdd()
 </div>
 
 
-</div><p></p><hr><a id="method-list_table"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-list_table"></a><div class="section">
 <h3 id="method-list-table-">Method <code>list_table()</code><a class="anchor" aria-label="anchor" href="#method-list-table-"></a></h3>
 <p>List all table names in EnergyPlus SQL output</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">list_table</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">list_table</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -713,11 +718,11 @@ job$list_table()
 </div>
 
 
-</div><p></p><hr><a id="method-read_table"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-read_table"></a><div class="section">
 <h3 id="method-read-table-">Method <code>read_table()</code><a class="anchor" aria-label="anchor" href="#method-read-table-"></a></h3>
 <p>Read a single table from EnergyPlus SQL output</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -750,11 +755,11 @@ job$read_table("Zones")
 </div>
 
 
-</div><p></p><hr><a id="method-report_data_dict"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-report_data_dict"></a><div class="section">
 <h3 id="method-report-data-dict-">Method <code>report_data_dict()</code><a class="anchor" aria-label="anchor" href="#method-report-data-dict-"></a></h3>
 <p>Read report data dictionary from EnergyPlus SQL output</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -792,28 +797,28 @@ job$report_data_dict()
 </div>
 
 
-</div><p></p><hr><a id="method-report_data"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-report_data"></a><div class="section">
 <h3 id="method-report-data-">Method <code>report_data()</code><a class="anchor" aria-label="anchor" href="#method-report-data-"></a></h3>
 <p>Read report data</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>
-  key_value <span class="op">=</span> <span class="cn">NULL</span>,
-  name <span class="op">=</span> <span class="cn">NULL</span>,
-  year <span class="op">=</span> <span class="cn">NULL</span>,
-  tz <span class="op">=</span> <span class="st">"UTC"</span>,
-  case <span class="op">=</span> <span class="st">"auto"</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  wide <span class="op">=</span> <span class="cn">FALSE</span>,
-  period <span class="op">=</span> <span class="cn">NULL</span>,
-  month <span class="op">=</span> <span class="cn">NULL</span>,
-  day <span class="op">=</span> <span class="cn">NULL</span>,
-  hour <span class="op">=</span> <span class="cn">NULL</span>,
-  minute <span class="op">=</span> <span class="cn">NULL</span>,
-  interval <span class="op">=</span> <span class="cn">NULL</span>,
-  simulation_days <span class="op">=</span> <span class="cn">NULL</span>,
-  day_type <span class="op">=</span> <span class="cn">NULL</span>,
-  environment_name <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span></span>
+<span>  key_value <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  year <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tz <span class="op">=</span> <span class="st">"UTC"</span>,</span>
+<span>  case <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  wide <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  period <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  month <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  day <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  hour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minute <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interval <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  simulation_days <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  day_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  environment_name <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -913,8 +918,8 @@ output can be obtained using
 environment data to extract. If <code>NULL</code>, all environment data
 are returned. Default: <code>NULL</code>. All possible
 <code>environment_name</code> for current simulation output can be
-obtained using:</p><div class="sourceCode"><pre><code>$read_table("EnvironmentPeriods")
-</code></pre></div></dd>
+obtained using:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span><span class="fu">read_table</span>(<span class="st">"EnvironmentPeriods"</span>)</span></code></pre><p></p></div></dd>
 
 
 </dl><p></p></div>
@@ -1032,19 +1037,19 @@ job$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
 </div>
 
 
-</div><p></p><hr><a id="method-tabular_data"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-tabular_data"></a><div class="section">
 <h3 id="method-tabular-data-">Method <code>tabular_data()</code><a class="anchor" aria-label="anchor" href="#method-tabular-data-"></a></h3>
 <p>Read tabular data</p><div class="section">
 <h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>
-  report_name <span class="op">=</span> <span class="cn">NULL</span>,
-  report_for <span class="op">=</span> <span class="cn">NULL</span>,
-  table_name <span class="op">=</span> <span class="cn">NULL</span>,
-  column_name <span class="op">=</span> <span class="cn">NULL</span>,
-  row_name <span class="op">=</span> <span class="cn">NULL</span>,
-  wide <span class="op">=</span> <span class="cn">FALSE</span>,
-  string_value <span class="op">=</span> <span class="op">!</span><span class="va">wide</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span>
+<span>  report_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  report_for <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  table_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  column_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  row_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wide <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  string_value <span class="op">=</span> <span class="op">!</span><span class="va">wide</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -1127,11 +1132,11 @@ str(job$tabular_data(
 </div>
 
 
-</div><p></p><hr><a id="method-print"></a><div class="section">
+</div><p></p><hr><a id="method-EplusJob-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print <code>EplusSql</code> object</p><div class="section">
 <h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">EplusJob</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EplusJob</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -1164,269 +1169,269 @@ job$print()
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$new`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="va">name_idf</span> <span class="op">&lt;-</span> <span class="st">"1ZoneUncontrolled.idf"</span></span>
-<span class="r-in">    <span class="va">name_epw</span> <span class="op">&lt;-</span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_idf</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_epw</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># create from local files</span></span>
-<span class="r-in">    <span class="va">job</span> <span class="op">&lt;-</span> <span class="fu">eplus_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># create from an Idf and an Epw object</span></span>
-<span class="r-in">    <span class="va">job</span> <span class="op">&lt;-</span> <span class="fu">eplus_job</span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>, <span class="fu"><a href="read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$version`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$path`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="st">"idf"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="st">"epw"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$run`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># only run design day</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># specify output directory</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># run in the background</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># see job status</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># force to kill background job before running the new one</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># do not show anything in the console</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># copy external files used in the model to simulation output directory</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>copy_external <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$kill`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$status`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$errors`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># show all information</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span>info <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$output_dir`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">output_dir</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Below will open output directory</span></span>
-<span class="r-in"><span class="co"># job$output_dir(open = TRUE)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$list_files`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># list all files in the output directory</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span>simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get a full list of all possible inputs and outputs even though they</span></span>
-<span class="r-in"><span class="co"># may not exist for current simulation</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># return the full paths instead of just file names</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span>full <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$locate_output`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># get the file path of the error file</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span><span class="st">".err"</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># can use to detect if certain output file exists</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span><span class="st">".expidf"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$read_rdd`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$read_mdd`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$list_table`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">list_table</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$read_table`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># read a specific table</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$report_data_dict`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$report_data`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># read all report data</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># specify output variables using report data dictionary</span></span>
-<span class="r-in"><span class="va">dict</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># specify output variables using 'key_value' and 'name'</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="st">"environment"</span>, <span class="st">"site outdoor air drybulb temperature"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># explicitly specify year value and time zone</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, year <span class="op">=</span> <span class="fl">2020</span>, tz <span class="op">=</span> <span class="st">"Etc/GMT+8"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># explicitly specify case name</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, case <span class="op">=</span> <span class="st">"example"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get all possible columns</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># return in a format that is similar as EnergyPlus CSV output</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># return in a format that is similar as EnergyPlus CSV output with</span></span>
-<span class="r-in"><span class="co"># extra columns</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, wide <span class="op">=</span> <span class="cn">TRUE</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># only get data at the working hour on the first Monday</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, hour <span class="op">=</span> <span class="fl">8</span><span class="op">:</span><span class="fl">18</span>, day_type <span class="op">=</span> <span class="st">"monday"</span>, simulation_days <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># only get specified run period data</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"EnvironmentPeriods"</span><span class="op">)</span> <span class="co"># possible environment name</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, environment_name <span class="op">=</span> <span class="st">"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># can also be done using 'environment_period_index' column</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">environment_period_index</span> <span class="op">==</span> <span class="fl">3L</span><span class="op">]</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$tabular_data`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># read all tabular data</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># explicitly specify data you want</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span>
-<span class="r-in">    report_name <span class="op">=</span> <span class="st">"AnnualBuildingUtilityPerformanceSummary"</span>,</span>
-<span class="r-in">    table_name <span class="op">=</span> <span class="st">"Site and Source Energy"</span>,</span>
-<span class="r-in">    column_name <span class="op">=</span> <span class="st">"Total Energy"</span>,</span>
-<span class="r-in">    row_name <span class="op">=</span> <span class="st">"Total Site Energy"</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get tabular data in wide format and coerce numeric values</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span>
-<span class="r-in">    report_name <span class="op">=</span> <span class="st">"AnnualBuildingUtilityPerformanceSummary"</span>,</span>
-<span class="r-in">    table_name <span class="op">=</span> <span class="st">"Site and Source Energy"</span>,</span>
-<span class="r-in">    column_name <span class="op">=</span> <span class="st">"Total Energy"</span>,</span>
-<span class="r-in">    row_name <span class="op">=</span> <span class="st">"Total Site Energy"</span>,</span>
-<span class="r-in">    wide <span class="op">=</span> <span class="cn">TRUE</span>, string_value <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"><span class="co">## Method `EplusJob$print`</span></span>
-<span class="r-in"><span class="co">## ------------------------------------------------</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">job</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$new`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">name_idf</span> <span class="op">&lt;-</span> <span class="st">"1ZoneUncontrolled.idf"</span></span></span>
+<span class="r-in"><span>    <span class="va">name_epw</span> <span class="op">&lt;-</span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># create from local files</span></span></span>
+<span class="r-in"><span>    <span class="va">job</span> <span class="op">&lt;-</span> <span class="fu">eplus_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># create from an Idf and an Epw object</span></span></span>
+<span class="r-in"><span>    <span class="va">job</span> <span class="op">&lt;-</span> <span class="fu">eplus_job</span><span class="op">(</span><span class="fu"><a href="read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span>, <span class="fu"><a href="read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path_epw</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$version`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$path`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="st">"idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">path</span><span class="op">(</span><span class="st">"epw"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$run`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># only run design day</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># specify output directory</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run in the background</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># see job status</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># force to kill background job before running the new one</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># do not show anything in the console</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>echo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># copy external files used in the model to simulation output directory</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>copy_external <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$kill`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$status`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$errors`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># show all information</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span>info <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$output_dir`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">output_dir</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Below will open output directory</span></span></span>
+<span class="r-in"><span><span class="co"># job$output_dir(open = TRUE)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$list_files`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># list all files in the output directory</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span>simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get a full list of all possible inputs and outputs even though they</span></span></span>
+<span class="r-in"><span><span class="co"># may not exist for current simulation</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">list_files</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># return the full paths instead of just file names</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span>full <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$locate_output`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># get the file path of the error file</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span><span class="st">".err"</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># can use to detect if certain output file exists</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">locate_output</span><span class="op">(</span><span class="st">".expidf"</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$read_rdd`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">read_rdd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$read_mdd`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">read_mdd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$list_table`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">list_table</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$read_table`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># read a specific table</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$report_data_dict`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$report_data`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># read all report data</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># specify output variables using report data dictionary</span></span></span>
+<span class="r-in"><span><span class="va">dict</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># specify output variables using 'key_value' and 'name'</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="st">"environment"</span>, <span class="st">"site outdoor air drybulb temperature"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># explicitly specify year value and time zone</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, year <span class="op">=</span> <span class="fl">2020</span>, tz <span class="op">=</span> <span class="st">"Etc/GMT+8"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># explicitly specify case name</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, case <span class="op">=</span> <span class="st">"example"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get all possible columns</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># return in a format that is similar as EnergyPlus CSV output</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># return in a format that is similar as EnergyPlus CSV output with</span></span></span>
+<span class="r-in"><span><span class="co"># extra columns</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, wide <span class="op">=</span> <span class="cn">TRUE</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># only get data at the working hour on the first Monday</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, hour <span class="op">=</span> <span class="fl">8</span><span class="op">:</span><span class="fl">18</span>, day_type <span class="op">=</span> <span class="st">"monday"</span>, simulation_days <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># only get specified run period data</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"EnvironmentPeriods"</span><span class="op">)</span> <span class="co"># possible environment name</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, environment_name <span class="op">=</span> <span class="st">"San Francisco Intl Ap CA USA TMY3 WMO#=724940"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># can also be done using 'environment_period_index' column</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">dict</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">environment_period_index</span> <span class="op">==</span> <span class="fl">3L</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$tabular_data`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># read all tabular data</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># explicitly specify data you want</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    report_name <span class="op">=</span> <span class="st">"AnnualBuildingUtilityPerformanceSummary"</span>,</span></span>
+<span class="r-in"><span>    table_name <span class="op">=</span> <span class="st">"Site and Source Energy"</span>,</span></span>
+<span class="r-in"><span>    column_name <span class="op">=</span> <span class="st">"Total Energy"</span>,</span></span>
+<span class="r-in"><span>    row_name <span class="op">=</span> <span class="st">"Total Site Energy"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get tabular data in wide format and coerce numeric values</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    report_name <span class="op">=</span> <span class="st">"AnnualBuildingUtilityPerformanceSummary"</span>,</span></span>
+<span class="r-in"><span>    table_name <span class="op">=</span> <span class="st">"Site and Source Energy"</span>,</span></span>
+<span class="r-in"><span>    column_name <span class="op">=</span> <span class="st">"Total Energy"</span>,</span></span>
+<span class="r-in"><span>    row_name <span class="op">=</span> <span class="st">"Total Site Energy"</span>,</span></span>
+<span class="r-in"><span>    wide <span class="op">=</span> <span class="cn">TRUE</span>, string_value <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `EplusJob$print`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -1441,7 +1446,7 @@ job$print()
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
