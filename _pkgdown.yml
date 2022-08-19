@@ -83,7 +83,6 @@ reference:
       - as.character.IdfObject
       - format.Idf
       - format.IdfObject
-      - plot.Idf
 
   - title: IDF schedules
     desc: Class for IDF `Schedule:Compact` objects
