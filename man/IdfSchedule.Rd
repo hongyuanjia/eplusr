@@ -131,46 +131,46 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{IdfScheduleCompact$new()}}
-\item \href{#method-type_limits}{\code{IdfScheduleCompact$type_limits()}}
-\item \href{#method-set}{\code{IdfScheduleCompact$set()}}
-\item \href{#method-update}{\code{IdfScheduleCompact$update()}}
-\item \href{#method-validate}{\code{IdfScheduleCompact$validate()}}
-\item \href{#method-is_valid}{\code{IdfScheduleCompact$is_valid()}}
-\item \href{#method-extract}{\code{IdfScheduleCompact$extract()}}
-\item \href{#method-clone}{\code{IdfScheduleCompact$clone()}}
+\item \href{#method-IdfScheduleCompact-new}{\code{IdfScheduleCompact$new()}}
+\item \href{#method-IdfScheduleCompact-type_limits}{\code{IdfScheduleCompact$type_limits()}}
+\item \href{#method-IdfScheduleCompact-set}{\code{IdfScheduleCompact$set()}}
+\item \href{#method-IdfScheduleCompact-update}{\code{IdfScheduleCompact$update()}}
+\item \href{#method-IdfScheduleCompact-validate}{\code{IdfScheduleCompact$validate()}}
+\item \href{#method-IdfScheduleCompact-is_valid}{\code{IdfScheduleCompact$is_valid()}}
+\item \href{#method-IdfScheduleCompact-extract}{\code{IdfScheduleCompact$extract()}}
+\item \href{#method-IdfScheduleCompact-clone}{\code{IdfScheduleCompact$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="class_name">}\href{../../eplusr/html/IdfObject.html#method-class_name}{\code{eplusr::IdfObject$class_name()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="comment">}\href{../../eplusr/html/IdfObject.html#method-comment}{\code{eplusr::IdfObject$comment()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="definition">}\href{../../eplusr/html/IdfObject.html#method-definition}{\code{eplusr::IdfObject$definition()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="group_name">}\href{../../eplusr/html/IdfObject.html#method-group_name}{\code{eplusr::IdfObject$group_name()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref">}\href{../../eplusr/html/IdfObject.html#method-has_ref}{\code{eplusr::IdfObject$has_ref()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_by">}\href{../../eplusr/html/IdfObject.html#method-has_ref_by}{\code{eplusr::IdfObject$has_ref_by()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node">}\href{../../eplusr/html/IdfObject.html#method-has_ref_node}{\code{eplusr::IdfObject$has_ref_node()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to">}\href{../../eplusr/html/IdfObject.html#method-has_ref_to}{\code{eplusr::IdfObject$has_ref_to()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id">}\href{../../eplusr/html/IdfObject.html#method-id}{\code{eplusr::IdfObject$id()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name">}\href{../../eplusr/html/IdfObject.html#method-name}{\code{eplusr::IdfObject$name()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent">}\href{../../eplusr/html/IdfObject.html#method-parent}{\code{eplusr::IdfObject$parent()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print">}\href{../../eplusr/html/IdfObject.html#method-print}{\code{eplusr::IdfObject$print()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_by_object">}\href{../../eplusr/html/IdfObject.html#method-ref_by_object}{\code{eplusr::IdfObject$ref_by_object()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_node">}\href{../../eplusr/html/IdfObject.html#method-ref_to_node}{\code{eplusr::IdfObject$ref_to_node()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_object">}\href{../../eplusr/html/IdfObject.html#method-ref_to_object}{\code{eplusr::IdfObject$ref_to_object()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_string">}\href{../../eplusr/html/IdfObject.html#method-to_string}{\code{eplusr::IdfObject$to_string()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_table">}\href{../../eplusr/html/IdfObject.html#method-to_table}{\code{eplusr::IdfObject$to_table()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value">}\href{../../eplusr/html/IdfObject.html#method-value}{\code{eplusr::IdfObject$value()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_possible">}\href{../../eplusr/html/IdfObject.html#method-value_possible}{\code{eplusr::IdfObject$value_possible()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_relation">}\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{eplusr::IdfObject$value_relation()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="version">}\href{../../eplusr/html/IdfObject.html#method-version}{\code{eplusr::IdfObject$version()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="class_name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-class_name'><code>eplusr::IdfObject$class_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="comment"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-comment'><code>eplusr::IdfObject$comment()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="definition"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-definition'><code>eplusr::IdfObject$definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="group_name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-group_name'><code>eplusr::IdfObject$group_name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref'><code>eplusr::IdfObject$has_ref()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_by"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_by'><code>eplusr::IdfObject$has_ref_by()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_node'><code>eplusr::IdfObject$has_ref_node()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_to'><code>eplusr::IdfObject$has_ref_to()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-id'><code>eplusr::IdfObject$id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-name'><code>eplusr::IdfObject$name()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-parent'><code>eplusr::IdfObject$parent()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-print'><code>eplusr::IdfObject$print()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_by_object"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-ref_by_object'><code>eplusr::IdfObject$ref_by_object()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_node"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-ref_to_node'><code>eplusr::IdfObject$ref_to_node()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="ref_to_object"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-ref_to_object'><code>eplusr::IdfObject$ref_to_object()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_string"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-to_string'><code>eplusr::IdfObject$to_string()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="to_table"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-to_table'><code>eplusr::IdfObject$to_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-value'><code>eplusr::IdfObject$value()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_possible"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-value_possible'><code>eplusr::IdfObject$value_possible()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="value_relation"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-value_relation'><code>eplusr::IdfObject$value_relation()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="version"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-version'><code>eplusr::IdfObject$version()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-new"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{IdfScheduleCompact} object
 \subsection{Usage}{
@@ -210,8 +210,8 @@ sch <- schedule_compact(model, "sch")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-type_limits"></a>}}
-\if{latex}{\out{\hypertarget{method-type_limits}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-type_limits"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-type_limits}{}}}
 \subsection{Method \code{type_limits()}}{
 Get or set the schedule type limits
 \subsection{Usage}{
@@ -236,8 +236,8 @@ A list of 2 elements:
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-set"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-set}{}}}
 \subsection{Method \code{set()}}{
 Set schedule values
 \subsection{Usage}{
@@ -286,8 +286,8 @@ sch$set(c("weekday", "summerdesignday") := list(
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update"></a>}}
-\if{latex}{\out{\hypertarget{method-update}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-update"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-update}{}}}
 \subsection{Method \code{update()}}{
 Update schedule values using data.frame
 \subsection{Usage}{
@@ -390,8 +390,8 @@ sch$update(val)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-validate"></a>}}
-\if{latex}{\out{\hypertarget{method-validate}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-validate"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-validate}{}}}
 \subsection{Method \code{validate()}}{
 Check possible object field value errors
 \subsection{Usage}{
@@ -440,8 +440,8 @@ sch$validate("final")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
 Check if there is any error in current object
 \subsection{Usage}{
@@ -487,8 +487,8 @@ sch$is_valid()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-extract"></a>}}
-\if{latex}{\out{\hypertarget{method-extract}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-extract"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-extract}{}}}
 \subsection{Method \code{extract()}}{
 Extract schedule values
 \subsection{Usage}{
@@ -561,8 +561,8 @@ sch$extract(timestep = "30 mins")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-IdfScheduleCompact-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfScheduleCompact-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

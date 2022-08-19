@@ -417,37 +417,37 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{IdfObject$new()}}
-\item \href{#method-version}{\code{IdfObject$version()}}
-\item \href{#method-parent}{\code{IdfObject$parent()}}
-\item \href{#method-id}{\code{IdfObject$id()}}
-\item \href{#method-name}{\code{IdfObject$name()}}
-\item \href{#method-group_name}{\code{IdfObject$group_name()}}
-\item \href{#method-class_name}{\code{IdfObject$class_name()}}
-\item \href{#method-definition}{\code{IdfObject$definition()}}
-\item \href{#method-comment}{\code{IdfObject$comment()}}
-\item \href{#method-value}{\code{IdfObject$value()}}
-\item \href{#method-set}{\code{IdfObject$set()}}
-\item \href{#method-value_possible}{\code{IdfObject$value_possible()}}
-\item \href{#method-validate}{\code{IdfObject$validate()}}
-\item \href{#method-is_valid}{\code{IdfObject$is_valid()}}
-\item \href{#method-value_relation}{\code{IdfObject$value_relation()}}
-\item \href{#method-ref_to_object}{\code{IdfObject$ref_to_object()}}
-\item \href{#method-ref_by_object}{\code{IdfObject$ref_by_object()}}
-\item \href{#method-ref_to_node}{\code{IdfObject$ref_to_node()}}
-\item \href{#method-has_ref_to}{\code{IdfObject$has_ref_to()}}
-\item \href{#method-has_ref_by}{\code{IdfObject$has_ref_by()}}
-\item \href{#method-has_ref_node}{\code{IdfObject$has_ref_node()}}
-\item \href{#method-has_ref}{\code{IdfObject$has_ref()}}
-\item \href{#method-to_table}{\code{IdfObject$to_table()}}
-\item \href{#method-to_string}{\code{IdfObject$to_string()}}
-\item \href{#method-print}{\code{IdfObject$print()}}
-\item \href{#method-clone}{\code{IdfObject$clone()}}
+\item \href{#method-IdfObject-new}{\code{IdfObject$new()}}
+\item \href{#method-IdfObject-version}{\code{IdfObject$version()}}
+\item \href{#method-IdfObject-parent}{\code{IdfObject$parent()}}
+\item \href{#method-IdfObject-id}{\code{IdfObject$id()}}
+\item \href{#method-IdfObject-name}{\code{IdfObject$name()}}
+\item \href{#method-IdfObject-group_name}{\code{IdfObject$group_name()}}
+\item \href{#method-IdfObject-class_name}{\code{IdfObject$class_name()}}
+\item \href{#method-IdfObject-definition}{\code{IdfObject$definition()}}
+\item \href{#method-IdfObject-comment}{\code{IdfObject$comment()}}
+\item \href{#method-IdfObject-value}{\code{IdfObject$value()}}
+\item \href{#method-IdfObject-set}{\code{IdfObject$set()}}
+\item \href{#method-IdfObject-value_possible}{\code{IdfObject$value_possible()}}
+\item \href{#method-IdfObject-validate}{\code{IdfObject$validate()}}
+\item \href{#method-IdfObject-is_valid}{\code{IdfObject$is_valid()}}
+\item \href{#method-IdfObject-value_relation}{\code{IdfObject$value_relation()}}
+\item \href{#method-IdfObject-ref_to_object}{\code{IdfObject$ref_to_object()}}
+\item \href{#method-IdfObject-ref_by_object}{\code{IdfObject$ref_by_object()}}
+\item \href{#method-IdfObject-ref_to_node}{\code{IdfObject$ref_to_node()}}
+\item \href{#method-IdfObject-has_ref_to}{\code{IdfObject$has_ref_to()}}
+\item \href{#method-IdfObject-has_ref_by}{\code{IdfObject$has_ref_by()}}
+\item \href{#method-IdfObject-has_ref_node}{\code{IdfObject$has_ref_node()}}
+\item \href{#method-IdfObject-has_ref}{\code{IdfObject$has_ref()}}
+\item \href{#method-IdfObject-to_table}{\code{IdfObject$to_table()}}
+\item \href{#method-IdfObject-to_string}{\code{IdfObject$to_string()}}
+\item \href{#method-IdfObject-print}{\code{IdfObject$print()}}
+\item \href{#method-IdfObject-clone}{\code{IdfObject$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-IdfObject-new"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{IdfObject} object
 \subsection{Usage}{
@@ -497,8 +497,8 @@ mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-version"></a>}}
-\if{latex}{\out{\hypertarget{method-version}{}}}
+\if{html}{\out{<a id="method-IdfObject-version"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of parent \code{Idf}
 \subsection{Usage}{
@@ -529,8 +529,8 @@ roof$version()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-parent"></a>}}
-\if{latex}{\out{\hypertarget{method-parent}{}}}
+\if{html}{\out{<a id="method-IdfObject-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-parent}{}}}
 \subsection{Method \code{parent()}}{
 Get parent \link{Idf}
 \subsection{Usage}{
@@ -557,8 +557,8 @@ roof$parent()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-id"></a>}}
-\if{latex}{\out{\hypertarget{method-id}{}}}
+\if{html}{\out{<a id="method-IdfObject-id"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-id}{}}}
 \subsection{Method \code{id()}}{
 Get the unique ID for current object
 \subsection{Usage}{
@@ -589,8 +589,8 @@ roof$id()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-name"></a>}}
-\if{latex}{\out{\hypertarget{method-name}{}}}
+\if{html}{\out{<a id="method-IdfObject-name"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-name}{}}}
 \subsection{Method \code{name()}}{
 Get the name for current object.
 \subsection{Usage}{
@@ -628,8 +628,8 @@ idf$Version$name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-group_name"></a>}}
-\if{latex}{\out{\hypertarget{method-group_name}{}}}
+\if{html}{\out{<a id="method-IdfObject-group_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-group_name}{}}}
 \subsection{Method \code{group_name()}}{
 Get name of group for current object.
 \subsection{Usage}{
@@ -657,8 +657,8 @@ roof$group_name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-class_name"></a>}}
-\if{latex}{\out{\hypertarget{method-class_name}{}}}
+\if{html}{\out{<a id="method-IdfObject-class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-class_name}{}}}
 \subsection{Method \code{class_name()}}{
 Get name of class for current object.
 \subsection{Usage}{
@@ -686,8 +686,8 @@ roof$class_name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-definition"></a>}}
-\if{latex}{\out{\hypertarget{method-definition}{}}}
+\if{html}{\out{<a id="method-IdfObject-definition"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-definition}{}}}
 \subsection{Method \code{definition()}}{
 Get the \link{IddObject} object for current class.
 \subsection{Usage}{
@@ -716,8 +716,8 @@ roof$definition()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-comment"></a>}}
-\if{latex}{\out{\hypertarget{method-comment}{}}}
+\if{html}{\out{<a id="method-IdfObject-comment"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-comment}{}}}
 \subsection{Method \code{comment()}}{
 Get and modify object comments
 \subsection{Usage}{
@@ -797,8 +797,8 @@ roof$comment()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-value"></a>}}
-\if{latex}{\out{\hypertarget{method-value}{}}}
+\if{html}{\out{<a id="method-IdfObject-value"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-value}{}}}
 \subsection{Method \code{value()}}{
 Get object field values.
 \subsection{Usage}{
@@ -869,8 +869,8 @@ mat[c("Name", "Density")]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-IdfObject-set"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-set}{}}}
 \subsection{Method \code{set()}}{
 Modify object field values.
 \subsection{Usage}{
@@ -881,8 +881,10 @@ Modify object field values.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{...}}{New field value definitions in \code{field = value} format or a
-single list in format:\preformatted{list(field1 = value1, field2 = value2)
-}}
+single list in format:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(field1 = value1, field2 = value2)
+}\if{html}{\out{</div>}}}
 
 \item{\code{.default}}{If \code{TRUE}, default values are used for those blank
 fields if possible. Default: \code{TRUE}.}
@@ -927,8 +929,8 @@ mat$Thickness
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-value_possible"></a>}}
-\if{latex}{\out{\hypertarget{method-value_possible}{}}}
+\if{html}{\out{<a id="method-IdfObject-value_possible"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-value_possible}{}}}
 \subsection{Method \code{value_possible()}}{
 Get possible object field values.
 \subsection{Usage}{
@@ -957,9 +959,11 @@ vector of valid field names, and returns all possible values for specified
 fields. For a specific field, there are 5 types of possible values:
 \itemize{
 \item \code{auto}: Whether the field can be filled with \code{Autosize} and
-\code{Autocalculate}. This field attribute can also be retrieved using:\preformatted{idfobj$definition()$is_autosizable_field()
+\code{Autocalculate}. This field attribute can also be retrieved using:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{idfobj$definition()$is_autosizable_field()
 idfobj$definition()$is_autocalculatable_field()
-}
+}\if{html}{\out{</div>}}
 \item \code{default}: The default value. This value can also be retrieved using
 \code{idfobj$defintion()$field_default()}.
 \item \code{choice}: The choices which the field can be set. This value can also be
@@ -1022,8 +1026,8 @@ mat$value_possible()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-validate"></a>}}
-\if{latex}{\out{\hypertarget{method-validate}{}}}
+\if{html}{\out{<a id="method-IdfObject-validate"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-validate}{}}}
 \subsection{Method \code{validate()}}{
 Check possible object field value errors
 \subsection{Usage}{
@@ -1147,12 +1151,16 @@ method to correct them.
 
 Different validate result examples are shown below:
 \itemize{
-\item No error is found:\preformatted{v No error found.
-}
+\item No error is found:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{v No error found.
+}\if{html}{\out{</div>}}
 
 Above result shows that there is no error found after conducting all
 validate checks in specified validate level.
-\item Errors are found:\preformatted{ x [2] Errors found during validation.
+\item Errors are found:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ x [2] Errors found during validation.
 =========================================================================
 
 -- [2] Invalid Autocalculate Field --------------------------------------
@@ -1162,7 +1170,7 @@ validate checks in specified validate level.
     \\- Object [ID:176] <SPACE5-1 VAV Reheat>
        +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat \{m3/s-m2\}
        \\- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
-}
+}\if{html}{\out{</div>}}
 
 Above result shows that after all validate components
 performed under current validate level, 2 invalid field values
@@ -1170,12 +1178,14 @@ are found. All of them are in a object named \verb{SPACE5-1 VAV Reheat}
 with ID \code{176}. They are invalid because those two fields do not
 have an autocalculatable attribute but are given \code{AUTOCALCULATE}
 value. Knowing this info, one simple way to fix the
-error is to correct those two fields by doing:\preformatted{idf$set(..176 =
+error is to correct those two fields by doing:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{idf$set(..176 =
     list(`Maximum Flow per Zone Floor Area During Reheat` = "autosize",
          `Maximum Flow Fraction During Reheat` = "autosize"
     )
 )
-}
+}\if{html}{\out{</div>}}
 }
 }
 
@@ -1203,8 +1213,8 @@ mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid}{}}}
+\if{html}{\out{<a id="method-IdfObject-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
 Check if there is any error in current object
 \subsection{Usage}{
@@ -1260,8 +1270,8 @@ mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-value_relation"></a>}}
-\if{latex}{\out{\hypertarget{method-value_relation}{}}}
+\if{html}{\out{<a id="method-IdfObject-value_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-value_relation}{}}}
 \subsection{Method \code{value_relation()}}{
 Get value relations
 \subsection{Usage}{
@@ -1346,13 +1356,15 @@ independently, such as zone air node.
 relation. It takes field indexes or field names, together a relation
 direction, and returns an \code{IdfRelation} object which contains data
 presenting such relation described above. For instance, if
-\code{idfobj$value_relation("Name", "ref_by")} gives results below:\preformatted{-- Referred by Others ------------------------
+\code{idfobj$value_relation("Name", "ref_by")} gives results below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{-- Referred by Others ------------------------
   \\- 1: "WALL-1";      !- Name
      ^~~~~~~~~~~~~~~~~~~~~~~~~
      \\- Class: <BuildingSurface:Detailed>
         \\- Object [ID:3] <WALL-1PF>
            \\- 3: "WALL-1";      !- Construction Name
-}
+}\if{html}{\out{</div>}}
 
 This means that the value \code{"WALL-1"} of field \code{Name} is referred by
 field \verb{Construction Name} in a surface named \verb{WALL-1PF}. All those
@@ -1385,8 +1397,8 @@ roof$value_relation("name", direction = "ref_by")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ref_to_object"></a>}}
-\if{latex}{\out{\hypertarget{method-ref_to_object}{}}}
+\if{html}{\out{<a id="method-IdfObject-ref_to_object"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-ref_to_object}{}}}
 \subsection{Method \code{ref_to_object()}}{
 Extract multiple \code{IdfObject} objects referred by specified field values
 \subsection{Usage}{
@@ -1471,8 +1483,8 @@ mat$ref_to_object() # not referencing other objects
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ref_by_object"></a>}}
-\if{latex}{\out{\hypertarget{method-ref_by_object}{}}}
+\if{html}{\out{<a id="method-IdfObject-ref_by_object"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-ref_by_object}{}}}
 \subsection{Method \code{ref_by_object()}}{
 Extract multiple \code{IdfObject} objects referring to specified field values
 \subsection{Usage}{
@@ -1557,8 +1569,8 @@ mat$ref_by_object() # referenced by construction "FLOOR"
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ref_to_node"></a>}}
-\if{latex}{\out{\hypertarget{method-ref_to_node}{}}}
+\if{html}{\out{<a id="method-IdfObject-ref_to_node"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-ref_to_node}{}}}
 \subsection{Method \code{ref_to_node()}}{
 Extract multiple \code{IdfObject} objects referring to same nodes
 \subsection{Usage}{
@@ -1623,8 +1635,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref_to"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref_to}{}}}
+\if{html}{\out{<a id="method-IdfObject-has_ref_to"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-has_ref_to}{}}}
 \subsection{Method \code{has_ref_to()}}{
 Check if object field values refer to others
 \subsection{Usage}{
@@ -1707,8 +1719,8 @@ mat$has_ref_to()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref_by"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref_by}{}}}
+\if{html}{\out{<a id="method-IdfObject-has_ref_by"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-has_ref_by}{}}}
 \subsection{Method \code{has_ref_by()}}{
 Check if object field values are referred by others
 \subsection{Usage}{
@@ -1791,8 +1803,8 @@ mat$has_ref_by()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref_node"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref_node}{}}}
+\if{html}{\out{<a id="method-IdfObject-has_ref_node"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-has_ref_node}{}}}
 \subsection{Method \code{has_ref_node()}}{
 Check if object field values refer to other nodes
 \subsection{Usage}{
@@ -1852,8 +1864,8 @@ mat$has_ref_node()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref}{}}}
+\if{html}{\out{<a id="method-IdfObject-has_ref"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-has_ref}{}}}
 \subsection{Method \code{has_ref()}}{
 Check if object field values refer to or are referred by others
 \subsection{Usage}{
@@ -1916,8 +1928,8 @@ mat$has_ref()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_table"></a>}}
-\if{latex}{\out{\hypertarget{method-to_table}{}}}
+\if{html}{\out{<a id="method-IdfObject-to_table"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-to_table}{}}}
 \subsection{Method \code{to_table()}}{
 Format \code{IdfObject} as a data.frame
 \subsection{Usage}{
@@ -2044,8 +2056,8 @@ surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRU
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_string"></a>}}
-\if{latex}{\out{\hypertarget{method-to_string}{}}}
+\if{html}{\out{<a id="method-IdfObject-to_string"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-to_string}{}}}
 \subsection{Method \code{to_string()}}{
 Format current object as a character vector
 \subsection{Usage}{
@@ -2097,8 +2109,8 @@ mat$to_string(leading = 0)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-IdfObject-print"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{IdfObject} object
 \subsection{Usage}{
@@ -2155,8 +2167,8 @@ mat$print(auto_sep = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-IdfObject-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

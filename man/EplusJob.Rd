@@ -320,29 +320,29 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{EplusJob$new()}}
-\item \href{#method-version}{\code{EplusJob$version()}}
-\item \href{#method-path}{\code{EplusJob$path()}}
-\item \href{#method-run}{\code{EplusJob$run()}}
-\item \href{#method-kill}{\code{EplusJob$kill()}}
-\item \href{#method-status}{\code{EplusJob$status()}}
-\item \href{#method-errors}{\code{EplusJob$errors()}}
-\item \href{#method-output_dir}{\code{EplusJob$output_dir()}}
-\item \href{#method-list_files}{\code{EplusJob$list_files()}}
-\item \href{#method-locate_output}{\code{EplusJob$locate_output()}}
-\item \href{#method-read_rdd}{\code{EplusJob$read_rdd()}}
-\item \href{#method-read_mdd}{\code{EplusJob$read_mdd()}}
-\item \href{#method-list_table}{\code{EplusJob$list_table()}}
-\item \href{#method-read_table}{\code{EplusJob$read_table()}}
-\item \href{#method-report_data_dict}{\code{EplusJob$report_data_dict()}}
-\item \href{#method-report_data}{\code{EplusJob$report_data()}}
-\item \href{#method-tabular_data}{\code{EplusJob$tabular_data()}}
-\item \href{#method-print}{\code{EplusJob$print()}}
+\item \href{#method-EplusJob-new}{\code{EplusJob$new()}}
+\item \href{#method-EplusJob-version}{\code{EplusJob$version()}}
+\item \href{#method-EplusJob-path}{\code{EplusJob$path()}}
+\item \href{#method-EplusJob-run}{\code{EplusJob$run()}}
+\item \href{#method-EplusJob-kill}{\code{EplusJob$kill()}}
+\item \href{#method-EplusJob-status}{\code{EplusJob$status()}}
+\item \href{#method-EplusJob-errors}{\code{EplusJob$errors()}}
+\item \href{#method-EplusJob-output_dir}{\code{EplusJob$output_dir()}}
+\item \href{#method-EplusJob-list_files}{\code{EplusJob$list_files()}}
+\item \href{#method-EplusJob-locate_output}{\code{EplusJob$locate_output()}}
+\item \href{#method-EplusJob-read_rdd}{\code{EplusJob$read_rdd()}}
+\item \href{#method-EplusJob-read_mdd}{\code{EplusJob$read_mdd()}}
+\item \href{#method-EplusJob-list_table}{\code{EplusJob$list_table()}}
+\item \href{#method-EplusJob-read_table}{\code{EplusJob$read_table()}}
+\item \href{#method-EplusJob-report_data_dict}{\code{EplusJob$report_data_dict()}}
+\item \href{#method-EplusJob-report_data}{\code{EplusJob$report_data()}}
+\item \href{#method-EplusJob-tabular_data}{\code{EplusJob$tabular_data()}}
+\item \href{#method-EplusJob-print}{\code{EplusJob$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-EplusJob-new"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{EplusJob} object
 \subsection{Usage}{
@@ -385,8 +385,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-version"></a>}}
-\if{latex}{\out{\hypertarget{method-version}{}}}
+\if{html}{\out{<a id="method-EplusJob-version"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of IDF in current job
 \subsection{Usage}{
@@ -413,8 +413,8 @@ job$version()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-path"></a>}}
-\if{latex}{\out{\hypertarget{method-path}{}}}
+\if{html}{\out{<a id="method-EplusJob-path"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-path}{}}}
 \subsection{Method \code{path()}}{
 Get the paths of file that current \code{EpwSql} uses
 \subsection{Usage}{
@@ -453,8 +453,8 @@ job$path("epw")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-EplusJob-run"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-run}{}}}
 \subsection{Method \code{run()}}{
 Run simulationA
 \subsection{Usage}{
@@ -556,8 +556,8 @@ job$run(copy_external = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-kill"></a>}}
-\if{latex}{\out{\hypertarget{method-kill}{}}}
+\if{html}{\out{<a id="method-EplusJob-kill"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-kill}{}}}
 \subsection{Method \code{kill()}}{
 Kill current running job
 \subsection{Usage}{
@@ -585,8 +585,8 @@ job$kill()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-status"></a>}}
-\if{latex}{\out{\hypertarget{method-status}{}}}
+\if{html}{\out{<a id="method-EplusJob-status"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-status}{}}}
 \subsection{Method \code{status()}}{
 Get the job status
 \subsection{Usage}{
@@ -625,8 +625,8 @@ job$status()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-errors"></a>}}
-\if{latex}{\out{\hypertarget{method-errors}{}}}
+\if{html}{\out{<a id="method-EplusJob-errors"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-errors}{}}}
 \subsection{Method \code{errors()}}{
 Read simulation errors
 \subsection{Usage}{
@@ -666,8 +666,8 @@ job$errors(info = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-output_dir"></a>}}
-\if{latex}{\out{\hypertarget{method-output_dir}{}}}
+\if{html}{\out{<a id="method-EplusJob-output_dir"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-output_dir}{}}}
 \subsection{Method \code{output_dir()}}{
 Get simulation output directory
 \subsection{Usage}{
@@ -701,8 +701,8 @@ job$output_dir()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_files"></a>}}
-\if{latex}{\out{\hypertarget{method-list_files}{}}}
+\if{html}{\out{<a id="method-EplusJob-list_files"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-list_files}{}}}
 \subsection{Method \code{list_files()}}{
 List all output files in current simulation
 \subsection{Usage}{
@@ -818,8 +818,8 @@ job$locate_output(full = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-locate_output"></a>}}
-\if{latex}{\out{\hypertarget{method-locate_output}{}}}
+\if{html}{\out{<a id="method-EplusJob-locate_output"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-locate_output}{}}}
 \subsection{Method \code{locate_output()}}{
 Get path of output file
 \subsection{Usage}{
@@ -860,8 +860,8 @@ job$locate_output(".expidf", strict = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_rdd"></a>}}
-\if{latex}{\out{\hypertarget{method-read_rdd}{}}}
+\if{html}{\out{<a id="method-EplusJob-read_rdd"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-read_rdd}{}}}
 \subsection{Method \code{read_rdd()}}{
 Read Report Data Dictionary (RDD) file
 \subsection{Usage}{
@@ -889,8 +889,8 @@ job$read_rdd()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_mdd"></a>}}
-\if{latex}{\out{\hypertarget{method-read_mdd}{}}}
+\if{html}{\out{<a id="method-EplusJob-read_mdd"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-read_mdd}{}}}
 \subsection{Method \code{read_mdd()}}{
 Read Report Data Dictionary (RDD) file
 \subsection{Usage}{
@@ -918,8 +918,8 @@ job$read_mdd()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_table"></a>}}
-\if{latex}{\out{\hypertarget{method-list_table}{}}}
+\if{html}{\out{<a id="method-EplusJob-list_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-list_table}{}}}
 \subsection{Method \code{list_table()}}{
 List all table names in EnergyPlus SQL output
 \subsection{Usage}{
@@ -947,8 +947,8 @@ job$list_table()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_table"></a>}}
-\if{latex}{\out{\hypertarget{method-read_table}{}}}
+\if{html}{\out{<a id="method-EplusJob-read_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-read_table}{}}}
 \subsection{Method \code{read_table()}}{
 Read a single table from EnergyPlus SQL output
 \subsection{Usage}{
@@ -985,8 +985,8 @@ job$read_table("Zones")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data_dict"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data_dict}{}}}
+\if{html}{\out{<a id="method-EplusJob-report_data_dict"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-report_data_dict}{}}}
 \subsection{Method \code{report_data_dict()}}{
 Read report data dictionary from EnergyPlus SQL output
 \subsection{Usage}{
@@ -1033,8 +1033,8 @@ job$report_data_dict()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data}{}}}
+\if{html}{\out{<a id="method-EplusJob-report_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-report_data}{}}}
 \subsection{Method \code{report_data()}}{
 Read report data
 \subsection{Usage}{
@@ -1131,8 +1131,10 @@ output can be obtained using
 environment data to extract. If \code{NULL}, all environment data
 are returned. Default: \code{NULL}. All possible
 \code{environment_name} for current simulation output can be
-obtained using:\preformatted{$read_table("EnvironmentPeriods")
-}}
+obtained using:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$read_table("EnvironmentPeriods")
+}\if{html}{\out{</div>}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -1264,8 +1266,8 @@ job$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabular_data"></a>}}
-\if{latex}{\out{\hypertarget{method-tabular_data}{}}}
+\if{html}{\out{<a id="method-EplusJob-tabular_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-tabular_data}{}}}
 \subsection{Method \code{tabular_data()}}{
 Read tabular data
 \subsection{Usage}{
@@ -1362,8 +1364,8 @@ str(job$tabular_data(
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-EplusJob-print"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusJob-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{EplusSql} object
 \subsection{Usage}{

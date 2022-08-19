@@ -276,27 +276,27 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{EplusGroupJob$new()}}
-\item \href{#method-run}{\code{EplusGroupJob$run()}}
-\item \href{#method-kill}{\code{EplusGroupJob$kill()}}
-\item \href{#method-status}{\code{EplusGroupJob$status()}}
-\item \href{#method-errors}{\code{EplusGroupJob$errors()}}
-\item \href{#method-output_dir}{\code{EplusGroupJob$output_dir()}}
-\item \href{#method-list_files}{\code{EplusGroupJob$list_files()}}
-\item \href{#method-locate_output}{\code{EplusGroupJob$locate_output()}}
-\item \href{#method-list_table}{\code{EplusGroupJob$list_table()}}
-\item \href{#method-read_table}{\code{EplusGroupJob$read_table()}}
-\item \href{#method-read_rdd}{\code{EplusGroupJob$read_rdd()}}
-\item \href{#method-read_mdd}{\code{EplusGroupJob$read_mdd()}}
-\item \href{#method-report_data_dict}{\code{EplusGroupJob$report_data_dict()}}
-\item \href{#method-report_data}{\code{EplusGroupJob$report_data()}}
-\item \href{#method-tabular_data}{\code{EplusGroupJob$tabular_data()}}
-\item \href{#method-print}{\code{EplusGroupJob$print()}}
+\item \href{#method-EplusGroupJob-new}{\code{EplusGroupJob$new()}}
+\item \href{#method-EplusGroupJob-run}{\code{EplusGroupJob$run()}}
+\item \href{#method-EplusGroupJob-kill}{\code{EplusGroupJob$kill()}}
+\item \href{#method-EplusGroupJob-status}{\code{EplusGroupJob$status()}}
+\item \href{#method-EplusGroupJob-errors}{\code{EplusGroupJob$errors()}}
+\item \href{#method-EplusGroupJob-output_dir}{\code{EplusGroupJob$output_dir()}}
+\item \href{#method-EplusGroupJob-list_files}{\code{EplusGroupJob$list_files()}}
+\item \href{#method-EplusGroupJob-locate_output}{\code{EplusGroupJob$locate_output()}}
+\item \href{#method-EplusGroupJob-list_table}{\code{EplusGroupJob$list_table()}}
+\item \href{#method-EplusGroupJob-read_table}{\code{EplusGroupJob$read_table()}}
+\item \href{#method-EplusGroupJob-read_rdd}{\code{EplusGroupJob$read_rdd()}}
+\item \href{#method-EplusGroupJob-read_mdd}{\code{EplusGroupJob$read_mdd()}}
+\item \href{#method-EplusGroupJob-report_data_dict}{\code{EplusGroupJob$report_data_dict()}}
+\item \href{#method-EplusGroupJob-report_data}{\code{EplusGroupJob$report_data()}}
+\item \href{#method-EplusGroupJob-tabular_data}{\code{EplusGroupJob$tabular_data()}}
+\item \href{#method-EplusGroupJob-print}{\code{EplusGroupJob$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-new"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{EplusGroupJob} object
 \subsection{Usage}{
@@ -348,8 +348,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-run"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-run}{}}}
 \subsection{Method \code{run()}}{
 Run grouped simulations
 \subsection{Usage}{
@@ -445,8 +445,8 @@ group$run(copy_external = TRUE, echo = FALSE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-kill"></a>}}
-\if{latex}{\out{\hypertarget{method-kill}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-kill"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-kill}{}}}
 \subsection{Method \code{kill()}}{
 Kill current running jobs
 \subsection{Usage}{
@@ -475,8 +475,8 @@ group$kill()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-status"></a>}}
-\if{latex}{\out{\hypertarget{method-status}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-status"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-status}{}}}
 \subsection{Method \code{status()}}{
 Get the group job status
 \subsection{Usage}{
@@ -526,8 +526,8 @@ group$status()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-errors"></a>}}
-\if{latex}{\out{\hypertarget{method-errors}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-errors"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-errors}{}}}
 \subsection{Method \code{errors()}}{
 Read group simulation errors
 \subsection{Usage}{
@@ -571,8 +571,8 @@ group$errors(info = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-output_dir"></a>}}
-\if{latex}{\out{\hypertarget{method-output_dir}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-output_dir"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-output_dir}{}}}
 \subsection{Method \code{output_dir()}}{
 Get simulation output directory
 \subsection{Usage}{
@@ -612,8 +612,8 @@ group$output_dir(c(1, 4))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_files"></a>}}
-\if{latex}{\out{\hypertarget{method-list_files}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-list_files"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-list_files}{}}}
 \subsection{Method \code{list_files()}}{
 List all output files in simulations
 \subsection{Usage}{
@@ -742,8 +742,8 @@ group$locate_output(full = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-locate_output"></a>}}
-\if{latex}{\out{\hypertarget{method-locate_output}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-locate_output"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-locate_output}{}}}
 \subsection{Method \code{locate_output()}}{
 Get paths of output file
 \subsection{Usage}{
@@ -791,8 +791,8 @@ group$locate_output(c(1, 4), ".expidf", strict = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_table"></a>}}
-\if{latex}{\out{\hypertarget{method-list_table}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-list_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-list_table}{}}}
 \subsection{Method \code{list_table()}}{
 List all table names in EnergyPlus SQL outputs
 \subsection{Usage}{
@@ -830,8 +830,8 @@ group$list_table(c(1, 4))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_table"></a>}}
-\if{latex}{\out{\hypertarget{method-read_table}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-read_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-read_table}{}}}
 \subsection{Method \code{read_table()}}{
 Read the same table from EnergyPlus SQL outputs
 \subsection{Usage}{
@@ -877,8 +877,8 @@ group$read_table(c(1, 4), "Zones")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_rdd"></a>}}
-\if{latex}{\out{\hypertarget{method-read_rdd}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-read_rdd"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-read_rdd}{}}}
 \subsection{Method \code{read_rdd()}}{
 Read Report Data Dictionary (RDD) files
 \subsection{Usage}{
@@ -919,8 +919,8 @@ group$read_rdd(c(1, 4))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_mdd"></a>}}
-\if{latex}{\out{\hypertarget{method-read_mdd}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-read_mdd"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-read_mdd}{}}}
 \subsection{Method \code{read_mdd()}}{
 Read Meter Data Dictionary (MDD) files
 \subsection{Usage}{
@@ -961,8 +961,8 @@ group$read_mdd(c(1, 4))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data_dict"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data_dict}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-report_data_dict"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-report_data_dict}{}}}
 \subsection{Method \code{report_data_dict()}}{
 Read report data dictionary from EnergyPlus SQL outputs
 \subsection{Usage}{
@@ -1022,8 +1022,8 @@ group$report_data_dict(c(1, 4))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-report_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-report_data}{}}}
 \subsection{Method \code{report_data()}}{
 Read report data
 \subsection{Usage}{
@@ -1129,8 +1129,10 @@ A few grouped options are also provided:
 environment data to extract. If \code{NULL}, all environment data
 are returned. Default: \code{NULL}. All possible
 \code{environment_name} for current simulation output can be
-obtained using:\preformatted{$read_table(NULL, "EnvironmentPeriods")
-}}
+obtained using:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$read_table(NULL, "EnvironmentPeriods")
+}\if{html}{\out{</div>}}}
 
 \item{\code{case}}{If not \code{NULL}, a character column will be added indicates
 the case of this simulation. If \code{"auto"}, the name of the IDF
@@ -1260,8 +1262,8 @@ group$report_data(c(1, 4), dict[1], hour = 8:18, day_type = "monday", simulation
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabular_data"></a>}}
-\if{latex}{\out{\hypertarget{method-tabular_data}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-tabular_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-tabular_data}{}}}
 \subsection{Method \code{tabular_data()}}{
 Read tabular data
 \subsection{Usage}{
@@ -1366,8 +1368,8 @@ str(group$tabular_data(c(1, 4),
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-EplusGroupJob-print"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusGroupJob-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{EplusGroupJob} object
 \subsection{Usage}{

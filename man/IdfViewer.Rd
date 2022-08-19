@@ -187,29 +187,29 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{IdfViewer$new()}}
-\item \href{#method-parent}{\code{IdfViewer$parent()}}
-\item \href{#method-geometry}{\code{IdfViewer$geometry()}}
-\item \href{#method-device}{\code{IdfViewer$device()}}
-\item \href{#method-background}{\code{IdfViewer$background()}}
-\item \href{#method-viewpoint}{\code{IdfViewer$viewpoint()}}
-\item \href{#method-win_size}{\code{IdfViewer$win_size()}}
-\item \href{#method-mouse_mode}{\code{IdfViewer$mouse_mode()}}
-\item \href{#method-axis}{\code{IdfViewer$axis()}}
-\item \href{#method-ground}{\code{IdfViewer$ground()}}
-\item \href{#method-wireframe}{\code{IdfViewer$wireframe()}}
-\item \href{#method-x_ray}{\code{IdfViewer$x_ray()}}
-\item \href{#method-render_by}{\code{IdfViewer$render_by()}}
-\item \href{#method-show}{\code{IdfViewer$show()}}
-\item \href{#method-focus}{\code{IdfViewer$focus()}}
-\item \href{#method-close}{\code{IdfViewer$close()}}
-\item \href{#method-snapshot}{\code{IdfViewer$snapshot()}}
-\item \href{#method-print}{\code{IdfViewer$print()}}
+\item \href{#method-IdfViewer-new}{\code{IdfViewer$new()}}
+\item \href{#method-IdfViewer-parent}{\code{IdfViewer$parent()}}
+\item \href{#method-IdfViewer-geometry}{\code{IdfViewer$geometry()}}
+\item \href{#method-IdfViewer-device}{\code{IdfViewer$device()}}
+\item \href{#method-IdfViewer-background}{\code{IdfViewer$background()}}
+\item \href{#method-IdfViewer-viewpoint}{\code{IdfViewer$viewpoint()}}
+\item \href{#method-IdfViewer-win_size}{\code{IdfViewer$win_size()}}
+\item \href{#method-IdfViewer-mouse_mode}{\code{IdfViewer$mouse_mode()}}
+\item \href{#method-IdfViewer-axis}{\code{IdfViewer$axis()}}
+\item \href{#method-IdfViewer-ground}{\code{IdfViewer$ground()}}
+\item \href{#method-IdfViewer-wireframe}{\code{IdfViewer$wireframe()}}
+\item \href{#method-IdfViewer-x_ray}{\code{IdfViewer$x_ray()}}
+\item \href{#method-IdfViewer-render_by}{\code{IdfViewer$render_by()}}
+\item \href{#method-IdfViewer-show}{\code{IdfViewer$show()}}
+\item \href{#method-IdfViewer-focus}{\code{IdfViewer$focus()}}
+\item \href{#method-IdfViewer-close}{\code{IdfViewer$close()}}
+\item \href{#method-IdfViewer-snapshot}{\code{IdfViewer$snapshot()}}
+\item \href{#method-IdfViewer-print}{\code{IdfViewer$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-IdfViewer-new"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{IdfViewer} object
 \subsection{Usage}{
@@ -250,8 +250,8 @@ viewer <- IdfViewer$new(path_idf)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-parent"></a>}}
-\if{latex}{\out{\hypertarget{method-parent}{}}}
+\if{html}{\out{<a id="method-IdfViewer-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-parent}{}}}
 \subsection{Method \code{parent()}}{
 Get parent \link{Idf} object
 \subsection{Usage}{
@@ -278,8 +278,8 @@ viewer$parent()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-geometry"></a>}}
-\if{latex}{\out{\hypertarget{method-geometry}{}}}
+\if{html}{\out{<a id="method-IdfViewer-geometry"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-geometry}{}}}
 \subsection{Method \code{geometry()}}{
 Get parent \link{IdfGeometry} object
 \subsection{Usage}{
@@ -305,8 +305,8 @@ viewer$geometry()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-device"></a>}}
-\if{latex}{\out{\hypertarget{method-device}{}}}
+\if{html}{\out{<a id="method-IdfViewer-device"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-device}{}}}
 \subsection{Method \code{device()}}{
 Get Rgl device ID
 \subsection{Usage}{
@@ -334,8 +334,8 @@ viewer$device()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-background"></a>}}
-\if{latex}{\out{\hypertarget{method-background}{}}}
+\if{html}{\out{<a id="method-IdfViewer-background"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-background}{}}}
 \subsection{Method \code{background()}}{
 Set the background color of the scene
 \subsection{Usage}{
@@ -362,8 +362,8 @@ viewer$background("blue")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-viewpoint"></a>}}
-\if{latex}{\out{\hypertarget{method-viewpoint}{}}}
+\if{html}{\out{<a id="method-IdfViewer-viewpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-viewpoint}{}}}
 \subsection{Method \code{viewpoint()}}{
 Set the viewpoint orientation of the scene
 \subsection{Usage}{
@@ -416,8 +416,8 @@ viewer$viewpoint()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-win_size"></a>}}
-\if{latex}{\out{\hypertarget{method-win_size}{}}}
+\if{html}{\out{<a id="method-IdfViewer-win_size"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-win_size}{}}}
 \subsection{Method \code{win_size()}}{
 Set the window size
 \subsection{Usage}{
@@ -445,8 +445,8 @@ viewer$win_size(0, 0, 400, 500)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mouse_mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mouse_mode}{}}}
+\if{html}{\out{<a id="method-IdfViewer-mouse_mode"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-mouse_mode}{}}}
 \subsection{Method \code{mouse_mode()}}{
 Set the handlers of mouse control
 \subsection{Usage}{
@@ -497,8 +497,8 @@ viewer$mouse_mode()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-axis"></a>}}
-\if{latex}{\out{\hypertarget{method-axis}{}}}
+\if{html}{\out{<a id="method-IdfViewer-axis"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-axis}{}}}
 \subsection{Method \code{axis()}}{
 Toggle axis in the scene
 \subsection{Usage}{
@@ -549,8 +549,8 @@ viewer$axis()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ground"></a>}}
-\if{latex}{\out{\hypertarget{method-ground}{}}}
+\if{html}{\out{<a id="method-IdfViewer-ground"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-ground}{}}}
 \subsection{Method \code{ground()}}{
 Toggle ground in the scene
 \subsection{Usage}{
@@ -591,8 +591,8 @@ viewer$ground()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-wireframe"></a>}}
-\if{latex}{\out{\hypertarget{method-wireframe}{}}}
+\if{html}{\out{<a id="method-IdfViewer-wireframe"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-wireframe}{}}}
 \subsection{Method \code{wireframe()}}{
 Toggle wireframe
 \subsection{Usage}{
@@ -633,8 +633,8 @@ viewer$wireframe()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-x_ray"></a>}}
-\if{latex}{\out{\hypertarget{method-x_ray}{}}}
+\if{html}{\out{<a id="method-IdfViewer-x_ray"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-x_ray}{}}}
 \subsection{Method \code{x_ray()}}{
 Toggle X-ray face style
 \subsection{Usage}{
@@ -668,8 +668,8 @@ viewer$x_ray()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-render_by"></a>}}
-\if{latex}{\out{\hypertarget{method-render_by}{}}}
+\if{html}{\out{<a id="method-IdfViewer-render_by"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-render_by}{}}}
 \subsection{Method \code{render_by()}}{
 Set render style
 \subsection{Usage}{
@@ -716,8 +716,8 @@ viewer$render_by()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-show"></a>}}
-\if{latex}{\out{\hypertarget{method-show}{}}}
+\if{html}{\out{<a id="method-IdfViewer-show"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-show}{}}}
 \subsection{Method \code{show()}}{
 Show \link{Idf} geometry
 \subsection{Usage}{
@@ -780,8 +780,8 @@ viewer$show()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-focus"></a>}}
-\if{latex}{\out{\hypertarget{method-focus}{}}}
+\if{html}{\out{<a id="method-IdfViewer-focus"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-focus}{}}}
 \subsection{Method \code{focus()}}{
 Bring the scene window to the top
 \subsection{Usage}{
@@ -800,8 +800,8 @@ viewer$top()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-IdfViewer-close"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-close}{}}}
 \subsection{Method \code{close()}}{
 Close the scene window
 \subsection{Usage}{
@@ -820,8 +820,8 @@ viewer$close()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-snapshot"></a>}}
-\if{latex}{\out{\hypertarget{method-snapshot}{}}}
+\if{html}{\out{<a id="method-IdfViewer-snapshot"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-snapshot}{}}}
 \subsection{Method \code{snapshot()}}{
 Capture and save current rgl view as an image
 \subsection{Usage}{
@@ -865,8 +865,8 @@ viewer$snapshot(tempfile(fileext = ".png"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-IdfViewer-print"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfViewer-print}{}}}
 \subsection{Method \code{print()}}{
 Print an \code{IdfViewer} object
 \subsection{Usage}{
