@@ -574,58 +574,58 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{IddObject$new()}}
-\item \href{#method-version}{\code{IddObject$version()}}
-\item \href{#method-parent}{\code{IddObject$parent()}}
-\item \href{#method-group_name}{\code{IddObject$group_name()}}
-\item \href{#method-group_index}{\code{IddObject$group_index()}}
-\item \href{#method-class_name}{\code{IddObject$class_name()}}
-\item \href{#method-class_index}{\code{IddObject$class_index()}}
-\item \href{#method-class_format}{\code{IddObject$class_format()}}
-\item \href{#method-min_fields}{\code{IddObject$min_fields()}}
-\item \href{#method-num_fields}{\code{IddObject$num_fields()}}
-\item \href{#method-memo}{\code{IddObject$memo()}}
-\item \href{#method-num_extensible}{\code{IddObject$num_extensible()}}
-\item \href{#method-first_extensible_index}{\code{IddObject$first_extensible_index()}}
-\item \href{#method-extensible_group_num}{\code{IddObject$extensible_group_num()}}
-\item \href{#method-add_extensible_group}{\code{IddObject$add_extensible_group()}}
-\item \href{#method-del_extensible_group}{\code{IddObject$del_extensible_group()}}
-\item \href{#method-has_name}{\code{IddObject$has_name()}}
-\item \href{#method-is_required}{\code{IddObject$is_required()}}
-\item \href{#method-is_unique}{\code{IddObject$is_unique()}}
-\item \href{#method-is_extensible}{\code{IddObject$is_extensible()}}
-\item \href{#method-field_name}{\code{IddObject$field_name()}}
-\item \href{#method-field_index}{\code{IddObject$field_index()}}
-\item \href{#method-field_type}{\code{IddObject$field_type()}}
-\item \href{#method-field_note}{\code{IddObject$field_note()}}
-\item \href{#method-field_unit}{\code{IddObject$field_unit()}}
-\item \href{#method-field_default}{\code{IddObject$field_default()}}
-\item \href{#method-field_choice}{\code{IddObject$field_choice()}}
-\item \href{#method-field_range}{\code{IddObject$field_range()}}
-\item \href{#method-field_relation}{\code{IddObject$field_relation()}}
-\item \href{#method-field_possible}{\code{IddObject$field_possible()}}
-\item \href{#method-is_valid_field_num}{\code{IddObject$is_valid_field_num()}}
-\item \href{#method-is_extensible_index}{\code{IddObject$is_extensible_index()}}
-\item \href{#method-is_valid_field_name}{\code{IddObject$is_valid_field_name()}}
-\item \href{#method-is_valid_field_index}{\code{IddObject$is_valid_field_index()}}
-\item \href{#method-is_autosizable_field}{\code{IddObject$is_autosizable_field()}}
-\item \href{#method-is_autocalculatable_field}{\code{IddObject$is_autocalculatable_field()}}
-\item \href{#method-is_numeric_field}{\code{IddObject$is_numeric_field()}}
-\item \href{#method-is_real_field}{\code{IddObject$is_real_field()}}
-\item \href{#method-is_integer_field}{\code{IddObject$is_integer_field()}}
-\item \href{#method-is_required_field}{\code{IddObject$is_required_field()}}
-\item \href{#method-has_ref}{\code{IddObject$has_ref()}}
-\item \href{#method-has_ref_to}{\code{IddObject$has_ref_to()}}
-\item \href{#method-has_ref_by}{\code{IddObject$has_ref_by()}}
-\item \href{#method-outputs}{\code{IddObject$outputs()}}
-\item \href{#method-to_table}{\code{IddObject$to_table()}}
-\item \href{#method-to_string}{\code{IddObject$to_string()}}
-\item \href{#method-print}{\code{IddObject$print()}}
+\item \href{#method-IddObject-new}{\code{IddObject$new()}}
+\item \href{#method-IddObject-version}{\code{IddObject$version()}}
+\item \href{#method-IddObject-parent}{\code{IddObject$parent()}}
+\item \href{#method-IddObject-group_name}{\code{IddObject$group_name()}}
+\item \href{#method-IddObject-group_index}{\code{IddObject$group_index()}}
+\item \href{#method-IddObject-class_name}{\code{IddObject$class_name()}}
+\item \href{#method-IddObject-class_index}{\code{IddObject$class_index()}}
+\item \href{#method-IddObject-class_format}{\code{IddObject$class_format()}}
+\item \href{#method-IddObject-min_fields}{\code{IddObject$min_fields()}}
+\item \href{#method-IddObject-num_fields}{\code{IddObject$num_fields()}}
+\item \href{#method-IddObject-memo}{\code{IddObject$memo()}}
+\item \href{#method-IddObject-num_extensible}{\code{IddObject$num_extensible()}}
+\item \href{#method-IddObject-first_extensible_index}{\code{IddObject$first_extensible_index()}}
+\item \href{#method-IddObject-extensible_group_num}{\code{IddObject$extensible_group_num()}}
+\item \href{#method-IddObject-add_extensible_group}{\code{IddObject$add_extensible_group()}}
+\item \href{#method-IddObject-del_extensible_group}{\code{IddObject$del_extensible_group()}}
+\item \href{#method-IddObject-has_name}{\code{IddObject$has_name()}}
+\item \href{#method-IddObject-is_required}{\code{IddObject$is_required()}}
+\item \href{#method-IddObject-is_unique}{\code{IddObject$is_unique()}}
+\item \href{#method-IddObject-is_extensible}{\code{IddObject$is_extensible()}}
+\item \href{#method-IddObject-field_name}{\code{IddObject$field_name()}}
+\item \href{#method-IddObject-field_index}{\code{IddObject$field_index()}}
+\item \href{#method-IddObject-field_type}{\code{IddObject$field_type()}}
+\item \href{#method-IddObject-field_note}{\code{IddObject$field_note()}}
+\item \href{#method-IddObject-field_unit}{\code{IddObject$field_unit()}}
+\item \href{#method-IddObject-field_default}{\code{IddObject$field_default()}}
+\item \href{#method-IddObject-field_choice}{\code{IddObject$field_choice()}}
+\item \href{#method-IddObject-field_range}{\code{IddObject$field_range()}}
+\item \href{#method-IddObject-field_relation}{\code{IddObject$field_relation()}}
+\item \href{#method-IddObject-field_possible}{\code{IddObject$field_possible()}}
+\item \href{#method-IddObject-is_valid_field_num}{\code{IddObject$is_valid_field_num()}}
+\item \href{#method-IddObject-is_extensible_index}{\code{IddObject$is_extensible_index()}}
+\item \href{#method-IddObject-is_valid_field_name}{\code{IddObject$is_valid_field_name()}}
+\item \href{#method-IddObject-is_valid_field_index}{\code{IddObject$is_valid_field_index()}}
+\item \href{#method-IddObject-is_autosizable_field}{\code{IddObject$is_autosizable_field()}}
+\item \href{#method-IddObject-is_autocalculatable_field}{\code{IddObject$is_autocalculatable_field()}}
+\item \href{#method-IddObject-is_numeric_field}{\code{IddObject$is_numeric_field()}}
+\item \href{#method-IddObject-is_real_field}{\code{IddObject$is_real_field()}}
+\item \href{#method-IddObject-is_integer_field}{\code{IddObject$is_integer_field()}}
+\item \href{#method-IddObject-is_required_field}{\code{IddObject$is_required_field()}}
+\item \href{#method-IddObject-has_ref}{\code{IddObject$has_ref()}}
+\item \href{#method-IddObject-has_ref_to}{\code{IddObject$has_ref_to()}}
+\item \href{#method-IddObject-has_ref_by}{\code{IddObject$has_ref_by()}}
+\item \href{#method-IddObject-outputs}{\code{IddObject$outputs()}}
+\item \href{#method-IddObject-to_table}{\code{IddObject$to_table()}}
+\item \href{#method-IddObject-to_string}{\code{IddObject$to_string()}}
+\item \href{#method-IddObject-print}{\code{IddObject$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-IddObject-new"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{IddObject} object
 \subsection{Usage}{
@@ -663,8 +663,8 @@ surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-version"></a>}}
-\if{latex}{\out{\hypertarget{method-version}{}}}
+\if{html}{\out{<a id="method-IddObject-version"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of parent \code{Idd}
 \subsection{Usage}{
@@ -695,8 +695,8 @@ surf$version()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-parent"></a>}}
-\if{latex}{\out{\hypertarget{method-parent}{}}}
+\if{html}{\out{<a id="method-IddObject-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-parent}{}}}
 \subsection{Method \code{parent()}}{
 Get parent \link{Idd}
 \subsection{Usage}{
@@ -723,8 +723,8 @@ surf$parent()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-group_name"></a>}}
-\if{latex}{\out{\hypertarget{method-group_name}{}}}
+\if{html}{\out{<a id="method-IddObject-group_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-group_name}{}}}
 \subsection{Method \code{group_name()}}{
 Get the group name
 \subsection{Usage}{
@@ -751,8 +751,8 @@ surf$group_name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-group_index"></a>}}
-\if{latex}{\out{\hypertarget{method-group_index}{}}}
+\if{html}{\out{<a id="method-IddObject-group_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-group_index}{}}}
 \subsection{Method \code{group_index()}}{
 Get the group index
 \subsection{Usage}{
@@ -781,8 +781,8 @@ surf$group_index()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-class_name"></a>}}
-\if{latex}{\out{\hypertarget{method-class_name}{}}}
+\if{html}{\out{<a id="method-IddObject-class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-class_name}{}}}
 \subsection{Method \code{class_name()}}{
 Get the class name of current \code{IddObject}
 \subsection{Usage}{
@@ -809,8 +809,8 @@ surf$class_name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-class_index"></a>}}
-\if{latex}{\out{\hypertarget{method-class_index}{}}}
+\if{html}{\out{<a id="method-IddObject-class_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-class_index}{}}}
 \subsection{Method \code{class_index()}}{
 Get the class index
 \subsection{Usage}{
@@ -839,8 +839,8 @@ surf$class_index()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-class_format"></a>}}
-\if{latex}{\out{\hypertarget{method-class_format}{}}}
+\if{html}{\out{<a id="method-IddObject-class_format"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-class_format}{}}}
 \subsection{Method \code{class_format()}}{
 Get the class format
 \subsection{Usage}{
@@ -868,8 +868,8 @@ surf$class_format()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-min_fields"></a>}}
-\if{latex}{\out{\hypertarget{method-min_fields}{}}}
+\if{html}{\out{<a id="method-IddObject-min_fields"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-min_fields}{}}}
 \subsection{Method \code{min_fields()}}{
 Get the minimum field number of current class
 \subsection{Usage}{
@@ -897,8 +897,8 @@ surf$min_fields()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-num_fields"></a>}}
-\if{latex}{\out{\hypertarget{method-num_fields}{}}}
+\if{html}{\out{<a id="method-IddObject-num_fields"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-num_fields}{}}}
 \subsection{Method \code{num_fields()}}{
 Get the total field number of current class
 \subsection{Usage}{
@@ -926,8 +926,8 @@ surf$num_fields()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-memo"></a>}}
-\if{latex}{\out{\hypertarget{method-memo}{}}}
+\if{html}{\out{<a id="method-IddObject-memo"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-memo}{}}}
 \subsection{Method \code{memo()}}{
 Get the memo string of current class
 \subsection{Usage}{
@@ -955,8 +955,8 @@ surf$memo()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-num_extensible"></a>}}
-\if{latex}{\out{\hypertarget{method-num_extensible}{}}}
+\if{html}{\out{<a id="method-IddObject-num_extensible"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-num_extensible}{}}}
 \subsection{Method \code{num_extensible()}}{
 Get the field number of the extensible group in current class
 \subsection{Usage}{
@@ -990,8 +990,8 @@ surf$num_extensible()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-first_extensible_index"></a>}}
-\if{latex}{\out{\hypertarget{method-first_extensible_index}{}}}
+\if{html}{\out{<a id="method-IddObject-first_extensible_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-first_extensible_index}{}}}
 \subsection{Method \code{first_extensible_index()}}{
 Get the minimum field number of current class
 \subsection{Usage}{
@@ -1025,8 +1025,8 @@ surf$first_extensible_index()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-extensible_group_num"></a>}}
-\if{latex}{\out{\hypertarget{method-extensible_group_num}{}}}
+\if{html}{\out{<a id="method-IddObject-extensible_group_num"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-extensible_group_num}{}}}
 \subsection{Method \code{extensible_group_num()}}{
 Get the number of extensible groups in current class
 \subsection{Usage}{
@@ -1060,8 +1060,8 @@ surf$extensible_group_num()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_extensible_group"></a>}}
-\if{latex}{\out{\hypertarget{method-add_extensible_group}{}}}
+\if{html}{\out{<a id="method-IddObject-add_extensible_group"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-add_extensible_group}{}}}
 \subsection{Method \code{add_extensible_group()}}{
 Add extensible groups in current class
 \subsection{Usage}{
@@ -1114,8 +1114,8 @@ surf$extensible_group_num()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-del_extensible_group"></a>}}
-\if{latex}{\out{\hypertarget{method-del_extensible_group}{}}}
+\if{html}{\out{<a id="method-IddObject-del_extensible_group"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-del_extensible_group}{}}}
 \subsection{Method \code{del_extensible_group()}}{
 Delete extensible groups in current class
 \subsection{Usage}{
@@ -1168,8 +1168,8 @@ surf$extensible_group_num()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_name"></a>}}
-\if{latex}{\out{\hypertarget{method-has_name}{}}}
+\if{html}{\out{<a id="method-IddObject-has_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-has_name}{}}}
 \subsection{Method \code{has_name()}}{
 Check if current class has name attribute
 \subsection{Usage}{
@@ -1200,8 +1200,8 @@ surf$has_name()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_required"></a>}}
-\if{latex}{\out{\hypertarget{method-is_required}{}}}
+\if{html}{\out{<a id="method-IddObject-is_required"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_required}{}}}
 \subsection{Method \code{is_required()}}{
 Check if current class is required
 \subsection{Usage}{
@@ -1232,8 +1232,8 @@ surf$is_required()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_unique"></a>}}
-\if{latex}{\out{\hypertarget{method-is_unique}{}}}
+\if{html}{\out{<a id="method-IddObject-is_unique"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_unique}{}}}
 \subsection{Method \code{is_unique()}}{
 Check if current class is unique
 \subsection{Usage}{
@@ -1264,8 +1264,8 @@ surf$is_unique()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_extensible"></a>}}
-\if{latex}{\out{\hypertarget{method-is_extensible}{}}}
+\if{html}{\out{<a id="method-IddObject-is_extensible"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_extensible}{}}}
 \subsection{Method \code{is_extensible()}}{
 Check if current class is extensible
 \subsection{Usage}{
@@ -1297,8 +1297,8 @@ surf$is_extensible()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_name"></a>}}
-\if{latex}{\out{\hypertarget{method-field_name}{}}}
+\if{html}{\out{<a id="method-IddObject-field_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_name}{}}}
 \subsection{Method \code{field_name()}}{
 Get field names
 \subsection{Usage}{
@@ -1355,8 +1355,8 @@ surf$field_name(unit = TRUE, in_ip = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_index"></a>}}
-\if{latex}{\out{\hypertarget{method-field_index}{}}}
+\if{html}{\out{<a id="method-IddObject-field_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_index}{}}}
 \subsection{Method \code{field_index()}}{
 Get field indices
 \subsection{Usage}{
@@ -1398,8 +1398,8 @@ surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_type"></a>}}
-\if{latex}{\out{\hypertarget{method-field_type}{}}}
+\if{html}{\out{<a id="method-IddObject-field_type"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_type}{}}}
 \subsection{Method \code{field_type()}}{
 Get field types
 \subsection{Usage}{
@@ -1449,8 +1449,8 @@ surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_note"></a>}}
-\if{latex}{\out{\hypertarget{method-field_note}{}}}
+\if{html}{\out{<a id="method-IddObject-field_note"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_note}{}}}
 \subsection{Method \code{field_note()}}{
 Get field notes
 \subsection{Usage}{
@@ -1493,8 +1493,8 @@ surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_unit"></a>}}
-\if{latex}{\out{\hypertarget{method-field_unit}{}}}
+\if{html}{\out{<a id="method-IddObject-field_unit"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_unit}{}}}
 \subsection{Method \code{field_unit()}}{
 Get field units
 \subsection{Usage}{
@@ -1539,8 +1539,8 @@ surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_default"></a>}}
-\if{latex}{\out{\hypertarget{method-field_default}{}}}
+\if{html}{\out{<a id="method-IddObject-field_default"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_default}{}}}
 \subsection{Method \code{field_default()}}{
 Get field default value
 \subsection{Usage}{
@@ -1585,8 +1585,8 @@ surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_choice"></a>}}
-\if{latex}{\out{\hypertarget{method-field_choice}{}}}
+\if{html}{\out{<a id="method-IddObject-field_choice"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_choice}{}}}
 \subsection{Method \code{field_choice()}}{
 Get choices of field values
 \subsection{Usage}{
@@ -1628,8 +1628,8 @@ surf$field_choice(c("name", "sun exposure", "wind exposure"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_range"></a>}}
-\if{latex}{\out{\hypertarget{method-field_range}{}}}
+\if{html}{\out{<a id="method-IddObject-field_range"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_range}{}}}
 \subsection{Method \code{field_range()}}{
 Get field value ranges
 \subsection{Usage}{
@@ -1694,8 +1694,8 @@ surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_relation"></a>}}
-\if{latex}{\out{\hypertarget{method-field_relation}{}}}
+\if{html}{\out{<a id="method-IddObject-field_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_relation}{}}}
 \subsection{Method \code{field_relation()}}{
 Extract the relationship among fields
 \subsection{Usage}{
@@ -1757,14 +1757,16 @@ elements \code{ref_to} and \code{ref_by}. Underneath, \code{ref_to} and \code{re
 are \link[data.table:data.table]{data.table}s which contain source
 field data and reference field data with custom printing method. For
 instance, if \code{iddobj$field_relation(c(1, 2), "ref_to")} gives results
-below:\preformatted{-- Refer to Others ---------------------
+below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{-- Refer to Others ---------------------
   +- Field: <1: Field 1>
   |  v~~~~~~~~~~~~~~~~~~
   |  \\- Class: <Class 2>
   |     \\- Field: <2: Field 2>
   |
   \\- Field: <2: Field 2>
-}
+}\if{html}{\out{</div>}}
 
 This means that \verb{Field 2} in current class does not refer to any other fields.
 But \verb{Field 1} in current class refers to \verb{Field 2} in class named \verb{Class 2}.
@@ -1787,8 +1789,8 @@ surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-field_possible"></a>}}
-\if{latex}{\out{\hypertarget{method-field_possible}{}}}
+\if{html}{\out{<a id="method-IddObject-field_possible"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-field_possible}{}}}
 \subsection{Method \code{field_possible()}}{
 Get field possible values
 \subsection{Usage}{
@@ -1810,7 +1812,9 @@ including auto-value (\code{Autosize}, \code{Autocalculate}, and \code{NA} if no
 applicable), and results from \verb{$field_default()}, \verb{$field_range()},
 \verb{$field_choice()}. Underneath, it returns a data.table with custom
 printing method. For instance, if \code{iddobj$field_possible(c(4, 2))}
-gives results below:\preformatted{-- 4: Field 4 ----------
+gives results below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{-- 4: Field 4 ----------
 * Auto value: <NA>
 * Default: <NA>
 * Choice:
@@ -1821,7 +1825,7 @@ gives results below:\preformatted{-- 4: Field 4 ----------
 * Auto value: "Autosize"
 * Default: 2
 * Choice: <NA>
-}
+}\if{html}{\out{</div>}}
 
 This means that \verb{Field 4} in current class cannot be "autosized" or
 "autocalculated", and it does not have any default value. Its value should be
@@ -1847,8 +1851,8 @@ surf$field_possible(6:10)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_field_num"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_field_num}{}}}
+\if{html}{\out{<a id="method-IddObject-is_valid_field_num"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_valid_field_num}{}}}
 \subsection{Method \code{is_valid_field_num()}}{
 Check if input is a valid field number
 \subsection{Usage}{
@@ -1889,8 +1893,8 @@ surf$is_valid_field_num(c(10, 14, 100))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_extensible_index"></a>}}
-\if{latex}{\out{\hypertarget{method-is_extensible_index}{}}}
+\if{html}{\out{<a id="method-IddObject-is_extensible_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_extensible_index}{}}}
 \subsection{Method \code{is_extensible_index()}}{
 Check if input field index indicates an extensible field
 \subsection{Usage}{
@@ -1928,8 +1932,8 @@ surf$is_extensible_index(c(10, 14, 100))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_field_name"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_field_name}{}}}
+\if{html}{\out{<a id="method-IddObject-is_valid_field_name"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_valid_field_name}{}}}
 \subsection{Method \code{is_valid_field_name()}}{
 Check if input character is a valid field name
 \subsection{Usage}{
@@ -1971,8 +1975,8 @@ surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_field_index"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_field_index}{}}}
+\if{html}{\out{<a id="method-IddObject-is_valid_field_index"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_valid_field_index}{}}}
 \subsection{Method \code{is_valid_field_index()}}{
 Check if input integer is a valid field index
 \subsection{Usage}{
@@ -2007,8 +2011,8 @@ surf$is_valid_field_index(1:10)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_autosizable_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_autosizable_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_autosizable_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_autosizable_field}{}}}
 \subsection{Method \code{is_autosizable_field()}}{
 Check if input field can be autosized
 \subsection{Usage}{
@@ -2047,8 +2051,8 @@ surf$is_autosizable_field(c("name", "sun_exposure"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_autocalculatable_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_autocalculatable_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_autocalculatable_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_autocalculatable_field}{}}}
 \subsection{Method \code{is_autocalculatable_field()}}{
 Check if input field can be autocalculated
 \subsection{Usage}{
@@ -2087,8 +2091,8 @@ surf$is_autocalculatable_field(c("name", "sun_exposure"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_numeric_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_numeric_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_numeric_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_numeric_field}{}}}
 \subsection{Method \code{is_numeric_field()}}{
 Check if input field value should be numeric
 \subsection{Usage}{
@@ -2127,8 +2131,8 @@ surf$is_numeric_field(c("name", "sun_exposure"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_real_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_real_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_real_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_real_field}{}}}
 \subsection{Method \code{is_real_field()}}{
 Check if input field value should be a real number
 \subsection{Usage}{
@@ -2167,8 +2171,8 @@ surf$is_real_field(c("name", "number of vertices"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_integer_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_integer_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_integer_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_integer_field}{}}}
 \subsection{Method \code{is_integer_field()}}{
 Check if input field value should be an integer
 \subsection{Usage}{
@@ -2207,8 +2211,8 @@ surf$is_integer_field(c("name", "number of vertices"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_required_field"></a>}}
-\if{latex}{\out{\hypertarget{method-is_required_field}{}}}
+\if{html}{\out{<a id="method-IddObject-is_required_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-is_required_field}{}}}
 \subsection{Method \code{is_required_field()}}{
 Check if input field is required
 \subsection{Usage}{
@@ -2246,8 +2250,8 @@ surf$is_required_field(c("name", "number of vertices"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref}{}}}
+\if{html}{\out{<a id="method-IddObject-has_ref"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-has_ref}{}}}
 \subsection{Method \code{has_ref()}}{
 Check if input field can refer to or can be referred by other fields
 \subsection{Usage}{
@@ -2298,8 +2302,8 @@ surf$has_ref(c("name", "zone name"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref_to"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref_to}{}}}
+\if{html}{\out{<a id="method-IddObject-has_ref_to"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-has_ref_to}{}}}
 \subsection{Method \code{has_ref_to()}}{
 Check if input field can refer to other fields
 \subsection{Usage}{
@@ -2350,8 +2354,8 @@ surf$has_ref_to(c("name", "zone name"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_ref_by"></a>}}
-\if{latex}{\out{\hypertarget{method-has_ref_by}{}}}
+\if{html}{\out{<a id="method-IddObject-has_ref_by"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-has_ref_by}{}}}
 \subsection{Method \code{has_ref_by()}}{
 Check if input field can be referred by other fields
 \subsection{Usage}{
@@ -2402,8 +2406,8 @@ surf$has_ref_by(c("name", "zone name"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-outputs"></a>}}
-\if{latex}{\out{\hypertarget{method-outputs}{}}}
+\if{html}{\out{<a id="method-IddObject-outputs"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-outputs}{}}}
 \subsection{Method \code{outputs()}}{
 Get possible output variables for current class
 \subsection{Usage}{
@@ -2444,8 +2448,8 @@ surf$outputs()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_table"></a>}}
-\if{latex}{\out{\hypertarget{method-to_table}{}}}
+\if{html}{\out{<a id="method-IddObject-to_table"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-to_table}{}}}
 \subsection{Method \code{to_table()}}{
 Format an \code{IddObject} as a data.frame
 \subsection{Usage}{
@@ -2490,8 +2494,8 @@ surf$to_table(TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_string"></a>}}
-\if{latex}{\out{\hypertarget{method-to_string}{}}}
+\if{html}{\out{<a id="method-IddObject-to_string"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-to_string}{}}}
 \subsection{Method \code{to_string()}}{
 Format an \code{IdfObject} as a character vector
 \subsection{Usage}{
@@ -2543,8 +2547,8 @@ surf$to_string(c("This", "will", "be", "comments"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-IddObject-print"></a>}}
+\if{latex}{\out{\hypertarget{method-IddObject-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{IddObject} object
 \subsection{Usage}{

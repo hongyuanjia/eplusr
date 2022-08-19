@@ -865,59 +865,59 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Idf$new()}}
-\item \href{#method-version}{\code{Idf$version()}}
-\item \href{#method-path}{\code{Idf$path()}}
-\item \href{#method-group_name}{\code{Idf$group_name()}}
-\item \href{#method-class_name}{\code{Idf$class_name()}}
-\item \href{#method-is_valid_group}{\code{Idf$is_valid_group()}}
-\item \href{#method-is_valid_class}{\code{Idf$is_valid_class()}}
-\item \href{#method-definition}{\code{Idf$definition()}}
-\item \href{#method-object_id}{\code{Idf$object_id()}}
-\item \href{#method-object_name}{\code{Idf$object_name()}}
-\item \href{#method-object_num}{\code{Idf$object_num()}}
-\item \href{#method-is_valid_id}{\code{Idf$is_valid_id()}}
-\item \href{#method-is_valid_name}{\code{Idf$is_valid_name()}}
-\item \href{#method-object}{\code{Idf$object()}}
-\item \href{#method-objects}{\code{Idf$objects()}}
-\item \href{#method-object_unique}{\code{Idf$object_unique()}}
-\item \href{#method-objects_in_class}{\code{Idf$objects_in_class()}}
-\item \href{#method-objects_in_group}{\code{Idf$objects_in_group()}}
-\item \href{#method-object_relation}{\code{Idf$object_relation()}}
-\item \href{#method-objects_in_relation}{\code{Idf$objects_in_relation()}}
-\item \href{#method-search_object}{\code{Idf$search_object()}}
-\item \href{#method-dup}{\code{Idf$dup()}}
-\item \href{#method-add}{\code{Idf$add()}}
-\item \href{#method-set}{\code{Idf$set()}}
-\item \href{#method-del}{\code{Idf$del()}}
-\item \href{#method-purge}{\code{Idf$purge()}}
-\item \href{#method-duplicated}{\code{Idf$duplicated()}}
-\item \href{#method-unique}{\code{Idf$unique()}}
-\item \href{#method-rename}{\code{Idf$rename()}}
-\item \href{#method-insert}{\code{Idf$insert()}}
-\item \href{#method-load}{\code{Idf$load()}}
-\item \href{#method-update}{\code{Idf$update()}}
-\item \href{#method-paste}{\code{Idf$paste()}}
-\item \href{#method-search_value}{\code{Idf$search_value()}}
-\item \href{#method-replace_value}{\code{Idf$replace_value()}}
-\item \href{#method-validate}{\code{Idf$validate()}}
-\item \href{#method-is_valid}{\code{Idf$is_valid()}}
-\item \href{#method-to_string}{\code{Idf$to_string()}}
-\item \href{#method-to_table}{\code{Idf$to_table()}}
-\item \href{#method-external_deps}{\code{Idf$external_deps()}}
-\item \href{#method-is_unsaved}{\code{Idf$is_unsaved()}}
-\item \href{#method-save}{\code{Idf$save()}}
-\item \href{#method-run}{\code{Idf$run()}}
-\item \href{#method-last_job}{\code{Idf$last_job()}}
-\item \href{#method-geometry}{\code{Idf$geometry()}}
-\item \href{#method-view}{\code{Idf$view()}}
-\item \href{#method-print}{\code{Idf$print()}}
-\item \href{#method-clone}{\code{Idf$clone()}}
+\item \href{#method-Idf-new}{\code{Idf$new()}}
+\item \href{#method-Idf-version}{\code{Idf$version()}}
+\item \href{#method-Idf-path}{\code{Idf$path()}}
+\item \href{#method-Idf-group_name}{\code{Idf$group_name()}}
+\item \href{#method-Idf-class_name}{\code{Idf$class_name()}}
+\item \href{#method-Idf-is_valid_group}{\code{Idf$is_valid_group()}}
+\item \href{#method-Idf-is_valid_class}{\code{Idf$is_valid_class()}}
+\item \href{#method-Idf-definition}{\code{Idf$definition()}}
+\item \href{#method-Idf-object_id}{\code{Idf$object_id()}}
+\item \href{#method-Idf-object_name}{\code{Idf$object_name()}}
+\item \href{#method-Idf-object_num}{\code{Idf$object_num()}}
+\item \href{#method-Idf-is_valid_id}{\code{Idf$is_valid_id()}}
+\item \href{#method-Idf-is_valid_name}{\code{Idf$is_valid_name()}}
+\item \href{#method-Idf-object}{\code{Idf$object()}}
+\item \href{#method-Idf-objects}{\code{Idf$objects()}}
+\item \href{#method-Idf-object_unique}{\code{Idf$object_unique()}}
+\item \href{#method-Idf-objects_in_class}{\code{Idf$objects_in_class()}}
+\item \href{#method-Idf-objects_in_group}{\code{Idf$objects_in_group()}}
+\item \href{#method-Idf-object_relation}{\code{Idf$object_relation()}}
+\item \href{#method-Idf-objects_in_relation}{\code{Idf$objects_in_relation()}}
+\item \href{#method-Idf-search_object}{\code{Idf$search_object()}}
+\item \href{#method-Idf-dup}{\code{Idf$dup()}}
+\item \href{#method-Idf-add}{\code{Idf$add()}}
+\item \href{#method-Idf-set}{\code{Idf$set()}}
+\item \href{#method-Idf-del}{\code{Idf$del()}}
+\item \href{#method-Idf-purge}{\code{Idf$purge()}}
+\item \href{#method-Idf-duplicated}{\code{Idf$duplicated()}}
+\item \href{#method-Idf-unique}{\code{Idf$unique()}}
+\item \href{#method-Idf-rename}{\code{Idf$rename()}}
+\item \href{#method-Idf-insert}{\code{Idf$insert()}}
+\item \href{#method-Idf-load}{\code{Idf$load()}}
+\item \href{#method-Idf-update}{\code{Idf$update()}}
+\item \href{#method-Idf-paste}{\code{Idf$paste()}}
+\item \href{#method-Idf-search_value}{\code{Idf$search_value()}}
+\item \href{#method-Idf-replace_value}{\code{Idf$replace_value()}}
+\item \href{#method-Idf-validate}{\code{Idf$validate()}}
+\item \href{#method-Idf-is_valid}{\code{Idf$is_valid()}}
+\item \href{#method-Idf-to_string}{\code{Idf$to_string()}}
+\item \href{#method-Idf-to_table}{\code{Idf$to_table()}}
+\item \href{#method-Idf-external_deps}{\code{Idf$external_deps()}}
+\item \href{#method-Idf-is_unsaved}{\code{Idf$is_unsaved()}}
+\item \href{#method-Idf-save}{\code{Idf$save()}}
+\item \href{#method-Idf-run}{\code{Idf$run()}}
+\item \href{#method-Idf-last_job}{\code{Idf$last_job()}}
+\item \href{#method-Idf-geometry}{\code{Idf$geometry()}}
+\item \href{#method-Idf-view}{\code{Idf$view()}}
+\item \href{#method-Idf-print}{\code{Idf$print()}}
+\item \href{#method-Idf-clone}{\code{Idf$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Idf-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{Idf} object
 \subsection{Usage}{
@@ -994,8 +994,8 @@ Idf$new(string_idf, use_idd(8.8, download = "auto"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-version"></a>}}
-\if{latex}{\out{\hypertarget{method-version}{}}}
+\if{html}{\out{<a id="method-Idf-version"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of current \code{Idf}
 \subsection{Usage}{
@@ -1026,8 +1026,8 @@ idf$version()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-path"></a>}}
-\if{latex}{\out{\hypertarget{method-path}{}}}
+\if{html}{\out{<a id="method-Idf-path"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{Idf}
 \subsection{Usage}{
@@ -1060,8 +1060,8 @@ Idf$new("Version, 8.8;\n")$path()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-group_name"></a>}}
-\if{latex}{\out{\hypertarget{method-group_name}{}}}
+\if{html}{\out{<a id="method-Idf-group_name"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-group_name}{}}}
 \subsection{Method \code{group_name()}}{
 Get names of groups
 \subsection{Usage}{
@@ -1110,8 +1110,8 @@ idf$group_name(all = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-class_name"></a>}}
-\if{latex}{\out{\hypertarget{method-class_name}{}}}
+\if{html}{\out{<a id="method-Idf-class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-class_name}{}}}
 \subsection{Method \code{class_name()}}{
 Get names of classes
 \subsection{Usage}{
@@ -1172,8 +1172,8 @@ idf$class_name(all = TRUE, by_group = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_group"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_group}{}}}
+\if{html}{\out{<a id="method-Idf-is_valid_group"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_valid_group}{}}}
 \subsection{Method \code{is_valid_group()}}{
 Check if elements in input character vector are valid group names.
 \subsection{Usage}{
@@ -1221,8 +1221,8 @@ idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_class"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_class}{}}}
+\if{html}{\out{<a id="method-Idf-is_valid_class"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_valid_class}{}}}
 \subsection{Method \code{is_valid_class()}}{
 Check if elements in input character vector are valid class names.
 \subsection{Usage}{
@@ -1271,8 +1271,8 @@ idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-definition"></a>}}
-\if{latex}{\out{\hypertarget{method-definition}{}}}
+\if{html}{\out{<a id="method-Idf-definition"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-definition}{}}}
 \subsection{Method \code{definition()}}{
 Get the \link{IddObject} object for specified class.
 \subsection{Usage}{
@@ -1312,8 +1312,8 @@ idf$definition("Version")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object_id"></a>}}
-\if{latex}{\out{\hypertarget{method-object_id}{}}}
+\if{html}{\out{<a id="method-Idf-object_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object_id}{}}}
 \subsection{Method \code{object_id()}}{
 Get the unique ID for each object in specified classes in the \code{Idf}.
 \subsection{Usage}{
@@ -1374,8 +1374,8 @@ idf$object_id(c("Version", "Zone"), simplify = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object_name"></a>}}
-\if{latex}{\out{\hypertarget{method-object_name}{}}}
+\if{html}{\out{<a id="method-Idf-object_name"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object_name}{}}}
 \subsection{Method \code{object_name()}}{
 Get names for objects in specified classes in the \code{Idf}.
 \subsection{Usage}{
@@ -1439,8 +1439,8 @@ idf$object_name(c("Version", "Zone"), simplify = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object_num"></a>}}
-\if{latex}{\out{\hypertarget{method-object_num}{}}}
+\if{html}{\out{<a id="method-Idf-object_num"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object_num}{}}}
 \subsection{Method \code{object_num()}}{
 Get number of objects in specified classes in the \link{Idf} object.
 \subsection{Usage}{
@@ -1482,8 +1482,8 @@ idf$object_num(c("Zone", "Schedule:Compact"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_id"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_id}{}}}
+\if{html}{\out{<a id="method-Idf-is_valid_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_valid_id}{}}}
 \subsection{Method \code{is_valid_id()}}{
 Check if elements in input integer vector are valid object IDs.
 \subsection{Usage}{
@@ -1523,8 +1523,8 @@ idf$is_valid_id(c(51, 1000))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid_name"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid_name}{}}}
+\if{html}{\out{<a id="method-Idf-is_valid_name"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_valid_name}{}}}
 \subsection{Method \code{is_valid_name()}}{
 Check if elements in input character vector are valid object names.
 \subsection{Usage}{
@@ -1571,8 +1571,8 @@ idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object"></a>}}
-\if{latex}{\out{\hypertarget{method-object}{}}}
+\if{html}{\out{<a id="method-Idf-object"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object}{}}}
 \subsection{Method \code{object()}}{
 Extract an \link{IdfObject} object using object ID or name.
 \subsection{Usage}{
@@ -1629,8 +1629,8 @@ idf$object("simple one zone (wireframe dxf)")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-objects"></a>}}
-\if{latex}{\out{\hypertarget{method-objects}{}}}
+\if{html}{\out{<a id="method-Idf-objects"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-objects}{}}}
 \subsection{Method \code{objects()}}{
 Extract multiple \link{IdfObject} objects using object IDs or names.
 \subsection{Usage}{
@@ -1683,8 +1683,8 @@ idf$objects(c("Simple One Zone (Wireframe DXF)", "zone one"))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object_unique"></a>}}
-\if{latex}{\out{\hypertarget{method-object_unique}{}}}
+\if{html}{\out{<a id="method-Idf-object_unique"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object_unique}{}}}
 \subsection{Method \code{object_unique()}}{
 Extract the \link{IdfObject} in class with \code{unique-object} attribute.
 \subsection{Usage}{
@@ -1746,8 +1746,8 @@ idf[["SimulationControl"]]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-objects_in_class"></a>}}
-\if{latex}{\out{\hypertarget{method-objects_in_class}{}}}
+\if{html}{\out{<a id="method-Idf-objects_in_class"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-objects_in_class}{}}}
 \subsection{Method \code{objects_in_class()}}{
 Extract all \link{IdfObject} objects in one class.
 \subsection{Usage}{
@@ -1805,8 +1805,8 @@ idf[["Zone"]]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-objects_in_group"></a>}}
-\if{latex}{\out{\hypertarget{method-objects_in_group}{}}}
+\if{html}{\out{<a id="method-Idf-objects_in_group"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-objects_in_group}{}}}
 \subsection{Method \code{objects_in_group()}}{
 Extract all \link{IdfObject} objects in one group.
 \subsection{Usage}{
@@ -1843,8 +1843,8 @@ idf$objects_in_group("Schedules")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-object_relation"></a>}}
-\if{latex}{\out{\hypertarget{method-object_relation}{}}}
+\if{html}{\out{<a id="method-Idf-object_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-object_relation}{}}}
 \subsection{Method \code{object_relation()}}{
 Extract the relationship between object field values.
 \subsection{Usage}{
@@ -1929,7 +1929,9 @@ exists independently, such as zone air node.
 relation. It takes a single object ID or name and also a relation
 direction, and returns an \code{IdfRelation} object which contains data
 presenting such relation above. For instance, if
-\code{model$object_relation("WALL-1", "ref_to")} gives results below:\preformatted{-- Refer to Others ------------------------
+\code{model$object_relation("WALL-1", "ref_to")} gives results below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{-- Refer to Others ------------------------
   Class: <Construction>
   \\- Object [ID:2] <WALL-1>
      \\- 2: "WD01";        !- Outside Layer
@@ -1937,7 +1939,7 @@ presenting such relation above. For instance, if
         \\- Class: <Material>
            \\- Object [ID:1] <WD01>
               \\- 1: "WD01";        !- Name
-}
+}\if{html}{\out{</div>}}
 
 This means that the value \code{"WD01"} of \verb{Outside Layer} in a
 construction named \code{WALL-1} refers to a material named \code{WD01}. All
@@ -1967,8 +1969,8 @@ idf$object_relation("floor", "ref_by")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-objects_in_relation"></a>}}
-\if{latex}{\out{\hypertarget{method-objects_in_relation}{}}}
+\if{html}{\out{<a id="method-Idf-objects_in_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-objects_in_relation}{}}}
 \subsection{Method \code{objects_in_relation()}}{
 Extract multiple \link{IdfObject} objects referencing each others.
 \subsection{Usage}{
@@ -2084,8 +2086,8 @@ idf$objects_in_relation("floor", "ref_by", class = "BuildingSurface:Detailed")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-search_object"></a>}}
-\if{latex}{\out{\hypertarget{method-search_object}{}}}
+\if{html}{\out{<a id="method-Idf-search_object"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-search_object}{}}}
 \subsection{Method \code{search_object()}}{
 Extract multiple \link{IdfObject} objects using regular expression on
 names.
@@ -2136,8 +2138,8 @@ idf$search_object("floor", ignore.case = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-dup"></a>}}
-\if{latex}{\out{\hypertarget{method-dup}{}}}
+\if{html}{\out{<a id="method-Idf-dup"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-dup}{}}}
 \subsection{Method \code{dup()}}{
 Duplicate existing objects.
 \subsection{Usage}{
@@ -2196,8 +2198,8 @@ idf$dup(floors_1, floors_2)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add"></a>}}
-\if{latex}{\out{\hypertarget{method-add}{}}}
+\if{html}{\out{<a id="method-Idf-add"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-add}{}}}
 \subsection{Method \code{add()}}{
 Add new objects.
 \subsection{Usage}{
@@ -2253,7 +2255,9 @@ methods that take field names as input.
 There is no need to give all field values if only specific fields are
 interested, as long as other fields are not required. For example, to
 define a new object in \code{RunPeriod} class, the following is enough (at
-least for EnergyPlus v8.8):\preformatted{idf$add(
+least for EnergyPlus v8.8):
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{idf$add(
     RunPeriod = list(
         "my run period",
         begin_month = 1, begin_day_of_month = 1,
@@ -2261,7 +2265,7 @@ least for EnergyPlus v8.8):\preformatted{idf$add(
     ),
     .default = TRUE
 )
-}
+}\if{html}{\out{</div>}}
 
 If not all field names are given, positions of those values without
 field names are determined after those values with names. E.g. in
@@ -2303,8 +2307,8 @@ empty$add(objs1, rp)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-Idf-set"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-set}{}}}
 \subsection{Method \code{set()}}{
 Set values of existing objects.
 \subsection{Usage}{
@@ -2437,8 +2441,8 @@ idf$set(sets)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-del"></a>}}
-\if{latex}{\out{\hypertarget{method-del}{}}}
+\if{html}{\out{<a id="method-Idf-del"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-del}{}}}
 \subsection{Method \code{del()}}{
 Delete existing objects
 \subsection{Usage}{
@@ -2547,8 +2551,8 @@ idf$del(ids)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-purge"></a>}}
-\if{latex}{\out{\hypertarget{method-purge}{}}}
+\if{html}{\out{<a id="method-Idf-purge"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-purge}{}}}
 \subsection{Method \code{purge()}}{
 Purge resource objects that are not used
 \subsection{Usage}{
@@ -2606,8 +2610,8 @@ idf$purge(group = "Schedules")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-duplicated"></a>}}
-\if{latex}{\out{\hypertarget{method-duplicated}{}}}
+\if{html}{\out{<a id="method-Idf-duplicated"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-duplicated}{}}}
 \subsection{Method \code{duplicated()}}{
 Determine duplicated objects
 \subsection{Usage}{
@@ -2672,8 +2676,8 @@ idf$duplicated(class = "Material", group = "Schedules")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-unique"></a>}}
-\if{latex}{\out{\hypertarget{method-unique}{}}}
+\if{html}{\out{<a id="method-Idf-unique"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-unique}{}}}
 \subsection{Method \code{unique()}}{
 Remove duplicated objects
 \subsection{Usage}{
@@ -2733,8 +2737,8 @@ idf$unique(class = "Material", group = "Schedules")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rename"></a>}}
-\if{latex}{\out{\hypertarget{method-rename}{}}}
+\if{html}{\out{<a id="method-Idf-rename"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-rename}{}}}
 \subsection{Method \code{rename()}}{
 Rename existing objects
 \subsection{Usage}{
@@ -2779,8 +2783,8 @@ idf$rename(on_off = "on/off", test_352a = 51)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-insert"></a>}}
-\if{latex}{\out{\hypertarget{method-insert}{}}}
+\if{html}{\out{<a id="method-Idf-insert"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-insert}{}}}
 \subsection{Method \code{insert()}}{
 Insert new objects from \link{IdfObject}s
 \subsection{Usage}{
@@ -2845,8 +2849,8 @@ idf$insert(idf$SizingPeriod_DesignDay)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-load"></a>}}
-\if{latex}{\out{\hypertarget{method-load}{}}}
+\if{html}{\out{<a id="method-Idf-load"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-load}{}}}
 \subsection{Method \code{load()}}{
 Load new objects from characters or data.frames
 \subsection{Usage}{
@@ -3004,8 +3008,8 @@ idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update"></a>}}
-\if{latex}{\out{\hypertarget{method-update}{}}}
+\if{html}{\out{<a id="method-Idf-update"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-update}{}}}
 \subsection{Method \code{update()}}{
 Update existing object values from characters or data.frames
 \subsection{Usage}{
@@ -3132,8 +3136,8 @@ idf$update(dt)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-paste"></a>}}
-\if{latex}{\out{\hypertarget{method-paste}{}}}
+\if{html}{\out{<a id="method-Idf-paste"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-paste}{}}}
 \subsection{Method \code{paste()}}{
 Paste new objects from IDF Editor
 \subsection{Usage}{
@@ -3185,8 +3189,8 @@ A named list of loaded \link{IdfObject} objects.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-search_value"></a>}}
-\if{latex}{\out{\hypertarget{method-search_value}{}}}
+\if{html}{\out{<a id="method-Idf-search_value"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-search_value}{}}}
 \subsection{Method \code{search_value()}}{
 Search objects by field values using regular expression
 \subsection{Usage}{
@@ -3243,8 +3247,8 @@ idf$search_value("floor", "Construction", ignore.case = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-replace_value"></a>}}
-\if{latex}{\out{\hypertarget{method-replace_value}{}}}
+\if{html}{\out{<a id="method-Idf-replace_value"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-replace_value}{}}}
 \subsection{Method \code{replace_value()}}{
 Replace object field values using regular expression
 \subsection{Usage}{
@@ -3307,8 +3311,8 @@ idf$replace_value("win", "windows")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-validate"></a>}}
-\if{latex}{\out{\hypertarget{method-validate}{}}}
+\if{html}{\out{<a id="method-Idf-validate"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-validate}{}}}
 \subsection{Method \code{validate()}}{
 Check possible object field value errors
 \subsection{Usage}{
@@ -3434,12 +3438,16 @@ method to correct them.
 
 Different validate result examples are shown below:
 \itemize{
-\item No error is found:\preformatted{v No error found.
-}
+\item No error is found:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{v No error found.
+}\if{html}{\out{</div>}}
 
 Above result shows that there is no error found after conducting all
 validate checks in specified validate level.
-\item Errors are found:\preformatted{ x [2] Errors found during validation.
+\item Errors are found:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ x [2] Errors found during validation.
 =========================================================================
 
 -- [2] Invalid Autocalculate Field --------------------------------------
@@ -3449,7 +3457,7 @@ validate checks in specified validate level.
     \\- Object [ID:176] <SPACE5-1 VAV Reheat>
        +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat \{m3/s-m2\}
        \\- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
-}
+}\if{html}{\out{</div>}}
 
 Above result shows that after all validate components
 performed under current validate level, 2 invalid field values
@@ -3457,12 +3465,14 @@ are found. All of them are in a object named \verb{SPACE5-1 VAV Reheat}
 with ID \code{176}. They are invalid because those two fields do not
 have an autocalculatable attribute but are given \code{AUTOCALCULATE}
 value. Knowing this info, one simple way to fix the
-error is to correct those two fields by doing:\preformatted{idf$set(..176 =
+error is to correct those two fields by doing:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{idf$set(..176 =
     list(`Maximum Flow per Zone Floor Area During Reheat` = "autosize",
          `Maximum Flow Fraction During Reheat` = "autosize"
     )
 )
-}
+}\if{html}{\out{</div>}}
 }
 }
 
@@ -3490,8 +3500,8 @@ idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_valid"></a>}}
-\if{latex}{\out{\hypertarget{method-is_valid}{}}}
+\if{html}{\out{<a id="method-Idf-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
 Check if there is any error in current \code{Idf}
 \subsection{Usage}{
@@ -3538,8 +3548,8 @@ idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_string"></a>}}
-\if{latex}{\out{\hypertarget{method-to_string}{}}}
+\if{html}{\out{<a id="method-Idf-to_string"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-to_string}{}}}
 \subsection{Method \code{to_string()}}{
 Format \code{Idf} as a character vector
 \subsection{Usage}{
@@ -3623,8 +3633,8 @@ head(idf$to_string("floor", leading = 0, sep_at = 0))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-to_table"></a>}}
-\if{latex}{\out{\hypertarget{method-to_table}{}}}
+\if{html}{\out{<a id="method-Idf-to_table"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-to_table}{}}}
 \subsection{Method \code{to_table()}}{
 Format \code{Idf} as a data.frame
 \subsection{Usage}{
@@ -3798,8 +3808,8 @@ idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-external_deps"></a>}}
-\if{latex}{\out{\hypertarget{method-external_deps}{}}}
+\if{html}{\out{<a id="method-Idf-external_deps"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-external_deps}{}}}
 \subsection{Method \code{external_deps()}}{
 Get external file dependencies that the Idf needs for simulation.
 \subsection{Usage}{
@@ -3871,8 +3881,8 @@ idf$external_deps()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_unsaved"></a>}}
-\if{latex}{\out{\hypertarget{method-is_unsaved}{}}}
+\if{html}{\out{<a id="method-Idf-is_unsaved"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-is_unsaved}{}}}
 \subsection{Method \code{is_unsaved()}}{
 Check if there are unsaved changes in current \code{Idf}
 \subsection{Usage}{
@@ -3901,8 +3911,8 @@ idf$is_unsaved()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save"></a>}}
-\if{latex}{\out{\hypertarget{method-save}{}}}
+\if{html}{\out{<a id="method-Idf-save"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-save}{}}}
 \subsection{Method \code{save()}}{
 Save \code{Idf} object as an IDF file
 \subsection{Usage}{
@@ -3981,8 +3991,8 @@ idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-Idf-run"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-run}{}}}
 \subsection{Method \code{run()}}{
 Run simulation using EnergyPlus
 \subsection{Usage}{
@@ -4105,8 +4115,8 @@ job$report_data()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-last_job"></a>}}
-\if{latex}{\out{\hypertarget{method-last_job}{}}}
+\if{html}{\out{<a id="method-Idf-last_job"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-last_job}{}}}
 \subsection{Method \code{last_job()}}{
 Get the last simulation job
 \subsection{Usage}{
@@ -4136,8 +4146,8 @@ idf$last_job()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-geometry"></a>}}
-\if{latex}{\out{\hypertarget{method-geometry}{}}}
+\if{html}{\out{<a id="method-Idf-geometry"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-geometry}{}}}
 \subsection{Method \code{geometry()}}{
 Extract \code{Idf} geometries
 \subsection{Usage}{
@@ -4168,8 +4178,8 @@ idf$geometry()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-view"></a>}}
-\if{latex}{\out{\hypertarget{method-view}{}}}
+\if{html}{\out{<a id="method-Idf-view"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-view}{}}}
 \subsection{Method \code{view()}}{
 View 3D \code{Idf} geometry
 \subsection{Usage}{
@@ -4252,8 +4262,8 @@ idf$view(render_by = "construction")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Idf-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{Idf} object
 \subsection{Usage}{
@@ -4319,8 +4329,8 @@ idf$print("field", order = FALSE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Idf-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

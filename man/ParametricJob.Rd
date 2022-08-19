@@ -242,41 +242,41 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ParametricJob$new()}}
-\item \href{#method-version}{\code{ParametricJob$version()}}
-\item \href{#method-seed}{\code{ParametricJob$seed()}}
-\item \href{#method-weather}{\code{ParametricJob$weather()}}
-\item \href{#method-param}{\code{ParametricJob$param()}}
-\item \href{#method-apply_measure}{\code{ParametricJob$apply_measure()}}
-\item \href{#method-models}{\code{ParametricJob$models()}}
-\item \href{#method-cases}{\code{ParametricJob$cases()}}
-\item \href{#method-save}{\code{ParametricJob$save()}}
-\item \href{#method-run}{\code{ParametricJob$run()}}
-\item \href{#method-print}{\code{ParametricJob$print()}}
+\item \href{#method-ParametricJob-new}{\code{ParametricJob$new()}}
+\item \href{#method-ParametricJob-version}{\code{ParametricJob$version()}}
+\item \href{#method-ParametricJob-seed}{\code{ParametricJob$seed()}}
+\item \href{#method-ParametricJob-weather}{\code{ParametricJob$weather()}}
+\item \href{#method-ParametricJob-param}{\code{ParametricJob$param()}}
+\item \href{#method-ParametricJob-apply_measure}{\code{ParametricJob$apply_measure()}}
+\item \href{#method-ParametricJob-models}{\code{ParametricJob$models()}}
+\item \href{#method-ParametricJob-cases}{\code{ParametricJob$cases()}}
+\item \href{#method-ParametricJob-save}{\code{ParametricJob$save()}}
+\item \href{#method-ParametricJob-run}{\code{ParametricJob$run()}}
+\item \href{#method-ParametricJob-print}{\code{ParametricJob$print()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors">}\href{../../eplusr/html/EplusGroupJob.html#method-errors}{\code{eplusr::EplusGroupJob$errors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill">}\href{../../eplusr/html/EplusGroupJob.html#method-kill}{\code{eplusr::EplusGroupJob$kill()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files">}\href{../../eplusr/html/EplusGroupJob.html#method-list_files}{\code{eplusr::EplusGroupJob$list_files()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table">}\href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{eplusr::EplusGroupJob$list_table()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output">}\href{../../eplusr/html/EplusGroupJob.html#method-locate_output}{\code{eplusr::EplusGroupJob$locate_output()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir">}\href{../../eplusr/html/EplusGroupJob.html#method-output_dir}{\code{eplusr::EplusGroupJob$output_dir()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_mdd">}\href{../../eplusr/html/EplusGroupJob.html#method-read_mdd}{\code{eplusr::EplusGroupJob$read_mdd()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_rdd">}\href{../../eplusr/html/EplusGroupJob.html#method-read_rdd}{\code{eplusr::EplusGroupJob$read_rdd()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_table">}\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{eplusr::EplusGroupJob$read_table()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data">}\href{../../eplusr/html/EplusGroupJob.html#method-report_data}{\code{eplusr::EplusGroupJob$report_data()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data_dict">}\href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{eplusr::EplusGroupJob$report_data_dict()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="status">}\href{../../eplusr/html/EplusGroupJob.html#method-status}{\code{eplusr::EplusGroupJob$status()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="tabular_data">}\href{../../eplusr/html/EplusGroupJob.html#method-tabular_data}{\code{eplusr::EplusGroupJob$tabular_data()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-errors'><code>eplusr::EplusGroupJob$errors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-kill'><code>eplusr::EplusGroupJob$kill()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_files"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-list_files'><code>eplusr::EplusGroupJob$list_files()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-list_table'><code>eplusr::EplusGroupJob$list_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-locate_output'><code>eplusr::EplusGroupJob$locate_output()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-output_dir'><code>eplusr::EplusGroupJob$output_dir()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_mdd"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-read_mdd'><code>eplusr::EplusGroupJob$read_mdd()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_rdd"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-read_rdd'><code>eplusr::EplusGroupJob$read_rdd()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_table"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-read_table'><code>eplusr::EplusGroupJob$read_table()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-report_data'><code>eplusr::EplusGroupJob$report_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data_dict"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-report_data_dict'><code>eplusr::EplusGroupJob$report_data_dict()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="status"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-status'><code>eplusr::EplusGroupJob$status()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="tabular_data"><a href='../../eplusr/html/EplusGroupJob.html#method-EplusGroupJob-tabular_data'><code>eplusr::EplusGroupJob$tabular_data()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ParametricJob-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-new}{}}}
 \subsection{Method \code{new()}}{
 Create a \code{ParametricJob} object
 \subsection{Usage}{
@@ -321,8 +321,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-version"></a>}}
-\if{latex}{\out{\hypertarget{method-version}{}}}
+\if{html}{\out{<a id="method-ParametricJob-version"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of seed IDF
 \subsection{Usage}{
@@ -349,8 +349,8 @@ param$version()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-seed"></a>}}
-\if{latex}{\out{\hypertarget{method-seed}{}}}
+\if{html}{\out{<a id="method-ParametricJob-seed"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-seed}{}}}
 \subsection{Method \code{seed()}}{
 Get the seed \link{Idf} object
 \subsection{Usage}{
@@ -374,8 +374,8 @@ param$seed()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-weather"></a>}}
-\if{latex}{\out{\hypertarget{method-weather}{}}}
+\if{html}{\out{<a id="method-ParametricJob-weather"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-weather}{}}}
 \subsection{Method \code{weather()}}{
 Get the \link{Epw} object
 \subsection{Usage}{
@@ -400,8 +400,8 @@ param$weather()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-param"></a>}}
-\if{latex}{\out{\hypertarget{method-param}{}}}
+\if{html}{\out{<a id="method-ParametricJob-param"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-param}{}}}
 \subsection{Method \code{param()}}{
 Set parameters for parametric simulations
 \subsection{Usage}{
@@ -458,14 +458,16 @@ For example, the code block below defines 3 parameters:
 levels being 0.01 to 0.1 m with a 0.1 m step.
 \item Field \code{Conductivity} in all objects in class \code{Material}, with 10
 levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.
-}\preformatted{param$param(
+}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{param$param(
     `Supply Fan 1` = list(Fan_Total_Efficiency = seq(0.1, 1.0, 0.1)),
     Material := list(
         Thickness = seq(0.01, 0.1, 0.1),
         Conductivity = seq(0.1, 1.0, 0.1)
     )
 )
-}
+}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -519,8 +521,8 @@ param$param(
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-apply_measure"></a>}}
-\if{latex}{\out{\hypertarget{method-apply_measure}{}}}
+\if{html}{\out{<a id="method-ParametricJob-apply_measure"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-apply_measure}{}}}
 \subsection{Method \code{apply_measure()}}{
 Create parametric models
 \subsection{Usage}{
@@ -606,8 +608,8 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30),
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-models"></a>}}
-\if{latex}{\out{\hypertarget{method-models}{}}}
+\if{html}{\out{<a id="method-ParametricJob-models"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-models}{}}}
 \subsection{Method \code{models()}}{
 Get created parametric \link{Idf} objects
 \subsection{Usage}{
@@ -654,8 +656,8 @@ param$models()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cases"></a>}}
-\if{latex}{\out{\hypertarget{method-cases}{}}}
+\if{html}{\out{<a id="method-ParametricJob-cases"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-cases}{}}}
 \subsection{Method \code{cases()}}{
 Get a summary of parametric models and parameters
 \subsection{Usage}{
@@ -696,8 +698,8 @@ param$cases()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save"></a>}}
-\if{latex}{\out{\hypertarget{method-save}{}}}
+\if{html}{\out{<a id="method-ParametricJob-save"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-save}{}}}
 \subsection{Method \code{save()}}{
 Save parametric models
 \subsection{Usage}{
@@ -752,8 +754,8 @@ param$save(tempdir(), separate = FALSE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-ParametricJob-run"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-run}{}}}
 \subsection{Method \code{run()}}{
 Run parametric simulations
 \subsection{Usage}{
@@ -839,8 +841,8 @@ print(param)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-ParametricJob-print"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{ParametricJob} object
 \subsection{Usage}{

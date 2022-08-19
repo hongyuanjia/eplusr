@@ -23,10 +23,14 @@
 * Fix `Idf$load()` when input is a single string without any new line (`\n`)
   (#510).
 * Fix `IdfViewer$snapshot()` for PNG output. A new parameter `webshot` has been
-  added in `IdfViewer$snapshot()` with default value being `FALSE`. (#509).
+  added in `IdfViewer$snapshot()` with default value being `FALSE` (#509).
 * Now `IdfSchedule$... <- val` works (#512).
 * Fix the error of invalid datetime in `Epw$data()` when data of Feb 28 is from
   a leap year while the EPW did not contain any leap year data (#552).
+
+## Documentation
+
+* Regenerate package documentation to fix CRAN NOTES on HTML manuals (#525).
 
 # eplusr 0.15.1
 

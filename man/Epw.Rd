@@ -436,44 +436,44 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Epw$new()}}
-\item \href{#method-path}{\code{Epw$path()}}
-\item \href{#method-definition}{\code{Epw$definition()}}
-\item \href{#method-location}{\code{Epw$location()}}
-\item \href{#method-design_condition}{\code{Epw$design_condition()}}
-\item \href{#method-typical_extreme_period}{\code{Epw$typical_extreme_period()}}
-\item \href{#method-ground_temperature}{\code{Epw$ground_temperature()}}
-\item \href{#method-holiday}{\code{Epw$holiday()}}
-\item \href{#method-comment1}{\code{Epw$comment1()}}
-\item \href{#method-comment2}{\code{Epw$comment2()}}
-\item \href{#method-num_period}{\code{Epw$num_period()}}
-\item \href{#method-interval}{\code{Epw$interval()}}
-\item \href{#method-period}{\code{Epw$period()}}
-\item \href{#method-missing_code}{\code{Epw$missing_code()}}
-\item \href{#method-initial_missing_value}{\code{Epw$initial_missing_value()}}
-\item \href{#method-range_exist}{\code{Epw$range_exist()}}
-\item \href{#method-range_valid}{\code{Epw$range_valid()}}
-\item \href{#method-fill_action}{\code{Epw$fill_action()}}
-\item \href{#method-data}{\code{Epw$data()}}
-\item \href{#method-abnormal_data}{\code{Epw$abnormal_data()}}
-\item \href{#method-redundant_data}{\code{Epw$redundant_data()}}
-\item \href{#method-make_na}{\code{Epw$make_na()}}
-\item \href{#method-fill_abnormal}{\code{Epw$fill_abnormal()}}
-\item \href{#method-add_unit}{\code{Epw$add_unit()}}
-\item \href{#method-drop_unit}{\code{Epw$drop_unit()}}
-\item \href{#method-purge}{\code{Epw$purge()}}
-\item \href{#method-add}{\code{Epw$add()}}
-\item \href{#method-set}{\code{Epw$set()}}
-\item \href{#method-del}{\code{Epw$del()}}
-\item \href{#method-is_unsaved}{\code{Epw$is_unsaved()}}
-\item \href{#method-save}{\code{Epw$save()}}
-\item \href{#method-print}{\code{Epw$print()}}
-\item \href{#method-clone}{\code{Epw$clone()}}
+\item \href{#method-Epw-new}{\code{Epw$new()}}
+\item \href{#method-Epw-path}{\code{Epw$path()}}
+\item \href{#method-Epw-definition}{\code{Epw$definition()}}
+\item \href{#method-Epw-location}{\code{Epw$location()}}
+\item \href{#method-Epw-design_condition}{\code{Epw$design_condition()}}
+\item \href{#method-Epw-typical_extreme_period}{\code{Epw$typical_extreme_period()}}
+\item \href{#method-Epw-ground_temperature}{\code{Epw$ground_temperature()}}
+\item \href{#method-Epw-holiday}{\code{Epw$holiday()}}
+\item \href{#method-Epw-comment1}{\code{Epw$comment1()}}
+\item \href{#method-Epw-comment2}{\code{Epw$comment2()}}
+\item \href{#method-Epw-num_period}{\code{Epw$num_period()}}
+\item \href{#method-Epw-interval}{\code{Epw$interval()}}
+\item \href{#method-Epw-period}{\code{Epw$period()}}
+\item \href{#method-Epw-missing_code}{\code{Epw$missing_code()}}
+\item \href{#method-Epw-initial_missing_value}{\code{Epw$initial_missing_value()}}
+\item \href{#method-Epw-range_exist}{\code{Epw$range_exist()}}
+\item \href{#method-Epw-range_valid}{\code{Epw$range_valid()}}
+\item \href{#method-Epw-fill_action}{\code{Epw$fill_action()}}
+\item \href{#method-Epw-data}{\code{Epw$data()}}
+\item \href{#method-Epw-abnormal_data}{\code{Epw$abnormal_data()}}
+\item \href{#method-Epw-redundant_data}{\code{Epw$redundant_data()}}
+\item \href{#method-Epw-make_na}{\code{Epw$make_na()}}
+\item \href{#method-Epw-fill_abnormal}{\code{Epw$fill_abnormal()}}
+\item \href{#method-Epw-add_unit}{\code{Epw$add_unit()}}
+\item \href{#method-Epw-drop_unit}{\code{Epw$drop_unit()}}
+\item \href{#method-Epw-purge}{\code{Epw$purge()}}
+\item \href{#method-Epw-add}{\code{Epw$add()}}
+\item \href{#method-Epw-set}{\code{Epw$set()}}
+\item \href{#method-Epw-del}{\code{Epw$del()}}
+\item \href{#method-Epw-is_unsaved}{\code{Epw$is_unsaved()}}
+\item \href{#method-Epw-save}{\code{Epw$save()}}
+\item \href{#method-Epw-print}{\code{Epw$print()}}
+\item \href{#method-Epw-clone}{\code{Epw$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Epw-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{Epw} object
 \subsection{Usage}{
@@ -530,8 +530,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-path"></a>}}
-\if{latex}{\out{\hypertarget{method-path}{}}}
+\if{html}{\out{<a id="method-Epw-path"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{Epw}
 \subsection{Usage}{
@@ -561,8 +561,8 @@ epw$path()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-definition"></a>}}
-\if{latex}{\out{\hypertarget{method-definition}{}}}
+\if{html}{\out{<a id="method-Epw-definition"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-definition}{}}}
 \subsection{Method \code{definition()}}{
 Get the \link{IddObject} object for specified EPW class.
 \subsection{Usage}{
@@ -608,8 +608,8 @@ epw$definition("LOCATION")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-location"></a>}}
-\if{latex}{\out{\hypertarget{method-location}{}}}
+\if{html}{\out{<a id="method-Epw-location"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-location}{}}}
 \subsection{Method \code{location()}}{
 Get and modify LOCATION header
 \subsection{Usage}{
@@ -685,8 +685,8 @@ epw$location(city = "MyCity")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-design_condition"></a>}}
-\if{latex}{\out{\hypertarget{method-design_condition}{}}}
+\if{html}{\out{<a id="method-Epw-design_condition"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-design_condition}{}}}
 \subsection{Method \code{design_condition()}}{
 Get DESIGN CONDITION header
 \subsection{Usage}{
@@ -722,8 +722,8 @@ epw$design_condition()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-typical_extreme_period"></a>}}
-\if{latex}{\out{\hypertarget{method-typical_extreme_period}{}}}
+\if{html}{\out{<a id="method-Epw-typical_extreme_period"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-typical_extreme_period}{}}}
 \subsection{Method \code{typical_extreme_period()}}{
 Get TYPICAL/EXTREME header
 \subsection{Usage}{
@@ -761,8 +761,8 @@ epw$typical_extreme_period()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ground_temperature"></a>}}
-\if{latex}{\out{\hypertarget{method-ground_temperature}{}}}
+\if{html}{\out{<a id="method-Epw-ground_temperature"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-ground_temperature}{}}}
 \subsection{Method \code{ground_temperature()}}{
 Get GROUND TEMPERATURE header
 \subsection{Usage}{
@@ -799,8 +799,8 @@ epw$ground_temperature()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-holiday"></a>}}
-\if{latex}{\out{\hypertarget{method-holiday}{}}}
+\if{html}{\out{<a id="method-Epw-holiday"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-holiday}{}}}
 \subsection{Method \code{holiday()}}{
 Get and modify HOLIDAYS/DAYLIGHT SAVINGS header
 \subsection{Usage}{
@@ -817,8 +817,10 @@ and end of daylight saving time. For example, \code{c(3.10, 10.3)}.}
 
 \item{\code{holiday}}{a list or a data.frame containing two elements
 (columns) \code{name} and \code{day} where \code{name} are the holiday names
-and \code{day} are valid EPW date specifications. For example:\preformatted{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
-}}
+and \code{day} are valid EPW date specifications. For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
+}\if{html}{\out{</div>}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -891,8 +893,8 @@ epw$holiday(dst = c(3.10, 11.3))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-comment1"></a>}}
-\if{latex}{\out{\hypertarget{method-comment1}{}}}
+\if{html}{\out{<a id="method-Epw-comment1"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-comment1}{}}}
 \subsection{Method \code{comment1()}}{
 Get and modify COMMENT1 header
 \subsection{Usage}{
@@ -932,8 +934,8 @@ epw$comment1("Comment1")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-comment2"></a>}}
-\if{latex}{\out{\hypertarget{method-comment2}{}}}
+\if{html}{\out{<a id="method-Epw-comment2"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-comment2}{}}}
 \subsection{Method \code{comment2()}}{
 Get and modify COMMENT2 header
 \subsection{Usage}{
@@ -973,8 +975,8 @@ epw$comment2("Comment2")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-num_period"></a>}}
-\if{latex}{\out{\hypertarget{method-num_period}{}}}
+\if{html}{\out{<a id="method-Epw-num_period"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-num_period}{}}}
 \subsection{Method \code{num_period()}}{
 Get number of data periods in DATA PERIODS header
 \subsection{Usage}{
@@ -1002,8 +1004,8 @@ epw$num_period()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-interval"></a>}}
-\if{latex}{\out{\hypertarget{method-interval}{}}}
+\if{html}{\out{<a id="method-Epw-interval"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-interval}{}}}
 \subsection{Method \code{interval()}}{
 Get the time interval in DATA PERIODS header
 \subsection{Usage}{
@@ -1031,8 +1033,8 @@ epw$interval()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-period"></a>}}
-\if{latex}{\out{\hypertarget{method-period}{}}}
+\if{html}{\out{<a id="method-Epw-period"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-period}{}}}
 \subsection{Method \code{period()}}{
 Get and modify data period meta data in DATA PERIODS header
 \subsection{Usage}{
@@ -1088,8 +1090,8 @@ epw$period(1, start_day_of_week = 3)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-missing_code"></a>}}
-\if{latex}{\out{\hypertarget{method-missing_code}{}}}
+\if{html}{\out{<a id="method-Epw-missing_code"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-missing_code}{}}}
 \subsection{Method \code{missing_code()}}{
 Get missing code for weather data variables
 \subsection{Usage}{
@@ -1117,8 +1119,8 @@ epw$missing_code()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-initial_missing_value"></a>}}
-\if{latex}{\out{\hypertarget{method-initial_missing_value}{}}}
+\if{html}{\out{<a id="method-Epw-initial_missing_value"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-initial_missing_value}{}}}
 \subsection{Method \code{initial_missing_value()}}{
 Get initial value for missing data of weather data variables
 \subsection{Usage}{
@@ -1147,8 +1149,8 @@ epw$initial_missing_value()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-range_exist"></a>}}
-\if{latex}{\out{\hypertarget{method-range_exist}{}}}
+\if{html}{\out{<a id="method-Epw-range_exist"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-range_exist}{}}}
 \subsection{Method \code{range_exist()}}{
 Get value ranges for existing values of weather data variables
 \subsection{Usage}{
@@ -1177,8 +1179,8 @@ epw$range_exist()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-range_valid"></a>}}
-\if{latex}{\out{\hypertarget{method-range_valid}{}}}
+\if{html}{\out{<a id="method-Epw-range_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-range_valid}{}}}
 \subsection{Method \code{range_valid()}}{
 Get value ranges for valid values of weather data variables
 \subsection{Usage}{
@@ -1207,8 +1209,8 @@ epw$range_valid()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fill_action"></a>}}
-\if{latex}{\out{\hypertarget{method-fill_action}{}}}
+\if{html}{\out{<a id="method-Epw-fill_action"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-fill_action}{}}}
 \subsection{Method \code{fill_action()}}{
 Get fill actions for abnormal values of weather data variables
 \subsection{Usage}{
@@ -1253,8 +1255,8 @@ epw$fill_action("out_of_range")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-data"></a>}}
-\if{latex}{\out{\hypertarget{method-data}{}}}
+\if{html}{\out{<a id="method-Epw-data"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-data}{}}}
 \subsection{Method \code{data()}}{
 Get weather data
 \subsection{Usage}{
@@ -1357,8 +1359,8 @@ attributes(epw$data(tz = "Etc/GMT+8")$datetime)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-abnormal_data"></a>}}
-\if{latex}{\out{\hypertarget{method-abnormal_data}{}}}
+\if{html}{\out{<a id="method-Epw-abnormal_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-abnormal_data}{}}}
 \subsection{Method \code{abnormal_data()}}{
 Get abnormal weather data
 \subsection{Usage}{
@@ -1440,8 +1442,8 @@ epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-redundant_data"></a>}}
-\if{latex}{\out{\hypertarget{method-redundant_data}{}}}
+\if{html}{\out{<a id="method-Epw-redundant_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-redundant_data}{}}}
 \subsection{Method \code{redundant_data()}}{
 Get redundant weather data
 \subsection{Usage}{
@@ -1475,8 +1477,8 @@ epw$redundant_data()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-make_na"></a>}}
-\if{latex}{\out{\hypertarget{method-make_na}{}}}
+\if{html}{\out{<a id="method-Epw-make_na"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-make_na}{}}}
 \subsection{Method \code{make_na()}}{
 Convert abnormal data into NAs
 \subsection{Usage}{
@@ -1534,8 +1536,8 @@ summary(epw$data()$liquid_precip_rate)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fill_abnormal"></a>}}
-\if{latex}{\out{\hypertarget{method-fill_abnormal}{}}}
+\if{html}{\out{<a id="method-Epw-fill_abnormal"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-fill_abnormal}{}}}
 \subsection{Method \code{fill_abnormal()}}{
 Fill abnormal data using prescribed pattern
 \subsection{Usage}{
@@ -1604,8 +1606,8 @@ summary(epw$data()$liquid_precip_rate)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_unit"></a>}}
-\if{latex}{\out{\hypertarget{method-add_unit}{}}}
+\if{html}{\out{<a id="method-Epw-add_unit"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-add_unit}{}}}
 \subsection{Method \code{add_unit()}}{
 Add units to weather data variables
 \subsection{Usage}{
@@ -1658,8 +1660,8 @@ head(t_dry_bulb)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-drop_unit"></a>}}
-\if{latex}{\out{\hypertarget{method-drop_unit}{}}}
+\if{html}{\out{<a id="method-Epw-drop_unit"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-drop_unit}{}}}
 \subsection{Method \code{drop_unit()}}{
 Remove units in weather data variables
 \subsection{Usage}{
@@ -1703,8 +1705,8 @@ epw$data()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-purge"></a>}}
-\if{latex}{\out{\hypertarget{method-purge}{}}}
+\if{html}{\out{<a id="method-Epw-purge"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-purge}{}}}
 \subsection{Method \code{purge()}}{
 Delete redundant weather data observations
 \subsection{Usage}{
@@ -1732,8 +1734,8 @@ epw$purge()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add"></a>}}
-\if{latex}{\out{\hypertarget{method-add}{}}}
+\if{html}{\out{<a id="method-Epw-add"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-add}{}}}
 \subsection{Method \code{add()}}{
 Add a data period
 \subsection{Usage}{
@@ -1817,8 +1819,8 @@ try(epw$add(epw$data()), silent = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-Epw-set"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-set}{}}}
 \subsection{Method \code{set()}}{
 Replace a data period
 \subsection{Usage}{
@@ -1898,8 +1900,8 @@ epw$set(epw$data())
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-del"></a>}}
-\if{latex}{\out{\hypertarget{method-del}{}}}
+\if{html}{\out{<a id="method-Epw-del"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-del}{}}}
 \subsection{Method \code{del()}}{
 Delete a data period
 \subsection{Usage}{
@@ -1924,8 +1926,8 @@ The modified \code{Epw} object itself, invisibly.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_unsaved"></a>}}
-\if{latex}{\out{\hypertarget{method-is_unsaved}{}}}
+\if{html}{\out{<a id="method-Epw-is_unsaved"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-is_unsaved}{}}}
 \subsection{Method \code{is_unsaved()}}{
 Check if there are unsaved changes in current \code{Epw}
 \subsection{Usage}{
@@ -1954,8 +1956,8 @@ epw$is_unsaved()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save"></a>}}
-\if{latex}{\out{\hypertarget{method-save}{}}}
+\if{html}{\out{<a id="method-Epw-save"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-save}{}}}
 \subsection{Method \code{save()}}{
 Save \code{Epw} object as an EPW file
 \subsection{Usage}{
@@ -2003,8 +2005,8 @@ epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Epw-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{Idf} object
 \subsection{Usage}{
@@ -2033,8 +2035,8 @@ epw$print()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Epw-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Epw-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

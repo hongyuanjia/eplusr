@@ -135,22 +135,22 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{IdfGeometry$new()}}
-\item \href{#method-parent}{\code{IdfGeometry$parent()}}
-\item \href{#method-rules}{\code{IdfGeometry$rules()}}
-\item \href{#method-convert}{\code{IdfGeometry$convert()}}
-\item \href{#method-coord_system}{\code{IdfGeometry$coord_system()}}
-\item \href{#method-round_digits}{\code{IdfGeometry$round_digits()}}
-\item \href{#method-area}{\code{IdfGeometry$area()}}
-\item \href{#method-azimuth}{\code{IdfGeometry$azimuth()}}
-\item \href{#method-tilt}{\code{IdfGeometry$tilt()}}
-\item \href{#method-view}{\code{IdfGeometry$view()}}
-\item \href{#method-print}{\code{IdfGeometry$print()}}
+\item \href{#method-IdfGeometry-new}{\code{IdfGeometry$new()}}
+\item \href{#method-IdfGeometry-parent}{\code{IdfGeometry$parent()}}
+\item \href{#method-IdfGeometry-rules}{\code{IdfGeometry$rules()}}
+\item \href{#method-IdfGeometry-convert}{\code{IdfGeometry$convert()}}
+\item \href{#method-IdfGeometry-coord_system}{\code{IdfGeometry$coord_system()}}
+\item \href{#method-IdfGeometry-round_digits}{\code{IdfGeometry$round_digits()}}
+\item \href{#method-IdfGeometry-area}{\code{IdfGeometry$area()}}
+\item \href{#method-IdfGeometry-azimuth}{\code{IdfGeometry$azimuth()}}
+\item \href{#method-IdfGeometry-tilt}{\code{IdfGeometry$tilt()}}
+\item \href{#method-IdfGeometry-view}{\code{IdfGeometry$view()}}
+\item \href{#method-IdfGeometry-print}{\code{IdfGeometry$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-new"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{IdfGeometry} object
 \subsection{Usage}{
@@ -193,8 +193,8 @@ geom <- IdfGeometry$new(path_idf)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-parent"></a>}}
-\if{latex}{\out{\hypertarget{method-parent}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-parent}{}}}
 \subsection{Method \code{parent()}}{
 Get parent \link{Idf} object
 \subsection{Usage}{
@@ -221,8 +221,8 @@ geom$parent()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rules"></a>}}
-\if{latex}{\out{\hypertarget{method-rules}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-rules"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-rules}{}}}
 \subsection{Method \code{rules()}}{
 Get global geometry rules
 \subsection{Usage}{
@@ -248,8 +248,8 @@ geom$rules()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-convert"></a>}}
-\if{latex}{\out{\hypertarget{method-convert}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-convert"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-convert}{}}}
 \subsection{Method \code{convert()}}{
 Convert simple geometry objects
 \subsection{Usage}{
@@ -296,8 +296,8 @@ geom$convert()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-coord_system"></a>}}
-\if{latex}{\out{\hypertarget{method-coord_system}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-coord_system"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-coord_system}{}}}
 \subsection{Method \code{coord_system()}}{
 Convert vertices to specified coordinate systems
 \subsection{Usage}{
@@ -337,8 +337,8 @@ geom$coord_system("world", "world", "world")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-round_digits"></a>}}
-\if{latex}{\out{\hypertarget{method-round_digits}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-round_digits"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-round_digits}{}}}
 \subsection{Method \code{round_digits()}}{
 Round digits on geometry vertices
 \subsection{Usage}{
@@ -378,8 +378,8 @@ geom$round_digits()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-area"></a>}}
-\if{latex}{\out{\hypertarget{method-area}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-area"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-area}{}}}
 \subsection{Method \code{area()}}{
 Get area
 \subsection{Usage}{
@@ -428,8 +428,8 @@ geom$area()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-azimuth"></a>}}
-\if{latex}{\out{\hypertarget{method-azimuth}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-azimuth"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-azimuth}{}}}
 \subsection{Method \code{azimuth()}}{
 Get azimuth
 \subsection{Usage}{
@@ -475,8 +475,8 @@ geom$azimuth()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tilt"></a>}}
-\if{latex}{\out{\hypertarget{method-tilt}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-tilt"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-tilt}{}}}
 \subsection{Method \code{tilt()}}{
 Get tilt
 \subsection{Usage}{
@@ -522,8 +522,8 @@ geom$tilt()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-view"></a>}}
-\if{latex}{\out{\hypertarget{method-view}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-view"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-view}{}}}
 \subsection{Method \code{view()}}{
 View 3D geometry
 \subsection{Usage}{
@@ -606,8 +606,8 @@ idf$view(new = TRUE, render_by = "construction")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-IdfGeometry-print"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-print}{}}}
 \subsection{Method \code{print()}}{
 Print an \code{IdfGeometry} object
 \subsection{Usage}{

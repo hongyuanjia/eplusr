@@ -189,20 +189,20 @@ Hongyuan Jia
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{EplusSql$new()}}
-\item \href{#method-path}{\code{EplusSql$path()}}
-\item \href{#method-path_idf}{\code{EplusSql$path_idf()}}
-\item \href{#method-list_table}{\code{EplusSql$list_table()}}
-\item \href{#method-read_table}{\code{EplusSql$read_table()}}
-\item \href{#method-report_data_dict}{\code{EplusSql$report_data_dict()}}
-\item \href{#method-report_data}{\code{EplusSql$report_data()}}
-\item \href{#method-tabular_data}{\code{EplusSql$tabular_data()}}
-\item \href{#method-print}{\code{EplusSql$print()}}
+\item \href{#method-EplusSql-new}{\code{EplusSql$new()}}
+\item \href{#method-EplusSql-path}{\code{EplusSql$path()}}
+\item \href{#method-EplusSql-path_idf}{\code{EplusSql$path_idf()}}
+\item \href{#method-EplusSql-list_table}{\code{EplusSql$list_table()}}
+\item \href{#method-EplusSql-read_table}{\code{EplusSql$read_table()}}
+\item \href{#method-EplusSql-report_data_dict}{\code{EplusSql$report_data_dict()}}
+\item \href{#method-EplusSql-report_data}{\code{EplusSql$report_data()}}
+\item \href{#method-EplusSql-tabular_data}{\code{EplusSql$tabular_data()}}
+\item \href{#method-EplusSql-print}{\code{EplusSql$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-EplusSql-new"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{EplusSql} object
 \subsection{Usage}{
@@ -245,8 +245,8 @@ if (is_avail_eplus(8.8)) {
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-path"></a>}}
-\if{latex}{\out{\hypertarget{method-path}{}}}
+\if{html}{\out{<a id="method-EplusSql-path"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{EpwSql} object
 \subsection{Usage}{
@@ -274,8 +274,8 @@ sql$path()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-path_idf"></a>}}
-\if{latex}{\out{\hypertarget{method-path_idf}{}}}
+\if{html}{\out{<a id="method-EplusSql-path_idf"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-path_idf}{}}}
 \subsection{Method \code{path_idf()}}{
 Get the path of corresponding IDF file
 \subsection{Usage}{
@@ -305,8 +305,8 @@ sql$path_idf()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_table"></a>}}
-\if{latex}{\out{\hypertarget{method-list_table}{}}}
+\if{html}{\out{<a id="method-EplusSql-list_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-list_table}{}}}
 \subsection{Method \code{list_table()}}{
 List all table names in current EnergyPlus SQL output
 \subsection{Usage}{
@@ -334,8 +334,8 @@ sql$list_table()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read_table"></a>}}
-\if{latex}{\out{\hypertarget{method-read_table}{}}}
+\if{html}{\out{<a id="method-EplusSql-read_table"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-read_table}{}}}
 \subsection{Method \code{read_table()}}{
 Read a single table from current EnergyPlus SQL output
 \subsection{Usage}{
@@ -372,8 +372,8 @@ sql$read_table("Zones")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data_dict"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data_dict}{}}}
+\if{html}{\out{<a id="method-EplusSql-report_data_dict"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-report_data_dict}{}}}
 \subsection{Method \code{report_data_dict()}}{
 Read report data dictionary from current EnergyPlus SQL output
 \subsection{Usage}{
@@ -420,8 +420,8 @@ sql$report_data_dict()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-report_data"></a>}}
-\if{latex}{\out{\hypertarget{method-report_data}{}}}
+\if{html}{\out{<a id="method-EplusSql-report_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-report_data}{}}}
 \subsection{Method \code{report_data()}}{
 Read report data
 \subsection{Usage}{
@@ -528,8 +528,10 @@ A few grouped options are also provided:
 environment data to extract. If \code{NULL}, all environment data
 are returned. Default: \code{NULL}. All possible
 \code{environment_name} for current simulation output can be
-obtained using:\preformatted{$read_table("EnvironmentPeriods")
-}}
+obtained using:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$read_table("EnvironmentPeriods")
+}\if{html}{\out{</div>}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -661,8 +663,8 @@ sql$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabular_data"></a>}}
-\if{latex}{\out{\hypertarget{method-tabular_data}{}}}
+\if{html}{\out{<a id="method-EplusSql-tabular_data"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-tabular_data}{}}}
 \subsection{Method \code{tabular_data()}}{
 Read tabular data
 \subsection{Usage}{
@@ -765,8 +767,8 @@ str(sql$tabular_data(
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-EplusSql-print"></a>}}
+\if{latex}{\out{\hypertarget{method-EplusSql-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{EplusSql} object
 \subsection{Usage}{
