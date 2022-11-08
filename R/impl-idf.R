@@ -2523,7 +2523,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
 #'
 #' @param class A character vector specifying the target class names
 #'
-#' @param pattern,ignore.case,perl,fixed,useBytes All of them are
+#' @param ignore.case,perl,fixed,useBytes All of them are
 #'        directly passed to [base::grepl][base::grep()] and
 #'        [base::gsub][base::grep()] with the same default values.
 #'
