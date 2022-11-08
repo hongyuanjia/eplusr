@@ -22,7 +22,6 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      NOT_CRAN: true
       RGL_USE_NULL: true
 
     steps:
