@@ -187,6 +187,7 @@ test_that("ExpandObjects()", {
 test_that("Basement()", {
     skip_on_cran()
 
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") != "")
     out_dir <- file.path(tempdir(), "Basement")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
@@ -298,6 +299,7 @@ test_that("Basement()", {
 test_that("Slab()", {
     skip_on_cran()
 
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") != "")
     out_dir <- file.path(tempdir(), "Basement")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
@@ -603,44 +605,46 @@ test_that("energyplus()", {
     expect_true(is.na(files["experr"]))
     unlink(c(path_exp, out_dir), recursive = TRUE)
 
-    # can run Basement
-    path_base <- copy_eplus_example(8.8, "LgOffVAVusingBasement.idf")
-    expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
-    # modify the input in order to reduce the simulation time
-    l <- read_lines(path_base)
-    l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
-    write_lines(l, path_base)
-    res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
-    expect_equal(length(res_base$file), 57L)
-    expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 27L)
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
-    expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["expidf"])))
-    expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
-    expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
-    expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
-    expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
-    unlink(c(path_base, out_dir), recursive = TRUE)
+    if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") == "") {
+        # can run Basement
+        path_base <- copy_eplus_example(8.8, "LgOffVAVusingBasement.idf")
+        expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
+        # modify the input in order to reduce the simulation time
+        l <- read_lines(path_base)
+        l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
+        write_lines(l, path_base)
+        res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
+        expect_equal(length(res_base$file), 57L)
+        expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 27L)
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
+        expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
+        expect_true(file.exists(file.path(out_dir, files["expidf"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
+        unlink(c(path_base, out_dir), recursive = TRUE)
 
-    # can run Slab
-    path_slab <- copy_eplus_example(8.8, "5ZoneAirCooledWithSlab.idf")
-    expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
-    # modify the input in order to reduce the simulation time
-    l <- read_lines(path_slab)
-    l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
-    l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
-    write_lines(l, path_slab)
-    res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_slab$file), 57L)
-    expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 26L)
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
-    expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
-    expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
-    expect_true(file.exists(file.path(out_dir, files["slab_out"])))
-    unlink(c(path_slab, out_dir), recursive = TRUE)
+        # can run Slab
+        path_slab <- copy_eplus_example(8.8, "5ZoneAirCooledWithSlab.idf")
+        expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
+        # modify the input in order to reduce the simulation time
+        l <- read_lines(path_slab)
+        l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
+        l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
+        write_lines(l, path_slab)
+        res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
+        expect_equal(length(res_slab$file), 57L)
+        expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 26L)
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
+        expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
+        expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
+        expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
+        expect_true(file.exists(file.path(out_dir, files["slab_out"])))
+        unlink(c(path_slab, out_dir), recursive = TRUE)
+    }
 
     # can convert eso to IP
     path_ip <- copy_eplus_example(8.8, "1ZoneUncontrolled.idf")
