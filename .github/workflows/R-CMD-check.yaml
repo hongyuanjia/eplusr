@@ -24,7 +24,7 @@ jobs:
         config:
           - {os: windows-latest, r: 'release', not_cran: false}
           - {os: macOS-latest,   r: 'release', not_cran: false}
-          - {os: ubuntu-latest,  r: 'release', not_cran: true}
+          - {os: ubuntu-latest,  r: 'release', not_cran: true, _EPLUSR_SKIP_TESTS_TRANSITION_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_: true, _EPLUSR_SKIP_TESTS_BASEMENT_: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
