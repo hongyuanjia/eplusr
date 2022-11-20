@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2.9001</span>
       </span>
     </div>
 
@@ -130,9 +130,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to eplusr</h1>
-                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan
+Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-08-19</h4>
+            <h4 data-toc-skip class="date">2022-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -141,26 +142,51 @@
 
     
     
-<p>This vignette introduces eplusr class structure, how to read EnergyPlus IDFs and perform modifications on them. Familiarity with <a href="https://cloud.r-project.org/package=data.table" class="external-link">data.table</a> is useful, but not essential to follow this vignette.</p>
+<p>This vignette introduces eplusr class structure, how to read
+EnergyPlus IDFs and perform modifications on them. Familiarity with <a href="https://cloud.r-project.org/package=data.table" class="external-link">data.table</a> is
+useful, but not essential to follow this vignette.</p>
 <hr>
 <div class="section level2">
 <h2 id="class-structure">Class structure<a class="anchor" aria-label="anchor" href="#class-structure"></a>
 </h2>
 <p>Below shows the class structure in eplusr.</p>
 <p><img src="class_structure.png" style="display: block; margin: auto;"></p>
-<p>Basically, eplusr uses <code>Idf</code> class to present the whole IDF file and <code>IdfObject</code> class to present a single object in an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain member functions for helping modify the data in IDF so it complies with the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD file is wrapped into two classes, i.e. <code>Idd</code> and <code>IddObject</code>.</p>
-<p>Besides, <code>Epw</code> class is used to present EnergyPlus Weather files; <code>EplusJob</code> and <code>GroupEplusJob</code> to run single and multiple EnergyPlus simulations and collect outputs, <code>ParametricJob</code> to run parametric EnergyPlus simulations and collect all outputs.</p>
-<p>It is highly recommended to read the documentation to get a thorough understanding on each class.</p>
+<p>Basically, eplusr uses <code>Idf</code> class to present the whole
+IDF file and <code>IdfObject</code> class to present a single object in
+an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain
+member functions for helping modify the data in IDF so it complies with
+the underlying EnergyPlus IDD (Input Data Dictionary). Similarly, IDD
+file is wrapped into two classes, i.e. <code>Idd</code> and
+<code>IddObject</code>.</p>
+<p>Besides, <code>Epw</code> class is used to present EnergyPlus Weather
+files; <code>EplusJob</code> and <code>GroupEplusJob</code> to run
+single and multiple EnergyPlus simulations and collect outputs,
+<code>ParametricJob</code> to run parametric EnergyPlus simulations and
+collect all outputs.</p>
+<p>It is highly recommended to read the documentation to get a thorough
+understanding on each class.</p>
 </div>
 <div class="section level2">
 <h2 id="preparation">Preparation<a class="anchor" aria-label="anchor" href="#preparation"></a>
 </h2>
-<p>Parsing an IDF requires the IDD data of that version, which serves as the schema. The IDD file will be parsed first and an <code>Idd</code> object will be created and cached. That <code>Idd</code> object will be reused whenever parsing IDFs with that version. For more details, please see <code>?use_idd()</code> and <code>?idd</code>.</p>
+<p>Parsing an IDF requires the IDD data of that version, which serves as
+the schema. The IDD file will be parsed first and an <code>Idd</code>
+object will be created and cached. That <code>Idd</code> object will be
+reused whenever parsing IDFs with that version. For more details, please
+see <code>?use_idd()</code> and <code>?idd</code>.</p>
 <div class="section level3">
 <h3 id="locate-energyplus">Locate EnergyPlus<a class="anchor" aria-label="anchor" href="#locate-energyplus"></a>
 </h3>
-<p>Usually, when you try to edit an IDF, the corresponding EnergyPlus is likely to be installed already. If EnergyPlus is installed in standard location (<code>C:\EnergyPlusVX-Y-0</code> on Windows, <code>/usr/local/EnergyPlus-X-Y-0</code> on Linux and <code>/Applications/EnergyPlus-X-Y-0</code> on macOS), eplusr is able to find it and use the <code>Energy+.idd</code> file distributed with that release to parse the input IDF.</p>
-<p>You can get all detected EnergyPlus versions using <code><a href="../reference/use_eplus.html">avail_eplus()</a></code> and meta data of EnergyPlus configuration using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
+<p>Usually, when you try to edit an IDF, the corresponding EnergyPlus is
+likely to be installed already. If EnergyPlus is installed in standard
+location (<code>C:\EnergyPlusVX-Y-0</code> on Windows,
+<code>/usr/local/EnergyPlus-X-Y-0</code> on Linux and
+<code>/Applications/EnergyPlus-X-Y-0</code> on macOS), eplusr is able to
+find it and use the <code>Energy+.idd</code> file distributed with that
+release to parse the input IDF.</p>
+<p>You can get all detected EnergyPlus versions using
+<code><a href="../reference/use_eplus.html">avail_eplus()</a></code> and meta data of EnergyPlus configuration
+using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] '8.8.0'</span></span>
@@ -174,17 +200,26 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $exe</span></span>
 <span><span class="co">#&gt; [1] "energyplus"</span></span></code></pre></div>
-<p>If your EnergyPlus was not installed in standard location, you can add that location using <code><a href="../reference/use_eplus.html">use_eplus()</a></code>. After adding, all models of that version will use this path to call EnergyPlus.</p>
+<p>If your EnergyPlus was not installed in standard location, you can
+add that location using <code><a href="../reference/use_eplus.html">use_eplus()</a></code>. After adding, all
+models of that version will use this path to call EnergyPlus.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV8-8-0"</span><span class="op">)</span></span></code></pre></div>
-<p>If the needed version of EnergyPlus was not installed, you can use <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
+<p>If the needed version of EnergyPlus was not installed, you can use
+<code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">8.8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
 </h3>
-<p>Sometimes you may just want to edit the model without installing the whole EnergyPlus software. You can just download the IDD file of that version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code> to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will download IDD file for EnergyPlus v8.8.0, parse it and create an <code>Idd</code> object that will be used whenever parsing all EnergyPlus models of version v8.8.</p>
+<p>Sometimes you may just want to edit the model without installing the
+whole EnergyPlus software. You can just download the IDD file of that
+version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code>
+to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will
+download IDD file for EnergyPlus v8.8.0, parse it and create an
+<code>Idd</code> object that will be used whenever parsing all
+EnergyPlus models of version v8.8.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
@@ -196,9 +231,22 @@
 <div class="section level2">
 <h2 id="read-and-parse-idf">Read and parse IDF<a class="anchor" aria-label="anchor" href="#read-and-parse-idf"></a>
 </h2>
-<p>All IDF reading process starts with function <code><a href="../reference/read_idf.html">read_idf()</a></code>, which returns an <code>Idf</code> object. The IDF will be printed in a similar style you see in IDF Editor, with additional heading lines showing the <code>Path</code>, <code>Version</code> of the model. The classes of objects in the model are ordered by groups and the number of objects in classes are shown in square bracket.</p>
-<p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we have already got the IDD, we can just ignore the <code>idd</code> argument.</p>
-<p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is successfully located, all IDFs with versions lower than <code>X.Y</code> can be parsed. For example, if you have EnergyPlus v9.1 installed, all IDFs from v7.2 to v9.1 can be parsed using simply <code>read_idf(path)</code> without specifying <code>idd</code>. This is because eplusr will use IDD files distributed with EnergyPlus VersionUpdater program.</p>
+<p>All IDF reading process starts with function <code><a href="../reference/read_idf.html">read_idf()</a></code>,
+which returns an <code>Idf</code> object. The IDF will be printed in a
+similar style you see in IDF Editor, with additional heading lines
+showing the <code>Path</code>, <code>Version</code> of the model. The
+classes of objects in the model are ordered by groups and the number of
+objects in classes are shown in square bracket.</p>
+<p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we
+have already got the IDD, we can just ignore the <code>idd</code>
+argument.</p>
+<p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is
+successfully located, all IDFs with versions lower than <code>X.Y</code>
+can be parsed. For example, if you have EnergyPlus v9.1 installed, all
+IDFs from v7.2 to v9.1 can be parsed using simply
+<code>read_idf(path)</code> without specifying <code>idd</code>. This is
+because eplusr will use IDD files distributed with EnergyPlus
+VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
@@ -224,9 +272,16 @@
 <div class="section level2">
 <h2 id="methods-in-idf-class">Methods in <code>Idf</code> class<a class="anchor" aria-label="anchor" href="#methods-in-idf-class"></a>
 </h2>
-<p><code>Idf</code> class provides lots of methods to programmatically query and modify EnergyPlus models. See table below. This vignette will demonstrate some of them.</p>
+<p><code>Idf</code> class provides lots of methods to programmatically
+query and modify EnergyPlus models. See table below. This vignette will
+demonstrate some of them.</p>
 <table class="table">
 <caption>Methods of <code>Idf</code> class</caption>
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Category</th>
 <th align="left">Method</th>
@@ -392,7 +447,8 @@
 <tr class="even">
 <td align="left"></td>
 <td align="left"><code>$paste()</code></td>
-<td align="left">Add new objects from IDF Editor <code>Copy obj</code>
+<td align="left">Add new objects from IDF Editor
+<code>Copy obj</code>
 </td>
 </tr>
 <tr class="odd">
@@ -445,18 +501,21 @@
 <tr class="even">
 <td align="left">Run</td>
 <td align="left"><code>$run()</code></td>
-<td align="left">Run <code>Idf</code> together with an <code>Epw</code>
+<td align="left">Run <code>Idf</code> together with an
+<code>Epw</code>
 </td>
 </tr>
 <tr class="odd">
 <td align="left">Geometry</td>
 <td align="left"><code>$geometry()</code></td>
-<td align="left">Extract <code>Idf</code> geometry and perform operations on them</td>
+<td align="left">Extract <code>Idf</code> geometry and perform
+operations on them</td>
 </tr>
 <tr class="even">
 <td align="left"></td>
 <td align="left"><code>$view()</code></td>
-<td align="left">Show <code>Idf</code> 3D geometry using the rgl package</td>
+<td align="left">Show <code>Idf</code> 3D geometry using the rgl
+package</td>
 </tr>
 <tr class="odd">
 <td align="left">Print</td>
@@ -470,7 +529,9 @@
 <div class="section level2">
 <h2 id="basic-info">Basic Info<a class="anchor" aria-label="anchor" href="#basic-info"></a>
 </h2>
-<p>If you want to see what groups and classes exist in your model, use <code>$group_name()</code> and <code>$class_name()</code> respectively.</p>
+<p>If you want to see what groups and classes exist in your model, use
+<code>$group_name()</code> and <code>$class_name()</code>
+respectively.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">group_name</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "Simulation Parameters"                        </span></span>
@@ -496,7 +557,9 @@
 <span><span class="co">#&gt; [5] "SurfaceConvectionAlgorithm:Outside" "HeatBalanceAlgorithm"              </span></span>
 <span><span class="co">#&gt; [7] "Timestep"                          </span></span>
 <span><span class="va">....</span></span></code></pre></div>
-<p>You can use <code>$is_valid_group()</code> and <code>$is_valid_class()</code> to check if curtain groups or names exist in current model.</p>
+<p>You can use <code>$is_valid_group()</code> and
+<code>$is_valid_class()</code> to check if curtain groups or names exist
+in current model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">is_valid_group</span><span class="op">(</span><span class="st">"Schedules"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
@@ -506,7 +569,10 @@
 <div class="section level2">
 <h2 id="class-definition">Class definition<a class="anchor" aria-label="anchor" href="#class-definition"></a>
 </h2>
-<p>You can get class definition using <code>$definition()</code>, which returns an <code>IddObject</code>. All required fields in each class are marked with <code>*</code>. For example, you can get the <code>IddObject</code> of class <code>Material</code>:</p>
+<p>You can get class definition using <code>$definition()</code>, which
+returns an <code>IddObject</code>. All required fields in each class are
+marked with <code>*</code>. For example, you can get the
+<code>IddObject</code> of class <code>Material</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">def_mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span></span>
 <span><span class="va">def_mat</span></span>
@@ -530,7 +596,8 @@
 <span><span class="co">#&gt;   7 : Thermal Absorptance</span></span>
 <span><span class="co">#&gt;   8 : Solar Absorptance</span></span>
 <span><span class="co">#&gt;   9 : Visible Absorptance</span></span></code></pre></div>
-<p>You can also achieve this using methods in <code>Idd</code> class.</p>
+<p>You can also achieve this using methods in <code>Idd</code>
+class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
@@ -540,10 +607,16 @@
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># idd_object(8.8, "Material")</span></span></code></pre></div>
-<p>With the <code>IddObject</code>, you can easily get class and field properties using methods it has.</p>
-<p>For example, you can get all default field values using <code>$field_default()</code>. As we did not give any field index or name, a list is returned containing default values of all fields. The type of each value will be consistent with field definition.</p>
+<p>With the <code>IddObject</code>, you can easily get class and field
+properties using methods it has.</p>
+<p>For example, you can get all default field values using
+<code>$field_default()</code>. As we did not give any field index or
+name, a list is returned containing default values of all fields. The
+type of each value will be consistent with field definition.</p>
 <blockquote>
-<p>NOTE: For numeric fields with default values being <code>"autosize"</code> or <code>"autocalculate"</code>, the type of returned values will be “character”.</p>
+<p>NOTE: For numeric fields with default values being
+<code>"autosize"</code> or <code>"autocalculate"</code>, the type of
+returned values will be “character”.</p>
 </blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">def_val</span> <span class="op">&lt;-</span> <span class="va">def_mat</span><span class="op">$</span><span class="fu">field_default</span><span class="op">(</span><span class="op">)</span></span>
@@ -558,12 +631,16 @@
 <span><span class="co">#&gt;  $ Thermal Absorptance: num 0.9</span></span>
 <span><span class="co">#&gt;  $ Solar Absorptance  : num 0.7</span></span>
 <span><span class="co">#&gt;  $ Visible Absorptance: num 0.7</span></span></code></pre></div>
-<p>Please see <code><a href="../reference/IddObject.html">?IddObject</a></code> for detailed documentation on <code>IddObject</code> class.</p>
+<p>Please see <code><a href="../reference/IddObject.html">?IddObject</a></code> for detailed documentation on
+<code>IddObject</code> class.</p>
 </div>
 <div class="section level2">
 <h2 id="get-object">Get object<a class="anchor" aria-label="anchor" href="#get-object"></a>
 </h2>
-<p>In an <code>Idf</code>, each object in the model is assigned with an unique <code>ID</code> according to its appearance sequence in the IDF file. You can find all valid <code>ID</code>s using <code>$object_id()</code>.</p>
+<p>In an <code>Idf</code>, each object in the model is assigned with an
+unique <code>ID</code> according to its appearance sequence in the IDF
+file. You can find all valid <code>ID</code>s using
+<code>$object_id()</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_id</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $Material</span></span>
@@ -571,7 +648,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $Construction</span></span>
 <span><span class="co">#&gt; [1] 66 67 68 69 70 71 72</span></span></code></pre></div>
-<p>You can get all object names using <code>$object_name()</code>. If the class does not have name attribute, <code>NA</code> will returned.</p>
+<p>You can get all object names using <code>$object_name()</code>. If
+the class does not have name attribute, <code>NA</code> will
+returned.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Version"</span>, <span class="st">"Material"</span>, <span class="st">"Construction"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $Version</span></span>
@@ -584,13 +663,19 @@
 <span><span class="co">#&gt; [1] "ROOF-1"               "WALL-1"               "CLNG-1"              </span></span>
 <span><span class="co">#&gt; [4] "FLOOR-SLAB-1"         "INT-WALL-1"           "Dbl Clr 3mm/13mm Air"</span></span>
 <span><span class="co">#&gt; [7] "Sgl Grey 3mm"</span></span></code></pre></div>
-<p>Object number in each class can be retrieved using <code>$object_num()</code>.</p>
+<p>Object number in each class can be retrieved using
+<code>$object_num()</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_num</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BuildingSurface:Detailed"</span>, <span class="st">"Material"</span>, <span class="st">"Output:Variable"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 40 10 13</span></span></code></pre></div>
-<p>Having the object ID or name, you can easily get any object using <code>$object()</code> which returns an <code>IdfObject</code> or using <code>$objects()</code> which returns a list of <code>IdfObject</code>s.</p>
+<p>Having the object ID or name, you can easily get any object using
+<code>$object()</code> which returns an <code>IdfObject</code> or using
+<code>$objects()</code> which returns a list of
+<code>IdfObject</code>s.</p>
 <blockquote>
-<p>NOTE: The matching of object names is case-insensitive. For instance, <code>model$object("rOoF")</code> is equivalent to <code>model$object("roof")</code>.</p>
+<p>NOTE: The matching of object names is case-insensitive. For instance,
+<code>model$object("rOoF")</code> is equivalent to
+<code>model$object("roof")</code>.</p>
 </blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">objects</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span><span class="op">)</span><span class="op">)</span></span>
@@ -615,7 +700,8 @@
 <span><span class="co">#&gt; │─ 3 : "BR01",     !- Layer 2</span></span>
 <span><span class="co">#&gt; │─ 4 : "IN46",     !- Layer 3</span></span>
 <span><span class="co">#&gt; └─ 5 : "WD01";     !- Layer 4</span></span></code></pre></div>
-<p>If you want to get all objects in a single class, use <code>$objects_in_class()</code>.</p>
+<p>If you want to get all objects in a single class, use
+<code>$objects_in_class()</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">objects_in_class</span><span class="op">(</span><span class="st">"Material"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $WD10</span></span>
@@ -649,7 +735,11 @@
 <span><span class="co">#&gt; Class: &lt;Material&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "BR01",         !- Name</span></span>
 <span><span class="va">....</span></span></code></pre></div>
-<p>Also, you can get all objects in a single class using <code>"$"</code> or <code>"[["</code>. Class names can be given in underscore-style. For example, you can just use <code>model$Material_NoMass</code> instead of <code>model$`Material:Nomass`</code> to save some typings.</p>
+<p>Also, you can get all objects in a single class using
+<code>"$"</code> or <code>"[["</code>. Class names can be given in
+underscore-style. For example, you can just use
+<code>model$Material_NoMass</code> instead of
+<code>model$`Material:Nomass`</code> to save some typings.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span></span>
 <span><span class="co">#&gt; $CP01</span></span>
@@ -685,10 +775,13 @@
 <span><span class="va">....</span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># model[["Material_NoMass"]]</span></span></code></pre></div>
-<p>Based on the above, if you want to get the first object in class <code>RunPeriod</code>, you can simply run:</p>
+<p>Based on the above, if you want to get the first object in class
+<code>RunPeriod</code>, you can simply run:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rp</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
-<p>For unique object, such like <code>SimulationControl</code> and <code>Building</code>, you can use <code>$object_unique()</code> which returns a single <code>IdfObject</code> object.</p>
+<p>For unique object, such like <code>SimulationControl</code> and
+<code>Building</code>, you can use <code>$object_unique()</code> which
+returns a single <code>IdfObject</code> object.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_unique</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'Building'&gt; [ID:3] `Building`</span></span>
@@ -704,7 +797,17 @@
 <span></span>
 <span><span class="co"># OR just</span></span>
 <span><span class="co"># model$Building</span></span></code></pre></div>
-<p>Many fields in a model can be referred by others. For example, the <code>Outside Layer</code> and other fields in <code>Construction</code> class refer to the <code>Name</code> field in <code>Material</code> class and other material related classes. Here it means that the <code>Outside Layer</code> field <strong>refers to</strong> the <code>Name</code> field and the <code>Name</code> field is <strong>referred by</strong> the <code>Outside Layer</code>. <code>$object_relation()</code> provides a simple interface to get this kind of relation. It takes a single object ID or name and also a relation direction, and returns an <code>IdfRelation</code> object which contains data presenting such relation above.</p>
+<p>Many fields in a model can be referred by others. For example, the
+<code>Outside Layer</code> and other fields in <code>Construction</code>
+class refer to the <code>Name</code> field in <code>Material</code>
+class and other material related classes. Here it means that the
+<code>Outside Layer</code> field <strong>refers to</strong> the
+<code>Name</code> field and the <code>Name</code> field is
+<strong>referred by</strong> the <code>Outside Layer</code>.
+<code>$object_relation()</code> provides a simple interface to get this
+kind of relation. It takes a single object ID or name and also a
+relation direction, and returns an <code>IdfRelation</code> object which
+contains data presenting such relation above.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_name</span><span class="op">(</span><span class="st">"Material:NoMass"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`Material:NoMass`</span></span>
@@ -725,7 +828,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
-<p>Above shows that no-mass material <code>MAT-CLNG-1</code> is used at the outside layer of a construction named <code>CLNG-1</code>. You can extract both of them using <code>$objects_in_relation()</code>.</p>
+<p>Above shows that no-mass material <code>MAT-CLNG-1</code> is used at
+the outside layer of a construction named <code>CLNG-1</code>. You can
+extract both of them using <code>$objects_in_relation()</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat_const</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">objects_in_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, <span class="st">"ref_by"</span><span class="op">)</span></span>
 <span><span class="va">mat_const</span></span>
@@ -744,8 +849,12 @@
 <span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span></span>
 <span><span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></span></code></pre></div>
-<p>After you get the objects, you can perform detailed modifications on them using methods <code>$set()</code> in both <code>Idf</code> and <code>IdfObject</code> class.</p>
-<p>Similarly, you can use <code>"$"</code> and <code>"[["</code> to get a single value in an <code>IdfObject</code> class or <code>"["</code> to get multiple values just like normal lists in R.</p>
+<p>After you get the objects, you can perform detailed modifications on
+them using methods <code>$set()</code> in both <code>Idf</code> and
+<code>IdfObject</code> class.</p>
+<p>Similarly, you can use <code>"$"</code> and <code>"[["</code> to get
+a single value in an <code>IdfObject</code> class or <code>"["</code> to
+get multiple values just like normal lists in R.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rp</span><span class="op">$</span><span class="va">Begin_Day_of_Month</span></span>
 <span><span class="co">#&gt; [1] 14</span></span>
@@ -761,15 +870,29 @@
 <div class="section level2">
 <h2 id="modify-object">Modify object<a class="anchor" aria-label="anchor" href="#modify-object"></a>
 </h2>
-<p>There are two ways to modify objects in eplusr. One is using methods in <code>Idf</code> which works on multiple objects, and the other way is using methods in <code>IdfObject</code> which only works for a single object.</p>
+<p>There are two ways to modify objects in eplusr. One is using methods
+in <code>Idf</code> which works on multiple objects, and the other way
+is using methods in <code>IdfObject</code> which only works for a single
+object.</p>
 <blockquote>
-<p>NOTE: Validations are performed during object modifications under different strictness level (<code>none</code>, <code>draft</code>, <code>final</code> or custom yours using <code><a href="../reference/custom_validate.html">custom_validate()</a></code>). For detailed explanations, please see <code><a href="../reference/level_checks.html">?level_checks</a></code>.</p>
+<p>NOTE: Validations are performed during object modifications under
+different strictness level (<code>none</code>, <code>draft</code>,
+<code>final</code> or custom yours using
+<code><a href="../reference/custom_validate.html">custom_validate()</a></code>). For detailed explanations, please see
+<code><a href="../reference/level_checks.html">?level_checks</a></code>.</p>
 </blockquote>
-<p>Object IDs will be appended after new objects are added, and the most-newly added object will always have the max ID. Object IDs will never be reused, even when their binded objects have been deleted.</p>
+<p>Object IDs will be appended after new objects are added, and the
+most-newly added object will always have the max ID. Object IDs will
+never be reused, even when their binded objects have been deleted.</p>
 <div class="section level3">
 <h3 id="duplicate-existing-objects-idfdup">Duplicate existing objects (<code>Idf$dup()</code>)<a class="anchor" aria-label="anchor" href="#duplicate-existing-objects-idfdup"></a>
 </h3>
-<p><code>$dup()</code> duplicates objects specified by object IDs or names. If the target classes have a name attribute, you can assign new names to the duplicated objects in form <code>new_name = "old_name"</code>. If new name is not given, the newly added object will have the same name as the original object except a appended suffix of “<code>1</code>”, “<code>2</code>” and etc.</p>
+<p><code>$dup()</code> duplicates objects specified by object IDs or
+names. If the target classes have a name attribute, you can assign new
+names to the duplicated objects in form
+<code>new_name = "old_name"</code>. If new name is not given, the newly
+added object will have the same name as the original object except a
+appended suffix of “<code>1</code>”, “<code>2</code>” and etc.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">dup</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>my_roof <span class="op">=</span> <span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; New names of duplicated objects not given are automatically generated:</span></span>
@@ -805,10 +928,20 @@
 <div class="section level3">
 <h3 id="add-new-objects-using-lists-idfadd">Add new objects using lists (<code>Idf$add()</code>)<a class="anchor" aria-label="anchor" href="#add-new-objects-using-lists-idfadd"></a>
 </h3>
-<p>You can add new objects using <code>$add()</code>. With <code>.default</code> being <code>TRUE</code>, the default behavior, all empty fields are filled with default values, if possible. Only minimum fields will be added by default. But you can change it by setting <code>.all</code> to <code>TRUE</code>.</p>
-<p>Fields can be given using either indices or names. Field index <code>X</code> is specified in format <code>..X</code>. Field name can be given in underscore-style, e.g. all <code>Begin Month</code>, <code>begin month</code> and <code>begin_month</code> refer to the same field.</p>
-<p>You can also add new comments alongside with new values using the special element <code>.comment</code>.</p>
-<p>For example, here we add two new objects with comments in <code>RunPeriod</code> class:</p>
+<p>You can add new objects using <code>$add()</code>. With
+<code>.default</code> being <code>TRUE</code>, the default behavior, all
+empty fields are filled with default values, if possible. Only minimum
+fields will be added by default. But you can change it by setting
+<code>.all</code> to <code>TRUE</code>.</p>
+<p>Fields can be given using either indices or names. Field index
+<code>X</code> is specified in format <code>..X</code>. Field name can
+be given in underscore-style, e.g. all <code>Begin Month</code>,
+<code>begin month</code> and <code>begin_month</code> refer to the same
+field.</p>
+<p>You can also add new comments alongside with new values using the
+special element <code>.comment</code>.</p>
+<p>For example, here we add two new objects with comments in
+<code>RunPeriod</code> class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -853,8 +986,12 @@
 <span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
 <span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
 <span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
-<p>Note that the use <code>.()</code> inside <code>$add()</code>. It is just an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
-<p>If you want to create multiple objects in one go, you can use <code>:=</code>, instead of <code>=</code>. For instance, below we create 3 materials. Note that field values with shorter length are automatically recycled.</p>
+<p>Note that the use <code>.()</code> inside <code>$add()</code>. It is
+just an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
+<p>If you want to create multiple objects in one go, you can use
+<code>:=</code>, instead of <code>=</code>. For instance, below we
+create 3 materials. Note that field values with shorter length are
+automatically recycled.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"mat%i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,</span>
@@ -895,10 +1032,13 @@
 <span><span class="co">#&gt; └─ 6*: 840;        !- Specific Heat {J/kg-K}</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="set-new-values-and-comments-using-lists-idfset">Set new values and comments using lists (<code>Idf$set()</code>)<a class="anchor" aria-label="anchor" href="#set-new-values-and-comments-using-lists-idfset"></a>
+<h3 id="set-new-values-and-comments-using-lists-idfset">Set new values and comments using lists
+(<code>Idf$set()</code>)<a class="anchor" aria-label="anchor" href="#set-new-values-and-comments-using-lists-idfset"></a>
 </h3>
-<p>Changing values of existing objects can be conducted using <code>$set()</code> in <code>Idf</code> and <code>IdfObject</code>:</p>
-<p>Note that you can also use <code>.()</code> here as an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
+<p>Changing values of existing objects can be conducted using
+<code>$set()</code> in <code>Idf</code> and <code>IdfObject</code>:</p>
+<p>Note that you can also use <code>.()</code> here as an alias of
+<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
 <span>  rp_test_1 <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_3"</span>, begin_day_of_month <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -908,7 +1048,7 @@
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-08-19</span></span>
+<span><span class="co">#&gt; !2022-11-20</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -923,7 +1063,8 @@
 <span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
 <span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
 <span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
-<p>You can modify all objects in a class using <code>class := list(...)</code>:</p>
+<p>You can modify all objects in a class using
+<code>class := list(...)</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
 <span>  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,</span>
@@ -962,7 +1103,7 @@
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-08-19</span></span>
+<span><span class="co">#&gt; !2022-11-20</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -996,9 +1137,12 @@
 <span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
 <span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <blockquote>
-<p>If the target class is store as a variable, e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside <code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
+<p>If the target class is store as a variable,
+e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside
+<code>..()</code>, i.e. <code>model$set(..(cls) := list(...))</code></p>
 </blockquote>
-<p>Multiple objects can be grouped inside <code>.()</code> or <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>:</p>
+<p>Multiple objects can be grouped inside <code>.()</code> or
+<code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $WinterDay</span></span>
@@ -1030,11 +1174,13 @@
 <span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
 <span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
 <span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
-<p>For setting a single value on one object, you can write it in a chain:</p>
+<p>For setting a single value on one object, you can write it in a
+chain:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">RunPeriod</span><span class="op">$</span><span class="va">rp_test_2</span><span class="op">$</span><span class="va">End_Day_of_Month</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<p>Also, if the modified fields are referenced by fields in other objects, the corresponding fields will also be updated.</p>
+<p>Also, if the modified fields are referenced by fields in other
+objects, the corresponding fields will also be updated.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">CC03</span></span>
 <span></span>
@@ -1084,7 +1230,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
-<p>Sometimes, you may want to get all possible values of fields before you change them. You can achieve that by using <code>$value_possible()</code> method in <code>IdfObject</code> class.</p>
+<p>Sometimes, you may want to get all possible values of fields before
+you change them. You can achieve that by using
+<code>$value_possible()</code> method in <code>IdfObject</code>
+class.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────</span></span>
@@ -1108,7 +1257,10 @@
 <div class="section level3">
 <h3 id="insert-objects-from-another-idf-idfinsert">Insert objects from another IDF (<code>Idf$insert()</code>)<a class="anchor" aria-label="anchor" href="#insert-objects-from-another-idf-idfinsert"></a>
 </h3>
-<p>Sometimes it may be useful to insert objects from other IDFs. For example, you may want to import some design days and update location data from a “.ddy” file. You can achieve that using <code>$insert()</code>.</p>
+<p>Sometimes it may be useful to insert objects from other IDFs. For
+example, you may want to import some design days and update location
+data from a “.ddy” file. You can achieve that using
+<code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
 <span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
@@ -1151,9 +1303,11 @@
 <span><span class="co">#&gt; └─ 5 : 2;                  !- Elevation {m}</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="load-objects-using-characters-or-data-frames-idfload">Load objects using characters or data.frames (<code>Idf$load()</code>)<a class="anchor" aria-label="anchor" href="#load-objects-using-characters-or-data-frames-idfload"></a>
+<h3 id="load-objects-using-characters-or-data-frames-idfload">Load objects using characters or data.frames
+(<code>Idf$load()</code>)<a class="anchor" aria-label="anchor" href="#load-objects-using-characters-or-data-frames-idfload"></a>
 </h3>
-<p>Here <code>load</code> means <strong>insert</strong>. You can use character vectors or data.frames to load new objects.</p>
+<p>Here <code>load</code> means <strong>insert</strong>. You can use
+character vectors or data.frames to load new objects.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Construction,"</span>, <span class="st">"new_const1,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="fu">name</span><span class="op">(</span><span class="op">)</span>, <span class="st">";"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="va">mat_chr</span><span class="op">)</span></span>
@@ -1176,7 +1330,8 @@
 <span><span class="co">#&gt; │─ 3 : "BR01",       !- Layer 2</span></span>
 <span><span class="co">#&gt; │─ 4 : "IN46",       !- Layer 3</span></span>
 <span><span class="co">#&gt; └─ 5 : "WD01";       !- Layer 4</span></span></code></pre></div>
-<p>The relation is automatically generated whenever new fields are added or modified.</p>
+<p>The relation is automatically generated whenever new fields are added
+or modified.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const1"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
@@ -1230,9 +1385,11 @@
 <span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="update-objects-using-characters-or-data-frames-idfupdate">Update objects using characters or data.frames (<code>Idf$update()</code>)<a class="anchor" aria-label="anchor" href="#update-objects-using-characters-or-data-frames-idfupdate"></a>
+<h3 id="update-objects-using-characters-or-data-frames-idfupdate">Update objects using characters or data.frames
+(<code>Idf$update()</code>)<a class="anchor" aria-label="anchor" href="#update-objects-using-characters-or-data-frames-idfupdate"></a>
 </h3>
-<p>Here <code>update</code> means <strong>set</strong>. You can use character vectors or data.frames to update existing objects.</p>
+<p>Here <code>update</code> means <strong>set</strong>. You can use
+character vectors or data.frames to update existing objects.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat_chr</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">WD10</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># change material density</span></span>
@@ -1268,7 +1425,10 @@
 <div class="section level3">
 <h3 id="delete-existing-objects-idfdel">Delete existing objects (<code>Idf$del()</code>)<a class="anchor" aria-label="anchor" href="#delete-existing-objects-idfdel"></a>
 </h3>
-<p><code>$del()</code> will delete objects specified by object IDs or names. For example, in current model, there is a material named <code>"MAT-CLNG-1"</code> in class <code>Material:NoMass</code>. Let’s see if it has been referred by other objects.</p>
+<p><code>$del()</code> will delete objects specified by object IDs or
+names. For example, in current model, there is a material named
+<code>"MAT-CLNG-1"</code> in class <code>Material:NoMass</code>. Let’s
+see if it has been referred by other objects.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span><span class="op">$</span><span class="va">`MAT-CLNG-1`</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
@@ -1286,8 +1446,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
-<p>As we can see, <code>MAT-CLNG-1</code> has been referred by a construction named <code>"CLNG-1"</code>.</p>
-<p>First, let’s try to direct delete Material <code>MAT-CLNG-1</code>.</p>
+<p>As we can see, <code>MAT-CLNG-1</code> has been referred by a
+construction named <code>"CLNG-1"</code>.</p>
+<p>First, let’s try to direct delete Material
+<code>MAT-CLNG-1</code>.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error: Cannot delete object(s) that are referred by others:</span></span>
@@ -1300,8 +1462,11 @@
 <span><span class="co">#&gt;             └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
 <span><span class="co">#&gt;                └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
-<p>We got an error, because directly deleting <code>MAT-CLNG-1</code> will introduce invalid reference in Construction <code>CLNG-1</code>.</p>
-<p>In some cases, you may still want to delete that object. You can achieve this by setting <code>.force</code> to <code>TRUE</code>.</p>
+<p>We got an error, because directly deleting <code>MAT-CLNG-1</code>
+will introduce invalid reference in Construction
+<code>CLNG-1</code>.</p>
+<p>In some cases, you may still want to delete that object. You can
+achieve this by setting <code>.force</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span>, .force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Deleting object(s) [ID: 55]</span></span>
@@ -1321,7 +1486,10 @@
 <div class="section level3">
 <h3 id="purge-unused-resource-objects-idfpurge">Purge unused resource objects (<code>Idf$purge()</code>)<a class="anchor" aria-label="anchor" href="#purge-unused-resource-objects-idfpurge"></a>
 </h3>
-<p><code>$purge()</code> will delete resource objects specified that are not used by any objects. Resource objects refer to objects that can be referenced by other objects, e.g. <code>Material</code>, <code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
+<p><code>$purge()</code> will delete resource objects specified that are
+not used by any objects. Resource objects refer to objects that can be
+referenced by other objects, e.g. <code>Material</code>,
+<code>Construction</code>, <code>Schedule:Compact</code> and etc.</p>
 <p>Below we remove all schedules that are not currently used.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">purge</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></span>
@@ -1330,9 +1498,14 @@
 <span><span class="co">#&gt;  #2| Object ID [19] (name 'FlowRate') in class 'ScheduleTypeLimits'</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="find-and-remove-duplicates-idfduplicated-idfunique">Find and remove duplicates (<code>Idf$duplicated()</code> &amp; <code>Idf$unique()</code>)<a class="anchor" aria-label="anchor" href="#find-and-remove-duplicates-idfduplicated-idfunique"></a>
+<h3 id="find-and-remove-duplicates-idfduplicated-idfunique">Find and remove duplicates (<code>Idf$duplicated()</code> &amp;
+<code>Idf$unique()</code>)<a class="anchor" aria-label="anchor" href="#find-and-remove-duplicates-idfduplicated-idfunique"></a>
 </h3>
-<p><code>$duplicatd()</code> and <code>$unique()</code> can be used to detect and remove duplicated objects, respectively. Here duplicated objects refer to objects whose field values are the same except the names. Object comments are ignored during comparison. These two methods can be useful when doing model cleaning.</p>
+<p><code>$duplicatd()</code> and <code>$unique()</code> can be used to
+detect and remove duplicated objects, respectively. Here duplicated
+objects refer to objects whose field values are the same except the
+names. Object comments are ignored during comparison. These two methods
+can be useful when doing model cleaning.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">duplicated</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  class id                               name duplicate</span></span>
@@ -1376,14 +1549,26 @@
 <div class="section level3">
 <h3 id="paste-objects-from-idf-editor-idfpaste">Paste objects from IDF Editor (<code>Idf$paste()</code>)<a class="anchor" aria-label="anchor" href="#paste-objects-from-idf-editor-idfpaste"></a>
 </h3>
-<p>Once an IDF file is opened in IDF Editor, you can copy objects by clicking the <code>Copy Obj</code> button in IDF Editor, and use <code>$paste()</code> to insert those objects into current <code>Idf</code>. Note that IDF Editor only exists on Windows, which means that <code>$paste()</code> will also work only on that platform.</p>
+<p>Once an IDF file is opened in IDF Editor, you can copy objects by
+clicking the <code>Copy Obj</code> button in IDF Editor, and use
+<code>$paste()</code> to insert those objects into current
+<code>Idf</code>. Note that IDF Editor only exists on Windows, which
+means that <code>$paste()</code> will also work only on that
+platform.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="check-possible-field-errors-idfvalidate">Check possible field errors (<code>Idf$validate()</code>)<a class="anchor" aria-label="anchor" href="#check-possible-field-errors-idfvalidate"></a>
 </h2>
-<p><code>$validate()</code> checks if there are any errors in current <code>Idf</code> under specified validation level. You can customize what kind of errors to check by changing the <code>level</code> argument. The default validation level is equal to <code>eplusr_option("validate_level")</code>.</p>
-<p>There are 10 different validation check components in total. Three predefined validation level are included, i.e. <code>"none"</code>, <code>"draft"</code> and <code>"final"</code>. To get what validation components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
+<p><code>$validate()</code> checks if there are any errors in current
+<code>Idf</code> under specified validation level. You can customize
+what kind of errors to check by changing the <code>level</code>
+argument. The default validation level is equal to
+<code>eplusr_option("validate_level")</code>.</p>
+<p>There are 10 different validation check components in total. Three
+predefined validation level are included, i.e. <code>"none"</code>,
+<code>"draft"</code> and <code>"final"</code>. To get what validation
+components those levels contain, use <code><a href="../reference/level_checks.html">level_checks()</a></code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "final"</span></span>
@@ -1399,8 +1584,11 @@
 <span><span class="co">#&gt;  $ choice         : logi TRUE</span></span>
 <span><span class="co">#&gt;  $ range          : logi TRUE</span></span>
 <span><span class="co">#&gt;  $ reference      : logi TRUE</span></span></code></pre></div>
-<p>In the previous section, we deleted a material named <code>MAT-CLNG-1</code>.</p>
-<p>The <code>final</code> validation level turns all checking components on. We can just trigger invalid reference checking using <code><a href="../reference/custom_validate.html">custom_validate()</a></code> function.</p>
+<p>In the previous section, we deleted a material named
+<code>MAT-CLNG-1</code>.</p>
+<p>The <code>final</code> validation level turns all checking components
+on. We can just trigger invalid reference checking using
+<code><a href="../reference/custom_validate.html">custom_validate()</a></code> function.</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu"><a href="../reference/custom_validate.html">custom_validate</a></span><span class="op">(</span>reference <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
@@ -1413,8 +1601,14 @@
 <span><span class="co">#&gt;     └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
 <span><span class="co">#&gt;        └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
-<p>As we can see, the invalid reference in construction <code>CLNG-1</code> is successfully detected.</p>
-<p>In this example, we already knows that <code>CLNG-1</code> is the invalid object. In many cases, we don’t know that information in advance. As <code>$validate()</code> returns a list of <code>data.table</code>s, we can extract invalid objects for different types directly using <code>$validate()</code>. Below we extract all objects that have invalid reference errors.</p>
+<p>As we can see, the invalid reference in construction
+<code>CLNG-1</code> is successfully detected.</p>
+<p>In this example, we already knows that <code>CLNG-1</code> is the
+invalid object. In many cases, we don’t know that information in
+advance. As <code>$validate()</code> returns a list of
+<code>data.table</code>s, we can extract invalid objects for different
+types directly using <code>$validate()</code>. Below we extract all
+objects that have invalid reference errors.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">invalid_reference</span><span class="op">$</span><span class="va">object_id</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 68</span></span>
@@ -1424,7 +1618,10 @@
 <span><span class="co">#&gt; Class: &lt;Construction&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "CLNG-1",     !- Name</span></span>
 <span><span class="co">#&gt; └─ 2*: "MAT-CLNG-1"; !- Outside Layer</span></span></code></pre></div>
-<p>Then we can use <code>$set()</code> to correct them. We can get all possible values for field <code>Outside Layer</code> using <code>$value_possible()</code> method in <code>IdfObject</code> class.</p>
+<p>Then we can use <code>$set()</code> to correct them. We can get all
+possible values for field <code>Outside Layer</code> using
+<code>$value_possible()</code> method in <code>IdfObject</code>
+class.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="st">"Outside Layer"</span><span class="op">)</span><span class="op">$</span><span class="va">source</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
@@ -1435,7 +1632,8 @@
 <span><span class="co">#&gt; [17] "AL21"          "AL23"          "CLEAR 3MM"     "GREY 3MM"     </span></span>
 <span><span class="co">#&gt; [21] "CLEAR 6MM"     "LoE CLEAR 6MM" "AIR 6MM"       "AIR 13MM"     </span></span>
 <span><span class="co">#&gt; [25] "ARGON 13MM"</span></span></code></pre></div>
-<p>Now let’s change the construction’s <code>Outside Layer</code> to <code>WD10</code>.</p>
+<p>Now let’s change the construction’s <code>Outside Layer</code> to
+<code>WD10</code>.</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>Outside_Layer <span class="op">=</span> <span class="st">"WD10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'Construction'&gt; [ID:68] `CLNG-1`</span></span>
@@ -1446,19 +1644,25 @@
 <div class="section level2">
 <h2 id="save-to-an-idf-file-idfsave">Save to an IDF file (<code>Idf$save()</code>)<a class="anchor" aria-label="anchor" href="#save-to-an-idf-file-idfsave"></a>
 </h2>
-<p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
+<p>You can save your model using <code>$save()</code>. If no path is
+given, the path of model itself will be used. This may overwrite the
+current file which has a risk of losing your original file and data. You
+have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
+process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpxwemhr/file33c6113fbab9.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpPUSkHR/file28497a22938e.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpxwemhr/file33c6113fbab9.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpPUSkHR/file28497a22938e.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>So far we have went through core methods in <code>Idf</code> class to modify an IDF file and save the results.</p>
-<p>Let’s turn our attention to run EnergyPlus simulations in the next vignette <em>“Run simulation and data exploration”</em>.</p>
+<p>So far we have went through core methods in <code>Idf</code> class to
+modify an IDF file and save the results.</p>
+<p>Let’s turn our attention to run EnergyPlus simulations in the next
+vignette <em>“Run simulation and data exploration”</em>.</p>
 </div>
   </div>
 

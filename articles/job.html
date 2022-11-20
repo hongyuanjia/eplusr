@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2.9001</span>
       </span>
     </div>
 
@@ -130,9 +130,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Run simulation and data exploration</h1>
-                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan
+Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-08-19</h4>
+            <h4 data-toc-skip class="date">2022-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -141,13 +142,26 @@
 
     
     
-<p>This vignette showcases the basic features of the <code>EplusJob</code> class with the main focus on how the tidy data interface can provide a seamless workflow to extract EnergyPlus output, feed it into data analysis pipelines and turn the results into understanding and knowledge.</p>
+<p>This vignette showcases the basic features of the
+<code>EplusJob</code> class with the main focus on how the tidy data
+interface can provide a seamless workflow to extract EnergyPlus output,
+feed it into data analysis pipelines and turn the results into
+understanding and knowledge.</p>
 <hr>
 <div class="section level2">
 <h2 id="run-simulations">Run simulations<a class="anchor" aria-label="anchor" href="#run-simulations"></a>
 </h2>
-<p>The <code>Idf</code> class provides a <code>$run()</code> method to call EnergyPlus and run simulations. Underneath, eplusr uses the EnergyPlus command line interface which was introduced since EnergyPlus v8.3.0, which means that <code>$run()</code> only supports models with version higher than v8.3.0.</p>
-<p><code>Idf$run()</code> will run the current model with specified weather using corresponding version of EnergyPlus. The model and the weather used will be copied to the output directory. An <code>EplusJob</code> object will be returned which provides detailed information of the simulation and methods to collect simulation output. Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for details.</p>
+<p>The <code>Idf</code> class provides a <code>$run()</code> method to
+call EnergyPlus and run simulations. Underneath, eplusr uses the
+EnergyPlus command line interface which was introduced since EnergyPlus
+v8.3.0, which means that <code>$run()</code> only supports models with
+version higher than v8.3.0.</p>
+<p><code>Idf$run()</code> will run the current model with specified
+weather using corresponding version of EnergyPlus. The model and the
+weather used will be copied to the output directory. An
+<code>EplusJob</code> object will be returned which provides detailed
+information of the simulation and methods to collect simulation output.
+Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for details.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
@@ -161,7 +175,9 @@
 <div class="section level3">
 <h3 id="run-only-design-day-simulation">Run only design day simulation<a class="anchor" aria-label="anchor" href="#run-only-design-day-simulation"></a>
 </h3>
-<p>Sometime, you may only want to run a design day simulation. <code>Idf$run()</code> provides a convenient way to do this by setting the <code>weather</code> argument to <code>NULL</code>.</p>
+<p>Sometime, you may only want to run a design day simulation.
+<code>Idf$run()</code> provides a convenient way to do this by setting
+the <code>weather</code> argument to <code>NULL</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="cn">NULL</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
@@ -169,7 +185,7 @@
 <span><span class="co">#&gt; No expanded file generated.</span></span>
 <span><span class="co">#&gt; ExpandObjects Finished. Time:     0.020</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.08.19 11:03</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2022.11.20 16:33</span></span>
 <span><span class="co">#&gt; Processing Data Dictionary</span></span>
 <span><span class="co">#&gt; Processing Input File</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
@@ -182,37 +198,46 @@
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpsWWlLF/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpd5MvMM/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
 <span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 11:03:44' and completed successfully after 0.81 secs.</span></span></span></code></pre></div>
-<p><code>job</code> prints the path of model and weather, the version and path of EnergyPlus used to run simulations, and the simulation job status.</p>
-<p>You can always retrieve the last simulation job of an <code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-11-20 16:33:38' and completed successfully after 0.8 secs.</span></span></span></code></pre></div>
+<p><code>job</code> prints the path of model and weather, the version
+and path of EnergyPlus used to run simulations, and the simulation job
+status.</p>
+<p>You can always retrieve the last simulation job of an
+<code>Idf</code> object using <code>Idf$last_job()</code> method:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpsWWlLF/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpd5MvMM/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
 <span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 11:03:44' and completed successfully after 0.81 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-11-20 16:33:38' and completed successfully after 0.8 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
 </h3>
-<p>By default, when calling <code>Idf$run()</code> method, R will hang on and wait for the simulation to complete. EnergyPlus standard output (stdout) and error (stderr) is printed to R console. You can make EnergyPlus run in the background by setting <code>wait</code> to <code>FALSE</code>. The simulation job status can be shown by printing the <code>EplusJob</code> object or using the <code>EplusJob$status()</code> method.</p>
+<p>By default, when calling <code>Idf$run()</code> method, R will hang
+on and wait for the simulation to complete. EnergyPlus standard output
+(stdout) and error (stderr) is printed to R console. You can make
+EnergyPlus run in the background by setting <code>wait</code> to
+<code>FALSE</code>. The simulation job status can be shown by printing
+the <code>EplusJob</code> object or using the
+<code>EplusJob$status()</code> method.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpsWWlLF/5Zone_Transformer.idf.</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpd5MvMM/5Zone_Transformer.idf.</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpsWWlLF/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt; * Model: '/tmp/Rtmpd5MvMM/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.In...</span></span>
 <span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
 <span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-08-19 11:03:45' and is still running...</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-11-20 16:33:39' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -233,12 +258,13 @@
 <div class="section level3">
 <h3 id="print-simulation-errors">Print simulation errors<a class="anchor" aria-label="anchor" href="#print-simulation-errors"></a>
 </h3>
-<p>You can get simulation errors using <code>EplusJob$errors()</code>.</p>
+<p>You can get simulation errors using
+<code>EplusJob$errors()</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt;   * EnergyPlus version: 8.8.0 (7c3bbe4830)</span></span>
-<span><span class="co">#&gt;   * Simulation started: 2022-08-19 11:03:00</span></span>
+<span><span class="co">#&gt;   * Simulation started: 2022-11-20 16:33:00</span></span>
 <span><span class="co">#&gt;   * Terminated: FALSE</span></span>
 <span><span class="co">#&gt;   * Successful: TRUE</span></span>
 <span><span class="co">#&gt;   * Warning[W]: 1</span></span>
@@ -257,31 +283,70 @@
 <div class="section level2">
 <h2 id="retrieve-simulation-output">Retrieve simulation output<a class="anchor" aria-label="anchor" href="#retrieve-simulation-output"></a>
 </h2>
-<p>eplusr uses the EnergyPlus SQL output for extracting simulation output. In order to do so, an object in <code>Output:SQLite</code> class with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be automatically created if it does not exists. <code>EplusJob</code> has provided some wrappers that do SQL queries to get report data results, i.e. results from <code>Output:Variable</code> and <code>Output:Meter*</code>. But for <code>Output:Table</code> results, you have to be familiar with the structure of the EnergyPlus SQL output, especially for table <em>“TabularDataWithStrings”</em>. For details, please see <em>“2.20 eplusout.sql”</em>, especially <em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
+<p>eplusr uses the EnergyPlus SQL output for extracting simulation
+output. In order to do so, an object in <code>Output:SQLite</code> class
+with <code>Option Type</code> value of <code>SimpleAndTabular</code>
+will be automatically created if it does not exists.
+<code>EplusJob</code> has provided some wrappers that do SQL queries to
+get report data results, i.e. results from <code>Output:Variable</code>
+and <code>Output:Meter*</code>. But for <code>Output:Table</code>
+results, you have to be familiar with the structure of the EnergyPlus
+SQL output, especially for table <em>“TabularDataWithStrings”</em>. For
+details, please see <em>“2.20 eplusout.sql”</em>, especially
+<em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details
+and Examples”</em> documentation.</p>
 <div class="section level3">
 <h3 id="tidy-data-interface">Tidy data interface<a class="anchor" aria-label="anchor" href="#tidy-data-interface"></a>
 </h3>
-<p><code>EplusJob</code> class is designed to extract and represent EnergyPlus simulation results from the SQLite output into tidy tables. The layout ensures that values of different variables from the same observation are always paired and is well fitted for data analyses using the <em>tidyverse</em> R package ecosystem.</p>
-<p>Table (a) in figure below shows an example of the standard format from EnergyPlus CSV table output, while Table (b) gives the tidy representation of the same underlying data.</p>
-<p>Although the structure of Table (a) provides efficient storage for completely crossed designs, it violates with the tidy principles, as variables form both the rows and columns and column headers are values, not variable names. Additional data cleaning efforts are needed to work with this structure, especially considering the missing values (<code>NA</code> in row 2 and 4 in Table (a)) introduced by the aggregation of various reporting frequencies, which may add new inefficiencies and potential errors.</p>
-<p>In Table (b), values in column headers have been extracted and converted into separate columns, and a new variable called <code>Value</code> is used to store the concatenated data values from the previously separate columns. Moreover, instead of presenting date and time as strings in Table (a), the tidy data interface splits its components into four new variables, including <code>Month</code>, <code>Day</code>, <code>Hour</code> and <code>Minute</code>. Taken together, Table (b) forms a nine-variable tidy table and each variable matches the semantics of simulation output.</p>
+<p><code>EplusJob</code> class is designed to extract and represent
+EnergyPlus simulation results from the SQLite output into tidy tables.
+The layout ensures that values of different variables from the same
+observation are always paired and is well fitted for data analyses using
+the <em>tidyverse</em> R package ecosystem.</p>
+<p>Table (a) in figure below shows an example of the standard format
+from EnergyPlus CSV table output, while Table (b) gives the tidy
+representation of the same underlying data.</p>
+<p>Although the structure of Table (a) provides efficient storage for
+completely crossed designs, it violates with the tidy principles, as
+variables form both the rows and columns and column headers are values,
+not variable names. Additional data cleaning efforts are needed to work
+with this structure, especially considering the missing values
+(<code>NA</code> in row 2 and 4 in Table (a)) introduced by the
+aggregation of various reporting frequencies, which may add new
+inefficiencies and potential errors.</p>
+<p>In Table (b), values in column headers have been extracted and
+converted into separate columns, and a new variable called
+<code>Value</code> is used to store the concatenated data values from
+the previously separate columns. Moreover, instead of presenting date
+and time as strings in Table (a), the tidy data interface splits its
+components into four new variables, including <code>Month</code>,
+<code>Day</code>, <code>Hour</code> and <code>Minute</code>. Taken
+together, Table (b) forms a nine-variable tidy table and each variable
+matches the semantics of simulation output.</p>
 <div class="figure" style="text-align: center">
 <img src="tidy-format.png" alt="An example of tidy BES output data representation where Table (a) is the standard output format of EnergyPlus CSV table and Table (b) is the tidy representation of the same underlying data" width="60%"><p class="caption">
-An example of tidy BES output data representation where Table (a) is the standard output format of EnergyPlus CSV table and Table (b) is the tidy representation of the same underlying data
+An example of tidy BES output data representation where Table (a) is the
+standard output format of EnergyPlus CSV table and Table (b) is the tidy
+representation of the same underlying data
 </p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="get-all-possible-output-meta-data">Get all possible output meta data<a class="anchor" aria-label="anchor" href="#get-all-possible-output-meta-data"></a>
 </h3>
-<p><code>EplusJob$report_data_dict()</code> returns a data.table which contains meta data of report data for current simulation. For details on the meaning of each columns, please see <em>“2.20.2.1 ReportDataDictionary Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation. The most useful columns are:</p>
+<p><code>EplusJob$report_data_dict()</code> returns a data.table which
+contains meta data of report data for current simulation. For details on
+the meaning of each columns, please see <em>“2.20.2.1
+ReportDataDictionary Table”</em> in EnergyPlus <em>“Output Details and
+Examples”</em> documentation. The most useful columns are:</p>
 <ul>
 <li>
 <code>key_value</code>: Key name of the data</li>
 <li>
 <code>name</code>: Actual report data name</li>
 <li>
-<code>is_meter</code>: Whether report data is a meter data. Possible values: <code>0</code> and <code>1</code>
+<code>is_meter</code>: Whether report data is a meter data. Possible
+values: <code>0</code> and <code>1</code>
 </li>
 <li>
 <code>reporting_frequency</code>: Data reporting frequency</li>
@@ -378,7 +443,11 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level3">
 <h3 id="retrieve-report-data">Retrieve report data<a class="anchor" aria-label="anchor" href="#retrieve-report-data"></a>
 </h3>
-<p><code>EplusJob$report_data()</code> extracts the report data using key values and variable names. Just for demonstration, let’s get the transformer input electric power at 11 a.m for the first day of RunPeriod named <code>SUMMERDAY</code>, tag this simulation as case <code>example</code>, and return all possible output columns.</p>
+<p><code>EplusJob$report_data()</code> extracts the report data using
+key values and variable names. Just for demonstration, let’s get the
+transformer input electric power at 11 a.m for the first day of
+RunPeriod named <code>SUMMERDAY</code>, tag this simulation as case
+<code>example</code>, and return all possible output columns.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">power</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="st">"transformer 1"</span>, <span class="st">"transformer input electric power"</span>, case <span class="op">=</span> <span class="st">"example"</span>,</span>
 <span>  all <span class="op">=</span> <span class="cn">TRUE</span>, simulation_days <span class="op">=</span> <span class="fl">1</span>, environment_name <span class="op">=</span> <span class="st">"summerday"</span>, hour <span class="op">=</span> <span class="fl">11</span>, minute <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
@@ -394,9 +463,12 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span><span class="co">#&gt; 1: Transformer Input Electric Power       Zone Timestep          &lt;NA&gt;     W</span></span>
 <span><span class="co">#&gt;       value</span></span>
 <span><span class="co">#&gt; 1: 12273.17</span></span></code></pre></div>
-<p>Please note that by default the report data of design day simulations are always put at the top. If you are only interested in results of specific run periods, there are 2 ways to do so:</p>
+<p>Please note that by default the report data of design day simulations
+are always put at the top. If you are only interested in results of
+specific run periods, there are 2 ways to do so:</p>
 <ul>
-<li>Set <code>environment_name</code> to the run periods you are interested, e.g.:</li>
+<li>Set <code>environment_name</code> to the run periods you are
+interested, e.g.:</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span>environment_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summerday"</span>, <span class="st">"winterday"</span><span class="op">)</span><span class="op">)</span></span>
@@ -425,25 +497,32 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span><span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span></span>
 <span><span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></span></code></pre></div>
 <ul>
-<li>Set <code>day_type</code> to specific day types you are interested. A few grouped options are also provided:
+<li>Set <code>day_type</code> to specific day types you are interested.
+A few grouped options are also provided:
 <ul>
 <li>
-<code>"Weekday"</code>: All working days, i.e. from <code>"Monday"</code> to <code>"Friday"</code>
+<code>"Weekday"</code>: All working days, i.e. from
+<code>"Monday"</code> to <code>"Friday"</code>
 </li>
 <li>
-<code>"Weekend"</code>: <code>"Saturday"</code> and <code>"Sunday"</code>
+<code>"Weekend"</code>: <code>"Saturday"</code> and
+<code>"Sunday"</code>
 </li>
 <li>
-<code>"DesignDay"</code>: Equivalent to <code>"SummerDesignDay"</code> plus <code>"WinterDesignDay"</code>
+<code>"DesignDay"</code>: Equivalent to
+<code>"SummerDesignDay"</code> plus <code>"WinterDesignDay"</code>
 </li>
 <li>
-<code>"CustomDay"</code>: <code>"CustomDay1"</code> and <code>"CustomDay2"</code>
+<code>"CustomDay"</code>: <code>"CustomDay1"</code> and
+<code>"CustomDay2"</code>
 </li>
 <li>
-<code>"SpecialDay"</code>: Equivalent to <code>"DesignDay"</code> plus <code>"CustomDay"</code>
+<code>"SpecialDay"</code>: Equivalent to <code>"DesignDay"</code>
+plus <code>"CustomDay"</code>
 </li>
 <li>
-<code>"NormalDay"</code>: Equivalent to <code>"Weekday"</code> and <code>"Weekend"</code> plus <code>"Holiday"</code>
+<code>"NormalDay"</code>: Equivalent to <code>"Weekday"</code> and
+<code>"Weekend"</code> plus <code>"Holiday"</code>
 </li>
 </ul>
 </li>
@@ -474,7 +553,10 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span><span class="co">#&gt; 3838:                    Electricity:Plant     J 0.000</span></span>
 <span><span class="co">#&gt; 3839:                    Electricity:Plant     J 0.000</span></span>
 <span><span class="co">#&gt; 3840:                    Electricity:Plant     J 0.000</span></span></code></pre></div>
-<p><code>$report_data()</code> can also directly take the whole or subset results of <code>$report_data_dict()</code> to extract report data. In some case this may be quite handy. Let’s get all report variable with Celsius degree unit.</p>
+<p><code>$report_data()</code> can also directly take the whole or
+subset results of <code>$report_data_dict()</code> to extract report
+data. In some case this may be quite handy. Let’s get all report
+variable with Celsius degree unit.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data</span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">units</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   case            datetime   key_value</span></span>
@@ -505,8 +587,15 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level3">
 <h3 id="retrieve-tabular-data">Retrieve tabular data<a class="anchor" aria-label="anchor" href="#retrieve-tabular-data"></a>
 </h3>
-<p><code>EplusJob$tabular_data()</code> extracts tabular data of current simulation. For details on the meaning of each columns, please see <em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
-<p>Now let’s get the total site energy per total building area. Note that the <code>value</code> column in the returned <code>data.table</code> is character types, as some table store not just numbers. We need to convert it by setting <code>string_value</code> to <code>FALSE</code>.</p>
+<p><code>EplusJob$tabular_data()</code> extracts tabular data of current
+simulation. For details on the meaning of each columns, please see
+<em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details
+and Examples”</em> documentation.</p>
+<p>Now let’s get the total site energy per total building area. Note
+that the <code>value</code> column in the returned
+<code>data.table</code> is character types, as some table store not just
+numbers. We need to convert it by setting <code>string_value</code> to
+<code>FALSE</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site_energy</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span></span>
 <span>    column_name <span class="op">=</span> <span class="st">"energy per total building area"</span>, row_name <span class="op">=</span> <span class="st">"total site energy"</span>,</span>
@@ -524,7 +613,9 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level2">
 <h2 id="data-exploration-example">Data exploration example<a class="anchor" aria-label="anchor" href="#data-exploration-example"></a>
 </h2>
-<p>Data exploration is an essential aspect of building energy simulation. In this example, we will demonstrates the data exploration process of obtaining:</p>
+<p>Data exploration is an essential aspect of building energy
+simulation. In this example, we will demonstrates the data exploration
+process of obtaining:</p>
 <ol style="list-style-type: decimal">
 <li>energy use intensity (EUI)</li>
 <li>heating and cooling demand profile</li>
@@ -553,8 +644,17 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level3">
 <h3 id="extract-simulation-results">Extract simulation results<a class="anchor" aria-label="anchor" href="#extract-simulation-results"></a>
 </h3>
-<p>Code below shows how to use methods <code>tabular_data()</code>, <code>read_table()</code> and <code>report_data()</code> provided by the tidy data interface in <code>EplusJob</code> to extract building area and building energy consumption, zone meta data, and cooling and heating demands, with all formatted in a tidy representation.</p>
-<p>Note that instead of presenting the simulated date and time as strings, the <code>report_data()</code> adds a time-series column <code>datetime</code> in <code>POSIXct</code> based on a derived year value. Moreover, the tidy data interface also provides a number of additional columns, which makes it quite convenient and straightforward to directly perform further data transformations.</p>
+<p>Code below shows how to use methods <code>tabular_data()</code>,
+<code>read_table()</code> and <code>report_data()</code> provided by the
+tidy data interface in <code>EplusJob</code> to extract building area
+and building energy consumption, zone meta data, and cooling and heating
+demands, with all formatted in a tidy representation.</p>
+<p>Note that instead of presenting the simulated date and time as
+strings, the <code>report_data()</code> adds a time-series column
+<code>datetime</code> in <code>POSIXct</code> based on a derived year
+value. Moreover, the tidy data interface also provides a number of
+additional columns, which makes it quite convenient and straightforward
+to directly perform further data transformations.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read building area from Standard Reports</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">tabular_data</span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"Building Area"</span>, wide <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -803,7 +903,13 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level3">
 <h3 id="data-exploration-using-tidyverse">Data exploration using tidyverse<a class="anchor" aria-label="anchor" href="#data-exploration-using-tidyverse"></a>
 </h3>
-<p>Code below demonstrate the benefits of the tidy format in selecting columns using <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code>, subsetting rows using <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>, sorting rows using <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>, adding new variables using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, summarizing data using a combination of <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize()</a></code>, joining tables using <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join()</a></code>, and data visualization using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code>.</p>
+<p>Code below demonstrate the benefits of the tidy format in selecting
+columns using <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code>, subsetting rows using
+<code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>, sorting rows using <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>, adding
+new variables using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, summarizing data using a
+combination of <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize()</a></code>,
+joining tables using <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join()</a></code>, and data visualization
+using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code>.</p>
 <div class="section level4">
 <h4 id="get-eui-breakdown">Get EUI breakdown<a class="anchor" aria-label="anchor" href="#get-eui-breakdown"></a>
 </h4>
@@ -834,7 +940,9 @@ An example of tidy BES output data representation where Table (a) is the standar
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in sprintf("%s [%.2f%%]", category, proportion, "%"): one argument not</span></span>
-<span><span class="co">#&gt; used by format '%s [%.2f%%]'</span></span></code></pre></div>
+<span><span class="co">#&gt; used by format '%s [%.2f%%]'</span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span></code></pre></div>
 <p><img src="job_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
@@ -891,8 +999,11 @@ An example of tidy BES output data representation where Table (a) is the standar
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>In this vignette, we have went through core methods in <code>EplusJob</code> class to run simulations and extract results in tidy format.</p>
-<p>In next vignette <em>“Parametric simulations”</em>, we will introduce the <code>ParametricJob</code> class to run parametric simulations.</p>
+<p>In this vignette, we have went through core methods in
+<code>EplusJob</code> class to run simulations and extract results in
+tidy format.</p>
+<p>In next vignette <em>“Parametric simulations”</em>, we will introduce
+the <code>ParametricJob</code> class to run parametric simulations.</p>
 </div>
   </div>
 

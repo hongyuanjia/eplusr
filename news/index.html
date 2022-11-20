@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2.9001</span>
       </span>
     </div>
 
@@ -99,7 +99,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.15.2" id="eplusr-0152">eplusr 0.15.2<a class="anchor" aria-label="anchor" href="#eplusr-0152"></a></h2>
+<h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>Fix EPW parsing error due to an update of lubridate (<a href="https://github.com/hongyuanjia/eplusr/issues/532" class="external-link">#532</a>).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.15.2" id="eplusr-0152">eplusr 0.15.2<small>2022-08-19</small><a class="anchor" aria-label="anchor" href="#eplusr-0152"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-15-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-15-2"></a></h3>
 <ul><li><p>A new <code>encoding</code> parameter has been added in <code><a href="../reference/read_idf.html">read_idf()</a></code>, <code><a href="../reference/use_idd.html">use_idd()</a></code> and <code><a href="../reference/read_epw.html">read_epw()</a></code>. The default value is <code>unknown</code> which indicates that the input file is native encoded (<a href="https://github.com/hongyuanjia/eplusr/issues/515" class="external-link">#515</a>).</p></li>
@@ -118,7 +125,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-0-15-2">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-15-2"></a></h3>
-<ul><li>Regenerate package documentation to fix CRAN NOTES on HTML manuals (<a href="https://github.com/hongyuanjia/eplusr/issues/525" class="external-link">#525</a>).</li></ul></div>
+<ul><li>Regenerate package documentation to fix CRAN NOTES on HTML manuals (<a href="https://github.com/hongyuanjia/eplusr/issues/525" class="external-link">#525</a>).</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.15.1" id="eplusr-0151">eplusr 0.15.1<small>2022-01-21</small><a class="anchor" aria-label="anchor" href="#eplusr-0151"></a></h2>
@@ -130,7 +138,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-15-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-15-1"></a></h3>
-<ul><li>Compatibility changes for incoming {units} v0.8 (<a href="https://github.com/hongyuanjia/eplusr/issues/499" class="external-link">#499</a>).</li></ul></div>
+<ul><li>Compatibility changes for incoming {units} v0.8 (<a href="https://github.com/hongyuanjia/eplusr/issues/499" class="external-link">#499</a>).</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.15.0" id="eplusr-v0150">eplusr v0.15.0<small>2021-11-17</small><a class="anchor" aria-label="anchor" href="#eplusr-v0150"></a></h2>
@@ -178,7 +187,8 @@
 <div class="section level3">
 <h3 id="break-changes-0-15-0">Break changes<a class="anchor" aria-label="anchor" href="#break-changes-0-15-0"></a></h3>
 <ul><li>
-<code>hvac_diagram()</code> has been deprecated as <code>HVAC-Diagram</code> will always be called after EnergyPlus simulation. If you still want to generate HVAC <code>svg</code> diagram manually, please use <code><a href="../reference/energyplus.html">HVAC_Diagram()</a></code> instead (<a href="https://github.com/hongyuanjia/eplusr/issues/467" class="external-link">#467</a>).</li></ul></div>
+<code>hvac_diagram()</code> has been deprecated as <code>HVAC-Diagram</code> will always be called after EnergyPlus simulation. If you still want to generate HVAC <code>svg</code> diagram manually, please use <code><a href="../reference/energyplus.html">HVAC_Diagram()</a></code> instead (<a href="https://github.com/hongyuanjia/eplusr/issues/467" class="external-link">#467</a>).</li>
+</ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-15-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-15-0"></a></h3>
 <ul><li>When <code>type</code> is <code>"all"</code> in <code><a href="../reference/download_weather.html">download_weather()</a></code>, the ZIP file will be downloaded instead of downloading both <code>EPW</code> and <code>DDY</code> files (<a href="https://github.com/hongyuanjia/eplusr/issues/453" class="external-link">#453</a>).</li>
@@ -205,10 +215,12 @@
 <code class="sourceCode R"><span></span>
 <span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Lights</span><span class="op">$</span><span class="fu">outputs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="break-changes-0-14-2">Break changes<a class="anchor" aria-label="anchor" href="#break-changes-0-14-2"></a></h3>
-<ul><li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/with_speed.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href="https://github.com/hongyuanjia/eplusr/issues/417" class="external-link">#417</a>).</li></ul></div>
+<ul><li>Autocompletion is enabled by registering a S3 <code>.DollarNames</code> method. Option <code>autocomplete</code> is deprecated. A warning is issued if you try to set it in <code><a href="../reference/eplusr_option.html">eplusr_option()</a></code>. Also, <code><a href="../reference/with_speed.html">with_speed()</a></code> is deprecated and falls back to <code><a href="../reference/with_option.html">without_checking()</a></code> when called (<a href="https://github.com/hongyuanjia/eplusr/issues/417" class="external-link">#417</a>).</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-14-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-14-2"></a></h3>
 <ul><li>Fixed wrong transition of <code>FuelFactors</code> from v9.2 to v9.3 (<a href="https://github.com/hongyuanjia/eplusr/issues/420" class="external-link">#420</a>).</li>
@@ -225,7 +237,8 @@
 <h2 class="page-header" data-toc-text="0.14.1" id="eplusr-0141">eplusr 0.14.1<small>2021-02-25</small><a class="anchor" aria-label="anchor" href="#eplusr-0141"></a></h2>
 <div class="section level3">
 <h3 id="minor-changes-0-14-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-14-1"></a></h3>
-<ul><li>Compatible changes for <a href="https://github.com/r-quantities/units" class="external-link">units</a> v0.7-0 (<a href="https://github.com/hongyuanjia/eplusr/issues/410" class="external-link">#410</a>).</li></ul></div>
+<ul><li>Compatible changes for <a href="https://github.com/r-quantities/units" class="external-link">units</a> v0.7-0 (<a href="https://github.com/hongyuanjia/eplusr/issues/410" class="external-link">#410</a>).</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.14.0" id="eplusr-0140">eplusr 0.14.0<small>2021-01-07</small><a class="anchor" aria-label="anchor" href="#eplusr-0140"></a></h2>
@@ -240,7 +253,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="major-changes-0-14-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-14-0"></a></h3>
-<ul><li>Now eplusr will always use the SQLite output for data extraction instead of using the CSV output. In EnergyPlus v9.3 and above, ReadVarsESO is deprecated and EnergyPlus itself will generate CSV directly. CSVs for variables and meters are always separated in this way. Together with the newly introduced <code>Output:Control:Files</code> which can be set to disable CSV output, it becomes very cumbersome to continuously support the CSV for data extraction (<a href="https://github.com/hongyuanjia/eplusr/issues/307" class="external-link">#307</a>).</li></ul></div>
+<ul><li>Now eplusr will always use the SQLite output for data extraction instead of using the CSV output. In EnergyPlus v9.3 and above, ReadVarsESO is deprecated and EnergyPlus itself will generate CSV directly. CSVs for variables and meters are always separated in this way. Together with the newly introduced <code>Output:Control:Files</code> which can be set to disable CSV output, it becomes very cumbersome to continuously support the CSV for data extraction (<a href="https://github.com/hongyuanjia/eplusr/issues/307" class="external-link">#307</a>).</li>
+</ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-14-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-14-0"></a></h3>
 <ul><li>Now rgl and decido package has been moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
@@ -558,7 +572,8 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-10-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-10-2"></a></h3>
 <ul><li>
-<code>$report_data()</code> method in <code>EplusSql</code> class now correctly returns data if even if <code>key_value</code> is not given (<a href="https://github.com/hongyuanjia/eplusr/issues/37" class="external-link">#37</a>)</li></ul></div>
+<code>$report_data()</code> method in <code>EplusSql</code> class now correctly returns data if even if <code>key_value</code> is not given (<a href="https://github.com/hongyuanjia/eplusr/issues/37" class="external-link">#37</a>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.10.1" id="eplusr-0101">eplusr 0.10.1<small>2019-05-09</small><a class="anchor" aria-label="anchor" href="#eplusr-0101"></a></h2>
@@ -693,7 +708,8 @@
 <h2 class="page-header" data-toc-text="0.9.4" id="eplusr-094">eplusr 0.9.4<small>2018-12-05</small><a class="anchor" aria-label="anchor" href="#eplusr-094"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-9-4">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-4"></a></h3>
-<ul><li>Now you can directly download EnergyPlus Weather File (.epw) and Design Day File (.ddy) using new function <code><a href="../reference/download_weather.html">download_weather()</a></code>. It takes a regular expression as input, searches through EnergyPlus weather data base (stored in this package), download corresponding files and return the saved paths. Below are some examples:<ul><li>
+<ul><li>Now you can directly download EnergyPlus Weather File (.epw) and Design Day File (.ddy) using new function <code><a href="../reference/download_weather.html">download_weather()</a></code>. It takes a regular expression as input, searches through EnergyPlus weather data base (stored in this package), download corresponding files and return the saved paths. Below are some examples:
+<ul><li>
 <p>Search locations that contains string <code>"los angeles"</code> and <code>"tmy"</code>, return a menu to select which one(s) to download. Once selected, download both corresponding weather file(s) and design day file(s):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -711,10 +727,12 @@
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/download_weather.html">download_weather</a></span><span class="op">(</span><span class="st">"beijing.*cswd"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"epw"</span>, ask <span class="op">=</span> <span class="cn">FALSE</span>, max_match <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 </li>
-</ul></li></ul></div>
+</ul></li>
+</ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-9-4">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-9-4"></a></h3>
-<ul><li>Now <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is run before every call to EnergyPlus.</li></ul></div>
+<ul><li>Now <code><a href="../reference/clean_wd.html">clean_wd()</a></code> is run before every call to EnergyPlus.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-4"></a></h3>
 <ul><li><p><code>$clone()</code> method has been refactored for <code>Idf</code> and <code>Idd</code> class. This fix the issue that internal shared environments were not cloned in version 0.9.3.</p></li>
@@ -726,20 +744,24 @@
 <h2 class="page-header" data-toc-text="0.9.3" id="eplusr-093">eplusr 0.9.3<small>2018-10-11</small><a class="anchor" aria-label="anchor" href="#eplusr-093"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-9-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-3"></a></h3>
-<ul><li>Add support for EnergyPlus v9.0.0.</li></ul></div>
+<ul><li>Add support for EnergyPlus v9.0.0.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-3"></a></h3>
-<ul><li>Remove duplicates when update value references (<a href="https://github.com/hongyuanjia/eplusr/issues/20" class="external-link">#20</a>).</li></ul></div>
+<ul><li>Remove duplicates when update value references (<a href="https://github.com/hongyuanjia/eplusr/issues/20" class="external-link">#20</a>).</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.2" id="eplusr-092">eplusr 0.9.2<small>2018-09-30</small><a class="anchor" aria-label="anchor" href="#eplusr-092"></a></h2>
 <div class="section level3">
 <h3 id="break-changes-0-9-2">Break changes<a class="anchor" aria-label="anchor" href="#break-changes-0-9-2"></a></h3>
-<ul><li>Clean up the dirty code that manually modifies <code>$clone()</code> method in R6 in order to be compatible with (<a href="https://github.com/hongyuanjia/eplusr/issues/19" class="external-link">#19</a>). After this, <code>deep</code> has to be set to <code>TRUE</code> if a completed cloned copy is desired. Also, documentations on <code>$clone()</code> method in <code>Epw</code>, <code>EplusJob</code>, <code>ParametricJob</code> have been added.</li></ul></div>
+<ul><li>Clean up the dirty code that manually modifies <code>$clone()</code> method in R6 in order to be compatible with (<a href="https://github.com/hongyuanjia/eplusr/issues/19" class="external-link">#19</a>). After this, <code>deep</code> has to be set to <code>TRUE</code> if a completed cloned copy is desired. Also, documentations on <code>$clone()</code> method in <code>Epw</code>, <code>EplusJob</code>, <code>ParametricJob</code> have been added.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-9-2">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-9-2"></a></h3>
 <ul><li>
-<code><a href="../reference/clean_wd.html">clean_wd()</a></code> is called internally when running EnergyPlus models. This guarantees that the old output file from last simulation is cleaned up before the new simulation starts.</li></ul></div>
+<code><a href="../reference/clean_wd.html">clean_wd()</a></code> is called internally when running EnergyPlus models. This guarantees that the old output file from last simulation is cleaned up before the new simulation starts.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="new-features-0-9-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-2"></a></h3>
 <ul><li><p>A new class <code>EplusSql</code> has been added. This makes it possible to directly retrieve simulation results without creating an <code>EplusJob</code> object which can only get simulation outputs after the job was successfully run before. It can be easily created using <code><a href="../reference/eplus_sql.html">eplus_sql()</a></code> function. However, it should be noted that, unlike <code>EplusJob</code>, there is no checking on whether the simulation is terminated or completed unsuccessfully, or the parent Idf has been changed since last simulation. This means that you may encounter some problems when retrieve data from an unsuccessful simulation. It is suggested to carefully go through the <code>.err</code> file to make sure the output data in the SQLite is correct and reliable. Currently, there are only few methods in <code>EplusSql</code> class which have some overlaps with theses in <code>EplusJob</code>, but more methods may be added in the future. For more details, please see the documentation of <code>EplusSql</code>.</p></li>
@@ -747,13 +769,15 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-2"></a></h3>
-<ul><li>Fix the error of missing Idf file when <code>dir</code> is not <code>NULL</code> in <code>$run()</code> in <code>Idf</code> class.</li></ul></div>
+<ul><li>Fix the error of missing Idf file when <code>dir</code> is not <code>NULL</code> in <code>$run()</code> in <code>Idf</code> class.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.1" id="eplusr-091">eplusr 0.9.1<small>2018-08-29</small><a class="anchor" aria-label="anchor" href="#eplusr-091"></a></h2>
 <div class="section level3">
 <h3 id="minor-changes-0-9-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-9-1"></a></h3>
-<ul><li>Long lines in err files now will be wrapped when printed.</li></ul></div>
+<ul><li>Long lines in err files now will be wrapped when printed.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-1"></a></h3>
 <ul><li><p>Fix the error when checking invalid extensible fields in value validation.</p></li>
@@ -835,10 +859,12 @@
 <div class="section level3">
 <h3 id="new-feature-0-8-2">New feature<a class="anchor" aria-label="anchor" href="#new-feature-0-8-2"></a></h3>
 <ul><li>
-<code>$get_value()</code> in <code>IdfObject</code> class new has a new argument <code>simplify</code>. If <code>TRUE</code>, a character vector will be returned instead of a named list. Default is <code>FALSE</code>.</li></ul></div>
+<code>$get_value()</code> in <code>IdfObject</code> class new has a new argument <code>simplify</code>. If <code>TRUE</code>, a character vector will be returned instead of a named list. Default is <code>FALSE</code>.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="minor-changes-0-8-2">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-8-2"></a></h3>
-<ul><li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li></ul></div>
+<ul><li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-8-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-2"></a></h3>
 <ul><li><p>Fix warning messages of column type coercion from data.table in <code>Idf</code> and <code>IdfObject</code>.</p></li>

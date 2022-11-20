@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.2.9001</span>
       </span>
     </div>
 
@@ -130,9 +130,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Update IDF version</h1>
-                        <h4 data-toc-skip class="author">Hongyuan Jia</h4>
+                        <h4 data-toc-skip class="author">Hongyuan
+Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-08-19</h4>
+            <h4 data-toc-skip class="date">2022-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -144,20 +145,51 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>EnergyPlus provides a preprocessor call <strong>IDFVersionUpdater</strong> to update IDF to the latest version. It is written in Fortran and the program itself evolves along with EnergyPlus. Once a new version of EnergyPlus is published, IDFVersionUpdater will add the support of that version.</p>
-<p>The original IDFVersionUpdater program is a GUI program and does not provide command line interface. This makes it hard to update lots of IDF files programmatically. The good news is that IDFVersionUpdater itself is a wrapper to call different standalone transition programs for each single version update. For example, when updating your model from EnergyPlus v8.7 to v8.9, <code>Transition-V8-7-0-to-V8-8-0</code> will be called, and then <code>Transition-V8-8-0-to-V8-9-0</code>.</p>
+<p>EnergyPlus provides a preprocessor call
+<strong>IDFVersionUpdater</strong> to update IDF to the latest version.
+It is written in Fortran and the program itself evolves along with
+EnergyPlus. Once a new version of EnergyPlus is published,
+IDFVersionUpdater will add the support of that version.</p>
+<p>The original IDFVersionUpdater program is a GUI program and does not
+provide command line interface. This makes it hard to update lots of IDF
+files programmatically. The good news is that IDFVersionUpdater itself
+is a wrapper to call different standalone transition programs for each
+single version update. For example, when updating your model from
+EnergyPlus v8.7 to v8.9, <code>Transition-V8-7-0-to-V8-8-0</code> will
+be called, and then <code>Transition-V8-8-0-to-V8-9-0</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="introduce-version_updater">Introduce <code>version_updater()</code><a class="anchor" aria-label="anchor" href="#introduce-version_updater"></a>
 </h2>
-<p><a href="https://hongyuanjia.github.io/eplusr/reference/version_updater.html"><code>version_updater()</code></a> is <a href="https://hongyuanjia.github.io/eplusr/index.html">eplusr</a>’s version of IDFVersionUpdater. <code><a href="../reference/version_updater.html">version_updater()</a></code> itself is not complicated. Compared to IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> has some improvements:</p>
+<p><a href="https://hongyuanjia.github.io/eplusr/reference/version_updater.html"><code>version_updater()</code></a>
+is <a href="https://hongyuanjia.github.io/eplusr/index.html">eplusr</a>’s
+version of IDFVersionUpdater. <code><a href="../reference/version_updater.html">version_updater()</a></code> itself is
+not complicated. Compared to IDFVersionUpdater,
+<code><a href="../reference/version_updater.html">version_updater()</a></code> has some improvements:</p>
 <ul>
-<li><p>IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01) fails to translate <code>FenesreationSurface:Detailed</code> objects. <code><a href="../reference/version_updater.html">version_updater()</a></code> will try to use the transition programs that come from the latest EnergyPlus installed on your computer, but will skip v9.0 if possible.</p></li>
-<li><p>Like IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> also renames all output file with suffix <code>VXY0</code>, where <code>X</code> and <code>Y</code> indicates the major and minor version of input IDF file. However, <code><a href="../reference/version_updater.html">version_updater()</a></code> always keep the original input file untouched and save a copy and rename it in the same pattern.</p></li>
-<li><p>All messages generated from each transition program are parsed, stored in a list and saved as an attributes named <code>errors</code>. So that you can easily extract all messages by <code>attr(results, "errors")</code>. The error messages are parsed and stored as <a href="http://r-datatable.com" class="external-link"><code>data.table</code>s</a> which make it easy for post-processing.</p></li>
-<li><p>A <code>dir</code> argument can be given to further specify where the updated models to be saved.</p></li>
+<li><p>IDFVersionUpdater in EnergyPlus v9.0 (both v9.0.0 and v9.01)
+fails to translate <code>FenesreationSurface:Detailed</code> objects.
+<code><a href="../reference/version_updater.html">version_updater()</a></code> will try to use the transition programs
+that come from the latest EnergyPlus installed on your computer, but
+will skip v9.0 if possible.</p></li>
+<li><p>Like IDFVersionUpdater, <code><a href="../reference/version_updater.html">version_updater()</a></code> also
+renames all output file with suffix <code>VXY0</code>, where
+<code>X</code> and <code>Y</code> indicates the major and minor version
+of input IDF file. However, <code><a href="../reference/version_updater.html">version_updater()</a></code> always keep
+the original input file untouched and save a copy and rename it in the
+same pattern.</p></li>
+<li><p>All messages generated from each transition program are parsed,
+stored in a list and saved as an attributes named <code>errors</code>.
+So that you can easily extract all messages by
+<code>attr(results, "errors")</code>. The error messages are parsed and
+stored as <a href="http://r-datatable.com" class="external-link"><code>data.table</code>s</a>
+which make it easy for post-processing.</p></li>
+<li><p>A <code>dir</code> argument can be given to further specify where
+the updated models to be saved.</p></li>
 </ul>
-<p>Unfortunately, even though the transition programs are written in Fortran, it could still take several minutes to complete the update process</p>
+<p>Unfortunately, even though the transition programs are written in
+Fortran, it could still take several minutes to complete the update
+process</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"RefBldgLargeOfficeNew2004_Chicago.idf"</span></span>
 <span><span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
@@ -280,13 +312,20 @@
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  79.188   1.633  80.625</span></span></code></pre></div>
+<span><span class="co">#&gt;  77.337   1.628  78.831</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
 </h2>
-<p>Having a clear mental model on how the transition works, the most cumbersome work left is to translate all those actions written in Fortran into R and write tests to make sure that the R implement should be the same as IDFVersionUpdater.</p>
-<p><a href="https://hongyuanjia.github.io/eplusr/reference/transition.html"><code>transition()</code></a> is a pure R implementation of transition programs. It takes similar arguments as <code><a href="../reference/version_updater.html">version_updater()</a></code> except it has an additional argument <code>save</code> to control whether to save the resultant <code>Idf</code> objects to IDF files or not.</p>
+<p>Having a clear mental model on how the transition works, the most
+cumbersome work left is to translate all those actions written in
+Fortran into R and write tests to make sure that the R implement should
+be the same as IDFVersionUpdater.</p>
+<p><a href="https://hongyuanjia.github.io/eplusr/reference/transition.html"><code>transition()</code></a>
+is a pure R implementation of transition programs. It takes similar
+arguments as <code><a href="../reference/version_updater.html">version_updater()</a></code> except it has an additional
+argument <code>save</code> to control whether to save the resultant
+<code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
@@ -320,22 +359,35 @@
 <span><span class="co">#&gt; Toward Ver: 9.2.0</span></span>
 <span><span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   4.461   0.036   4.497</span></span></code></pre></div>
-<p>It is about 17.9 times faster.</p>
-<p>Fast is always good. The most important thing is to ensure that <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we compare the results.</p>
+<span><span class="co">#&gt;   4.401   0.016   4.418</span></span></code></pre></div>
+<p>It is about 17.8 times faster.</p>
+<p>Fast is always good. The most important thing is to ensure that
+<code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we
+compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "    Yes,                     !- Use Weather File Snow Indicators"</span></span>
 <span><span class="co">#&gt; [2] "    ;                        !- Treat Weather as Actual"</span></span></code></pre></div>
-<p>As we can see from below, there is only one difference between results from <code><a href="../reference/transition.html">transition()</a></code> and <code><a href="../reference/version_updater.html">version_updater()</a></code>:</p>
+<p>As we can see from below, there is only one difference between
+results from <code><a href="../reference/transition.html">transition()</a></code> and
+<code><a href="../reference/version_updater.html">version_updater()</a></code>:</p>
 <ul>
-<li>An empty field <code>Treat Weather as Actual</code> in <code>RunPeriod</code> exists in <code><a href="../reference/version_updater.html">version_updater()</a></code> version, but not in <code><a href="../reference/transition.html">transition()</a></code> version. This is because this field is not an required field and eplusr tried to only save minimum-necessary fields.</li>
+<li>An empty field <code>Treat Weather as Actual</code> in
+<code>RunPeriod</code> exists in <code><a href="../reference/version_updater.html">version_updater()</a></code> version,
+but not in <code><a href="../reference/transition.html">transition()</a></code> version. This is because this field
+is not an required field and eplusr tried to only save minimum-necessary
+fields.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="how-the-transition-works">How the transition works<a class="anchor" aria-label="anchor" href="#how-the-transition-works"></a>
 </h2>
-<p>During version updates, some classes in the original IDF are removed, some classes are splitted into several classes, some fields are removed and there is no way to extract those information back. For example, from EnergyPlus v8.8 to v8.9, one single object in class <code>GroundHeatExchanger:Vertical</code> will be splitted into 4 different objects in class:</p>
+<p>During version updates, some classes in the original IDF are removed,
+some classes are splitted into several classes, some fields are removed
+and there is no way to extract those information back. For example, from
+EnergyPlus v8.8 to v8.9, one single object in class
+<code>GroundHeatExchanger:Vertical</code> will be splitted into 4
+different objects in class:</p>
 <ul>
 <li>
 <code>GroundHeatExchanger:System</code>,</li>
@@ -344,10 +396,15 @@
 <li><code>Site:GroundTemperature:Undisturbed:KusudaAchenbach</code></li>
 <li><code>GroundHeatExchanger:ResponseFactors</code></li>
 </ul>
-<p>A basic transition on a single class is a combination of different transition actions. Below I will describe most typical ones together with the related transition program source code:</p>
+<p>A basic transition on a single class is a combination of different
+transition actions. Below I will describe most typical ones together
+with the related transition program source code:</p>
 <ul>
 <li>
-<p>Insert: Insert a new field. The code block below means that if input class is <code>OtherEquipment</code>, get the definition of it from IDD, fill new objects with all old field values except insert a new field #2 with value <code>"None"</code>.</p>
+<p>Insert: Insert a new field. The code block below means that if
+input class is <code>OtherEquipment</code>, get the definition of it
+from IDD, fill new objects with all old field values except insert a new
+field #2 with value <code>"None"</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode fortran"><code class="sourceCode fortranfixed"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">CASE('OTHEREQUIPMENT')</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  nodiff <span class="kw">=</span> <span class="cn">.false.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
@@ -357,7 +414,12 @@
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  CurArgs <span class="kw">=</span> CurArgs<span class="kw">+</span><span class="dv">1</span></span></code></pre></div>
 </li>
 <li>
-<p>Reset: Replace old value with new value. The code block below means that if input class is <code>Exterior:FuelEquipment</code>, get the definition of it from IDD, fill new objects with all old field values except replace field #2 with <code>"NaturalGas"</code> if old value is <code>"Gas"</code> and <code>PropaneGas</code> if <code>LPG</code>. Conversion for other classes looks similar.</p>
+<p>Reset: Replace old value with new value. The code block below
+means that if input class is <code>Exterior:FuelEquipment</code>, get
+the definition of it from IDD, fill new objects with all old field
+values except replace field #2 with <code>"NaturalGas"</code> if old
+value is <code>"Gas"</code> and <code>PropaneGas</code> if
+<code>LPG</code>. Conversion for other classes looks similar.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode fortran"><code class="sourceCode fortranfixed"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">CASE('EXTERIOR:FUELEQUIPMENT')</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    ObjectName<span class="kw">=</span><span class="st">'Exterior:FuelEquipment'</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
@@ -371,7 +433,11 @@
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">endif</span></span></code></pre></div>
 </li>
 <li>
-<p>Delete: Delete the old field, offset indices of all other field by the number of fields deleted. The code block below means that if input class is <code>HVACTemplate:System:Unitary</code>, get the definition of it from IDD, fill new objects with all old field values except removing #40.</p>
+<p>Delete: Delete the old field, offset indices of all other field
+by the number of fields deleted. The code block below means that if
+input class is <code>HVACTemplate:System:Unitary</code>, get the
+definition of it from IDD, fill new objects with all old field values
+except removing #40.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode fortran"><code class="sourceCode fortranfixed"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">CASE('HVACTEMPLATE:SYSTEM:UNITARY')</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    ObjectName<span class="kw">=</span><span class="st">'HVACTemplate:System:Unitary'</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
@@ -381,7 +447,11 @@
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    CurArgs <span class="kw">=</span> CurArgs<span class="kw">-</span><span class="dv">1</span></span></code></pre></div>
 </li>
 <li>
-<p>Offset: Set the new value of field #N as the old value of field #M. The code block means that if input class is <code>Daylight:Controls</code>, get the definition of it from IDD, add a suffix <code>_DaylCtrl</code> to old #1 as new #1, use old #1 as new #2, set new #3 as <code>"SplitFlux"</code> and use #20 as new #4.</p>
+<p>Offset: Set the new value of field #N as the old value of field
+#M. The code block means that if input class is
+<code>Daylight:Controls</code>, get the definition of it from IDD, add a
+suffix <code>_DaylCtrl</code> to old #1 as new #1, use old #1 as new #2,
+set new #3 as <code>"SplitFlux"</code> and use #20 as new #4.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode fortran"><code class="sourceCode fortranfixed"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">CASE('DAYLIGHTING:CONTROLS')</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  nodiff<span class="kw">=</span><span class="cn">.false.</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">CALL</span> GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)</span>
@@ -392,9 +462,16 @@
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>......</span></code></pre></div>
 </li>
 </ul>
-<p>The combinations of those four actions together builds a skeleton of an EnergyPlus transition program, together with some pre-processes and post-processes.</p>
-<p>In eplusr, all IDF data are stored as data.tables. So transition means to write a function to perform the similar actions on field values stored in data.tables. <code>trans_action()</code> is designed for this purpose.</p>
-<p>For example, the equivalent transition implemented in R for <code>Exterior:FuelEquipment</code> objects demonstrated in the <strong>Reset</strong> code block would be:</p>
+<p>The combinations of those four actions together builds a skeleton of
+an EnergyPlus transition program, together with some pre-processes and
+post-processes.</p>
+<p>In eplusr, all IDF data are stored as data.tables. So transition
+means to write a function to perform the similar actions on field values
+stored in data.tables. <code>trans_action()</code> is designed for this
+purpose.</p>
+<p>For example, the equivalent transition implemented in R for
+<code>Exterior:FuelEquipment</code> objects demonstrated in the
+<strong>Reset</strong> code block would be:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Insert</span></span>
 <span><span class="va">dt1</span> <span class="op">&lt;-</span> <span class="fu">trans_action</span><span class="op">(</span><span class="va">idf</span>, <span class="st">"OtherEquipment"</span>, insert <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="st">"None"</span><span class="op">)</span><span class="op">)</span></span>
@@ -413,7 +490,9 @@
 <span>    offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">20L</span>, <span class="fl">4L</span><span class="op">)</span>,</span>
 <span>    reset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">3</span>, <span class="st">"SplitFlux"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Having the updated IDF data, we can then easily insert them to the next new version of IDF by simply doing <code>new_idf$load(dt)</code>.</p>
+<p>Having the updated IDF data, we can then easily insert them to the
+next new version of IDF by simply doing
+<code>new_idf$load(dt)</code>.</p>
 </div>
   </div>
 
