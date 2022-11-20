@@ -28,6 +28,7 @@ test_that("Assertion functions", {
         file.create(file.path(tempdir(), "energyplus.exe"))
         is_eplus_path(tempdir())
     })
+    unlink(file.path(tempdir(), c("Energy+.idd", "energyplus", "energyplus.exe")))
 
     expect_false(is_idd(1))
     expect_true(is_idd(use_idd(8.8, download = "auto")))

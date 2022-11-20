@@ -1,7 +1,7 @@
 #' @importFrom stringi stri_isempty stri_match_first_regex stri_replace_all_charclass
 #' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub "stri_sub<-"
 #' @importFrom stringi stri_trans_tolower stri_trans_totitle stri_trans_toupper
-#' @importFrom lubridate as_datetime make_date make_datetime force_tz tz
+#' @importFrom lubridate as_datetime make_date force_tz tz
 #' @importFrom lubridate days_in_month minutes hours days years leap_year
 #' @importFrom lubridate mday month yday year "year<-" parse_date_time
 #' @importFrom data.table "%chin%" chmatch copy fread fwrite as.data.table
@@ -187,7 +187,7 @@ parse_epw_file <- function (path, idd = NULL, encoding = "unknown") {
     set(epw_data, NULL, "line", seq_len(nrow(epw_data)))
 
     # parse date time
-    epw_data[, datetime := lubridate::make_datetime(year, month, day, hour, tz = "UTC")]
+    epw_data[, datetime := stringi::stri_datetime_create(year, month, day, hour, tz = "UTC", lenient = TRUE)]
 
     # match date time
     matched <- match_epw_data(epw_data, epw_header)
@@ -2223,10 +2223,11 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     # }}}
 
     # check if the datetime is valid
-    expect_start <- make_datetime(
+    expect_start <- stringi::stri_datetime_create(
         lubridate::year(start), lubridate::month(start), lubridate::mday(start),
         # hour # minute
-        0L,    step
+        0L,    step,
+        tz = "UTC", lenient = TRUE
     )
     if (start != expect_start) {
         abort(paste0("Invalid starting date time found in input data. ",
@@ -2336,7 +2337,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
         set(data, NULL, "hour", data$hour + 1L)
 
         # ignore minute when validation
-        set(data, NULL, "datetime", lubridate::make_datetime(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime)))
+        set(data, NULL, "datetime", stringi::stri_datetime_create(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime), lenient = TRUE))
     }
 
     m <- match_epw_data(data, header, target_period)
