@@ -1,10 +1,10 @@
-# Version 0.15.2
+# Version 0.15.3
 
 ## Initial submission
 
 ### Test environments
 
-* Windows (on local and GitHub Actions), R release
+* Windows 10 21H2 (on local and GitHub Actions), R release
 * Ubuntu 20.04 (on GitHub Actions), R release
 * macOS (on GitHub Actions), R release
 
