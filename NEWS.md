@@ -1,3 +1,9 @@
+# eplusr (development version)
+
+## Bug fixes
+
+* Fix EPW parsing error due to an update of lubridate (#532).
+
 # eplusr 0.15.2
 
 ## New features
