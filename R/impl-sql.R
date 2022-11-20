@@ -1,6 +1,6 @@
 #' @importFrom RSQLite SQLite dbConnect dbDisconnect dbGetQuery dbListTables dbReadTable
 #' @importFrom data.table setDT setcolorder setorder
-#' @importFrom lubridate year force_tz make_datetime
+#' @importFrom lubridate year force_tz
 NULL
 
 # RPFREQ {{{
@@ -400,7 +400,8 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
     }
 
     set(time, NULL, "datetime",
-        lubridate::make_datetime(time$year, time$month, time$day, time$hour, time$minute, tz = tz)
+        # see https://github.com/tidyverse/lubridate/issues/1098
+        stringi::stri_datetime_create(time$year, time$month, time$day, time$hour, time$minute, tz = tz, lenient = TRUE)
     )
 
     set(time, NULL, "year", NULL)
