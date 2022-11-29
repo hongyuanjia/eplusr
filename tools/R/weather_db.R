@@ -73,7 +73,7 @@ parse_kml <- function(path_kml, path_codes) {
     for (i in seq_len(ncol(coord))) data.table::set(coord, NULL, i, as.double(coord[[i]]))
 
     tbl <- cbind(desc, coord, loc)
-    data.table::set(tbl, NULL, "title", stri_replace_all_fixed(tbl$title, " ", "_"))
+    data.table::set(tbl, NULL, "title", stringi::stri_replace_all_fixed(tbl$title, " ", "_"))
     data.table::setcolorder(tbl,
         c("country_code", "state_province", "location", "wmo_number", "source_type",
             "longitude", "latitude", "zip_url"
