@@ -41,7 +41,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(8.8)) install_eplus(8.8)
+if (!is_avail_eplus(22.1)) install_eplus(22.1)
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
@@ -65,7 +65,7 @@ related objects, including:
   `Daylighting` group
 
 ```{r}
-path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/HospitalLowEnergy.idf")
+path_idf <- file.path(eplus_config(22.1)$dir, "ExampleFiles/HospitalLowEnergy.idf")
 idf <- read_idf(path_idf)
 geom <- idf$geometry()
 geom
@@ -121,7 +121,7 @@ detailed class, including:
 * `Shading:Zone:Detailed`
 
 ```{r}
-path_simple <- file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf")
+path_simple <- file.path(eplus_config(22.1)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf")
 simple <- read_idf(path_simple)
 
 simple$class_name(by_group = TRUE)["Thermal Zones and Surfaces"]

@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(8.8)) install_eplus(8.8)
+if (!is_avail_eplus(22.1)) install_eplus(22.1)
 ```
 
 # How to control the maximum number of parallel simulations?
