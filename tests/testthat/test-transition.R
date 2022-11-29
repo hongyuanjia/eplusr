@@ -2473,3 +2473,28 @@ test_that("Transition v9.5 --> v9.6", {
     )
 })
 # }}}
+# v9.6 --> v22.1 {{{
+test_that("Transition v9.6 --> v22.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- 9.6
+    to <- 22.1
+
+    expect_is(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "PythonPlugin:SearchPaths" = list("Py", "Yes", "Yes", "Yes"),
+            .all = FALSE
+        )
+    )
+
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_is(idfTR <- transition(idfOri, to), "Idf")
+
+    expect_equal(
+        idfVU$"PythonPlugin:SearchPaths"$value(),
+        idfTR$"PythonPlugin:SearchPaths"$value()
+    )
+})
+# }}}
