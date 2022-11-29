@@ -1,5 +1,7 @@
 # eplusr (development version)
 
+* Add support for EnergyPlus v22.1 (#517).
+
 # eplusr 0.15.3
 
 ## Bug fixes
