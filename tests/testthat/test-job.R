@@ -2,12 +2,12 @@ test_that("Job methods", {
     eplusr_option(verbose_info = FALSE)
     skip_on_cran()
 
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
-    path_epw <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
+    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     expect_silent(job <- eplus_job(path_idf, path_epw))
 
-    expect_equal(job$version(), numeric_version("8.8.0"))
+    expect_equal(job$version(), numeric_version(LATEST_EPLUS_VER))
     expect_output(job$print())
 
     # can get job status
@@ -30,7 +30,7 @@ test_that("Job methods", {
     expect_false(job$kill())
 
     # can read ERR file
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     job <- eplus_job(path_idf, path_epw)
     expect_is({job$run(echo = FALSE);job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
@@ -38,9 +38,9 @@ test_that("Job methods", {
     expect_equal(names(err), c("index", "envir_index", "envir",
         "level_index", "level", "message"
     ))
-    expect_equal(attr(err, "eplus_version"), numeric_version("8.8.0"))
+    expect_equal(attr(err, "eplus_version"), numeric_version(LATEST_EPLUS_VER))
     expect_equal(attr(err, "eplus_build"), "7c3bbe4830")
-    expect_equal(attr(err, "idd_version"), numeric_version("8.8.0"))
+    expect_equal(attr(err, "idd_version"), numeric_version(LATEST_EPLUS_VER))
     expect_equal(attr(err, "successful"), TRUE)
     expect_equal(attr(err, "terminated"), FALSE)
 

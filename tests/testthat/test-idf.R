@@ -303,7 +303,7 @@ test_that("$object_relation()", {
     expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
     expect_is(idf$object_relation(2), "IdfRelation")
 
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
 
     # default only include both objects that are both referenced by their field
     # value and class names
@@ -536,7 +536,7 @@ test_that("$set()", {
 
     # can handle references
     skip_on_cran()
-    expect_is(idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
+    expect_is(idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
     expect_is(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
     expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
 })
@@ -604,7 +604,7 @@ test_that("$purge()", {
 # DUPLICATED {{{
 test_that("$duplicated()", {
     skip_on_cran()
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_silent(dup <- idf_1$duplicated())
     expect_equal(nrow(dup), 322)
     expect_equal(names(dup), c("class", "id", "name", "duplicate"))
@@ -620,7 +620,7 @@ test_that("$duplicated()", {
 # UNIQUE {{{
 test_that("$unique()", {
     skip_on_cran()
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_is(idf_1$unique(1, group = "Schedules"), "Idf")
     expect_false(all(idf_1$is_valid_id(c(35, 38, 42))))
 

@@ -3,10 +3,10 @@ test_that("IdfGeometry", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     geom <- idf_geometry(idf$path())
     geom <- idf_geometry(idf)
-    expect_warning(idf_geometry(empty_idf(8.8)))
+    expect_warning(idf_geometry(empty_idf(LATEST_EPLUS_VER)))
 
     idf$GlobalGeometryRules$Coordinate_System <- "Relative"
     idf$Output_Meter <- NULL

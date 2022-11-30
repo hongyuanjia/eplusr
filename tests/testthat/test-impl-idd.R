@@ -276,7 +276,7 @@ test_that("Idd implementation", {
         )
     )
 
-    idd <- use_idd(8.8, "auto")
+    idd <- use_idd(LATEST_EPLUS_VER, "auto")
     idd_env <- get_priv_env(idd)$idd_env()
     fld <- get_idd_field(idd_env, "Construction")
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", keep_all = TRUE, depth = 0L)), 15L)

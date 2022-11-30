@@ -275,10 +275,9 @@ test_that("parse_idd_file()", {
     )
     expect_error(parse_idd_file(idd_wrong), "Invalid \\\\object-list value", class = "eplusr_error_parse_idd")
 
-    # can fix ConnectorList references
     skip_on_cran()
-
-    idd <- parse_idd_file(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
+    # can fix ConnectorList references
+    idd <- parse_idd_file(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "Energy+.idd"))
     id <- idd$class[J("ConnectorList"), on = "class_name", class_id]
     expect_true(idd$reference[J(id), on = "class_id", .N > 0])
 })

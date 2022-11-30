@@ -4,7 +4,7 @@ eplusr_option(verbose_info = FALSE)
 test_that("NEW", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
     expect_is(idf <- read_idf(path_idf), "Idf")
 
     expect_error(IdfScheduleCompact$new(""), class = "eplusr_error_idfobject_missing_parent")
@@ -22,7 +22,7 @@ test_that("NEW", {
 test_that("TYPELIMITS", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
     expect_is(idf <- read_idf(path_idf), "Idf")
 
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
@@ -40,7 +40,7 @@ test_that("TYPELIMITS", {
 test_that("SET", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
@@ -127,7 +127,7 @@ test_that("SET", {
 test_that("UPDATE", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
@@ -227,7 +227,7 @@ test_that("UPDATE", {
 test_that("EXTRACT", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
@@ -304,7 +304,7 @@ test_that("EXTRACT", {
 test_that("VALIDATE", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
@@ -329,7 +329,7 @@ test_that("VALIDATE", {
 test_that("$<-.IdfSchedule", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
 
     expect_is(idf <- read_idf(path_idf), "Idf")
     expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")

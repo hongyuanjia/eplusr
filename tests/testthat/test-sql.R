@@ -92,7 +92,7 @@ test_that("Sql methods", {
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
 
     expect_equivalent(
-        read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
+        read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
             run(NULL, tempdir(), echo = FALSE)$
             tabular_data(table_name = "Site and Source Energy", wide = TRUE)[[1]][
             , lapply(.SD, class)],

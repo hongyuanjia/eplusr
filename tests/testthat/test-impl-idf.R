@@ -1,5 +1,5 @@
 eplusr_option(validate_level = "final", verbose_info = FALSE)
-use_idd(8.8, "auto")
+use_idd(LATEST_EPLUS_VER, "auto")
 
 # TABLE {{{
 test_that("table", {
@@ -493,9 +493,9 @@ test_that("table", {
     # read a more complex model
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "5Zone_Transformer.idf")
-    idf_env <- parse_idf_file(path_idf, 8.8)
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles", "5Zone_Transformer.idf")
+    idf_env <- parse_idf_file(path_idf, LATEST_EPLUS_VER)
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     # can handle class-name-references
     expect_equal(nrow(get_idf_relation(idd_env, idf_env, 217L, direction = "ref_to")), 8L)
@@ -505,9 +505,9 @@ test_that("table", {
 
     # NODE RELATION {{{
     # read idf
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles", "5Zone_Transformer.idf")
-    idf_env <- parse_idf_file(path_idf, 8.8)
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    path_idf <- file.path(eplus_config("latest")$dir, "ExampleFiles", "5Zone_Transformer.idf")
+    idf_env <- parse_idf_file(path_idf, "latest")
+    idd_env <- get_priv_env(use_idd("latest"))$idd_env()
 
     expect_error(get_idf_node_relation(idd_env, idf_env))
 

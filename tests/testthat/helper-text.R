@@ -107,7 +107,7 @@ idftext <- function(type = c("idf", "idd"), ver = NULL) {
 }
 # }}}
 # example IDF shipped with this package {{{
-example <- function () {
+example <- function() {
     system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 }
 # }}}

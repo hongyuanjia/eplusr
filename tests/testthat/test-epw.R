@@ -11,7 +11,7 @@ test_that("IDD", {
 test_that("Meta info", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- read_epw(path_epw), "Epw")
 
@@ -29,7 +29,7 @@ test_that("Meta info", {
 test_that("Header getter and setter", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
 
@@ -171,7 +171,7 @@ test_that("Header getter and setter", {
 test_that("Constant data", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
 
@@ -192,7 +192,7 @@ test_that("Constant data", {
 test_that("$save() & $is_unsaved()", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(d_ori <- epw$data(), "data.table")
@@ -217,7 +217,7 @@ test_that("$save() & $is_unsaved()", {
 test_that("Data Getter", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
 
@@ -280,7 +280,7 @@ test_that("Data Getter", {
 test_that("Data Tagger", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- Epw$new(path_epw), "Epw")
 
@@ -330,7 +330,7 @@ test_that("Data Tagger", {
 test_that("Data Setter", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(epw <- read_epw(path_epw), "Epw")
 
@@ -469,7 +469,7 @@ test_that("Data Setter", {
 test_that("$clone()", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     expect_is(epw1 <- Epw$new(path_epw), "Epw")
 
     epw2 <- epw1$clone()
@@ -483,7 +483,7 @@ test_that("$clone()", {
 test_that("$print()", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
 
@@ -497,7 +497,7 @@ test_that("$print()", {
 test_that("str.Epw & format.Epw", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
     expect_output(str(epw))
@@ -509,7 +509,7 @@ test_that("str.Epw & format.Epw", {
 test_that("==.Epw & !=.Epw", {
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- Epw$new(path_epw))
 

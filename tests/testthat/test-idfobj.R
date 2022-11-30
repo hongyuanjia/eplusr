@@ -270,7 +270,7 @@ test_that("$validate()", {
 
     skip_on_cran()
 
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     idf$dup(c(my_roof = "ROOF-1", "ROOF-1", "WALL-1"))
     expect_equal(nrow(idf$validate()$invalid_reference), 0L)
 })
@@ -392,7 +392,7 @@ test_that("$ref_to_object()", {
 
     skip_on_cran()
 
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_is(loop <- IdfObject$new(278, parent = idf), "IdfObject")
     expect_equal(length(loop$ref_to_node()), 9)
 

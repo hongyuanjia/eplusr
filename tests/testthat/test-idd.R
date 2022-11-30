@@ -18,7 +18,7 @@ test_that("can read IDD", {
     skip_on_cran()
 
     # remove all parsed IDD
-    .globals$idd <- list()
+    rm_global_cache("idd")
 
     expect_error(is_avail_idd("latest"))
 
@@ -37,50 +37,47 @@ test_that("can read IDD", {
     expect_is(use_idd(8.4), "Idd")
 
     # can use the IDD in EnergyPlus VersionUpdater folder
-
-    .globals$idd <- list()
+    rm_global_cache("idd")
     expect_is(use_idd(8.4), "Idd")
 
     # can stop if that EnergyPlus is not available and IDD if not found in any
     # existing VersionUpdater folder
-    .globals$eplus[['9.2.0']] <- NULL
-    expect_error(use_idd(9.2), class = "eplusr_error_locate_idd")
+    rm_global_cache("eplus", avail_eplus())
+    expect_error(use_idd(LATEST_EPLUS_VER), class = "eplusr_error_locate_idd")
 
     # can direct read if corresponding EnergyPlus is found
-    expect_is(use_idd(8.8), "Idd")
+    use_eplus(LATEST_EPLUS_VER)
+    expect_is(use_idd(LATEST_EPLUS_VER), "Idd")
 
     # can search in VersionUpdater folder if "Energy+.idd" is not found in
     # EnergyPlus folder
-    f1 <- file.path(eplus_config(8.8)$dir, "Energy+.idd")
+    use_eplus(LATEST_EPLUS_VER)
+    f1 <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "Energy+.idd")
     f1_bak <- paste0(f1, ".bak")
     file.rename(f1, f1_bak)
-    expect_is(use_idd(8.8), "Idd")
+    expect_is(use_idd(LATEST_EPLUS_VER), "Idd")
     file.rename(f1_bak, f1)
 
     # can stop if no available IDD found in any existing VersionUpdater folder
-    .globals$eplus <- list()
-    .globals$eplus[["8.8.0"]] <- use_eplus(8.8)
-    .globals$idd <- list()
+    rm_global_cache("eplus")
+    use_eplus(LATEST_EPLUS_VER)
+    rm_global_cache("idd")
     f2 <- find_idd_from_updater(8.8)
     f2_bak <- paste0(f2, ".bak")
-    file.rename(f1, f1_bak)
     file.rename(f2, f2_bak)
     expect_error(use_idd(8.8), class = "eplusr_error_locate_idd")
     # but "auto" still work in this case
     expect_is(use_idd(8.8, "auto"), "Idd")
-
-    # recover
-    file.rename(f1_bak, f1)
     file.rename(f2_bak, f2)
 
     # can use "latest" notation
     expect_is(use_idd("latest", download = TRUE), "Idd")
 
     # helper functions
-    expect_true(numeric_version("8.8.0") %in% avail_idd())
-    expect_true(is_avail_idd(8.8))
-    expect_true(is_avail_idd("8.8"))
-    expect_true(is_avail_idd("8.8.0"))
+    expect_true(numeric_version("22.1.0") %in% avail_idd())
+    expect_true(is_avail_idd(22.1))
+    expect_true(is_avail_idd("22.1"))
+    expect_true(is_avail_idd("22.1.0"))
 
     # can use custom IDD
     expect_silent(use_idd(idftext("idd", "9.9.9")))
@@ -101,13 +98,13 @@ test_that("can read IDD", {
     expect_warning(get_idd_from_ver(standardize_ver(8.5), use_idd(8.8)), "mismatch")
     expect_warning(get_idd_from_ver(NULL, use_idd(8.8)), "given IDD")
     # can stop if no available IDD parsed
-    .globals$idd <- list()
-    .globals$eplus <- list()
+    rm_global_cache("idd")
+    rm_global_cache("eplus")
     expect_error(get_idd_from_ver(8.8, NULL), class = "eplusr_error_locate_idd")
     expect_error(get_idd_from_ver(NULL, NULL), class = "eplusr_error_no_avail_idd")
 
     locate_eplus()
-    use_idd(8.8)
+    use_idd(LATEST_EPLUS_VER)
     expect_warning(get_idd_from_ver(NULL, NULL), "latest")
 })
 # }}}

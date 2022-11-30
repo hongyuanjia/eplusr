@@ -93,7 +93,7 @@ test_that("Geometry Extraction", {
     expect_equal(nrow(subsurf_d$vertices), 4L)
 
     # detailed shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/HospitalLowEnergy.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/HospitalLowEnergy.idf"))
     expect_is(shade_d <- extract_geom_shading_detailed(idf), "list")
     expect_equal(names(shade_d), c("meta", "vertices"))
     expect_equal(nrow(shade_d$meta), 25L)
@@ -116,7 +116,7 @@ test_that("Geometry Extraction", {
     expect_equal(nrow(dayl_pnts$vertices), 1L)
 
     # simple surfaces
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     expect_is(surf_s <- extract_geom_surface_simple(idf), "list")
     expect_equal(names(surf_s), c("meta", "vertices"))
     expect_equal(nrow(surf_s$meta), 24L)
@@ -132,7 +132,7 @@ test_that("Geometry Extraction", {
     expect_equal(nrow(surf_s$vertices), 4L)
 
     # simple subsurface
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     idf$add(
         Wall_Exterior = list("wall", "EXTERIOR", "ZONE 4", ..5 = 0),
         Window = list("win", "SINGLE PANE HW WINDOW", "wall", NULL, NULL, 1, 8, 3, 3, 5),
@@ -152,7 +152,7 @@ test_that("Geometry Extraction", {
     expect_equal(nrow(subsurf_s$vertices), 4L)
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     without_checking(idf$add(
         Shading_Overhang_Projection = list("overhang1", NULL, 0.7, 90, 0, 0, 0.5),
         Shading_Overhang_Projection = list("overhang2", "Zn001:Wall001:Win001", NULL, NULL, 0, 0, NULL),
@@ -166,7 +166,7 @@ test_that("Geometry Extraction", {
     expect_equal(names(shade_s$vertices), c("id", "index", "x", "y", "z"))
     expect_equal(nrow(shade_s$vertices), 72L)
 
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     expect_is(geom <- extract_geom(idf), "list")
     expect_equal(names(geom), c("rules", "building", "zone", "surface", "subsurface", "shading", "daylighting_point", "vertices"))
 })
@@ -177,7 +177,7 @@ test_that("Simple Geometry Conversion", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     cls <- get_geom_class(idf)
 
     expect_is(geom <- convert_geom_surface_simple(idf), "list")
@@ -208,7 +208,7 @@ test_that("Align coordinate system", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     cls <- get_geom_class(idf)
 
     expect_is(geoms <- extract_geom(idf), "list")
@@ -218,7 +218,7 @@ test_that("Align coordinate system", {
     expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("world", 3L))
 
-    expect_warning(geoms <- extract_geom(empty_idf(8.8)))
+    expect_warning(geoms <- extract_geom(empty_idf(LATEST_EPLUS_VER)))
     expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
 })
 # }}}
@@ -228,7 +228,7 @@ test_that("subset_geom", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
     expect_is(geoms <- extract_geom(idf), "list")
     expect_is(l <- subset_geom(geoms, "all"), "list")
     expect_equal(nrow(l$surface), 24L)

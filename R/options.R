@@ -10,6 +10,20 @@ NULL
 .globals$idd <- list()
 .globals$epw <- list()
 .globals$color <- has_color()
+
+rm_global_cache <- function(type = c("idd", "epw", "eplus"), ver = NULL) {
+    type <- match.arg(type)
+
+    if (is.null(ver)) {
+        .globals[[type]] <- list()
+    } else {
+        for (v in as.character(standardize_ver(ver))) {
+            if (v %in% names(.globals[[type]])) {
+                .globals[[type]][[v]] <- NULL
+            }
+        }
+    }
+}
 # }}}
 
 # package level mutable global options {{{

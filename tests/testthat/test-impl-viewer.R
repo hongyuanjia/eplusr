@@ -3,7 +3,7 @@ test_that("IdfViewer Implemention", {
     skip_on_cran()
 
     # simple model
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
 
     expect_is(geoms <- extract_geom(idf), "list")
     expect_is(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
@@ -59,7 +59,7 @@ test_that("IdfViewer Implemention", {
     expect_is(id_surface <- rgl_view_surface(dev, geoms, "normal"), "integer")
 
     # complex model
-    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/HospitalLowEnergy.idf"))
+    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/HospitalLowEnergy.idf"))
     expect_is(geoms <- extract_geom(idf), "list")
     expect_is(geoms <- align_coord_system(geoms, "relative", "relative", "relative"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))

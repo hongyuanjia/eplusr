@@ -2,15 +2,15 @@ test_that("Parametric methods", {
     skip_on_cran()
 
     # can stop if idf is not saved
-    expect_error(param_job(empty_idf(8.8), NULL), class = "eplusr_error_idf_not_local")
+    expect_error(param_job(empty_idf(LATEST_EPLUS_VER), NULL), class = "eplusr_error_idf_not_local")
 
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
-    path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
+    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     param <- param_job(path_idf, path_epw)
 
     # $version()
-    expect_equal(param$version(), numeric_version("8.8.0"))
+    expect_equal(param$version(), numeric_version(LATEST_EPLUS_VER))
 
     # $seed()
     expect_is(param$seed(), "Idf")
@@ -23,7 +23,7 @@ test_that("Parametric methods", {
 test_that("$apply_measure()", {
     skip_on_cran()
 
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path_idf, NULL)
 
     mea <- function(idf, num) idf
@@ -44,7 +44,7 @@ test_that("$apply_measure()", {
 test_that("$param()", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
 
     expect_is(class = "ParametricJob",
@@ -87,7 +87,7 @@ test_that("$models()", {
     skip_on_cran()
 
     eplusr_option(verbose_info = FALSE)
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path_idf, NULL)
 
     expect_null(param$models())
@@ -106,7 +106,7 @@ test_that("$models()", {
 test_that("$cases()", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
 
     param <- param_job(path, NULL)
 
@@ -146,7 +146,7 @@ test_that("$cases()", {
 test_that("$run()", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
 
     expect_error(param$run(), "No measure")
@@ -155,7 +155,7 @@ test_that("$run()", {
     param$models()[[1L]]$set(Material := list(thickness = 0.05))
     expect_warning(param$run())
 
-    path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     param <- param_job(path, path_epw)
     param$apply_measure(function(idf, num) idf, num = 1:2)
     expect_is(param$run(), "ParametricJob")
@@ -164,7 +164,7 @@ test_that("$run()", {
 test_that("$save()", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
     expect_error(param$save())
 
@@ -176,7 +176,7 @@ test_that("$save()", {
         )
     )
 
-    param <- param_job(path, path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"))
+    param <- param_job(path, path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"))
     param$apply_measure(function(idf, num) idf, num = 1:2)
     expect_equivalent(param$save(separate = FALSE),
         data.table(
@@ -189,7 +189,7 @@ test_that("$save()", {
 test_that("$print()", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
     expect_output(param$print())
 
@@ -201,7 +201,7 @@ test_that("$print()", {
 test_that("==.ParametricJob and !=.ParametricJob", {
     skip_on_cran()
 
-    path <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
 
     expect_false(param == 1)

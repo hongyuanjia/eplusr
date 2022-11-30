@@ -398,7 +398,7 @@ test_that("Epw Data", {
 
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_is(parsed <- parse_epw_file(path_epw), "list")
     expect_equal(names(parsed), c("header", "data", "matched"))

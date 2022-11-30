@@ -3,7 +3,7 @@ test_that("Group methods", {
 
     eplusr_option(verbose_info = FALSE)
 
-    path_idfs <- path_eplus_example(8.8,
+    path_idfs <- path_eplus_example(LATEST_EPLUS_VER,
         c("1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf",
           "1ZoneEvapCooler.idf",
           "1ZoneParameterAspect.idf",
@@ -11,7 +11,7 @@ test_that("Group methods", {
           "1ZoneUncontrolled_DDChanges.idf"
         )
     )
-    path_epws <- path_eplus_weather(8.8,
+    path_epws <- path_eplus_weather(LATEST_EPLUS_VER,
         c("USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw",
           "USA_CO_Golden-NREL.724666_TMY3.epw",
           "USA_FL_Tampa.Intl.AP.722110_TMY3.epw",
@@ -20,7 +20,7 @@ test_that("Group methods", {
         )
     )
 
-    expect_error(group_job(empty_idf(8.8)), "local", class = "eplusr_error")
+    expect_error(group_job(empty_idf(LATEST_EPLUS_VER)), "local", class = "eplusr_error")
     # can stop if input model is not saved after modification
     expect_error(
         group_job(
@@ -109,29 +109,29 @@ test_that("Group methods", {
     expect_is(grp$report_data_dict(c(1,2,4,5)), "data.table")
     expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "index"))
     expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "case"))
-    expect_equal(nrow(grp$report_data_dict(2)), 22)
-    expect_equal(nrow(grp$report_data_dict("1zoneevapcooler")), 22)
+    expect_equal(nrow(grp$report_data_dict(2)), 23)
+    expect_equal(nrow(grp$report_data_dict("1zoneevapcooler")), 23)
     # }}}
 
     # Tabular Data {{{
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5))), 14668)
+    expect_equal(nrow(grp$tabular_data(c(1,2,4,5))), 21692)
     expect_equal(nrow(grp$tabular_data(c(1,2,4,5),
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
             "Initialization Summary"
         ))),
-        9032
+        10923
     )
     expect_equal(nrow(grp$tabular_data(c(1,2,4,5), table_name = "Site and Source Energy")), 12 * 4)
     expect_equal(nrow(grp$tabular_data(c(1,2,4,5), column_name = "Total Energy")), 4 * 4)
     expect_equal(nrow(grp$tabular_data(c(1,2,4,5), row_name = "Total Site Energy")), 3 * 4)
-    expect_equal(nrow(grp$tabular_data(2)), 2172)
+    expect_equal(nrow(grp$tabular_data(2)), 3923)
     expect_equal(nrow(grp$tabular_data(2,
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
             "Initialization Summary"
         ))),
-        769
+        1227
     )
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler", table_name = "Site and Source Energy")), 12)
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler" ,column_name = "Total Energy")), 4)
@@ -155,9 +155,9 @@ test_that("Group methods", {
     # }}}
 
     # Report Data {{{
-    expect_equal(nrow(grp$report_data(2, grp$report_data_dict(2))), 872)
-    expect_equal(nrow(grp$report_data(2)), 872)
-    expect_equal(nrow(grp$report_data(2, "")), 8)
+    expect_equal(nrow(grp$report_data(2, grp$report_data_dict(2))), 920)
+    expect_equal(nrow(grp$report_data(2)), 920)
+    expect_equal(nrow(grp$report_data(2, name = c("Electricity:Facility", "Electricity:HVAC"))), 8)
     expect_equal(lubridate::tz(grp$report_data(2, tz = "Asia/Shanghai")$datetime),
         "Asia/Shanghai"
     )
@@ -172,15 +172,15 @@ test_that("Group methods", {
 
     expect_equal(nrow(grp$report_data(2, period = seq(
         lubridate::ymd_hms("2019-12-21 1:0:0"), lubridate::ymd_hms("2019-12-22 0:0:0"), "1 hour")
-    )), 414)
-    expect_equal(nrow(grp$report_data(2, month = 12)), 436)
-    expect_equal(nrow(grp$report_data(2, month = 12, hour = 1)), 18)
-    expect_equal(nrow(grp$report_data(2, minute = 0)), 872)
+    )), 437)
+    expect_equal(nrow(grp$report_data(2, month = 12)), 460)
+    expect_equal(nrow(grp$report_data(2, month = 12, hour = 1)), 19)
+    expect_equal(nrow(grp$report_data(2, minute = 0)), 920)
     # See https://github.com/NREL/EnergyPlus/issues/8367
-    expect_equal(nrow(grp$report_data(2, interval = 60)), 872)
-    expect_equal(nrow(grp$report_data(2, simulation_days = 1)), 872)
-    expect_equal(nrow(grp$report_data(2, day_type = "WinterDesignDay")), 436)
-    expect_equal(nrow(grp$report_data(2, environment_name = "DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB")), 436)
+    expect_equal(nrow(grp$report_data(2, interval = 60)), 920)
+    expect_equal(nrow(grp$report_data(2, simulation_days = 1)), 920)
+    expect_equal(nrow(grp$report_data(2, day_type = "WinterDesignDay")), 460)
+    expect_equal(nrow(grp$report_data(2, environment_name = "DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB")), 460)
     # }}}
 
     # S3 {{{
