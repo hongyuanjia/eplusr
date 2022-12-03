@@ -690,6 +690,7 @@ Only surfaces that have boundary conditions will be rendered
 with a color. All other surfaces will be white.
 \item \code{"construction"}: Render the model by surface constructions.
 \item \code{"zone"}: Render the model by zones assigned.
+\item \code{"space"}: Render the model by spaces assigned.
 \item \code{"normal"}: Render the model by surface normal. The outside
 face of a heat transfer face will be rendered as white and the
 inside face will be rendered as red.
@@ -724,6 +725,7 @@ Show \link{Idf} geometry
 \if{html}{\out{<div class="r">}}\preformatted{IdfViewer$show(
   type = "all",
   zone = NULL,
+  space = NULL,
   surface = NULL,
   width = 1.5,
   dayl_color = "red",
@@ -750,6 +752,10 @@ a subset of following:
 
 \item{\code{zone}}{A character vector of names or an integer vector of IDs
 of zones in current \link{Idf} to show. If \code{NULL}, no subsetting is
+performed.}
+
+\item{\code{space}}{A character vector of names or an integer vector of IDs
+of spaces in current \link{Idf} to show. If \code{NULL}, no subsetting is
 performed.}
 
 \item{\code{surface}}{A character vector of names or an integer vector of IDs

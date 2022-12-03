@@ -62,6 +62,15 @@ test_that("Geometry Extraction", {
         )
     )
 
+    # spaces
+    expect_equal(get_spaces(read_idf(example$idf)),
+        data.table(id = integer(), name = character(), type = character(), zone = character())
+    )
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSpaces.idf"))
+    expect_s3_class(spaces <- get_spaces(idf), "data.table")
+    expect_equal(names(spaces), c("id", "name", "type", "zone"))
+    expect_equal(nrow(spaces), 8L)
+
     # detailed surface
     idf <- read_idf(example$idf)
     expect_type(surf_d <- extract_geom_surface_detailed(idf), "list")
@@ -266,7 +275,15 @@ test_that("subset_geom", {
     expect_equal(nrow(l$shading), 4L)
     expect_equal(nrow(l$vertices), 48L)
 
-    expect_is(l <- subset_geom(geoms, surface = "Zn001:Wall001"), "list")
+    path_space <- path_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSpaces.idf")
+    expect_type(l <- subset_geom(extract_geom(read_idf(path_space)), space = "space 3 open office 1"), "list")
+    expect_equal(nrow(l$zone), 1L)
+    expect_equal(nrow(l$space), 1L)
+    expect_equal(nrow(l$surface), 6L)
+    expect_equal(nrow(l$subsurface), 1L)
+    expect_equal(nrow(l$shading), 0L)
+    expect_equal(nrow(l$vertices), 28L)
+
     expect_type(l <- subset_geom(geoms, surface = "Zn001:Wall001"), "list")
     expect_equal(nrow(l$surface), 1L)
     expect_equal(nrow(l$subsurface), 0L)

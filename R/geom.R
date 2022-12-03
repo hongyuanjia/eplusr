@@ -231,6 +231,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' * `name`: Character type. Object names.
         #' * `class`: Character type. Class names.
         #' * `zone`: Character type. Zone names that specified objects belong to.
+        #' * `space`: Character type. Space names that specified objects belong to.
         #' * `type`: Character type. Surface types.
         #' * `area`: Numeric type. Surface Area in m2.
         #'
@@ -262,6 +263,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' * `name`: Character type. Object names.
         #' * `class`: Character type. Class names.
         #' * `zone`: Character type. Zone names that specified objects belong to.
+        #' * `space`: Character type. Space names that specified objects belong to.
         #' * `type`: Character type. Surface types.
         #' * `azimuth`: Numeric type. Azimuth in degree.
         #'
@@ -293,6 +295,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' * `name`: Character type. Object names.
         #' * `class`: Character type. Class names.
         #' * `zone`: Character type. Zone names that specified objects belong to.
+        #' * `space`: Character type. Space names that specified objects belong to.
         #' * `type`: Character type. Surface types.
         #' * `tilt`: Numeric type. Azimuth in degree.
         #'
@@ -341,6 +344,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #'   color. All other surfaces will be white.
         #' * `"construction"`: Render the model by surface constructions.
         #' * `"zone"`: Render the model by zones assigned.
+        #' * `"space"`: Render the model by spaces assigned.
         #' * `"normal"`: Render the model by surface normal. The outside face of
         #'   a heat transfer face will be rendered as white and the inside face
         #'   will be rendered as red.
@@ -437,7 +441,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
                 as.data.table(stri_split_fixed(obj$class_name, ":", n = 3L, simplify = TRUE))
             )
             obj[type %chin% c("Building", "GlobalGeometryRules",
-                "Zone", "BuildingSurface", "Wall", "RoofCeiling", "Floor",
+                "Zone", "Space", "BuildingSurface", "Wall", "RoofCeiling", "Floor",
                 "Wall", "Roof", "Ceiling", "FenestrationSurface", "Window",
                 "Door", "GlazedDoor", "Shading", "Daylighting")]
         },
@@ -625,7 +629,7 @@ idfgeom_cal_property <- function (self, private, class = NULL, object = NULL, fu
 
     if (!nrow(geoms$vertices)) {
         return(data.table(id = integer(), name = character(), class = character(),
-            zone = character(), type = character(), property = double()
+            zone = character(), space = character(), type = character(), property = double()
         ))
     }
 
@@ -635,16 +639,16 @@ idfgeom_cal_property <- function (self, private, class = NULL, object = NULL, fu
     }
     prop <- get_newall_vector(geoms$vertices)[, by = "id", list(property = fun(c(x, y, z)))]
 
-    add_zone_name(geoms)
-    cols <- c("id", "name", "class", "zone_name", "surface_type")
+    add_zone_space_name(geoms)
+    cols <- c("id", "name", "class", "zone_name", "space_name", "surface_type")
     meta <- rbindlist(list(
         NULL,
         if (nrow(geoms$surface)) fast_subset(geoms$surface, cols),
         if (nrow(geoms$subsurface)) fast_subset(geoms$subsurface, cols),
         if (nrow(geoms$shading)) fast_subset(geoms$shading, cols)
     ))
-    setnames(meta, c("id", "name", "class", "zone", "type"))
-    del_zone_name(geoms)
+    setnames(meta, c("id", "name", "class", "zone", "space", "type"))
+    del_zone_space_name(geoms)
 
     add_joined_cols(meta, prop, "id", names(meta)[-1L])
     setcolorder(prop, names(meta))
