@@ -4,7 +4,7 @@ test_that("Validate method", {
     idf_env <- get_priv_env(idf)$m_idf_env
     idd_env <- get_priv_env(idf)$idd_env()
 
-    expect_is(empty_validity(), "IdfValidity")
+    expect_s3_class(empty_validity(), "IdfValidity")
     expect_equal(names(empty_validity()),
         c("missing_object",
           "duplicate_object",
@@ -24,7 +24,7 @@ test_that("Validate method", {
 
     expect_error(level_checks(1))
 
-    expect_is(format_validity(empty_validity()), "character")
+    expect_type(format_validity(empty_validity()), "character")
     expect_output(print.IdfValidity(empty_validity()))
     expect_output(print.EpwValidity(empty_validity()))
 

@@ -2,16 +2,16 @@ use_idd(8.8, "auto")
 
 # NEW {{{
 test_that("$new()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
 
     expect_error(IdfObject$new(1))
     expect_error(IdfObject$new(1, class = "Material", parent = idf))
 
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(get_priv_env(mat)$m_object_id, 1L)
     expect_equal(get_priv_env(mat)$m_class_id, 55L)
 
-    expect_is(mat <- IdfObject$new(1, 55, parent = idf), "IdfObject")
+    expect_s3_class(mat <- IdfObject$new(1, 55, parent = idf), "IdfObject")
     expect_equal(get_priv_env(mat)$m_object_id, 1L)
     expect_equal(get_priv_env(mat)$m_class_id, 55L)
 })
@@ -19,64 +19,64 @@ test_that("$new()", {
 
 # VERSION {{{
 test_that("$version()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(5, parent = idf), "IdfObject")
     expect_equal(obj$version(), numeric_version("8.8.0"))
 })
 # }}}
 
 # PARENT {{{
 test_that("$parent()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(5, parent = idf), "IdfObject")
-    expect_is(obj$parent(), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(obj$parent(), "Idf")
 })
 # }}}
 
 # ID {{{
 test_that("$id()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(obj$id(), 1L)
 })
 # }}}
 
 # NAME {{{
 test_that("$name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(obj$name(), "WD01")
 })
 # }}}
 
 # GROUP_NAME {{{
 test_that("$group_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_equal(obj$group_name(), "Surface Construction Elements")
 })
 # }}}
 
 # CLASS_NAME {{{
 test_that("$class_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_equal(obj$class_name(), "Construction")
 })
 # }}}
 
 # DEFINITION {{{
 test_that("$definition()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(obj <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(obj$definition(), "IddObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(obj <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(obj$definition(), "IddObject")
 })
 # }}}
 
 # COMMENT {{{
 test_that("$comment()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_equal(mat$comment(), " this is a test comment for WD01")
 
@@ -111,11 +111,13 @@ test_that("$comment()", {
 
 # VALUE {{{
 test_that("$value()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     # can handle cases when both `index` and `name` are NULL
-    expect_equivalent(mat$value(), tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
+        mat$value(),
         list(Name = "WD01",
              Roughness = "MediumSmooth",
              Thickness = 0.0191,
@@ -128,7 +130,9 @@ test_that("$value()", {
         )
     )
 
-    expect_equivalent(mat$value(unit = TRUE), tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
+        mat$value(unit = TRUE),
         list(Name = "WD01",
              Roughness = "MediumSmooth",
              Thickness = units::set_units(0.0191, "m"),
@@ -150,7 +154,9 @@ test_that("$value()", {
     expect_error(mat$value(c(1, 10:11)), class = "eplusr_error_invalid_field_index")
 
     # can return subset of values in a object using `index`
-    expect_equivalent(mat$value(c(3, 1, 5)), tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
+        mat$value(c(3, 1, 5)),
         list(Thickness = 0.0191, Name = "WD01", Density = 513)
     )
     expect_equal(mat[[2]], "MediumSmooth")
@@ -158,8 +164,8 @@ test_that("$value()", {
     expect_equal(mat[c(2,1)], list(Roughness = "MediumSmooth", Name = "WD01"))
 
     # can return subset of values in a object using `name`
-    expect_equivalent(mat$value("Roughness"), list(Roughness = "MediumSmooth"))
-    expect_equivalent(mat$value("Roughness", simplify = TRUE), "MediumSmooth")
+    expect_equal(ignore_attr = TRUE, mat$value("Roughness"), list(Roughness = "MediumSmooth"))
+    expect_equal(ignore_attr = TRUE, mat$value("Roughness", simplify = TRUE), "MediumSmooth")
     expect_equal(mat$Roughness, "MediumSmooth")
 
     # can detect invalid `name` values
@@ -169,11 +175,11 @@ test_that("$value()", {
 
 # SET {{{
 test_that("$set()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(surf <- IdfObject$new(3, parent = idf), "IdfObject")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(ver <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(surf <- IdfObject$new(3, parent = idf), "IdfObject")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     # can stop when trying to directly modify `Version` object
     expect_error(ver$set(8.8), class = "eplusr_error_set_version")
@@ -226,10 +232,12 @@ test_that("$set()", {
 
 # VALUE_POSSIBLE {{{
 test_that("$value_possible()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
-    expect_equivalent(con$value_possible(),
+    expect_equal(
+        ignore_attr = TRUE,
+        con$value_possible(),
         data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
             object_name = "WALL-1", field_id = 11006:11010, field_index = 1:5,
             field_name = c("Name", "Outside Layer", paste("Layer", 2:4)),
@@ -240,7 +248,9 @@ test_that("$value_possible()", {
             source = c(list(NULL), rep(list(c("WD01", "WD02")), 4))
         )
     )
-    expect_equivalent(con$value_possible(6),
+    expect_equal(
+        ignore_attr = TRUE,
+        con$value_possible(6),
         data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
             object_name = "WALL-1", field_id = 11011, field_index = 6L,
             field_name = "Layer 5", value_id = -1L, value_chr = NA_character_, value_num = NA_real_,
@@ -254,8 +264,8 @@ test_that("$value_possible()", {
 
 # VALIDATE {{{
 test_that("$validate()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equal(con$validate()$invalid_reference,
         data.table(object_id = 2L, object_name = "WALL-1", class_id = 90L,
@@ -278,11 +288,11 @@ test_that("$validate()", {
 
 # IS_VALID {{{
 test_that("$is_valid()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(surf <- IdfObject$new(3, parent = idf), "IdfObject")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(ver <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(surf <- IdfObject$new(3, parent = idf), "IdfObject")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_true(ver$is_valid())
     expect_true(mat$is_valid())
@@ -293,10 +303,12 @@ test_that("$is_valid()", {
 
 # VALUE_RELATION {{{
 test_that("$value_relation()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
-    expect_equivalent(con$value_relation(1),
+    expect_equal(
+        ignore_attr = TRUE,
+        con$value_relation(1),
         list(
             ref_to = data.table(
                 class_id = integer(), class_name = character(),
@@ -333,7 +345,9 @@ test_that("$value_relation()", {
             )
         )
     )
-    expect_equivalent(con$value_relation(1, keep = TRUE),
+    expect_equal(
+        ignore_attr = TRUE,
+        con$value_relation(1, keep = TRUE),
         list(
             ref_to = data.table(
                 class_id = 90L, class_name = "Construction",
@@ -375,9 +389,9 @@ test_that("$value_relation()", {
 
 # REF {{{
 test_that("$ref_to_object()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
-    expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(ver <- IdfObject$new(5, parent = idf), "IdfObject")
 
     expect_message(with_verbose(ver$ref_to_object()), "does not refer")
     expect_message(with_verbose(ver$ref_to_object(class = "Material")), "does not refer")
@@ -393,7 +407,7 @@ test_that("$ref_to_object()", {
     skip_on_cran()
 
     idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/5Zone_Transformer.idf"))
-    expect_is(loop <- IdfObject$new(278, parent = idf), "IdfObject")
+    expect_s3_class(loop <- IdfObject$new(278, parent = idf), "IdfObject")
     expect_equal(length(loop$ref_to_node()), 9)
 
     expect_equal(con$has_ref(), c(TRUE, TRUE, FALSE, FALSE, FALSE))
@@ -410,9 +424,9 @@ test_that("$ref_to_object()", {
 
 # TO_TABLE {{{
 test_that("$to_table()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equal(
         con$to_table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE),
@@ -435,7 +449,8 @@ test_that("$to_table()", {
             value = as.list(c("WALL-1", "WD01", "PW03", "IN02", "GP01", rep(NA_character_, 6)))
         )
     )
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE, 
         con$to_table(all = TRUE, unit = TRUE, wide = TRUE, string_value = FALSE),
         data.table(id = 2L, name = "WALL-1", class = "Construction",
             Name = "WALL-1", `Outside Layer` = "WD01", `Layer 2` = "PW03",
@@ -444,7 +459,9 @@ test_that("$to_table()", {
             `Layer 9` = NA_character_, `Layer 10` = NA_character_
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5
+       
         mat$to_table(string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
             field = mat$definition()$field_name(),
@@ -454,7 +471,9 @@ test_that("$to_table()", {
             )
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5
+       
         mat$to_table(wide = TRUE, string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", Name = "WD01",
             `Roughness` = "MediumSmooth",
@@ -471,8 +490,8 @@ test_that("$to_table()", {
 
 # TO_STRING {{{
 test_that("$to_string()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_equal(con$to_string(leading = 0, sep_at = 10),
         c("Construction,",
@@ -502,9 +521,9 @@ test_that("$to_string()", {
 
 # PRINT {{{
 test_that("$print()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(ver <- IdfObject$new(5, parent = idf), "IdfObject")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_output(ver$print())
     expect_output(ver$print(brief = TRUE))
@@ -512,9 +531,9 @@ test_that("$print()", {
     expect_output(con$print(all = TRUE), "11 :")
     expect_output(con$print(auto_sep = FALSE))
 
-    expect_is(idf <- read_idf(example(), 8.8), "Idf")
-    expect_is(ver <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(out <- IdfObject$new(40, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(example(), 8.8), "Idf")
+    expect_s3_class(ver <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(out <- IdfObject$new(40, parent = idf), "IdfObject")
     expect_output(ver$print())
     expect_output(out$print())
 })
@@ -522,10 +541,10 @@ test_that("$print()", {
 
 # S3 FORMAT {{{
 test_that("format.IdfObject, as.character.IdfObject, etc", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
-    expect_is(format(con), "character")
+    expect_type(format(con), "character")
     expect_equal(as.character(con), con$to_string())
     expect_output(str(con))
     expect_output(print(con))
@@ -534,8 +553,8 @@ test_that("format.IdfObject, as.character.IdfObject, etc", {
 
 # S3 SUBSET {{{
 test_that("$.IdfObject and [[.IdfObject", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_error(mat[1, 2])
     expect_equal(mat[1:2], list(Name = "WD01", Roughness = "MediumSmooth"))
@@ -547,14 +566,14 @@ test_that("$.IdfObject and [[.IdfObject", {
     expect_null(mat[["roughness"]])
     expect_error(mat[[1:2]])
 
-    expect_is(mat[["version"]], "function")
+    expect_type(mat[["version"]], "function")
 })
 # }}}
 
 # S3 ASSIGN {{{
 test_that("$<-.IdfObject and [[<-.IdfObject", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
 
     expect_error(mat$name <- "Smooth")
     expect_silent(mat$Roughness <- "Smooth")
@@ -580,9 +599,9 @@ test_that("$<-.IdfObject and [[<-.IdfObject", {
 
 # S3 EQUITY {{{
 test_that("==.IdfObject and !=.IdfObject", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
-    expect_is(mat <- IdfObject$new(1, parent = idf), "IdfObject")
-    expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
 
     expect_false(con == TRUE)
     expect_true(con == con)
@@ -601,16 +620,16 @@ test_that("idf_object()", {
     expect_error(idf_object(parent = idf))
 
     expect_error(idf_object(idf, class = "Construction"))
-    expect_is(obj <- without_checking(idf_object(idf, class = "Construction")), "IdfObject")
+    expect_s3_class(obj <- without_checking(idf_object(idf, class = "Construction")), "IdfObject")
     expect_equal(obj$class_name(), "Construction")
 
-    expect_is(idf_object(idf, 5), "IdfObject")
+    expect_s3_class(idf_object(idf, 5), "IdfObject")
 })
 # }}}
 
 # AUTOCOMPLETE {{{
 test_that(".DollarNames.Idf", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", 8.8), use_idd(8.8, "auto")), "Idf")
     expect_equal(.DollarNames.Idf(idf, "Ma"), "Material")
 })
 # }}}

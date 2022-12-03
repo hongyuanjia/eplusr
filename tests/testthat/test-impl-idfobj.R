@@ -5,7 +5,9 @@ test_that("get_idfobj_value()", {
     idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_equivalent(get_idfobj_value(idd_env, idf_env, 1), tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idfobj_value(idd_env, idf_env, 1), tolerance = 1e-5,
         list(Name = "WD01",
              Roughness = "MediumSmooth",
              Thickness = 0.0191,
@@ -18,7 +20,9 @@ test_that("get_idfobj_value()", {
         )
     )
 
-    expect_equivalent(get_idfobj_value(idd_env, idf_env, 1, unit = TRUE), tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idfobj_value(idd_env, idf_env, 1, unit = TRUE), tolerance = 1e-5,
         list(Name = "WD01",
              Roughness = "MediumSmooth",
              Thickness = units::set_units(0.0191, "m"),
@@ -53,7 +57,9 @@ test_that("get_idfobj_possible()", {
     idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_equivalent(get_idfobj_possible(idd_env, idf_env, 2),
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idfobj_possible(idd_env, idf_env, 2),
         data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
             object_name = "WALL-1", field_id = 11006:11010, field_index = 1:5,
             field_name = c("Name", "Outside Layer", paste("Layer", 2:4)),
@@ -65,7 +71,9 @@ test_that("get_idfobj_possible()", {
         )
     )
 
-    expect_equivalent(get_idfobj_possible(idd_env, idf_env, 2, 2),
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idfobj_possible(idd_env, idf_env, 2, 2),
         data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
             object_name = "WALL-1", field_id = 11007, field_index = 2,
             field_name = "Outside Layer",
@@ -88,7 +96,9 @@ test_that("get_idfobj_relation()", {
     idf_env <- parse_idf_file(idftext("idf", 8.8))
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_equivalent(get_idfobj_relation(idd_env, idf_env, 2, 10),
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idfobj_relation(idd_env, idf_env, 2, 10),
         list(
             ref_to = data.table(
                 class_id = integer(), class_name = character(),

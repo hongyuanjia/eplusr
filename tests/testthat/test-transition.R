@@ -4,7 +4,8 @@ test_that("Transition Helper", {
     idf <- read_idf(example(), use_idd(8.8, "auto"))
 
     # transition action {{{
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         trans_action(idf, "Construction",
             offset = list(2L, 4L),
             add = list(2L:3L, "No")
@@ -24,7 +25,8 @@ test_that("Transition Helper", {
     )
 
     # can insert new extensible fields
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         trans_action(idf, "Construction",
             insert = list(2:3, NA, step = 1)
         ),
@@ -43,7 +45,8 @@ test_that("Transition Helper", {
     )
 
     # can insert multiple times
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         trans_action(idf, "RunPeriod",
             insert = list(c(`Start Year` = 4)),
             insert = list(c(`End Year` = 7))
@@ -70,24 +73,24 @@ test_that("Transition Helper", {
 
     # preprocess {{{
     expect_silent(new_idf <- trans_preprocess(idf, 8.9, "Construction"))
-    expect_equivalent(new_idf$version(), numeric_version("8.9.0"))
+    expect_equal(new_idf$version(), numeric_version("8.9.0"))
     expect_false(new_idf$is_valid_class("Construction"))
     expect_false(get_priv_env(new_idf)$uuid() == get_priv_env(idf)$uuid())
     # }}}
 
     # versions {{{
-    expect_equivalent(
+    expect_equal(
         trans_upper_versions(idf, 9.1, patch = TRUE),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.0.1", "9.1.0"))
     )
-    expect_equivalent(
+    expect_equal(
         trans_upper_versions(idf, 9.1),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.1.0"))
     )
     # }}}
 
     # transition functions {{{
-    expect_equivalent(
+    expect_equal(
         trans_fun_names(c("8.8.0", "8.9.0", "9.0.1", "9.1.0")),
         c("f880t890", "f890t900", "f900t910")
     )
@@ -101,7 +104,7 @@ test_that("Transition v7.2 --> v8.0", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 7.2
     to <- 8.0
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(7.2,
             ShadowCalculation = list(),
@@ -139,8 +142,8 @@ test_that("Transition v7.2 --> v8.0", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to))
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    suppressWarnings(expect_warning(idfTR <- transition(idfOri, to)))
 
     expect_equal(
         idfVU$"Coil:Heating:DX:MultiSpeed"$Coil$value()[1:40],
@@ -303,7 +306,7 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     # can handle forkeq variables
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(
             7.2,
@@ -320,7 +323,7 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     # can handle forkeq variables
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(
             7.2,
@@ -367,7 +370,7 @@ test_that("Transition v8.0 --> v8.1", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.0
     to <- 8.1
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "People" = list("People"),
@@ -394,8 +397,8 @@ test_that("Transition v8.0 --> v8.1", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"People"[[1]]$value()[1:16],
@@ -505,7 +508,7 @@ test_that("Transition v8.1 --> v8.2", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.1
     to <- 8.2
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "ZoneHVAC:UnitVentilator" = list("UV"),
@@ -528,8 +531,8 @@ test_that("Transition v8.1 --> v8.2", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"ZoneHVAC:UnitVentilator"$UV$value(1:23),
@@ -634,7 +637,7 @@ test_that("Transition v8.2 --> v8.3", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.2
     to <- 8.3
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Chiller:Electric:ReformulatedEIR" = list(),
@@ -651,8 +654,8 @@ test_that("Transition v8.2 --> v8.3", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"Chiller:Electric:ReformulatedEIR"[[1]]$value(1:26),
@@ -681,7 +684,7 @@ test_that("Transition v8.3 --> v8.4", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.3
     to <- 8.4
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Coil:WaterHeating:AirToWaterHeatPump" = list(),
@@ -714,8 +717,8 @@ test_that("Transition v8.3 --> v8.4", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"Coil:WaterHeating:AirToWaterHeatPump:Pumped"[[1]]$value(1:21),
@@ -863,7 +866,7 @@ test_that("Transition v8.4 --> v8.5", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.4
     to <- 8.5
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "EnergyManagementSystem:Actuator" := list(
@@ -873,8 +876,8 @@ test_that("Transition v8.4 --> v8.5", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"EnergyManagementSystem:Actuator"[[1]]$value(),
@@ -892,7 +895,7 @@ test_that("Transition v8.5 --> v8.6", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.5
     to <- 8.6
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Building" = list(),
@@ -946,8 +949,8 @@ test_that("Transition v8.5 --> v8.6", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     use_idd(8.5)$"Daylighting:DELight:Controls"
     use_idd(8.6)$"Daylighting:Controls"
@@ -1103,7 +1106,7 @@ test_that("Transition v8.5 --> v8.6", {
 
     # NOTE: VersionUpdater will crash if no matched material found for
     # "MaterialProperty:MoisturePenetrationDepth:Settings"
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "MaterialProperty:MoisturePenetrationDepth:Settings" := list(
@@ -1122,7 +1125,7 @@ test_that("Transition v8.6 --> v8.7", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.6
     to <- 8.7
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Coil:Cooling:DX:MultiSpeed" = list("ClgCoil1", ..16 = NULL),
@@ -1140,8 +1143,8 @@ test_that("Transition v8.6 --> v8.7", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"Coil:Cooling:DX:MultiSpeed"$ClgCoil1$value(1:91),
@@ -1203,7 +1206,7 @@ test_that("Transition v8.7 --> v8.8", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.7
     to <- 8.8
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Output:Surfaces:List" = list("DecayCurvesfromZoneComponentLoads"),
@@ -1240,8 +1243,8 @@ test_that("Transition v8.7 --> v8.8", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to), "'SurfaceProperty:ExposedFoundationPerimeter'")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(expect_warning(idfTR <- transition(idfOri, to), "'SurfaceProperty:ExposedFoundationPerimeter'"))
 
     expect_equal(
         idfVU$"Output:Surfaces:List"[[1]]$value(1),
@@ -1329,7 +1332,7 @@ test_that("Transition v8.8 --> v8.9", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.8
     to <- 8.9
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "ZoneHVAC:EquipmentList" = list("Equip"),
@@ -1350,8 +1353,8 @@ test_that("Transition v8.8 --> v8.9", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"ZoneHVAC:EquipmentList"[[1]]$value(1:6),
@@ -1411,7 +1414,7 @@ test_that("Transition v8.9 --> v9.0", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 8.9
     to <- 9.0
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "OutdoorAir:Mixer" = list("OAMixer"),
@@ -1437,8 +1440,8 @@ test_that("Transition v8.9 --> v9.0", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to), "UseWeatherFile")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(expect_warning(idfTR <- transition(idfOri, to), "UseWeatherFile"))
 
     expect_equal(
         idfVU$"AirflowNetwork:Distribution:Component:OutdoorAirFlow"[[1]]$value(1:4),
@@ -1509,7 +1512,7 @@ test_that("Transition v9.0 --> v9.1", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 9.0
     to <- 9.1
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "HybridModel:Zone" = list("HM", "Zone", "no", "no", "sch", 1, 1, 12, 31),
@@ -1518,8 +1521,8 @@ test_that("Transition v9.0 --> v9.1", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"HybridModel:Zone"[[1]]$value(),
@@ -1540,7 +1543,7 @@ test_that("Transition v9.1 --> v9.2", {
     to <- 9.2
     unlink(file.path(tempdir(), "test.csv"))
     writeLines("", file.path(tempdir(), "test.csv"))
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Foundation:Kiva" = list(),
@@ -1679,8 +1682,8 @@ test_that("Transition v9.1 --> v9.2", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to), "comments")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    suppressWarnings(expect_warning(idfTR <- transition(idfOri, to), "comments"))
 
     expect_equal(
         idfVU$"Foundation:Kiva"[[1]]$value(1),
@@ -1815,7 +1818,7 @@ test_that("Transition v9.2 --> v9.3", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 9.2
     to <- 9.3
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "AirConditioner:VariableRefrigerantFlow" = list("VRF", ..67 = "propanegas"),
@@ -1861,7 +1864,7 @@ test_that("Transition v9.2 --> v9.3", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
     expect_warning(idfTR <- transition(idfOri, to), "ANDCD2")
 
     expect_equal(
@@ -2009,7 +2012,7 @@ test_that("Transition v9.3 --> v9.4", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 9.3
     to <- 9.4
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Construction:InternalSource" = list("IS", ..6 = "Mat"),
@@ -2035,8 +2038,8 @@ test_that("Transition v9.3 --> v9.4", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to), "Python")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(expect_warning(idfTR <- transition(idfOri, to), "Python"))
 
     expect_equal(
         idfVU$"Construction:InternalSource"$IS$value(),
@@ -2095,7 +2098,7 @@ test_that("Transition v9.4 --> v9.5", {
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
     from <- 9.4
     to <- 9.5
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "Construction:AirBoundary" := list(
@@ -2166,8 +2169,8 @@ test_that("Transition v9.4 --> v9.5", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_warning(idfTR <- transition(idfOri, to), "Construction:AirBoundary")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_warning(expect_warning(idfTR <- transition(idfOri, to), "Construction:AirBoundary"))
 
     expect_equal(
         idfVU$"Construction:AirBoundary"$CAB1$value(),
@@ -2284,7 +2287,7 @@ test_that("Transition v9.5 --> v9.6", {
 
     from <- 9.5
     to <- 9.6
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "AirflowNetwork:MultiZone:ReferenceCrackConditions" = list("AN", NULL),
@@ -2365,8 +2368,8 @@ test_that("Transition v9.5 --> v9.6", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"AirflowNetwork:MultiZone:ReferenceCrackConditions"$AN$value(),
@@ -2481,7 +2484,7 @@ test_that("Transition v9.6 --> v22.1", {
     from <- 9.6
     to <- 22.1
 
-    expect_is(
+    expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
             "PythonPlugin:SearchPaths" = list("Py", "Yes", "Yes", "Yes"),
@@ -2489,8 +2492,8 @@ test_that("Transition v9.6 --> v22.1", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
-    expect_is(idfTR <- transition(idfOri, to), "Idf")
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
         idfVU$"PythonPlugin:SearchPaths"$value(),

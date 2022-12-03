@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.15.3.9000
+Version: 0.15.3.9001
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -42,7 +42,7 @@ Imports:
 Suggests:
     decido,
     rgl (>= 0.105.13),
-    testthat (>= 2.1.0)
+    testthat (>= 3.0.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
     "collate"))
@@ -89,3 +89,5 @@ Collate:
     'validate.R'
     'viewer.R'
     'zzz.R'
+Config/testthat/edition: 3
+Config/testthat/parallel: true

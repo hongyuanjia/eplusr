@@ -2,7 +2,7 @@ eplusr_option(verbose_info = FALSE)
 
 # download_idd() {{{
 test_that("download_idd() can download IDD from EnergyPlus repo", {
-    expect_error(download_idd(1, tempdir()), classs = "eplusr_error_invalid_eplus_ver")
+    expect_error(download_idd(1, tempdir()), class = "eplusr_error_invalid_eplus_ver")
 
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
@@ -31,14 +31,14 @@ test_that("can read IDD", {
     expect_silent(idd <- use_idd(8.4, download = TRUE))
 
     # can directly return if input is an Idd
-    expect_is(use_idd(idd), "Idd")
+    expect_s3_class(use_idd(idd), "Idd")
 
     # can directly return if parsed previously
-    expect_is(use_idd(8.4), "Idd")
+    expect_s3_class(use_idd(8.4), "Idd")
 
     # can use the IDD in EnergyPlus VersionUpdater folder
     rm_global_cache("idd")
-    expect_is(use_idd(8.4), "Idd")
+    expect_s3_class(use_idd(8.4), "Idd")
 
     # can stop if that EnergyPlus is not available and IDD if not found in any
     # existing VersionUpdater folder
@@ -47,7 +47,7 @@ test_that("can read IDD", {
 
     # can direct read if corresponding EnergyPlus is found
     use_eplus(LATEST_EPLUS_VER)
-    expect_is(use_idd(LATEST_EPLUS_VER), "Idd")
+    expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
 
     # can search in VersionUpdater folder if "Energy+.idd" is not found in
     # EnergyPlus folder
@@ -55,7 +55,7 @@ test_that("can read IDD", {
     f1 <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "Energy+.idd")
     f1_bak <- paste0(f1, ".bak")
     file.rename(f1, f1_bak)
-    expect_is(use_idd(LATEST_EPLUS_VER), "Idd")
+    expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
     file.rename(f1_bak, f1)
 
     # can stop if no available IDD found in any existing VersionUpdater folder
@@ -67,11 +67,11 @@ test_that("can read IDD", {
     file.rename(f2, f2_bak)
     expect_error(use_idd(8.8), class = "eplusr_error_locate_idd")
     # but "auto" still work in this case
-    expect_is(use_idd(8.8, "auto"), "Idd")
+    expect_s3_class(use_idd(8.8, "auto"), "Idd")
     file.rename(f2_bak, f2)
 
     # can use "latest" notation
-    expect_is(use_idd("latest", download = TRUE), "Idd")
+    expect_s3_class(use_idd("latest", download = TRUE), "Idd")
 
     # helper functions
     expect_true(numeric_version("22.1.0") %in% avail_idd())
@@ -93,7 +93,7 @@ test_that("can read IDD", {
     expect_silent(use_idd(8.2))
 
     # can auto find suitable IDD
-    expect_is(get_idd_from_ver(8.8, NULL), "Idd")
+    expect_s3_class(get_idd_from_ver(8.8, NULL), "Idd")
     # can give warning if hard-coded IDD is used
     expect_warning(get_idd_from_ver(standardize_ver(8.5), use_idd(8.8)), "mismatch")
     expect_warning(get_idd_from_ver(NULL, use_idd(8.8)), "given IDD")
@@ -163,11 +163,11 @@ test_that("Idd class", {
     expect_equal(idd$class_index(by_group = TRUE), list(TestGroup1 = 1L, TestGroup2 = 2L))
 
     # can stop when invalid class names are given
-    expect_error(idd$class_index("WrongClass"), error = "eplusr_error_invalid_class_name")
+    expect_error(idd$class_index("WrongClass"), class = "eplusr_error_invalid_class_name")
 
-    expect_is(idd$object_relation("TestSimple"), "IddRelation")
-    expect_is(idd$object_relation("TestSimple", "ref_to"), "IddRelation")
-    expect_is(idd$object_relation("TestSimple", "ref_by"), "IddRelation")
+    expect_s3_class(idd$object_relation("TestSimple"), "IddRelation")
+    expect_s3_class(idd$object_relation("TestSimple", "ref_to"), "IddRelation")
+    expect_s3_class(idd$object_relation("TestSimple", "ref_by"), "IddRelation")
 
     # can return names of all required classes
     expect_equal(idd$required_class_name(), "TestSlash")
@@ -179,11 +179,11 @@ test_that("Idd class", {
     expect_equal(idd$extensible_class_name(), "TestSlash")
 
     # can return a single IddObject using class name
-    expect_is(idd$object("TestSimple"), "IddObject")
+    expect_s3_class(idd$object("TestSimple"), "IddObject")
 
     # can stop when invalid class names are given
-    expect_error(idd$object("WrongClass"), error = "error_class_name_us")
-    expect_is(idd$object("TestSlash"), "IddObject")
+    expect_error(idd$object("WrongClass"), class = "eplusr_error_invalid_class_name")
+    expect_s3_class(idd$object("TestSlash"), "IddObject")
 
     # can return when multiple class names are given
     expect_equal(idd$objects(c("TestSimple", "TestSlash")),
@@ -191,7 +191,7 @@ test_that("Idd class", {
             TestSlash = idd$object("TestSlash")))
 
     # can return all IddObjects in a group
-    expect_is(idd$objects_in_group("TestGroup1"), "list")
+    expect_type(idd$objects_in_group("TestGroup1"), "list")
     expect_equal(idd$objects_in_group("TestGroup1"), list(TestSimple = idd$object("TestSimple")))
 
     # can stop when invalid group names are given
@@ -199,11 +199,11 @@ test_that("Idd class", {
 
     # can stop when multiple group names are given
     expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")), "Must have length 1")
-    expect_is(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
+    expect_s3_class(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
 
-    expect_is(idd$objects_in_relation("TestSimple", "ref_to"), "list")
+    expect_type(idd$objects_in_relation("TestSimple", "ref_to"), "list")
     expect_equal(names(idd$objects_in_relation("TestSimple", "ref_to")), "TestSimple")
-    expect_is(idd$objects_in_relation("TestSimple", "ref_by"), "list")
+    expect_type(idd$objects_in_relation("TestSimple", "ref_by"), "list")
     expect_equal(names(idd$objects_in_relation("TestSimple", "ref_by")), c("TestSimple", "TestSlash"))
 
     # can check if input is a valid group

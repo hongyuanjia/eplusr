@@ -87,7 +87,7 @@ test_that("Group methods", {
     # Table {{{
     expect_error(grp$list_table())
     expect_silent(lsts <- grp$list_table(c(1,2,4)))
-    expect_is(lsts, "list")
+    expect_type(lsts, "list")
     expect_equal(length(lsts), 3L)
 
     expect_error(grp$read_table())
@@ -98,15 +98,15 @@ test_that("Group methods", {
     # RDD & MDD {{{
     expect_error(grp$read_rdd(3))
     expect_silent(rdds <- grp$read_rdd(c(1,2,4)))
-    expect_is(rdds, "data.table")
+    expect_s3_class(rdds, "data.table")
     expect_error(grp$read_mdd(3))
     expect_silent(mdds <- grp$read_mdd(c(1,2,4)))
-    expect_is(mdds, "data.table")
+    expect_s3_class(mdds, "data.table")
     # }}}
 
     # Report Data Dict {{{
     expect_error(grp$report_data_dict(), class = "eplusr_error_job_error")
-    expect_is(grp$report_data_dict(c(1,2,4,5)), "data.table")
+    expect_s3_class(grp$report_data_dict(c(1,2,4,5)), "data.table")
     expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "index"))
     expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "case"))
     expect_equal(nrow(grp$report_data_dict(2)), 23)
@@ -139,7 +139,9 @@ test_that("Group methods", {
     # can convert to wide table
     expect_silent(tab <- grp$tabular_data("1zoneevapcooler", row_name = "Total Site Energy", wide = TRUE))
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
-    expect_equivalent(tab[[1L]][, lapply(.SD, class)],
+    expect_equal(
+        ignore_attr = TRUE,
+        tab[[1L]][, lapply(.SD, class)],
         data.table(
             index = "integer",
             case = "character",
@@ -201,21 +203,21 @@ test_that("Group methods", {
     # }}}
 
     # List files {{{
-    expect_is(files <- grp$list_files(c(1, 2), simplify = TRUE), "list")
+    expect_type(files <- grp$list_files(c(1, 2), simplify = TRUE), "list")
     expect_equal(length(files), 2L)
     expect_equal(length(files[[1]]), 21L)
     expect_equal(length(files[[2]]), 21L)
 
-    expect_is(files <- grp$list_files(c(1, 2), simplify = TRUE, full = TRUE), "list")
+    expect_type(files <- grp$list_files(c(1, 2), simplify = TRUE, full = TRUE), "list")
     expect_equal(length(files), 2L)
     expect_equal(normalizePath(dirname(files[[1]])), rep(grp$output_dir(1), 21L))
     expect_equal(normalizePath(dirname(files[[2]])), rep(grp$output_dir(2), 21L))
 
-    expect_is(files <- grp$list_files(c(1, 2), simplify = FALSE), "data.table")
+    expect_s3_class(files <- grp$list_files(c(1, 2), simplify = FALSE), "data.table")
     expect_equal(names(files), c("index", "type", "file"))
     expect_equal(nrow(files), 114L)
 
-    expect_is(files <- grp$list_files(c(1, 2), simplify = FALSE, full = TRUE), "data.table")
+    expect_s3_class(files <- grp$list_files(c(1, 2), simplify = FALSE, full = TRUE), "data.table")
     expect_equal(names(files), c("index", "type", "file"))
     expect_equal(nrow(files), 114L)
     # }}}

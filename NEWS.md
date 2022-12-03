@@ -1,6 +1,11 @@
 # eplusr (development version)
 
+## New features
+
 * Add support for EnergyPlus v22.1 (#517).
+## Internal refactor
+
+* Use testthat 3rd edition for parallel testing (#478).
 
 # eplusr 0.15.3
 

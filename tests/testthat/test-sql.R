@@ -4,12 +4,12 @@ test_that("Sql methods", {
     example <- copy_example()
     idf <- read_idf(example$idf)
 
-    expect_is(job <- idf$run(example$epw, NULL, echo = FALSE), "EplusJob")
+    expect_s3_class(job <- idf$run(example$epw, NULL, echo = FALSE), "EplusJob")
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
     expect_output(sql$print())
     expect_output(str(sql))
-    expect_is(format(sql), "character")
+    expect_type(format(sql), "character")
 
     # path
     expect_equal(sql$path(), normalizePath(file.path(tempdir(), "5Zone_Transformer.sql")))
@@ -20,10 +20,10 @@ test_that("Sql methods", {
 
     # can read table
     expect_error(sql$read_table("a"), "no such table")
-    expect_is(sql$read_table("Zones"), "data.table")
+    expect_s3_class(sql$read_table("Zones"), "data.table")
 
     # can read report data dictionary
-    expect_is(sql$report_data_dict(), "data.table")
+    expect_s3_class(sql$report_data_dict(), "data.table")
 
     # can read report data
     expect_equal(nrow(sql$report_data(sql$report_data_dict())), 3840L)
@@ -91,7 +91,8 @@ test_that("Sql methods", {
     expect_silent(tab <- sql$tabular_data(row_name = "Total Site Energy", wide = TRUE, case = NULL))
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
 
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
             run(NULL, tempdir(), echo = FALSE)$
             tabular_data(table_name = "Site and Source Energy", wide = TRUE)[[1]][
@@ -107,7 +108,9 @@ test_that("Sql methods", {
             `Energy Per Conditioned Building Area [MJ/m2]` = "numeric"
         )
     )
-    expect_equivalent(tab[[1L]][, lapply(.SD, class)],
+    expect_equal(
+        ignore_attr = TRUE,
+        tab[[1L]][, lapply(.SD, class)],
         data.table(
             report_name = "character",
             report_for = "character",

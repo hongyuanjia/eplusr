@@ -8,8 +8,8 @@ test_that("HVAC Diagram", {
 
     expect_warning(res <- hvac_diagram(job$version(), tempfile()))
 
-    expect_is(job$run(wait = TRUE, echo = FALSE), "EplusJob")
+    expect_s3_class(job$run(wait = TRUE, echo = FALSE), "EplusJob")
 
     expect_warning(res <- hvac_diagram(job$version(), job$locate_output(".bnd")))
-    expect_is(res, "character")
+    expect_type(res, "character")
 })

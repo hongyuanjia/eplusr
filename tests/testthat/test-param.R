@@ -13,10 +13,10 @@ test_that("Parametric methods", {
     expect_equal(param$version(), numeric_version(LATEST_EPLUS_VER))
 
     # $seed()
-    expect_is(param$seed(), "Idf")
+    expect_s3_class(param$seed(), "Idf")
 
     # $weather()
-    expect_is(param$weather(), "Epw")
+    expect_s3_class(param$weather(), "Epw")
     expect_null(param_job(path_idf, NULL)$weather())
 })
 
@@ -30,7 +30,7 @@ test_that("$apply_measure()", {
 
     expect_error(param$apply_measure(function(idf) idf))
     expect_error(param$apply_measure(function(idf, ...) 1, a = 1:5))
-    expect_is(param$apply_measure(mea, num = 1:2, .names = "case"), "ParametricJob")
+    expect_s3_class(param$apply_measure(mea, num = 1:2, .names = "case"), "ParametricJob")
     expect_equal(names(param$models()), c("case_1", "case_2"))
     expect_error(param$apply_measure(mea, num = 1:2, .names = c("a", "b", "c")))
 
@@ -47,12 +47,12 @@ test_that("$param()", {
     path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
 
-    expect_is(class = "ParametricJob",
+    expect_s3_class(class = "ParametricJob",
         param$param("Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)), .cross = TRUE)
     )
     expect_equal(length(param$models()), 3L)
 
-    expect_is(class = "ParametricJob",
+    expect_s3_class(class = "ParametricJob",
         param$param(
             Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
             "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8))
@@ -60,7 +60,7 @@ test_that("$param()", {
     )
     expect_equal(length(param$models()), 3L)
 
-    expect_is(class = "ParametricJob",
+    expect_s3_class(class = "ParametricJob",
         param$param(
             Material := list(Thickness = seq(0.1, 1, length.out = 3), Conductivity = seq(0.1, 0.6, length.out = 3)),
             "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
@@ -75,7 +75,7 @@ test_that("$param()", {
             .names = c("p1", "p2")
         )
     )
-    expect_is(class = "ParametricJob",
+    expect_s3_class(class = "ParametricJob",
         param$param(
             "Supply Fan 1" = list(fan_total_efficiency = c(0.1, 0.5, 0.8)),
             .names = "fan_eff"
@@ -95,7 +95,7 @@ test_that("$models()", {
 
     param$apply_measure(function(idf, num) idf, num = 1:2)
 
-    expect_is(param$models(), "list")
+    expect_type(param$models(), "list")
     expect_equal(length(param$models()), 2)
     expect_equal(names(param$models()), c("case_1", "case_2"))
 
@@ -119,7 +119,9 @@ test_that("$cases()", {
         ),
         c("GP01", "GP02") := .(thickness = c(0.01, 0.02))
     )
-    expect_equivalent(param$cases(),
+    expect_equal(
+        ignore_attr = TRUE,
+        param$cases(),
         data.table(
             index = 1:2, case = c("case_1", "case_2"),
             param_1 = c(0.1, 0.2),
@@ -136,7 +138,9 @@ test_that("$cases()", {
         c("FanAvailSched", "Always On"),
         eff = c(0.1, 0.2)
     )
-    expect_equivalent(param$cases(),
+    expect_equal(
+        ignore_attr = TRUE,
+        param$cases(),
         data.table(index = 1:2, case = c("case_1", "case_2"),
             eff = c(0.1, 0.2), sch = c("FanAvailSched", "Always On")
         )
@@ -158,7 +162,7 @@ test_that("$run()", {
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     param <- param_job(path, path_epw)
     param$apply_measure(function(idf, num) idf, num = 1:2)
-    expect_is(param$run(), "ParametricJob")
+    expect_s3_class(param$run(), "ParametricJob")
 })
 
 test_that("$save()", {
@@ -169,7 +173,9 @@ test_that("$save()", {
     expect_error(param$save())
 
     param$apply_measure(function(idf, num) idf, num = 1:2)
-    expect_equivalent(param$save(),
+    expect_equal(
+        ignore_attr = TRUE,
+        param$save(),
         data.table(
             model = normalizePath(file.path(tempdir(), c("case_1", "case_2"), c("case_1.idf", "case_2.idf"))),
             weather = NA_character_
@@ -178,7 +184,9 @@ test_that("$save()", {
 
     param <- param_job(path, path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"))
     param$apply_measure(function(idf, num) idf, num = 1:2)
-    expect_equivalent(param$save(separate = FALSE),
+    expect_equal(
+        ignore_attr = TRUE,
+        param$save(separate = FALSE),
         data.table(
             model = normalizePath(file.path(tempdir(), c("case_1.idf", "case_2.idf"))),
             weather = normalizePath(file.path(tempdir(), "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"))

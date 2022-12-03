@@ -108,6 +108,6 @@ test_that("Utility functions", {
     expect_equal(match_in_vec("a", LETTERS, "aa", label = TRUE), "A")
     expect_equal(match_in_vec("aa", LETTERS, "aa", label = TRUE), "A")
 
-    expect_is(catch_cnd(warn("")), "eplusr_warning")
-    expect_is(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
+    expect_s3_class(catch_cnd(warn("")), "eplusr_warning")
+    expect_s3_class(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
 })

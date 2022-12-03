@@ -65,7 +65,7 @@ test_that("Assertion functions", {
     expect_true(is_epwdate(epw_date(1)))
     expect_false(is_epwdate(epw_date(-1)))
 
-    expect_is(is_windows(), "logical")
-    expect_is(is_linux(), 'logical')
-    expect_is(is_macos(), 'logical')
+    expect_type(is_windows(), "logical")
+    expect_type(is_linux(), 'logical')
+    expect_type(is_macos(), 'logical')
 })

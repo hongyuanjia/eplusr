@@ -285,7 +285,7 @@ test_that("parse_idd_file()", {
 
 # parse_idd_file("EPW.idd") {{{
 test_that("parse_idd_file()", {
-    expect_is(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
+    expect_type(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
 
     # can get Idd version
     expect_equal(idd_parsed$version, as.numeric_version("1.0.0"))
@@ -324,7 +324,7 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$field$field_id, 1:149)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
     expect_equal(fld$units, NA_character_)
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -351,7 +351,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$missing_num, NA_real_)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Liquid Precip Depth"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[field_name == "Liquid Precip Depth"], "data.table")
     expect_equal(fld$units, "mm")
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -378,7 +378,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$missing_num, 999)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Dry Bulb Temperature"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[field_name == "Dry Bulb Temperature"], "data.table")
     expect_equal(fld$has_exist, TRUE)
     expect_equal(fld$exist_maximum, 99.9)
     expect_equal(fld$exist_minimum, -Inf)
@@ -396,16 +396,19 @@ test_that("parse_idd_file()", {
 test_that("parse_idf_file()", {
     # get version {{{
     # Normal formatted
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         get_idf_ver(data.table(string = c("Version,", "8.6;"), line = 1:2)),
         numeric_version(8.6)
     )
     # One line formatted
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         get_idf_ver(data.table(string = "Version, 8.6;", line = 1)),
         numeric_version(8.6)
     )
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         get_idf_ver(data.table(string = "Version, 8.6; !- Version", line = 1)),
         numeric_version(8.6)
     )
@@ -468,11 +471,15 @@ test_that("parse_idf_file()", {
 
     # can parse one-line empty object
     expect_silent(idf_parsed <- parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
-    expect_equivalent(idf_parsed$object,
+    expect_equal(
+        ignore_attr = TRUE,
+        idf_parsed$object,
         data.table(object_id = 1:2, object_name = rep(NA_character_, 2),
         object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 764L))
     )
-    expect_equivalent(idf_parsed$value,
+    expect_equal(
+        ignore_attr = TRUE,
+        idf_parsed$value,
         data.table(value_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
         value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 58822L, 58823L))
     )
@@ -482,7 +489,7 @@ test_that("parse_idf_file()", {
     expect_equal(names(idf_value$value),
         c("value_id", "value_chr", "value_num", "object_id", "field_id"))
     expect_equal(idf_value$value$value_id, 1:10)
-    expect_equivalent(idf_value$value$value_num, num)
+    expect_equal(idf_value$value$value_num, num)
     expect_equal(idf_value$value$object_id, c(rep(1, 9), 2))
 
     # can detect invalid lines
@@ -563,6 +570,6 @@ test_that("parse_idf_file()", {
         SurfaceConvectionAlgorithm:Inside   ,
             Simple  ; !- Algorithm
     "
-    expect_is(idf_parsed <- parse_idf_file(idf_str, 8.8), "list")
+    expect_type(idf_parsed <- parse_idf_file(idf_str, 8.8), "list")
 })
 # }}}

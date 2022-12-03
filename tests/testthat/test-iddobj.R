@@ -9,7 +9,7 @@ test_that("IddObject class", {
 
     expect_equal(slash$version(), idd$version())
 
-    expect_is(slash$parent(), "Idd")
+    expect_s3_class(slash$parent(), "Idd")
 
     # Group {{{
     # can use $group_name()
@@ -82,33 +82,37 @@ test_that("IddObject class", {
     expect_equal(slash$field_index(
             c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
     # can use $field_type()
-    expect_equivalent(slash$field_type(c(4, 2)), c("choice", "real"))
+    expect_equal(slash$field_type(c(4, 2)), c("choice", "real"))
 
     # can use $field_note()
-    expect_equivalent(slash$field_note(c(2, 1)), list(NULL, "Test Note Parsing"))
+    expect_equal(slash$field_note(c(2, 1)), list(NULL, "Test Note Parsing"))
 
     # can use $field_unit()
-    expect_equivalent(slash$field_unit(c(4, 2)), c(NA_character_, "m"))
-    expect_equivalent(slash$field_unit(c(4, 2), in_ip = TRUE), c(NA_character_, "in"))
+    expect_equal(slash$field_unit(c(4, 2)), c(NA_character_, "m"))
+    expect_equal(slash$field_unit(c(4, 2), in_ip = TRUE), c(NA_character_, "in"))
 
     # can use $field_default()
-    expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
+    expect_equal(slash$field_default(c(4, 2)),
+        list("Test Character Field 2" = NA_character_, "Test Numeric Field 1" = 2L)
+    )
     expect_silent({val <- slash$field_default(c(4, 2), in_ip = TRUE)})
-    expect_equivalent(unname(val), list(NA_character_, 78.74016), tolerance = 0.001)
+    expect_equal(unname(val), list(NA_character_, 78.74016), tolerance = 0.001)
 
     # can use $field_choice()
-    expect_equivalent(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NULL))
+    expect_equal(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NULL))
 
     # can use $field_range()
-    expect_equivalent(slash$field_range(c(4, 2)),
+    expect_equal(slash$field_range(c(4, 2)),
         list(ranger(NA_real_, FALSE, NA_real_, FALSE), ranger(1L, TRUE, 10, FALSE)))
 
     # can use $field_relation()
-    expect_is(slash$field_relation(), "list")
-    expect_is(slash$field_relation(c(4, 2)), "list")
+    expect_type(slash$field_relation(), "list")
+    expect_type(slash$field_relation(c(4, 2)), "list")
     expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
     expect_equal(nrow(slash$field_relation(c(4, 2), keep = TRUE)$ref_by), 2L)
-    expect_equivalent(slash$field_relation(c(1, 3), keep = TRUE)$ref_to,
+    expect_equal(
+        ignore_attr = TRUE,
+        slash$field_relation(c(1, 3), keep = TRUE)$ref_to,
         data.table(
             class_id = 2L, class_name = "TestSlash",
             field_id = c(2L, 4L), field_index = c(1L, 3L),
@@ -121,7 +125,9 @@ test_that("IddObject class", {
     )
 
     # can use $field_possible()
-    expect_equivalent(slash$field_possible(c(4, 2)),
+    expect_equal(
+        ignore_attr = TRUE,
+        slash$field_possible(c(4, 2)),
         data.table(class_id = 2L, class_name = "TestSlash",
             field_id = c(5L, 3L), field_index = c(4L, 2L),
             field_name = c("Test Character Field 2", "Test Numeric Field 1"),
@@ -221,7 +227,9 @@ test_that("IddObject class", {
 
     # Table {{{
     # can extract class and field info into a data.table
-    expect_equivalent(slash$to_table(),
+    expect_equal(
+        ignore_attr = TRUE,
+        slash$to_table(),
         data.table(
             class = rep("TestSlash", 3L),
             index = 1L:3L,
@@ -232,14 +240,16 @@ test_that("IddObject class", {
 
     # String {{{
     # can convert to a character vector
-    expect_equivalent(slash$to_string(),
+    expect_equal(
+        slash$to_string(),
         c("TestSlash,",
           "    ,                        !- Test Character Field 1",
           "    ,                        !- Test Numeric Field 1 {m}",
           "    ;                        !- Test Numeric Field 2"
         )
     )
-    expect_equivalent(slash$to_string(c("comment1", "comment2"), leading = 0L, sep_at = 0L),
+    expect_equal(
+        slash$to_string(c("comment1", "comment2"), leading = 0L, sep_at = 0L),
         c("!comment1",
           "!comment2",
           "",
@@ -262,7 +272,9 @@ test_that("IddObject class", {
     expect_equal(nrow(res <- use_idd(8.8, "auto")$Lights$outputs()), 25L)
     expect_equal(names(res), c("index", "class", "reported_time_step",
         "report_type", "variable", "units"))
-    expect_equivalent(use_idd(8.8, "auto")$Version$outputs(),
+    expect_equal(
+        ignore_attr = TRUE,
+        use_idd(8.8, "auto")$Version$outputs(),
         data.table(index = integer(),
             class = character(),
             reported_time_step = character(),
@@ -270,7 +282,9 @@ test_that("IddObject class", {
             units = character()
         )
     )
-    expect_equivalent(idd$TestSlash$outputs(),
+    expect_equal(
+        ignore_attr = TRUE,
+        idd$TestSlash$outputs(),
         data.table(index = integer(),
             class = character(),
             reported_time_step = character(),

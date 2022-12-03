@@ -567,8 +567,8 @@ test_that("energyplus()", {
     expect_equal(names(res_imf), c("version", "energyplus", "start_time", "end_time", "exit_status", "output_dir", "file", "run"))
     expect_equal(as.character(res_imf$version), "8.8.0")
     expect_equal(res_imf$energyplus, eplus_config(8.8)$dir)
-    expect_is(res_imf$start_time, "POSIXct")
-    expect_is(res_imf$end_time, "POSIXct")
+    expect_s3_class(res_imf$start_time, "POSIXct")
+    expect_s3_class(res_imf$end_time, "POSIXct")
     expect_equal(res_imf$output_dir, normalizePath(out_dir))
     expect_equal(length(res_imf$file), 57L)
     expect_equal({files <- unlist(res_imf$file); files <- files[!is.na(files)]; length(files)}, 24L)
@@ -576,7 +576,7 @@ test_that("energyplus()", {
     expect_equal(sort(unname(files[names(files) != "epw"])),
         sort(c(list.files(out_dir, "AbsorptionChiller_Macro"), basename(path_resources)))
     )
-    expect_is(res_imf$run, "data.table")
+    expect_s3_class(res_imf$run, "data.table")
     expect_equal(names(res_imf$run),
         c("program", "exit_status", "start_time", "end_time", "stdout", "stderr")
     )
@@ -692,9 +692,9 @@ test_that("run_idf()", {
     path_epw <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     # can run ddy simulation
-    expect_is(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE), "list")
+    expect_type(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE), "list")
     # can specify EnergyPlus version
-    expect_is(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE, eplus = 8.8), "list")
+    expect_type(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE, eplus = 8.8), "list")
     expect_null(res$epw)
     # can stop if failed to find version
     expect_error({
@@ -703,40 +703,40 @@ test_that("run_idf()", {
         run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
     }, "Missing version field")
     # can use input file directory
-    expect_is({
+    expect_type({
         f <- tempfile(fileext = ".idf")
         file.copy(path_idf, f, overwrite = TRUE)
         res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
     }, "list")
 
     # can run simulation with weather
-    expect_is(res <- run_idf(path_idf, path_epw, output_dir = tempdir(), echo = FALSE), "list")
+    expect_type(res <- run_idf(path_idf, path_epw, output_dir = tempdir(), echo = FALSE), "list")
     expect_equal(res$idf, normalizePath(path_idf))
     expect_equal(res$epw, normalizePath(path_epw))
     expect_equal(res$version, numeric_version("8.8.0"))
     expect_equal(res$exit_status, 0L)
-    expect_is(res$start_time, "POSIXct")
-    expect_is(res$end_time, "POSIXct")
+    expect_s3_class(res$start_time, "POSIXct")
+    expect_s3_class(res$end_time, "POSIXct")
     expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
     expect_equal(res$energyplus, normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE))
-    expect_is(res$stdout, "character")
+    expect_type(res$stdout, "character")
     expect_true("stderr" %in% names(res))
-    expect_is(res$process, "process")
+    expect_s3_class(res$process, "process")
     expect_true(file.exists(res$idf))
     expect_true(file.exists(res$epw))
 
     # can run in the background
-    expect_is(proc <- run_idf(path_idf, NULL, output_dir = tempdir(), wait = FALSE), "r_process")
-    expect_is({proc$wait(); res <- proc$get_result()}, "list")
+    expect_s3_class(proc <- run_idf(path_idf, NULL, output_dir = tempdir(), wait = FALSE), "r_process")
+    expect_type({proc$wait(); res <- proc$get_result()}, "list")
     expect_equal(res$idf, normalizePath(path_idf))
     expect_null(res$epw)
     expect_equal(res$version, numeric_version("8.8.0"))
     expect_equal(res$exit_status, 0L)
-    expect_is(res$start_time, "POSIXct")
-    expect_is(res$end_time, "POSIXct")
+    expect_s3_class(res$start_time, "POSIXct")
+    expect_s3_class(res$end_time, "POSIXct")
     expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
     expect_equal(res$energyplus, normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE))
-    expect_is(res$stdout, "character")
+    expect_type(res$stdout, "character")
     expect_null(res$process)
 })
 
@@ -777,7 +777,7 @@ test_that("run_multi()", {
         res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b"))),
         "FAILED"
     )
-    expect_is(res, "data.table")
+    expect_s3_class(res, "data.table")
     expect_equal(names(res), c("index", "status", "idf", "epw", "version",
             "exit_status", "start_time", "end_time", "output_dir", "energyplus",
             "stdout", "stderr"))
@@ -787,16 +787,16 @@ test_that("run_multi()", {
     expect_equal(res$epw, rep(NA_character_, 2))
     expect_equal(res$version, rep("8.8.0", 2))
     expect_equal(res$exit_status > 0, rep(TRUE, 2))
-    expect_is(res$start_time, "POSIXct")
-    expect_is(res$end_time, "POSIXct")
+    expect_s3_class(res$start_time, "POSIXct")
+    expect_s3_class(res$end_time, "POSIXct")
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
 
     expect_silent(res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b")), wait = FALSE))
-    expect_is(res, "r_process")
+    expect_s3_class(res, "r_process")
     expect_equal({res$wait(); res$get_exit_status()}, 0L)
     expect_silent(res <- res$get_result())
-    expect_is(res, "data.table")
+    expect_s3_class(res, "data.table")
     expect_equal(names(res), c("index", "status", "idf", "epw", "version",
             "exit_status", "start_time", "end_time", "output_dir", "energyplus",
             "stdout", "stderr"))
@@ -806,8 +806,8 @@ test_that("run_multi()", {
     expect_equal(res$epw, rep(NA_character_, 2))
     expect_equal(res$version, rep("8.8.0", 2))
     expect_equal(res$exit_status > 0, rep(TRUE, 2))
-    expect_is(res$start_time, "POSIXct")
-    expect_is(res$end_time, "POSIXct")
+    expect_s3_class(res$start_time, "POSIXct")
+    expect_s3_class(res$end_time, "POSIXct")
     expect_equal(res$output_dir, normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE))
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")

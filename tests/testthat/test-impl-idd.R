@@ -11,16 +11,22 @@ test_that("Idd implementation", {
     # }}}
 
     # CLASS {{{
-    expect_equivalent(get_idd_class(idd_parsed),
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idd_class(idd_parsed),
         idd_parsed$class[, .SD, .SDcols = c("class_id", "class_name", "group_id")]
     )
-    expect_equivalent(d <- get_idd_class(idd_parsed, property = c("group_name", "group_id"))[],
+    expect_equal(
+        ignore_attr = TRUE,
+        d <- get_idd_class(idd_parsed, property = c("group_name", "group_id"))[],
         data.table(
             class_id = 1:2, class_name = c("TestSimple", "TestSlash"),
             group_id = 1:2, group_name = c("TestGroup1", "TestGroup2")
         )
     )
-    expect_equivalent(get_idd_class(idd_parsed, property = "group_name"),
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idd_class(idd_parsed, property = "group_name"),
         set(idd_parsed$class[, .SD, .SDcols = c("class_id", "class_name", "group_id")],
             NULL, "group_name", c("TestGroup1", "TestGroup2")
         )
@@ -52,7 +58,9 @@ test_that("Idd implementation", {
             min_fields = c(3L, 0L)
         )
     )
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
+       
         get_idd_class(idd_parsed, NULL, "min_fields"),
         data.table(class_id = c(1L, 2L),
             class_name = c("TestSimple", "TestSlash"), group_id = c(1L, 2L),
@@ -60,10 +68,14 @@ test_that("Idd implementation", {
         )
     )
 
-    expect_equivalent(get_idd_class_field_num(copy(idd_parsed$class)),
+    expect_equal(
+            ignore_attr = TRUE,
+            get_idd_class_field_num(copy(idd_parsed$class)),
         set(copy(idd_parsed$class), NULL, c("input_num", "acceptable_num"), list(0L, c(0L, 3L)))
     )
-    expect_equivalent(names(get_idd_class_field_num(idd_parsed$class[0L])),
+    expect_equal(
+            ignore_attr = TRUE,
+            names(get_idd_class_field_num(idd_parsed$class[0L])),
         names(set(idd_parsed$class[0L], NULL, c("input_num", "acceptable_num"), integer(0))[])
     )
 
@@ -115,7 +127,9 @@ test_that("Idd implementation", {
     # }}}
     # DEL {{{
     expect_error(del_idd_extensible_group(idd_parsed, "TestSimple", 1, strict = TRUE), "Non-extensible class", class = "eplusr_error_non_extensible_class")
-    expect_equivalent((idd_del <- del_idd_extensible_group(idd_added, "TestSlash", 1))$field, idd_parsed$field)
+    expect_equal(
+    ignore_attr = TRUE,
+    (idd_del <- del_idd_extensible_group(idd_added, "TestSlash", 1))$field, idd_parsed$field)
     expect_equal(idd_del$class$num_fields[2L], 4L)
     expect_equal(idd_del$class$num_extensible_group[2L], 1L)
     expect_error(del_idd_extensible_group(idd_del, "TestSlash", 4), "0 left with 1 required", class = "eplusr_error")
@@ -134,7 +148,9 @@ test_that("Idd implementation", {
             rleid = c(1L, rep(2L, 3)), class_name = c("TestSimple", rep("TestSlash", 3))
         )
     )
-    expect_equivalent(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), all = TRUE),
+    expect_equal(
+            ignore_attr = TRUE,
+            get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), all = TRUE),
         data.table(field_id = 1:5, class_id = c(1L, rep(2L, 4)),
             field_index = c(1L, 1:4),
             field_name = c("Test Field", "Test Character Field 1",
@@ -142,7 +158,9 @@ test_that("Idd implementation", {
             rleid = c(1L, rep(2L, 4)), class_name = c("TestSimple", rep("TestSlash", 4))
         )
     )
-    expect_equivalent(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), property = "type_enum"),
+    expect_equal(
+            ignore_attr = TRUE,
+            get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), property = "type_enum"),
         data.table(field_id = 1:4, class_id = c(1L, rep(2L, 3)),
             field_index = c(1L, 1:3),
             field_name = c("Test Field", "Test Character Field 1",
@@ -255,7 +273,9 @@ test_that("Idd implementation", {
     # }}}
 
     # RELATION {{{
-    expect_equivalent(
+    expect_equal(
+            ignore_attr = TRUE,
+           
         get_idd_relation(idd_parsed, name = TRUE),
         data.table(
             class_id = 2L, class_name = "TestSlash",
@@ -265,7 +285,9 @@ test_that("Idd implementation", {
             src_enum = 2L, dep = 0L
         )
     )
-    expect_equivalent(
+    expect_equal(
+            ignore_attr = TRUE,
+           
         get_idd_relation(idd_parsed, name = TRUE, direction = "ref_by"),
         data.table(
             class_id = 2L, class_name = "TestSlash",
@@ -287,16 +309,16 @@ test_that("Idd implementation", {
     expect_error(get_idd_relation(idd_env, class_id = fld$class_id, field_id = fld$field_id), class = "eplusr_error_idd_relation")
 
     fld <- get_idd_field(idd_env, "Construction")
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 29697L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 32850L)
 
     fld <- get_idd_field(idd_env, "Construction", 2L)
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 14L)
 
     fld <- get_idd_field(idd_env, "Construction", 1L)
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", depth = 3L, class = "PlantEquipmentOperationSchemes")), 212L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", depth = 3L, class = "PlantEquipmentOperationSchemes")), 282L)
 
     fld <- get_idd_field(idd_env, "Branch", 3:4)
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 123L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 130L)
 
     fld <- get_idd_field(idd_env, "Pump:ConstantSpeed")
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by",
