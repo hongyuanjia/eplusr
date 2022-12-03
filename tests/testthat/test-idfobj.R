@@ -450,7 +450,7 @@ test_that("$to_table()", {
         )
     )
     expect_equal(
-        ignore_attr = TRUE, 
+        ignore_attr = TRUE,
         con$to_table(all = TRUE, unit = TRUE, wide = TRUE, string_value = FALSE),
         data.table(id = 2L, name = "WALL-1", class = "Construction",
             Name = "WALL-1", `Outside Layer` = "WD01", `Layer 2` = "PW03",
@@ -460,8 +460,7 @@ test_that("$to_table()", {
         )
     )
     expect_equal(
-        ignore_attr = TRUE, tolerance = 1e-5
-       
+        ignore_attr = TRUE, tolerance = 1e-5,
         mat$to_table(string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
             field = mat$definition()$field_name(),
@@ -472,8 +471,7 @@ test_that("$to_table()", {
         )
     )
     expect_equal(
-        ignore_attr = TRUE, tolerance = 1e-5
-       
+        ignore_attr = TRUE, tolerance = 1e-5,
         mat$to_table(wide = TRUE, string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", Name = "WD01",
             `Roughness` = "MediumSmooth",

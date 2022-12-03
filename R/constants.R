@@ -143,7 +143,7 @@ utils::globalVariables(c(
     "area", "dt", "interval_type", "new_rleid", "time_index", "i.time_index",
     "i.environment_name", "i.environment_type", "i.simulation_index", "i.new",
     "value_lower_start", "expand_obj", "i.year", "provider", "energyplus_exe",
-    "exist", "resources", "ver", "Name", "param_index"
+    "exist", "resources", "ver", "Name", "param_index", "i.space_name"
 ))
 # }}}
 # nocov end
