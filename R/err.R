@@ -119,7 +119,7 @@ parse_err_file <- function (path) {
         # EnergyPlus {{{
         if (!is_trans) {
             # EnergyPlus version and build
-            ver_bld <- stri_match_first_regex(err_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
+            ver_bld <- stri_match_first_regex(err_head[3L], "Version (\\d{1,2}\\.\\d\\.\\d)-([0-9a-z]{10})")
             if (!is.na(ver_bld[, 2L])) att$eplus_version <- standardize_ver(ver_bld[, 2L])
             if (!is.na(ver_bld[, 3L])) att$eplus_build <- ver_bld[, 3L]
 
@@ -128,12 +128,12 @@ parse_err_file <- function (path) {
             if(!is.na(d)) att$datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
 
             # IDD version
-            v <- stri_match_first_regex(err_head[5L], "IDD_Version (\\d\\.\\d\\.\\d)")[, 2L]
+            v <- stri_match_first_regex(err_head[5L], "IDD_Version (\\d{1,2}\\.\\d\\.\\d)")[, 2L]
             if (!is.na(v)) att$idd_version <- standardize_ver(v)
         # }}}
         # IDFVersionUpdater {{{
         } else {
-            trans_ver <- stri_match_first_regex(err_head[2L], "Conversion (\\d\\.\\d) => (\\d\\.\\d)")
+            trans_ver <- stri_match_first_regex(err_head[2L], "Conversion (\\d{1,2}\\.\\d) => (\\d{1,2}\\.\\d)")
             if (!is.na(trans_ver[, 2L])) att$from <- standardize_ver(trans_ver[, 2L])
             if (!is.na(trans_ver[, 3L])) att$to <- standardize_ver(trans_ver[, 3L])
             att$successful <- stri_detect_fixed(err_dt[.N, string], "Conversion Completed Successfully")
