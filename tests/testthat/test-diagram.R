@@ -2,7 +2,7 @@ test_that("HVAC Diagram", {
     skip_on_cran()
 
     eplusr_option(verbose_info = FALSE)
-    example <- copy_example()
+    example <- copy_example(LATEST_EPLUS_VER)
 
     expect_silent(job <- eplus_job(example$idf, example$epw))
 
