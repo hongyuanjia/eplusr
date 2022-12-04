@@ -11,6 +11,7 @@
 ## Bug fixes
 
 * `IdfGeometry$convert()` now work for EnergyPlus v9.6 and above (#536).
+* Now IMF files can be handled correctly (#537).
 
 ## Internal refactor
 
