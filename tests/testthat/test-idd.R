@@ -52,7 +52,7 @@ test_that("can read IDD", {
     # can search in VersionUpdater folder if "Energy+.idd" is not found in
     # EnergyPlus folder
     use_eplus(LATEST_EPLUS_VER)
-    f1 <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "Energy+.idd")
+    f1 <- path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
     f1_bak <- paste0(f1, ".bak")
     file.rename(f1, f1_bak)
     expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")

@@ -86,7 +86,7 @@ test_that("get_idfobj_possible()", {
 
     skip_on_cran()
 
-    idf_env <- parse_idf_file(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
     expect_equal(length(get_idfobj_possible(idd_env, idf_env, object = 278, 11)$source[[1]]), 88)
 })
 # }}}

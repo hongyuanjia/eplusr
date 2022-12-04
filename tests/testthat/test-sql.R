@@ -93,7 +93,7 @@ test_that("Sql methods", {
 
     expect_equal(
         ignore_attr = TRUE,
-        read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
+        read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$
             run(NULL, tempdir(), echo = FALSE)$
             tabular_data(table_name = "Site and Source Energy", wide = TRUE)[[1]][
             , lapply(.SD, class)],

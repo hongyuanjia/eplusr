@@ -277,7 +277,7 @@ test_that("parse_idd_file()", {
 
     skip_on_cran()
     # can fix ConnectorList references
-    idd <- parse_idd_file(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "Energy+.idd"))
+    idd <- parse_idd_file(path_eplus(LATEST_EPLUS_VER, "Energy+.idd"))
     id <- idd$class[J("ConnectorList"), on = "class_name", class_id]
     expect_true(idd$reference[J(id), on = "class_id", .N > 0])
 })

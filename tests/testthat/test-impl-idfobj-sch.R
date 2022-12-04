@@ -4,7 +4,7 @@ eplusr_option(verbose_info = FALSE)
 test_that("parse_sch_cmpt()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()
@@ -91,7 +91,7 @@ test_that("parse_sch_cmpt()", {
 test_that("compose_sch_cmpt()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()
@@ -284,7 +284,7 @@ test_that("expand_sch_time()", {
 test_that("get_sch_type_limits()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()

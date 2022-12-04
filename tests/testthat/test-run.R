@@ -827,6 +827,6 @@ test_that("run_multi()", {
     expect_s3_class(res$start_time, "POSIXct")
     expect_s3_class(res$end_time, "POSIXct")
     expect_equal(res$output_dir, normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE))
-    expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(LATEST_EPLUS_VER)$dir, eplus_config(LATEST_EPLUS_VER)$exe), mustWork = TRUE), 2L))
+    expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
     checkmate::expect_list(res$stdout, "character")
 })

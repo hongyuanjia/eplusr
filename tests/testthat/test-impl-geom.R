@@ -217,7 +217,7 @@ test_that("Align coordinate system", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "4ZoneWithShading_Simple_1.idf"))
     cls <- get_geom_class(idf)
 
     expect_warning(expect_type(geoms <- extract_geom(idf), "list"))
@@ -237,7 +237,7 @@ test_that("subset_geom", {
     skip_on_cran()
 
     # simple shading
-    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf"))
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "4ZoneWithShading_Simple_1.idf"))
     expect_warning(expect_type(geoms <- extract_geom(idf), "list"))
     expect_type(l <- subset_geom(geoms, "all"), "list")
     expect_equal(nrow(l$surface), 24L)

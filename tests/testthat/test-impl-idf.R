@@ -493,7 +493,7 @@ test_that("table", {
     # read a more complex model
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles", "5Zone_Transformer.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     idf_env <- parse_idf_file(path_idf, LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
@@ -505,7 +505,7 @@ test_that("table", {
 
     # NODE RELATION {{{
     # read idf
-    path_idf <- file.path(eplus_config("latest")$dir, "ExampleFiles", "5Zone_Transformer.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VEr, "5Zone_Transformer.idf")
     idf_env <- parse_idf_file(path_idf, "latest")
     idd_env <- get_priv_env(use_idd("latest"))$idd_env()
 

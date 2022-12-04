@@ -63,7 +63,7 @@ test_that("IdfViewer Implemention", {
     expect_type(id_surface <- rgl_view_surface(dev, geoms, "normal"), "integer")
 
     # complex model
-    idf <- read_idf(file.path(eplus_config(LATEST_EPLUS_VER)$dir, "ExampleFiles/HospitalLowEnergy.idf"))
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "HospitalLowEnergy.idf"))
     expect_type(geoms <- extract_geom(idf), "list")
     expect_type(geoms <- align_coord_system(geoms, "relative", "relative", "relative"), "list")
     expect_equal(unlist(geoms$rules[3:5], FALSE, FALSE), rep("relative", 3L))
