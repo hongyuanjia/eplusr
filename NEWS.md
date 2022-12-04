@@ -1,3 +1,9 @@
+# eplusr (development version)
+
+## Bug fixes
+
+* Now IMF files can be handled correctly (#537).
+
 # eplusr 0.15.3
 
 ## Bug fixes

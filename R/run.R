@@ -1062,9 +1062,17 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
         if (!is.null(idd)) args <- c(args, "--idd", normalizePath(idd, mustWork = FALSE))
         if (!is.null(weather)) args <- c(args, "--weather", normalizePath(weather, mustWork = FALSE))
 
-        args <- c(args, cmd$model)
+        # NOTE: if input file has an extension of 'epmidf' or 'epmidf', create
+        # an IDF file with the same name
+        model <- cmd$model
+        if (clean_idf <- tools::file_ext(model) %in% c("epmidf", "expidf")) {
+            model <- file_copy(model, file.path(dirname(model), sprintf("%s.idf", tools::file_path_sans_ext(basename(model)))))
+        }
+
+        args <- c(args, model)
 
         file_callback <- function() {
+            if (clean_idf) unlink(model)
             file <- list()
             file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
             if (!is.null(cmd$weather)) {
@@ -1662,7 +1670,7 @@ run_energyplus <- function(
             unlink(cmd$idf)
 
             # use the expanded model as the input for later simulation
-            cmd$idf <- file_copy(file$expidf, path_sim2(("_expanded.idf")))
+            cmd$idf <- file_copy(file$expidf, path_sim2("_expanded.idf"))
         }
 
         if (!is.na(res_expandobj$file$experr)) {
