@@ -429,11 +429,11 @@ element `.comment`.
 For example, here we add two new objects with comments in `RunPeriod` class:
 
 ```{r add_obj}
-rp1 <- list(RunPeriod = list("rp_test_1", 1, 1, 2, 1, .comment = c("Comment for new object 1", "Another comment")))
+rp1 <- list(RunPeriod = list("rp_test_1", 1, 1, NULL, 2, 1, .comment = c("Comment for new object 1", "Another comment")))
 
 model$add(rp1,
   RunPeriod = .(name = "rp_test_2", begin_month = 3, begin_day_of_month = 1,
-    ..4 = 4, ..5 = 1, .comment = "Comment for new object 2"
+    ..5 = 4, ..6 = 1, .comment = "Comment for new object 2"
   )
 )
 ```
@@ -474,8 +474,8 @@ You can modify all objects in a class using `class := list(...)`:
 
 ```{r}
 model$set(RunPeriod := .(
-  ..6 = c("Monday", "Tuesday", "Wednesday", "Thursday"),
-  ..8 = "No"
+  ..8 = c("Monday", "Tuesday", "Wednesday", "Thursday"),
+  ..10 = "No"
 ))
 ```
 
@@ -485,7 +485,7 @@ model$set(RunPeriod := .(
 Multiple objects can be grouped inside `.()` or `c()`:
 
 ```{r}
-model$set(.("WinterDay", "SummerDay") := .(..8 = "Yes"))
+model$set(.("WinterDay", "SummerDay") := .(..10 = "Yes"))
 ```
 
 For setting a single value on one object, you can write it in a chain:
