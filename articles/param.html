@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9002</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-04</h4>
+            <h4 data-toc-skip class="date">2022-12-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/param.Rmd" class="external-link"><code>vignettes/param.Rmd</code></a></small>
       <div class="hidden name"><code>param.Rmd</code></div>
@@ -166,13 +166,13 @@ giving a seed model and a weather file.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hongyuanjia.github.io/eplusr/">eplusr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
-<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
+<span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="va">idf</span><span class="op">$</span><span class="va">SimulationControl</span><span class="op">$</span><span class="va">Run_Simulation_for_Weather_File_Run_Periods</span> <span class="op">&lt;-</span> <span class="st">"Yes"</span></span>
@@ -295,17 +295,17 @@ investigations.</p>
 <span><span class="co">#&gt; 3|RUNNING    --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
 <span><span class="co">#&gt; 1|COMPLETED  --&gt; [IDF]'Ori.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
 <span><span class="co">#&gt; 4|RUNNING    --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
-<span><span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
-<span><span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
 <span><span class="co">#&gt; 3|COMPLETED  --&gt; [IDF]'LED.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300...</span></span>
+<span><span class="co">#&gt; 5|RUNNING    --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
+<span><span class="co">#&gt; 4|COMPLETED  --&gt; [IDF]'0.6Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
 <span><span class="co">#&gt; 6|RUNNING    --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span></span>
 <span><span class="co">#&gt; 5|COMPLETED  --&gt; [IDF]'0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.AP.72...</span></span>
 <span><span class="co">#&gt; 6|COMPLETED  --&gt; [IDF]'LED+0.2Frac.idf' + [EPW]'USA_IL_Chicago-OHare.Intl.A...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Seed: '/tmp/Rtmp36rnE8/MediumOffice.idf'</span></span>
-<span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.In...</span></span>
-<span><span class="co">#&gt; * EnergyPlus Version: '8.8.0'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-8-8-0'</span></span>
+<span><span class="co">#&gt; * Seed: '/tmp/RtmpiLCzgP/MediumOffice.idf'</span></span>
+<span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.I...</span></span>
+<span><span class="co">#&gt; * EnergyPlus Version: '22.1.0'</span></span>
+<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-22-1-0'</span></span>
 <span><span class="co">#&gt; Applied Measure: 'ecm'</span></span>
 <span><span class="co">#&gt; Parametric Models [6]: </span></span>
 <span><span class="co">#&gt; [1]: 'Ori.idf'         &lt;-- SUCCEEDED</span></span>
@@ -314,7 +314,7 @@ investigations.</p>
 <span><span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-12-04 15:38:23' and completed successfully after 2.82 mins.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-12-05 14:42:23' and completed successfully after 3.31 mins.</span></span></span>
 <span></span>
 <span><span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -334,19 +334,19 @@ investigations.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $job_status</span></span>
 <span><span class="co">#&gt;    index    status                                         idf</span></span>
-<span><span class="co">#&gt; 1:     1 completed                 /tmp/Rtmp36rnE8/Ori/Ori.idf</span></span>
-<span><span class="co">#&gt; 2:     2 completed                   /tmp/Rtmp36rnE8/T5/T5.idf</span></span>
-<span><span class="co">#&gt; 3:     3 completed                 /tmp/Rtmp36rnE8/LED/LED.idf</span></span>
-<span><span class="co">#&gt; 4:     4 completed         /tmp/Rtmp36rnE8/0.6Frac/0.6Frac.idf</span></span>
-<span><span class="co">#&gt; 5:     5 completed         /tmp/Rtmp36rnE8/0.2Frac/0.2Frac.idf</span></span>
-<span><span class="co">#&gt; 6:     6 completed /tmp/Rtmp36rnE8/LED+0.2Frac/LED+0.2Frac.idf</span></span>
-<span><span class="co">#&gt;                                                                                     epw</span></span>
-<span><span class="co">#&gt; 1: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
-<span><span class="co">#&gt; 2: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
-<span><span class="co">#&gt; 3: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
-<span><span class="co">#&gt; 4: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
-<span><span class="co">#&gt; 5: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
-<span><span class="co">#&gt; 6: /usr/local/EnergyPlus-8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpiLCzgP/Ori/Ori.idf</span></span>
+<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpiLCzgP/T5/T5.idf</span></span>
+<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpiLCzgP/LED/LED.idf</span></span>
+<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpiLCzgP/0.6Frac/0.6Frac.idf</span></span>
+<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpiLCzgP/0.2Frac/0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpiLCzgP/LED+0.2Frac/LED+0.2Frac.idf</span></span>
+<span><span class="co">#&gt;                                                                                      epw</span></span>
+<span><span class="co">#&gt; 1: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 2: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 3: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 4: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 5: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
+<span><span class="co">#&gt; 6: /usr/local/EnergyPlus-22-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
 <span><span class="va">....</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -429,35 +429,35 @@ simulations.</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">!=</span> <span class="st">"Pumps"</span>, <span class="va">category</span> <span class="op">!=</span> <span class="st">"Exterior Lighting"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_eui</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            case           category    eui</span></span>
-<span><span class="co">#&gt;  1:         Ori     Total End Uses 152.18</span></span>
-<span><span class="co">#&gt;  2:     0.6Frac     Total End Uses 147.62</span></span>
-<span><span class="co">#&gt;  3:     0.2Frac     Total End Uses 143.35</span></span>
-<span><span class="co">#&gt;  4:          T5     Total End Uses 140.83</span></span>
-<span><span class="co">#&gt;  5:         LED     Total End Uses 134.81</span></span>
-<span><span class="co">#&gt;  6: LED+0.2Frac     Total End Uses 126.40</span></span>
+<span><span class="co">#&gt;  1:         Ori     Total End Uses 154.08</span></span>
+<span><span class="co">#&gt;  2:     0.6Frac     Total End Uses 149.55</span></span>
+<span><span class="co">#&gt;  3:     0.2Frac     Total End Uses 145.28</span></span>
+<span><span class="co">#&gt;  4:          T5     Total End Uses 142.69</span></span>
+<span><span class="co">#&gt;  5:         LED     Total End Uses 136.67</span></span>
+<span><span class="co">#&gt;  6: LED+0.2Frac     Total End Uses 128.27</span></span>
 <span><span class="co">#&gt;  7:         Ori Interior Equipment  59.46</span></span>
 <span><span class="co">#&gt;  8:          T5 Interior Equipment  59.46</span></span>
 <span><span class="co">#&gt;  9:         LED Interior Equipment  59.46</span></span>
 <span><span class="co">#&gt; 10:     0.6Frac Interior Equipment  52.74</span></span>
 <span><span class="co">#&gt; 11:     0.2Frac Interior Equipment  46.01</span></span>
 <span><span class="co">#&gt; 12: LED+0.2Frac Interior Equipment  46.01</span></span>
-<span><span class="co">#&gt; 13: LED+0.2Frac            Heating  35.94</span></span>
-<span><span class="co">#&gt; 14:         Ori  Interior Lighting  33.80</span></span>
-<span><span class="co">#&gt; 15:     0.6Frac  Interior Lighting  33.80</span></span>
-<span><span class="co">#&gt; 16:     0.2Frac  Interior Lighting  33.80</span></span>
-<span><span class="co">#&gt; 17:     0.2Frac            Heating  33.09</span></span>
-<span><span class="co">#&gt; 18:     0.6Frac            Heating  30.30</span></span>
-<span><span class="co">#&gt; 19:         LED            Heating  30.22</span></span>
-<span><span class="co">#&gt; 20:          T5            Heating  29.34</span></span>
-<span><span class="co">#&gt; 21:         Ori            Heating  27.73</span></span>
+<span><span class="co">#&gt; 13: LED+0.2Frac            Heating  36.69</span></span>
+<span><span class="co">#&gt; 14:     0.2Frac            Heating  33.90</span></span>
+<span><span class="co">#&gt; 15:         Ori  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 16:     0.6Frac  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 17:     0.2Frac  Interior Lighting  33.80</span></span>
+<span><span class="co">#&gt; 18:     0.6Frac            Heating  31.10</span></span>
+<span><span class="co">#&gt; 19:         LED            Heating  30.96</span></span>
+<span><span class="co">#&gt; 20:          T5            Heating  30.09</span></span>
+<span><span class="co">#&gt; 21:         Ori            Heating  28.52</span></span>
 <span><span class="co">#&gt; 22:          T5  Interior Lighting  21.99</span></span>
 <span><span class="co">#&gt; 23:         LED  Interior Lighting  15.71</span></span>
 <span><span class="co">#&gt; 24: LED+0.2Frac  Interior Lighting  15.71</span></span>
-<span><span class="co">#&gt; 25:         Ori            Cooling  14.44</span></span>
-<span><span class="co">#&gt; 26:     0.6Frac            Cooling  14.08</span></span>
-<span><span class="co">#&gt; 27:     0.2Frac            Cooling  13.77</span></span>
-<span><span class="co">#&gt; 28:          T5            Cooling  13.51</span></span>
-<span><span class="co">#&gt; 29:         LED            Cooling  13.01</span></span>
+<span><span class="co">#&gt; 25:         Ori            Cooling  15.31</span></span>
+<span><span class="co">#&gt; 26:     0.6Frac            Cooling  14.95</span></span>
+<span><span class="co">#&gt; 27:     0.2Frac            Cooling  14.65</span></span>
+<span><span class="co">#&gt; 28:          T5            Cooling  14.37</span></span>
+<span><span class="co">#&gt; 29:         LED            Cooling  13.88</span></span>
 <span><span class="va">....</span></span>
 <span></span>
 <span><span class="co"># extract the seed model, i.e. "Ori" case as the baseline</span></span>
@@ -469,36 +469,36 @@ simulations.</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>savings <span class="op">=</span> <span class="op">(</span><span class="va">eui_ori</span> <span class="op">-</span> <span class="va">eui</span><span class="op">)</span> <span class="op">/</span> <span class="va">eui_ori</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">case</span> <span class="op">!=</span> <span class="st">"Ori"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param_savings</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            case           category    eui eui_ori    savings</span></span>
-<span><span class="co">#&gt;  1:     0.6Frac     Total End Uses 147.62  152.18   2.996452</span></span>
-<span><span class="co">#&gt;  2:     0.2Frac     Total End Uses 143.35  152.18   5.802339</span></span>
-<span><span class="co">#&gt;  3:          T5     Total End Uses 140.83  152.18   7.458273</span></span>
-<span><span class="co">#&gt;  4:         LED     Total End Uses 134.81  152.18  11.414115</span></span>
-<span><span class="co">#&gt;  5: LED+0.2Frac     Total End Uses 126.40  152.18  16.940465</span></span>
-<span><span class="co">#&gt;  6:          T5 Interior Equipment  59.46   59.46   0.000000</span></span>
-<span><span class="co">#&gt;  7:         LED Interior Equipment  59.46   59.46   0.000000</span></span>
-<span><span class="co">#&gt;  8:     0.6Frac Interior Equipment  52.74   59.46  11.301715</span></span>
-<span><span class="co">#&gt;  9:     0.2Frac Interior Equipment  46.01   59.46  22.620249</span></span>
-<span><span class="co">#&gt; 10: LED+0.2Frac Interior Equipment  46.01   59.46  22.620249</span></span>
-<span><span class="co">#&gt; 11: LED+0.2Frac            Heating  35.94   27.73 -29.606924</span></span>
-<span><span class="co">#&gt; 12:     0.6Frac  Interior Lighting  33.80   33.80   0.000000</span></span>
-<span><span class="co">#&gt; 13:     0.2Frac  Interior Lighting  33.80   33.80   0.000000</span></span>
-<span><span class="co">#&gt; 14:     0.2Frac            Heating  33.09   27.73 -19.329246</span></span>
-<span><span class="co">#&gt; 15:     0.6Frac            Heating  30.30   27.73  -9.267941</span></span>
-<span><span class="co">#&gt; 16:         LED            Heating  30.22   27.73  -8.979445</span></span>
-<span><span class="co">#&gt; 17:          T5            Heating  29.34   27.73  -5.805986</span></span>
-<span><span class="co">#&gt; 18:          T5  Interior Lighting  21.99   33.80  34.940828</span></span>
-<span><span class="co">#&gt; 19:         LED  Interior Lighting  15.71   33.80  53.520710</span></span>
-<span><span class="co">#&gt; 20: LED+0.2Frac  Interior Lighting  15.71   33.80  53.520710</span></span>
-<span><span class="co">#&gt; 21:     0.6Frac            Cooling  14.08   14.44   2.493075</span></span>
-<span><span class="co">#&gt; 22:     0.2Frac            Cooling  13.77   14.44   4.639889</span></span>
-<span><span class="co">#&gt; 23:          T5            Cooling  13.51   14.44   6.440443</span></span>
-<span><span class="co">#&gt; 24:         LED            Cooling  13.01   14.44   9.903047</span></span>
-<span><span class="co">#&gt; 25: LED+0.2Frac            Cooling  12.41   14.44  14.058172</span></span>
-<span><span class="co">#&gt; 26:     0.6Frac               Fans   3.72    3.77   1.326260</span></span>
-<span><span class="co">#&gt; 27:     0.2Frac               Fans   3.68    3.77   2.387268</span></span>
-<span><span class="co">#&gt; 28:          T5               Fans   3.55    3.77   5.835544</span></span>
-<span><span class="co">#&gt; 29:         LED               Fans   3.43    3.77   9.018568</span></span>
+<span><span class="co">#&gt;            case           category    eui eui_ori     savings</span></span>
+<span><span class="co">#&gt;  1:     0.6Frac     Total End Uses 149.55  154.08   2.9400312</span></span>
+<span><span class="co">#&gt;  2:     0.2Frac     Total End Uses 145.28  154.08   5.7113188</span></span>
+<span><span class="co">#&gt;  3:          T5     Total End Uses 142.69  154.08   7.3922638</span></span>
+<span><span class="co">#&gt;  4:         LED     Total End Uses 136.67  154.08  11.2993250</span></span>
+<span><span class="co">#&gt;  5: LED+0.2Frac     Total End Uses 128.27  154.08  16.7510384</span></span>
+<span><span class="co">#&gt;  6:          T5 Interior Equipment  59.46   59.46   0.0000000</span></span>
+<span><span class="co">#&gt;  7:         LED Interior Equipment  59.46   59.46   0.0000000</span></span>
+<span><span class="co">#&gt;  8:     0.6Frac Interior Equipment  52.74   59.46  11.3017154</span></span>
+<span><span class="co">#&gt;  9:     0.2Frac Interior Equipment  46.01   59.46  22.6202489</span></span>
+<span><span class="co">#&gt; 10: LED+0.2Frac Interior Equipment  46.01   59.46  22.6202489</span></span>
+<span><span class="co">#&gt; 11: LED+0.2Frac            Heating  36.69   28.52 -28.6465638</span></span>
+<span><span class="co">#&gt; 12:     0.2Frac            Heating  33.90   28.52 -18.8639551</span></span>
+<span><span class="co">#&gt; 13:     0.6Frac  Interior Lighting  33.80   33.80   0.0000000</span></span>
+<span><span class="co">#&gt; 14:     0.2Frac  Interior Lighting  33.80   33.80   0.0000000</span></span>
+<span><span class="co">#&gt; 15:     0.6Frac            Heating  31.10   28.52  -9.0462833</span></span>
+<span><span class="co">#&gt; 16:         LED            Heating  30.96   28.52  -8.5553997</span></span>
+<span><span class="co">#&gt; 17:          T5            Heating  30.09   28.52  -5.5049088</span></span>
+<span><span class="co">#&gt; 18:          T5  Interior Lighting  21.99   33.80  34.9408284</span></span>
+<span><span class="co">#&gt; 19:         LED  Interior Lighting  15.71   33.80  53.5207101</span></span>
+<span><span class="co">#&gt; 20: LED+0.2Frac  Interior Lighting  15.71   33.80  53.5207101</span></span>
+<span><span class="co">#&gt; 21:     0.6Frac            Cooling  14.95   15.31   2.3514043</span></span>
+<span><span class="co">#&gt; 22:     0.2Frac            Cooling  14.65   15.31   4.3109079</span></span>
+<span><span class="co">#&gt; 23:          T5            Cooling  14.37   15.31   6.1397779</span></span>
+<span><span class="co">#&gt; 24:         LED            Cooling  13.88   15.31   9.3403005</span></span>
+<span><span class="co">#&gt; 25: LED+0.2Frac            Cooling  13.28   15.31  13.2593076</span></span>
+<span><span class="co">#&gt; 26:     0.6Frac               Fans   3.97    4.01   0.9975062</span></span>
+<span><span class="co">#&gt; 27:     0.2Frac               Fans   3.93    4.01   1.9950125</span></span>
+<span><span class="co">#&gt; 28:          T5               Fans   3.79    4.01   5.4862843</span></span>
+<span><span class="co">#&gt; 29:         LED               Fans   3.67    4.01   8.4788030</span></span>
 <span><span class="va">....</span></span>
 <span></span>
 <span><span class="co"># plot a bar chart to show the energy savings</span></span>

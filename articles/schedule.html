@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9002</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-04</h4>
+            <h4 data-toc-skip class="date">2022-12-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -156,7 +156,9 @@ the usual <code>Field #</code> manner.</p>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
 <span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-8-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-8-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span></span>

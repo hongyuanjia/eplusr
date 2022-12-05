@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9002</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-04</h4>
+            <h4 data-toc-skip class="date">2022-12-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -189,14 +189,14 @@ release to parse the input IDF.</p>
 using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '8.8.0'</span></span>
+<span><span class="co">#&gt; [1] '22.1.0'</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $version</span></span>
-<span><span class="co">#&gt; [1] '8.8.0'</span></span>
+<span><span class="co">#&gt; [1] '22.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dir</span></span>
-<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-8-8-0"</span></span>
+<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-22-1-0"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $exe</span></span>
 <span><span class="co">#&gt; [1] "energyplus"</span></span></code></pre></div>
@@ -204,11 +204,11 @@ using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 add that location using <code><a href="../reference/use_eplus.html">use_eplus()</a></code>. After adding, all
 models of that version will use this path to call EnergyPlus.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV8-8-0"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV22-1-0"</span><span class="op">)</span></span></code></pre></div>
 <p>If the needed version of EnergyPlus was not installed, you can use
 <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">8.8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">22.1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
@@ -217,15 +217,15 @@ models of that version will use this path to call EnergyPlus.</p>
 whole EnergyPlus software. You can just download the IDD file of that
 version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code>
 to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will
-download IDD file for EnergyPlus v8.8.0, parse it and create an
+download IDD file for EnergyPlus v22.1.0, parse it and create an
 <code>Idd</code> object that will be used whenever parsing all
-EnergyPlus models of version v8.8.</p>
+EnergyPlus models of version v22.1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">22.1</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">22.1</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -237,7 +237,7 @@ similar style you see in IDF Editor, with additional heading lines
 showing the <code>Path</code>, <code>Version</code> of the model. The
 classes of objects in the model are ordered by groups and the number of
 objects in classes are shown in square bracket.</p>
-<p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As we
+<p>Now let’s read an IDF file distributed with EnergyPlus 22.1.0. As we
 have already got the IDD, we can just ignore the <code>idd</code>
 argument.</p>
 <p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is
@@ -248,18 +248,18 @@ IDFs from v7.2 to v9.1 can be parsed using simply
 because eplusr will use IDD files distributed with EnergyPlus
 VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span></span>
 <span><span class="va">model</span></span>
 <span><span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-8-8-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt;  * Version: '8.8.0'</span></span>
+<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-22-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  * Version: '22.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span></span>
 <span><span class="co">#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span></span>
@@ -599,14 +599,14 @@ marked with <code>*</code>. For example, you can get the
 <p>You can also achieve this using methods in <code>Idd</code>
 class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># idd$object("Material")</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="co"># idd_object(8.8, "Material")</span></span></code></pre></div>
+<span><span class="co"># idd_object(22.1, "Material")</span></span></code></pre></div>
 <p>With the <code>IddObject</code>, you can easily get class and field
 properties using methods it has.</p>
 <p>For example, you can get all default field values using
@@ -789,7 +789,7 @@ returns a single <code>IdfObject</code> object.</p>
 <span><span class="co">#&gt; ├─ 1: "Building",     !- Name</span></span>
 <span><span class="co">#&gt; │─ 2: 30,             !- North Axis {deg}</span></span>
 <span><span class="co">#&gt; │─ 3: "City",         !- Terrain</span></span>
-<span><span class="co">#&gt; │─ 4: 0.04,           !- Loads Convergence Tolerance Value</span></span>
+<span><span class="co">#&gt; │─ 4: 0.04,           !- Loads Convergence Tolerance Value {W}</span></span>
 <span><span class="co">#&gt; │─ 5: 0.4,            !- Temperature Convergence Tolerance Value {deltaC}</span></span>
 <span><span class="co">#&gt; │─ 6: "FullExterior", !- Solar Distribution</span></span>
 <span><span class="co">#&gt; │─ 7: 25,             !- Maximum Number of Warmup Days</span></span>
@@ -943,11 +943,11 @@ special element <code>.comment</code>.</p>
 <p>For example, here we add two new objects with comments in
 <code>RunPeriod</code> class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">rp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>RunPeriod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"rp_test_1"</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="cn">NULL</span>, <span class="fl">2</span>, <span class="fl">1</span>, .comment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Comment for new object 1"</span>, <span class="st">"Another comment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">rp1</span>,</span>
 <span>  RunPeriod <span class="op">=</span> <span class="fu">.</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"rp_test_2"</span>, begin_month <span class="op">=</span> <span class="fl">3</span>, begin_day_of_month <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>    ..4 <span class="op">=</span> <span class="fl">4</span>, ..5 <span class="op">=</span> <span class="fl">1</span>, .comment <span class="op">=</span> <span class="st">"Comment for new object 2"</span></span>
+<span>    ..5 <span class="op">=</span> <span class="fl">4</span>, ..6 <span class="op">=</span> <span class="fl">1</span>, .comment <span class="op">=</span> <span class="st">"Comment for new object 2"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $rp_test_1</span></span>
@@ -957,17 +957,13 @@ special element <code>.comment</code>.</p>
 <span><span class="co">#&gt; !Another comment</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "rp_test_1",      !- Name</span></span>
-<span><span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span></span>
-<span><span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 2,                !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; ├─ 1*: "rp_test_1", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: 1,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 3*: 1,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 5*: 2,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 6*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; └─ 7 : &lt;Blank&gt;;     !- End Year</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $rp_test_2</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span></span>
@@ -975,17 +971,13 @@ special element <code>.comment</code>.</p>
 <span><span class="co">#&gt; !Comment for new object 2</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "rp_test_2",      !- Name</span></span>
-<span><span class="co">#&gt; │─ 02*: 3,                !- Begin Month</span></span>
-<span><span class="co">#&gt; │─ 03*: 1,                !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 4,                !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
+<span><span class="co">#&gt; ├─ 1*: "rp_test_2", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: 3,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 3*: 1,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 5*: 4,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 6*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; └─ 7 : &lt;Blank&gt;;     !- End Year</span></span></code></pre></div>
 <p>Note that the use <code>.()</code> inside <code>$add()</code>. It is
 just an alias of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
 <p>If you want to create multiple objects in one go, you can use
@@ -1048,76 +1040,75 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-12-04</span></span>
+<span><span class="co">#&gt; !2022-12-05</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "rp_test_3",      !- Name</span></span>
-<span><span class="co">#&gt; │─ 02*: 1,                !- Begin Month</span></span>
-<span><span class="co">#&gt; │─ 03*: 2,                !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 2,                !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 1,                !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "UseWeatherFile", !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",            !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "Yes",            !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",             !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",            !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";            !- Use Weather File Snow Indicators</span></span></code></pre></div>
+<span><span class="co">#&gt; ├─ 1*: "rp_test_3", !- Name</span></span>
+<span><span class="co">#&gt; │─ 2*: 1,           !- Begin Month</span></span>
+<span><span class="co">#&gt; │─ 3*: 2,           !- Begin Day of Month</span></span>
+<span><span class="co">#&gt; │─ 4 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 5*: 2,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 6*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; └─ 7 : &lt;Blank&gt;;     !- End Year</span></span></code></pre></div>
 <p>You can modify all objects in a class using
 <code>class := list(...)</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">RunPeriod</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span></span>
-<span>  ..6 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,</span>
-<span>  ..8 <span class="op">=</span> <span class="st">"No"</span></span>
+<span>  ..8 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span><span class="op">)</span>,</span>
+<span>  ..10 <span class="op">=</span> <span class="st">"No"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $WinterDay</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "WinterDay", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 1,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 14,          !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Monday",    !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 10 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 11 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 12 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 13 : "Yes";       !- Use Weather File Snow Indicators</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $SummerDay</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "SummerDay", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 7,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 7,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 7,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Tuesday",   !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 10 : "No",        !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 11 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 12 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 13 : "Yes";       !- Use Weather File Snow Indicators</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-12-04</span></span>
+<span><span class="co">#&gt; !2022-12-05</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "rp_test_3", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "rp_test_3", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 2,           !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 2,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Wednesday", !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 2,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Wednesday", !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : &lt;"Blank"&gt;,   !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; └─ 10 : "No";        !- Use Weather File Daylight Saving Period</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $rp_test_2</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:327] `rp_test_2`</span></span>
@@ -1125,17 +1116,16 @@ automatically recycled.</p>
 <span><span class="co">#&gt; !Comment for new object 2</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "rp_test_2", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "rp_test_2", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 3,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 1,           !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 4,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 1,           !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Thursday",  !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "No",        !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 4,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 1,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Thursday",  !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : &lt;"Blank"&gt;,   !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; └─ 10 : "No";        !- Use Weather File Daylight Saving Period</span></span></code></pre></div>
 <blockquote>
 <p>If the target class is store as a variable,
 e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside
@@ -1144,36 +1134,40 @@ e.g. <code>cls &lt;- "RunPeriod"</code>, you can input it inside
 <p>Multiple objects can be grouped inside <code>.()</code> or
 <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..8 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="fu">.</span><span class="op">(</span><span class="st">"WinterDay"</span>, <span class="st">"SummerDay"</span><span class="op">)</span> <span class="op">:=</span> <span class="fu">.</span><span class="op">(</span>..10 <span class="op">=</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $WinterDay</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:8] `WinterDay`</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "WinterDay", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "WinterDay", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 1,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 14,          !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 1,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 14,          !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Monday",    !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 1,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 14,          !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Monday",    !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 11 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 12 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 13 : "Yes";       !- Use Weather File Snow Indicators</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $SummerDay</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:9] `SummerDay`</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
-<span><span class="co">#&gt; ├─ 01 : "SummerDay", !- Name</span></span>
+<span><span class="co">#&gt; ├─ 01*: "SummerDay", !- Name</span></span>
 <span><span class="co">#&gt; │─ 02*: 7,           !- Begin Month</span></span>
 <span><span class="co">#&gt; │─ 03*: 7,           !- Begin Day of Month</span></span>
-<span><span class="co">#&gt; │─ 04*: 7,           !- End Month</span></span>
-<span><span class="co">#&gt; │─ 05*: 7,           !- End Day of Month</span></span>
-<span><span class="co">#&gt; │─ 06 : "Tuesday",   !- Day of Week for Start Day</span></span>
-<span><span class="co">#&gt; │─ 07 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
-<span><span class="co">#&gt; │─ 08 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
-<span><span class="co">#&gt; │─ 09 : "No",        !- Apply Weekend Holiday Rule</span></span>
-<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Rain Indicators</span></span>
-<span><span class="co">#&gt; └─ 11 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
+<span><span class="co">#&gt; │─ 04 : &lt;Blank&gt;,     !- Begin Year</span></span>
+<span><span class="co">#&gt; │─ 05*: 7,           !- End Month</span></span>
+<span><span class="co">#&gt; │─ 06*: 7,           !- End Day of Month</span></span>
+<span><span class="co">#&gt; │─ 07 : &lt;Blank&gt;,     !- End Year</span></span>
+<span><span class="co">#&gt; │─ 08 : "Tuesday",   !- Day of Week for Start Day</span></span>
+<span><span class="co">#&gt; │─ 09 : "Yes",       !- Use Weather File Holidays and Special Days</span></span>
+<span><span class="co">#&gt; │─ 10 : "Yes",       !- Use Weather File Daylight Saving Period</span></span>
+<span><span class="co">#&gt; │─ 11 : "No",        !- Apply Weekend Holiday Rule</span></span>
+<span><span class="co">#&gt; │─ 12 : "Yes",       !- Use Weather File Rain Indicators</span></span>
+<span><span class="co">#&gt; └─ 13 : "Yes";       !- Use Weather File Snow Indicators</span></span></code></pre></div>
 <p>For setting a single value on one object, you can write it in a
 chain:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -1263,7 +1257,7 @@ data from a “.ddy” file. You can achieve that using
 <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
-<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
+<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
 <span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
 <span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1651,10 +1645,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpT4eEIl/file269e524acf90.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpM3YwE5/file23613582edf8.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpT4eEIl/file269e524acf90.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpM3YwE5/file23613582edf8.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>

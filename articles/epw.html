@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9002</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-04</h4>
+            <h4 data-toc-skip class="date">2022-12-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/epw.Rmd" class="external-link"><code>vignettes/epw.Rmd</code></a></small>
       <div class="hidden name"><code>epw.Rmd</code></div>
@@ -217,7 +217,7 @@ data. For details on the data structure of EPW file, please see “Chapter
 2 - Weather Converter Program” in EnergyPlus “Auxiliary Programs”
 documentation. An online version can be found <a href="https://bigladdersoftware.com/epx/docs/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">epw</span></span>

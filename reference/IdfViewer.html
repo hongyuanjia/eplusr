@@ -24,7 +24,7 @@ simulation results to the geometries."><meta property="og:image" content="https:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9002</span>
       </span>
     </div>
 
@@ -631,6 +631,7 @@ Only surfaces that have boundary conditions will be rendered
 with a color. All other surfaces will be white.</p></li>
 <li><p><code>"construction"</code>: Render the model by surface constructions.</p></li>
 <li><p><code>"zone"</code>: Render the model by zones assigned.</p></li>
+<li><p><code>"space"</code>: Render the model by spaces assigned.</p></li>
 <li><p><code>"normal"</code>: Render the model by surface normal. The outside
 face of a heat transfer face will be rendered as white and the
 inside face will be rendered as red.</p></li>
@@ -664,6 +665,7 @@ viewer$render_by()
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfViewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span></span>
 <span>  type <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  zone <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  space <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  surface <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">1.5</span>,</span>
 <span>  dayl_color <span class="op">=</span> <span class="st">"red"</span>,</span>
@@ -690,6 +692,12 @@ a subset of following:</p><ul><li><p><code>"floor"</code></p></li>
 <dt><code>zone</code></dt>
 <dd><p>A character vector of names or an integer vector of IDs
 of zones in current <a href="Idf.html">Idf</a> to show. If <code>NULL</code>, no subsetting is
+performed.</p></dd>
+
+
+<dt><code>space</code></dt>
+<dd><p>A character vector of names or an integer vector of IDs
+of spaces in current <a href="Idf.html">Idf</a> to show. If <code>NULL</code>, no subsetting is
 performed.</p></dd>
 
 
