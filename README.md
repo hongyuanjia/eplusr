@@ -10,7 +10,7 @@ status](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)](
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2)](https://app.codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN
-Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
+Checks](https://badges.cranchecks.info/worst/eplusr.svg)](https://badges.cranchecks.info/worst/eplusr.svg)
 [![CRAN Download
 Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
 <!-- badges: end -->
