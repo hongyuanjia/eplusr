@@ -451,7 +451,7 @@ test_that("parse_idf_file()", {
     expect_equal(idf_parsed$object$comment, list(" this is a test comment for WD01", NULL, NULL, NULL, NULL))
 
     # can detect EpMacro lines
-    expect_warning(parse_idf_file("Version, 8.8;\n##include abc"), "IMF is not fully supported")
+    expect_warning(sprintf(parse_idf_file("Version, %s;\n##include abc", LATEST_IDF_VER)), "IMF is not fully supported")
 
     # can parse value data
     text_object <- c(
@@ -545,7 +545,7 @@ test_that("parse_idf_file()", {
     expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_class")
 
     # can detect error of multiple version
-    idf_wrong <- "Version, 8.8;\nVersion, 8.9;"
+    idf_wrong <- sprintf("Version, %s;\nVersion, %s;", LATEST_IDF_VER, LATEST_IDF_VER)
     expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_ver")
 
     # can detect error of invalid field number
