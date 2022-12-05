@@ -451,7 +451,7 @@ test_that("parse_idf_file()", {
     expect_equal(idf_parsed$object$comment, list(" this is a test comment for WD01", NULL, NULL, NULL, NULL))
 
     # can detect EpMacro lines
-    expect_warning(sprintf(parse_idf_file("Version, %s;\n##include abc", LATEST_IDF_VER)), "IMF is not fully supported")
+    expect_warning(parse_idf_file(sprintf("Version, %s;\n##include abc", LATEST_IDF_VER)), "IMF is not fully supported")
 
     # can parse value data
     text_object <- c(
