@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2010 04 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.0 C</b>, <b>14.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3225</b>, CDD10 <b>1083</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2010 04 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.0 C</b>, <b>14.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3119</b>, CDD10 <b>1357</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,15 +80,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2010 04 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 103810</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.1 C</b>, <b>15.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
        <tr><td>HDD18 <b>3438</b>, CDD10 <b>1262</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2010_04_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -100,14 +100,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2035 04 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.0 C</b>, <b>14.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>2855</b>, CDD10 <b>1284</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -119,14 +119,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2035 04 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.0 C</b>, <b>14.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>2752</b>, CDD10 <b>1443</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -138,14 +138,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BB Potsdam 103790 TRY2035 04 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>103790</b></td></tr>
-       <tr><td><b>N 52° 22.98'   E 13° 3.96'</b></td></tr>
+       <tr><td><b>N 52&deg; 22.98'   E 13&deg; 3.96'</b></td></tr>
        <tr><td>Elevation <b>81</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.0 C</b>, <b>14.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3061</b>, CDD10 <b>1253</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BB_Brandenburg/DEU_BB_Potsdam_103790_TRY2035_04_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -157,15 +157,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2010 12 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2723</b>, CDD10 <b>1324</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -177,15 +177,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2010 12 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2688</b>, CDD10 <b>1570</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -197,15 +197,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2010 12 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2924</b>, CDD10 <b>1429</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2010_12_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -217,15 +217,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2035 12 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2417</b>, CDD10 <b>1583</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -237,15 +237,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2035 12 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2334</b>, CDD10 <b>1791</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -257,15 +257,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Mannheim 107290 TRY2035 12 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>107290</b></td></tr>
-       <tr><td><b>N 49° 31.20'   E 8° 33.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 31.20'   E 8&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>96</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106370</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.5 C</b>, <b>20.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.3 C</b>, <b>84.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>2516</b>, CDD10 <b>1550</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Mannheim_107290_TRY2035_12_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -273,19 +273,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2010 14 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3798</b>, CDD10 <b>745</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -293,19 +293,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2010 14 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3722</b>, CDD10 <b>946</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -313,19 +313,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2010 14 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>4114</b>, CDD10 <b>780</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2010_14_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -333,19 +333,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2035 14 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3415</b>, CDD10 <b>974</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -353,19 +353,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2035 14 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3236</b>, CDD10 <b>1185</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -373,19 +373,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Stötten-Geislingen an der Steige BW DEU</name>
+    <name>Stï¿½n-Geislingen an der Steige BW DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BW Stotten-Geislingen.an.der.Steige 108360 TRY2035 14 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108360</b></td></tr>
-       <tr><td><b>N 48° 39.60'   E 9° 51.60'</b></td></tr>
+       <tr><td><b>N 48&deg; 39.60'   E 9&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 108270</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3500</b>, CDD10 <b>981</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Württemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BW_Baden-Wurttemberg/DEU_BW_Stotten-Geislingen.an.der.Steige_108360_TRY2035_14_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -397,15 +397,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2010 15 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>3913</b>, CDD10 <b>730</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -417,15 +417,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2010 15 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>3989</b>, CDD10 <b>885</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -437,15 +437,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2010 15 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>4018</b>, CDD10 <b>866</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2010_15_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -457,15 +457,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2035 15 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>3518</b>, CDD10 <b>968</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -477,15 +477,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2035 15 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>3368</b>, CDD10 <b>1118</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -497,15 +497,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Garmisch-Partenkirchen 109630 TRY2035 15 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>109630</b></td></tr>
-       <tr><td><b>N 47° 28.80'   E 11° 3.60'</b></td></tr>
+       <tr><td><b>N 47&deg; 28.80'   E 11&deg; 3.60'</b></td></tr>
        <tr><td>Elevation <b>719</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 109620</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>23.7 C</b>, <b>74.7 F</b></td></tr>
        <tr><td>HDD18 <b>3599</b>, CDD10 <b>955</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Garmisch-Partenkirchen_109630_TRY2035_15_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -517,14 +517,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2010 10 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3917</b>, CDD10 <b>707</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -536,14 +536,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2010 10 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3800</b>, CDD10 <b>920</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -555,14 +555,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2010 10 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3924</b>, CDD10 <b>896</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2010_10_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -574,14 +574,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2035 10 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3527</b>, CDD10 <b>901</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -593,14 +593,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2035 10 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3349</b>, CDD10 <b>1068</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -612,14 +612,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Hof 106850 TRY2035 10 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>106850</b></td></tr>
-       <tr><td><b>N 50° 19.20'   E 11° 52.80'</b></td></tr>
+       <tr><td><b>N 50&deg; 19.20'   E 11&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.0 C</b>, <b>8.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.2 C</b>, <b>77.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.0 C</b>, <b>78.8 F</b></td></tr>
        <tr><td>HDD18 <b>3641</b>, CDD10 <b>919</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Hof_106850_TRY2035_10_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -627,19 +627,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2010 13 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3537</b>, CDD10 <b>949</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -647,19 +647,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2010 13 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3142</b>, CDD10 <b>1111</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -667,19 +667,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2010 13 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3642</b>, CDD10 <b>1022</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2010_13_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -687,19 +687,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2035 13 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3146</b>, CDD10 <b>1170</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -707,19 +707,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2035 13 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3076</b>, CDD10 <b>1310</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -727,19 +727,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Mühldorf am Inn BY DEU</name>
+    <name>Mï¿½f am Inn BY DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU BY Muhldorf.am.Inn 108750 TRY2035 13 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>108750</b></td></tr>
-       <tr><td><b>N 48° 16.80'   E 12° 30.00'</b></td></tr>
+       <tr><td><b>N 48&deg; 16.80'   E 12&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>405</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 107880</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3320</b>, CDD10 <b>1156</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/BY_Bayern/DEU_BY_Muhldorf.am.Inn_108750_TRY2035_13_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -751,14 +751,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2010 01 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>2975</b>, CDD10 <b>1003</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -770,14 +770,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2010 01 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>3006</b>, CDD10 <b>1211</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -789,14 +789,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2010 01 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>3143</b>, CDD10 <b>1196</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2010_01_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -808,14 +808,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2035 01 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>2623</b>, CDD10 <b>1195</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -827,14 +827,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2035 01 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>2492</b>, CDD10 <b>1330</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -846,14 +846,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HB Bremerhaven 101290 TRY2035 01 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101290</b></td></tr>
-       <tr><td><b>N 53° 31.98'   E 8° 34.98'</b></td></tr>
+       <tr><td><b>N 53&deg; 31.98'   E 8&deg; 34.98'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.1 C</b>, <b>77.2 F</b></td></tr>
        <tr><td>HDD18 <b>2707</b>, CDD10 <b>1222</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HB_Bremen/DEU_HB_Bremerhaven_101290_TRY2035_01_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -865,14 +865,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2010 07 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3258</b>, CDD10 <b>961</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -884,14 +884,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2010 07 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3191</b>, CDD10 <b>1189</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -903,14 +903,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2010 07 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3490</b>, CDD10 <b>993</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2010_07_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -922,14 +922,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2035 07 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2936</b>, CDD10 <b>1167</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -941,14 +941,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2035 07 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2772</b>, CDD10 <b>1361</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -960,14 +960,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HE Kassel 104380 TRY2035 07 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104380</b></td></tr>
-       <tr><td><b>N 51° 18.00'   E 9° 27.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 18.00'   E 9&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3030</b>, CDD10 <b>1176</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HE_Hessen/DEU_HE_Kassel_104380_TRY2035_07_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -975,18 +975,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2010 03 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>3194</b>, CDD10 <b>933</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -994,18 +994,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2010 03 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>3235</b>, CDD10 <b>1111</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1013,18 +1013,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2010 03 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>3362</b>, CDD10 <b>1092</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2010_03_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1032,18 +1032,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2035 03 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>2807</b>, CDD10 <b>1161</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1051,18 +1051,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2035 03 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>2677</b>, CDD10 <b>1349</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1070,18 +1070,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Hamburg-Fuhlsbüttel HH DEU</name>
+    <name>Hamburg-Fuhlsbï¿½HH DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU HH Hamburg-Fuhlsbuttel 101470 TRY2035 03 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101470</b></td></tr>
-       <tr><td><b>N 53° 37.98'   E 10° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 37.98'   E 10&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>13</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>2961</b>, CDD10 <b>1112</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/HH_Hamburg/DEU_HH_Hamburg-Fuhlsbuttel_101470_TRY2035_03_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1089,18 +1089,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2010 02 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>3152</b>, CDD10 <b>946</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1108,18 +1108,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2010 02 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>3072</b>, CDD10 <b>1061</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1127,18 +1127,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2010 02 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>3321</b>, CDD10 <b>1143</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2010_02_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1146,18 +1146,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2035 02 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>2764</b>, CDD10 <b>1148</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1165,18 +1165,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2035 02 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>2637</b>, CDD10 <b>1293</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1184,18 +1184,18 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Rostock-Warnemünde MV DEU</name>
+    <name>Rostock-Warnemï¿½V DEU</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU MV Rostock-Warnemunde 101700 TRY2035 02 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>101700</b></td></tr>
-       <tr><td><b>N 54° 10.98'   E 12° 4.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 10.98'   E 12&deg; 4.98'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.2 C</b>, <b>19.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.3 C</b>, <b>75.7 F</b></td></tr>
        <tr><td>HDD18 <b>2929</b>, CDD10 <b>1125</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/MV_Mecklenburg-Vorpommern/DEU_MV_Rostock-Warnemunde_101700_TRY2035_02_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1207,15 +1207,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2010 08 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>4136</b>, CDD10 <b>543</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1227,15 +1227,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2010 08 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>3935</b>, CDD10 <b>788</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1247,15 +1247,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2010 08 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>4526</b>, CDD10 <b>361</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2010_08_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1267,15 +1267,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2035 08 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>3792</b>, CDD10 <b>707</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1287,15 +1287,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2035 08 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>3579</b>, CDD10 <b>860</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1307,15 +1307,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NI Braunlage 104520 TRY2035 08 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104520</b></td></tr>
-       <tr><td><b>N 51° 43.80'   E 10° 36.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 43.80'   E 10&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>607</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 104490</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.4 C</b>, <b>77.7 F</b></td></tr>
        <tr><td>HDD18 <b>3923</b>, CDD10 <b>680</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NI_Niedersachsen/DEU_NI_Braunlage_104520_TRY2035_08_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1327,14 +1327,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2010 05 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2909</b>, CDD10 <b>1047</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1346,14 +1346,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2010 05 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2864</b>, CDD10 <b>1338</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1365,14 +1365,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2010 05 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3208</b>, CDD10 <b>842</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2010_05_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1384,14 +1384,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2035 05 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2543</b>, CDD10 <b>1288</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1403,14 +1403,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2035 05 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2437</b>, CDD10 <b>1516</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1422,14 +1422,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU NW Essen 104100 TRY2035 05 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>104100</b></td></tr>
-       <tr><td><b>N 51° 24.00'   E 6° 57.60'</b></td></tr>
+       <tr><td><b>N 51&deg; 24.00'   E 6&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>152</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>2696</b>, CDD10 <b>1284</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/NW_Nordrhein-Westfalen/DEU_NW_Essen_104100_TRY2035_05_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1441,15 +1441,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2010 06 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3781</b>, CDD10 <b>679</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1461,15 +1461,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2010 06 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3892</b>, CDD10 <b>797</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1481,15 +1481,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2010 06 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3937</b>, CDD10 <b>756</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2010_06_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1501,15 +1501,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2035 06 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3383</b>, CDD10 <b>893</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1521,15 +1521,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2035 06 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3170</b>, CDD10 <b>1136</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1541,15 +1541,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU RP Bad.Marienberg 105260 TRY2035 06 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105260</b></td></tr>
-       <tr><td><b>N 50° 39.60'   E 7° 57.60'</b></td></tr>
+       <tr><td><b>N 50&deg; 39.60'   E 7&deg; 57.60'</b></td></tr>
        <tr><td>Elevation <b>547</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 106130</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.4 C</b>, <b>18.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3540</b>, CDD10 <b>830</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/RP_Rheinland-Pfalz/DEU_RP_Bad.Marienberg_105260_TRY2035_06_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1561,14 +1561,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2010 09 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3483</b>, CDD10 <b>908</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1580,14 +1580,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2010 09 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3346</b>, CDD10 <b>999</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1599,14 +1599,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2010 09 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3733</b>, CDD10 <b>972</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2010_09_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1618,14 +1618,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2035 09 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3119</b>, CDD10 <b>1105</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1637,14 +1637,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2035 09 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>2963</b>, CDD10 <b>1302</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1656,14 +1656,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Chemnitz-Stelzendorf 105770 TRY2035 09 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105770</b></td></tr>
-       <tr><td><b>N 50° 48.00'   E 12° 51.96'</b></td></tr>
+       <tr><td><b>N 50&deg; 48.00'   E 12&deg; 51.96'</b></td></tr>
        <tr><td>Elevation <b>418</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.8 C</b>, <b>12.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3290</b>, CDD10 <b>1094</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Chemnitz-Stelzendorf_105770_TRY2035_09_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1675,14 +1675,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2010 11 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>5189</b>, CDD10 <b>265</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1694,14 +1694,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2010 11 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>5078</b>, CDD10 <b>383</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1713,14 +1713,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2010 11 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>5167</b>, CDD10 <b>374</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2010_11_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1732,14 +1732,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2035 11 Jahr BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>4763</b>, CDD10 <b>407</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Jahr_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Jahr_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1751,14 +1751,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2035 11 Somm BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>4582</b>, CDD10 <b>523</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Somm_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Somm_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1770,14 +1770,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>DEU SN Fichtelberg 105780 TRY2035 11 Wint BBSR</b></td></tr>
        <tr><td><b>Data Source BBSR</td></tr>
        <tr><td>WMO <b>105780</b></td></tr>
-       <tr><td><b>N 50° 25.80'   E 12° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 25.80'   E 12&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>1213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
        <tr><td>1% Cooling DB <b>19.8 C</b>, <b>67.6 F</b></td></tr>
        <tr><td>HDD18 <b>4858</b>, CDD10 <b>402</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Wint_BBSR.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/SN_Sachsen/DEU_SN_Fichtelberg_105780_TRY2035_11_Wint_BBSR.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

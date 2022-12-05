@@ -33,41 +33,39 @@ download_kml <- function(dir = tempdir()) {
 
 # parse kml files
 parse_kml <- function(path_kml, path_codes) {
-    doc <- xml2::xml_ns_strip(xml2::read_xml(path_kml, encoding = "latin1"))
+    kml <- sf::st_read(path_kml)
 
-    places <- xml2::xml_find_all(doc, "//Placemark")
+    # skip features with no description
+    kml <- kml[kml$Description != "", drop = FALSE]
 
     # country, state_province, city
-    name <- xml2::xml_text(xml2::xml_find_all(places, "name"))
-    loc <- stringi::stri_match_first_regex(name, "(.+) ([A-Z a-z]+) ([A-Z]+)")[, -1L]
+    loc <- stringi::stri_match_first_regex(kml$Name, "(.+) ([A-Z a-z]+) ([A-Z]+)")[, -1L, drop = FALSE]
     colnames(loc) <- c("location", "state_province", "country_code")
     loc <- data.table::as.data.table(loc)
 
     # data source, wmo number, etc.
-    desc <- xml2::xml_text(xml2::xml_find_all(places, "description/text()"))
-    read_table <- function(cdata) {
-        html <- paste0("<!doctype html>\n<meta charset=utf-8>\n", cdata)
-        cells <- as.list(xml2::xml_text(xml2::xml_find_all(xml2::read_html(html), ".//tr/td")))
-        if (length(cells) == 12) {
-            cells <- cells[c(1:2, 4, length(cells))]
-        } else {
-            cells <- cells[c(1:3, length(cells))]
+    desc <- lapply(kml$Description,
+        function(desc) {
+            html <- xml2::read_html(desc)
+            tbl <- rvest::html_table(rvest::html_node(html, "table"))$X1
+
+            title <- tbl[[1L]]
+            source_type <- stringi::stri_sub(stringi::stri_subset_regex(tbl, "^Data Source ")[1L], 13L)
+            wmo_number <- stringi::stri_sub(stringi::stri_subset_regex(tbl, "^WMO "), 5L)
+            zip_url <- stringi::stri_sub(stringi::stri_subset_regex(tbl, "^URL "), 5L)
+            wmo_region <- stringi::stri_extract_first_regex(zip_url, "(?<=onebuilding.org/WMO_Region_)\\d+(?=\\D+)",
+                case_insensitive = TRUE
+            )
+
+            list(title = title, source_type = source_type, wmo_number = wmo_number,
+                zip_url = zip_url, wmo_region = as.integer(wmo_region)
+            )
         }
-        names(cells) <- c("title", "source_type", "wmo_number", "zip_url")
-        cells$source_type <- gsub("Data Source ", "", cells$source_type)
-        cells$wmo_number <- gsub("WMO ", "", cells$wmo_number)
-        cells$zip_url <- gsub("URL ", "", cells$zip_url)
-
-        cells$wmo_region <- basename(dirname(dirname(cells$zip_url)))
-        cells$wmo_region <- as.integer(stringi::stri_extract_first_regex(cells$wmo_region, "\\d+"))
-
-        cells
-    }
-    desc <- data.table::rbindlist(lapply(desc, read_table))
+    )
+    desc <- data.table::rbindlist(desc)
 
     # coordinates
-    coord <- xml2::xml_text(xml2::xml_find_all(places, "Point/coordinates"))
-    coord <- stringi::stri_split_fixed(coord, ",", n = 3, simplify = TRUE)
+    coord <- sf::st_coordinates(kml)
     colnames(coord) <- c("longitude", "latitude", "altitude")
     coord <- data.table::as.data.table(coord)
     for (i in seq_len(ncol(coord))) data.table::set(coord, NULL, i, as.double(coord[[i]]))

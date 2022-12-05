@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Kolobrzeg.121000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121000</b></td></tr>
-       <tr><td><b>N 54° 11.00'   E 15° 35.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 11.00'   E 15&deg; 35.00'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>23.9 C</b>, <b>75.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.0 C</b>, <b>17.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.2 C</b>, <b>75.6 F</b></td></tr>
        <tr><td>HDD18 <b>3538</b>, CDD10 <b>670</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Kolobrzeg.121000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Kolobrzeg.121000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Koszalin.121050 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121050</b></td></tr>
-       <tr><td><b>N 54° 12.00'   E 16° 11.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 12.00'   E 16&deg; 11.00'</b></td></tr>
        <tr><td>Elevation <b>34</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-8.8 C</b>, <b>16.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.8 C</b>, <b>78.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
        <tr><td>HDD18 <b>3687</b>, CDD10 <b>725</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Koszalin.121050_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Koszalin.121050_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Ustka.121150 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121150</b></td></tr>
-       <tr><td><b>N 54° 35.00'   E 16° 51.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 35.00'   E 16&deg; 51.00'</b></td></tr>
        <tr><td>Elevation <b>11</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.9 C</b>, <b>17.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.8 C</b>, <b>18.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.4 C</b>, <b>75.9 F</b></td></tr>
        <tr><td>HDD18 <b>3695</b>, CDD10 <b>670</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Ustka.121150_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Ustka.121150_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Leba.121200 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121200</b></td></tr>
-       <tr><td><b>N 54° 45.00'   E 17° 33.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 45.00'   E 17&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>6</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-8.8 C</b>, <b>16.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.5 C</b>, <b>76.1 F</b></td></tr>
        <tr><td>HDD18 <b>3734</b>, CDD10 <b>800</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Leba.121200_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Leba.121200_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Lebork.121250 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121250</b></td></tr>
-       <tr><td><b>N 54° 33.00'   E 17° 45.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 33.00'   E 17&deg; 45.00'</b></td></tr>
        <tr><td>Elevation <b>41</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.7 C</b>, <b>14.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.2 C</b>, <b>79.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.8 C</b>, <b>14.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
        <tr><td>HDD18 <b>3739</b>, CDD10 <b>775</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Lebork.121250_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Lebork.121250_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -137,14 +137,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Hel.121350 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121350</b></td></tr>
-       <tr><td><b>N 54° 37.00'   E 18° 47.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 37.00'   E 18&deg; 47.00'</b></td></tr>
        <tr><td>Elevation <b>3</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.1 C</b>, <b>19.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>23.8 C</b>, <b>74.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
        <tr><td>HDD18 <b>3571</b>, CDD10 <b>801</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Hel.121350_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Hel.121350_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -156,14 +156,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Gdansk-Port.Polnocny.121400 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121400</b></td></tr>
-       <tr><td><b>N 54° 21.00'   E 18° 38.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 21.00'   E 18&deg; 38.00'</b></td></tr>
        <tr><td>Elevation <b>63</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-10.1 C</b>, <b>13.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
        <tr><td>HDD18 <b>3438</b>, CDD10 <b>854</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Gdansk-Port.Polnocny.121400_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Gdansk-Port.Polnocny.121400_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -175,14 +175,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WN Elblag.121600 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121600</b></td></tr>
-       <tr><td><b>N 54° 9.00'   E 19° 26.00'</b></td></tr>
+       <tr><td><b>N 54&deg; 9.00'   E 19&deg; 26.00'</b></td></tr>
        <tr><td>Elevation <b>43</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.8 C</b>, <b>10.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.1 C</b>, <b>79.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.2 C</b>, <b>79.2 F</b></td></tr>
        <tr><td>HDD18 <b>3949</b>, CDD10 <b>750</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Elblag.121600_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Elblag.121600_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -194,14 +194,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WN Ketrzyn.121850 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121850</b></td></tr>
-       <tr><td><b>N 54° 4.68'   E 21° 22.58'</b></td></tr>
+       <tr><td><b>N 54&deg; 4.68'   E 21&deg; 22.58'</b></td></tr>
        <tr><td>Elevation <b>110</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-13.5 C</b>, <b>7.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.5 C</b>, <b>79.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
        <tr><td>HDD18 <b>3994</b>, CDD10 <b>828</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Ketrzyn.121850_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Ketrzyn.121850_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -213,14 +213,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PD Suwalki.121950 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>121950</b></td></tr>
-       <tr><td><b>N 54° 5.97'   E 22° 55.98'</b></td></tr>
+       <tr><td><b>N 54&deg; 5.97'   E 22&deg; 55.98'</b></td></tr>
        <tr><td>Elevation <b>186</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-15.9 C</b>, <b>3.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.4 C</b>, <b>79.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.7 C</b>, <b>80.1 F</b></td></tr>
        <tr><td>HDD18 <b>4299</b>, CDD10 <b>800</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PD_Podlaskie/POL_PD_Suwalki.121950_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PD_Podlaskie/POL_PD_Suwalki.121950_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -232,14 +232,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Swinoujscie.122000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122000</b></td></tr>
-       <tr><td><b>N 53° 55.00'   E 14° 15.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 55.00'   E 14&deg; 15.00'</b></td></tr>
        <tr><td>Elevation <b>5</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-7.6 C</b>, <b>18.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.7 C</b>, <b>76.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-7.5 C</b>, <b>18.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>3353</b>, CDD10 <b>868</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Swinoujscie.122000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Swinoujscie.122000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -251,14 +251,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Szczecin-Dabie.AP.122050 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122050</b></td></tr>
-       <tr><td><b>N 53° 24.00'   E 14° 40.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 24.00'   E 14&deg; 40.00'</b></td></tr>
        <tr><td>Elevation <b>7</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.0 C</b>, <b>15.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.9 C</b>, <b>16.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
        <tr><td>HDD18 <b>3411</b>, CDD10 <b>918</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Szczecin-Dabie.AP.122050_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Szczecin-Dabie.AP.122050_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -270,14 +270,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Resko.122100 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122100</b></td></tr>
-       <tr><td><b>N 53° 43.00'   E 15° 7.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 43.00'   E 15&deg; 7.00'</b></td></tr>
        <tr><td>Elevation <b>56</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.6 C</b>, <b>14.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.8 C</b>, <b>80.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
        <tr><td>HDD18 <b>3532</b>, CDD10 <b>792</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Resko.122100_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Resko.122100_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -289,14 +289,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL ZP Szczecinek.122150 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122150</b></td></tr>
-       <tr><td><b>N 53° 43.00'   E 16° 42.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 43.00'   E 16&deg; 42.00'</b></td></tr>
        <tr><td>Elevation <b>144</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.0 C</b>, <b>12.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.6 C</b>, <b>79.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.2 C</b>, <b>81.0 F</b></td></tr>
        <tr><td>HDD18 <b>3742</b>, CDD10 <b>728</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Szczecinek.122150_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/ZP_Zachodniopomorskie/POL_ZP_Szczecinek.122150_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -308,14 +308,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WP Pila.122300 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122300</b></td></tr>
-       <tr><td><b>N 53° 9.00'   E 16° 45.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 9.00'   E 16&deg; 45.00'</b></td></tr>
        <tr><td>Elevation <b>73</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.9 C</b>, <b>10.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.1 C</b>, <b>10.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3586</b>, CDD10 <b>902</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Pila.122300_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Pila.122300_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -327,14 +327,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PM Chojnice.122350 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122350</b></td></tr>
-       <tr><td><b>N 53° 42.00'   E 17° 34.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 42.00'   E 17&deg; 34.00'</b></td></tr>
        <tr><td>Elevation <b>172</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.4 C</b>, <b>79.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.7 C</b>, <b>80.1 F</b></td></tr>
        <tr><td>HDD18 <b>4006</b>, CDD10 <b>724</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Chojnice.122350_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PM_Pomorskie/POL_PM_Chojnice.122350_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -346,14 +346,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL KP Bydgoszcz-Paderewski.AP.122400 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122400</b></td></tr>
-       <tr><td><b>N 53° 9.00'   E 18° 0.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 9.00'   E 18&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>49</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.3 C</b>, <b>8.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.2 C</b>, <b>10.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.9 C</b>, <b>84.0 F</b></td></tr>
        <tr><td>HDD18 <b>3742</b>, CDD10 <b>828</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/KP_Kujawsko-Pomorskie/POL_KP_Bydgoszcz-Paderewski.AP.122400_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/KP_Kujawsko-Pomorskie/POL_KP_Bydgoszcz-Paderewski.AP.122400_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -365,14 +365,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL KP Torun.122500 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122500</b></td></tr>
-       <tr><td><b>N 51° 6.00'   E 23° 5.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 6.00'   E 23&deg; 5.00'</b></td></tr>
        <tr><td>Elevation <b>72</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.5 C</b>, <b>9.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.3 C</b>, <b>9.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
        <tr><td>HDD18 <b>3665</b>, CDD10 <b>895</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/KP_Kujawsko-Pomorskie/POL_KP_Torun.122500_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/KP_Kujawsko-Pomorskie/POL_KP_Torun.122500_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -384,14 +384,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MZ Mlawa.122700 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122700</b></td></tr>
-       <tr><td><b>N 53° 7.00'   E 20° 23.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 7.00'   E 20&deg; 23.00'</b></td></tr>
        <tr><td>Elevation <b>149</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.5 C</b>, <b>7.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.4 C</b>, <b>7.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
        <tr><td>HDD18 <b>3921</b>, CDD10 <b>785</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Mlawa.122700_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Mlawa.122700_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -403,14 +403,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WN Olsztyn.AP.122720 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122720</b></td></tr>
-       <tr><td><b>N 53° 47.00'   E 20° 29.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 47.00'   E 20&deg; 29.00'</b></td></tr>
        <tr><td>Elevation <b>137</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.4 C</b>, <b>7.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.7 C</b>, <b>80.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.3 C</b>, <b>8.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.0 C</b>, <b>80.6 F</b></td></tr>
        <tr><td>HDD18 <b>4106</b>, CDD10 <b>768</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Olsztyn.AP.122720_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Olsztyn.AP.122720_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -422,14 +422,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WN Mikolajki.122800 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122800</b></td></tr>
-       <tr><td><b>N 53° 48.00'   E 21° 35.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 48.00'   E 21&deg; 35.00'</b></td></tr>
        <tr><td>Elevation <b>132</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-14.2 C</b>, <b>6.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.2 C</b>, <b>79.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.1 C</b>, <b>6.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.5 C</b>, <b>79.7 F</b></td></tr>
        <tr><td>HDD18 <b>4019</b>, CDD10 <b>815</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Mikolajki.122800_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WN_Warminsko-Mazurskie/POL_WN_Mikolajki.122800_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -441,14 +441,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LD Ostroleka.122850 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122850</b></td></tr>
-       <tr><td><b>N 51° 10.00'   E 19° 8.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 10.00'   E 19&deg; 8.00'</b></td></tr>
        <tr><td>Elevation <b>97</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.6 C</b>, <b>9.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.6 C</b>, <b>81.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.4 C</b>, <b>9.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
        <tr><td>HDD18 <b>3824</b>, CDD10 <b>891</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Ostroleka.122850_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Ostroleka.122850_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -460,14 +460,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PD Bialystok-Krywlany.AP.122950 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>122950</b></td></tr>
-       <tr><td><b>N 53° 0.00'   E 23° 15.00'</b></td></tr>
+       <tr><td><b>N 53&deg; 0.00'   E 23&deg; 15.00'</b></td></tr>
        <tr><td>Elevation <b>151</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-15.2 C</b>, <b>4.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.1 C</b>, <b>4.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>4101</b>, CDD10 <b>780</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PD_Podlaskie/POL_PD_Bialystok-Krywlany.AP.122950_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PD_Podlaskie/POL_PD_Bialystok-Krywlany.AP.122950_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -479,14 +479,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LB Gorzow.Wielkopolski.123000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123000</b></td></tr>
-       <tr><td><b>N 52° 44.00'   E 15° 14.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 44.00'   E 15&deg; 14.00'</b></td></tr>
        <tr><td>Elevation <b>73</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.6 C</b>, <b>14.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.8 C</b>, <b>82.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.5 C</b>, <b>14.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
        <tr><td>HDD18 <b>3445</b>, CDD10 <b>1038</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Gorzow.Wielkopolski.123000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Gorzow.Wielkopolski.123000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -498,14 +498,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LB Slubice.123100 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123100</b></td></tr>
-       <tr><td><b>N 52° 21.00'   E 14° 35.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 21.00'   E 14&deg; 35.00'</b></td></tr>
        <tr><td>Elevation <b>24</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.6 C</b>, <b>14.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.1 C</b>, <b>15.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
        <tr><td>HDD18 <b>3378</b>, CDD10 <b>921</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Slubice.123100_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Slubice.123100_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -517,14 +517,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WP Poznan-Lawica-Wieniawski.AP.123300 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123300</b></td></tr>
-       <tr><td><b>N 52° 25.00'   E 16° 58.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 25.00'   E 16&deg; 58.00'</b></td></tr>
        <tr><td>Elevation <b>84</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-10.6 C</b>, <b>12.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.3 C</b>, <b>13.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.8 C</b>, <b>83.8 F</b></td></tr>
        <tr><td>HDD18 <b>3678</b>, CDD10 <b>989</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Poznan-Lawica-Wieniawski.AP.123300_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Poznan-Lawica-Wieniawski.AP.123300_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -536,14 +536,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WP Kolo.123450 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123450</b></td></tr>
-       <tr><td><b>N 52° 11.00'   E 18° 37.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 11.00'   E 18&deg; 37.00'</b></td></tr>
        <tr><td>Elevation <b>117</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.8 C</b>, <b>85.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.5 C</b>, <b>13.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>3522</b>, CDD10 <b>951</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Kolo.123450_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Kolo.123450_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -555,14 +555,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MZ Plock.AP.123600 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123600</b></td></tr>
-       <tr><td><b>N 52° 33.00'   E 19° 42.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 33.00'   E 19&deg; 42.00'</b></td></tr>
        <tr><td>Elevation <b>109</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.9 C</b>, <b>8.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.7 C</b>, <b>9.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3621</b>, CDD10 <b>944</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Plock.AP.123600_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Plock.AP.123600_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -574,14 +574,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MZ Warszawa-Chopina.Intl.AP.123750 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123750</b></td></tr>
-       <tr><td><b>N 52° 15.00'   E 21° 0.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 15.00'   E 21&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>106</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.4 C</b>, <b>9.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.2 C</b>, <b>10.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.4 C</b>, <b>83.1 F</b></td></tr>
        <tr><td>HDD18 <b>3666</b>, CDD10 <b>926</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Warszawa-Chopina.Intl.AP.123750_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Warszawa-Chopina.Intl.AP.123750_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -593,14 +593,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MZ Siedlce.123850 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123850</b></td></tr>
-       <tr><td><b>N 52° 10.00'   E 22° 18.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 10.00'   E 22&deg; 18.00'</b></td></tr>
        <tr><td>Elevation <b>155</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.9 C</b>, <b>7.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.7 C</b>, <b>7.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
        <tr><td>HDD18 <b>3890</b>, CDD10 <b>919</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Siedlce.123850_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MZ_Mazowieckie/POL_MZ_Siedlce.123850_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -612,14 +612,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LU Terespol.123990 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>123990</b></td></tr>
-       <tr><td><b>N 52° 5.00'   E 23° 34.00'</b></td></tr>
+       <tr><td><b>N 52&deg; 5.00'   E 23&deg; 34.00'</b></td></tr>
        <tr><td>Elevation <b>137</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-14.6 C</b>, <b>5.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.8 C</b>, <b>82.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.2 C</b>, <b>6.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.4 C</b>, <b>83.1 F</b></td></tr>
        <tr><td>HDD18 <b>3820</b>, CDD10 <b>933</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Terespol.123990_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Terespol.123990_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -631,14 +631,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LB Zielona.Gora.124000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124000</b></td></tr>
-       <tr><td><b>N 51° 56.00'   E 15° 30.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 56.00'   E 15&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>192</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.8 C</b>, <b>14.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.6 C</b>, <b>14.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
        <tr><td>HDD18 <b>3639</b>, CDD10 <b>918</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Zielona.Gora.124000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LB_Lubuskie/POL_LB_Zielona.Gora.124000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -650,14 +650,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL DS Legnica.124150 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124150</b></td></tr>
-       <tr><td><b>N 51° 12.00'   E 16° 12.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 12.00'   E 16&deg; 12.00'</b></td></tr>
        <tr><td>Elevation <b>124</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-10.6 C</b>, <b>12.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.3 C</b>, <b>13.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
        <tr><td>HDD18 <b>3383</b>, CDD10 <b>973</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Legnica.124150_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Legnica.124150_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -669,14 +669,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WP Leszno-Strzyrzowice.AP.124180 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124180</b></td></tr>
-       <tr><td><b>N 51° 50.00'   E 16° 32.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 50.00'   E 16&deg; 32.00'</b></td></tr>
        <tr><td>Elevation <b>92</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.1 C</b>, <b>12.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.3 C</b>, <b>11.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.4 C</b>, <b>83.1 F</b></td></tr>
        <tr><td>HDD18 <b>3800</b>, CDD10 <b>874</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Leszno-Strzyrzowice.AP.124180_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Leszno-Strzyrzowice.AP.124180_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -688,14 +688,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL DS Wroclaw-Copernicus.AP.124240 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124240</b></td></tr>
-       <tr><td><b>N 51° 6.00'   E 17° 2.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 6.00'   E 17&deg; 2.00'</b></td></tr>
        <tr><td>Elevation <b>124</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.4 C</b>, <b>83.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.3 C</b>, <b>13.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.0 C</b>, <b>84.2 F</b></td></tr>
        <tr><td>HDD18 <b>3671</b>, CDD10 <b>900</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Wroclaw-Copernicus.AP.124240_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Wroclaw-Copernicus.AP.124240_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -707,14 +707,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL WP Kalisz.124350 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124350</b></td></tr>
-       <tr><td><b>N 51° 45.00'   E 18° 5.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 45.00'   E 18&deg; 5.00'</b></td></tr>
        <tr><td>Elevation <b>140</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-10.9 C</b>, <b>12.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.7 C</b>, <b>12.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
        <tr><td>HDD18 <b>3777</b>, CDD10 <b>944</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Kalisz.124350_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/WP_Wielkopolskie/POL_WP_Kalisz.124350_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -726,14 +726,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LD Wielun.124550 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124550</b></td></tr>
-       <tr><td><b>N 51° 13.00'   E 18° 33.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 13.00'   E 18&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>201</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.2 C</b>, <b>11.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.9 C</b>, <b>12.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
        <tr><td>HDD18 <b>3593</b>, CDD10 <b>968</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Wielun.124550_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Wielun.124550_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -745,14 +745,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LD Lodz-Reymont.AP.124650 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124650</b></td></tr>
-       <tr><td><b>N 51° 45.00'   E 19° 28.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 45.00'   E 19&deg; 28.00'</b></td></tr>
        <tr><td>Elevation <b>190</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.9 C</b>, <b>10.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.8 C</b>, <b>10.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
        <tr><td>HDD18 <b>3691</b>, CDD10 <b>898</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Lodz-Reymont.AP.124650_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Lodz-Reymont.AP.124650_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -764,14 +764,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LD Sulejow.124690 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124690</b></td></tr>
-       <tr><td><b>N 51° 22.00'   E 19° 53.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 22.00'   E 19&deg; 53.00'</b></td></tr>
        <tr><td>Elevation <b>189</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.6 C</b>, <b>9.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.3 C</b>, <b>9.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
        <tr><td>HDD18 <b>3767</b>, CDD10 <b>822</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Sulejow.124690_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LD_Lodzkie/POL_LD_Sulejow.124690_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -783,14 +783,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LU Lublin-Radawiec.AP.124950 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124950</b></td></tr>
-       <tr><td><b>N 51° 15.00'   E 22° 30.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 15.00'   E 22&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>240</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.3 C</b>, <b>8.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.2 C</b>, <b>81.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.2 C</b>, <b>8.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
        <tr><td>HDD18 <b>3810</b>, CDD10 <b>948</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Lublin-Radawiec.AP.124950_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Lublin-Radawiec.AP.124950_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -802,14 +802,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL LU Wlodawa.124970 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>124970</b></td></tr>
-       <tr><td><b>N 51° 33.00'   E 23° 33.00'</b></td></tr>
+       <tr><td><b>N 51&deg; 33.00'   E 23&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>179</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-14.1 C</b>, <b>6.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.9 C</b>, <b>7.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.4 C</b>, <b>83.1 F</b></td></tr>
        <tr><td>HDD18 <b>3876</b>, CDD10 <b>919</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Wlodawa.124970_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/LU_Lubelskie/POL_LU_Wlodawa.124970_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -821,14 +821,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL DS Jelenia-Gora.AP.125000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125000</b></td></tr>
-       <tr><td><b>N 50° 54.05'   E 15° 43.52'</b></td></tr>
+       <tr><td><b>N 50&deg; 54.05'   E 15&deg; 43.52'</b></td></tr>
        <tr><td>Elevation <b>344</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.6 C</b>, <b>7.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.8 C</b>, <b>80.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-13.4 C</b>, <b>7.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.1 C</b>, <b>80.8 F</b></td></tr>
        <tr><td>HDD18 <b>3854</b>, CDD10 <b>720</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Jelenia-Gora.AP.125000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Jelenia-Gora.AP.125000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -840,14 +840,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL DS Sniezka-Obserwatorium.Meteorologiczne.Holdysa.125100 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125100</b></td></tr>
-       <tr><td><b>N 50° 44.13'   E 15° 43.95'</b></td></tr>
+       <tr><td><b>N 50&deg; 44.13'   E 15&deg; 43.95'</b></td></tr>
        <tr><td>Elevation <b>1</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-14.8 C</b>, <b>5.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>16.7 C</b>, <b>62.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>17.2 C</b>, <b>63.0 F</b></td></tr>
        <tr><td>HDD18 <b>6003</b>, CDD10 <b>91</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Sniezka-Obserwatorium.Meteorologiczne.Holdysa.125100_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Sniezka-Obserwatorium.Meteorologiczne.Holdysa.125100_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -859,14 +859,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL DS Klodzko.125200 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125200</b></td></tr>
-       <tr><td><b>N 50° 26.00'   E 16° 39.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 26.00'   E 16&deg; 39.00'</b></td></tr>
        <tr><td>Elevation <b>375</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.7 C</b>, <b>9.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.5 C</b>, <b>79.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.3 C</b>, <b>9.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
        <tr><td>HDD18 <b>3782</b>, CDD10 <b>819</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Klodzko.125200_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/DS_Dolnoslaskie/POL_DS_Klodzko.125200_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -878,14 +878,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL OP Opole.125300 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125300</b></td></tr>
-       <tr><td><b>N 50° 40.00'   E 17° 57.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 40.00'   E 17&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>163</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-10.9 C</b>, <b>12.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.1 C</b>, <b>84.4 F</b></td></tr>
        <tr><td>HDD18 <b>3418</b>, CDD10 <b>1013</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/OP_Opolskie/POL_OP_Opole.125300_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/OP_Opolskie/POL_OP_Opole.125300_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -897,14 +897,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SL Raciborz.125400 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125400</b></td></tr>
-       <tr><td><b>N 50° 5.00'   E 18° 12.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 5.00'   E 18&deg; 12.00'</b></td></tr>
        <tr><td>Elevation <b>206</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.0 C</b>, <b>10.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
        <tr><td>HDD18 <b>3468</b>, CDD10 <b>1009</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Raciborz.125400_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Raciborz.125400_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -916,14 +916,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SL Czestochowa-Rudniki.AP.125500 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125500</b></td></tr>
-       <tr><td><b>N 50° 45.00'   E 19° 0.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 45.00'   E 19&deg; 0.00'</b></td></tr>
        <tr><td>Elevation <b>295</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.3 C</b>, <b>11.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.7 C</b>, <b>81.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.1 C</b>, <b>12.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
        <tr><td>HDD18 <b>3685</b>, CDD10 <b>963</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Czestochowa-Rudniki.AP.125500_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Czestochowa-Rudniki.AP.125500_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -935,14 +935,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SL Katowice.Intl.AP.125600 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125600</b></td></tr>
-       <tr><td><b>N 50° 14.00'   E 19° 2.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 14.00'   E 19&deg; 2.00'</b></td></tr>
        <tr><td>Elevation <b>304</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.9 C</b>, <b>10.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.8 C</b>, <b>82.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
        <tr><td>HDD18 <b>3712</b>, CDD10 <b>963</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Katowice.Intl.AP125600_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Katowice.Intl.AP125600_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -954,14 +954,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Krakow-Balice-Jana.Pawla.II.Intl.AP.125660 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125660</b></td></tr>
-       <tr><td><b>N 50° 5.00'   E 19° 55.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 5.00'   E 19&deg; 55.00'</b></td></tr>
        <tr><td>Elevation <b>237</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.9 C</b>, <b>8.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.5 C</b>, <b>9.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.5 C</b>, <b>83.3 F</b></td></tr>
        <tr><td>HDD18 <b>3664</b>, CDD10 <b>998</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Krakow-Balice-Jana.Pawla.II.Intl.AP.125660_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Krakow-Balice-Jana.Pawla.II.Intl.AP.125660_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -973,14 +973,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SK Kielce.125700 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125700</b></td></tr>
-       <tr><td><b>N 50° 50.00'   E 20° 40.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 50.00'   E 20&deg; 40.00'</b></td></tr>
        <tr><td>Elevation <b>261</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.3 C</b>, <b>8.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.5 C</b>, <b>81.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.9 C</b>, <b>8.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
        <tr><td>HDD18 <b>3887</b>, CDD10 <b>810</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SK_Swietokrzyskie/POL_SK_Kielce.125700_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SK_Swietokrzyskie/POL_SK_Kielce.125700_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -992,14 +992,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Tarnow.125750 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125750</b></td></tr>
-       <tr><td><b>N 50° 1.00'   E 20° 59.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 1.00'   E 20&deg; 59.00'</b></td></tr>
        <tr><td>Elevation <b>209</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.1 C</b>, <b>10.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.5 C</b>, <b>11.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.2 C</b>, <b>84.6 F</b></td></tr>
        <tr><td>HDD18 <b>3386</b>, CDD10 <b>999</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Tarnow.125750_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Tarnow.125750_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1011,14 +1011,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PK Rzeszow-Jasionka.Intl.AP.125800 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125800</b></td></tr>
-       <tr><td><b>N 50° 6.00'   E 22° 1.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 6.00'   E 22&deg; 1.00'</b></td></tr>
        <tr><td>Elevation <b>201</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-13.4 C</b>, <b>7.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.2 C</b>, <b>82.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.8 C</b>, <b>9.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.7 C</b>, <b>83.7 F</b></td></tr>
        <tr><td>HDD18 <b>3894</b>, CDD10 <b>895</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Rzeszow-Jasionka.Intl.AP.125800_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Rzeszow-Jasionka.Intl.AP.125800_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1030,14 +1030,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SK Sandomierz.125850 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125850</b></td></tr>
-       <tr><td><b>N 50° 41.00'   E 21° 45.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 41.00'   E 21&deg; 45.00'</b></td></tr>
        <tr><td>Elevation <b>218</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.5 C</b>, <b>9.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.5 C</b>, <b>81.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.2 C</b>, <b>10.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.8 C</b>, <b>82.0 F</b></td></tr>
        <tr><td>HDD18 <b>3638</b>, CDD10 <b>967</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SK_Swietokrzyskie/POL_SK_Sandomierz.125850_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SK_Swietokrzyskie/POL_SK_Sandomierz.125850_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1049,14 +1049,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Zamosc-Mokre.AP.125950 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>125950</b></td></tr>
-       <tr><td><b>N 50° 45.00'   E 23° 15.00'</b></td></tr>
+       <tr><td><b>N 50&deg; 45.00'   E 23&deg; 15.00'</b></td></tr>
        <tr><td>Elevation <b>213</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-14.5 C</b>, <b>5.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.4 C</b>, <b>81.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.0 C</b>, <b>6.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.0 C</b>, <b>82.4 F</b></td></tr>
        <tr><td>HDD18 <b>3989</b>, CDD10 <b>818</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Zamosc-Mokre.AP.125950_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Zamosc-Mokre.AP.125950_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1068,14 +1068,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL SL Bielsko-Biala.AP.126000 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126000</b></td></tr>
-       <tr><td><b>N 49° 40.00'   E 19° 15.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 40.00'   E 19&deg; 15.00'</b></td></tr>
        <tr><td>Elevation <b>399</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>27.0 C</b>, <b>80.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.6 C</b>, <b>11.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.5 C</b>, <b>81.5 F</b></td></tr>
        <tr><td>HDD18 <b>3558</b>, CDD10 <b>1019</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Bielsko-Biala.AP.126000_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/SL_Slaskie/POL_SL_Bielsko-Biala.AP.126000_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1087,14 +1087,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Zakopane.126250 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126250</b></td></tr>
-       <tr><td><b>N 49° 18.00'   E 19° 58.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 18.00'   E 19&deg; 58.00'</b></td></tr>
        <tr><td>Elevation <b>857</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-14.1 C</b>, <b>6.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>24.4 C</b>, <b>75.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-14.0 C</b>, <b>6.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
        <tr><td>HDD18 <b>4574</b>, CDD10 <b>453</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Zakopane.126250_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Zakopane.126250_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1106,14 +1106,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Kasprowy.Wierch.Obserwatorium.Meteorologiczne.126500 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126500</b></td></tr>
-       <tr><td><b>N 49° 17.00'   E 19° 58.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 17.00'   E 19&deg; 58.00'</b></td></tr>
        <tr><td>Elevation <b>1</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>7 - Very Cold</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>7 - Very Cold</b></td></tr>
        <tr><td>99% Heating DB <b>-16.8 C</b>, <b>1.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>15.3 C</b>, <b>59.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>15.6 C</b>, <b>60.1 F</b></td></tr>
        <tr><td>HDD18 <b>6808</b>, CDD10 <b>19</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Kasprowy.Wierch.Obserwatorium.Meteorologiczne.126500_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Kasprowy.Wierch.Obserwatorium.Meteorologiczne.126500_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1125,14 +1125,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL MA Nowy.Sacz.126600 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126600</b></td></tr>
-       <tr><td><b>N 49° 35.00'   E 20° 30.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 35.00'   E 20&deg; 30.00'</b></td></tr>
        <tr><td>Elevation <b>295</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.7 C</b>, <b>9.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.0 C</b>, <b>10.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.6 C</b>, <b>83.5 F</b></td></tr>
        <tr><td>HDD18 <b>3554</b>, CDD10 <b>911</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Nowy.Sacz.126600_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/MA_Malopolskie/POL_MA_Nowy.Sacz.126600_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1144,14 +1144,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PK Krosno.126700 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126700</b></td></tr>
-       <tr><td><b>N 49° 41.00'   E 21° 47.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 41.00'   E 21&deg; 47.00'</b></td></tr>
        <tr><td>Elevation <b>310</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.2 C</b>, <b>10.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.9 C</b>, <b>80.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.0 C</b>, <b>10.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.3 C</b>, <b>81.1 F</b></td></tr>
        <tr><td>HDD18 <b>3710</b>, CDD10 <b>998</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Krosno.126700_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Krosno.126700_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1163,14 +1163,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PK Lesko.126900 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126900</b></td></tr>
-       <tr><td><b>N 49° 27.00'   E 22° 19.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 27.00'   E 22&deg; 19.00'</b></td></tr>
        <tr><td>Elevation <b>422</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.5 C</b>, <b>9.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.5 C</b>, <b>79.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.4 C</b>, <b>9.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.0 C</b>, <b>80.6 F</b></td></tr>
        <tr><td>HDD18 <b>3672</b>, CDD10 <b>820</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Lesko.126900_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Lesko.126900_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1182,14 +1182,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>POL PK Przemysl.126950 IMGW</b></td></tr>
        <tr><td><b>Data Source IMGW</td></tr>
        <tr><td>WMO <b>126950</b></td></tr>
-       <tr><td><b>N 49° 47.00'   E 22° 47.00'</b></td></tr>
+       <tr><td><b>N 49&deg; 47.00'   E 22&deg; 47.00'</b></td></tr>
        <tr><td>Elevation <b>280</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+1.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.6 C</b>, <b>11.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>26.4 C</b>, <b>79.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.4 C</b>, <b>11.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
        <tr><td>HDD18 <b>3862</b>, CDD10 <b>962</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Przemysl.126950_IMGW.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/POL_Poland/PK_Podkarpackie/POL_PK_Przemysl.126950_IMGW.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

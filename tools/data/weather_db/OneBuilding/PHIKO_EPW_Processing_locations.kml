@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KB Andong.471360 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471360</td></tr>
        <tr><td>WMO <b>471360</b></td></tr>
-       <tr><td><b>N 36° 34.00'   E 128° 42.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 34.00'   E 128&deg; 42.00'</b></td></tr>
        <tr><td>Elevation <b>140</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-9.2 C</b>, <b>15.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
        <tr><td>HDD18 <b>2814</b>, CDD10 <b>2116</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KB_Gyeongsangbuk-do/KOR_KB_Andong.471360_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KB_Gyeongsangbuk-do/KOR_KB_Andong.471360_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR PU Busan.471590 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471590</td></tr>
        <tr><td>WMO <b>471590</b></td></tr>
-       <tr><td><b>N 35° 6.00'   E 129° 1.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 6.00'   E 129&deg; 1.00'</b></td></tr>
        <tr><td>Elevation <b>70</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-3.3 C</b>, <b>26.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.1 C</b>, <b>86.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.4 C</b>, <b>25.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.4 C</b>, <b>86.7 F</b></td></tr>
        <tr><td>HDD18 <b>1906</b>, CDD10 <b>2398</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/PU_Busan/KOR_PU_Busan.471590_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/PU_Busan/KOR_PU_Busan.471590_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR HB Cheongju.471310 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471310</td></tr>
        <tr><td>WMO <b>471310</b></td></tr>
-       <tr><td><b>N 36° 38.00'   E 127° 26.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 38.00'   E 127&deg; 26.00'</b></td></tr>
        <tr><td>Elevation <b>57</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.8 C</b>, <b>16.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.6 C</b>, <b>16.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
        <tr><td>HDD18 <b>2542</b>, CDD10 <b>2263</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HB_Chungcheongbuk-do/KOR_HB_Cheongju.471310_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HB_Chungcheongbuk-do/KOR_HB_Cheongju.471310_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KW Chuncheon.471010 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471010</td></tr>
        <tr><td>WMO <b>471010</b></td></tr>
-       <tr><td><b>N 37° 54.00'   E 127° 44.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 54.00'   E 127&deg; 44.00'</b></td></tr>
        <tr><td>Elevation <b>78</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-12.6 C</b>, <b>9.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.7 C</b>, <b>9.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
        <tr><td>HDD18 <b>3104</b>, CDD10 <b>2035</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Chuncheon.471010_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Chuncheon.471010_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR HB Chupungnyeong.471350 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471350</td></tr>
        <tr><td>WMO <b>471350</b></td></tr>
-       <tr><td><b>N 36° 13.00'   E 127° 59.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 13.00'   E 127&deg; 59.00'</b></td></tr>
        <tr><td>Elevation <b>245</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.5 C</b>, <b>16.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.4 C</b>, <b>86.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.6 C</b>, <b>16.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
        <tr><td>HDD18 <b>2800</b>, CDD10 <b>1921</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HB_Chungcheongbuk-do/KOR_HB_Chupungnyeong.471350_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HB_Chungcheongbuk-do/KOR_HB_Chupungnyeong.471350_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -137,14 +137,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR TG Daegu.471430 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471430</td></tr>
        <tr><td>WMO <b>471430</b></td></tr>
-       <tr><td><b>N 35° 53.00'   E 128° 37.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 53.00'   E 128&deg; 37.00'</b></td></tr>
        <tr><td>Elevation <b>64</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-5.3 C</b>, <b>22.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.9 C</b>, <b>91.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.4 C</b>, <b>22.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.2 C</b>, <b>91.8 F</b></td></tr>
        <tr><td>HDD18 <b>2207</b>, CDD10 <b>2509</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/TG_Daegu/KOR_TG_Daegu.471430_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/TG_Daegu/KOR_TG_Daegu.471430_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -156,14 +156,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KW Daegwallyeong.471000 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471000</td></tr>
        <tr><td>WMO <b>471000</b></td></tr>
-       <tr><td><b>N 37° 40.00'   E 128° 43.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 40.00'   E 128&deg; 43.00'</b></td></tr>
        <tr><td>Elevation <b>773</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>6A - Cold - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-15.6 C</b>, <b>3.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>25.7 C</b>, <b>78.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6A - Cold - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-15.7 C</b>, <b>3.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>25.9 C</b>, <b>78.6 F</b></td></tr>
        <tr><td>HDD18 <b>3994</b>, CDD10 <b>1232</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Daegwallyeong.471000_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Daegwallyeong.471000_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -175,14 +175,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR TJ Daejeon.471330 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471330</td></tr>
        <tr><td>WMO <b>471330</b></td></tr>
-       <tr><td><b>N 36° 22.00'   E 127° 22.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 22.00'   E 127&deg; 22.00'</b></td></tr>
        <tr><td>Elevation <b>69</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-8.8 C</b>, <b>16.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.2 C</b>, <b>88.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
        <tr><td>HDD18 <b>2671</b>, CDD10 <b>2209</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/TJ_Daejeon/KOR_TJ_Daejeon.471330_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/TJ_Daejeon/KOR_TJ_Daejeon.471330_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -194,14 +194,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KW Gangneung.471050 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471050</td></tr>
        <tr><td>WMO <b>471050</b></td></tr>
-       <tr><td><b>N 37° 45.00'   E 128° 53.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 45.00'   E 128&deg; 53.00'</b></td></tr>
        <tr><td>Elevation <b>26</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-5.8 C</b>, <b>21.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.9 C</b>, <b>21.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
        <tr><td>HDD18 <b>2249</b>, CDD10 <b>2258</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Gangneung.471050_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Gangneung.471050_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -213,14 +213,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR CJ Gosan.471850 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471850</td></tr>
        <tr><td>WMO <b>471850</b></td></tr>
-       <tr><td><b>N 33° 17.00'   E 126° 9.00'</b></td></tr>
+       <tr><td><b>N 33&deg; 17.00'   E 126&deg; 9.00'</b></td></tr>
        <tr><td>Elevation <b>74</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>1.4 C</b>, <b>34.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.4 C</b>, <b>84.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.3 C</b>, <b>34.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>29.7 C</b>, <b>85.5 F</b></td></tr>
        <tr><td>HDD18 <b>1571</b>, CDD10 <b>2459</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CJ_Jeju-do/KOR_CJ_Gosan.471850_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CJ_Jeju-do/KOR_CJ_Gosan.471850_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -232,14 +232,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KJ Gwangju.471560 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471560</td></tr>
        <tr><td>WMO <b>471560</b></td></tr>
-       <tr><td><b>N 35° 10.00'   E 126° 53.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 10.00'   E 126&deg; 53.00'</b></td></tr>
        <tr><td>Elevation <b>72</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-5.0 C</b>, <b>23.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
        <tr><td>HDD18 <b>2206</b>, CDD10 <b>2423</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KJ_Gwangju/KOR_KJ_Gwangju.471560_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KJ_Gwangju/KOR_KJ_Gwangju.471560_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -251,14 +251,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR CB Heuksando.471690 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471690</td></tr>
        <tr><td>WMO <b>471690</b></td></tr>
-       <tr><td><b>N 34° 41.00'   E 125° 27.00'</b></td></tr>
+       <tr><td><b>N 34&deg; 41.00'   E 125&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>77</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>28.1 C</b>, <b>82.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>28.3 C</b>, <b>82.9 F</b></td></tr>
        <tr><td>HDD18 <b>2153</b>, CDD10 <b>1958</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CB_Jeollabuk-do/KOR_CB_Heuksando.471690_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CB_Jeollabuk-do/KOR_CB_Heuksando.471690_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -270,14 +270,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR IN Incheon.471120 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471120</td></tr>
        <tr><td>WMO <b>471120</b></td></tr>
-       <tr><td><b>N 37° 28.00'   E 126° 37.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 28.00'   E 126&deg; 37.00'</b></td></tr>
        <tr><td>Elevation <b>68</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.7 C</b>, <b>85.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.4 C</b>, <b>16.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
        <tr><td>HDD18 <b>2703</b>, CDD10 <b>2126</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/IN_Incheon/KOR_IN_Incheon.471120_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/IN_Incheon/KOR_IN_Incheon.471120_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -289,14 +289,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR CJ Jeju.471840 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471840</td></tr>
        <tr><td>WMO <b>471840</b></td></tr>
-       <tr><td><b>N 33° 30.00'   E 126° 31.00'</b></td></tr>
+       <tr><td><b>N 33&deg; 30.00'   E 126&deg; 31.00'</b></td></tr>
        <tr><td>Elevation <b>20</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>1.3 C</b>, <b>34.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.0 C</b>, <b>87.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
        <tr><td>HDD18 <b>1539</b>, CDD10 <b>2598</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CJ_Jeju-do/KOR_CJ_Jeju.471840_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CJ_Jeju-do/KOR_CJ_Jeju.471840_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -308,14 +308,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR CB Jeonju.471460 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471460</td></tr>
        <tr><td>WMO <b>471460</b></td></tr>
-       <tr><td><b>N 35° 49.00'   E 127° 9.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 49.00'   E 127&deg; 9.00'</b></td></tr>
        <tr><td>Elevation <b>53</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.9 C</b>, <b>19.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.8 C</b>, <b>19.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
        <tr><td>HDD18 <b>2461</b>, CDD10 <b>2335</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CB_Jeollabuk-do/KOR_CB_Jeonju.471460_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CB_Jeollabuk-do/KOR_CB_Jeonju.471460_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -327,14 +327,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KN Jinju.471920 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471920</td></tr>
        <tr><td>WMO <b>471920</b></td></tr>
-       <tr><td><b>N 35° 9.00'   E 128° 2.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 9.00'   E 128&deg; 2.00'</b></td></tr>
        <tr><td>Elevation <b>30</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-7.0 C</b>, <b>19.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
        <tr><td>HDD18 <b>2412</b>, CDD10 <b>2321</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KN_Gyeongsangnam-do/KOR_KN_Jinju.471920_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KN_Gyeongsangnam-do/KOR_KN_Jinju.471920_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -346,14 +346,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR CN Mokpo.471650 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471650</td></tr>
        <tr><td>WMO <b>471650</b></td></tr>
-       <tr><td><b>N 34° 49.00'   E 126° 22.00'</b></td></tr>
+       <tr><td><b>N 34&deg; 49.00'   E 126&deg; 22.00'</b></td></tr>
        <tr><td>Elevation <b>38</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-3.5 C</b>, <b>25.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.5 C</b>, <b>86.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.6 C</b>, <b>25.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.8 C</b>, <b>87.4 F</b></td></tr>
        <tr><td>HDD18 <b>2296</b>, CDD10 <b>2195</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CN_Jeollanam-do/KOR_CN_Mokpo.471650_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/CN_Jeollanam-do/KOR_CN_Mokpo.471650_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -365,14 +365,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KB Pohang.471380 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471380</td></tr>
        <tr><td>WMO <b>471380</b></td></tr>
-       <tr><td><b>N 36° 1.00'   E 129° 22.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 1.00'   E 129&deg; 22.00'</b></td></tr>
        <tr><td>Elevation <b>2</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-4.5 C</b>, <b>23.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.4 C</b>, <b>90.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-4.6 C</b>, <b>23.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.6 C</b>, <b>90.7 F</b></td></tr>
        <tr><td>HDD18 <b>2025</b>, CDD10 <b>2415</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KB_Gyeongsangbuk-do/KOR_KB_Pohang.471380_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KB_Gyeongsangbuk-do/KOR_KB_Pohang.471380_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -384,14 +384,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR HN Seosan.471290 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471290</td></tr>
        <tr><td>WMO <b>471290</b></td></tr>
-       <tr><td><b>N 36° 46.00'   E 126° 29.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 46.00'   E 126&deg; 29.00'</b></td></tr>
        <tr><td>Elevation <b>29</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-8.3 C</b>, <b>17.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-8.4 C</b>, <b>16.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.5 C</b>, <b>86.9 F</b></td></tr>
        <tr><td>HDD18 <b>2688</b>, CDD10 <b>2017</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HN_Chungcheongnam-do/KOR_HN_Seosan.471290_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/HN_Chungcheongnam-do/KOR_HN_Seosan.471290_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -403,14 +403,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR SO Seoul.471080 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471080</td></tr>
        <tr><td>WMO <b>471080</b></td></tr>
-       <tr><td><b>N 37° 34.00'   E 126° 57.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 34.00'   E 126&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>86</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.3 C</b>, <b>15.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.5 C</b>, <b>14.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
        <tr><td>HDD18 <b>2637</b>, CDD10 <b>2158</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/SO_Seoul/KOR_SO_Seoul.471080_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/SO_Seoul/KOR_SO_Seoul.471080_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -422,14 +422,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KG Suwon.471190 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471190</td></tr>
        <tr><td>WMO <b>471190</b></td></tr>
-       <tr><td><b>N 37° 16.02'   E 126° 58.98'</b></td></tr>
+       <tr><td><b>N 37&deg; 16.02'   E 126&deg; 58.98'</b></td></tr>
        <tr><td>Elevation <b>34</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.4 C</b>, <b>15.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.9 C</b>, <b>87.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.3 C</b>, <b>15.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.4 C</b>, <b>88.5 F</b></td></tr>
        <tr><td>HDD18 <b>2625</b>, CDD10 <b>2238</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KG_Gyeonggi-do/KOR_KG_Suwon.471190_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KG_Gyeonggi-do/KOR_KG_Suwon.471190_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -441,14 +441,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>KOR KW Wonju.471140 TRY PHIKO</b></td></tr>
        <tr><td><b>Data Source Custom-471140</td></tr>
        <tr><td>WMO <b>471140</b></td></tr>
-       <tr><td><b>N 37° 20.00'   E 127° 56.00'</b></td></tr>
+       <tr><td><b>N 37&deg; 20.00'   E 127&deg; 56.00'</b></td></tr>
        <tr><td>Elevation <b>149</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-11.7 C</b>, <b>10.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.2 C</b>, <b>88.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-11.3 C</b>, <b>11.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
        <tr><td>HDD18 <b>2878</b>, CDD10 <b>2165</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Wonju.471140_TRY_PHIKO.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/KOR_South_Korea/KW_Gangwon-do/KOR_KW_Wonju.471140_TRY_PHIKO.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

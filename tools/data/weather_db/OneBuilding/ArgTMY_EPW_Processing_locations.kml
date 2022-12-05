@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG SF Ceres 872570 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>872570</b></td></tr>
-       <tr><td><b>S 29∞ 52.80'   W 61∞ 57.00'</b></td></tr>
+       <tr><td><b>S 29&deg; 52.80'   W 61&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>88</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.3 C</b>, <b>36.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.8 C</b>, <b>94.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.8 C</b>, <b>37.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.0 C</b>, <b>95.0 F</b></td></tr>
        <tr><td>HDD18 <b>647</b>, CDD10 <b>3516</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Ceres_872570_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Ceres_872570_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG ER Concordia 873950 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>873950</b></td></tr>
-       <tr><td><b>S 31∞ 18.00'   W 58∞ 1.20'</b></td></tr>
+       <tr><td><b>S 31&deg; 18.00'   W 58&deg; 1.20'</b></td></tr>
        <tr><td>Elevation <b>38</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.8 C</b>, <b>37.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.0 C</b>, <b>37.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
        <tr><td>HDD18 <b>659</b>, CDD10 <b>3397</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Concordia_873950_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Concordia_873950_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG CN Corrientes.Intl.AP 871660 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>871660</b></td></tr>
-       <tr><td><b>S 27∞ 27.00'   W 58∞ 46.20'</b></td></tr>
+       <tr><td><b>S 27&deg; 27.00'   W 58&deg; 46.20'</b></td></tr>
        <tr><td>Elevation <b>62</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>5.9 C</b>, <b>42.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>35.8 C</b>, <b>96.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.0 C</b>, <b>42.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.7 C</b>, <b>96.3 F</b></td></tr>
        <tr><td>HDD18 <b>364</b>, CDD10 <b>4239</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Corrientes.Intl.AP_871660_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Corrientes.Intl.AP_871660_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG FM Formosa.Intl.AP 871620 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>871620</b></td></tr>
-       <tr><td><b>S 26∞ 12.00'   W 58∞ 13.80'</b></td></tr>
+       <tr><td><b>S 26&deg; 12.00'   W 58&deg; 13.80'</b></td></tr>
        <tr><td>Elevation <b>60</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>6.0 C</b>, <b>42.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>36.2 C</b>, <b>97.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.2 C</b>, <b>43.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.5 C</b>, <b>97.7 F</b></td></tr>
        <tr><td>HDD18 <b>261</b>, CDD10 <b>4656</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/FM_Formosa/ARG_FM_Formosa.Intl.AP_871620_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/FM_Formosa/ARG_FM_Formosa.Intl.AP_871620_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG ER Gualeguaychu.AP 874970 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>874970</b></td></tr>
-       <tr><td><b>S 33∞ 0.00'   W 58∞ 37.20'</b></td></tr>
+       <tr><td><b>S 33&deg; 0.00'   W 58&deg; 37.20'</b></td></tr>
        <tr><td>Elevation <b>21</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.2 C</b>, <b>91.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.4 C</b>, <b>36.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.3 C</b>, <b>91.9 F</b></td></tr>
        <tr><td>HDD18 <b>891</b>, CDD10 <b>2988</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Gualeguaychu.AP_874970_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Gualeguaychu.AP_874970_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -137,14 +137,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG CN Monte.Caseros.AP 873930 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>873930</b></td></tr>
-       <tr><td><b>S 30∞ 16.20'   W 57∞ 39.00'</b></td></tr>
+       <tr><td><b>S 30&deg; 16.20'   W 57&deg; 39.00'</b></td></tr>
        <tr><td>Elevation <b>54</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>4.5 C</b>, <b>40.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.0 C</b>, <b>41.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
        <tr><td>HDD18 <b>563</b>, CDD10 <b>3623</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Monte.Caseros.AP_873930_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Monte.Caseros.AP_873930_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -156,14 +156,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG ER Parana.AP 873740 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>873740</b></td></tr>
-       <tr><td><b>S 31∞ 46.80'   W 60∞ 28.80'</b></td></tr>
+       <tr><td><b>S 31&deg; 46.80'   W 60&deg; 28.80'</b></td></tr>
        <tr><td>Elevation <b>78</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>3.8 C</b>, <b>38.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>4.0 C</b>, <b>39.2 F</b></td></tr>
        <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
        <tr><td>HDD18 <b>760</b>, CDD10 <b>3163</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Parana.AP_873740_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/ER_Entre_Rios/ARG_ER_Parana.AP_873740_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -175,14 +175,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG CN Paso.de.los.Libres.Intl.AP 872890 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>872890</b></td></tr>
-       <tr><td><b>S 29∞ 40.80'   W 57∞ 9.00'</b></td></tr>
+       <tr><td><b>S 29&deg; 40.80'   W 57&deg; 9.00'</b></td></tr>
        <tr><td>Elevation <b>70</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>4.1 C</b>, <b>39.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>4.3 C</b>, <b>39.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>34.8 C</b>, <b>94.6 F</b></td></tr>
        <tr><td>HDD18 <b>571</b>, CDD10 <b>3652</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Paso.de.los.Libres.Intl.AP_872890_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CN_Corrientes/ARG_CN_Paso.de.los.Libres.Intl.AP_872890_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -194,14 +194,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG MN Posadas-San.Martin.Intl.AP 871780 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>871780</b></td></tr>
-       <tr><td><b>S 27∞ 22.20'   W 55∞ 58.20'</b></td></tr>
+       <tr><td><b>S 27&deg; 22.20'   W 55&deg; 58.20'</b></td></tr>
        <tr><td>Elevation <b>125</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>6.5 C</b>, <b>43.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>35.1 C</b>, <b>95.2 F</b></td></tr>
        <tr><td>HDD18 <b>250</b>, CDD10 <b>4494</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/MN_Misiones/ARG_MN_Posadas-San.Martin.Intl.AP_871780_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/MN_Misiones/ARG_MN_Posadas-San.Martin.Intl.AP_871780_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -209,19 +209,19 @@
    </Point>
   </Placemark>
   <Placemark>
-    <name>Saenz PeÒa AP Chaco ARG</name>
+    <name>Saenz PeüüÅP Chaco ARG</name>
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG CC Saenz.Pena.AP 871490 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>871490</b></td></tr>
-       <tr><td><b>S 26∞ 49.20'   W 60∞ 27.00'</b></td></tr>
+       <tr><td><b>S 26&deg; 49.20'   W 60&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>92</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 871480</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>3.4 C</b>, <b>38.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>36.6 C</b>, <b>97.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.3 C</b>, <b>37.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.7 C</b>, <b>98.1 F</b></td></tr>
        <tr><td>HDD18 <b>402</b>, CDD10 <b>4404</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CC_Chaco/ARG_CC_Saenz.Pena.AP_871490_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CC_Chaco/ARG_CC_Saenz.Pena.AP_871490_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -233,14 +233,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG MN Puerto.Iguazu.Intl.AP 870970 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>870970</b></td></tr>
-       <tr><td><b>S 25∞ 43.80'   W 54∞ 28.20'</b></td></tr>
+       <tr><td><b>S 25&deg; 43.80'   W 54&deg; 28.20'</b></td></tr>
        <tr><td>Elevation <b>270</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>5.9 C</b>, <b>42.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.1 C</b>, <b>43.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
        <tr><td>HDD18 <b>288</b>, CDD10 <b>4125</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/MN_Misiones/ARG_MN_Puerto.Iguazu.Intl.AP_870970_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/MN_Misiones/ARG_MN_Puerto.Iguazu.Intl.AP_870970_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -252,14 +252,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG SF Reconquista.AP 872700 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>872700</b></td></tr>
-       <tr><td><b>S 29∞ 10.80'   W 59∞ 42.00'</b></td></tr>
+       <tr><td><b>S 29&deg; 10.80'   W 59&deg; 42.00'</b></td></tr>
        <tr><td>Elevation <b>53</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>4.5 C</b>, <b>40.1 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.5 C</b>, <b>94.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>4.6 C</b>, <b>40.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.8 C</b>, <b>94.6 F</b></td></tr>
        <tr><td>HDD18 <b>523</b>, CDD10 <b>3850</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Reconquista.AP_872700_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Reconquista.AP_872700_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -271,14 +271,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG CC Resistencia.Intl.AP 871550 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>871550</b></td></tr>
-       <tr><td><b>S 27∞ 27.00'   W 59∞ 3.00'</b></td></tr>
+       <tr><td><b>S 27&deg; 27.00'   W 59&deg; 3.00'</b></td></tr>
        <tr><td>Elevation <b>52</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>3.8 C</b>, <b>38.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.9 C</b>, <b>39.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>36.0 C</b>, <b>96.8 F</b></td></tr>
        <tr><td>HDD18 <b>416</b>, CDD10 <b>4247</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CC_Chaco/ARG_CC_Resistencia.Intl.AP_871550_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/CC_Chaco/ARG_CC_Resistencia.Intl.AP_871550_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -290,14 +290,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG SF Rosario.Intl.AP 874800 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>874800</b></td></tr>
-       <tr><td><b>S 32∞ 55.20'   W 60∞ 46.80'</b></td></tr>
+       <tr><td><b>S 32&deg; 55.20'   W 60&deg; 46.80'</b></td></tr>
        <tr><td>Elevation <b>25</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>1.0 C</b>, <b>33.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.0 C</b>, <b>91.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.1 C</b>, <b>34.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
        <tr><td>HDD18 <b>894</b>, CDD10 <b>3052</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Rosario.Intl.AP_874800_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Rosario.Intl.AP_874800_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -309,14 +309,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG SF Sauce.Viejo.AP 873710 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>873710</b></td></tr>
-       <tr><td><b>S 31∞ 42.00'   W 60∞ 49.20'</b></td></tr>
+       <tr><td><b>S 31&deg; 42.00'   W 60&deg; 49.20'</b></td></tr>
        <tr><td>Elevation <b>18</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.9 C</b>, <b>37.2 F</b></td></tr>
        <tr><td>1% Cooling DB <b>33.6 C</b>, <b>92.5 F</b></td></tr>
        <tr><td>HDD18 <b>692</b>, CDD10 <b>3418</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Sauce.Viejo.AP_873710_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/SF_Santa_Fe/ARG_SF_Sauce.Viejo.AP_873710_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -328,15 +328,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ARG BA La.Plata.AP 875930 ArgTMY</b></td></tr>
        <tr><td><b>Data Source ArgTMY</td></tr>
        <tr><td>WMO <b>875930</b></td></tr>
-       <tr><td><b>S 34∞ 58.32'   W 57∞ 53.70'</b></td></tr>
+       <tr><td><b>S 34&deg; 58.32'   W 57&deg; 53.70'</b></td></tr>
        <tr><td>Elevation <b>22</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-4.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 875760</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>1.2 C</b>, <b>34.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.7 C</b>, <b>35.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.3 C</b>, <b>90.1 F</b></td></tr>
        <tr><td>HDD18 <b>1108</b>, CDD10 <b>2497</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/BA_Buenos_Aires/ARG_BA_La.Plata.AP_875930_ArgTMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/ARG_Argentina/BA_Buenos_Aires/ARG_BA_La.Plata.AP_875930_ArgTMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Ahmedabad-Patel.Intl.AP.426470 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>426470</b></td></tr>
-       <tr><td><b>N 23° 4.20'   E 72° 37.80'</b></td></tr>
+       <tr><td><b>N 23&deg; 4.20'   E 72&deg; 37.80'</b></td></tr>
        <tr><td>Elevation <b>55</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>12.1 C</b>, <b>53.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.2 C</b>, <b>106.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.9 C</b>, <b>107.4 F</b></td></tr>
        <tr><td>HDD18 <b>8</b>, CDD10 <b>6365</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Ahmedabad-Patel.Intl.AP.426470_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Ahmedabad-Patel.Intl.AP.426470_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND PB Amritsar.420710 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>420710</b></td></tr>
-       <tr><td><b>N 31° 37.80'   E 74° 52.20'</b></td></tr>
+       <tr><td><b>N 31&deg; 37.80'   E 74&deg; 52.20'</b></td></tr>
        <tr><td>Elevation <b>234</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>3.5 C</b>, <b>38.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.0 C</b>, <b>105.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>3.9 C</b>, <b>39.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.9 C</b>, <b>105.6 F</b></td></tr>
        <tr><td>HDD18 <b>480</b>, CDD10 <b>4726</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/PB_Punjab/IND_PB_Amritsar.420710_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/PB_Punjab/IND_PB_Amritsar.420710_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Aurangabad.AP.430140 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>430140</b></td></tr>
-       <tr><td><b>N 19° 51.00'   E 75° 24.00'</b></td></tr>
+       <tr><td><b>N 19&deg; 51.00'   E 75&deg; 24.00'</b></td></tr>
        <tr><td>Elevation <b>579</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>12.1 C</b>, <b>53.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.2 C</b>, <b>102.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>12.5 C</b>, <b>54.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.4 C</b>, <b>102.9 F</b></td></tr>
        <tr><td>HDD18 <b>2</b>, CDD10 <b>5678</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Aurangabad.AP.430140_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Aurangabad.AP.430140_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND KA Belgaum-Sambre.AP.431980 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431980</b></td></tr>
-       <tr><td><b>N 15° 51.00'   E 74° 37.20'</b></td></tr>
+       <tr><td><b>N 15&deg; 51.00'   E 74&deg; 37.20'</b></td></tr>
        <tr><td>Elevation <b>747</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>14.2 C</b>, <b>57.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>35.3 C</b>, <b>95.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>14.3 C</b>, <b>57.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.5 C</b>, <b>95.9 F</b></td></tr>
        <tr><td>HDD18 <b>1</b>, CDD10 <b>5011</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Belgaum-Sambre.AP.431980_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Belgaum-Sambre.AP.431980_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND KA Bengaluru.432950 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432950</b></td></tr>
-       <tr><td><b>N 12° 58.20'   E 77° 34.80'</b></td></tr>
+       <tr><td><b>N 12&deg; 58.20'   E 77&deg; 34.80'</b></td></tr>
        <tr><td>Elevation <b>921</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>16.0 C</b>, <b>60.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>16.2 C</b>, <b>61.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.6 C</b>, <b>92.5 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>5062</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Bengaluru.432950_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Bengaluru.432950_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -137,14 +137,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MP Bhopal-Bhoj.AP.426670 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>426670</b></td></tr>
-       <tr><td><b>N 23° 16.80'   E 77° 21.00'</b></td></tr>
+       <tr><td><b>N 23&deg; 16.80'   E 77&deg; 21.00'</b></td></tr>
        <tr><td>Elevation <b>523</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>10.8 C</b>, <b>51.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.6 C</b>, <b>105.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>10.5 C</b>, <b>50.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.8 C</b>, <b>105.4 F</b></td></tr>
        <tr><td>HDD18 <b>63</b>, CDD10 <b>5629</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Bhopal-Bhoj.AP.426670_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Bhopal-Bhoj.AP.426670_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -156,14 +156,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND OR Bhubaneshwar-Patnaik.Intl.AP.429710 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>429710</b></td></tr>
-       <tr><td><b>N 20° 15.00'   E 85° 49.80'</b></td></tr>
+       <tr><td><b>N 20&deg; 15.00'   E 85&deg; 49.80'</b></td></tr>
        <tr><td>Elevation <b>46</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>15.0 C</b>, <b>59.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.7 C</b>, <b>99.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>14.9 C</b>, <b>58.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.0 C</b>, <b>100.4 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6117</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/OR_Odisha/IND_OR_Bhubaneshwar-Patnaik.Intl.AP.429710_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/OR_Odisha/IND_OR_Bhubaneshwar-Patnaik.Intl.AP.429710_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -175,14 +175,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Bhuj.426340 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>426340</b></td></tr>
-       <tr><td><b>N 23° 15.00'   E 69° 40.20'</b></td></tr>
+       <tr><td><b>N 23&deg; 15.00'   E 69&deg; 40.20'</b></td></tr>
        <tr><td>Elevation <b>80</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>10.2 C</b>, <b>50.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.5 C</b>, <b>103.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>11.2 C</b>, <b>52.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.6 C</b>, <b>103.3 F</b></td></tr>
        <tr><td>HDD18 <b>19</b>, CDD10 <b>6159</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Bhuj.426340_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Bhuj.426340_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -194,14 +194,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND TN Chennai.Intl.AP.432790 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432790</b></td></tr>
-       <tr><td><b>N 13° 0.00'   E 80° 10.80'</b></td></tr>
+       <tr><td><b>N 13&deg; 0.00'   E 80&deg; 10.80'</b></td></tr>
        <tr><td>Elevation <b>16</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>20.8 C</b>, <b>69.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.4 C</b>, <b>99.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>20.9 C</b>, <b>69.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.9 C</b>, <b>100.2 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6706</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Chennai.Intl.AP.432790_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Chennai.Intl.AP.432790_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -213,14 +213,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND KA Chitradurga.432330 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432330</b></td></tr>
-       <tr><td><b>N 14° 13.80'   E 76° 25.80'</b></td></tr>
+       <tr><td><b>N 14&deg; 13.80'   E 76&deg; 25.80'</b></td></tr>
        <tr><td>Elevation <b>733</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>16.8 C</b>, <b>62.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>35.4 C</b>, <b>95.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>16.9 C</b>, <b>62.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.7 C</b>, <b>96.3 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>5436</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Chitradurga.432330_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Chitradurga.432330_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -232,14 +232,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UT Dehradun.421110 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>421110</b></td></tr>
-       <tr><td><b>N 30° 19.20'   E 78° 1.80'</b></td></tr>
+       <tr><td><b>N 30&deg; 19.20'   E 78&deg; 1.80'</b></td></tr>
        <tr><td>Elevation <b>682</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>6.3 C</b>, <b>43.3 F</b></td></tr>
        <tr><td>1% Cooling DB <b>36.3 C</b>, <b>97.3 F</b></td></tr>
        <tr><td>HDD18 <b>464</b>, CDD10 <b>4165</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UT_Uttarakhand/IND_UT_Dehradun.421110_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UT_Uttarakhand/IND_UT_Dehradun.421110_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -251,14 +251,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND HR Hissar.421310 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>421310</b></td></tr>
-       <tr><td><b>N 29° 10.20'   E 75° 43.80'</b></td></tr>
+       <tr><td><b>N 29&deg; 10.20'   E 75&deg; 43.80'</b></td></tr>
        <tr><td>Elevation <b>221</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>6.6 C</b>, <b>43.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>6.3 C</b>, <b>43.3 F</b></td></tr>
        <tr><td>1% Cooling DB <b>43.1 C</b>, <b>109.6 F</b></td></tr>
        <tr><td>HDD18 <b>259</b>, CDD10 <b>5755</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/HR_Haryana/IND_HR_Hissar.421310_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/HR_Haryana/IND_HR_Hissar.421310_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -270,14 +270,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND TG Hyderabad-Gandhi.Intl.AP.431280 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431280</b></td></tr>
-       <tr><td><b>N 17° 27.00'   E 78° 28.20'</b></td></tr>
+       <tr><td><b>N 17&deg; 27.00'   E 78&deg; 28.20'</b></td></tr>
        <tr><td>Elevation <b>545</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>14.9 C</b>, <b>58.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.2 C</b>, <b>102.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.9 C</b>, <b>103.8 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>5979</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TG_Telangana/IND_TG_Hyderabad-Gandhi.Intl.AP.431280_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TG_Telangana/IND_TG_Hyderabad-Gandhi.Intl.AP.431280_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -289,14 +289,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Jaipur.Intl.AP.423480 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423480</b></td></tr>
-       <tr><td><b>N 26° 49.20'   E 75° 48.00'</b></td></tr>
+       <tr><td><b>N 26&deg; 49.20'   E 75&deg; 48.00'</b></td></tr>
        <tr><td>Elevation <b>390</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>8.5 C</b>, <b>47.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>8.7 C</b>, <b>47.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>41.2 C</b>, <b>106.2 F</b></td></tr>
        <tr><td>HDD18 <b>141</b>, CDD10 <b>5732</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jaipur.Intl.AP.423480_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jaipur.Intl.AP.423480_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -308,14 +308,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Jaisalmer.423280 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423280</b></td></tr>
-       <tr><td><b>N 26° 54.00'   E 70° 55.20'</b></td></tr>
+       <tr><td><b>N 26&deg; 54.00'   E 70&deg; 55.20'</b></td></tr>
        <tr><td>Elevation <b>231</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>9.1 C</b>, <b>48.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>42.3 C</b>, <b>108.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>9.2 C</b>, <b>48.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.6 C</b>, <b>108.7 F</b></td></tr>
        <tr><td>HDD18 <b>82</b>, CDD10 <b>6516</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jaisalmer.423280_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jaisalmer.423280_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -327,14 +327,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Jodhpur.423390 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423390</b></td></tr>
-       <tr><td><b>N 26° 18.00'   E 73° 1.20'</b></td></tr>
+       <tr><td><b>N 26&deg; 18.00'   E 73&deg; 1.20'</b></td></tr>
        <tr><td>Elevation <b>224</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>9.9 C</b>, <b>49.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.3 C</b>, <b>106.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.5 C</b>, <b>106.7 F</b></td></tr>
        <tr><td>HDD18 <b>55</b>, CDD10 <b>6446</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jodhpur.423390_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Jodhpur.423390_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -346,14 +346,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND WB Kolkata-Bose.Intl.AP.428090 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>428090</b></td></tr>
-       <tr><td><b>N 22° 39.00'   E 88° 27.00'</b></td></tr>
+       <tr><td><b>N 22&deg; 39.00'   E 88&deg; 27.00'</b></td></tr>
        <tr><td>Elevation <b>6</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>12.4 C</b>, <b>54.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>36.7 C</b>, <b>98.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>12.2 C</b>, <b>54.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.9 C</b>, <b>98.4 F</b></td></tr>
        <tr><td>HDD18 <b>8</b>, CDD10 <b>5944</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/WB_West_Bengal/IND_WB_Kolkata-Bose.Intl.AP.428090_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/WB_West_Bengal/IND_WB_Kolkata-Bose.Intl.AP.428090_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -365,14 +365,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AP Kurnool.432130 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432130</b></td></tr>
-       <tr><td><b>N 15° 48.00'   E 78° 4.20'</b></td></tr>
+       <tr><td><b>N 15&deg; 48.00'   E 78&deg; 4.20'</b></td></tr>
        <tr><td>Elevation <b>281</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>18.0 C</b>, <b>64.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.4 C</b>, <b>104.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>18.2 C</b>, <b>64.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.6 C</b>, <b>105.1 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6773</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Kurnool.432130_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Kurnool.432130_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -384,14 +384,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UP Lucknow-Amausi-Singh.Intl.AP.423690 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423690</b></td></tr>
-       <tr><td><b>N 26° 45.00'   E 80° 52.80'</b></td></tr>
+       <tr><td><b>N 26&deg; 45.00'   E 80&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>128</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>7.9 C</b>, <b>46.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.9 C</b>, <b>105.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.2 C</b>, <b>106.2 F</b></td></tr>
        <tr><td>HDD18 <b>192</b>, CDD10 <b>5552</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Lucknow-Amausi-Singh.Intl.AP.423690_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Lucknow-Amausi-Singh.Intl.AP.423690_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -403,14 +403,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Mumbai-Andheri.RS.430030 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>430030</b></td></tr>
-       <tr><td><b>N 19° 7.20'   E 72° 51.00'</b></td></tr>
+       <tr><td><b>N 19&deg; 7.20'   E 72&deg; 51.00'</b></td></tr>
        <tr><td>Elevation <b>14</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>18.1 C</b>, <b>64.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.9 C</b>, <b>94.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>18.8 C</b>, <b>65.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.0 C</b>, <b>95.0 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6275</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Mumbai-Andheri.RS.430030_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Mumbai-Andheri.RS.430030_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -422,14 +422,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Nagpur-Ambedkar.Intl.AP.428670 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>428670</b></td></tr>
-       <tr><td><b>N 21° 6.00'   E 79° 3.00'</b></td></tr>
+       <tr><td><b>N 21&deg; 6.00'   E 79&deg; 3.00'</b></td></tr>
        <tr><td>Elevation <b>310</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>12.8 C</b>, <b>55.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>43.0 C</b>, <b>109.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>43.1 C</b>, <b>109.6 F</b></td></tr>
        <tr><td>HDD18 <b>5</b>, CDD10 <b>6027</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Nagpur-Ambedkar.Intl.AP.428670_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Nagpur-Ambedkar.Intl.AP.428670_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -441,14 +441,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AP Nellore.432450 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432450</b></td></tr>
-       <tr><td><b>N 14° 27.00'   E 79° 58.80'</b></td></tr>
+       <tr><td><b>N 14&deg; 27.00'   E 79&deg; 58.80'</b></td></tr>
        <tr><td>Elevation <b>20</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>21.2 C</b>, <b>70.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.3 C</b>, <b>102.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>21.4 C</b>, <b>70.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.5 C</b>, <b>103.1 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6847</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Nellore.432450_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Nellore.432450_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -460,14 +460,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND DL New.Delhi-Safdarjung.AP.421820 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>421820</b></td></tr>
-       <tr><td><b>N 28° 34.80'   E 77° 12.00'</b></td></tr>
+       <tr><td><b>N 28&deg; 34.80'   E 77&deg; 12.00'</b></td></tr>
        <tr><td>Elevation <b>216</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.8 C</b>, <b>105.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>7.1 C</b>, <b>44.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.0 C</b>, <b>105.8 F</b></td></tr>
        <tr><td>HDD18 <b>319</b>, CDD10 <b>5395</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/DL_Delhi/IND_DL_New.Delhi-Safdarjung.AP.421820_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/DL_Delhi/IND_DL_New.Delhi-Safdarjung.AP.421820_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -479,14 +479,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GA Panjim.431920 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431920</b></td></tr>
-       <tr><td><b>N 15° 28.80'   E 73° 49.20'</b></td></tr>
+       <tr><td><b>N 15&deg; 28.80'   E 73&deg; 49.20'</b></td></tr>
        <tr><td>Elevation <b>60</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>20.3 C</b>, <b>68.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.6 C</b>, <b>92.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.7 C</b>, <b>92.7 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6266</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GA_Goa/IND_GA_Panjim.431920_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GA_Goa/IND_GA_Panjim.431920_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -498,14 +498,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Rajkot.AP.427370 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>427370</b></td></tr>
-       <tr><td><b>N 22° 18.00'   E 70° 46.80'</b></td></tr>
+       <tr><td><b>N 22&deg; 18.00'   E 70&deg; 46.80'</b></td></tr>
        <tr><td>Elevation <b>138</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>13.2 C</b>, <b>55.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.0 C</b>, <b>104.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>13.3 C</b>, <b>55.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.2 C</b>, <b>104.4 F</b></td></tr>
        <tr><td>HDD18 <b>3</b>, CDD10 <b>6436</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Rajkot.AP.427370_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Rajkot.AP.427370_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -517,14 +517,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Ratnagiri.431100 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431100</b></td></tr>
-       <tr><td><b>N 16° 58.80'   E 73° 19.80'</b></td></tr>
+       <tr><td><b>N 16&deg; 58.80'   E 73&deg; 19.80'</b></td></tr>
        <tr><td>Elevation <b>67</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>18.9 C</b>, <b>66.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.4 C</b>, <b>92.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.6 C</b>, <b>92.5 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6092</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Ratnagiri.431100_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Ratnagiri.431100_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -536,14 +536,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Solapur.431170 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431170</b></td></tr>
-       <tr><td><b>N 17° 40.20'   E 75° 54.00'</b></td></tr>
+       <tr><td><b>N 17&deg; 40.20'   E 75&deg; 54.00'</b></td></tr>
        <tr><td>Elevation <b>479</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>16.9 C</b>, <b>62.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.0 C</b>, <b>104.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>16.7 C</b>, <b>62.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.3 C</b>, <b>104.5 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6472</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Solapur.431170_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Solapur.431170_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -555,14 +555,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND KL Thiruvananthapuram.433710 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>433710</b></td></tr>
-       <tr><td><b>N 8° 28.80'   E 76° 57.00'</b></td></tr>
+       <tr><td><b>N 8&deg; 28.80'   E 76&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>64</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>22.8 C</b>, <b>73.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.4 C</b>, <b>92.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.6 C</b>, <b>92.5 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6282</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KL_Kerala/IND_KL_Thiruvananthapuram.433710_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KL_Kerala/IND_KL_Thiruvananthapuram.433710_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -574,14 +574,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND TN Tiruchirapalli.Intl.AP.433440 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>433440</b></td></tr>
-       <tr><td><b>N 10° 46.20'   E 78° 43.20'</b></td></tr>
+       <tr><td><b>N 10&deg; 46.20'   E 78&deg; 43.20'</b></td></tr>
        <tr><td>Elevation <b>88</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>20.8 C</b>, <b>69.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>38.2 C</b>, <b>100.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>20.9 C</b>, <b>69.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.8 C</b>, <b>101.8 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6876</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Tiruchirapalli.Intl.AP.433440_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Tiruchirapalli.Intl.AP.433440_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -593,14 +593,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UP Varanasi-Shastri.Intl.AP.424790 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424790</b></td></tr>
-       <tr><td><b>N 25° 27.00'   E 82° 52.20'</b></td></tr>
+       <tr><td><b>N 25&deg; 27.00'   E 82&deg; 52.20'</b></td></tr>
        <tr><td>Elevation <b>85</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>8.4 C</b>, <b>47.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>8.8 C</b>, <b>47.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>41.9 C</b>, <b>107.4 F</b></td></tr>
        <tr><td>HDD18 <b>180</b>, CDD10 <b>5697</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Varanasi-Shastri.Intl.AP.424790_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Varanasi-Shastri.Intl.AP.424790_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -612,14 +612,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Veraval.429090 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>429090</b></td></tr>
-       <tr><td><b>N 20° 54.00'   E 70° 22.20'</b></td></tr>
+       <tr><td><b>N 20&deg; 54.00'   E 70&deg; 22.20'</b></td></tr>
        <tr><td>Elevation <b>8</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>16.1 C</b>, <b>61.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>16.2 C</b>, <b>61.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6169</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Veraval.429090_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Veraval.429090_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -631,14 +631,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Akola.AP.429340 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>429340</b></td></tr>
-       <tr><td><b>N 20° 42.00'   E 77° 4.20'</b></td></tr>
+       <tr><td><b>N 20&deg; 42.00'   E 77&deg; 4.20'</b></td></tr>
        <tr><td>Elevation <b>309</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>12.5 C</b>, <b>54.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>43.1 C</b>, <b>109.6 F</b></td></tr>
        <tr><td>HDD18 <b>3.E-02</b>, CDD10 <b>6362</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Akola.AP.429340_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Akola.AP.429340_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -650,14 +650,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UP Allahabad-Bamrauli.AP.424750 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424750</b></td></tr>
-       <tr><td><b>N 25° 27.00'   E 81° 43.80'</b></td></tr>
+       <tr><td><b>N 25&deg; 27.00'   E 81&deg; 43.80'</b></td></tr>
        <tr><td>Elevation <b>98</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>8.0 C</b>, <b>46.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>43.4 C</b>, <b>110.1 F</b></td></tr>
        <tr><td>HDD18 <b>167</b>, CDD10 <b>5913</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Allahabad-Bamrauli.AP.424750_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Allahabad-Bamrauli.AP.424750_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -669,14 +669,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Barmer.424350 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424350</b></td></tr>
-       <tr><td><b>N 25° 45.00'   E 71° 22.80'</b></td></tr>
+       <tr><td><b>N 25&deg; 45.00'   E 71&deg; 22.80'</b></td></tr>
        <tr><td>Elevation <b>194</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>11.3 C</b>, <b>52.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.5 C</b>, <b>106.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.9 C</b>, <b>107.4 F</b></td></tr>
        <tr><td>HDD18 <b>59</b>, CDD10 <b>6408</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Barmer.424350_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Barmer.424350_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -688,14 +688,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND BR Bhagalpur.424980 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424980</b></td></tr>
-       <tr><td><b>N 25° 13.80'   E 86° 57.00'</b></td></tr>
+       <tr><td><b>N 25&deg; 13.80'   E 86&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>49</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>12.4 C</b>, <b>54.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.4 C</b>, <b>99.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.8 C</b>, <b>53.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.6 C</b>, <b>99.7 F</b></td></tr>
        <tr><td>HDD18 <b>18</b>, CDD10 <b>5987</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar\IND_BR_Bhagalpur.424980_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar\IND_BR_Bhagalpur.424980_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -707,14 +707,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Bikaner.421650 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>421650</b></td></tr>
-       <tr><td><b>N 28° 0.00'   E 73° 18.00'</b></td></tr>
+       <tr><td><b>N 28&deg; 0.00'   E 73&deg; 18.00'</b></td></tr>
        <tr><td>Elevation <b>224</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>7.5 C</b>, <b>45.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>42.9 C</b>, <b>109.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>7.6 C</b>, <b>45.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.8 C</b>, <b>109.0 F</b></td></tr>
        <tr><td>HDD18 <b>252</b>, CDD10 <b>5981</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Bikaner.421650_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan/IND_RJ_Bikaner.421650_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -726,14 +726,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AS Dibrugarh.AP.423140 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423140</b></td></tr>
-       <tr><td><b>N 27° 28.80'   E 95° 1.20'</b></td></tr>
+       <tr><td><b>N 27&deg; 28.80'   E 95&deg; 1.20'</b></td></tr>
        <tr><td>Elevation <b>111</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>10.9 C</b>, <b>51.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.0 C</b>, <b>51.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>34.2 C</b>, <b>93.6 F</b></td></tr>
        <tr><td>HDD18 <b>216</b>, CDD10 <b>4521</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Dibrugarh.AP.423140_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Dibrugarh.AP.423140_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -745,14 +745,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UP Gorakhpur.423790 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423790</b></td></tr>
-       <tr><td><b>N 26° 45.00'   E 83° 22.20'</b></td></tr>
+       <tr><td><b>N 26&deg; 45.00'   E 83&deg; 22.20'</b></td></tr>
        <tr><td>Elevation <b>77</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>8.9 C</b>, <b>48.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>39.4 C</b>, <b>102.9 F</b></td></tr>
        <tr><td>HDD18 <b>157</b>, CDD10 <b>5602</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Gorakhpur.423790_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UP_Uttar_Pradesh/IND_UP_Gorakhpur.423790_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -764,14 +764,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AS Guwahati-Bordoloi.Intl.AP.424100 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424100</b></td></tr>
-       <tr><td><b>N 26° 6.00'   E 91° 34.80'</b></td></tr>
+       <tr><td><b>N 26&deg; 6.00'   E 91&deg; 34.80'</b></td></tr>
        <tr><td>Elevation <b>54</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>11.8 C</b>, <b>53.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.9 C</b>, <b>53.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.4 C</b>, <b>93.9 F</b></td></tr>
        <tr><td>HDD18 <b>71</b>, CDD10 <b>5101</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Guwahati-Bordoloi.Intl.AP.424100_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Guwahati-Bordoloi.Intl.AP.424100_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -783,14 +783,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MP Gwalior.423610 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423610</b></td></tr>
-       <tr><td><b>N 26° 13.80'   E 78° 15.00'</b></td></tr>
+       <tr><td><b>N 26&deg; 13.80'   E 78&deg; 15.00'</b></td></tr>
        <tr><td>Elevation <b>207</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>42.4 C</b>, <b>108.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.6 C</b>, <b>108.7 F</b></td></tr>
        <tr><td>HDD18 <b>233</b>, CDD10 <b>5651</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Gwalior.423610_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Gwalior.423610_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -802,14 +802,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MN Imphal.426230 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>426230</b></td></tr>
-       <tr><td><b>N 24° 40.20'   E 93° 54.00'</b></td></tr>
+       <tr><td><b>N 24&deg; 40.20'   E 93&deg; 54.00'</b></td></tr>
        <tr><td>Elevation <b>774</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>6.3 C</b>, <b>43.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>6.4 C</b>, <b>43.5 F</b></td></tr>
        <tr><td>1% Cooling DB <b>31.5 C</b>, <b>88.7 F</b></td></tr>
        <tr><td>HDD18 <b>456</b>, CDD10 <b>3736</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MN_Manipur/IND_MN_Imphal.426230_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MN_Manipur/IND_MN_Imphal.426230_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -821,14 +821,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MP Indore-Holkar.AP.427540 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>427540</b></td></tr>
-       <tr><td><b>N 22° 43.20'   E 75° 48.00'</b></td></tr>
+       <tr><td><b>N 22&deg; 43.20'   E 75&deg; 48.00'</b></td></tr>
        <tr><td>Elevation <b>567</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>10.8 C</b>, <b>51.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.6 C</b>, <b>103.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>11.0 C</b>, <b>51.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.7 C</b>, <b>103.5 F</b></td></tr>
        <tr><td>HDD18 <b>27</b>, CDD10 <b>5383</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Indore-Holkar.AP.427540_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Indore-Holkar.AP.427540_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -840,14 +840,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MP Jabalpur.426750 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>426750</b></td></tr>
-       <tr><td><b>N 23° 12.00'   E 79° 57.00'</b></td></tr>
+       <tr><td><b>N 23&deg; 12.00'   E 79&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>393</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>9.6 C</b>, <b>49.3 F</b></td></tr>
        <tr><td>1% Cooling DB <b>41.3 C</b>, <b>106.3 F</b></td></tr>
        <tr><td>HDD18 <b>78</b>, CDD10 <b>5460</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Jabalpur.426750_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MP_Madhya_Pradesh/IND_MP_Jabalpur.426750_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -859,14 +859,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND CT Jagdalpur.430410 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>430410</b></td></tr>
-       <tr><td><b>N 19° 4.80'   E 82° 1.80'</b></td></tr>
+       <tr><td><b>N 19&deg; 4.80'   E 82&deg; 1.80'</b></td></tr>
        <tr><td>Elevation <b>553</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>11.5 C</b>, <b>52.7 F</b></td></tr>
        <tr><td>1% Cooling DB <b>38.1 C</b>, <b>100.6 F</b></td></tr>
        <tr><td>HDD18 <b>22</b>, CDD10 <b>5275</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/CT_Chhattisgarh/IND_CT_Jagdalpur.430410_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/CT_Chhattisgarh/IND_CT_Jagdalpur.430410_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -878,14 +878,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Jamnagar.427340 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>427340</b></td></tr>
-       <tr><td><b>N 22° 27.00'   E 70° 4.80'</b></td></tr>
+       <tr><td><b>N 22&deg; 27.00'   E 70&deg; 4.80'</b></td></tr>
        <tr><td>Elevation <b>20</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>8.8 C</b>, <b>47.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>36.8 C</b>, <b>98.2 F</b></td></tr>
        <tr><td>HDD18 <b>8</b>, CDD10 <b>5680</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Jamnagar.427340_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Jamnagar.427340_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -897,14 +897,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AS Jorhat.424230 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424230</b></td></tr>
-       <tr><td><b>N 26° 54.00'   E 94° 12.00'</b></td></tr>
+       <tr><td><b>N 26&deg; 54.00'   E 94&deg; 12.00'</b></td></tr>
        <tr><td>Elevation <b>87</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>8.9 C</b>, <b>48.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>34.7 C</b>, <b>94.5 F</b></td></tr>
        <tr><td>HDD18 <b>174</b>, CDD10 <b>4816</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Jorhat.424230_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Jorhat.424230_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -916,14 +916,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND RJ Kota.AP.424520 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424520</b></td></tr>
-       <tr><td><b>N 25° 9.00'   E 75° 51.00'</b></td></tr>
+       <tr><td><b>N 25&deg; 9.00'   E 75&deg; 51.00'</b></td></tr>
        <tr><td>Elevation <b>274</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>11.1 C</b>, <b>52.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>42.7 C</b>, <b>108.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>11.0 C</b>, <b>51.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>42.9 C</b>, <b>109.2 F</b></td></tr>
        <tr><td>HDD18 <b>78</b>, CDD10 <b>6085</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan\IND_RJ_Kota.AP.424520_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/RJ_Rajasthan\IND_RJ_Kota.AP.424520_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -935,14 +935,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND KA Mangaluru.432840 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>432840</b></td></tr>
-       <tr><td><b>N 12° 55.20'   E 74° 52.80'</b></td></tr>
+       <tr><td><b>N 12&deg; 55.20'   E 74&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>102</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>21.5 C</b>, <b>70.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.8 C</b>, <b>92.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>21.8 C</b>, <b>71.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6156</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Mangaluru.432840_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/KA_Karnataka/IND_KA_Mangaluru.432840_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -954,14 +954,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND BR Patna-Jayaprakash.AP.424920 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424920</b></td></tr>
-       <tr><td><b>N 25° 36.00'   E 85° 6.00'</b></td></tr>
+       <tr><td><b>N 25&deg; 36.00'   E 85&deg; 6.00'</b></td></tr>
        <tr><td>Elevation <b>60</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>9.0 C</b>, <b>48.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>39.8 C</b>, <b>103.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>8.9 C</b>, <b>48.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>39.9 C</b>, <b>103.8 F</b></td></tr>
        <tr><td>HDD18 <b>130</b>, CDD10 <b>5539</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar/IND_BR_Patna-Jayaprakash.AP.424920_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar/IND_BR_Patna-Jayaprakash.AP.424920_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -973,14 +973,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND MH Pune.AP.430630 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>430630</b></td></tr>
-       <tr><td><b>N 18° 31.80'   E 73° 51.00'</b></td></tr>
+       <tr><td><b>N 18&deg; 31.80'   E 73&deg; 51.00'</b></td></tr>
        <tr><td>Elevation <b>559</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>10.9 C</b>, <b>51.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.2 C</b>, <b>99.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>11.2 C</b>, <b>52.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.4 C</b>, <b>99.3 F</b></td></tr>
        <tr><td>HDD18 <b>10</b>, CDD10 <b>5138</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Pune.AP.430630_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/MH_Maharashtra/IND_MH_Pune.AP.430630_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -992,15 +992,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND CT Raipur.428750 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>428750</b></td></tr>
-       <tr><td><b>N 21° 13.80'   E 81° 39.00'</b></td></tr>
+       <tr><td><b>N 21&deg; 13.80'   E 81&deg; 39.00'</b></td></tr>
        <tr><td>Elevation <b>298</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 428740</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>13.8 C</b>, <b>56.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>42.1 C</b>, <b>107.8 F</b></td></tr>
        <tr><td>HDD18 <b>6</b>, CDD10 <b>6057</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/CT_Chhattisgarh/IND_CT_Raipur.428750_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/CT_Chhattisgarh/IND_CT_Raipur.428750_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1012,14 +1012,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND TG Ramagundam.RS.430860 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>430860</b></td></tr>
-       <tr><td><b>N 18° 46.20'   E 79° 25.80'</b></td></tr>
+       <tr><td><b>N 18&deg; 46.20'   E 79&deg; 25.80'</b></td></tr>
        <tr><td>Elevation <b>156</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>14.3 C</b>, <b>57.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.4 C</b>, <b>106.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>14.4 C</b>, <b>57.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.6 C</b>, <b>106.9 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6446</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TG_Telangana/IND_TG_Ramagundam.RS.430860_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TG_Telangana/IND_TG_Ramagundam.RS.430860_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1031,14 +1031,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND JH Ranchi-Munda.Intl.AP.427010 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>427010</b></td></tr>
-       <tr><td><b>N 23° 19.20'   E 85° 19.20'</b></td></tr>
+       <tr><td><b>N 23&deg; 19.20'   E 85&deg; 19.20'</b></td></tr>
        <tr><td>Elevation <b>652</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>9.8 C</b>, <b>49.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>38.1 C</b>, <b>100.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>9.7 C</b>, <b>49.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>38.2 C</b>, <b>100.8 F</b></td></tr>
        <tr><td>HDD18 <b>107</b>, CDD10 <b>4947</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/JH_Jharkhand/IND_JH_Ranchi-Munda.Intl.AP.427010_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/JH_Jharkhand/IND_JH_Ranchi-Munda.Intl.AP.427010_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1050,14 +1050,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND BR Raxaul.AP.423820 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>423820</b></td></tr>
-       <tr><td><b>N 26° 58.80'   E 84° 51.00'</b></td></tr>
+       <tr><td><b>N 26&deg; 58.80'   E 84&deg; 51.00'</b></td></tr>
        <tr><td>Elevation <b>79</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
        <tr><td>1% Cooling DB <b>36.8 C</b>, <b>98.2 F</b></td></tr>
        <tr><td>HDD18 <b>196</b>, CDD10 <b>5157</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar/IND_BR_Raxaul.AP.423820_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/BR_Bihar/IND_BR_Raxaul.AP.423820_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1069,14 +1069,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND UP Roorkee.421400 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>421400</b></td></tr>
-       <tr><td><b>N 29° 51.00'   E 77° 52.80'</b></td></tr>
+       <tr><td><b>N 29&deg; 51.00'   E 77&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>274</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>1.0 C</b>, <b>33.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>38.9 C</b>, <b>102.0 F</b></td></tr>
        <tr><td>HDD18 <b>569</b>, CDD10 <b>4304</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UT_Uttarakhand/IND_UP_Roorkee.421400_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/UT_Uttarakhand/IND_UP_Roorkee.421400_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1088,14 +1088,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND ML Shillong.425160 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>425160</b></td></tr>
-       <tr><td><b>N 25° 34.20'   E 91° 52.80'</b></td></tr>
+       <tr><td><b>N 25&deg; 34.20'   E 91&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>1598</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>0.0 C</b>, <b>32.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
        <tr><td>HDD18 <b>1454</b>, CDD10 <b>1791</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/ML_Meghalaya/IND_ML_Shillong.425160_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/ML_Meghalaya/IND_ML_Shillong.425160_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1107,14 +1107,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND GJ Surat.428400 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>428400</b></td></tr>
-       <tr><td><b>N 21° 12.00'   E 72° 49.80'</b></td></tr>
+       <tr><td><b>N 21&deg; 12.00'   E 72&deg; 49.80'</b></td></tr>
        <tr><td>Elevation <b>12</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>15.4 C</b>, <b>59.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>36.5 C</b>, <b>97.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.7 C</b>, <b>98.1 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6269</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Surat.428400_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/GJ_Gujarat/IND_GJ_Surat.428400_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1126,14 +1126,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AS Tezpur.424150 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>424150</b></td></tr>
-       <tr><td><b>N 26° 37.20'   E 92° 46.80'</b></td></tr>
+       <tr><td><b>N 26&deg; 37.20'   E 92&deg; 46.80'</b></td></tr>
        <tr><td>Elevation <b>79</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1A - Very Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>12.1 C</b>, <b>53.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
        <tr><td>HDD18 <b>72</b>, CDD10 <b>4994</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Tezpur.424150_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AS_Assam/IND_AS_Tezpur.424150_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1145,14 +1145,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AP Vishakhapatnam.431500 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>431500</b></td></tr>
-       <tr><td><b>N 17° 42.00'   E 83° 18.00'</b></td></tr>
+       <tr><td><b>N 17&deg; 42.00'   E 83&deg; 18.00'</b></td></tr>
        <tr><td>Elevation <b>66</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>20.8 C</b>, <b>69.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.2 C</b>, <b>91.8 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6388</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Vishakhapatnam.431500_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AP_Andhra_Pradesh/IND_AP_Vishakhapatnam.431500_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1164,14 +1164,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND TN Kodaikanal.433390 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>433390</b></td></tr>
-       <tr><td><b>N 10° 13.80'   E 77° 28.20'</b></td></tr>
+       <tr><td><b>N 10&deg; 13.80'   E 77&deg; 28.20'</b></td></tr>
        <tr><td>Elevation <b>2343</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>6.8 C</b>, <b>44.2 F</b></td></tr>
        <tr><td>1% Cooling DB <b>22.1 C</b>, <b>71.8 F</b></td></tr>
        <tr><td>HDD18 <b>1380</b>, CDD10 <b>1540</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Kodaikanal.433390_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/TN_Tamil_Nadu/IND_TN_Kodaikanal.433390_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1183,14 +1183,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND AN Port.Blair.433330 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>433330</b></td></tr>
-       <tr><td><b>N 11° 40.20'   E 92° 43.20'</b></td></tr>
+       <tr><td><b>N 11&deg; 40.20'   E 92&deg; 43.20'</b></td></tr>
        <tr><td>Elevation <b>79</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>22.5 C</b>, <b>72.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.1 C</b>, <b>89.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>22.6 C</b>, <b>72.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.2 C</b>, <b>90.0 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6224</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AN_Andaman_and_Nicobar_Islands/IND_AN_Port.Blair.433330_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/AN_Andaman_and_Nicobar_Islands/IND_AN_Port.Blair.433330_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -1202,14 +1202,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IND JK Srinagar.420270 ISHRAE2014</b></td></tr>
        <tr><td><b>Data Source ISHRAE2014</td></tr>
        <tr><td>WMO <b>420270</b></td></tr>
-       <tr><td><b>N 34° 4.80'   E 74° 49.80'</b></td></tr>
+       <tr><td><b>N 34&deg; 4.80'   E 74&deg; 49.80'</b></td></tr>
        <tr><td>Elevation <b>1587</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+5.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4A - Mixed - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>-2.5 C</b>, <b>27.5 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.8 C</b>, <b>87.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
        <tr><td>HDD18 <b>2167</b>, CDD10 <b>2065</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/JK_Jammu_and_Kashmir/IND_JK_Srinagar.420270_ISHRAE2014.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IND_India/JK_Jammu_and_Kashmir/IND_JK_Srinagar.420270_ISHRAE2014.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

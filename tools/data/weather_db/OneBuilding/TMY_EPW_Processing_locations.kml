@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>MHL Kwajalein-Bucholz.AAF.913660 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--40604</td></tr>
        <tr><td>WMO <b>913660</b></td></tr>
-       <tr><td><b>N 8° 43.80'   E 167° 43.80'</b></td></tr>
+       <tr><td><b>N 8&deg; 43.80'   E 167&deg; 43.80'</b></td></tr>
        <tr><td>Elevation <b>2</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>24.9 C</b>, <b>76.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.1 C</b>, <b>88.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>25.0 C</b>, <b>77.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.2 C</b>, <b>88.2 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6404</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/MHL_Marshall_Islands/MHL_Kwajalein-Bucholz.AAF.913660_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/MHL_Marshall_Islands/MHL_Kwajalein-Bucholz.AAF.913660_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>PLW Palau-Tmetuchl.Intl.AP.914080 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--40309</td></tr>
        <tr><td>WMO <b>914080</b></td></tr>
-       <tr><td><b>N 7° 22.02'   E 134° 32.64'</b></td></tr>
+       <tr><td><b>N 7&deg; 22.02'   E 134&deg; 32.64'</b></td></tr>
        <tr><td>Elevation <b>28</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+9.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>24.1 C</b>, <b>75.4 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>24.0 C</b>, <b>75.2 F</b></td></tr>
        <tr><td>1% Cooling DB <b>31.7 C</b>, <b>89.1 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>6242</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/PLW_Palau/PLW_Palau-Tmetuchl.Intl.AP.914080_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/PLW_Palau/PLW_Palau-Tmetuchl.Intl.AP.914080_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>UMI Wake.Island.AF.912460 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--41606</td></tr>
        <tr><td>WMO <b>912460</b></td></tr>
-       <tr><td><b>N 19° 16.80'   E 166° 39.00'</b></td></tr>
+       <tr><td><b>N 19&deg; 16.80'   E 166&deg; 39.00'</b></td></tr>
        <tr><td>Elevation <b>4</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+12.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0A - Extremely Hot - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>22.7 C</b>, <b>72.9 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.3 C</b>, <b>90.1 F</b></td></tr>
        <tr><td>HDD18 <b>0</b>, CDD10 <b>5952</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/UMI_United_States_Minor_Outlying_Islands/UMI_Wake.Island.AF.912460_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_5_Southwest_Pacific/UMI_United_States_Minor_Outlying_Islands/UMI_Wake.Island.AF.912460_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,15 +99,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA CA Irvine-El.Toro.MCAS-Orange.County.Great.Park.690140 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--93101</td></tr>
        <tr><td>WMO <b>690140</b></td></tr>
-       <tr><td><b>N 33° 39.60'   W 117° 43.80'</b></td></tr>
+       <tr><td><b>N 33&deg; 39.60'   W 117&deg; 43.80'</b></td></tr>
        <tr><td>Elevation <b>116</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 722977</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>7.1 C</b>, <b>44.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>7.2 C</b>, <b>45.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.2 C</b>, <b>86.4 F</b></td></tr>
        <tr><td>HDD18 <b>934</b>, CDD10 <b>2384</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CA_California/USA_CA_Irvine-El.Toro.MCAS-Orange.County.Great.Park.690140_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CA_California/USA_CA_Irvine-El.Toro.MCAS-Orange.County.Great.Park.690140_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -119,14 +119,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA AK Summit.AP.702640 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--26414</td></tr>
        <tr><td>WMO <b>702640</b></td></tr>
-       <tr><td><b>N 63° 19.80'   W 149° 7.80'</b></td></tr>
+       <tr><td><b>N 63&deg; 19.80'   W 149&deg; 7.80'</b></td></tr>
        <tr><td>Elevation <b>734</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-9.0</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>-30.7 C</b>, <b>-23.3 F</b></td></tr>
        <tr><td>1% Cooling DB <b>20.3 C</b>, <b>68.5 F</b></td></tr>
        <tr><td>HDD18 <b>7923</b>, CDD10 <b>88</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/AK_Alaska/USA_AK_Summit.AP.702640_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/AK_Alaska/USA_AK_Summit.AP.702640_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -138,14 +138,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA FL Apalachicola.Rgnl.AP.722200 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--12832</td></tr>
        <tr><td>WMO <b>722200</b></td></tr>
-       <tr><td><b>N 29° 43.80'   W 85° 1.80'</b></td></tr>
+       <tr><td><b>N 29&deg; 43.80'   W 85&deg; 1.80'</b></td></tr>
        <tr><td>Elevation <b>6</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-5.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>1.9 C</b>, <b>35.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>32.5 C</b>, <b>90.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>1.8 C</b>, <b>35.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.7 C</b>, <b>90.9 F</b></td></tr>
        <tr><td>HDD18 <b>729</b>, CDD10 <b>3805</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/FL_Florida/USA_FL_Apalachicola.Rgnl.AP.722200_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/FL_Florida/USA_FL_Apalachicola.Rgnl.AP.722200_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -157,14 +157,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA TX Sherman-Dennison-North.Texas.Rgnl.AP-Perrin.Field.722541 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--13923</td></tr>
        <tr><td>WMO <b>722541</b></td></tr>
-       <tr><td><b>N 33° 43.20'   W 96° 40.20'</b></td></tr>
+       <tr><td><b>N 33&deg; 43.20'   W 96&deg; 40.20'</b></td></tr>
        <tr><td>Elevation <b>233</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-3.9 C</b>, <b>25.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.3 C</b>, <b>99.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-3.8 C</b>, <b>25.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.1 C</b>, <b>98.8 F</b></td></tr>
        <tr><td>HDD18 <b>1486</b>, CDD10 <b>3199</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/TX_Texas/USA_TX_Sherman-Dennison-North.Texas.Rgnl.AP-Perrin.Field.722541_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/TX_Texas/USA_TX_Sherman-Dennison-North.Texas.Rgnl.AP-Perrin.Field.722541_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -176,14 +176,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA TX Fort.Worth.Meacham.Intl.AP.722600 TMY</b></td></tr>
        <tr><td><b>Data Source TMY-- 3927</td></tr>
        <tr><td>WMO <b>722600</b></td></tr>
-       <tr><td><b>N 32° 49.20'   W 97° 22.20'</b></td></tr>
+       <tr><td><b>N 32&deg; 49.20'   W 97&deg; 22.20'</b></td></tr>
        <tr><td>Elevation <b>216</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-6.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-2.9 C</b>, <b>26.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>36.2 C</b>, <b>97.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>-2.8 C</b>, <b>27.0 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>36.4 C</b>, <b>97.5 F</b></td></tr>
        <tr><td>HDD18 <b>1300</b>, CDD10 <b>3375</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/TX_Texas/USA_TX_Fort.Worth.Meacham.Intl.AP.722600_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/TX_Texas/USA_TX_Fort.Worth.Meacham.Intl.AP.722600_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -195,14 +195,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA NV Nevada.Test.Site-Yucca.Airstrip.723850 TMY</b></td></tr>
        <tr><td><b>Data Source TMY-- 3133</td></tr>
        <tr><td>WMO <b>723850</b></td></tr>
-       <tr><td><b>N 36° 57.00'   W 116° 3.00'</b></td></tr>
+       <tr><td><b>N 36&deg; 57.00'   W 116&deg; 3.00'</b></td></tr>
        <tr><td>Elevation <b>1196</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
-       <tr><td>Design conditions from weather file</td></tr>
-       <tr><td>99% Heating DB <b>-11.8 C</b>, <b>10.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>38.4 C</b>, <b>101.1 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>6B - Cold - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-12.1 C</b>, <b>10.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>27.9 C</b>, <b>82.2 F</b></td></tr>
        <tr><td>HDD18 <b>2548</b>, CDD10 <b>2072</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/NV_Nevada/USA_NV_Nevada.Test.Site-Yucca.Airstrip.723850_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/NV_Nevada/USA_NV_Nevada.Test.Site-Yucca.Airstrip.723850_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -214,14 +214,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA CO Denver-Stapleton.Intl.AP.724690 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--23062</td></tr>
        <tr><td>WMO <b>724690</b></td></tr>
-       <tr><td><b>N 39° 45.60'   W 104° 51.60'</b></td></tr>
+       <tr><td><b>N 39&deg; 45.60'   W 104&deg; 51.60'</b></td></tr>
        <tr><td>Elevation <b>1611</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5A - Cool - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5B - Cool - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>-14.9 C</b>, <b>5.2 F</b></td></tr>
        <tr><td>1% Cooling DB <b>32.9 C</b>, <b>91.2 F</b></td></tr>
        <tr><td>HDD18 <b>3379</b>, CDD10 <b>1446</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CO_Colorado/USA_CO_Denver-Stapleton.Intl.AP.724690_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CO_Colorado/USA_CO_Denver-Stapleton.Intl.AP.724690_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -233,14 +233,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA CA Mount.Shasta-Rep.AP.725957 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--24215</td></tr>
        <tr><td>WMO <b>725957</b></td></tr>
-       <tr><td><b>N 41° 19.80'   W 122° 19.80'</b></td></tr>
+       <tr><td><b>N 41&deg; 19.80'   W 122&deg; 19.80'</b></td></tr>
        <tr><td>Elevation <b>1077</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-8.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>5C - Cool - Marine</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.0 C</b>, <b>21.2 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.6 C</b>, <b>88.9 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>5C - Cool - Marine</b></td></tr>
+       <tr><td>99% Heating DB <b>-5.7 C</b>, <b>21.7 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>31.9 C</b>, <b>89.4 F</b></td></tr>
        <tr><td>HDD18 <b>3033</b>, CDD10 <b>1338</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CA_California/USA_CA_Mount.Shasta-Rep.AP.725957_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/CA_California/USA_CA_Mount.Shasta-Rep.AP.725957_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -252,14 +252,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>USA MT Dillon.AP.726796 TMY</b></td></tr>
        <tr><td><b>Data Source TMY--24138</td></tr>
        <tr><td>WMO <b>726796</b></td></tr>
-       <tr><td><b>N 45° 15.00'   W 112° 33.00'</b></td></tr>
+       <tr><td><b>N 45&deg; 15.00'   W 112&deg; 33.00'</b></td></tr>
        <tr><td>Elevation <b>1597</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-7.0</b> hours}</td></tr>
        <tr><td>Design conditions from weather file</td></tr>
        <tr><td>99% Heating DB <b>-23.4 C</b>, <b>-10.1 F</b></td></tr>
        <tr><td>1% Cooling DB <b>30.7 C</b>, <b>87.3 F</b></td></tr>
        <tr><td>HDD18 <b>4500</b>, CDD10 <b>852</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/MT_Montana/USA_MT_Dillon.AP.726796_TMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_4_North_and_Central_America/USA_United_States_of_America/MT_Montana/USA_MT_Dillon.AP.726796_TMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
