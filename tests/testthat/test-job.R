@@ -38,7 +38,7 @@ test_that("Job methods", {
         "level_index", "level", "message"
     ))
     expect_equal(attr(err, "eplus_version"), numeric_version(LATEST_EPLUS_VER))
-    expect_equal(attr(err, "eplus_build"), "ed759b17ee")
+    expect_equal(attr(err, "eplus_build"), "c249759bad")
     # New EnergyPlus version has removed the IDD version in ERR file
     expect_equal(attr(err, "idd_version"), NA)
     expect_equal(attr(err, "successful"), TRUE)

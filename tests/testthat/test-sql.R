@@ -76,13 +76,13 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$report_data(day_type = "designday")), 0)
     expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)
 
-    expect_equal(nrow(sql$tabular_data()), 10140L)
+    expect_equal(nrow(sql$tabular_data()), 10501L)
     expect_equal(nrow(sql$tabular_data(
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
             "Initialization Summary"
         ))),
-        4281L
+        803L
     )
     expect_equal(nrow(sql$tabular_data(table_name = "Site and Source Energy")), 12)
     expect_equal(nrow(sql$tabular_data(column_name = "Total Energy")), 4)

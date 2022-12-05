@@ -1,5 +1,6 @@
-test_that("Install", {
+test_that("Install EnergyPlus v9.0 and below", {
     skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_INSTALL_OLD_") != "")
 
     expect_equal(as.character(avail_eplus()), names(.globals$eplus))
 
@@ -8,6 +9,12 @@ test_that("Install", {
     } else {
         install_eplus(8.8, local = TRUE)
     }
+})
+
+test_that("Install EnergyPlus v9.1 and above", {
+    skip_on_cran()
+
+    expect_equal(as.character(avail_eplus()), names(.globals$eplus))
 
     # test if patch on EnergyPlus v9.1 and above works
     if (!is_avail_eplus(LATEST_EPLUS_VER)) {
