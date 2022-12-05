@@ -1186,6 +1186,7 @@ test_that("$print()", {
     expect_output(idf$print())
 
     # only test on UTF-8 supported platform
+    local_reproducible_output(unicode = TRUE)
     skip_if_not(cli::is_utf8_output())
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     expect_output(idf$print("group"))
