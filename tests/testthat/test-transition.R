@@ -1,7 +1,7 @@
 # HELPER {{{
 test_that("Transition Helper", {
-    eplusr_option(verbose_info = FALSE)
-    idf <- read_idf(example(), use_idd(8.8, "auto"))
+    skip_on_cran()
+    idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
     # transition action {{{
     expect_equal(
@@ -72,7 +72,7 @@ test_that("Transition Helper", {
     # }}}
 
     # preprocess {{{
-    expect_silent(new_idf <- trans_preprocess(idf, 8.9, "Construction"))
+    expect_s3_class(new_idf <- trans_preprocess(idf, 8.9, "Construction"), "Idf")
     expect_equal(new_idf$version(), numeric_version("8.9.0"))
     expect_false(new_idf$is_valid_class("Construction"))
     expect_false(get_priv_env(new_idf)$uuid() == get_priv_env(idf)$uuid())

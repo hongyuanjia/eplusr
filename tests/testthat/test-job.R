@@ -1,5 +1,4 @@
 test_that("Job methods", {
-    eplusr_option(verbose_info = FALSE)
     skip_on_cran()
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")

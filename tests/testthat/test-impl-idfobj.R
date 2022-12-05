@@ -1,9 +1,8 @@
-use_idd(8.8, "auto")
-
 # VALUE {{{
 test_that("get_idfobj_value()", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     expect_equal(
         ignore_attr = TRUE,
@@ -42,8 +41,8 @@ test_that("get_idfobj_value()", {
     val <- get_idf_value(idd_env, idf_env, object = 1, property = "type_enum")
     expect_silent(with_option(list(view_in_ip = TRUE), get_value_list(val, TRUE)))
 
-    idf_env <- parse_idf_file(example())
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     val <- get_idf_value(idd_env, idf_env, object = 8, property = "type_enum")
     val[2, `:=`(value_chr = "4.5", value_num = 4.5)]
@@ -54,14 +53,15 @@ test_that("get_idfobj_value()", {
 
 # VALUE_POSSIBLE {{{
 test_that("get_idfobj_possible()", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     expect_equal(
         ignore_attr = TRUE,
         get_idfobj_possible(idd_env, idf_env, 2),
-        data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
-            object_name = "WALL-1", field_id = 11006:11010, field_index = 1:5,
+        data.table(class_id = 91L, class_name = "Construction", object_id = 2L,
+            object_name = "WALL-1", field_id = 16515:16519, field_index = 1:5,
             field_name = c("Name", "Outside Layer", paste("Layer", 2:4)),
             value_id = 10:14, value_chr = c("WALL-1", "WD01", "PW03", "IN02", "GP01"),
             value_num = rep(NA_real_, 5),
@@ -74,8 +74,8 @@ test_that("get_idfobj_possible()", {
     expect_equal(
         ignore_attr = TRUE,
         get_idfobj_possible(idd_env, idf_env, 2, 2),
-        data.table(class_id = 90L, class_name = "Construction", object_id = 2L,
-            object_name = "WALL-1", field_id = 11007, field_index = 2,
+        data.table(class_id = 91L, class_name = "Construction", object_id = 2L,
+            object_name = "WALL-1", field_id = 16516, field_index = 2,
             field_name = "Outside Layer",
             value_id = 11, value_chr = "WD01", value_num = NA_real_,
             auto = NA_character_, default = list(NA_character_),
@@ -93,8 +93,9 @@ test_that("get_idfobj_possible()", {
 
 # VALUE_RELATION {{{
 test_that("get_idfobj_relation()", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     expect_equal(
         ignore_attr = TRUE,
@@ -112,13 +113,13 @@ test_that("get_idfobj_relation()", {
                 src_enum = integer(), dep = integer()
             ),
             ref_by = data.table(
-                class_id = 103L, class_name = "BuildingSurface:Detailed",
+                class_id = 108L, class_name = "BuildingSurface:Detailed",
                 object_id = 3L, object_name = "WALL-1PF",
-                field_id = 11624L, field_index = 3L, field_name = "Construction Name",
+                field_id = 17188, field_index = 3L, field_name = "Construction Name",
                 value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
-                src_class_id = 90L, src_class_name = "Construction",
+                src_class_id = 91L, src_class_name = "Construction",
                 src_object_id = 2L, src_object_name = "WALL-1",
-                src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
+                src_field_id = 16515, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
                 src_enum = 2L, dep = 0L
             ),
@@ -140,8 +141,9 @@ test_that("get_idfobj_relation()", {
 
 # TABLE {{{
 test_that("get_idfobj_table()", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     expect_equal(
         get_idfobj_table(idd_env, idf_env, 2),
@@ -155,8 +157,9 @@ test_that("get_idfobj_table()", {
 
 # STRING {{{
 test_that("get_idfobj_string()", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     expect_equal(get_idfobj_string(idd_env, idf_env, 2, leading = 0, sep_at = 10, comment = FALSE),
         c("Construction,",
@@ -186,8 +189,9 @@ test_that("get_idfobj_string()", {
 
 # COMMENT {{{
 test_that("set_idfobj_comment", {
-    idf_env <- parse_idf_file(idftext("idf", 8.8))
-    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+    skip_on_cran()
+    idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
+    idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
     # can delete comments
     expect_equal(set_idfobj_comment(idd_env, idf_env, 1, comment = NULL)$comment, list(NULL))

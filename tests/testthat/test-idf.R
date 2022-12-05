@@ -34,7 +34,7 @@ test_that("$path()", {
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
     expect_equal(idf$path(), NULL)
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_equal(basename(idf$path()), "1ZoneUncontrolled.idf")
 })
 # }}}
@@ -79,7 +79,7 @@ test_that("$class_name()", {
     expect_equal(idf$class_name(all = TRUE), use_idd(LATEST_EPLUS_VER)$class_name())
 
     # can get class names by group
-    expect_equal(length(idf$class_name(all = TRUE, by_group = TRUE)), 58)
+    expect_equal(length(idf$class_name(all = TRUE, by_group = TRUE)), 59)
 
     # can get class names by group
     expect_equal(idf$class_name(by_group = TRUE),
@@ -432,7 +432,7 @@ test_that("$add()", {
     expect_error(idf$add("Material" = list(name = "a", name = "a")))
     # adding existing unique
     expect_error(idf$add("Version" = list(8)))
-    expect_silent(idf_full <- read_idf(example()))
+    expect_silent(idf_full <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
     expect_error(idf_full$add("Building" = list()))
 
     # adding empty object
@@ -458,27 +458,28 @@ test_that("$add()", {
     # incomplete extensible group
     # add all fields with defaults
     expect_equal(
-        idf$add("RunPeriod" = list("rp_test_1", 1, 1, 2, 1),
+        idf$add("RunPeriod" = list("rp_test_1", 1, 1, NULL, 2, 1),
             .default = TRUE, .all = TRUE)$rp_test_1$value(),
         list(Name = "rp_test_1",
              `Begin Month` = 1L,
              `Begin Day of Month` = 1L,
+             `Begin Year` = NA_real_,
              `End Month` = 2L,
              `End Day of Month` = 1L,
-             `Day of Week for Start Day` = "UseWeatherFile",
+             `End Year` = NA_real_,
+             `Day of Week for Start Day` = NA_character_,
              `Use Weather File Holidays and Special Days` = "Yes",
              `Use Weather File Daylight Saving Period` = "Yes",
              `Apply Weekend Holiday Rule` = "No",
              `Use Weather File Rain Indicators` = "Yes",
              `Use Weather File Snow Indicators` = "Yes",
-             `Number of Times Runperiod to be Repeated` = 1L,
-             `Increment Day of Week on repeat` = "Yes",
-             `Start Year` = NA_integer_
+             `Treat Weather as Actual` = "No",
+             `First Hour Interpolation Starting Values` = "Hour24"
         )
     )
     expect_silent(
         idf$add(
-            RunPeriod = list("rp_test_2", 1, 1, 2, 1,
+            RunPeriod = list("rp_test_2", 1, 1, NULL, 2, 1,
                 .comment = c("Comment for new object 1", "Another comment")
             ),
             RunPeriod = list(name = "rp_test_3", begin_month = 3, begin_day_of_month = 1, end_month = 4,
@@ -487,12 +488,10 @@ test_that("$add()", {
         )
     )
     expect_equal(idf$object("rp_test_2")$value(simplify = TRUE),
-        c("rp_test_2", "1", "1", "2", "1", "UseWeatherFile", "Yes", "Yes",
-            "No", "Yes", "Yes")
+        c("rp_test_2", "1", "1", NA, "2", "1", NA)
     )
     expect_equal(idf$objects("rp_test_3")[[1]]$value(simplify = TRUE),
-        c("rp_test_3", "3", "1", "4", "1", "UseWeatherFile", "Yes", "Yes",
-            "No", "Yes", "Yes")
+        c("rp_test_3", "3", "1", NA, "4", "1", NA)
     )
 
     # can stop adding objects if trying to add a object with same name
@@ -503,7 +502,7 @@ test_that("$add()", {
 # SET {{{
 test_that("$set()", {
     skip_on_cran()
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     # set new values and comments
     expect_type(type = "list",
@@ -522,28 +521,28 @@ test_that("$set()", {
             use_weather_file_rain_indicators = NULL, use_weather_file_snow_indicators = NULL
         ))
     )
-    expect_equal(length(idf$RunPeriod$rp_test$value()), 11)
+    expect_equal(length(idf$RunPeriod$rp_test$value()), 13)
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
 
     # can remove trailing empty fields
     expect_type(type = "list",
         idf$set(rp_test = list(
-            Number_of_Times_Runperiod_to_be_Repeated = NULL,
-            Increment_Day_of_Week_on_repeat = NULL
+            use_weather_file_rain_indicators = NULL,
+            use_weather_file_snow_indicators = NULL
         ), .default = FALSE)
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 11)
 
     # can keep trailing empty fields
     expect_type(type = "list",
-        idf$set(rp_test = list(start_year = NULL), .default = FALSE, .empty = TRUE)
+        idf$set(rp_test = list(treat_weather_as_actual = NULL), .default = FALSE, .empty = TRUE)
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 14)
 
     # can set all values in a class
     expect_type(type = "list",
         idf$set(
-            RunPeriod := list(start_year = NULL),
+            RunPeriod := list(treat_weather_as_actual = NULL),
             Material_NoMass := list(roughness = "Rough")
         )
     )
@@ -558,7 +557,6 @@ test_that("$set()", {
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
 
     # can handle references
-    skip_on_cran()
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")), "Idf")
     expect_type(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
     expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
@@ -573,7 +571,7 @@ test_that("$del()", {
     expect_error(idf$del(5L), class = "eplusr_error_del_version")
     expect_error(idf$del(c(1, 2, 1)), class = "eplusr_error_del_same")
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_error(idf$del(idf$Material_NoMass[[1]]$id()), class = "eplusr_error_del_referenced")
     expect_error(idf$del(idf$Building$id()), class = "eplusr_error_del_required")
 
@@ -581,7 +579,7 @@ test_that("$del()", {
     expect_equal(idf$is_valid_id(c(12, 15)), c(FALSE, TRUE))
     expect_false(idf$object("R13WALL")$is_valid())
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_s3_class(idf$del(12, .ref_by = TRUE, .force = TRUE), "Idf")
     expect_equal(idf$is_valid_id(c(12, 15)), c(FALSE, FALSE))
 })
@@ -658,7 +656,7 @@ test_that("$unique()", {
 # RENAME {{{
 test_that("$rename()", {
     skip_on_cran()
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     expect_type(idf$rename(test = "C5 - 4 IN HW CONCRETE"), "list")
     expect_equal(idf$object_name("Material"), list(Material = "test"))
     expect_equal(idf$Construction$FLOOR$Outside_Layer, "test")
@@ -669,7 +667,7 @@ test_that("$rename()", {
 test_that("$insert()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
-    expect_s3_class(idf_full <- read_idf(example()), "Idf")
+    expect_s3_class(idf_full <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     expect_error(idf$insert(list()), class = "eplusr_error_dots_format")
 
@@ -728,11 +726,11 @@ test_that("$replace_value()", {
 # PASTE {{{
 test_that("$paste()", {
     skip_on_cran()
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     if (!is_windows()) expect_error(idf$paste())
 
     skip_if_not(is_windows())
-    text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
+    text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
     writeClipboard(text)
     expect_s3_class(idf$paste()[[1L]], "IdfObject")
     writeClipboard(text)
@@ -783,7 +781,7 @@ test_that("$load()", {
 # UPDATE {{{
 test_that("$update()", {
     skip_on_cran()
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     # can stop if trying to update non-named objects using string
     expect_error(idf$update("SimulationControl, no;\n"))
@@ -822,9 +820,9 @@ test_that("$validate()", {
     expect_equal(val$invalid_reference,
         data.table(object_id = c(2L, 2L, 2L, 3L),
             object_name = c("WALL-1", "WALL-1", "WALL-1", "WALL-1PF"),
-            class_id = c(90L, 90L, 90L, 103L),
+            class_id = c(91L, 91L, 91L, 108L),
             class_name = c("Construction", "Construction", "Construction", "BuildingSurface:Detailed"),
-            field_id = c(11008L, 11009L, 11010L, 11625L),
+            field_id = c(16517L, 16518L, 16519L, 17189L),
             field_index = c(3L, 4L, 5L, 4L),
             field_name = c("Layer 2", "Layer 3", "Layer 4", "Zone Name"),
             units = c(NA_character_, NA_character_, NA_character_, NA_character_),
@@ -863,13 +861,13 @@ test_that("$to_string()", {
         "    WD01;                    !- Outside Layer",
         "",
         "Version,",
-        sprintf("    %s;                     !- Version Identifier", LATEST_EPLUS_VER),
+        sprintf("    %s;                  !- Version Identifier", LATEST_EPLUS_VER),
         ""
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
     expect_equal(idf_1$to_string(format = "new_top"), idf_string)
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_equal(idf$to_string()[2], "!-Option OriginalOrderTop")
 })
 # }}}
@@ -909,12 +907,13 @@ test_that("$to_table()", {
     expect_equal(
         idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:15,
+            index = 1:16,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -932,6 +931,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -949,12 +949,13 @@ test_that("$to_table()", {
     expect_equal(
         idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:13,
+            index = 1:14,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -970,6 +971,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -986,12 +988,13 @@ test_that("$to_table()", {
         ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:15,
+            index = 1:16,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -1009,6 +1012,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -1027,12 +1031,13 @@ test_that("$to_table()", {
         ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:13,
+            index = 1:14,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -1048,6 +1053,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -1068,6 +1074,7 @@ test_that("$to_table()", {
             "Surface Type" = "WALL",
             "Construction Name" = "WALL-1",
             "Zone Name" = "PLENUM-1",
+            "Space Name" = NA_character_,
             "Outside Boundary Condition" = "Outdoors",
             "Outside Boundary Condition Object" = NA_character_,
             "Sun Exposure" = "SunExposed",
@@ -1089,6 +1096,7 @@ test_that("$to_table()", {
             "Surface Type" = "WALL",
             "Construction Name" = "WALL-1",
             "Zone Name" = "PLENUM-1",
+            "Space Name" = NA_character_,
             "Outside Boundary Condition" = "Outdoors",
             "Outside Boundary Condition Object" = NA_character_,
             "Sun Exposure" = "SunExposed",
@@ -1120,7 +1128,7 @@ test_that("$save()", {
 test_that("$run()", {
     skip_on_cran()
     expect_error(read_idf(idftext("idf", LATEST_EPLUS_VER))$save(), class = "eplusr_error")
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_s3_class(job <- idf$run(NULL, tempdir(), echo = FALSE), "EplusJob")
 
     expect_silent(idf$set(..12 = list(roughness = "smooth")))
@@ -1132,7 +1140,7 @@ test_that("$run()", {
 # LAST_JOB {{{
 test_that("$last_job()", {
     skip_on_cran()
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_null(idf$last_job())
     expect_s3_class({idf$run(NULL, tempdir(), echo = FALSE); idf$last_job()}, "EplusJob")
 })
@@ -1142,7 +1150,7 @@ test_that("$last_job()", {
 test_that("$geometry()", {
     skip_on_cran()
     expect_warning(expect_warning(empty_idf(LATEST_EPLUS_VER)$geometry()))
-    expect_s3_class(read_idf(example())$geometry(), "IdfGeometry")
+    expect_s3_class(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$geometry(), "IdfGeometry")
 })
 # }}}
 
@@ -1152,10 +1160,10 @@ test_that("$view()", {
     expect_warning(expect_warning(v <- empty_idf(LATEST_EPLUS_VER)$view()))
     v$close()
 
-    expect_s3_class(v <- read_idf(example())$view(), "IdfViewer")
+    expect_s3_class(v <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$view(), "IdfViewer")
     v$close()
 
-    expect_s3_class(v <- plot(read_idf(example())), "IdfViewer")
+    expect_s3_class(v <- plot(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))), "IdfViewer")
     v$close()
 })
 # }}}
@@ -1163,7 +1171,7 @@ test_that("$view()", {
 # CLONE {{{
 test_that("$clone()", {
     skip_on_cran()
-    idf1 <- read_idf(example())
+    idf1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     idf2 <- idf1$clone()
     idf1$set(c(idf1$Zone[[1]]$name()) := list(name = "zone"))
     expect_equal(idf1$Zone[[1]]$Name, "zone")
@@ -1179,7 +1187,7 @@ test_that("$print()", {
 
     # only test on UTF-8 supported platform
     skip_if_not(cli::is_utf8_output())
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     expect_output(idf$print("group"))
     expect_output(idf$print("group", order = FALSE))
     expect_output(idf$print("class"))
@@ -1194,9 +1202,9 @@ test_that("$print()", {
 # ADD_OUTPUT {{{
 test_that("idf_add_output_*", {
     skip_on_cran()
-    expect_true(idf_add_output_sqlite(example()))
+    expect_true(idf_add_output_sqlite(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_true(idf_add_output_sqlite(idf))
     expect_type(idf$set(`Output:SQLite` := list("Simple")), "list")
     expect_true(idf_add_output_sqlite(idf))
@@ -1206,9 +1214,9 @@ test_that("idf_add_output_*", {
     expect_equal(idf$Zone[[1]]$Name, "zone")
     expect_equal(idf1$Zone[[1]]$Name, "ZONE ONE")
 
-    expect_false(idf_add_output_vardict(example()))
+    expect_false(idf_add_output_vardict(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_silent(without_checking(idf$Output_VariableDictionary[[1L]]$Key_Field <- "wrong"))
     expect_true(idf_add_output_vardict(idf))
     expect_null(idf$Output_VariableDictionary <- NULL)
@@ -1294,7 +1302,7 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- NULL))
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- idf_2[["BuildingSurface:Detailed"]]))
 
-    expect_s3_class(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     expect_error(idf$SimulationControl <- idf$Timestep)
     expect_error(idf$SimulationControl <- "Timestep, 6;\n")

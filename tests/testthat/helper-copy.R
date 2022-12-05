@@ -1,4 +1,4 @@
-copy_example <- function(ver = 8.8) {
+copy_example <- function(ver = LATEST_EPLUS_VER) {
     if (!is_avail_eplus(ver)) return()
 
     cfg <- eplus_config(ver)

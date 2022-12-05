@@ -1,5 +1,5 @@
 # text used for testing {{{
-idftext <- function(type = c("idf", "idd"), ver = NULL) {
+idftext <- function(type = c("idf", "idd"), ver = LATEST_EPLUS_VER) {
     type <- match.arg(type)
     # idd_text {{{
     idd_text <- c(
@@ -67,6 +67,7 @@ idftext <- function(type = c("idf", "idd"), ver = NULL) {
             WALL,                    !- Surface Type
             WALL-1,                  !- Construction Name
             PLENUM-1,                !- Zone Name
+            ,                        !- Space Name
             Outdoors,                !- Outside Boundary Condition
             ,                        !- Outside Boundary Condition Object
             SunExposed,              !- Sun Exposure
@@ -104,10 +105,5 @@ idftext <- function(type = c("idf", "idd"), ver = NULL) {
         if (!is.null(ver)) text <- paste0(text, "\nVersion, ", ver, ";")
     }
     text
-}
-# }}}
-# example IDF shipped with this package {{{
-example <- function() {
-    system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 }
 # }}}

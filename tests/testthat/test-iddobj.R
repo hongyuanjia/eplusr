@@ -268,13 +268,14 @@ test_that("IddObject class", {
     expect_equal(as.character(slash), slash$to_string())
     # }}}
 
+    skip_on_cran()
     # Outputs {{{
-    expect_equal(nrow(res <- use_idd(8.8, "auto")$Lights$outputs()), 25L)
+    expect_equal(nrow(res <- use_idd(LATEST_EPLUS_VER, "auto")$Lights$outputs()), 49L)
     expect_equal(names(res), c("index", "class", "reported_time_step",
         "report_type", "variable", "units"))
     expect_equal(
         ignore_attr = TRUE,
-        use_idd(8.8, "auto")$Version$outputs(),
+        use_idd(LATEST_EPLUS_VER, "auto")$Version$outputs(),
         data.table(index = integer(),
             class = character(),
             reported_time_step = character(),

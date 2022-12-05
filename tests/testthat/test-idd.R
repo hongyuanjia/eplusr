@@ -1,5 +1,3 @@
-eplusr_option(verbose_info = FALSE)
-
 # download_idd() {{{
 test_that("download_idd() can download IDD from EnergyPlus repo", {
     expect_error(download_idd(1, tempdir()), class = "eplusr_error_invalid_eplus_ver")
@@ -28,7 +26,7 @@ test_that("can read IDD", {
     expect_error(use_idd(""), class = "eplusr_error_read_lines")
 
     # can directly download from EnergyPlus GitHub repo
-    expect_silent(idd <- use_idd(8.4, download = TRUE))
+    expect_s3_class(idd <- use_idd(8.4, download = TRUE), "Idd")
 
     # can directly return if input is an Idd
     expect_s3_class(use_idd(idd), "Idd")
@@ -87,10 +85,10 @@ test_that("can read IDD", {
     locate_eplus()
 
     # can parse old IDD
-    expect_silent(use_idd(7.2))
-    expect_silent(use_idd(8.0))
-    expect_silent(use_idd(8.1))
-    expect_silent(use_idd(8.2))
+    expect_s3_class(use_idd(7.2), "Idd")
+    expect_s3_class(use_idd(8.0), "Idd")
+    expect_s3_class(use_idd(8.1), "Idd")
+    expect_s3_class(use_idd(8.2), "Idd")
 
     # can auto find suitable IDD
     expect_s3_class(get_idd_from_ver(8.8, NULL), "Idd")

@@ -1,7 +1,7 @@
 test_that("Rdd", {
     skip_on_cran()
 
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     job <- idf$run(NULL, dir = tempdir(), echo = FALSE)
 
     expect_s3_class(parse_rdd_file(tempfile()), "RddFile")

@@ -515,6 +515,8 @@ read_report_data_sql <- function (sql, env, dict, time,
     # reflected this by adding new time for those added run periods, but
     # EnvironmentPeriods table did not have entries for those periods.
     ind_time_env <- unique(time$environment_period_index)
+    # NOTE: This has been fixed in EnergyPlus v9.5 and above
+    # nocov start
     if (length(extra_env <- setdiff(ind_time_env, env$environment_period_index))) {
         # append rows for environment period table
         time_env <- time[J(ind_time_env), on = "environment_period_index", mult = "first",
@@ -540,6 +542,7 @@ read_report_data_sql <- function (sql, env, dict, time,
             }
         ]
     }
+    # nocov end
 
     dict <- subset_sql_report_data_dict(dict, key_value = key_value, name = name)
     env <- subset_sql_environment_periods(env, environment_name = environment_name)
