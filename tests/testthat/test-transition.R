@@ -2501,3 +2501,183 @@ test_that("Transition v9.6 --> v22.1", {
     )
 })
 # }}}
+# v22.1 --> v22.2 {{{
+test_that("Transition v22.1 --> v22.2", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- 22.1
+    to <- 22.2
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            "Coil:Cooling:DX:CurveFit:Speed" = list(
+                "CDXCF", 1.0, 1.0, 1.0, "autosize", 3.5, 1.0, NULL, 1.0, NULL
+            ),
+            "Coil:Cooling:DX:SingleSpeed" = list(
+                "CDXS", "Schedule", 100000, 0.8, 4.5, 8.5, NULL, "Inlet", "Outlet",
+                "Curve1", "Curve2", "Curve3", "Curve4", "Curve5"
+            ),
+            "Coil:Cooling:DX:MultiSpeed" = list(
+                "CDXM1", "Schedule", "Inlet", "Outlet", "AirNode", "AirCooled",
+                NULL, NULL, NULL, "No", "No", 200, 10, NULL, NULL, NULL,
+                "Electricity", 2,
+                10000, 0.8, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve1-6", 0.9, 1.2, 44
+            ),
+            "Coil:Cooling:DX:MultiSpeed" = list(
+                "CDXM2", "Schedule", "Inlet", "Outlet", "AirNode", "AirCooled",
+                NULL, NULL, NULL, "No", "No", 200, 10, NULL, NULL, NULL,
+                "Electricity", 2,
+                10000, 0.8, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve1-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve2-6", 0.9, 1.2, 44
+            ),
+            "Coil:Cooling:DX:MultiSpeed" = list(
+                "CDXM3", "Schedule", "Inlet", "Outlet", "AirNode", "AirCooled",
+                NULL, NULL, NULL, "No", "No", 200, 10, NULL, NULL, NULL,
+                "Electricity", 3,
+                10000, 0.8, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve1-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve2-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve3-1", "Curve3-2", "Curve3-3", "Curve3-4", "Curve3-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve3-6", 0.9, 1.2, 44
+            ),
+            "Coil:Cooling:DX:MultiSpeed" = list(
+                "CDXM4", "Schedule", "Inlet", "Outlet", "AirNode", "AirCooled",
+                NULL, NULL, NULL, "No", "No", 200, 10, NULL, NULL, NULL,
+                "Electricity", 4,
+                10000, 0.8, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve1-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve2-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve3-1", "Curve3-2", "Curve3-3", "Curve3-4", "Curve3-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve3-6", 0.9, 1.2, 44,
+                10000, 0.8, 4.5, 0.6, 500, "Curve4-1", "Curve4-2", "Curve4-3", "Curve4-4", "Curve4-5",
+                1000, 1.5, 3.0, 45.0, 0.2, "Curve4-6", 0.9, 1.2, 44
+            ),
+            "Coil:Heating:DX:SingleSpeed" = list(
+                "HDXS", "Schedule", "autosize", 2.75, "autosize", NULL, "Inlet", "Outlet",
+                NULL, "Curve1", "Curve2", "Curve3", "Curve4", "Curve5"
+            ),
+            "Coil:Heating:DX:MultiSpeed" = list(
+                "HDXM1", "Schedule", "Inlet", "Outlet",
+                -15, -8.8, 200, 10, "HPACDefrostCAPFT", 7.2, "ReverseCycle", "timed", 0.06, 2000, "No",
+                "Electricity", 4, 2,
+                10000, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5", 0.2, "Curve1-6"
+            ),
+            "Coil:Heating:DX:MultiSpeed" = list(
+                "HDXM2", "Schedule", "Inlet", "Outlet",
+                -15, -8.8, 200, 10, "HPACDefrostCAPFT", 7.2, "ReverseCycle", "timed", 0.06, 2000, "No",
+                "Electricity", 4, 2,
+                10000, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5", 0.2, "Curve1-6",
+                10000, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5", 0.2, "Curve2-6"
+            ),
+            "Coil:Heating:DX:MultiSpeed" = list(
+                "HDXM3", "Schedule", "Inlet", "Outlet",
+                -15, -8.8, 200, 10, "HPACDefrostCAPFT", 7.2, "ReverseCycle", "timed", 0.06, 2000, "No",
+                "Electricity", 4, 3,
+                10000, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5", 0.2, "Curve1-6",
+                10000, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5", 0.2, "Curve2-6",
+                10000, 4.5, 0.6, 500, "Curve3-1", "Curve3-2", "Curve3-3", "Curve3-4", "Curve3-5", 0.2, "Curve3-6"
+            ),
+            "Coil:Heating:DX:MultiSpeed" = list(
+                "HDXM4", "Schedule", "Inlet", "Outlet",
+                -15, -8.8, 200, 10, "HPACDefrostCAPFT", 7.2, "ReverseCycle", "timed", 0.06, 2000, "No",
+                "Electricity", 4, 4,
+                10000, 4.5, 0.6, 500, "Curve1-1", "Curve1-2", "Curve1-3", "Curve1-4", "Curve1-5", 0.2, "Curve1-6",
+                10000, 4.5, 0.6, 500, "Curve2-1", "Curve2-2", "Curve2-3", "Curve2-4", "Curve2-5", 0.2, "Curve2-6",
+                10000, 4.5, 0.6, 500, "Curve3-1", "Curve3-2", "Curve3-3", "Curve3-4", "Curve3-5", 0.2, "Curve3-6",
+                10000, 4.5, 0.6, 500, "Curve4-1", "Curve4-2", "Curve4-3", "Curve4-4", "Curve4-5", 0.2, "Curve4-6"
+            ),
+            "FuelFactors" = list("NaturalGas", "m3", NULL, 0.01, "natgasTDVfromCZ06com"),
+            "Space" = list("Space", "Zone", NULL, "Office"),
+            "Coil:Cooling:WaterToAirHeatPump:EquationFit" = list(
+                "CWAHP", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
+                "Autosize", "Autosize", "Autosize", "Autosize", 5.0,
+                "Curve1", "Curve2", "Curve3", 0, 0
+            ),
+            "Coil:Heating:WaterToAirHeatPump:EquationFit" = list(
+                "HWAHP", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
+                "Autosize", "Autosize", "Autosize", 5.0, "Curve1", "Curve2"
+            ),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    suppressWarnings(expect_warning(expect_s3_class(idfTR <- transition(idfOri, to), "Idf")))
+
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:CurveFit:Speed"$CDXCF$value(),
+        idfTR$"Coil:Cooling:DX:CurveFit:Speed"$CDXCF$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:SingleSpeed"$CDXS$value(),
+        idfTR$"Coil:Cooling:DX:SingleSpeed"$CDXS$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:MultiSpeed"$CDXM1$value(),
+        idfTR$"Coil:Cooling:DX:MultiSpeed"$CDXM1$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:MultiSpeed"$CDXM2$value(),
+        idfTR$"Coil:Cooling:DX:MultiSpeed"$CDXM2$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:MultiSpeed"$CDXM3$value(),
+        idfTR$"Coil:Cooling:DX:MultiSpeed"$CDXM3$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Cooling:DX:MultiSpeed"$CDXM4$value(),
+        idfTR$"Coil:Cooling:DX:MultiSpeed"$CDXM4$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Heating:DX:SingleSpeed"$HDXS$value(),
+        idfTR$"Coil:Heating:DX:SingleSpeed"$HDXS$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Heating:DX:MultiSpeed"$HDXM1$value(),
+        idfTR$"Coil:Heating:DX:MultiSpeed"$HDXM1$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Heating:DX:MultiSpeed"$HDXM2$value(),
+        idfTR$"Coil:Heating:DX:MultiSpeed"$HDXM2$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Heating:DX:MultiSpeed"$HDXM3$value(),
+        idfTR$"Coil:Heating:DX:MultiSpeed"$HDXM3$value()
+    )
+    expect_equal(
+        idfVU$"Coil:Heating:DX:MultiSpeed"$HDXM4$value(),
+        idfTR$"Coil:Heating:DX:MultiSpeed"$HDXM4$value()
+    )
+
+    expect_equal(
+        idfVU$FuelFactors[[1]]$value(),
+        idfTR$FuelFactors[[1]]$value()
+    )
+
+    expect_equal(
+        idfVU$Space$Space$value(),
+        idfTR$Space$Space$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$CWAHP$value(),
+        idfTR$"Coil:Cooling:WaterToAirHeatPump:EquationFit"$CWAHP$value()
+    )
+
+    expect_equal(
+        idfVU$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HWAHP$value(),
+        idfTR$"Coil:Heating:WaterToAirHeatPump:EquationFit"$HWAHP$value()
+    )
+})
+# }}}
