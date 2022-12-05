@@ -1,10 +1,10 @@
 test_that("Rdd", {
     skip_on_cran()
 
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     job <- idf$run(NULL, dir = tempdir(), echo = FALSE)
 
-    expect_is(parse_rdd_file(tempfile()), "RddFile")
+    expect_s3_class(parse_rdd_file(tempfile()), "RddFile")
 
     expect_silent(rdd <- job$read_rdd())
     expect_silent(mdd <- job$read_mdd())
@@ -23,27 +23,35 @@ test_that("Rdd", {
     expect_error(mdd_to_load(mdd[1:2][, reporting_frequency := c(1, 2)]), class = "eplusr_error")
     expect_error(mdd_to_load(mdd, class = ""))
 
-    expect_equivalent(rdd_to_load(rdd[1L]),
+    expect_equal(
+        ignore_attr = TRUE,
+        rdd_to_load(rdd[1L]),
         data.table(id = 1L, class = "Output:Variable", index = 1:3,
             field = c("Key Value", "Variable Name", "Reporting Frequency"),
             value = c("*", "Site Outdoor Air Drybulb Temperature", "Timestep")
         )
     )
 
-    expect_equivalent(rdd_to_load(rdd[1L][, key_value := "Environment"]),
+    expect_equal(
+        ignore_attr = TRUE,
+        rdd_to_load(rdd[1L][, key_value := "Environment"]),
         data.table(id = 1L, class = "Output:Variable", index = 1:3,
             field = c("Key Value", "Variable Name", "Reporting Frequency"),
             value = c("Environment", "Site Outdoor Air Drybulb Temperature", "Timestep")
         )
     )
 
-    expect_equivalent(mdd_to_load(mdd[1L]),
+    expect_equal(
+        ignore_attr = TRUE,
+        mdd_to_load(mdd[1L]),
         data.table(id = 1L, class = "Output:Meter", index = 1:2,
             field = c("Key Name", "Reporting Frequency"),
             value = c("Electricity:Facility", "Timestep")
         )
     )
-    expect_equivalent(mdd_to_load(mdd[1L], class = "Output:Meter:MeterFileOnly"),
+    expect_equal(
+        ignore_attr = TRUE,
+        mdd_to_load(mdd[1L], class = "Output:Meter:MeterFileOnly"),
         data.table(id = 1L, class = "Output:Meter:MeterFileOnly", index = 1:2,
             field = c("Key Name", "Reporting Frequency"),
             value = c("Electricity:Facility", "Timestep")

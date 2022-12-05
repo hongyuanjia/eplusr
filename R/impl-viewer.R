@@ -66,7 +66,7 @@ rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov =
 
 # rgl_view_surface {{{
 rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, wireframe = TRUE, width = 1.5) {
-    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
+    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "space", "normal"))
     assert_flag(x_ray)
     # should contain vertices after triangulation
     assert_names(names(geoms), must.include = "vertices2")
@@ -584,7 +584,7 @@ rgl_pop <- function (id, type = "shapes") {
 
 # map_view_color {{{
 map_view_color <- function (geoms, type = "surface_type", x_ray = FALSE) {
-    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "normal"))
+    assert_choice(type, c("surface_type", "boundary", "construction", "zone", "space", "normal"))
     alpha <- if (x_ray) 0.4 else 1.0
 
     set.seed(1L)
@@ -719,6 +719,25 @@ map_view_color <- function (geoms, type = "surface_type", x_ray = FALSE) {
         if (nrow(geoms$surface)) {
             set(geoms$surface, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
             geoms$surface[geoms$zone, on = c("zone_name" = "name"), `:=`(color = i.color, alpha = i.alpha)]
+
+            if (nrow(geoms$subsurface)) {
+                set(geoms$subsurface, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+                geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"),
+                    `:=`(color = i.color, alpha = i.alpha)]
+            }
+            if (nrow(geoms$shading)) {
+                set(geoms$shading, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+                geoms$shading[geoms$surface, on = c("base_surface_name" = "name"),
+                    `:=`(color = i.color, alpha = i.alpha)]
+            }
+        }
+    } else if (type == "space") {
+        set(geoms$space, NULL, c("color", "alpha"), list(sample(COLOR_MAP$color, nrow(geoms$space), replace = TRUE), alpha))
+        # add surface
+        if (nrow(geoms$surface)) {
+            # NOTE: It is possible that the space name is left empty.
+            set(geoms$surface, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))
+            geoms$surface[geoms$space, on = c("space_name" = "name"), `:=`(color = i.color, alpha = i.alpha)]
 
             if (nrow(geoms$subsurface)) {
                 set(geoms$subsurface, NULL, c("color", "alpha"), list(COLOR_MAP$surface_type["Undefined"], alpha))

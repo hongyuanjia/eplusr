@@ -412,6 +412,7 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
 \item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{space}: Character type. Space names that specified objects belong to.
 \item \code{type}: Character type. Surface types.
 \item \code{area}: Numeric type. Surface Area in m2.
 }
@@ -459,6 +460,7 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
 \item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{space}: Character type. Space names that specified objects belong to.
 \item \code{type}: Character type. Surface types.
 \item \code{azimuth}: Numeric type. Azimuth in degree.
 }
@@ -506,6 +508,7 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{name}: Character type. Object names.
 \item \code{class}: Character type. Class names.
 \item \code{zone}: Character type. Zone names that specified objects belong to.
+\item \code{space}: Character type. Space names that specified objects belong to.
 \item \code{type}: Character type. Surface types.
 \item \code{tilt}: Numeric type. Azimuth in degree.
 }
@@ -554,6 +557,7 @@ surfaces that have boundary conditions will be rendered with a
 color. All other surfaces will be white.
 \item \code{"construction"}: Render the model by surface constructions.
 \item \code{"zone"}: Render the model by zones assigned.
+\item \code{"space"}: Render the model by spaces assigned.
 \item \code{"normal"}: Render the model by surface normal. The outside face of
 a heat transfer face will be rendered as white and the inside face
 will be rendered as red.

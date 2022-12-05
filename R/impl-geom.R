@@ -1,3 +1,22 @@
+get_first_vertex_field_index <- function(ver) {
+    c(
+        "Zone" = 3L,
+
+        # NOTE: handle 'Space' class added in EnergyPlus v9.6
+        "BuildingSurface:Detailed" = if (ver < 9.6) 11L else 12L,
+        "Wall:Detailed" = if (ver < 9.6) 10L else 11L,
+        "RoofCeiling:Detailed" = if (ver < 9.6) 10L else 11L,
+        "Floor:Detailed" = if (ver < 9.6) 10L else 11L,
+
+        # NOTE: 7th 'Shading Control Name' field has been removed in EnergyPlus v9.0
+        "FenestrationSurface:Detailed" = if (ver < 9.0) 11L else 10L,
+
+        "Shading:Site:Detailed" = 4L,
+        "Shading:Building:Detailed" = 4L,
+        "Shading:Zone:Detailed" = 5L
+    )
+}
+
 # get_geom_class {{{
 get_geom_class <- function (idf, object = NULL) {
     # geometry and daylighting points
@@ -60,16 +79,18 @@ get_global_geom_rules <- function (idf) {
                     names(rules[i]), choices[[i]][[1L]]
                 ), "geom_invalid_ggr")
                 rules[[i]] <- stri_trans_tolower(choices[[i]][[1L]])
-            } else if (!stri_trans_tolower(rules[[i]]) %chin% stri_trans_tolower(choices[[i]])) {
-                warn(sprintf("Invalid '%s' found ('%s') in 'GlobalGeometryRules'. Assuming '%s'.",
-                    names(rules[i]), rules[[i]], choices[[i]][[1L]]
-                ), "geom_invalid_ggr")
-                rules[[i]] <- stri_trans_tolower(choices[[i]][[1L]])
             } else {
-                rules[[i]] <- stri_trans_tolower(rules[[i]])
-            }
+                if (stri_trans_tolower(rules[[i]]) == "absolute") rules[[i]] <- "world"
 
-            if (rules[[i]] == "absolute") rules[[i]] <- "world"
+                if (!stri_trans_tolower(rules[[i]]) %chin% stri_trans_tolower(choices[[i]])) {
+                    warn(sprintf("Invalid '%s' found ('%s') in 'GlobalGeometryRules'. Assuming '%s'.",
+                        names(rules[i]), rules[[i]], choices[[i]][[1L]]
+                    ), "geom_invalid_ggr")
+                    rules[[i]] <- stri_trans_tolower(choices[[i]][[1L]])
+                } else {
+                    rules[[i]] <- stri_trans_tolower(rules[[i]])
+                }
+            }
         }
 
         setattr(rules, "names", lower_name(names(rules)))
@@ -86,6 +107,8 @@ get_building_transformation <- function (idf) {
 
         list(id = NA_integer_, name = NA_character_, north_axis = 0.0)
     } else {
+        # NOTE: Always check 'Building' class when adding compatibility for new
+        # EnergyPlus versions
         bldg <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
             "Building", field = 2L, complete = TRUE)
         id <- bldg$object_id[[1L]]
@@ -131,6 +154,22 @@ get_zone_transformation <- function (idf) {
 }
 # }}}
 
+get_spaces <- function (idf) {
+    if (!idf$is_valid_class("Space")) {
+        space <- data.table(id = integer(), name = character(), type = character(), zone = character())
+    } else {
+        space <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
+            class = "Space", field = c("Name", "Zone Name", "Space Type"))
+        space <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), space, keep = FALSE)
+        space <- dcast.data.table(space, object_id + class_name ~ field_name, value.var = "value_chr")
+        set(space, NULL, "class_name", NULL)
+        setnames(space, lower_name(names(space)))
+        setcolorder(space, c("object_id", "name", "space_type", "zone_name"))
+        setnames(space, c("id", "name", "type", "zone"))
+    }
+    space
+}
+
 # extract_geom {{{
 extract_geom <- function (idf, object = NULL) {
     geom_class <- get_geom_class(idf, object)
@@ -169,7 +208,10 @@ extract_geom <- function (idf, object = NULL) {
     # zone transformation
     zone <- get_zone_transformation(idf)
 
-    list(rules = rules, building = building, zone = zone,
+    # spaces
+    space <- get_spaces(idf)
+
+    list(rules = rules, building = building, zone = zone, space = space,
          surface = surface$meta, subsurface = subsurface$meta,
          shading = shading$meta, daylighting_point = dayl_pnts$meta,
          vertices = vertices
@@ -203,8 +245,15 @@ extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL
 
     if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
 
+    # NOTE: handle 'Space' class added in EnergyPlus v9.6
+    has_space <- idf$version() > 9.5
+
     # fields needed
-    fld <- get_idd_field(get_priv_env(idf)$idd_env(), "BuildingSurface:Detailed", 1:8)$field_name
+    fld <- get_idd_field(get_priv_env(idf)$idd_env(), "BuildingSurface:Detailed",
+        # NOTE: Always check 'BuildingSurface:Detailed' class when adding
+        # compatibility for new EnergyPlus versions
+        c(1:8, if (has_space) 9L)
+    )$field_name
 
     # extract data
     dt <- get_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(),
@@ -218,8 +267,9 @@ extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL
     meta <- dcast.data.table(meta, object_id + class_name ~ field_name, value.var = "value_chr")
     setnames(meta, lower_name(names(meta)))
     meta[geom_class[!J("Detailed"), on = "subtype"], on = c(class_name = "class"), surface_type := i.subtype]
+    if (!has_space) set(meta, NULL, "space_name", NA_character_)
     setcolorder(meta, c("object_id", "name", "class_name", "surface_type",
-        "construction_name", "zone_name"))
+        "construction_name", "space_name", "zone_name"))
     # a surface will be an adiabatic one if the outside boundary condition
     # object is itself
     meta[name == outside_boundary_condition_object, `:=`(outside_boundary_condition = "Adiabatic", outside_boundary_condition_object = NA_character_)]
@@ -306,9 +356,12 @@ extract_geom_surface_simple <- function (idf, geom_class = NULL, object = NULL) 
         )
     ]
 
+    # NOTE: handle 'Space' class added in EnergyPlus v9.6
+    has_space <- idf$version() > 9.5
+    if (!has_space) set(dt, NULL, "space_name", NA_character_)
     setnames(dt, c("object_id", "class_name"), c("id", "class"))
     setcolorder(dt, c("id", "name", "class", "surface_type",
-        "construction_name", "zone_name", "outside_boundary_condition"))
+        "construction_name", "space_name", "zone_name", "outside_boundary_condition"))
     list(meta = dt, vertices = vertices)
 }
 # }}}
@@ -347,6 +400,8 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
     )
 
     # meta
+    # NOTE: Always check 'FenestrationSurface:Detailed' class when adding
+    # compatibility for new EnergyPlus versions
     meta <- dt[J(1:5), on = "field_index"]
     meta <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), meta, keep = FALSE)
     meta <- dcast.data.table(meta, object_id + class_name ~ field_name, value.var = "value_chr")
@@ -355,8 +410,9 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
     setnames(meta, c("object_id", "class_name"), c("id", "class"))
 
     # vertices
-    fldid_start <- dt[stri_startswith_fixed(field_name, "Vertex 1"), min(field_index)]
-    vertices <- dt[J(fldid_start:(fldid_start + 11)), on = "field_index"][, by = "object_id",
+    fldid_start <- get_first_vertex_field_index(idf$version())[["FenestrationSurface:Detailed"]]
+    # NOTE: currently fenestrations only support triangle and rectangles
+    vertices <- dt[J(fldid_start:(fldid_start + 11L)), on = "field_index"][, by = "object_id",
         list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
     vertices <- dcast.data.table(vertices, object_id + index ~ field, value.var = "value_num")
     setnames(vertices, "object_id", "id")
@@ -769,7 +825,6 @@ extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NUL
     # 'Daylighting:Controls' and DE daylighting in
     # 'Daylighting:DELight:ReferencePoint'
     if (idf$version() > 8.5) {
-        # currently only 'FenestrationSurface:Detailed' is the defailed geometry
         geom_class <- geom_class[J("Daylighting", "ReferencePoint"), on = c("category", "subtype"), nomatch = NULL]
 
         if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
@@ -782,6 +837,8 @@ extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NUL
         meta <- dt[J(2L), on = "field_index"]
         meta <- standardize_idf_value(get_priv_env(idf)$idd_env(), get_priv_env(idf)$idf_env(), meta, keep = FALSE)
         set(meta, NULL, setdiff(names(meta), c("class_name", "object_id", "object_name", "value_chr")), NULL)
+        # NOTE: In EnergyPlus v9.6, 2nd field 'Zone Name' has been changed to
+        # 'Zone or Space Name'
         setnames(meta, c("class", "id", "name", "zone_name"))
         setcolorder(meta, c("id", "name"))
 
@@ -992,9 +1049,10 @@ convert_geom_surface_simple <- function (idf, geom = NULL) {
             geom$vertices <- geom$vertices[J(geom$meta$id[is_simple]), on = "id", nomatch = NULL]
         }
     }
+    # NOTE: handle 'Space' class added in EnergyPlus v9.6
     convert_geom_simple(idf, geom, "BuildingSurface:Detailed",
         c("Name", "Construction Name", "Zone Name", "Outside Boundary Condition Object"),
-        first_vertex = 11L
+        first_vertex = get_first_vertex_field_index(idf$version())[["BuildingSurface:Detailed"]]
     )
 }
 # }}}
@@ -1013,7 +1071,7 @@ convert_geom_subsurface_simple <- function (idf, geom = NULL) {
     }
     convert_geom_simple(idf, geom, "FenestrationSurface:Detailed",
         c("Name", "Construction Name", "Building Surface Name", "Frame and Divider Name", "Outside Boundary Condition Object"),
-        first_vertex = if (idf$version() < 9.0) 11L else 10L
+        first_vertex = get_first_vertex_field_index(idf$version())[["FenestrationSurface:Detailed"]]
     )
 }
 # }}}
@@ -1043,14 +1101,14 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
         site <- convert_geom_simple(idf,
             list(meta = meta$SiteShading, vertices = geom$vertices[J(meta$SiteShading$id), on = "id"]),
             "Shading:Site:Detailed", c("Name", "Transmittance Schedule Name"),
-            first_vertex = 4L
+            first_vertex = get_first_vertex_field_index(idf$version())[["Shading:Site:Detailed"]]
         )
     }
     if ("BuildingShading" %chin% names(meta)) {
         bldg <- convert_geom_simple(idf,
             list(meta = meta$BuildingShading, vertices = geom$vertices[J(meta$BuildingShading$id), on = "id"]),
             "Shading:Building:Detailed", c("Name", "Transmittance Schedule Name"),
-            first_vertex = 4L
+            first_vertex = get_first_vertex_field_index(idf$version())[["Shading:Building:Detailed"]]
         )
     }
     if ("ZoneShading" %chin% names(meta)) {
@@ -1061,7 +1119,9 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
             overhang$meta <- meta$ZoneShading[J(c("Shading:Overhang", "Shading:Overhang:Projection")), on = "class", nomatch = NULL]
             overhang$vertices <- geom$vertices[J(overhang$meta$id), on = "id"]
 
-            overhang <- convert_geom_simple(idf, overhang, "Shading:Zone:Detailed", "Name", first_vertex = 5L)
+            overhang <- convert_geom_simple(idf, overhang, "Shading:Zone:Detailed", "Name",
+                first_vertex = get_first_vertex_field_index(idf$version())[["Shading:Zone:Detailed"]]
+            )
         }
 
         # should handle fin shading separately
@@ -1071,7 +1131,8 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 
             fin_left <- convert_geom_simple(idf,
                 list(meta = fin$meta[id > 0L], vertices = fin$vertices[id > 0L]),
-                "Shading:Zone:Detailed", "Name", first_vertex = 5L
+                "Shading:Zone:Detailed", "Name",
+                first_vertex = get_first_vertex_field_index(idf$version())[["Shading:Zone:Detailed"]]
             )
             set(fin_left$object, NULL, c("object_name", "object_name_lower"),
                 list(paste(fin_left$object$object_name, "Left"),
@@ -1092,7 +1153,8 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 
             fin_right <- convert_geom_simple(idf,
                 list(meta = fin$meta[id < 0L][, id := -id], vertices = fin$vertices[id < 0L][, id := -id]),
-                "Shading:Zone:Detailed", "Name", first_vertex = 5L
+                "Shading:Zone:Detailed", "Name",
+                first_vertex = get_first_vertex_field_index(idf$version())[["Shading:Zone:Detailed"]]
             )
             set(fin_right$object, NULL, c("object_name", "object_name_lower"),
                 list(paste(fin_right$object$object_name, "Right"),
@@ -1134,10 +1196,11 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 
 # subset_geom {{{
 subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
-                         zone = NULL, surface = NULL) {
+                         zone = NULL, surface = NULL, space = NULL) {
     assert_subset(type, c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"))
-    zone <- assert_valid_type(zone, "Zone ID|Name", null.ok = TRUE)
-    surface <- assert_valid_type(surface, "Surface ID|Name", null.ok = TRUE)
+    zone <- assert_valid_type(unique(zone), "Zone ID|Name", null.ok = TRUE)
+    surface <- assert_valid_type(unique(surface), "Surface ID|Name", null.ok = TRUE)
+    space <- assert_valid_type(unique(space), "Space ID|Name", null.ok = TRUE)
 
     # subset geoms by components {{{
     if (!length(type)) {
@@ -1176,6 +1239,36 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
     }
     # }}}
 
+    # subset geoms by spaces {{{
+    if (!is.null(space)) {
+        if (is.integer(space)) {
+            geoms$space <- geoms$space[J(space), on = "id", nomatch = NULL]
+        } else {
+            set(geoms$space, NULL, "name_lower", stri_trans_tolower(geoms$space$name))
+            geoms$space <- geoms$space[J(stri_trans_tolower(space)), on = "name_lower", nomatch = NULL]
+            set(geoms$space, NULL, "name_lower", NULL)
+        }
+        geoms$zone <- geoms$zone[J(geoms$space$zone), on = "name", nomatch = NULL]
+
+        if (!nrow(geoms$space) || !nrow(geoms$surface)) {
+            geoms$surface <- geoms$surface[0L]
+            geoms$subsurface <- geoms$subsurface[0L]
+            geoms$shading <- geoms$shading[0L]
+            geoms$daylighting_point <- geoms$daylighting_point[0L]
+        } else {
+            geoms$surface <- geoms$surface[J(geoms$space$name), on = "space_name", nomatch = NULL]
+
+            if (nrow(geoms$subsurface)) {
+                geoms$subsurface <- geoms$subsurface[J(geoms$surface$name), on = "building_surface_name", nomatch = NULL]
+            }
+
+            if (nrow(geoms$shading)) {
+                geoms$shading <- geoms$shading[J(geoms$surface$name), on = "base_surface_name", nomatch = NULL]
+            }
+        }
+    }
+    # }}}
+
     # subset geoms by zones {{{
     if (!is.null(zone)) {
         if (is.integer(zone)) {
@@ -1185,6 +1278,7 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
             geoms$zone <- geoms$zone[J(stri_trans_tolower(zone)), on = "name_lower", nomatch = NULL]
             set(geoms$zone, NULL, "name_lower", NULL)
         }
+        geoms$space <- geoms$space[J(geoms$zone$name), on = "zone", nomatch = NULL]
 
         if (!nrow(geoms$zone) || !nrow(geoms$surface)) {
             geoms$surface <- geoms$surface[0L]
@@ -1243,12 +1337,13 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
     # }}}
 
     # subset daylighting points by zones {{{
-    if ((!is.null(zone) || !is.null(surface)) && NROW(geoms$daylighting_point)) {
+    if ((!is.null(zone) || !is.null(surface) || !is.null(space)) && NROW(geoms$daylighting_point)) {
         if (!nrow(geoms$surface)) {
             geoms$daylighting_point <- geoms$daylighting_point[0L]
         } else if (nrow(geoms$daylighting_point)) {
             geoms$daylighting_point <- geoms$daylighting_point[
-                J(geoms$surface$zone_name), on = "zone_name", nomatch = NULL]
+                J(c(geoms$surface$zone_name, geoms$surface$space_name)),
+                on = "zone_name", nomatch = NULL]
         }
     }
     # }}}
@@ -1274,7 +1369,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
     if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(geoms)
     if (!nrow(geoms$zone)) return(geoms)
 
-    add_zone_name(geoms)
+    add_zone_space_name(geoms)
 
     # init
     empty <- data.table(id = integer(), zone_name = character(), mult = integer())
@@ -1422,18 +1517,8 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
     if (!NROW(geom$meta)) return(idf)
 
     # only works for detailed geometry classes
-    map <- data.table(
-        class = c(
-            "Zone",
-            "BuildingSurface:Detailed", "FenestrationSurface:Detailed",
-            "Shading:Site:Detailed", "Shading:Building:Detailed",
-            "Shading:Zone:Detailed"),
-        first_vertex = c(
-            3L,
-            11L, if (idf$version() < 9.0) 11L else 10L,
-            4L, 4L, 5L
-        )
-    )
+    fldid <- get_first_vertex_field_index(idf$version())
+    map <- data.table(class = names(fldid), first_vertex = fldid)
     meta <- geom$meta[map, on = "class", nomatch = NULL, list(id, first_vertex)]
     if (!nrow(meta)) return(idf)
 
@@ -1461,27 +1546,31 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
 }
 # }}}
 
-# add_zone_name {{{
-add_zone_name <- function (geoms) {
+# add_zone_space_name {{{
+add_zone_space_name <- function (geoms) {
     if (!nrow(geoms$surface)) return(geoms)
 
     if (nrow(geoms$subsurface)) {
-        geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"), zone_name := i.zone_name]
+        geoms$subsurface[geoms$surface, on = c("building_surface_name" = "name"),
+            `:=`(zone_name = i.zone_name, space_name = i.space_name)
+        ]
     }
     if (nrow(geoms$shading)) {
-        geoms$shading[geoms$surface, on = c("base_surface_name" = "name"), zone_name := i.zone_name]
+        geoms$shading[geoms$surface, on = c("base_surface_name" = "name"),
+            `:=`(zone_name = i.zone_name, space_name = i.space_name)
+        ]
     }
     geoms
 }
 # }}}
 
-# del_zone_name {{{
-del_zone_name <- function (geoms) {
+# del_zone_space_name {{{
+del_zone_space_name <- function (geoms) {
     if (nrow(geoms$subsurface) && has_names(geoms$subsurface, "zone_name")) {
-        set(geoms$subsurface, NULL, "zone_name", NULL)
+        set(geoms$subsurface, NULL, c("zone_name", "space_name"), NULL)
     }
     if (nrow(geoms$shading) && has_names(geoms$shading, "zone_name")) {
-        set(geoms$shading, NULL, "zone_name", NULL)
+        set(geoms$shading, NULL, c("zone_name", "space_name"), NULL)
     }
     geoms
 }
@@ -1509,14 +1598,8 @@ reverse_idf_detailed_vertices <- function (idf, geom_class = NULL) {
     if (!nrow(detailed)) return(idf)
 
     # only works for detailed geometry classes
-    map <- data.table(
-        class = c("BuildingSurface:Detailed", "FenestrationSurface:Detailed",
-            "Shading:Site:Detailed", "Shading:Building:Detailed",
-            "Shading:Zone:Detailed"),
-        first_vertex = c(11L, if (idf$version() < 9.0) 11L else 10L,
-            4L, 4L, 5L
-        )
-    )
+    fldid <- get_first_vertex_field_index(idf$version())
+    map <- data.table(class = names(fldid), first_vertex = fldid)
     detailed <- detailed[map, on = "class", nomatch = NULL, list(class, first_vertex)]
 
     dt <- idf$to_table(class = detailed$class)

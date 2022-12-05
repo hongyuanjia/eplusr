@@ -4,17 +4,17 @@ eplusr_option(verbose_info = FALSE)
 test_that("NEW", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
-    expect_is(idf <- read_idf(path_idf), "Idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
 
     expect_error(IdfScheduleCompact$new(""), class = "eplusr_error_idfobject_missing_parent")
     expect_error(IdfScheduleCompact$new("a", idf), class = "eplusr_error_invalid_object_name")
 
-    expect_is(IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
-    expect_is(schedule_compact(idf, "sch1", new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(schedule_compact(idf, "sch1", new = TRUE), "IdfScheduleCompact")
 
-    expect_is(IdfScheduleCompact$new("bldg_occ_sch", idf), "IdfScheduleCompact")
-    expect_is(schedule_compact(idf, "bldg_occ_sch"), "IdfScheduleCompact")
+    expect_s3_class(IdfScheduleCompact$new("bldg_occ_sch", idf), "IdfScheduleCompact")
+    expect_s3_class(schedule_compact(idf, "bldg_occ_sch"), "IdfScheduleCompact")
 })
 # }}}
 
@@ -22,15 +22,15 @@ test_that("NEW", {
 test_that("TYPELIMITS", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
-    expect_is(idf <- read_idf(path_idf), "Idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
 
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
     expect_null(sch$type_limits())
     expect_error(sch$type_limits(""), class = "eplusr_error_invalid_object_name")
     expect_equal(sch$type_limits("any number"), list(name = "Any Number", range = ranger()))
 
-    expect_is(occu <- IdfScheduleCompact$new("bldg_occ_sch", idf), "IdfScheduleCompact")
+    expect_s3_class(occu <- IdfScheduleCompact$new("bldg_occ_sch", idf), "IdfScheduleCompact")
     expect_equal(occu$type_limits(), list(name = "Fraction", range = ranger(0, TRUE, 1, TRUE)))
     expect_equal(occu$type_limits("any number"), list(name = "Any Number", range = ranger()))
 })
@@ -40,10 +40,10 @@ test_that("TYPELIMITS", {
 test_that("SET", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
 
-    expect_is(idf <- read_idf(path_idf), "Idf")
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
 
     # can stop if invalid day type
     expect_error(sch$set(c(1) := list(..24 = 0)), class = "eplusr_error_idfschcmpt_daytype")
@@ -127,14 +127,14 @@ test_that("SET", {
 test_that("UPDATE", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
 
-    expect_is(idf <- read_idf(path_idf), "Idf")
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
 
     # simple case
     val <- data.table(year_day = 365, daytype = "AllDay", time = "24:00", value = 0)
-    expect_is(sch$update(val), "IdfScheduleCompact")
+    expect_s3_class(sch$update(val), "IdfScheduleCompact")
 
     # can work with compacted daytypes
     val1 <- data.table(year_day = "12/31",
@@ -144,7 +144,7 @@ test_that("UPDATE", {
     )
     val2 <- data.table(year_day = "12/31", daytype = "allotherday", time = "24:00", value = 0.0)
     val <- rbindlist(list(val1, val2))
-    expect_is(sch$update(val), "IdfScheduleCompact")
+    expect_s3_class(sch$update(val), "IdfScheduleCompact")
     expect_equal(sch$value(simplify = TRUE),
         c("sch",
           NA,
@@ -181,7 +181,7 @@ test_that("UPDATE", {
     val2 <- copy(val1)[, daytype := "summerdesignday"]
     val3 <- data.table(id = 2L, year_day = "12/31", daytype = "allotherday", time = "24:00", value = 0.0)
     val <- rbindlist(list(val1, val2, val3))
-    expect_is(sch$update(val), "IdfScheduleCompact")
+    expect_s3_class(sch$update(val), "IdfScheduleCompact")
     expect_equal(sch$value(simplify = TRUE),
         c("sch",
           NA,
@@ -227,12 +227,12 @@ test_that("UPDATE", {
 test_that("EXTRACT", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
 
-    expect_is(idf <- read_idf(path_idf), "Idf")
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
     expect_null(sch$extract())
-    expect_is(sch$set(
+    expect_s3_class(sch$set(
         c("weekday", "summerdesignday") := list(
             ..6 = 0.2, "8:00" = 0.5,
             ..12 = 0.95, "13:30" = 0.6, ..14 = 0.8,
@@ -304,22 +304,22 @@ test_that("EXTRACT", {
 test_that("VALIDATE", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
 
-    expect_is(idf <- read_idf(path_idf), "Idf")
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
-    expect_is(valid <- sch$validate(), "IdfValidity")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(valid <- sch$validate(), "IdfValidity")
     expect_equal(valid$missing_value$field_index, 2:5)
     expect_equal(valid$invalid_schedule_type_limits$field_index, 2L)
     expect_equal(valid$invalid_through_field$field_index, 3L)
     expect_false(sch$is_valid())
 
     expect_equal(sch$type_limits("fraction"), list(name = "Fraction", range = ranger(0, TRUE, 1, TRUE)))
-    expect_is(sch$set(
+    expect_s3_class(sch$set(
         c("weekday", "summerdesignday") := list(..6 = 2, ..24 = 0),
         allotherday = list(..24 = 0), .check_range = FALSE
     ), "IdfScheduleCompact")
-    expect_is(valid <- sch$validate(), "IdfValidity")
+    expect_s3_class(valid <- sch$validate(), "IdfValidity")
     expect_equal(valid$invalid_range$field_index, 6L)
     expect_equal(valid$invalid_range$value_num, 2)
 })
@@ -329,10 +329,10 @@ test_that("VALIDATE", {
 test_that("$<-.IdfSchedule", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgLargeOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgLargeOfficeNew2004_Chicago.idf")
 
-    expect_is(idf <- read_idf(path_idf), "Idf")
-    expect_is(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
+    expect_s3_class(idf <- read_idf(path_idf), "Idf")
+    expect_s3_class(sch <- IdfScheduleCompact$new("sch", idf, new = TRUE), "IdfScheduleCompact")
 
     expect_silent(sch$`Schedule Type Limits Name` <- "Fraction")
     expect_equal(sch$`Schedule Type Limits Name`, "Fraction")

@@ -33,7 +33,7 @@ test_that("Utility functions", {
 
     expect_equal(underscore_name(read_lines(test_path("file/latin1"), encoding = "Latin-1")$string)[1], "N13_field_Young_s_modulus")
 
-    expect_equal(standardize_ver("latest"), numeric_version("9.6.0"))
+    expect_equal(standardize_ver("latest"), numeric_version("22.1.0"))
     expect_equal(standardize_ver("latest", strict = TRUE), numeric_version(NA, strict = FALSE))
     expect_equal(standardize_ver(c(1, 1.1)), numeric_version(c("1.0.0", "1.1.0")))
     expect_equal(standardize_ver(c(1, 1.1), complete = FALSE), numeric_version(c("1.0", "1.1")))
@@ -108,6 +108,6 @@ test_that("Utility functions", {
     expect_equal(match_in_vec("a", LETTERS, "aa", label = TRUE), "A")
     expect_equal(match_in_vec("aa", LETTERS, "aa", label = TRUE), "A")
 
-    expect_is(catch_cnd(warn("")), "eplusr_warning")
-    expect_is(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
+    expect_s3_class(catch_cnd(warn("")), "eplusr_warning")
+    expect_s3_class(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
 })

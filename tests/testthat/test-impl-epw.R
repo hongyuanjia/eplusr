@@ -1,7 +1,7 @@
 # Epw Header {{{
 test_that("Epw Header", {
     # IDD
-    expect_is(idd <- get_epw_idd(), "Idd")
+    expect_s3_class(idd <- get_epw_idd(), "Idd")
 
     # PARSE {{{
     expect_error(parse_epw_header("Wrong\n"), class = "eplusr_error_parse_epw_header_name")
@@ -9,7 +9,7 @@ test_that("Epw Header", {
     expect_error(parse_epw_header(paste0("LOCATION", strrep(",", 11), "\n")), class = "eplusr_error_parse_epw_header_field")
 
     # can stop if missing header
-    expect_is(err <- catch_cnd(parse_epw_header("LOCATION\n")), "eplusr_error_validity_check")
+    expect_s3_class(err <- catch_cnd(parse_epw_header("LOCATION\n")), "eplusr_error_validity_check")
     expect_equal(err$data$missing_object, c(
         "DESIGN CONDITIONS",
         "TYPICAL/EXTREME PERIODS",
@@ -21,12 +21,12 @@ test_that("Epw Header", {
     ))
 
     # can stop if invalid type
-    expect_is(err <- catch_cnd(parse_epw_header("DESIGN CONDITIONS,a\n")), "eplusr_error_validity_check")
+    expect_s3_class(err <- catch_cnd(parse_epw_header("DESIGN CONDITIONS,a\n")), "eplusr_error_validity_check")
     expect_equal(err$data$invalid_numeric$class_name, "DESIGN CONDITIONS")
     expect_equal(err$data$invalid_numeric$field_index, 1L)
 
     # can fill "0" for empty headers
-    expect_is(class = "list",
+    expect_type(type = "list",
         h <- parse_epw_header(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
@@ -46,7 +46,7 @@ test_that("Epw Header", {
     get_idf_value(get_epw_idd_env(), h, EPW_CLASS[[paste0("comment", 1)]])
 
     # can fix mismatched extensible group and value of number field
-    expect_warning(
+    suppressWarnings(expect_warning(
         {
             DC <- function (n = 1, m = n) {
                 htg <- c("heating", 1:15)
@@ -70,7 +70,7 @@ test_that("Epw Header", {
             ))
         },
         "Number of Design Conditions"
-    )
+    ))
     expect_equal(h$value[object_id == 2, value_num][1], 1L)
     expect_equal(h$value[object_id == 3, value_num][1], 1L)
     expect_equal(h$value[object_id == 4, value_num][1], 1L)
@@ -228,7 +228,7 @@ test_that("Epw Header", {
         )),
         class = "eplusr_error_parse_epw"
     )
-    expect_warning(
+    suppressWarnings(expect_warning(
         h <- parse_epw_header(paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
@@ -241,8 +241,8 @@ test_that("Epw Header", {
             DATA PERIODS,1,1,Data,Friday,01/29,2016/3/21
             "
         )),
-        class = "eplusr_error_parse_epw"
-    )
+        class = "eplusr_warning_parse_epw_header"
+    ))
     expect_equal(h$value[object_id == 8L, value_chr][6], " 3/21")
     expect_warning(
         h <- parse_epw_header(paste0(
@@ -326,7 +326,7 @@ test_that("Epw Header", {
 
     # FORMAT {{{
     idd_env <- get_priv_env(idd)$idd_env()
-    expect_is(class = "list",
+    expect_type(type = "list",
         h <- parse_epw_header(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
@@ -398,9 +398,9 @@ test_that("Epw Data", {
 
     skip_on_cran()
 
-    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_is(parsed <- parse_epw_file(path_epw), "list")
+    expect_type(parsed <- parse_epw_file(path_epw), "list")
     expect_equal(names(parsed), c("header", "data", "matched"))
     expect_equal(ncol(parsed$data), 36L)
     expect_equal(parsed$matched, data.table(index = 1L, row = 1L, num = 8760L))

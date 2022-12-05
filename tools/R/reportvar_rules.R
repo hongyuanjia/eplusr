@@ -2,7 +2,7 @@
 extract_reportvar_rules <- function(eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     dir <- file.path(eplus_src, "src/Transition/SupportFiles")
 
-    re <- "Report Variables (\\d-\\d-\\d(?:-\\d+){0,1}) to (\\d-\\d-\\d(?:-\\d+){0,1})"
+    re <- "Report Variables (\\d+-\\d-\\d(?:-\\d+){0,1}) to (\\d+-\\d-\\d(?:-\\d+){0,1})"
     paths <- list.files(dir, re, full.names = TRUE)
 
     # extract versions

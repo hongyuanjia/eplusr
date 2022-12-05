@@ -565,7 +565,7 @@ get_eplus_loc_from_input <- function(idf, eplus = NULL) {
 }
 
 get_ver_from_output_string <- function(line) {
-    re <- "Program Version,EnergyPlus, Version (\\d\\.\\d\\.\\d)-[0-9a-f]+, YMD=\\d+\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}"
+    re <- "Program Version,EnergyPlus, Version (\\d{1,2}\\.\\d\\.\\d)-[0-9a-f]+, YMD=\\d+\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}"
     standardize_ver(regmatches(line, regexec(re, line))[[1L]][2L])
 }
 

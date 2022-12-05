@@ -3862,6 +3862,27 @@ trans_funs$f950t960 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_960_2210 {{{
+trans_funs$f960t2210 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 9.6)
+
+    target_cls <- c(
+        "PythonPlugin:SearchPaths" # 1
+    )
+
+    new_idf <- trans_preprocess(idf, 22.1, target_cls)
+
+    # 1: PythonPlugin:SearchPaths {{{
+    dt1 <- trans_action(idf, "PythonPlugin:SearchPaths",
+        insert = list(4, "Yes")
+    )
+    # }}}
+
+    trans_process(new_idf, idf, dt1)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

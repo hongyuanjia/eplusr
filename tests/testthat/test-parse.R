@@ -275,10 +275,9 @@ test_that("parse_idd_file()", {
     )
     expect_error(parse_idd_file(idd_wrong), "Invalid \\\\object-list value", class = "eplusr_error_parse_idd")
 
-    # can fix ConnectorList references
     skip_on_cran()
-
-    idd <- parse_idd_file(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
+    # can fix ConnectorList references
+    idd <- parse_idd_file(path_eplus(LATEST_EPLUS_VER, "Energy+.idd"))
     id <- idd$class[J("ConnectorList"), on = "class_name", class_id]
     expect_true(idd$reference[J(id), on = "class_id", .N > 0])
 })
@@ -286,7 +285,7 @@ test_that("parse_idd_file()", {
 
 # parse_idd_file("EPW.idd") {{{
 test_that("parse_idd_file()", {
-    expect_is(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
+    expect_type(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
 
     # can get Idd version
     expect_equal(idd_parsed$version, as.numeric_version("1.0.0"))
@@ -325,7 +324,7 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$field$field_id, 1:149)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
     expect_equal(fld$units, NA_character_)
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -352,7 +351,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$missing_num, NA_real_)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Liquid Precip Depth"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[field_name == "Liquid Precip Depth"], "data.table")
     expect_equal(fld$units, "mm")
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -379,7 +378,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$missing_num, 999)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Dry Bulb Temperature"], "data.table")
+    expect_s3_class(fld <- idd_parsed$field[field_name == "Dry Bulb Temperature"], "data.table")
     expect_equal(fld$has_exist, TRUE)
     expect_equal(fld$exist_maximum, 99.9)
     expect_equal(fld$exist_minimum, -Inf)
@@ -395,31 +394,36 @@ test_that("parse_idd_file()", {
 
 # parse_idf_file() {{{
 test_that("parse_idf_file()", {
+    LATEST_IDF_VER <- stri_sub(LATEST_EPLUS_VER, to = -3L)
+
     # get version {{{
     # Normal formatted
-    expect_equivalent(
-        get_idf_ver(data.table(string = c("Version,", "8.6;"), line = 1:2)),
-        numeric_version(8.6)
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idf_ver(data.table(string = c("Version,", sprintf("%s;", LATEST_IDF_VER)), line = 1:2)),
+        numeric_version(LATEST_IDF_VER)
     )
     # One line formatted
-    expect_equivalent(
-        get_idf_ver(data.table(string = "Version, 8.6;", line = 1)),
-        numeric_version(8.6)
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idf_ver(data.table(string = sprintf("Version, %s;", LATEST_IDF_VER), line = 1)),
+        numeric_version(LATEST_IDF_VER)
     )
-    expect_equivalent(
-        get_idf_ver(data.table(string = "Version, 8.6; !- Version", line = 1)),
-        numeric_version(8.6)
+    expect_equal(
+        ignore_attr = TRUE,
+        get_idf_ver(data.table(string = sprintf("Version, %s; !- Version", LATEST_IDF_VER), line = 1)),
+        numeric_version(LATEST_IDF_VER)
     )
     # }}}
 
-    expect_warning(idf_parsed <- parse_idf_file(idftext("idf"), 8.8), "Missing version field in input IDF")
+    expect_warning(idf_parsed <- parse_idf_file(idftext("idf", NULL), LATEST_IDF_VER), "Missing version field in input IDF")
 
     # can parse Idf stored in strings
     expect_equal(names(idf_parsed),
         c("version", "options", "object", "value", "reference"))
 
     # can add version according to input Idd object
-    expect_equal(idf_parsed$version, as.numeric_version("8.8.0"))
+    expect_equal(idf_parsed$version, as.numeric_version(LATEST_EPLUS_VER))
 
     # can parse options data
     expect_equal(idf_parsed$options,
@@ -427,17 +431,17 @@ test_that("parse_idf_file()", {
     )
 
     expect_equal(
-        parse_idf_file(idd = 8.8,
-            "!-Option OriginalOrderTop UseSpecialFormat
-             Version, 8.8;
-            "
-        )$options,
+        parse_idf_file(idd = LATEST_IDF_VER,
+            sprintf("!-Option OriginalOrderTop UseSpecialFormat
+             Version, %s;
+            ", LATEST_IDF_VER
+        ))$options,
         list(idf_editor = FALSE, special_format = TRUE, view_in_ip = FALSE, save_format = "new_top")
     )
 
     # can parse object data
     expect_equal(idf_parsed$object$object_id, 1:5)
-    expect_equal(idf_parsed$object$class_id, c(55, 90, 103, 55, 1))
+    expect_equal(idf_parsed$object$class_id, c(56, 91, 108, 56, 1))
 
     # can parse value reference data
     expect_equal(idf_parsed$reference$src_value_id, c(1, NA, NA, NA, 10, NA))
@@ -447,7 +451,7 @@ test_that("parse_idf_file()", {
     expect_equal(idf_parsed$object$comment, list(" this is a test comment for WD01", NULL, NULL, NULL, NULL))
 
     # can detect EpMacro lines
-    expect_warning({x <- parse_idf_file("Version, 8.8;\n##include abc")}, "IMF is not fully supported")
+    expect_warning(parse_idf_file(sprintf("Version, %s;\n##include abc", LATEST_IDF_VER)), "IMF is not fully supported")
 
     # can parse value data
     text_object <- c(
@@ -463,32 +467,36 @@ test_that("parse_idf_file()", {
             0.7800000;               !- Visible Absorptance
         ")
     val <- c("WD01", "MediumSmooth", "0.2", "0.115", "513", "1381", "0.9",
-        "0.78", "0.78", "8.8")
+        "0.78", "0.78", LATEST_IDF_VER)
     num <- suppressWarnings(as.numeric(val))
     num[10] <- NA_real_
 
     # can parse one-line empty object
-    expect_silent(idf_parsed <- parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
-    expect_equivalent(idf_parsed$object,
+    expect_silent(idf_parsed <- parse_idf_file(sprintf("Version,%s;\nOutput:Surfaces:List,,;", LATEST_IDF_VER)))
+    expect_equal(
+        ignore_attr = TRUE,
+        idf_parsed$object,
         data.table(object_id = 1:2, object_name = rep(NA_character_, 2),
-        object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 764L))
+        object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 798L))
     )
-    expect_equivalent(idf_parsed$value,
-        data.table(value_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
-        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 58822L, 58823L))
+    expect_equal(
+        ignore_attr = TRUE,
+        idf_parsed$value,
+        data.table(value_id = 1:3, value_chr = c(LATEST_IDF_VER, NA_character_, NA_character_),
+        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 64566L, 64567L))
     )
 
-    expect_silent(parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
-    expect_warning(idf_value <- parse_idf_file(text_object, 8.8))
+    expect_silent(parse_idf_file(sprintf("Version,%s;\nOutput:Surfaces:List,,;", LATEST_IDF_VER)))
+    expect_warning(idf_value <- parse_idf_file(text_object, LATEST_IDF_VER))
     expect_equal(names(idf_value$value),
         c("value_id", "value_chr", "value_num", "object_id", "field_id"))
     expect_equal(idf_value$value$value_id, 1:10)
-    expect_equivalent(idf_value$value$value_num, num)
+    expect_equal(idf_value$value$value_num, num)
     expect_equal(idf_value$value$object_id, c(rep(1, 9), 2))
 
     # can detect invalid lines
-    idf_wrong <- c(
-        "Version,8.8;
+    idf_wrong <- sprintf(
+        "Version,%s;
          WrongClass<
             WD01,                    !- Name
             MediumSmooth,            !- Roughness
@@ -499,13 +507,13 @@ test_that("parse_idf_file()", {
             0.9000000,               !- Thermal Absorptance
             0.7800000,               !- Solar Absorptance
             0.7800000;               !- Visible Absorptance
-        ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_line")
-    expect_error(parse_idf_file("Construction, const1, mat; Construction, const2;\nVersion, 8.8;"))
+        ", LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_line")
+    expect_error(parse_idf_file("Construction, const1, mat; Construction, const2;\nVersion, 9.9;"))
 
     # can detect incomplete object
-    idf_wrong <- c(
-        "Version,8.8;
+    idf_wrong <- sprintf(
+        "Version,%s;
          WrongClass,
             WD01,                    !- Name
             MediumSmooth,            !- Roughness
@@ -516,54 +524,54 @@ test_that("parse_idf_file()", {
             0.9000000,               !- Thermal Absorptance
             0.7800000,               !- Solar Absorptance
             0.7800000,               !- Visible Absorptance
-        ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_object")
+        ", LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_object")
 
     # can detect error of invalid class name
-    idf_wrong <- c(
-        "Version,8.8;
+    idf_wrong <- sprintf(
+        "Version,%s;
         ! comment
          WrongClass,
             WD01;                    !- Name
         ! comment
          WrongClass,
             WD01;                    !- Name
-        ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_class")
-    idf_wrong <- c(
-        "Version,8.8;
+        ", LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_class")
+    idf_wrong <- sprintf(
+        "Version,%s;
          WrongClass, WD01;
-        ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_class")
+        ", LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_class")
 
     # can detect error of multiple version
-    idf_wrong <- "Version, 8.8;\nVersion, 8.9;"
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_ver")
+    idf_wrong <- sprintf("Version, %s;\nVersion, %s;", LATEST_IDF_VER, LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_ver")
 
     # can detect error of invalid field number
-    idf_wrong <- "
-        Version, 8.8;
+    idf_wrong <- sprintf("
+        Version, %s;
         SurfaceConvectionAlgorithm:Inside,
             Simple, !- Algorithm
             Simple, !- Algorithm
-            TARP; !- Algorithm"
-    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_field")
+            TARP; !- Algorithm", LATEST_IDF_VER)
+    expect_error(parse_idf_file(idf_wrong, LATEST_IDF_VER), class = "eplusr_error_parse_idf_field")
 
     # can optional discard reference parsing
-    expect_equal(nrow(parse_idf_file(idftext(ver = 8.8), 8.8, ref = FALSE)$reference), 0L)
+    expect_equal(nrow(parse_idf_file(idftext(), LATEST_IDF_VER, ref = FALSE)$reference), 0L)
 
     # can handle DDY without giving unnecessary warning
     ddy <- tempfile(fileext = ".ddy")
     file.create(ddy)
-    expect_silent(idf_parsed <- parse_idf_file(ddy, 8.8))
+    expect_silent(idf_parsed <- parse_idf_file(ddy, LATEST_IDF_VER))
     unlink(ddy)
 
     # can handle trailing spaces after class names
-    idf_str <- "
-        Version , 8.8 ;
+    idf_str <- sprintf("
+        Version , %s ;
         SurfaceConvectionAlgorithm:Inside   ,
             Simple  ; !- Algorithm
-    "
-    expect_is(idf_parsed <- parse_idf_file(idf_str, 8.8), "list")
+    ", LATEST_IDF_VER)
+    expect_type(idf_parsed <- parse_idf_file(idf_str, LATEST_IDF_VER), "list")
 })
 # }}}

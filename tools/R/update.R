@@ -40,7 +40,7 @@ update_weather_db <- function(eplus_src = NULL, force = FALSE, dir_assets = here
     db_geojson <- parse_weather_geojson(geojson, country_code)
     db_kml <- data.table::rbindlist(lapply(kml, parse_kml, path_codes = country_code))
 
-    db <- rbindlist(list(db_geojson, db_kml), use.names = TRUE, fill = TRUE)
+    db <- data.table::rbindlist(list(db_geojson, db_kml), use.names = TRUE, fill = TRUE)
 
     write_meta(meta, weather_db = hash)
 

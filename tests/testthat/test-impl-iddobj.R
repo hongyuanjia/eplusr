@@ -5,7 +5,8 @@ test_that("IddObject implementation", {
     # RELATION {{{
     expect_silent(rel <- get_iddobj_relation(idd_parsed, 2L, direction = "ref_to", name = TRUE, keep_all = TRUE))
     expect_equal(names(rel), c("ref_to", "ref_by"))
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         rel$ref_to,
         data.table(
             class_id = 2L, class_name = "TestSlash",
@@ -23,7 +24,8 @@ test_that("IddObject implementation", {
 
     expect_silent(rel <- get_iddobj_relation(idd_parsed, 2L, direction = "ref_to", name = TRUE, keep_all = FALSE))
     expect_equal(names(rel), c("ref_to", "ref_by"))
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         rel$ref_to,
         data.table(
             class_id = 2L, class_name = "TestSlash",
@@ -37,7 +39,8 @@ test_that("IddObject implementation", {
 
     expect_silent(rel <- get_iddobj_relation(idd_parsed, 2L, direction = "ref_by", name = TRUE, keep_all = FALSE))
     expect_equal(names(rel), c("ref_to", "ref_by"))
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         rel$ref_by,
         data.table(
             class_id = integer(), class_name = character(),
@@ -51,7 +54,8 @@ test_that("IddObject implementation", {
 
     expect_silent(rel <- get_iddobj_relation(idd_parsed, 2L, direction = "all", name = FALSE, keep_all = FALSE))
     expect_equal(names(rel), c("ref_to", "ref_by"))
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         rel$ref_to,
         data.table(
             class_id = 2L, field_id = 2L, src_class_id = 1L, sec_field_id = 1L,
@@ -64,7 +68,8 @@ test_that("IddObject implementation", {
     # }}}
 
     # POSSIBLE {{{
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         get_iddobj_possible(idd_parsed, 1L),
         data.table(class_id = 1L, class_name = "TestSimple",
             field_id = 1L, field_index = 1L,
@@ -77,7 +82,8 @@ test_that("IddObject implementation", {
             )
         )
     )
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         get_iddobj_possible(idd_parsed, field_id = c(5L, 3L)),
         data.table(class_id = 2L, class_name = "TestSlash",
             field_id = c(5L, 3L), field_index = c(4L, 2L),

@@ -30,23 +30,6 @@ test_that("Assertion functions", {
     })
     unlink(file.path(tempdir(), c("Energy+.idd", "energyplus", "energyplus.exe")))
 
-    expect_false(is_idd(1))
-    expect_true(is_idd(use_idd(8.8, download = "auto")))
-
-    expect_false(is_idf(1))
-    expect_true(is_idf(read_idf(example())))
-
-    expect_false(is_iddobject(1))
-    expect_true(is_iddobject(use_idd(8.8)$Version))
-
-    expect_false(is_idfobject(1))
-    expect_true(is_idfobject(read_idf(example())$Version))
-
-    expect_false(is_epw(1))
-
-    expect_true(is_rdd(structure(data.table(), class = "RddFile")))
-    expect_true(is_mdd(structure(data.table(), class = "MddFile")))
-
     expect_error(assert_same_len(1:5, 1))
     expect_equal(assert_same_len(1:5, 1:5), 1:5)
 
@@ -65,7 +48,26 @@ test_that("Assertion functions", {
     expect_true(is_epwdate(epw_date(1)))
     expect_false(is_epwdate(epw_date(-1)))
 
-    expect_is(is_windows(), "logical")
-    expect_is(is_linux(), 'logical')
-    expect_is(is_macos(), 'logical')
+    expect_type(is_windows(), "logical")
+    expect_type(is_linux(), 'logical')
+    expect_type(is_macos(), 'logical')
+
+    skip_on_cran()
+    expect_false(is_idd(1))
+    expect_true(is_idd(use_idd(LATEST_EPLUS_VER, download = "auto")))
+
+    expect_false(is_idf(1))
+    expect_true(is_idf(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))))
+
+    expect_false(is_iddobject(1))
+    expect_true(is_iddobject(use_idd(LATEST_EPLUS_VER)$Version))
+
+    expect_false(is_idfobject(1))
+    expect_true(is_idfobject(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$Version))
+
+    expect_false(is_epw(1))
+
+    expect_true(is_rdd(structure(data.table(), class = "RddFile")))
+    expect_true(is_mdd(structure(data.table(), class = "MddFile")))
+
 })

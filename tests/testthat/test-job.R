@@ -1,13 +1,12 @@
 test_that("Job methods", {
-    eplusr_option(verbose_info = FALSE)
     skip_on_cran()
 
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
-    path_epw <- path_eplus_weather(8.8, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
+    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     expect_silent(job <- eplus_job(path_idf, path_epw))
 
-    expect_equal(job$version(), numeric_version("8.8.0"))
+    expect_equal(job$version(), numeric_version(LATEST_EPLUS_VER))
     expect_output(job$print())
 
     # can get job status
@@ -30,17 +29,18 @@ test_that("Job methods", {
     expect_false(job$kill())
 
     # can read ERR file
-    path_idf <- copy_eplus_example(8.8, "5Zone_Transformer.idf")
+    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     job <- eplus_job(path_idf, path_epw)
-    expect_is({job$run(echo = FALSE);job$errors()}, "ErrFile")
-    expect_is(job$errors(info = TRUE), "ErrFile")
+    expect_s3_class({job$run(echo = FALSE);job$errors()}, "ErrFile")
+    expect_s3_class(job$errors(info = TRUE), "ErrFile")
     expect_silent({err <- job$errors()})
     expect_equal(names(err), c("index", "envir_index", "envir",
         "level_index", "level", "message"
     ))
-    expect_equal(attr(err, "eplus_version"), numeric_version("8.8.0"))
-    expect_equal(attr(err, "eplus_build"), "7c3bbe4830")
-    expect_equal(attr(err, "idd_version"), numeric_version("8.8.0"))
+    expect_equal(attr(err, "eplus_version"), numeric_version(LATEST_EPLUS_VER))
+    expect_equal(attr(err, "eplus_build"), "ed759b17ee")
+    # New EnergyPlus version has removed the IDD version in ERR file
+    expect_equal(attr(err, "idd_version"), NA)
     expect_equal(attr(err, "successful"), TRUE)
     expect_equal(attr(err, "terminated"), FALSE)
 
@@ -52,14 +52,14 @@ test_that("Job methods", {
 
     # can read table
     expect_error(job$read_table("a"), "no such table")
-    expect_is(job$read_table("Zones"), "data.table")
+    expect_s3_class(job$read_table("Zones"), "data.table")
 
     # can read report data dictionary
-    expect_is(job$report_data_dict(), "data.table")
+    expect_s3_class(job$report_data_dict(), "data.table")
 
     # can read report data
     expect_equal(nrow(job$report_data()), 3840L)
-    expect_equal(nrow(job$report_data("")), 1344L)
+    expect_equal(nrow(job$report_data(name = job$report_data_dict()[is.na(key_value), name])), 1344L)
     expect_equal(nrow(job$report_data(
         "TRANSFORMER 1", "Transformer Load Loss Rate")),
         192L

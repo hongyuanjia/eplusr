@@ -6,24 +6,27 @@ test_that("Basic Table Implementation", {
     expect_error(assert_valid_type("a", len = 2, type = "name"), "length 2")
     expect_equal(assert_valid_type(1, type = "id"), 1L)
     expect_equal(assert_valid_type(1), 1L)
-    expect_error(assert_valid_type(1, lower = 2, type = "both"), 1L)
+    expect_error(assert_valid_type(1, lower = 2, type = "both"), "1")
 
     expect_error(
         recognize_input("ClassName", type = "class", underscore = TRUE, lower = TRUE),
         "underscore and lower cannot all be TRUE"
     )
 
-    expect_equivalent(
+    expect_equal(
+    ignore_attr = TRUE,
         recognize_input("Class:Name", type = "class", underscore = TRUE),
         data.table(class_name_us = "Class_Name", rleid = 1L, original = "Class:Name")
     )
 
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         recognize_input("Field Name", type = "field", underscore = TRUE),
         data.table(field_name_us = "field_name", rleid = 1L, original = "Field Name")
     )
 
-    expect_equivalent(
+    expect_equal(
+        ignore_attr = TRUE,
         recognize_input("Field Name", type = "field", lower = TRUE),
         data.table(field_name_lower = "field name", rleid = 1L, original = "Field Name")
     )

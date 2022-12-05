@@ -3,11 +3,12 @@ test_that("IdfViewer class", {
     skip_on_cran()
 
     # simple model
-    idf <- read_idf(path_eplus_example(8.8, "4ZoneWithShading_Simple_1.idf"))
+    path <- path_eplus_example(LATEST_EPLUS_VER, "4ZoneWithShading_Simple_1.idf")
+    expect_s3_class(idf <- read_idf(path), "Idf")
 
-    expect_is(viewer <- idf_viewer(idf), "IdfViewer")
-    expect_is(viewer$parent(), "Idf")
-    expect_is(viewer$geometry(), "IdfGeometry")
+    expect_warning(viewer <- idf_viewer(idf))
+    expect_s3_class(viewer$parent(), "Idf")
+    expect_s3_class(viewer$geometry(), "IdfGeometry")
     expect_null(viewer$device())
     expect_null(viewer$background())
     expect_null(viewer$viewpoint())
@@ -51,13 +52,13 @@ test_that("IdfViewer class", {
     expect_null(viewer$show(zone = "Zone 1", surface = names(idf$Window)))
     expect_null(viewer$show(surface = names(idf$Window)))
 
-    expect_is(f <- viewer$snapshot(tempfile(fileext = ".pdf")), "character")
+    expect_type(f <- viewer$snapshot(tempfile(fileext = ".pdf")), "character")
     expect_true(file.exists(f))
     if (testthat:::on_ci()) {
-        expect_is(f <- viewer$snapshot(tempfile(fileext = ".png"), webshot = TRUE), "character")
+        expect_type(f <- viewer$snapshot(tempfile(fileext = ".png"), webshot = TRUE), "character")
         expect_true(file.exists(f))
     } else {
-        expect_is(f <- viewer$snapshot(tempfile(fileext = ".png")), "character")
+        expect_type(f <- viewer$snapshot(tempfile(fileext = ".png")), "character")
         expect_true(file.exists(f))
     }
     expect_null(viewer$focus())

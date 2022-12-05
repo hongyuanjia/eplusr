@@ -4,12 +4,12 @@ test_that("Sql methods", {
     example <- copy_example()
     idf <- read_idf(example$idf)
 
-    expect_is(job <- idf$run(example$epw, NULL, echo = FALSE), "EplusJob")
+    expect_s3_class(job <- idf$run(example$epw, NULL, echo = FALSE), "EplusJob")
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
     expect_output(sql$print())
     expect_output(str(sql))
-    expect_is(format(sql), "character")
+    expect_type(format(sql), "character")
 
     # path
     expect_equal(sql$path(), normalizePath(file.path(tempdir(), "5Zone_Transformer.sql")))
@@ -20,15 +20,15 @@ test_that("Sql methods", {
 
     # can read table
     expect_error(sql$read_table("a"), "no such table")
-    expect_is(sql$read_table("Zones"), "data.table")
+    expect_s3_class(sql$read_table("Zones"), "data.table")
 
     # can read report data dictionary
-    expect_is(sql$report_data_dict(), "data.table")
+    expect_s3_class(sql$report_data_dict(), "data.table")
 
     # can read report data
     expect_equal(nrow(sql$report_data(sql$report_data_dict())), 3840L)
     expect_equal(nrow(sql$report_data()), 3840L)
-    expect_equal(nrow(sql$report_data("")), 1344L)
+    expect_equal(nrow(sql$report_data(name = sql$report_data_dict()[is.na(key_value), name])), 1344L)
     expect_equal(nrow(sql$report_data(
         "TRANSFORMER 1", "Transformer Load Loss Rate")),
         192L
@@ -76,13 +76,13 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$report_data(day_type = "designday")), 0)
     expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)
 
-    expect_equal(nrow(sql$tabular_data()), 6662)
+    expect_equal(nrow(sql$tabular_data()), 10140L)
     expect_equal(nrow(sql$tabular_data(
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
             "Initialization Summary"
         ))),
-        3774
+        4281L
     )
     expect_equal(nrow(sql$tabular_data(table_name = "Site and Source Energy")), 12)
     expect_equal(nrow(sql$tabular_data(column_name = "Total Energy")), 4)
@@ -91,8 +91,9 @@ test_that("Sql methods", {
     expect_silent(tab <- sql$tabular_data(row_name = "Total Site Energy", wide = TRUE, case = NULL))
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
 
-    expect_equivalent(
-        read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
+    expect_equal(
+        ignore_attr = TRUE,
+        read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$
             run(NULL, tempdir(), echo = FALSE)$
             tabular_data(table_name = "Site and Source Energy", wide = TRUE)[[1]][
             , lapply(.SD, class)],
@@ -107,7 +108,9 @@ test_that("Sql methods", {
             `Energy Per Conditioned Building Area [MJ/m2]` = "numeric"
         )
     )
-    expect_equivalent(tab[[1L]][, lapply(.SD, class)],
+    expect_equal(
+        ignore_attr = TRUE,
+        tab[[1L]][, lapply(.SD, class)],
         data.table(
             report_name = "character",
             report_for = "character",
@@ -118,19 +121,6 @@ test_that("Sql methods", {
             `Energy Per Conditioned Building Area [MJ/m2]` = "numeric"
         )
     )
-
-    # test if DDY HVAC sizing data can be extracted
-    idf$SimulationControl$Do_HVAC_Sizing_Simulation_for_Sizing_Periods <- "Yes"
-    idf$SimulationControl$Maximum_Number_of_HVAC_Sizing_Simulation_Passes <- 2
-    idf$save(overwrite = TRUE)
-    job <- idf$run(example$epw, NULL, echo = FALSE)
-    sql <- eplus_sql(job$locate_output(".sql"))
-    expect_equal(nrow(tab <- sql$report_data(all = TRUE)), 7680L)
-    expect_equal(nrow(tab[environment_period_index > 4L]), 3840L)
-    expect_equal(unique(tab[environment_period_index > 4L, unique(environment_name)]),
-        c("WinterDesignDay HVAC Sizing Pass 1", "SummerDesignDay HVAC Sizing Pass 1")
-    )
-    expect_equal(nrow(sql$report_data(wide = TRUE)), 384L)
 
     # can get path
     if (!is_macos()) expect_equal(sql$path(), job$locate_output(".sql"))
@@ -150,7 +140,7 @@ test_that("Data extraction", {
     # remove original run periods
     idf$RunPeriod <- NULL
     # define new run periods
-    idf$add(RunPeriod = list("Long", 1, 1, 12, 31), RunPeriod = list("Short", 7, 1, 8, 15))
+    idf$add(RunPeriod = list("Long", 1, 1, NULL, 12, 31), RunPeriod = list("Short", 7, 1, NULL, 8, 15))
 
     # add new output variables to cover all possible report frequency
     idf$`Output:Variable` <- NULL

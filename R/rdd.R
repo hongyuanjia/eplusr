@@ -109,7 +109,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
     idf_fmt <- stri_startswith_fixed(rdd_head[[1L]], "!")
 
     # EnergyPlus eplus_version and eplus_build
-    ver_bld <- stri_match_first_regex(rdd_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
+    ver_bld <- stri_match_first_regex(rdd_head[3L], "Version (\\d{1,2}\\.\\d\\.\\d)-([0-9a-z]{10})")
     if (!is.na(ver_bld[, 2L])) eplus_version <- standardize_ver(ver_bld[, 2L])
     if (!is.na(ver_bld[, 3L])) eplus_build <- ver_bld[, 3L]
 

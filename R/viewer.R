@@ -368,6 +368,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'   with a color. All other surfaces will be white.
         #' * `"construction"`: Render the model by surface constructions.
         #' * `"zone"`: Render the model by zones assigned.
+        #' * `"space"`: Render the model by spaces assigned.
         #' * `"normal"`: Render the model by surface normal. The outside
         #'   face of a heat transfer face will be rendered as white and the
         #'   inside face will be rendered as red.
@@ -403,6 +404,10 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #'        of zones in current [Idf] to show. If `NULL`, no subsetting is
         #'        performed.
         #'
+        #' @param space A character vector of names or an integer vector of IDs
+        #'        of spaces in current [Idf] to show. If `NULL`, no subsetting is
+        #'        performed.
+        #'
         #' @param surface A character vector of names or an integer vector of IDs
         #'        of surfaces in current [Idf] to show. If `NULL`, no subsetting
         #'        is performed.
@@ -420,7 +425,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$show()
         #' }
-        show = function (type = "all", zone = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
+        show = function (type = "all", zone = NULL, space = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
             idfviewer_show(self, private, type, zone, surface, width = 1.5, dayl_color, dayl_size),
         # }}}
 
@@ -764,8 +769,8 @@ idfviewer_x_ray <- function (self, private, on = TRUE) {
 }
 # }}}
 # idfviewer_render_by {{{
-idfviewer_render_by <- function (self, private, style = c("surface_type", "boundary", "construction", "zone", "normal")) {
-    assert_choice(style, c("surface_type", "boundary", "construction", "zone", "normal"))
+idfviewer_render_by <- function (self, private, style = c("surface_type", "boundary", "construction", "zone", "space", "normal")) {
+    assert_choice(style, c("surface_type", "boundary", "construction", "zone", "space", "normal"))
 
     private$m_render_by <- style
 

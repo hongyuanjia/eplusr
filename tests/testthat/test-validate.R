@@ -1,10 +1,12 @@
 # VALIDTATE {{{
 test_that("Validate method", {
-    idf <- read_idf(example(), use_idd(8.8, "auto"))
+    skip_on_cran()
+
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     idf_env <- get_priv_env(idf)$m_idf_env
     idd_env <- get_priv_env(idf)$idd_env()
 
-    expect_is(empty_validity(), "IdfValidity")
+    expect_s3_class(empty_validity(), "IdfValidity")
     expect_equal(names(empty_validity()),
         c("missing_object",
           "duplicate_object",
@@ -24,12 +26,12 @@ test_that("Validate method", {
 
     expect_error(level_checks(1))
 
-    expect_is(format_validity(empty_validity()), "character")
+    expect_type(format_validity(empty_validity()), "character")
     expect_output(print.IdfValidity(empty_validity()))
     expect_output(print.EpwValidity(empty_validity()))
 
     # MISSING OBJECT {{{
-    env_in <- parse_idf_file(idftext("idf", 8.8))
+    env_in <- parse_idf_file(idftext("idf"))
     expect_equal(
         check_missing_object(idd_env, idf_env, env_in)$validity$missing_object,
         c("Building", "GlobalGeometryRules")
@@ -42,7 +44,7 @@ test_that("Validate method", {
     # }}}
 
     # DUPLICATE OBJECT {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     expect_equal(nrow(check_duplicate_object(idd_env, idf_env, env_in)$validity$duplicate_object), 0L)
     env_in$object <- rbindlist(list(
@@ -78,7 +80,7 @@ test_that("Validate method", {
     # }}}
 
     # CONFLICT NAME {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     env_in$check_whole <- TRUE
     expect_equal(nrow(check_conflict_name(idd_env, idf_env, env_in)$validity$conflict_name), 0L)
@@ -115,7 +117,7 @@ test_that("Validate method", {
     # }}}
 
     # INCOMPLETE EXTENSIBLE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -124,12 +126,12 @@ test_that("Validate method", {
     invisible(env_in$value[extensible_group == 3L, value_chr := NA_character_])
     expect_silent({err <- check_incomplete_extensible(idd_env, idf_env, env_in)$validity$incomplete_extensible})
     expect_equal(err$object_id, rep(3L, 3))
-    expect_equal(err$field_index, 17:19)
-    expect_equal(err$value_id, 31:33)
+    expect_equal(err$field_index, 18:20)
+    expect_equal(err$value_id, 32:34)
     # }}}
 
     # MISSING VALUE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -138,11 +140,11 @@ test_that("Validate method", {
 
     expect_silent({mis <- check_missing_value(idd_env, idf_env, env_in)$validity$missing_value})
     expect_equal(mis$object_id, c(1:3, 4, 4))
-    expect_equal(mis$value_id, c(1L, 10L, 15L, 45L, 46L))
+    expect_equal(mis$value_id, c(1L, 10L, 15L, 46L, 47L))
     # }}}
 
     # INVALID AUTOSIZE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -153,11 +155,11 @@ test_that("Validate method", {
     expect_silent({autosize <- check_invalid_autosize(idd_env, idf_env, env_in)$validity$invalid_autosize})
     expect_equal(autosize$object_id, 1:4)
     expect_equal(autosize$field_index, rep(1L, 4L))
-    expect_equal(autosize$value_id, c(1L, 10L, 15L, 40L))
+    expect_equal(autosize$value_id, c(1L, 10L, 15L, 41L))
     # }}}
 
     # INVALID AUTOCALCULATE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -168,11 +170,11 @@ test_that("Validate method", {
     expect_silent({autocal <- check_invalid_autocalculate(idd_env, idf_env, env_in)$validity$invalid_autocalculate})
     expect_equal(autocal$object_id, 1:4)
     expect_equal(autocal$field_index, rep(1L, 4L))
-    expect_equal(autocal$value_id, c(1L, 10L, 15L, 40L))
+    expect_equal(autocal$value_id, c(1L, 10L, 15L, 41L))
     # }}}
 
     # INVALID CHARACTER {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -182,11 +184,11 @@ test_that("Validate method", {
     expect_silent({chr <- check_invalid_character(idd_env, idf_env, env_in)$validity$invalid_character})
     expect_equal(chr$object_id, 1:4)
     expect_equal(chr$field_index, rep(1L, 4L))
-    expect_equal(chr$value_id, c(1L, 10L, 15L, 40L))
+    expect_equal(chr$value_id, c(1L, 10L, 15L, 41L))
     # }}}
 
     # INVALID NUMERIC {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -195,11 +197,11 @@ test_that("Validate method", {
 
     expect_silent({num <- check_invalid_numeric(idd_env, idf_env, env_in)$validity$invalid_numeric})
     expect_equal(num$object_id, c(rep(1L, 7), rep(3L, 3), rep(4L, 2)))
-    expect_equal(num$value_id, c(3:9, 37:39, 45:46))
+    expect_equal(num$value_id, c(3:9, 38:40, 46:47))
     # }}}
 
     # INVALID INTEGER {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -212,7 +214,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID CHOICE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -226,7 +228,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID RANGE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
@@ -242,7 +244,7 @@ test_that("Validate method", {
     # }}}
 
     # INVALID REFERENCE {{{
-    env_in <- list2env(parse_idf_file(idftext("idf", 8.8)))
+    env_in <- list2env(parse_idf_file(idftext("idf")))
     env_in$validity <- empty_validity()
     env_in$check_whole <- TRUE
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
@@ -251,9 +253,9 @@ test_that("Validate method", {
         c("src_enum", "field_index", "field_name", "units", "ip_units", "type_enum")
     )
 
-    expect_silent({ref <- check_invalid_reference(idd_env, env_in, env_in)$validity$invalid_reference})
-    expect_equal(ref$object_id, c(rep(2L, 3), rep(3L, 2)))
-    expect_equal(ref$value_id, c(12:14, 18L, 20L))
+    expect_silent(ref <- check_invalid_reference(idd_env, env_in, env_in)$validity$invalid_reference)
+    expect_equal(ref$object_id, c(rep(2L, 3), rep(3L, 3)))
+    expect_equal(ref$value_id, c(12:14, 18L, 19L, 21L))
     # }}}
 })
 # }}}

@@ -1,8 +1,21 @@
 # eplusr (development version)
 
+## New features
+
+* Add support for EnergyPlus v22.1 (#517).
+* Add support `Space` in `IdfGeometry`. Results from `IdfGeometry$area()`,
+  `IdfGeometry$tilt()` and `IdfGeometry$azimuth()` now include a new column
+  `space` indicating the spaces where the surfaces are attached to.
+  `IdfGeometry$view()` and `IdfViewer$show()` now can render by spaces (#535).
+
 ## Bug fixes
 
+* `IdfGeometry$convert()` now work for EnergyPlus v9.6 and above (#536).
 * Now IMF files can be handled correctly (#537).
+
+## Internal refactor
+
+* Use testthat 3rd edition for parallel testing (#478).
 
 # eplusr 0.15.3
 

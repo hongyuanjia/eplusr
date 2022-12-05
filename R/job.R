@@ -931,9 +931,9 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     }
 
     path_idf <- private$m_idf$path()
-    if (is.null(dir))
+    if (is.null(dir)) {
         run_dir <- dirname(path_idf)
-    else {
+    } else {
         run_dir <- dir
         path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = FALSE)
     }

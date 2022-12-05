@@ -4,16 +4,16 @@ eplusr_option(verbose_info = FALSE)
 test_that("parse_sch_cmpt()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()
 
     val <- get_idf_value(idd_env, idf_env, object = "BLDG_SWH_SCH")
-    expect_is(l <- parse_sch_cmpt(val), "list")
+    expect_type(l <- parse_sch_cmpt(val), "list")
 
     val <- rbindlist(list(val[1:4], val[4][, `:=`(value_chr = "Interpolate: Linear")], val[5:.N]))
-    expect_is(l <- parse_sch_cmpt(val), "list")
+    expect_type(l <- parse_sch_cmpt(val), "list")
 
     expect_equal(names(l), c("type_limits", "meta", "value"))
     expect_equal(l$type_limits,
@@ -91,16 +91,16 @@ test_that("parse_sch_cmpt()", {
 test_that("compose_sch_cmpt()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()
     val <- get_idf_value(idd_env, idf_env, object = "BLDG_SWH_SCH")
     val <- rbindlist(list(val[1:4], val[4][, `:=`(value_chr = "Interpolate: Linear")], val[5:.N]))
 
-    expect_is(l <- parse_sch_cmpt(val), "list")
+    expect_type(l <- parse_sch_cmpt(val), "list")
 
-    expect_is(cmpt <- compose_sch_cmpt(l$type_limits, l$meta, l$value), "list")
+    expect_type(cmpt <- compose_sch_cmpt(l$type_limits, l$meta, l$value), "list")
     expect_equal(names(cmpt), c("object", "value"))
     expect_equal(cmpt$object,
         data.table(rleid = 1L, object_id = 595L, class_name = "Schedule:Compact",
@@ -110,10 +110,10 @@ test_that("compose_sch_cmpt()", {
     expect_equal(cmpt$value$value_chr[-c(62, 77)], val$value_chr[-c(62, 77)])
 
     # can work with single row meta
-    expect_is(cmpt <- compose_sch_cmpt(l$type_limits, l$meta[1L], l$value[daytype_index == 1L]), "list")
+    expect_type(cmpt <- compose_sch_cmpt(l$type_limits, l$meta[1L], l$value[daytype_index == 1L]), "list")
 
     # can work with empty type limits
-    expect_is(cmpt <- compose_sch_cmpt(l$type_limits[, -"type_limits"], l$meta[1L], l$value), "list")
+    expect_type(cmpt <- compose_sch_cmpt(l$type_limits[, -"type_limits"], l$meta[1L], l$value), "list")
 })
 # }}}
 
@@ -284,7 +284,7 @@ test_that("expand_sch_time()", {
 test_that("get_sch_type_limits()", {
     skip_on_cran()
 
-    path_idf <- file.path(eplus_config(8.8)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+    path_idf <- path_eplus_example(LATEST_EPLUS_VER, "RefBldgMediumOfficeNew2004_Chicago.idf")
     idf <- read_idf(path_idf)
     idd_env <- get_priv_env(idf)$idd_env()
     idf_env <- get_priv_env(idf)$idf_env()
@@ -295,22 +295,22 @@ test_that("get_sch_type_limits()", {
         list(name = "Fraction", range = ranger(0, TRUE, 1, TRUE))
     )
 
-    expect_is(obj <- idf$add(ScheduleTypeLimits = list("lim"))[[1L]], "IdfObject")
+    expect_s3_class(obj <- idf$add(ScheduleTypeLimits = list("lim"))[[1L]], "IdfObject")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim"),
         list(name = "lim", range = ranger())
     )
 
     idf$definition("ScheduleTypeLimits")
-    expect_is(idf$add(ScheduleTypeLimits = list("lim1", ..4 = "discrete")), "list")
+    expect_type(idf$add(ScheduleTypeLimits = list("lim1", ..4 = "discrete")), "list")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim1"), list(name = "lim1", range = list()))
 
-    expect_is(idf$add(ScheduleTypeLimits = list("lim2", 1, 5, "discrete")), "list")
+    expect_type(idf$add(ScheduleTypeLimits = list("lim2", 1, 5, "discrete")), "list")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim2"), list(name = "lim2", range = 1:5))
 
-    expect_is(idf$add(ScheduleTypeLimits = list("lim3", 2, 1, "discrete")), "list")
+    expect_type(idf$add(ScheduleTypeLimits = list("lim3", 2, 1, "discrete")), "list")
     expect_error(get_sch_type_limits(idd_env, idf_env, "lim3"), class = "eplusr_error_idfschcmpt_typelimit")
 
-    expect_is(without_checking(idf$add(ScheduleTypeLimits = list("lim4", 1, 2, "integer"))), "list")
+    expect_type(without_checking(idf$add(ScheduleTypeLimits = list("lim4", 1, 2, "integer"))), "list")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim4"), list(name = "lim4", range = list()))
 })
 # }}}

@@ -1,20 +1,18 @@
-eplusr_option(verbose_info = FALSE)
-use_idd(8.8, "auto")
-
 # NEW {{{
 test_that("$new()", {
+    skip_on_cran()
     # can create new Idf object from string
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     priv <- get_priv_env(idf)
 
     expect_null(priv$m_path)
-    expect_is(priv$m_version, "numeric_version")
-    expect_is(priv$m_idd, "Idd")
-    expect_is(priv$m_idf_env, "environment")
-    expect_is(priv$m_log, "environment")
+    expect_s3_class(priv$m_version, "numeric_version")
+    expect_s3_class(priv$m_idd, "Idd")
+    expect_type(priv$m_idf_env, "environment")
+    expect_type(priv$m_log, "environment")
 
-    expect_is(priv$m_log$uuid, "character")
+    expect_type(priv$m_log$uuid, "character")
     expect_false(priv$m_log$unsaved)
     expect_false(priv$m_log$view_in_ip)
     expect_equal(priv$m_log$save_format, "sorted")
@@ -23,25 +21,28 @@ test_that("$new()", {
 
 # VERSION {{{
 test_that("$version()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_equal(idf$version(), as.numeric_version("8.8.0"))
+    expect_equal(idf$version(), numeric_version(LATEST_EPLUS_VER))
 })
 # }}}
 
 # PATH {{{
 test_that("$path()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
     expect_equal(idf$path(), NULL)
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_equal(basename(idf$path()), "1ZoneUncontrolled.idf")
 })
 # }}}
 
 # GROUP_NAME {{{
 test_that("$group_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get group names in Idf
     expect_equal(idf$group_name(), c("Simulation Parameters",
@@ -57,13 +58,14 @@ test_that("$group_name()", {
     )
 
     # can get group names in Idd
-    expect_equal(idf$group_name(all = TRUE), use_idd(8.8)$group_name())
+    expect_equal(idf$group_name(all = TRUE), use_idd(LATEST_EPLUS_VER)$group_name())
 })
 # }}}
 
 # CLASS_NAME {{{
 test_that("$class_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get class names in Idf
     expect_equal(idf$class_name(sorted = FALSE),
@@ -74,10 +76,10 @@ test_that("$class_name()", {
         c("Version", "Material", "Construction", "BuildingSurface:Detailed"))
 
     # can get class names in Idd
-    expect_equal(idf$class_name(all = TRUE), use_idd(8.8)$class_name())
+    expect_equal(idf$class_name(all = TRUE), use_idd(LATEST_EPLUS_VER)$class_name())
 
     # can get class names by group
-    expect_equal(length(idf$class_name(all = TRUE, by_group = TRUE)), 58)
+    expect_equal(length(idf$class_name(all = TRUE, by_group = TRUE)), 59)
 
     # can get class names by group
     expect_equal(idf$class_name(by_group = TRUE),
@@ -94,7 +96,8 @@ test_that("$class_name()", {
 
 # OBJECT_ID {{{
 test_that("$object_id()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get all object ids
     expect_equal(idf$object_id(),
@@ -110,7 +113,8 @@ test_that("$object_id()", {
 
 # OBJECT_NAME {{{
 test_that("$object_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get object names
     expect_equal(idf$object_name(), list(Version = NA_character_, Material = c("WD01", "WD02"),
@@ -125,7 +129,8 @@ test_that("$object_name()", {
 
 # OBJECT_NUM {{{
 test_that("$object_num()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get object num
     expect_equal(idf$object_num(), 5L)
@@ -136,7 +141,8 @@ test_that("$object_num()", {
 
 # IS_VALID_GROUP {{{
 test_that("$is_valid_group()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check invalid group name
     expect_true(idf$is_valid_group("Simulation Parameters"))
@@ -146,7 +152,8 @@ test_that("$is_valid_group()", {
 
 # IS_VALID_CLASS {{{
 test_that("$is_valid_class()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check invalid class name
     expect_true(idf$is_valid_class("Version"))
@@ -156,7 +163,8 @@ test_that("$is_valid_class()", {
 
 # IS_VALID_ID {{{
 test_that("$is_valid_id()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check invalid object ID
     expect_true(idf$is_valid_id(1L))
@@ -172,7 +180,8 @@ test_that("$is_valid_id()", {
 
 # IS_VALID_NAME {{{
 test_that("$is_valid_name()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check invalid object name
     expect_true(idf$is_valid_name("WD01"))
@@ -188,7 +197,8 @@ test_that("$is_valid_name()", {
 
 # EXTERNAL_DEPS {{{
 test_that("$external_deps()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     sch <- file.path(tempdir(), "schedule_file.csv")
     write_lines("index, value\n1, 1\n", sch)
@@ -197,7 +207,8 @@ test_that("$external_deps()", {
     expect_equal(idf$external_deps(), normalizePath(sch))
     expect_null(attr(idf$external_deps(), "extra"))
 
-    expect_equivalent(idf$external_deps(full = TRUE),
+    expect_equal(
+        ignore_attr = TRUE, idf$external_deps(full = TRUE),
         data.table(
             id = 6L, name = "Schedule", class = "Schedule:File",
             index = 3L, field = "File Name", value = sch,
@@ -209,7 +220,8 @@ test_that("$external_deps()", {
 
 # IS_UNSAVED {{{
 test_that("$is_unsaved()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check if model has been changed since read
     expect_false(idf$is_unsaved())
@@ -218,22 +230,24 @@ test_that("$is_unsaved()", {
 
 # DEFINITION {{{
 test_that("$definition()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get Idd
-    expect_is(idf$definition(), "Idd")
+    expect_s3_class(idf$definition(), "Idd")
 
     # can get IddObject
-    expect_is(idf$definition("Version"), "IddObject")
+    expect_s3_class(idf$definition("Version"), "IddObject")
 })
 # }}}
 
 # OBJECT {{{
 test_that("$object()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get IdfObject
-    expect_is(idf$object(1), "IdfObject")
+    expect_s3_class(idf$object(1), "IdfObject")
 
     # can stop if multiple inputs
     expect_error(idf$object(1:2), "Assertion")
@@ -242,7 +256,8 @@ test_that("$object()", {
 
 # OBJECT_UNIQUE {{{
 test_that("$object_unique()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can stop if not a unique-class name
     expect_error(idf$object_unique("Material"))
@@ -252,7 +267,7 @@ test_that("$object_unique()", {
         idf <- with_option(
             list(validate_level = "none", verbose_info = FALSE),
             {
-                idf <- empty_idf(8.8)
+                idf <- empty_idf(LATEST_EPLUS_VER)
                 idf$add(Building = list(), Building = list())
                 idf
             }
@@ -264,14 +279,15 @@ test_that("$object_unique()", {
 
 # OBJECTS {{{
 test_that("$objects()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_equal(names(idf$objects("WD01")), "WD01")
 
     # can ignore cases
     expect_equal(names(idf$objects("wall-1")), "WALL-1")
 
-    expect_is(idf$objects(1:2), "list")
+    expect_type(idf$objects(1:2), "list")
     expect_error(idf$objects("a"), class = "eplusr_error_invalid_object_name")
     expect_error(idf$objects(1:6), class = "eplusr_error_invalid_object_id")
 })
@@ -279,31 +295,33 @@ test_that("$objects()", {
 
 # OBJECTS_IN_CLASS {{{
 test_that("$objects_in_class()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get all objects in a class
     expect_error(idf$objects_in_class("version"), class = "eplusr_error_invalid_class_name")
-    expect_is(idf$objects_in_class("Version"), "list")
+    expect_type(idf$objects_in_class("Version"), "list")
 })
 # }}}
 
 # OBJECTS_IN_GROUP {{{
 test_that("$objects_in_group()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get all objects in a group
     expect_error(idf$objects_in_group("Schedules"), class = "eplusr_error_invalid_group_name")
-    expect_is(idf$objects_in_group("Simulation Parameters"), "list")
+    expect_type(idf$objects_in_group("Simulation Parameters"), "list")
 })
 # }}}
 
 # OBJECT_RELATION {{{
 test_that("$object_relation()", {
     skip_on_cran()
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(idf$object_relation(2), "IdfRelation")
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+    expect_s3_class(idf$object_relation(2), "IdfRelation")
 
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
 
     # default only include both objects that are both referenced by their field
     # value and class names
@@ -343,9 +361,10 @@ test_that("$object_relation()", {
 
 # OBJECTS_IN_RELATION {{{
 test_that("$objects_in_relation()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_is(obj <- idf$objects_in_relation(2), "list")
+    expect_type(obj <- idf$objects_in_relation(2), "list")
     expect_equal(length(obj), 2L)
     expect_equal(names(obj), c("WALL-1", "WD01"))
 
@@ -354,18 +373,19 @@ test_that("$objects_in_relation()", {
     expect_equal(length(obj), 1L)
     expect_equal(names(obj), "WD01")
 
-    expect_is(obj <- idf$objects_in_relation("WALL-1", "ref_by"), "list")
+    expect_type(obj <- idf$objects_in_relation("WALL-1", "ref_by"), "list")
     expect_equal(names(obj), c("WALL-1", "WALL-1PF"))
 })
 # }}}
 
 # SEARCH_OBJECT {{{
 test_that("$search_object()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_error(idf$search_object("W", class = rep("Version", 2)))
 
-    expect_is(obj <- idf$search_object("W"), "list")
+    expect_type(obj <- idf$search_object("W"), "list")
     expect_equal(names(obj), c("WD01", "WALL-1", "WALL-1PF", "WD02"))
 
     expect_equal(names(idf$search_object("W", class = "Material")), c("WD01", "WD02"))
@@ -376,7 +396,8 @@ test_that("$search_object()", {
 
 # DUP {{{
 test_that("$dup()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can duplicate objects and assign new names
     expect_equal(names(idf$dup("WD01-DUP" = "WD01")), "WD01-DUP")
@@ -390,7 +411,8 @@ test_that("$dup()", {
 
 # ADD {{{
 test_that("$add()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # invalid value input format
     expect_error(idf$add("Material" = list(name = "mat"), "Construction"))
@@ -410,11 +432,11 @@ test_that("$add()", {
     expect_error(idf$add("Material" = list(name = "a", name = "a")))
     # adding existing unique
     expect_error(idf$add("Version" = list(8)))
-    expect_silent(idf_full <- read_idf(example()))
+    expect_silent(idf_full <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
     expect_error(idf_full$add("Building" = list()))
 
     # adding empty object
-    expect_is(idf$add("Building" = list())[[1L]], "IdfObject")
+    expect_s3_class(idf$add("Building" = list())[[1L]], "IdfObject")
 
     # invalid field number
     expect_error(idf$add("Output:Variable" = list("a", "b", "c", "d", "e")), class = "eplusr_error_invalid_field_index")
@@ -430,33 +452,34 @@ test_that("$add()", {
     expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_7 = "day7", Schedule_Day_Name_6 = "sch6")), class = "eplusr_error_validity_check")
     expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Surface_Name_8 = "surf8", Surface_Name_20 = "surf20")), class = "eplusr_error_invalid_field_name")
     expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_8 = "day8", Schedule_Day_Name_8 = "sch8")), class = "eplusr_error_validity_check")
-    expect_equal(use_idd(8.8)$SurfaceProperty_HeatTransferAlgorithm_SurfaceList$num_fields(), 8L)
-    expect_equal(use_idd(8.8)$Schedule_Week_Compact$num_fields(), 17L)
+    expect_equal(use_idd(LATEST_EPLUS_VER)$SurfaceProperty_HeatTransferAlgorithm_SurfaceList$num_fields(), 8L)
+    expect_equal(use_idd(LATEST_EPLUS_VER)$Schedule_Week_Compact$num_fields(), 17L)
 
     # incomplete extensible group
     # add all fields with defaults
     expect_equal(
-        idf$add("RunPeriod" = list("rp_test_1", 1, 1, 2, 1),
+        idf$add("RunPeriod" = list("rp_test_1", 1, 1, NULL, 2, 1),
             .default = TRUE, .all = TRUE)$rp_test_1$value(),
         list(Name = "rp_test_1",
              `Begin Month` = 1L,
              `Begin Day of Month` = 1L,
+             `Begin Year` = NA_real_,
              `End Month` = 2L,
              `End Day of Month` = 1L,
-             `Day of Week for Start Day` = "UseWeatherFile",
+             `End Year` = NA_real_,
+             `Day of Week for Start Day` = NA_character_,
              `Use Weather File Holidays and Special Days` = "Yes",
              `Use Weather File Daylight Saving Period` = "Yes",
              `Apply Weekend Holiday Rule` = "No",
              `Use Weather File Rain Indicators` = "Yes",
              `Use Weather File Snow Indicators` = "Yes",
-             `Number of Times Runperiod to be Repeated` = 1L,
-             `Increment Day of Week on repeat` = "Yes",
-             `Start Year` = NA_integer_
+             `Treat Weather as Actual` = "No",
+             `First Hour Interpolation Starting Values` = "Hour24"
         )
     )
     expect_silent(
         idf$add(
-            RunPeriod = list("rp_test_2", 1, 1, 2, 1,
+            RunPeriod = list("rp_test_2", 1, 1, NULL, 2, 1,
                 .comment = c("Comment for new object 1", "Another comment")
             ),
             RunPeriod = list(name = "rp_test_3", begin_month = 3, begin_day_of_month = 1, end_month = 4,
@@ -465,12 +488,10 @@ test_that("$add()", {
         )
     )
     expect_equal(idf$object("rp_test_2")$value(simplify = TRUE),
-        c("rp_test_2", "1", "1", "2", "1", "UseWeatherFile", "Yes", "Yes",
-            "No", "Yes", "Yes")
+        c("rp_test_2", "1", "1", NA, "2", "1", NA)
     )
     expect_equal(idf$objects("rp_test_3")[[1]]$value(simplify = TRUE),
-        c("rp_test_3", "3", "1", "4", "1", "UseWeatherFile", "Yes", "Yes",
-            "No", "Yes", "Yes")
+        c("rp_test_3", "3", "1", NA, "4", "1", NA)
     )
 
     # can stop adding objects if trying to add a object with same name
@@ -480,10 +501,11 @@ test_that("$add()", {
 
 # SET {{{
 test_that("$set()", {
-    expect_is(idf <- read_idf(example()), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     # set new values and comments
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$set(..8 = list(name = "rp_test", begin_day_of_month = 2,
                 use_weather_file_rain_indicators = "no",
                 .comment = c("begin day has been changed."))
@@ -494,33 +516,33 @@ test_that("$set()", {
     expect_equal(idf$RunPeriod$rp_test$comment(), "begin day has been changed.")
 
     # can set default values
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$set(rp_test = list(
             use_weather_file_rain_indicators = NULL, use_weather_file_snow_indicators = NULL
         ))
     )
-    expect_equal(length(idf$RunPeriod$rp_test$value()), 11)
+    expect_equal(length(idf$RunPeriod$rp_test$value()), 13)
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
 
     # can remove trailing empty fields
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$set(rp_test = list(
-            Number_of_Times_Runperiod_to_be_Repeated = NULL,
-            Increment_Day_of_Week_on_repeat = NULL
+            use_weather_file_rain_indicators = NULL,
+            use_weather_file_snow_indicators = NULL
         ), .default = FALSE)
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 11)
 
     # can keep trailing empty fields
-    expect_is(class = "list",
-        idf$set(rp_test = list(start_year = NULL), .default = FALSE, .empty = TRUE)
+    expect_type(type = "list",
+        idf$set(rp_test = list(treat_weather_as_actual = NULL), .default = FALSE, .empty = TRUE)
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 14)
 
     # can set all values in a class
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$set(
-            RunPeriod := list(start_year = NULL),
+            RunPeriod := list(treat_weather_as_actual = NULL),
             Material_NoMass := list(roughness = "Rough")
         )
     )
@@ -528,44 +550,45 @@ test_that("$set()", {
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Rough")
 
     # can set multiple objects
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$set(c(12, 13) := list(roughness = c("VeryRough", "Smooth")))
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "VeryRough")
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
 
     # can handle references
-    skip_on_cran()
-    expect_is(idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
-    expect_is(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")), "Idf")
+    expect_type(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
     expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
 })
 # }}}
 
 # DEL {{{
 test_that("$del()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_error(idf$del(5L), class = "eplusr_error_del_version")
     expect_error(idf$del(c(1, 2, 1)), class = "eplusr_error_del_same")
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_error(idf$del(idf$Material_NoMass[[1]]$id()), class = "eplusr_error_del_referenced")
     expect_error(idf$del(idf$Building$id()), class = "eplusr_error_del_required")
 
-    expect_is(without_checking(idf$del(12, .ref_by = TRUE)), "Idf")
+    expect_s3_class(without_checking(idf$del(12, .ref_by = TRUE)), "Idf")
     expect_equal(idf$is_valid_id(c(12, 15)), c(FALSE, TRUE))
     expect_false(idf$object("R13WALL")$is_valid())
 
-    expect_is(idf <- read_idf(example()), "Idf")
-    expect_is(idf$del(12, .ref_by = TRUE, .force = TRUE), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    expect_s3_class(idf$del(12, .ref_by = TRUE, .force = TRUE), "Idf")
     expect_equal(idf$is_valid_id(c(12, 15)), c(FALSE, FALSE))
 })
 # }}}
 
 # PURGE {{{
 test_that("$purge()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_error(idf$purge(1000), class = "eplusr_error_invalid_object_id")
     expect_error(idf$purge(class = "AirLoopHVAC"), class = "eplusr_error_invalid_class_name")
@@ -586,17 +609,17 @@ test_that("$purge()", {
     expect_false(all(idf$purge(c(1, 2, 3))$is_valid_id(c(1, 2, 3))))
 
     # can purge using input class names
-    idf <- read_idf(idftext("idf", 8.8))
+    idf <- read_idf(idftext("idf", LATEST_EPLUS_VER))
     expect_equal(idf$purge(class = "Material")$is_valid_id(c(1, 4)), c(TRUE, FALSE))
-    idf <- read_idf(idftext("idf", 8.8))
+    idf <- read_idf(idftext("idf", LATEST_EPLUS_VER))
     expect_equal(idf$purge(class = c("Material", "Construction"))$is_valid_id(c(1, 4)), c(TRUE, FALSE))
 
     # can purge using input class names
-    idf <- read_idf(idftext("idf", 8.8))
+    idf <- read_idf(idftext("idf", LATEST_EPLUS_VER))
     expect_equal(idf$purge(group = "Surface Construction Elements")$is_valid_id(c(1, 4)), c(TRUE, FALSE))
 
     # can purge using various specifications
-    idf <- read_idf(idftext("idf", 8.8))
+    idf <- read_idf(idftext("idf", LATEST_EPLUS_VER))
     expect_equal(idf$purge(1:5, c("Material", "Construction"), idf$group_name())$is_valid_id(1:5), c(rep(FALSE, 4), TRUE))
 })
 # }}}
@@ -604,7 +627,7 @@ test_that("$purge()", {
 # DUPLICATED {{{
 test_that("$duplicated()", {
     skip_on_cran()
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
     expect_silent(dup <- idf_1$duplicated())
     expect_equal(nrow(dup), 322)
     expect_equal(names(dup), c("class", "id", "name", "duplicate"))
@@ -620,20 +643,21 @@ test_that("$duplicated()", {
 # UNIQUE {{{
 test_that("$unique()", {
     skip_on_cran()
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
-    expect_is(idf_1$unique(1, group = "Schedules"), "Idf")
+    idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
+    expect_s3_class(idf_1$unique(1, group = "Schedules"), "Idf")
     expect_false(all(idf_1$is_valid_id(c(35, 38, 42))))
 
     id <- idf_1$object_id(c("Material", "Output:Meter:MeterFileOnly"))
-    expect_is(idf_1$unique(class = c("Material", "Output:Meter:MeterFileOnly")), "Idf")
+    expect_s3_class(idf_1$unique(class = c("Material", "Output:Meter:MeterFileOnly")), "Idf")
     expect_equal(idf_1$object_id(c("Material", "Output:Meter:MeterFileOnly")), id)
 })
 # }}}
 
 # RENAME {{{
 test_that("$rename()", {
-    idf <- read_idf(example())
-    expect_is(idf$rename(test = "C5 - 4 IN HW CONCRETE"), "list")
+    skip_on_cran()
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
+    expect_type(idf$rename(test = "C5 - 4 IN HW CONCRETE"), "list")
     expect_equal(idf$object_name("Material"), list(Material = "test"))
     expect_equal(idf$Construction$FLOOR$Outside_Layer, "test")
 })
@@ -641,12 +665,13 @@ test_that("$rename()", {
 
 # INSERT {{{
 test_that("$insert()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(idf_full <- read_idf(example()), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+    expect_s3_class(idf_full <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     expect_error(idf$insert(list()), class = "eplusr_error_dots_format")
 
-    expect_is(idf$insert(idf_full$Material_NoMass$R13LAYER), "list")
+    expect_type(idf$insert(idf_full$Material_NoMass$R13LAYER), "list")
     expect_equal(idf$object_name("Material:NoMass", simplify = TRUE), "R13LAYER")
     expect_equal(idf_full$Material_NoMass$R13LAYER$value(simplify = TRUE),
         c("R13LAYER", "Rough", "2.290965", "0.9", "0.75", "0.75")
@@ -660,10 +685,10 @@ test_that("$insert()", {
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER, idf$Material_NoMass$R13LAYER))
 
-    idf1 <- empty_idf(8.8)
-    idf2 <- empty_idf(8.8)
-    expect_is(idf1$add(ScheduleTypeLimits = list("Fraction", 0, 1, "continuous")), "list")
-    expect_is(idf2$add(ScheduleTypeLimits = list("Fraction", 0, 1, "Continuous")), "list")
+    idf1 <- empty_idf(LATEST_EPLUS_VER)
+    idf2 <- empty_idf(LATEST_EPLUS_VER)
+    expect_type(idf1$add(ScheduleTypeLimits = list("Fraction", 0, 1, "continuous")), "list")
+    expect_type(idf2$add(ScheduleTypeLimits = list("Fraction", 0, 1, "Continuous")), "list")
     expect_null(idf1$insert(idf2$ScheduleTypeLimits$Fraction))
     expect_equal(idf1$object_id()$ScheduleTypeLimits, 2L)
     # can directly insert an Idf
@@ -674,8 +699,9 @@ test_that("$insert()", {
 
 # SEARCH_VALUE {{{
 test_that("$search_value()", {
+    skip_on_cran()
     # can create new Idf object from string
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_null(idf$search_value("AAA"))
     expect_equal(
@@ -687,7 +713,8 @@ test_that("$search_value()", {
 
 # REPLACE_VALUE {{{
 test_that("$replace_value()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_equal(
         without_checking(vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1))),
@@ -698,13 +725,14 @@ test_that("$replace_value()", {
 
 # PASTE {{{
 test_that("$paste()", {
-    idf <- read_idf(example())
+    skip_on_cran()
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     if (!is_windows()) expect_error(idf$paste())
 
     skip_if_not(is_windows())
-    text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
+    text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
     writeClipboard(text)
-    expect_is(idf$paste()[[1L]], "IdfObject")
+    expect_s3_class(idf$paste()[[1L]], "IdfObject")
     writeClipboard(text)
     expect_null(idf$paste())
 })
@@ -712,15 +740,16 @@ test_that("$paste()", {
 
 # LOAD {{{
 test_that("$load()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can error if trying to add Version
     expect_error(idf$load("Version,8.7;\n"))
 
-    expect_is(idf$load("SimulationControl,no;\n"), "list")
-    expect_is(idf$SimulationControl, "IdfObject")
+    expect_type(idf$load("SimulationControl,no;\n"), "list")
+    expect_s3_class(idf$SimulationControl, "IdfObject")
 
-    expect_is(class = "list",
+    expect_type(type = "list",
         idf$load(
             c("! some comments;",
               "Material,",
@@ -734,9 +763,9 @@ test_that("$load()", {
             )
         )
     )
-    expect_is(idf$Material$mat, "IdfObject")
+    expect_s3_class(idf$Material$mat, "IdfObject")
 
-    expect_is(class = "list",
+    expect_type(type = "list",
         {
             dt <- idf$to_table(class = rep("Material:NoMass", 2), init = TRUE)[
                 ,by = "id", value := c("mat", "Smooth", "0.5")
@@ -751,15 +780,16 @@ test_that("$load()", {
 
 # UPDATE {{{
 test_that("$update()", {
-    expect_is(idf <- read_idf(example()), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     # can stop if trying to update non-named objects using string
     expect_error(idf$update("SimulationControl, no;\n"))
 
-    expect_is(idf$update("Material:NoMass, R13LAYER, Smooth, 2;\n"), "list")
+    expect_type(idf$update("Material:NoMass, R13LAYER, Smooth, 2;\n"), "list")
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Smooth")
 
-    expect_is(class = "list",
+    expect_type(type = "list",
         {
             idf$update(idf$to_table("r13layer")[2][, value := "Rough"])
         }
@@ -770,9 +800,10 @@ test_that("$update()", {
 
 # VALIDATE {{{
 test_that("$validate()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_is(val <- idf$validate(), "IdfValidity")
+    expect_s3_class(val <- idf$validate(), "IdfValidity")
     expect_equal(val$missing_object, c("Building", "GlobalGeometryRules"))
     expect_equal(nrow(val$duplicate_object), 0)
     expect_equal(nrow(val$conflict_name), 0)
@@ -789,9 +820,9 @@ test_that("$validate()", {
     expect_equal(val$invalid_reference,
         data.table(object_id = c(2L, 2L, 2L, 3L),
             object_name = c("WALL-1", "WALL-1", "WALL-1", "WALL-1PF"),
-            class_id = c(90L, 90L, 90L, 103L),
+            class_id = c(91L, 91L, 91L, 108L),
             class_name = c("Construction", "Construction", "Construction", "BuildingSurface:Detailed"),
-            field_id = c(11008L, 11009L, 11010L, 11625L),
+            field_id = c(16517L, 16518L, 16519L, 17189L),
             field_index = c(3L, 4L, 5L, 4L),
             field_name = c("Layer 2", "Layer 3", "Layer 4", "Zone Name"),
             units = c(NA_character_, NA_character_, NA_character_, NA_character_),
@@ -807,7 +838,8 @@ test_that("$validate()", {
 
 # IS_VALID {{{
 test_that("$is_valid()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_false(idf$is_valid())
 })
@@ -815,6 +847,7 @@ test_that("$is_valid()", {
 
 # TO_STRING {{{
 test_that("$to_string()", {
+    skip_on_cran()
     # can get idf in string format
     idf_string <- c(
         "!-Generator eplusr",
@@ -828,23 +861,24 @@ test_that("$to_string()", {
         "    WD01;                    !- Outside Layer",
         "",
         "Version,",
-        "    8.8;                     !- Version Identifier",
+        sprintf("    %s;                  !- Version Identifier", LATEST_EPLUS_VER),
         ""
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
     expect_equal(idf_1$to_string(format = "new_top"), idf_string)
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_equal(idf$to_string()[2], "!-Option OriginalOrderTop")
 })
 # }}}
 
 # TO_TABLE {{{
 test_that("$to_table()", {
+    skip_on_cran()
     # can get idf in table format
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(idf$to_table(), "data.table")
-    expect_is(idf$to_string(), "character")
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+    expect_s3_class(idf$to_table(), "data.table")
+    expect_type(idf$to_string(), "character")
     expect_equal(
         idf$to_table(2, unit = TRUE, string_value = TRUE),
         data.table(id = 2L, name = "WALL-1", class = "Construction", index = 1:5,
@@ -859,7 +893,8 @@ test_that("$to_table()", {
             value = as.list(c("WALL-1", "WD01", "PW03", "IN02", "GP01"))
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(1, unit = TRUE, string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
             field = idf$definition("Material")$field_name(),
@@ -872,12 +907,13 @@ test_that("$to_table()", {
     expect_equal(
         idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:15,
+            index = 1:16,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -895,6 +931,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -912,12 +949,13 @@ test_that("$to_table()", {
     expect_equal(
         idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:13,
+            index = 1:14,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -933,6 +971,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -945,15 +984,17 @@ test_that("$to_table()", {
             )
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:15,
+            index = 1:16,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -971,6 +1012,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -985,15 +1027,17 @@ test_that("$to_table()", {
             )
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
-            index = 1:13,
+            index = 1:14,
             field = c(
                 "Name",
                 "Surface Type",
                 "Construction Name",
                 "Zone Name",
+                "Space Name",
                 "Outside Boundary Condition",
                 "Outside Boundary Condition Object",
                 "Sun Exposure",
@@ -1009,6 +1053,7 @@ test_that("$to_table()", {
                 "WALL",
                 "WALL-1",
                 "PLENUM-1",
+                NA_character_,
                 "Outdoors",
                 NA_character_,
                 "SunExposed",
@@ -1021,13 +1066,15 @@ test_that("$to_table()", {
             )
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "group", wide = TRUE),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             "Name" = "WALL-1PF",
             "Surface Type" = "WALL",
             "Construction Name" = "WALL-1",
             "Zone Name" = "PLENUM-1",
+            "Space Name" = NA_character_,
             "Outside Boundary Condition" = "Outdoors",
             "Outside Boundary Condition Object" = NA_character_,
             "Sun Exposure" = "SunExposed",
@@ -1041,13 +1088,15 @@ test_that("$to_table()", {
             "Vrtx5X-crd|Vrtx5Y-crd|Vrtx5Z-crd" = list(rep(list(set_units(NA_real_, "m")), 3L))
         )
     )
-    expect_equivalent(tolerance = 1e-5,
+    expect_equal(
+        ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "index", wide = TRUE),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             "Name" = "WALL-1PF",
             "Surface Type" = "WALL",
             "Construction Name" = "WALL-1",
             "Zone Name" = "PLENUM-1",
+            "Space Name" = NA_character_,
             "Outside Boundary Condition" = "Outdoors",
             "Outside Boundary Condition Object" = NA_character_,
             "Sun Exposure" = "SunExposed",
@@ -1064,22 +1113,23 @@ test_that("$to_table()", {
 
 # SAVE {{{
 test_that("$save()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
     expect_error(idf$save(), "not created from local", "eplusr_error")
 
     unlink(file.path(tempdir(), "test_save.idf"), force = TRUE)
     expect_silent(idf$save(file.path(tempdir(), "test_save.idf")))
     expect_error(idf$save(file.path(tempdir(), "test_save.idf")))
-    expect_is(idf$save(overwrite = TRUE), "character")
+    expect_type(idf$save(overwrite = TRUE), "character")
 })
 # }}}
 
 # RUN {{{
 test_that("$run()", {
     skip_on_cran()
-    expect_error(read_idf(idftext("idf", 8.8))$save(), class = "eplusr_error")
-    expect_is(idf <- read_idf(example()), "Idf")
-    expect_is(job <- idf$run(NULL, tempdir(), echo = FALSE), "EplusJob")
+    expect_error(read_idf(idftext("idf", LATEST_EPLUS_VER))$save(), class = "eplusr_error")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    expect_s3_class(job <- idf$run(NULL, tempdir(), echo = FALSE), "EplusJob")
 
     expect_silent(idf$set(..12 = list(roughness = "smooth")))
     expect_error(idf$run())
@@ -1090,36 +1140,38 @@ test_that("$run()", {
 # LAST_JOB {{{
 test_that("$last_job()", {
     skip_on_cran()
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_null(idf$last_job())
-    expect_is({idf$run(NULL, tempdir(), echo = FALSE); idf$last_job()}, "EplusJob")
+    expect_s3_class({idf$run(NULL, tempdir(), echo = FALSE); idf$last_job()}, "EplusJob")
 })
 # }}}
 
 # GEOMETRY {{{
 test_that("$geometry()", {
-    expect_warning(empty_idf(8.8)$geometry())
-    expect_is(read_idf(example())$geometry(), "IdfGeometry")
+    skip_on_cran()
+    expect_warning(expect_warning(empty_idf(LATEST_EPLUS_VER)$geometry()))
+    expect_s3_class(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$geometry(), "IdfGeometry")
 })
 # }}}
 
 # VIEW {{{
 test_that("$view()", {
     skip_on_cran()
-    expect_warning(v <- empty_idf(8.8)$view())
+    expect_warning(expect_warning(v <- empty_idf(LATEST_EPLUS_VER)$view()))
     v$close()
 
-    expect_is(v <- read_idf(example())$view(), "IdfViewer")
+    expect_s3_class(v <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))$view(), "IdfViewer")
     v$close()
 
-    expect_is(v <- plot(read_idf(example())), "IdfViewer")
+    expect_s3_class(v <- plot(read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))), "IdfViewer")
     v$close()
 })
 # }}}
 
 # CLONE {{{
 test_that("$clone()", {
-    idf1 <- read_idf(example())
+    skip_on_cran()
+    idf1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     idf2 <- idf1$clone()
     idf1$set(c(idf1$Zone[[1]]$name()) := list(name = "zone"))
     expect_equal(idf1$Zone[[1]]$Name, "zone")
@@ -1129,12 +1181,14 @@ test_that("$clone()", {
 
 # PRINT {{{
 test_that("$print()", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
     expect_output(idf$print())
 
     # only test on UTF-8 supported platform
+    local_reproducible_output(unicode = TRUE)
     skip_if_not(cli::is_utf8_output())
-    idf <- read_idf(example())
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     expect_output(idf$print("group"))
     expect_output(idf$print("group", order = FALSE))
     expect_output(idf$print("class"))
@@ -1148,11 +1202,12 @@ test_that("$print()", {
 
 # ADD_OUTPUT {{{
 test_that("idf_add_output_*", {
-    expect_true(idf_add_output_sqlite(example()))
+    skip_on_cran()
+    expect_true(idf_add_output_sqlite(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_true(idf_add_output_sqlite(idf))
-    expect_is(idf$set(`Output:SQLite` := list("Simple")), "list")
+    expect_type(idf$set(`Output:SQLite` := list("Simple")), "list")
     expect_true(idf_add_output_sqlite(idf))
 
     idf1 <- idf$clone()
@@ -1160,9 +1215,9 @@ test_that("idf_add_output_*", {
     expect_equal(idf$Zone[[1]]$Name, "zone")
     expect_equal(idf1$Zone[[1]]$Name, "ZONE ONE")
 
-    expect_false(idf_add_output_vardict(example()))
+    expect_false(idf_add_output_vardict(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_silent(without_checking(idf$Output_VariableDictionary[[1L]]$Key_Field <- "wrong"))
     expect_true(idf_add_output_vardict(idf))
     expect_null(idf$Output_VariableDictionary <- NULL)
@@ -1172,13 +1227,15 @@ test_that("idf_add_output_*", {
 
 # EMPTY IDF {{{
 test_that("empty_idf()", {
-    expect_is(idf <- empty_idf(8.8), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- empty_idf(LATEST_EPLUS_VER), "Idf")
 })
 # }}}
 
 # S3 FORMATTING {{{
 test_that("format.Idf, as.character.Idf and etc", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_output(print(idf))
 
@@ -1196,8 +1253,9 @@ test_that("format.Idf, as.character.Idf and etc", {
 
 # S3 EQUALITY {{{
 test_that("==.Idf and !=.Idf", {
-    expect_is(idf_1 <- read_idf(idftext("idf", 8.8)), "Idf")
-    expect_is(idf_2 <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf_1 <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+    expect_s3_class(idf_2 <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can check equality
     expect_false(idf_1 == TRUE)
@@ -1210,9 +1268,10 @@ test_that("==.Idf and !=.Idf", {
 
 # S3 SUBSET {{{
 test_that("[[.Idf and $.Idf", {
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_is(idf$Version, "IdfObject")
+    expect_s3_class(idf$Version, "IdfObject")
 
     expect_equal(names(idf[["Material"]]), c("WD01", "WD02"))
     expect_equal(names(idf$Material), c("WD01", "WD02"))
@@ -1228,14 +1287,14 @@ test_that("[[.Idf and $.Idf", {
 # S3 ASSIGN {{{
 test_that("[[<-.Idf and $<-.Idf", {
     skip_on_cran()
-    expect_is(idf <- read_idf(idftext("idf", 8.8)), "Idf")
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
     expect_error(idf$version() <- NULL)
     expect_error(idf$VERSION <- NULL)
     expect_error(idf[[1:2]] <- NULL)
     expect_error(idf[["VERSION"]] <- NULL)
 
-    expect_is(idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
-    expect_is(idf_2 <- read_idf(idf_1$path()), "Idf")
+    expect_s3_class(idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")), "Idf")
+    expect_s3_class(idf_2 <- read_idf(idf_1$path()), "Idf")
     expect_silent(without_checking(idf_1$BuildingSurface_Detailed <- idf_2$BuildingSurface_Detailed))
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- idf_2[["BuildingSurface:Detailed"]]))
 
@@ -1244,7 +1303,7 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- NULL))
     expect_silent(without_checking(idf_1[["BuildingSurface:Detailed"]] <- idf_2[["BuildingSurface:Detailed"]]))
 
-    expect_is(idf <- read_idf(example()), "Idf")
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
 
     expect_error(idf$SimulationControl <- idf$Timestep)
     expect_error(idf$SimulationControl <- "Timestep, 6;\n")
@@ -1267,10 +1326,10 @@ test_that("[[<-.Idf and $<-.Idf", {
     tbl[5, value := "No"]
 
     # can replace unique-object class
-    expect_is(idf$SimulationControl <- idf$SimulationControl, "IdfObject")
-    expect_is(idf$SimulationControl <- tbl, "data.table")
+    expect_s3_class(idf$SimulationControl <- idf$SimulationControl, "IdfObject")
+    expect_s3_class(idf$SimulationControl <- tbl, "data.table")
     expect_equal(idf$SimulationControl$to_table()$value[[5]], "No")
-    expect_is(idf$SimulationControl <- str, "character")
+    expect_type(idf$SimulationControl <- str, "character")
     expect_equal(idf$SimulationControl$to_table()$value[[5]], "Yes")
 
     # can remove unique-object class
@@ -1314,9 +1373,9 @@ test_that("[[<-.Idf and $<-.Idf", {
     eplusr_option(validate_level = "final")
 
     # can directly insert objects from other idf
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
     expect_silent(without_checking(idf$BuildingSurface_Detailed <- idf_1$BuildingSurface_Detailed))
-    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
     idf_2 <- read_idf(idf_1$path())
     expect_silent(without_checking(idf_1$BuildingSurface_Detailed <- idf_2$BuildingSurface_Detailed))
     # }}}
