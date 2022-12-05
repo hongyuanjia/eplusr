@@ -85,10 +85,10 @@ are helper functions in eplusr to download and install it automatically on major
 operating systems (Windows, macOS and Linux):
 
 ```{r eplus-install, eval = FALSE}
-# install the latest version (currently v22.1.0)
+# install the latest version (currently v22.2.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v22.1.0) and run the installer
+# OR download the latest version (currently v22.2.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -97,10 +97,6 @@ Note that the installation process in `install_eplus()` requires
 **administrative privileges**. You have to run R with administrator (or with
 sudo if you are on macOS or Linux) to make it work if you are not in interactive
 mode.
-
-```{r install_eplus, include = FALSE}
-if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
-```
 
 ## Features
 
