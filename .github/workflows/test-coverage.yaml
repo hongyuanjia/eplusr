@@ -15,6 +15,7 @@ name: test-coverage
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.head_commit.message, '[skip-check]') }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

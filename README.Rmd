@@ -41,7 +41,7 @@ invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 [![R build status](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)](https://github.com/hongyuanjia/eplusr/actions)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg?token=HoBA0Qm6k2)](https://app.codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
-[![CRAN Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
+[![CRAN Checks](https://badges.cranchecks.info/worst/eplusr.svg)](https://badges.cranchecks.info/worst/eplusr.svg)
 [![CRAN Download Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
 <!-- badges: end -->
 
@@ -97,10 +97,6 @@ Note that the installation process in `install_eplus()` requires
 **administrative privileges**. You have to run R with administrator (or with
 sudo if you are on macOS or Linux) to make it work if you are not in interactive
 mode.
-
-```{r install_eplus, include = FALSE}
-if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
-```
 
 ## Features
 
