@@ -198,7 +198,7 @@ test_that("Basement()", {
            1;
 
          MatlProps,
-           6,
+           1,
            2242.6,
            2242.6,
            311.66,
@@ -267,9 +267,9 @@ test_that("Basement()", {
            TRUE;
 
          EquivAutoGrid,
-           15,
+           1,
            0.1,
-           2.4;
+           0.5;
         ",
         path
     )
@@ -306,7 +306,7 @@ test_that("Slab()", {
     path <- file.path(out_dir, "slab.idf")
     write_lines(
         "Materials,
-             2,
+             1,
              0.158,
              0.379,
              0.9,
@@ -623,6 +623,9 @@ test_that("energyplus()", {
             # modify the input in order to reduce the simulation time
             l <- read_lines(path_base)
             l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
+            l[grepl("NMAT: Number of materials in this domain", string), string := "1,"]
+            l[grepl("CLEARANCE: Distance from outside of wall", string), string := "1,"]
+            l[grepl("BaseDepth: Depth of the basement wall", string), string := "0.5;"]
             write_lines(l, path_base)
             res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
             expect_equal(length(res_base$file), 57L)
