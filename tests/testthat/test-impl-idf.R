@@ -1095,7 +1095,7 @@ test_that("VALUE DOTS", {
         res$value[, -"value_chr"],
         data.table(rleid = 1L, class_id = 815L, class_name = "Output:Variable",
             object_id = rep(27:42, each = 3), object_name = NA_character_,
-            field_id = rep(64843:647845, 16), field_index = rep(1:3, 16),
+            field_id = rep(64843:64845, 16), field_index = rep(1:3, 16),
             field_name = rep(c("Key Value", "Variable Name", "Reporting Frequency"), 16),
             value_id = 272:319, value_num = NA_real_
         )

@@ -73,8 +73,8 @@ test_that("can read IDD", {
 
     # helper functions
     expect_true(numeric_version(LATEST_EPLUS_VER) %in% avail_idd())
-    expect_true(is_avail_idd(as.double(stri_sub(LATEST_EPLUS_VER, to = -4L))))
-    expect_true(is_avail_idd(stri_sub(LATEST_EPLUS_VER, to = -4L)))
+    expect_true(is_avail_idd(as.double(stri_sub(LATEST_EPLUS_VER, to = -3L))))
+    expect_true(is_avail_idd(stri_sub(LATEST_EPLUS_VER, to = -3L)))
     expect_true(is_avail_idd(LATEST_EPLUS_VER))
 
     # can use custom IDD
