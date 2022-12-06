@@ -822,7 +822,7 @@ test_that("$validate()", {
             object_name = c("WALL-1", "WALL-1", "WALL-1", "WALL-1PF"),
             class_id = c(91L, 91L, 91L, 108L),
             class_name = c("Construction", "Construction", "Construction", "BuildingSurface:Detailed"),
-            field_id = c(16517L, 16518L, 16519L, 17189L),
+            field_id = c(16517L, 16518L, 16519L, 17191L),
             field_index = c(3L, 4L, 5L, 4L),
             field_name = c("Layer 2", "Layer 3", "Layer 4", "Zone Name"),
             units = c(NA_character_, NA_character_, NA_character_, NA_character_),

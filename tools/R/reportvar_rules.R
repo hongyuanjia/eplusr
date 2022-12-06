@@ -38,9 +38,14 @@ extract_reportvar_rules <- function(eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     )
 
     # read tables
-    report_vars[, dt := lapply(paths, data.table::fread, skip = 2, fill = TRUE, sep = ",",
+    # skip empty table if needed
+    lnum <- vapply(paths, function(path) nrow(data.table::fread(path, sep = NULL, header = FALSE)), 1L)
+    report_vars[lnum > 3L, dt := lapply(path, data.table::fread, skip = 2, fill = TRUE, sep = ",",
         col.names = c("old", "new", "special"), select = 1:3
     )]
+    report_vars[lnum <= 3L, by = "from",
+        dt := list(list(data.table(old = character(), new = character(), special = character())))
+    ]
 
     # add version info and comine into one
     report_vars <- data.table::rbindlist(mapply(

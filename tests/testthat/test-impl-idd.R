@@ -309,7 +309,7 @@ test_that("Idd implementation", {
     expect_error(get_idd_relation(idd_env, class_id = fld$class_id, field_id = fld$field_id), class = "eplusr_error_idd_relation")
 
     fld <- get_idd_field(idd_env, "Construction")
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 32850L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 32871L)
 
     fld <- get_idd_field(idd_env, "Construction", 2L)
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 14L)
@@ -318,7 +318,7 @@ test_that("Idd implementation", {
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", depth = 3L, class = "PlantEquipmentOperationSchemes")), 282L)
 
     fld <- get_idd_field(idd_env, "Branch", 3:4)
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 130L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 131L)
 
     fld <- get_idd_field(idd_env, "Pump:ConstantSpeed")
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by",

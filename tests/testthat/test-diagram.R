@@ -1,10 +1,9 @@
 test_that("HVAC Diagram", {
     skip_on_cran()
 
-    eplusr_option(verbose_info = FALSE)
-    example <- copy_example(LATEST_EPLUS_VER)
+    example <- copy_example()
 
-    expect_silent(job <- eplus_job(example$idf, example$epw))
+    expect_s3_class(job <- eplus_job(example$idf, example$epw), "EplusJob")
 
     expect_warning(res <- hvac_diagram(job$version(), tempfile()))
 

@@ -115,7 +115,7 @@ test_that("get_idfobj_relation()", {
             ref_by = data.table(
                 class_id = 108L, class_name = "BuildingSurface:Detailed",
                 object_id = 3L, object_name = "WALL-1PF",
-                field_id = 17188, field_index = 3L, field_name = "Construction Name",
+                field_id = 17190, field_index = 3L, field_name = "Construction Name",
                 value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
                 src_class_id = 91L, src_class_name = "Construction",
                 src_object_id = 2L, src_object_name = "WALL-1",

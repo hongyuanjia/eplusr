@@ -3,6 +3,8 @@
 ## New features
 
 * Add support for EnergyPlus v22.1 (#517).
+* Add support for EnergyPlus v22.2 (#530).
+* Update weather database (#519).
 * Add support `Space` in `IdfGeometry`. Results from `IdfGeometry$area()`,
   `IdfGeometry$tilt()` and `IdfGeometry$azimuth()` now include a new column
   `space` indicating the spaces where the surfaces are attached to.

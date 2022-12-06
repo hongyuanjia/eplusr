@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>URY CO Colonia.de.Sacramento 865600 AMTUes</b></td></tr>
        <tr><td><b>Data Source Custom-865600</td></tr>
        <tr><td>WMO <b>865600</b></td></tr>
-       <tr><td><b>S 34° 27.00'   W 57° 46.20'</b></td></tr>
+       <tr><td><b>S 34&deg; 27.00'   W 57&deg; 46.20'</b></td></tr>
        <tr><td>Elevation <b>20</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>5.0 C</b>, <b>41.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.9 C</b>, <b>85.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>5.3 C</b>, <b>41.5 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>1216</b>, CDD10 <b>2567</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CO_Colonia/URY_CO_Colonia.de.Sacramento_865600_AMTUes.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CO_Colonia/URY_CO_Colonia.de.Sacramento_865600_AMTUes.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>URY CA Montevideo-Carrasco.Intl.AP 865800 AMTUes</b></td></tr>
        <tr><td><b>Data Source Custom-865800</td></tr>
        <tr><td>WMO <b>865800</b></td></tr>
-       <tr><td><b>S 34° 49.80'   W 56° 0.60'</b></td></tr>
+       <tr><td><b>S 34&deg; 49.80'   W 56&deg; 0.60'</b></td></tr>
        <tr><td>Elevation <b>33</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.8 C</b>, <b>37.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.0 C</b>, <b>37.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>1047</b>, CDD10 <b>2464</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CA_Canelones/URY_CA_Montevideo-Carrasco.Intl.AP_865800_AMTUes.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/CA_Canelones/URY_CA_Montevideo-Carrasco.Intl.AP_865800_AMTUes.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>URY RV Rivera-Gestido.Intl.AP 863500 AMTUes</b></td></tr>
        <tr><td><b>Data Source Custom-863500</td></tr>
        <tr><td>WMO <b>863500</b></td></tr>
-       <tr><td><b>S 30° 54.00'   W 55° 32.40'</b></td></tr>
+       <tr><td><b>S 30&deg; 54.00'   W 55&deg; 32.40'</b></td></tr>
        <tr><td>Elevation <b>240</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>3.7 C</b>, <b>38.7 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.8 C</b>, <b>38.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>33.1 C</b>, <b>91.6 F</b></td></tr>
        <tr><td>HDD18 <b>732</b>, CDD10 <b>3110</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RV_Rivera/URY_RV_Rivera-Gestido.Intl.AP_863500_AMTUes.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RV_Rivera/URY_RV_Rivera-Gestido.Intl.AP_863500_AMTUes.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>URY RO Rocha 865650 AMTUes</b></td></tr>
        <tr><td><b>Data Source Custom-865650</td></tr>
        <tr><td>WMO <b>865650</b></td></tr>
-       <tr><td><b>S 34° 29.40'   W 54° 18.60'</b></td></tr>
+       <tr><td><b>S 34&deg; 29.40'   W 54&deg; 18.60'</b></td></tr>
        <tr><td>Elevation <b>18</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>29.8 C</b>, <b>85.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>2.3 C</b>, <b>36.1 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>30.0 C</b>, <b>86.0 F</b></td></tr>
        <tr><td>HDD18 <b>1077</b>, CDD10 <b>2352</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RO_Rocha/URY_RO_Rocha_865650_AMTUes.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/RO_Rocha/URY_RO_Rocha_865650_AMTUes.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>URY SA Salto-Nueva.Hesperides.Intl.AP 863600 AMTUes</b></td></tr>
        <tr><td><b>Data Source Custom-863600</td></tr>
        <tr><td>WMO <b>863600</b></td></tr>
-       <tr><td><b>S 31° 16.20'   W 57° 52.80'</b></td></tr>
+       <tr><td><b>S 31&deg; 16.20'   W 57&deg; 52.80'</b></td></tr>
        <tr><td>Elevation <b>50</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>-3.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
        <tr><td>99% Heating DB <b>2.6 C</b>, <b>36.7 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.0 C</b>, <b>93.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.2 C</b>, <b>93.6 F</b></td></tr>
        <tr><td>HDD18 <b>652</b>, CDD10 <b>3415</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/SA_Salto/URY_SA_Salto-Nueva.Hesperides.Intl.AP_863600_AMTUes.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_3_South_America/URY_Uruguay/SA_Salto/URY_SA_Salto-Nueva.Hesperides.Intl.AP_863600_AMTUes.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

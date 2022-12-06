@@ -42,15 +42,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ISR D Beer.Sheva.City.401900 IMS</b></td></tr>
        <tr><td><b>Data Source MSI</td></tr>
        <tr><td>WMO <b>401900</b></td></tr>
-       <tr><td><b>N 31° 15.00'   E 34° 48.00'</b></td></tr>
+       <tr><td><b>N 31&deg; 15.00'   E 34&deg; 48.00'</b></td></tr>
        <tr><td>Elevation <b>280</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 401910</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>6.3 C</b>, <b>43.3 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.9 C</b>, <b>93.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>6.8 C</b>, <b>44.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>34.1 C</b>, <b>93.4 F</b></td></tr>
        <tr><td>HDD18 <b>763</b>, CDD10 <b>3386</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Beer.Sheva.City.401900_IMS.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Beer.Sheva.City.401900_IMS.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -62,14 +62,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ISR D Eilat-Hozman.AP.401990 IMS</b></td></tr>
        <tr><td><b>Data Source MSI</td></tr>
        <tr><td>WMO <b>401990</b></td></tr>
-       <tr><td><b>N 29° 33.00'   E 34° 57.00'</b></td></tr>
+       <tr><td><b>N 29&deg; 33.00'   E 34&deg; 57.00'</b></td></tr>
        <tr><td>Elevation <b>12</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>1B - Very Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>9.9 C</b>, <b>49.8 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>41.6 C</b>, <b>106.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>41.7 C</b>, <b>107.1 F</b></td></tr>
        <tr><td>HDD18 <b>207</b>, CDD10 <b>5358</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Eilat-Hozman.AP.401990_IMS.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/D_HaDarom/ISR_D_Eilat-Hozman.AP.401990_IMS.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -81,15 +81,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ISR JM Jerusalem-Atarot.AP.401840 IMS</b></td></tr>
        <tr><td><b>Data Source MSI</td></tr>
        <tr><td>WMO <b>401840</b></td></tr>
-       <tr><td><b>N 31° 52.00'   E 35° 13.00'</b></td></tr>
+       <tr><td><b>N 31&deg; 52.00'   E 35&deg; 13.00'</b></td></tr>
        <tr><td>Elevation <b>757</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 402900</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>2.2 C</b>, <b>36.0 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>31.8 C</b>, <b>89.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3A - Warm - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>3.5 C</b>, <b>38.3 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>32.0 C</b>, <b>89.6 F</b></td></tr>
        <tr><td>HDD18 <b>1364</b>, CDD10 <b>2397</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/JM_Yerushalayim/ISR_JM_Jerusalem-Atarot.AP.401840_IMS.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/JM_Yerushalayim/ISR_JM_Jerusalem-Atarot.AP.401840_IMS.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -101,15 +101,15 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>ISR TA Tel.Aviv-Bet.Dagan.401790 IMS</b></td></tr>
        <tr><td><b>Data Source MSI</td></tr>
        <tr><td>WMO <b>401790</b></td></tr>
-       <tr><td><b>N 32° 0.00'   E 34° 49.00'</b></td></tr>
+       <tr><td><b>N 32&deg; 0.00'   E 34&deg; 49.00'</b></td></tr>
        <tr><td>Elevation <b>35</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+2.0</b> hours}</td></tr>
        <tr><td>Design conditions from alternate WMO 401800</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2A - Hot - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>7.0 C</b>, <b>44.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>33.2 C</b>, <b>91.8 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2A - Hot - Humid</b></td></tr>
+       <tr><td>99% Heating DB <b>7.7 C</b>, <b>45.9 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>33.5 C</b>, <b>92.3 F</b></td></tr>
        <tr><td>HDD18 <b>709</b>, CDD10 <b>3285</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/TA_Tel-Aviv/ISR_TA_Tel.Aviv-Bet.Dagan.401790_IMS.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_6_Europe/ISR_Israel/TA_Tel-Aviv/ISR_TA_Tel.Aviv-Bet.Dagan.401790_IMS.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>

@@ -477,13 +477,13 @@ test_that("parse_idf_file()", {
         ignore_attr = TRUE,
         idf_parsed$object,
         data.table(object_id = 1:2, object_name = rep(NA_character_, 2),
-        object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 798L))
+        object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 802L))
     )
     expect_equal(
         ignore_attr = TRUE,
         idf_parsed$value,
         data.table(value_id = 1:3, value_chr = c(LATEST_IDF_VER, NA_character_, NA_character_),
-        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 64566L, 64567L))
+        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 64655L, 64656L))
     )
 
     expect_silent(parse_idf_file(sprintf("Version,%s;\nOutput:Surfaces:List,,;", LATEST_IDF_VER)))

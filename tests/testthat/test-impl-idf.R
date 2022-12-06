@@ -349,7 +349,7 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "BuildingSurface:Detailed", field = 1:24)})
     expect_equal(val$value_id, c(15:38))
     expect_equal(val$object_id, rep(3L, 24))
-    expect_equal(val$field_id, 17186:17209)
+    expect_equal(val$field_id, 17188:17211)
     expect_equal(val$class_id, rep(108L, 24))
     expect_equal(val$field_index, 1:24)
     expect_equal(val$rleid, rep(1L, 24))
@@ -361,7 +361,7 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 10))})
     expect_equal(val$value_id, c(4L, 44L, 24L))
     expect_equal(val$object_id, c(1L, 4L, 3L))
-    expect_equal(val$field_id, c(rep(12592L, 2), 17195L))
+    expect_equal(val$field_id, c(rep(12592L, 2), 17197L))
     expect_equal(val$class_id, c(rep(56L, 2), 108L))
     expect_equal(val$field_index, c(rep(4L, 2), 10L))
     expect_equal(val$field_name, c(rep("Conductivity", 2), "View Factor to Ground"))
@@ -610,7 +610,7 @@ test_that("NAME DOTS", {
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"))[, -"comment"],
         data.table(rleid = 1:3,
-            class_id = c(91L, 105L, 284L),
+            class_id = c(91L, 105L, 287L),
             class_name = c("Construction", "Zone", "Exterior:Lights"),
             object_id = c(16L, 18L, 51L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
@@ -623,7 +623,7 @@ test_that("NAME DOTS", {
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"), .keep_name = FALSE)[, -"comment"],
         data.table(rleid = 1:3,
-            class_id = c(91L, 105L, 284L),
+            class_id = c(91L, 105L, 287L),
             class_name = c("Construction", "Zone", "Exterior:Lights"),
             object_id = c(16L, 18L, 51L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
@@ -1085,7 +1085,7 @@ test_that("VALUE DOTS", {
     expect_equal(
         ignore_attr = TRUE,
         res$object,
-        data.table(rleid = 1L, class_id = 810L, class_name = "Output:Variable",
+        data.table(rleid = 1L, class_id = 815L, class_name = "Output:Variable",
             object_id = 27:42, object_name = NA_character_,
             object_name_lower = NA_character_, comment = list()
         )
@@ -1093,9 +1093,9 @@ test_that("VALUE DOTS", {
     expect_equal(
         ignore_attr = TRUE,
         res$value[, -"value_chr"],
-        data.table(rleid = 1L, class_id = 810L, class_name = "Output:Variable",
+        data.table(rleid = 1L, class_id = 815L, class_name = "Output:Variable",
             object_id = rep(27:42, each = 3), object_name = NA_character_,
-            field_id = rep(64744:64746, 16), field_index = rep(1:3, 16),
+            field_id = rep(64843:64845, 16), field_index = rep(1:3, 16),
             field_name = rep(c("Key Value", "Variable Name", "Reporting Frequency"), 16),
             value_id = 272:319, value_num = NA_real_
         )
@@ -1729,7 +1729,7 @@ test_that("make_idf_object_name", {
             set(obj, 1L, "object_name_lower", "const")
             make_idf_object_name(idd_env, idf_env, obj, keep_na = FALSE)
         },
-        data.table(rleid = 1:4, class_id = c(rep(91L, 3), 404L),
+        data.table(rleid = 1:4, class_id = c(rep(91L, 3), 407L),
             class_name = c(rep("Construction", 3), "Coil:Cooling:Water"),
             group_id = c(rep(5L, 3), 23L), object_id = 56:59,
             object_name = c("Const", rep(NA_character_, 3)),
@@ -1898,7 +1898,7 @@ test_that("Add", {
                 NA, NA, NA, NA, NA, NA, NA, NA, NA, "Zone"),
             value_num = NA_real_,
             object_id = c(rep(56L, 6), rep(57L, 6), rep(58L, 6), rep(59L, 4), rep(60L, 20), 61L),
-            field_id = c(rep(12589:12594, 3), 16515:16518, 17186:17205, 16669L)
+            field_id = c(rep(12589:12594, 3), 16515:16518, 17188:17207, 16671L)
         )
     )
     expect_equal(l$reference[22:26],
@@ -2329,7 +2329,7 @@ test_that("Parsing IDF EDITOR Copy Contents", {
     expect_equal(l$value,
         data.table(
             rleid = 1L, class_id = 108L, class_name = "BuildingSurface:Detailed",
-            object_id = 1L, object_name = "Surface", field_id = 17186:17208,
+            object_id = 1L, object_name = "Surface", field_id = 17188:17210,
             field_index = 1:23,
             field_name = c("Name", "Surface Type", "Construction Name", "Zone Name",
                 "Space Name", "Outside Boundary Condition", "Outside Boundary Condition Object",

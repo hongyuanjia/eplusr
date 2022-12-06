@@ -72,10 +72,10 @@ test_that("can read IDD", {
     expect_s3_class(use_idd("latest", download = TRUE), "Idd")
 
     # helper functions
-    expect_true(numeric_version("22.1.0") %in% avail_idd())
-    expect_true(is_avail_idd(22.1))
-    expect_true(is_avail_idd("22.1"))
-    expect_true(is_avail_idd("22.1.0"))
+    expect_true(numeric_version(LATEST_EPLUS_VER) %in% avail_idd())
+    expect_true(is_avail_idd(as.double(stri_sub(LATEST_EPLUS_VER, to = -3L))))
+    expect_true(is_avail_idd(stri_sub(LATEST_EPLUS_VER, to = -3L)))
+    expect_true(is_avail_idd(LATEST_EPLUS_VER))
 
     # can use custom IDD
     expect_silent(use_idd(idftext("idd", "9.9.9")))

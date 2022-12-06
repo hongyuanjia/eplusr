@@ -3883,6 +3883,101 @@ trans_funs$f960t2210 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_2210_2220 {{{
+trans_funs$f2210t2220 <- function (idf) {
+    assert_true(idf$version()[, 1:2] == 22.1)
+
+    target_cls <- c(
+        "Coil:Cooling:DX:CurveFit:Speed",              # 1
+        "Coil:Cooling:DX:SingleSpeed",                 # 2
+        "Coil:Cooling:DX:MultiSpeed",                  # 3
+        "Coil:Heating:DX:SingleSpeed",                 # 4
+        "Coil:Heating:DX:MultiSpeed",                  # 5
+        "FuelFactors",                                 # 6
+        "Space",                                       # 7
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit", # 8
+        "Coil:Heating:WaterToAirHeatPump:EquationFit"  # 9
+    )
+
+    new_idf <- trans_preprocess(idf, 22.2, target_cls)
+
+    # 1: Coil:Cooling:DX:CurveFit:Speed {{{
+    dt1 <- trans_action(idf, "Coil:Cooling:DX:CurveFit:Speed", insert = list(9L))
+    # }}}
+    # 2: Coil:Cooling:DX:SingleSpeed {{{
+    dt2 <- trans_action(idf, "Coil:Cooling:DX:SingleSpeed", insert = list(8L))
+    # }}}
+    # 3: Coil:Cooling:DX:MultiSpeed {{{
+    dt3 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed",
+        insert = list(24L),
+        insert = list(44L),
+        insert = list(64L),
+        insert = list(84L)
+    )
+    # }}}
+    # 4: Coil:Heating:DX:SingleSpeed {{{
+    dt4 <- trans_action(idf, "Coil:Heating:DX:SingleSpeed", insert = list(6L))
+    # }}}
+    # 5: Coil:Heating:DX:MultiSpeed {{{
+    dt5 <- trans_action(idf, "Coil:Heating:DX:MultiSpeed",
+        insert = list(23L),
+        insert = list(35L),
+        insert = list(47L),
+        insert = list(59L)
+    )
+    # }}}
+    # 6: FuelFactors {{{
+    dt6 <- trans_action(idf, "FuelFactors", delete = list(2:3))
+    if (nrow(dt6)) dt6[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 7: Space {{{
+    dt7 <- trans_action(idf, "Space",
+        insert = list(3, "autocalculate"),
+        insert = list(4, "autocalculate")
+    )
+    # }}}
+
+    warn_temp <- function(class, dt) {
+        warn(paste0(
+            "When transitioning to EnergyPlus v22.2.0, rated temperature ",
+            "from ISO 13256-1:1988 for water loop application are used ",
+            "for objects below in class '", class, "'. ",
+            "Make sure that they align with your application.\n",
+            get_object_info(dt, c("name", "id"), collapse = "\n")
+            ),
+            "trans_2210_2220"
+        )
+    }
+
+    # 8: Coil:Cooling:WaterToAirHeatPump:EquationFit {{{
+    dt8 <- trans_action(idf, "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+        insert = list(11, "30.0"),
+        insert = list(12, "27.0"),
+        insert = list(13, "19.0")
+    )
+    if (nrow(dt8)) {
+        dt <- unique(dt8[, .SD, .SDcols = c("id", "name", "class")])
+        setnames(dt, c("id", "name", "class"), c("object_id", "object_name", "class_name"))
+        warn_temp("Coil:Cooling:WaterToAirHeatPump:EquationFit", dt)
+    }
+    # }}}
+    # 9: Coil:Heating:WaterToAirHeatPump:EquationFit {{{
+    dt9 <- trans_action(idf, "Coil:Heating:WaterToAirHeatPump:EquationFit",
+        insert = list(10, "20.0"),
+        insert = list(11, "20.0"),
+        insert = list(12, "1.0")
+    )
+    if (nrow(dt9)) {
+        dt <- unique(dt9[, .SD, .SDcols = c("id", "name", "class")])
+        setnames(dt, c("id", "name", "class"), c("object_id", "object_name", "class_name"))
+        warn_temp("Coil:Heating:WaterToAirHeatPump:EquationFit", dt)
+    }
+    # }}}
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:9))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

@@ -42,14 +42,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN HG Bandar.Abass.Intl.AP.408750 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>408750</b></td></tr>
-       <tr><td><b>N 27° 13.00'   E 56° 22.00'</b></td></tr>
+       <tr><td><b>N 27&deg; 13.00'   E 56&deg; 22.00'</b></td></tr>
        <tr><td>Elevation <b>10</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>0B - Extremely Hot - Dry</b></td></tr>
        <tr><td>99% Heating DB <b>10.8 C</b>, <b>51.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>40.1 C</b>, <b>104.2 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>40.2 C</b>, <b>104.4 F</b></td></tr>
        <tr><td>HDD18 <b>63</b>, CDD10 <b>6114</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/HG_Hormozgan/IRN_HG_Bandar.Abass.Intl.AP.408750_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/HG_Hormozgan/IRN_HG_Bandar.Abass.Intl.AP.408750_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -61,14 +61,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN ES Badr.Esfahan.AFB.408000 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>408000</b></td></tr>
-       <tr><td><b>N 32° 37.00'   E 51° 40.00'</b></td></tr>
+       <tr><td><b>N 32&deg; 37.00'   E 51&deg; 40.00'</b></td></tr>
        <tr><td>Elevation <b>1550</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>-6.1 C</b>, <b>21.0 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-6.8 C</b>, <b>19.8 F</b></td></tr>
        <tr><td>1% Cooling DB <b>38.1 C</b>, <b>100.6 F</b></td></tr>
        <tr><td>HDD18 <b>1827</b>, CDD10 <b>2854</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/ES_Esfahan/IRN_ES_Badr.Esfahan.AFB.408000_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/ES_Esfahan/IRN_ES_Badr.Esfahan.AFB.408000_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -80,14 +80,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN FA Shiraz.Intl.AP.408480 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>408480</b></td></tr>
-       <tr><td><b>N 29° 32.00'   E 52° 36.00'</b></td></tr>
+       <tr><td><b>N 29&deg; 32.00'   E 52&deg; 36.00'</b></td></tr>
        <tr><td>Elevation <b>1481</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3A - Warm - Humid</b></td></tr>
-       <tr><td>99% Heating DB <b>-1.0 C</b>, <b>30.2 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-0.9 C</b>, <b>30.4 F</b></td></tr>
        <tr><td>1% Cooling DB <b>38.2 C</b>, <b>100.8 F</b></td></tr>
        <tr><td>HDD18 <b>1472</b>, CDD10 <b>3226</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/FA_Fars/IRN_FA_Shiraz.Intl.AP.408480_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/FA_Fars/IRN_FA_Shiraz.Intl.AP.408480_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -99,14 +99,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN EA Tabriz.Intl.AP.407060 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>407060</b></td></tr>
-       <tr><td><b>N 38° 8.03'   E 46° 14.10'</b></td></tr>
+       <tr><td><b>N 38&deg; 8.03'   E 46&deg; 14.10'</b></td></tr>
        <tr><td>Elevation <b>1361</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>-9.2 C</b>, <b>15.4 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>34.2 C</b>, <b>93.6 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>4B - Mixed - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-9.1 C</b>, <b>15.6 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>35.0 C</b>, <b>95.0 F</b></td></tr>
        <tr><td>HDD18 <b>2921</b>, CDD10 <b>2057</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/EA_East Azarbaijan/IRN_EA_Tabriz.Intl.AP.407060_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/EA_East Azarbaijan/IRN_EA_Tabriz.Intl.AP.407060_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -118,14 +118,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN TE Tehran.Mehrabad.Intl.AP.407540 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>407540</b></td></tr>
-       <tr><td><b>N 35° 41.00'   E 51° 19.00'</b></td></tr>
+       <tr><td><b>N 35&deg; 41.00'   E 51&deg; 19.00'</b></td></tr>
        <tr><td>Elevation <b>1190</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>3B - Warm - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>-1.9 C</b>, <b>28.6 F</b></td></tr>
-       <tr><td>1% Cooling DB <b>37.4 C</b>, <b>99.3 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>3B - Warm - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.2 C</b>, <b>29.8 F</b></td></tr>
+       <tr><td>1% Cooling DB <b>37.9 C</b>, <b>100.2 F</b></td></tr>
        <tr><td>HDD18 <b>1749</b>, CDD10 <b>3230</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/TE_Tehran/IRN_TE_Tehran.Mehrabad.Intl.AP.407540_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/TE_Tehran/IRN_TE_Tehran.Mehrabad.Intl.AP.407540_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
@@ -137,14 +137,14 @@
     <description><![CDATA[<table><tr><td colspan="2"><b>IRN YA Yazd.Shahid.Sadooghi.AP.408210 ITMY</b></td></tr>
        <tr><td><b>Data Source ITMY</td></tr>
        <tr><td>WMO <b>408210</b></td></tr>
-       <tr><td><b>N 31° 54.00'   E 54° 17.00'</b></td></tr>
+       <tr><td><b>N 31&deg; 54.00'   E 54&deg; 17.00'</b></td></tr>
        <tr><td>Elevation <b>1237</b> m</td></tr>
        <tr><td>Time Zone {GMT <b>+3.5</b> hours}</td></tr>
-       <tr><td>ASHRAE HOF 2017 Climate Zone <b>2B - Hot - Dry</b></td></tr>
-       <tr><td>99% Heating DB <b>-1.4 C</b>, <b>29.5 F</b></td></tr>
+       <tr><td>ASHRAE HOF 2021 Climate Zone <b>2B - Hot - Dry</b></td></tr>
+       <tr><td>99% Heating DB <b>-1.1 C</b>, <b>30.0 F</b></td></tr>
        <tr><td>1% Cooling DB <b>40.9 C</b>, <b>105.6 F</b></td></tr>
        <tr><td>HDD18 <b>1411</b>, CDD10 <b>3735</b></td></tr>
-       <tr><td>URL http://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/YA_Yazd/IRN_YA.Shahid.Sadooghi.AP.408210_ITMY.zip</td></tr></table>]]></description>
+       <tr><td>URL https://climate.onebuilding.org/WMO_Region_2_Asia/IRN_Iran/YA_Yazd/IRN_YA.Shahid.Sadooghi.AP.408210_ITMY.zip</td></tr></table>]]></description>
    <styleUrl>#weatherlocation</styleUrl>
    <Point>
      <altitudeMode>absolute</altitudeMode>
