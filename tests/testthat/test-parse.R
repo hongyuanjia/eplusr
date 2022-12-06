@@ -483,7 +483,7 @@ test_that("parse_idf_file()", {
         ignore_attr = TRUE,
         idf_parsed$value,
         data.table(value_id = 1:3, value_chr = c(LATEST_IDF_VER, NA_character_, NA_character_),
-        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 64555L, 64556L))
+        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 64655L, 64656L))
     )
 
     expect_silent(parse_idf_file(sprintf("Version,%s;\nOutput:Surfaces:List,,;", LATEST_IDF_VER)))
