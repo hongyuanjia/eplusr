@@ -712,7 +712,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     }
 
     measure_wrapper <- function (idf, ..., .__PROGRESS_BAR__) {
-        .__PROGRESS_BAR__$tick()
+        cli::cli_progress_update(id = .__PROGRESS_BAR__$id, .envir = .__PROGRESS_BAR__$env)
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
         if (!is_idf(idf)) {
@@ -733,15 +733,19 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     private$m_log$bare <- bare
 
     # progress bar
-    progress_bar <- progress::progress_bar$new(
+    progress_bar <- cli::cli_progress_bar(
         total = max(viapply(list(...), length)), clear = TRUE,
-        format = "[:current/:total | :percent] :bar [Elapsed: :elapsedfull]"
+        format = "[{cli::pb_current}/{cli::pb_total}] | {cli::pb_percent} {cli::pb_bar} [Elapsed: {cli::pb_elapsed}]"
     )
 
     # create models
     out <- mapply(measure_wrapper, ...,
-        MoreArgs = list(idf = private$m_seed, .__PROGRESS_BAR__ = progress_bar),
-        SIMPLIFY = FALSE, USE.NAMES = FALSE)
+        MoreArgs = list(
+            idf = private$m_seed,
+            .__PROGRESS_BAR__ = list(id = progress_bar, env = environment())
+        ),
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
+    )
 
     # in case there are no argument specified to measure
     if (!length(out)) abort("No arguments have been given to the input measure.")
