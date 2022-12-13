@@ -387,17 +387,6 @@ wday <- function (x, label = FALSE) {
 }
 # }}}
 
-# str_trunc {{{
-#' @importFrom cli console_width
-str_trunc <- function (x, width = cli::console_width()) {
-    # in case invalid UTF-8 character in IDF
-    x <- stringi::stri_encode(x)
-    tr <- nchar(crayon::strip_style(x), "width") > (0.95 * width)
-    x[tr] <- paste0(stri_sub(x[tr], to = width - 5L), "...")
-    x
-}
-# }}}
-
 # match_in_vec {{{
 match_in_vec <- function (x, vec, abbr = NULL, label = FALSE) {
     x <- stri_trans_tolower(x)

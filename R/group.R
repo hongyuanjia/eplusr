@@ -1576,11 +1576,11 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
         nm_idf <- vcapply(private$m_idfs, function (x) basename(x$path()))
     }
     if (!epw) {
-        nm <- str_trunc(paste0(
+        nm <- cli::ansi_strtrim(paste0(
             "[", lpad(seq_along(private$m_idfs), 0), "]: ", surround(nm_idf)
         ))
     } else {
-        nm_idf <- str_trunc(paste0(
+        nm_idf <- cli::ansi_strtrim(paste0(
             "[", lpad(seq_along(private$m_idfs), 0), "]: ",
             paste0("[IDF] ", surround(nm_idf))
         ))
@@ -1598,7 +1598,7 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
     }
 
     if (!status$run_before) {
-        cli::cat_line(paste0(str_trunc(nm), collapse = "\n"))
+        cli::cat_line(paste0(cli::ansi_strtrim(nm), collapse = "\n"))
         cli::cat_line("<< Job has not been run before >>",
             col = "white", background_col = "blue")
         return(invisible())
@@ -1635,13 +1635,13 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
         }
     } else {
         if (isTRUE(status$terminated)) {
-            cli::cat_line(paste0(str_trunc(rpad(nm), width = getOption("width", 60L) - 15L),
+            cli::cat_line(paste0(cli::ansi_strtrim(rpad(nm), width = cli::console_width() - 15L),
                 " <-- TERMINATED", collapse = "\n"))
         } else {
             nm <- private$m_job$jobs[, paste0(
                 ifelse(exit_status == 0L,
-                    paste0(str_trunc(rpad(nm), getOption("width", 60L) - 14L), " <-- SUCCEEDED"),
-                    paste0(str_trunc(rpad(nm), getOption("width", 60L) - 11L), " <-- FAILED")
+                    cli::ansi_strtrim(paste0(rpad(nm), " <-- SUCCEEDED")),
+                    cli::ansi_strtrim(paste0(rpad(nm), " <-- FAILED"))
                 )
             )]
             cli::cat_line(paste0(nm, collapse = "\n"))

@@ -712,23 +712,23 @@ idfgeom_view <- function (self, private, new = FALSE, render_by = "surface_type"
 idfgeom_print <- function (self, private) {
     cli::cat_rule("EnergPlus IDF Geometry", line = 1)
 
-    if (is.null(private$m_parent$path())) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_parent$path())
+    if (is.null(private$m_parent$path())) path <- cli::style_bold(cli::bg_red("NOT LOCAL")) else path <- surround(private$m_parent$path())
 
-    cli::cat_line(" * ", c(
-        str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
-        paste0("Version: ", surround(private$m_parent$version()))
-    ))
+    cli::cat_line(cli::ansi_strtrim(c(
+        paste0(" ", cli::symbol$bullet, " Path: ", path),
+        paste0(" ", cli::symbol$bullet, " Version: ", surround(private$m_parent$version()))
+    )))
 
     geoms <- private$geoms()
 
-    cli::cat_line(sprintf(" * Building: '%s'", geoms$building$name))
-    cli::cat_line(sprintf(" * North Axis: %s\u00B0", geoms$building$north_axis))
-    cli::cat_line(sprintf(" * Zone Num: %s", NROW(geoms$zone)))
-    cli::cat_line(sprintf(" * Surface Num: %s", NROW(geoms$surface)))
-    cli::cat_line(sprintf(" * SubSurface Num: %s", NROW(geoms$subsurface)))
-    cli::cat_line(sprintf(" * Shading Num: %s", NROW(geoms$shading)))
-    cli::cat_line(sprintf(" * Dayl Ref Pnt Num: %s", NROW(geoms$daylighting_point)))
-    cli::cat_line(" * Coordinate System:")
+    cli::cat_line(sprintf(" %s Building: '%s'", cli::symbol$bullet, geoms$building$name))
+    cli::cat_line(sprintf(" %s North Axis: %s\u00B0", cli::symbol$bullet, geoms$building$north_axis))
+    cli::cat_line(sprintf(" %s Zone Num: %s", cli::symbol$bullet, NROW(geoms$zone)))
+    cli::cat_line(sprintf(" %s Surface Num: %s", cli::symbol$bullet, NROW(geoms$surface)))
+    cli::cat_line(sprintf(" %s SubSurface Num: %s", cli::symbol$bullet, NROW(geoms$subsurface)))
+    cli::cat_line(sprintf(" %s Shading Num: %s", cli::symbol$bullet, NROW(geoms$shading)))
+    cli::cat_line(sprintf(" %s Dayl Ref Pnt Num: %s", cli::symbol$bullet, NROW(geoms$daylighting_point)))
+    cli::cat_line(" %s Coordinate System:", cli::symbol$bullet)
     cli::cat_line(c(
         sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "world", "World", "Relative")),
         sprintf("   - Simple:   '%s'", ifelse(geoms$rules$rectangular_surface_coordinate_system == "world", "World", "Relative")),

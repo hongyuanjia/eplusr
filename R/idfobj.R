@@ -1805,7 +1805,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
     # comment
     if (comment && !is.null(obj$comment[[1L]])) {
         cli::cat_rule("COMMENTS")
-        cli::cat_line(str_trunc(paste0("!", obj$comment[[1L]])))
+        cli::cat_line(cli::ansi_strtrim(paste0("!", obj$comment[[1L]])))
         cli::cat_rule("VALUES")
     }
 
@@ -1821,7 +1821,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
     add_joined_cols(private$idd_env()$field, val, "field_id", c("units", "ip_units", "type_enum", "required_field"))
     fmt <- format_objects(val, c("class", "value"), brief = FALSE, sep_at = sep_at, required = TRUE)$out[[1L]]
     # remove trailing blank line
-    cli::cat_line(str_trunc(fmt[-length(fmt)]))
+    cli::cat_line(cli::ansi_strtrim(fmt[-length(fmt)]))
 
     invisible(self)
 }

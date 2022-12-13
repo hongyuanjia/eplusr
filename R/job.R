@@ -1405,10 +1405,9 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
     config <- eplus_config(eplus_ver)
     if (is.null(config)) {
         path_eplus <- "<< Not Found >>"
-        eplus_ver <- surround(eplus_ver)
     } else {
-        path_eplus <- surround(normalizePath(config$dir))
-        eplus_ver <- surround(config$version)
+        path_eplus <- normalizePath(config$dir)
+        eplus_ver <- config$version
     }
 
     path_idf <- normalizePath(path_idf, mustWork = FALSE)
@@ -1418,11 +1417,11 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
         normalizePath(path_epw, mustWork = FALSE)
     }
 
-    cli::cat_line(c(
-        str_trunc(paste0("* ", name_idf, ": ", surround(path_idf))),
-        str_trunc(paste0("* ", name_epw, ": ", surround(path_epw))),
-        paste0("* EnergyPlus Version: ", eplus_ver),
-        str_trunc(paste0("* EnergyPlus Path: ", path_eplus))
-    ))
+    cli::cat_line(cli::ansi_strtrim(c(
+        paste0(" ", cli::symbol$bullet, " Path: ", surround(path_idf)),
+        paste0(" ", cli::symbol$bullet, " Version: ", surround(path_epw)),
+        paste0(" ", cli::symbol$bullet, " EnergyPlus Version: ", surround(eplus_ver)),
+        paste0(" ", cli::symbol$bullet, " EnergyPlus Path: ", surround(path_eplus))
+    )))
 }
 # }}}

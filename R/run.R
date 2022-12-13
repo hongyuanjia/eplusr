@@ -2,12 +2,10 @@
 #' @importFrom checkmate assert_flag assert_file_exists assert_directory_exists
 #' @importFrom checkmate assert_logical
 #' @importFrom cli cat_line
-#' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
 #' @importFrom lubridate with_tz
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
-#' @importFrom progress progress_bar
 #' @importFrom tools file_path_sans_ext
 NULL
 
@@ -1976,10 +1974,13 @@ run_sim_event_loop <- function(state) {
     )
 
     # global progress bar
-    state$progress <- progress::progress_bar$new(
+    state$progress <- cli::cli_progress_bar(
         total = nrow(state$jobs), clear = FALSE,
-        format = "[:current/:total | :percent] :bar [Elapsed: :elapsedfull]"
+        format = "[{cli::pb_current}/{cli::pb_total}] | {cli::pb_percent} {cli::pb_bar} [Elapsed: {cli::pb_elapsed}]"
     )
+    # catch current enviroment where the progress bar is created
+    # this is needed to correctly update the progress
+    state$env <- environment()
 
     # kill all simulation jobs once exit
     on.exit(kill_all_sims(state), add = TRUE)
@@ -1987,7 +1988,6 @@ run_sim_event_loop <- function(state) {
     # init one simulation for each worker
     num <- min(state$options$num_parallel, nrow(state$jobs))
     for (i in seq_len(num)) {
-        state$progress$tick(0L)
         state <- schedule_next_sim(state)
         state <- do_sim(state)
     }
@@ -1995,9 +1995,8 @@ run_sim_event_loop <- function(state) {
     # run simulations until all simulation completes
     while (TRUE) {
         if (are_all_completed(state)) break;
-        state$progress$tick(0L)
         state <- handle_sim_events(state)
-        state  <- schedule_next_sim(state)
+        state <- schedule_next_sim(state)
         state <- do_sim(state)
     }
 
@@ -2082,9 +2081,9 @@ handle_sim_events <- function(state) {
 
             if (state$options$echo) {
                 comp <- get_sim_status_string("completed", index, model, weather, exit_status)
-                state$progress$message(paste0(comp, collapse = "\n"))
+                cli::cli_progress_output(paste0(comp, collapse = "\n"), id = state$progress, .envir = state$env)
             }
-            state$progress$tick(.N)
+            cli::cli_progress_update(inc = .N, id = state$progress, .envir = state$env)
 
             status[exit_status == 0L] <- "completed"
             status[exit_status != 0L] <- "failed"
@@ -2115,9 +2114,8 @@ do_sim <- function(state) {
 
         if (state$options$echo) {
             run <- get_sim_status_string("running", index, model, weather)
-            state$progress$message(paste0(run, collapse = "\n"))
+            cli::cli_progress_output(paste0(run, collapse = "\n"), id = state$progress, .envir = state$env)
         }
-        state$progress$tick(0L)
 
         list(status = "running", process = list(process), start_time = current())
     }]

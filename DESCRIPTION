@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.15.3.9004
+Version: 0.15.3.9005
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -27,14 +27,11 @@ Depends:
 Imports:
     callr (>= 2.0.4),
     checkmate,
-    cli (>= 1.1.0),
-    crayon,
+    cli (>= 3.0.0),
     data.table (>= 1.14.6),
     hms,
     lubridate,
-    methods,
     processx (>= 3.2.0),
-    progress (>= 1.2.0),
     R6,
     RSQLite,
     stringi,

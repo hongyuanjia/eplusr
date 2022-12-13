@@ -616,18 +616,18 @@ sql_print <- function (self, private) {
 
     path_idf <- paste0(tools::file_path_sans_ext(private$m_path_sql), ".idf")
     if (is.null(private$m_path_idf)) {
-        idf <- crayon::bgRed$bold("Not Found")
+        idf <- cli::style_bold(cli::bg_red("Not Found"))
     } else {
-        idf <- surround(str_trunc(path_idf, width = getOption("width") - 16L))
+        idf <- path_idf
     }
 
     m_time <- file.info(private$m_path_sql)$mtime
 
-    cli::cat_line(c(
-        paste0("* File: ", surround(str_trunc(private$m_path_sql, width = getOption("width") - 10L))),
-        paste0("* Last Modified: ", m_time),
-        paste0("* Parent Idf: ", idf)
-    ))
+    cli::cat_line(cli::ansi_strtrim(c(
+        paste0(" ", cli::symbol$bullet, " File: ", surround(private$m_path_sql)),
+        paste0(" ", cli::symbol$bullet, " Last Modified: ", m_time),
+        paste0(" ", cli::symbol$bullet, " Parent Idf: ", surround(idf))
+    )))
 }
 # }}}
 # S3 EplusSql methods {{{
