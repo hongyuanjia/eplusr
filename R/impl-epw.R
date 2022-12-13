@@ -11,7 +11,6 @@
 #' @importFrom cli cat_rule cat_line
 #' @importFrom utils combn
 #' @importFrom stats na.omit
-#' @importFrom methods setOldClass
 #' @include parse.R
 #' @include utils.R
 #' @include assert.R
