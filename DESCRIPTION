@@ -28,7 +28,7 @@ Imports:
     callr (>= 2.0.4),
     checkmate,
     cli (>= 3.0.0),
-    data.table (>= 1.12.4),
+    data.table (>= 1.14.6),
     hms,
     lubridate,
     processx (>= 3.2.0),
