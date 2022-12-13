@@ -887,14 +887,14 @@ idfviewer_print <- function (self, private) {
     cli::cat_rule("EnergPlus IDF Geometry Viewer", line = 1)
 
     if (is.null(private$m_geom$parent()$path())) {
-        path <- crayon::bold$bgRed("NOT LOCAL")
+        path <- cli::style_bold(cli::bg_red("NOT LOCAL"))
     } else {
         path <- surround(private$m_geom$parent()$path())
     }
 
-    cli::cat_line(" * ", c(
-        str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
-        paste0("Version: ", surround(private$m_geom$parent()$version()))
-    ))
+    cli::cat_line(cli::ansi_strtrim(c(
+        paste0(" ", cli::symbol$bullet, " Path: ", path),
+        paste0(" ", cli::symbol$bullet, " Version: ", surround(private$m_geom$parent()$version()))
+    )))
 }
 # }}}

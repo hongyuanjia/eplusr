@@ -1,6 +1,5 @@
 #' @importFrom R6 R6Class
 #' @importFrom cli cat_line cat_rule
-#' @importFrom crayon bold
 #' @importFrom utils .DollarNames
 #' @include impl-idf.R
 NULL
@@ -3386,12 +3385,12 @@ idf_print <- function (self, private, zoom = c("object", "class", "group", "fiel
 
     cli::cat_rule("EnergPlus Input Data File", line = 1)
 
-    if (is.null(private$m_path)) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_path)
+    if (is.null(private$m_path)) path <- cli::style_bold(cli::bg_red("NOT LOCAL")) else path <- surround(private$m_path)
 
-    cli::cat_line(" * ", c(
-        str_trunc(paste0("Path: ", path), width = cli::console_width() - 3L),
-        paste0("Version: ", surround(private$m_version))
-    ))
+    cli::cat_line(cli::ansi_strtrim(c(
+        paste0(" ", cli::symbol$bullet, " Path: ", path),
+        paste0(" ", cli::symbol$bullet, " Version: ", surround(private$m_version))
+    )))
 
     cli::cat_line()
 
@@ -3440,7 +3439,7 @@ idf_print <- function (self, private, zoom = c("object", "class", "group", "fiel
 
     # remove tailing space
     if (zoom != "group") out <- out[-length(out)]
-    cli::cat_line(str_trunc(out))
+    cli::cat_line(cli::ansi_strtrim(out))
 
     invisible(self)
 }

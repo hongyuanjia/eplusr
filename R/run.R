@@ -2,7 +2,6 @@
 #' @importFrom checkmate assert_flag assert_file_exists assert_directory_exists
 #' @importFrom checkmate assert_logical
 #' @importFrom cli cat_line
-#' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
 #' @importFrom lubridate with_tz
 #' @importFrom tools file_path_sans_ext

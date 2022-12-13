@@ -101,8 +101,6 @@ test_that("Utility functions", {
     expect_equal(wday(as.Date("2020-01-01")), 3L)
     expect_equal(as.character(wday(as.Date("2020-01-01"), label = TRUE)), "Wednesday")
 
-    expect_equal(str_trunc("abcdefghij", 10), "abcde...")
-
     expect_equal(match_in_vec("a", LETTERS), 1L)
     expect_equal(match_in_vec("a", LETTERS, "aa"), 1L)
     expect_equal(match_in_vec("a", LETTERS, "aa", label = TRUE), "A")

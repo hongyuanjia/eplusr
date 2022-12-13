@@ -1035,7 +1035,7 @@ print.IddRelationBy <- function (x, ...) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
         s <- paste0(" ", unlist(format_idd_relation(x, "ref_by")$fmt, use.names = FALSE))
-        cli::cat_line(str_trunc(s))
+        cli::cat_line(cli::ansi_strtrim(s))
     }
     invisible(x)
 }
@@ -1048,7 +1048,7 @@ print.IddRelationTo <- function (x, ...) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {
         s <- paste0(" ", unlist(format_idd_relation(x, "ref_to")$fmt, use.names = FALSE))
-        cli::cat_line(str_trunc(s))
+        cli::cat_line(cli::ansi_strtrim(s))
     }
     invisible(x)
 }
@@ -1074,7 +1074,7 @@ print.IdfRelationBy <- function (x, ...) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
         s <- paste0(" ", unlist(format_idf_relation(x, "ref_by")$fmt, use.names = FALSE))
-        cli::cat_line(str_trunc(s))
+        cli::cat_line(cli::ansi_strtrim(s))
     }
     invisible(x)
 }
@@ -1093,7 +1093,7 @@ print.IdfRelationTo <- function (x, ...) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {
         s <- paste0(" ", unlist(format_idf_relation(x, "ref_to")$fmt, use.names = FALSE))
-        cli::cat_line(str_trunc(s))
+        cli::cat_line(cli::ansi_strtrim(s))
     }
     invisible(x)
 }
@@ -1111,7 +1111,7 @@ print.IdfRelationNode <- function (x, ...) {
         cli::cat_line("Target(s) has no node or their nodes have no reference to other object.")
     } else {
         s <- paste0(" ", unlist(format_idf_relation(x, "ref_by")$fmt, use.names = FALSE))
-        cli::cat_line(str_trunc(s))
+        cli::cat_line(cli::ansi_strtrim(s))
     }
     invisible(x)
 }
@@ -1204,12 +1204,12 @@ with_nocolor <- function (...) {
 # }}}
 # has_color {{{
 has_color <- function () {
-    requireNamespace("crayon") && crayon::has_color()
+    cli::num_ansi_colors() > 1L
 }
 # }}}
 # s_nm: style for field names {{{
-s_nm <- function (...) if (.globals$color) crayon::italic(...) else c(...)
+s_nm <- function (...) if (.globals$color) cli::style_italic(...) else c(...)
 # }}}
 # s_blk: style for blank {{{
-s_blk <- function (...) if (.globals$color) crayon::underline(...) else c(...)
+s_blk <- function (...) if (.globals$color) cli::style_underline(...) else c(...)
 # }}}

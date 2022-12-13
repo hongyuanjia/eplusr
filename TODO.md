@@ -6,8 +6,6 @@
   - One possible way is to use `$search_value()` to detect if the values in
     those fields could be targeted or not.
 
-* Model version conversion
-
 * Fix extensible field names when they should be "A123" or "N123" but not
   self-explainary
 
@@ -17,8 +15,6 @@
   checking in `$validate()`.
 
 * Add function to reorder objects in a class
-
-* Remove crayon dep
 
 * Add functionality to check location differences between epw and idf.
   ```cpp
@@ -30,9 +26,6 @@
       ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent, [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
   }
   ```
-
-* Add a vignette about simulation data extraction and modifying models using
-  functions.
 
 * Use Rcpp to unlock environment. Reference: https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051
 
