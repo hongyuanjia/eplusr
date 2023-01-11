@@ -590,7 +590,7 @@ idfviewer_device <- function (self, private) {
 idfviewer_background <- function (self, private, color = "white") {
     assert_string(color)
     private$m_background <- color
-    if (!is.null(self$device())) rgl::rgl.bg(color = color)
+    if (!is.null(self$device())) rgl::bg3d(color = color)
     invisible()
 }
 # }}}
@@ -794,8 +794,8 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
 
     # open a new device
     if (!length(self$device())) {
-        rgl::rgl.open()
-        private$m_device <- rgl::rgl.cur()
+        rgl::open3d()
+        private$m_device <- rgl::cur3d()
 
         # apply window size
         rgl::par3d(dev = private$m_device, windowRect = private$m_win_size)
@@ -804,7 +804,7 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
         do.call(self$viewpoint, private$m_viewpoint)
 
         # apply background
-        rgl::rgl.bg(color = private$m_background)
+        rgl::bg3d(color = private$m_background)
 
         # apply mouse mode
         do.call(self$mouse_mode, private$m_mouse_mode)
@@ -854,7 +854,7 @@ idfviewer_focus <- function (self, private) {
     if (is.null(self$device())) {
         verbose_info("No viewer window found. Skip.")
     } else {
-        rgl::rgl.set(private$m_device)
+        rgl::set3d(private$m_device)
         rgl::rgl.bringtotop()
     }
 
@@ -866,8 +866,8 @@ idfviewer_close <- function (self, private) {
     if (is.null(self$device())) {
         verbose_info("No viewer window found. Skip.")
     } else {
-        rgl::rgl.set(private$m_device)
-        rgl::rgl.close()
+        rgl::set3d(private$m_device)
+        rgl::close3d()
     }
 
     invisible()

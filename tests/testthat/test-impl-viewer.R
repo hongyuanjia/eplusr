@@ -12,16 +12,16 @@ test_that("IdfViewer Implemention", {
     rgl_init <- function (clear = TRUE) {
         new <- FALSE
         if (clear) {
-            if (rgl::rgl.cur() == 0) new <- TRUE else rgl::rgl.clear()
+            if (rgl::cur3d() == 0) new <- TRUE else rgl::rgl.clear()
         }
         if (!new) {
-            dev <- rgl::rgl.cur()
+            dev <- rgl::cur3d()
         } else {
-            rgl::rgl.open()
-            dev <- rgl::rgl.cur()
+            rgl::open3d()
+            dev <- rgl::cur3d()
 
             # set viewpoint
-            rgl::rgl.viewpoint(0, -60, 60)
+            rgl::view3d(0, -60, 60)
 
             # change mouse control method
             cur <- rgl::par3d("mouseMode")
@@ -32,9 +32,9 @@ test_that("IdfViewer Implemention", {
             pan3d(2L)
         }
 
-        rgl::rgl.bg(color = "white")
+        rgl::bg3d(color = "white")
 
-        rgl::rgl.set(dev)
+        rgl::set3d(dev)
         dev
     }
 
@@ -92,6 +92,6 @@ test_that("IdfViewer Implemention", {
     expect_type(rgl_pop(id = unlist(id_surface)), "integer")
     expect_type(id_surface <- rgl_view_surface(dev, geoms, "normal"), "integer")
 
-    rgl::rgl.close()
+    rgl::close3d()
 })
 # }}}

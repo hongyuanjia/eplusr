@@ -330,7 +330,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' For more detailed control on the scene, see [IdfViewer].
         #'
         #' @param new If `TRUE`, a new rgl window will be open using
-        #'        [rgl::rgl.open()]. If `FALSE`, existing rgl window will be
+        #'        [rgl::open3d()]. If `FALSE`, existing rgl window will be
         #'        reused if possible. Default: `FALSE`.
         #'
         #' @param render_by A single string specifying the way of rendering the

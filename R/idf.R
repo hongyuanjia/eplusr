@@ -2585,7 +2585,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' * Wheel: Zoom
         #'
         #' @param new If `TRUE`, a new rgl window will be open using
-        #'        [rgl::rgl.open()]. If `FALSE`, existing rgl window will be
+        #'        [rgl::open3d()]. If `FALSE`, existing rgl window will be
         #'        reused if possible. Default: `FALSE`.
         #'
         #' @param render_by A single string specifying the way of rendering the
