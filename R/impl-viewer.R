@@ -57,8 +57,8 @@ rgl_viewpoint <- function (dev, look_at = "iso", theta = NULL, phi = NULL, fov =
 
     m <- get_viewpoint_matrix(rot[1], rot[2], rot[3])
 
-    rgl::rgl.set(dev)
-    rgl::rgl.viewpoint(fov = fov, zoom = zoom, scale = scale, userMatrix = m)
+    rgl::set3d(dev)
+    rgl::view3d(fov = fov, zoom = zoom, scale = scale, userMatrix = m)
 
     list(userMatrix = m, fov = fov, zoom = zoom, scale = scale)
 }
@@ -77,7 +77,7 @@ rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, 
         on.exit(rgl_vertice_trans_to_eplus(geoms$vertices2), add = TRUE)
     }
 
-    rgl::rgl.set(dev)
+    rgl::set3d(dev)
 
     geoms <- map_view_color(geoms, type = type, x_ray = x_ray)
 
@@ -178,13 +178,13 @@ rgl_view_surface <- function (dev, geoms, type = "surface_type", x_ray = FALSE, 
 # rgl_view_surface_twoside_tri {{{
 rgl_view_surface_twoside_tri <- function (vertices) {
     if (!nrow(vertices)) return(integer())
-    ext <- rgl::rgl.triangles(
+    ext <- rgl::triangles3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep("color_ext", 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
         front = "filled", back = "culled", lit = FALSE
     )
-    int <- rgl::rgl.triangles(
+    int <- rgl::triangles3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep("color_int", 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
@@ -197,13 +197,13 @@ rgl_view_surface_twoside_tri <- function (vertices) {
 # rgl_view_surface_twoside_quad {{{
 rgl_view_surface_twoside_quad <- function (vertices) {
     if (!nrow(vertices)) return(integer())
-    ext <- rgl::rgl.quads(
+    ext <- rgl::quads3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep("color_ext", 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
         front = "filled", back = "culled", lit = FALSE
     )
-    int <- rgl::rgl.quads(
+    int <- rgl::quads3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep("color_int", 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
@@ -218,7 +218,7 @@ rgl_view_surface_oneside_tri <- function (vertices) {
     if (!nrow(vertices)) return(integer())
     col <- if (has_names(vertices, "color_int")) "color_int" else "color"
 
-    as.integer(rgl::rgl.triangles(
+    as.integer(rgl::triangles3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep(col, 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
@@ -232,7 +232,7 @@ rgl_view_surface_oneside_quad <- function (vertices) {
     if (!nrow(vertices)) return(integer())
     col <- if (has_names(vertices, "color_int")) "color_int" else "color"
 
-    as.integer(rgl::rgl.quads(
+    as.integer(rgl::quads3d(
         x = as.matrix(fast_subset(vertices, c("x", "y", "z"))),
         color = as.matrix(fast_subset(vertices, rep(col, 3L))),
         alpha = as.matrix(fast_subset(vertices, rep("alpha", 3L))),
@@ -251,9 +251,9 @@ rgl_view_wireframe <- function (dev, geoms, color = "black", width = 1.5, alpha 
         on.exit(rgl_vertice_trans_to_eplus(geoms$vertices), add = TRUE)
     }
 
-    rgl::rgl.set(dev)
+    rgl::set3d(dev)
     l <- pair_line_vertex(geoms$vertices)
-    as.integer(rgl::rgl.lines(l$x, l$y, l$z, color = color, lwd = width, lit = FALSE, alpha = alpha, ...))
+    as.integer(rgl::segments3d(l$x, l$y, l$z, color = color, lwd = width, lit = FALSE, alpha = alpha, ...))
 }
 # }}}
 
@@ -270,8 +270,8 @@ rgl_view_point <- function (dev, geoms, color = "red", size = 8.0, lit = TRUE, .
 
     v <- geoms$vertices[J(geoms$daylighting_point$id), on = "id", nomatch = NULL]
 
-    rgl::rgl.set(dev)
-    as.integer(rgl::rgl.points(v$x, v$y, v$z, color = color, size = size, lit = lit, ...))
+    rgl::set3d(dev)
+    as.integer(rgl::points3d(v$x, v$y, v$z, color = color, size = size, lit = lit, ...))
 }
 # }}}
 
@@ -366,7 +366,7 @@ rgl_view_ground <- function (dev, geoms, expand = 1.02, color = "#EDEDEB", alpha
     # transform geometry from EnergyPlus to OpenGL coordinate system
     vert <- rgl_vertice_trans_to_opengl(vert)
 
-    as.integer(rgl::rgl.quads(
+    as.integer(rgl::quads3d(
         vert$x, vert$y, vert$z,
         color = color, lit = FALSE, alpha = alpha
     ))
@@ -378,7 +378,7 @@ rgl_snapshot <- function (dev, filename, webshot = FALSE, ...) {
     assert_string(filename)
 
     # set the last plot device as active
-    if (!rgl::rgl.useNULL()) rgl::rgl.set(dev)
+    if (!rgl::rgl.useNULL()) rgl::set3d(dev)
 
     if (!dir.exists(dirname(filename))) dir.create(dirname(filename), recursive = TRUE)
 
@@ -540,7 +540,7 @@ triangulate_surfaces <- function (vertices) {
 
 # pan3d {{{
 # adapted from rgl examples
-pan3d <- function(button, dev = rgl::rgl.cur(), subscene = rgl::currentSubscene3d(dev)) {
+pan3d <- function(button, dev = rgl::cur3d(), subscene = rgl::currentSubscene3d(dev)) {
     start <- list()
 
     begin <- function(x, y) {
@@ -578,7 +578,7 @@ pan_view <- function (dev, x, y, z) {
 
 # rgl_pop {{{
 rgl_pop <- function (id, type = "shapes") {
-    try(as.integer(rgl::rgl.pop(id = id, type = "shapes")), silent = TRUE)
+    try(as.integer(rgl::pop3d(id = id, type = "shapes")), silent = TRUE)
 }
 # }}}
 

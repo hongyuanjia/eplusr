@@ -4196,7 +4196,7 @@ View 3D \code{Idf} geometry
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{new}}{If \code{TRUE}, a new rgl window will be open using
-\code{\link[rgl:rgl.open]{rgl::rgl.open()}}. If \code{FALSE}, existing rgl window will be
+\code{\link[rgl:open3d]{rgl::open3d()}}. If \code{FALSE}, existing rgl window will be
 reused if possible. Default: \code{FALSE}.}
 
 \item{\code{render_by}}{A single string specifying the way of rendering the
