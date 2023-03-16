@@ -951,6 +951,15 @@ test_that("VALUE DOTS", {
              )
         )
     )
+    expect_equal(parse_dots_value(..5 = as.list(1:3)),
+        list(object = data.table(rleid = 1, each_rleid = 1L, id = 5L, name = NA_character_,
+                comment = list(), is_ref = FALSE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = FALSE),
+             value = data.table(rleid = 1L, each_rleid = 1L, id = 5L, name = NA_character_,
+                 field_index = NA_integer_, field_name = NA_character_,
+                 value_chr = c("1", "2", "3"), value_num = c(1, 2, 3)
+            )
+        )
+    )
 
     # whole game
     expect_equal(
