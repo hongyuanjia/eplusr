@@ -335,7 +335,7 @@ test_that("Data Setter", {
     expect_s3_class(epw <- read_epw(path_epw), "Epw")
 
     # $set() {{{
-    expect_s3_class(d <- epw$data(), "data.table")
+    expect_s3_class(d <- epw$data(start_year = 2017), "data.table")
     expect_output(with_verbose(epw$set(d, realyear = TRUE)))
     expect_equal(epw$period(),
         data.table(index = 1L, name = "Data", start_day_of_week = "Sunday",
