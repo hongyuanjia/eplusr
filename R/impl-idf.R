@@ -1069,25 +1069,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
             # for .()
             if (li[[1L]] == ".") li[[1L]] <- as.name("list")
 
-            # 'Name = list()', '..ID = list()'
-            if (li[[1L]] == "list") {
-                # stop if not named
-                if (is.na(nm[[i]])) {
-                    abort("Assertion on 'Input' failed: Must be named.", "dots_no_name")
-                }
-
-                # for '..ID = list()'
-                name <- nm[[i]]
-                if (stri_detect_regex(name, "^\\.\\.\\d+$")) {
-                    id <- stri_sub(name, 3L)
-                    storage.mode(id) <- "integer"
-                    set(dt_in, i, "id", list(id))
-                    set(dt_in, i, "name", list(NA_character_))
-                # for 'Name = list()'
-                } else {
-                    set(dt_in, i, "name", list(name))
-                }
-            } else if (li[[1L]] == ":=") {
+            if (li[[1L]] == ":=") {
                 if (!.ref_assign) abort("Assertion on 'Input' failed: ':=' is not allowed in this context", "dots_ref")
                 # for 'ClassName := list()'
                 if (length(li[[2L]]) == 1L) {
@@ -1124,6 +1106,24 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
 
                 # for .()
                 if (!is.symbol(li) && li[[1L]] == ".") li[[1L]] <- as.name("list")
+            } else {
+                # 'Name = list()', '..ID = list()'
+                # stop if not named
+                if (is.na(nm[[i]])) {
+                    abort("Assertion on 'Input' failed: Must be named.", "dots_no_name")
+                }
+
+                # for '..ID = list()'
+                name <- nm[[i]]
+                if (stri_detect_regex(name, "^\\.\\.\\d+$")) {
+                    id <- stri_sub(name, 3L)
+                    storage.mode(id) <- "integer"
+                    set(dt_in, i, "id", list(id))
+                    set(dt_in, i, "name", list(NA_character_))
+                # for 'Name = list()'
+                } else {
+                    set(dt_in, i, "name", list(name))
+                }
             }
         }
 

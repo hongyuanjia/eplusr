@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.15.3.9005
+Version: 0.15.3.9006
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -43,7 +43,7 @@ Suggests:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
     "collate"))
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 SystemRequirements: EnergyPlus (optional)
     (<https://energyplus.net>); udunits2
 Collate:
