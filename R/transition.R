@@ -4775,8 +4775,8 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
         }
     }
 
-    latest_ver <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
-    if (!length(latest_ver)) {
+    newer_ep <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
+    if (!length(newer_ep)) {
         abort(paste0("EnergyPlus v", ver, " or newer are not installed."))
     }
 
@@ -4787,15 +4787,13 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     idf$save(file.path(dir, original), overwrite = TRUE)
 
     # get the directory of IDFVersionUpdater
-    # avoid to use IDFVersionUpdater v9.0 as there are fital errors
-    if (length(latest_ver[latest_ver[, 1:2] != 9.0])) latest_ver <- latest_ver[latest_ver[, 1:2] != 9.0]
-    path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
-    verbose_info("IDFVersionUpdater: ", normalizePath(path_updater, mustWork = FALSE))
+    # avoid to use IDFVersionUpdater v9.0 as there are fatal errors
+    if (length(newer_ep[newer_ep[, 1:2] != 9.0])) newer_ep <- newer_ep[newer_ep[, 1:2] != 9.0]
 
     # get upper versions toward target version
     vers <- trans_upper_versions(idf, ver)
 
-    # get fun names
+    # get transition executable names
     exe <- if (is_windows()) ".exe" else NULL
     from <- vers[-length(vers)]
     to <- vers[-1L]
@@ -4816,6 +4814,20 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     errors <- vector("list", 1L + length(to))
     names(errors) <- names(models)
 
+    # NOTE: From EnergyPlus v23.1, the supported oldest version for transition
+    # is v9.0. Should check if transitions below v9.0 are needed. If so, check
+    # if there is an installed EnergyPlus version lower than v23.1 and use
+    # transition executable from there when applicable.
+    path_updater <- file.path(eplus_config(max(newer_ep))$dir, "PreProcess/IDFVersionUpdater")
+    path_updater <- rep(path_updater, length(trans_exe))
+    if (any(vers < 9.0) && any(newer_ep >= 23.1) && any(newer_ep < 23.1)) {
+        path_updater[to <= 9.0] <- file.path(
+            eplus_config(max(newer_ep[newer_ep < 23.1]))$dir,
+            "PreProcess/IDFVersionUpdater"
+        )
+    }
+    names(path_updater) <- as.character(to)
+
     while (idf$version()[, 1:2] != max(to)[, 1:2]) {
         # restore paths
         paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
@@ -4825,14 +4837,16 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
 
         current_exe <- trans_exe[from[, 1:2] == idf$version()[, 1:2]]
         toward <- to[from[, 1:2] == idf$version()[, 1:2]]
+        updater <- path_updater[names(path_updater) == as.character(toward)]
 
+        verbose_info("IDFVersionUpdater: ", normalizePath(updater, mustWork = FALSE))
         verbose_info(
             "Input file: ", idf$path(), "\n",
             " From  Ver: ", idf$version(), "\n",
             "Toward Ver: ", toward
         )
 
-        trans_path <- file.path(path_updater, current_exe)
+        trans_path <- file.path(updater, current_exe)
 
         if (!file.exists(trans_path)) {
             abort(paste0("Transition executable ", surround(trans_path), " does not exist."))
