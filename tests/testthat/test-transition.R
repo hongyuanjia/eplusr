@@ -2681,3 +2681,20 @@ test_that("Transition v22.1 --> v22.2", {
     )
 })
 # }}}
+# v22.2 --> v23.1 {{{
+test_that("Transition v22.2 --> v23.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- 22.2
+    to <- 23.1
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from)
+    )
+
+    expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
+    suppressWarnings(expect_warning(expect_s3_class(idfTR <- transition(idfOri, to), "Idf")))
+})
+# }}}
