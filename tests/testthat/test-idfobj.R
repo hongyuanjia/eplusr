@@ -244,12 +244,15 @@ test_that("$value_possible()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf")), "Idf")
     expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    idd_env <- get_priv_env(idf$definition())$idd_env()
+    cls_id <- idd_env$class[class_name == "Construction", class_id]
+    fld_id <- idd_env$field[class_id == cls_id, field_id]
 
     expect_equal(
         ignore_attr = TRUE,
         con$value_possible(),
-        data.table(class_id = 91L, class_name = "Construction", object_id = 2L,
-            object_name = "WALL-1", field_id = 16515:16519, field_index = 1:5,
+        data.table(class_id = cls_id, class_name = "Construction", object_id = 2L,
+            object_name = "WALL-1", field_id = fld_id[1:5], field_index = 1:5,
             field_name = c("Name", "Outside Layer", paste("Layer", 2:4)),
             value_id = 10:14, value_chr = c("WALL-1", "WD01", "PW03", "IN02", "GP01"),
             value_num = rep(NA_real_, 5),
@@ -261,8 +264,8 @@ test_that("$value_possible()", {
     expect_equal(
         ignore_attr = TRUE,
         con$value_possible(6),
-        data.table(class_id = 91L, class_name = "Construction", object_id = 2L,
-            object_name = "WALL-1", field_id = 16520L, field_index = 6L,
+        data.table(class_id = cls_id, class_name = "Construction", object_id = 2L,
+            object_name = "WALL-1", field_id = fld_id[6], field_index = 6L,
             field_name = "Layer 5", value_id = -1L, value_chr = NA_character_, value_num = NA_real_,
             auto = NA_character_, default = list(NA_character_),
             choice = list(), range = list(ranger(NA_real_, FALSE, NA_real_, FALSE)),
@@ -277,10 +280,13 @@ test_that("$validate()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf")), "Idf")
     expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    idd_env <- get_priv_env(idf$definition())$idd_env()
+    cls_id <- idd_env$class[class_name == "Construction", class_id]
+    fld_id <- idd_env$field[class_id == cls_id, field_id]
 
     expect_equal(con$validate()$invalid_reference,
-        data.table(object_id = 2L, object_name = "WALL-1", class_id = 91L,
-            class_name = "Construction", field_id = 16517:16519,
+        data.table(object_id = 2L, object_name = "WALL-1", class_id = cls_id,
+            class_name = "Construction", field_id = fld_id[3:5],
             field_index = 3:5, field_name = paste("Layer", 2:4),
             units = rep(NA_character_, 3L), ip_units = rep(NA_character_, 3L),
             type_enum = 5L, value_id = 12:14,
@@ -318,6 +324,11 @@ test_that("$value_relation()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf")), "Idf")
     expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
+    idd_env <- get_priv_env(idf$definition())$idd_env()
+    src_cls_id <- idd_env$class[class_name == "Construction", class_id]
+    src_fld_id <- idd_env$field[class_id == src_cls_id, field_id][1]
+    cls_id <- idd_env$class[class_name == "BuildingSurface:Detailed", class_id]
+    fld_id <- idd_env$field[class_id == cls_id, field_id][3]
 
     expect_equal(
         ignore_attr = TRUE,
@@ -335,13 +346,13 @@ test_that("$value_relation()", {
                 src_enum = integer(), dep = integer()
             ),
             ref_by = data.table(
-                class_id = 108L, class_name = "BuildingSurface:Detailed",
+                class_id = cls_id, class_name = "BuildingSurface:Detailed",
                 object_id = 3L, object_name = "WALL-1PF",
-                field_id = 17190L, field_index = 3L, field_name = "Construction Name",
+                field_id = fld_id, field_index = 3L, field_name = "Construction Name",
                 value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
-                src_class_id = 91L, src_class_name = "Construction",
+                src_class_id = src_cls_id, src_class_name = "Construction",
                 src_object_id = 2L, src_object_name = "WALL-1",
-                src_field_id = 16515L, src_field_index = 1L, src_field_name = "Name",
+                src_field_id = src_fld_id, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
                 src_enum = 2L, dep = 0L
             ),
@@ -363,9 +374,9 @@ test_that("$value_relation()", {
         con$value_relation(1, keep = TRUE),
         list(
             ref_to = data.table(
-                class_id = 91L, class_name = "Construction",
+                class_id = src_cls_id, class_name = "Construction",
                 object_id = 2L, object_name = "WALL-1",
-                field_id = 16515L, field_index = 1L, field_name = "Name",
+                field_id = src_fld_id, field_index = 1L, field_name = "Name",
                 value_id = 10L, value_chr = "WALL-1", value_num = NA_real_, type_enum = 4L,
                 src_class_id = NA_integer_, src_class_name = NA_character_,
                 src_object_id = NA_integer_, src_object_name = NA_character_,
@@ -374,13 +385,13 @@ test_that("$value_relation()", {
                 src_enum = NA_integer_, dep = 0L
             ),
             ref_by = data.table(
-                class_id = 108L, class_name = "BuildingSurface:Detailed",
+                class_id = cls_id, class_name = "BuildingSurface:Detailed",
                 object_id = 3L, object_name = "WALL-1PF",
-                field_id = 17190L, field_index = 3L, field_name = "Construction Name",
+                field_id = fld_id, field_index = 3L, field_name = "Construction Name",
                 value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
-                src_class_id = 91L, src_class_name = "Construction",
+                src_class_id = src_cls_id, src_class_name = "Construction",
                 src_object_id = 2L, src_object_name = "WALL-1",
-                src_field_id = 16515L, src_field_index = 1L, src_field_name = "Name",
+                src_field_id = src_fld_id, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
                 src_enum = 2L, dep = 0L
             ),
@@ -389,9 +400,9 @@ test_that("$value_relation()", {
                 object_id = NA_integer_, object_name = NA_character_,
                 field_id = NA_integer_, field_index = NA_integer_, field_name = NA_character_,
                 value_id = NA_integer_, value_chr = NA_character_, value_num = NA_real_, type_enum = NA_integer_,
-                src_class_id = 91L, src_class_name = "Construction",
+                src_class_id = src_cls_id, src_class_name = "Construction",
                 src_object_id = 2L, src_object_name = "WALL-1",
-                src_field_id = 16515L, src_field_index = 1L, src_field_name = "Name",
+                src_field_id = src_fld_id, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_real_, src_type_enum = 4L,
                 src_enum = NA_integer_, dep = 0L
             )

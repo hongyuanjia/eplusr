@@ -36,7 +36,9 @@ test_that("can read IDD", {
 
     # can use the IDD in EnergyPlus VersionUpdater folder
     rm_global_cache("idd")
-    expect_s3_class(use_idd(8.4), "Idd")
+    # NOTE: from EnergyPlus v23.1, the oldest IDD version shipped with
+    # EnergyPlus is EnergyPlus v9.0
+    expect_s3_class(use_idd(9.0), "Idd")
 
     # can stop if that EnergyPlus is not available and IDD if not found in any
     # existing VersionUpdater folder
@@ -60,12 +62,12 @@ test_that("can read IDD", {
     rm_global_cache("eplus")
     use_eplus(LATEST_EPLUS_VER)
     rm_global_cache("idd")
-    f2 <- find_idd_from_updater(8.8)
+    f2 <- find_idd_from_updater(9.0)
     f2_bak <- paste0(f2, ".bak")
     file.rename(f2, f2_bak)
-    expect_error(use_idd(8.8), class = "eplusr_error_locate_idd")
+    expect_error(use_idd(9.0), class = "eplusr_error_locate_idd")
     # but "auto" still work in this case
-    expect_s3_class(use_idd(8.8, "auto"), "Idd")
+    expect_s3_class(use_idd(9.0, "auto"), "Idd")
     file.rename(f2_bak, f2)
 
     # can use "latest" notation
@@ -91,14 +93,14 @@ test_that("can read IDD", {
     expect_s3_class(use_idd(8.2), "Idd")
 
     # can auto find suitable IDD
-    expect_s3_class(get_idd_from_ver(8.8, NULL), "Idd")
+    expect_s3_class(get_idd_from_ver(9.0, NULL), "Idd")
     # can give warning if hard-coded IDD is used
-    expect_warning(get_idd_from_ver(standardize_ver(8.5), use_idd(8.8)), "mismatch")
-    expect_warning(get_idd_from_ver(NULL, use_idd(8.8)), "given IDD")
+    expect_warning(get_idd_from_ver(standardize_ver(8.5), use_idd(9.0)), "mismatch")
+    expect_warning(get_idd_from_ver(NULL, use_idd(9.0)), "given IDD")
     # can stop if no available IDD parsed
     rm_global_cache("idd")
     rm_global_cache("eplus")
-    expect_error(get_idd_from_ver(8.8, NULL), class = "eplusr_error_locate_idd")
+    expect_error(get_idd_from_ver(9.0, NULL), class = "eplusr_error_locate_idd")
     expect_error(get_idd_from_ver(NULL, NULL), class = "eplusr_error_no_avail_idd")
 
     locate_eplus()

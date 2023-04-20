@@ -1,3 +1,8 @@
+# NOTE: From EnergyPlus v23.1, the supported oldest version for transition is
+# v9.0. Have to install at least one version before v23.1 for testing older
+# version transitions
+if (!is_avail_eplus(22.2)) install_eplus(22.2, local = TRUE)
+
 # HELPER {{{
 test_that("Transition Helper", {
     skip_on_cran()
@@ -97,7 +102,6 @@ test_that("Transition Helper", {
     # }}}
 })
 # }}}
-
 # v7.2 --> v8.0 {{{
 test_that("Transition v7.2 --> v8.0", {
     skip_on_cran()
@@ -201,18 +205,20 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     expect_equal(
-        idfVU$"Wall:Detailed"$Wall$value(),
-        idfTR$"Wall:Detailed"$Wall$value()
+        # VersionUpdater adds an extra '11: Vertex 1 X-coordinate'
+        idfVU$"Wall:Detailed"$Wall$value()[1:39],
+        idfTR$"Wall:Detailed"$Wall$value()[1:39]
     )
 
     expect_equal(
-        idfVU$"RoofCeiling:Detailed"$Roof$value(),
-        idfTR$"RoofCeiling:Detailed"$Roof$value()
+        # VersionUpdater adds an extra '11: Vertex 1 X-coordinate'
+        idfVU$"RoofCeiling:Detailed"$Roof$value()[1:39],
+        idfTR$"RoofCeiling:Detailed"$Roof$value()[1:39]
     )
 
     expect_equal(
-        idfVU$"Floor:Detailed"$Floor$value(),
-        idfTR$"Floor:Detailed"$Floor$value()
+        idfVU$"Floor:Detailed"$Floor$value()[1:39],
+        idfTR$"Floor:Detailed"$Floor$value()[1:39]
     )
 
     expect_equal(
@@ -952,12 +958,6 @@ test_that("Transition v8.5 --> v8.6", {
     expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
-    use_idd(8.5)$"Daylighting:DELight:Controls"
-    use_idd(8.6)$"Daylighting:Controls"
-
-    use_idd(8.5)$"Daylighting:DELight:ReferencePoint"
-    use_idd(8.6)$"Daylighting:DELight:ReferencePoint"
-
     expect_equal(
         idfVU$"Building"$value(),
         idfTR$"Building"$value()
@@ -1261,6 +1261,8 @@ test_that("Transition v8.7 --> v8.8", {
         idfTR$"BuildingSurface:Detailed"$Surf1$value(1:22)
     )
 
+    # XXX:Detailed transition breaks in EnergyPlus v9.6
+    # See: https://github.com/NREL/EnergyPlus/issues/9172
     expect_equal(
         idfVU$"Floor:Detailed"$Surf2$value(),
         idfTR$"Floor:Detailed"$Surf2$value(1:21)
@@ -2598,11 +2600,11 @@ test_that("Transition v22.1 --> v22.2", {
             "Coil:Cooling:WaterToAirHeatPump:EquationFit" = list(
                 "CWAHP", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
                 "Autosize", "Autosize", "Autosize", "Autosize", 5.0,
-                "Curve1", "Curve2", "Curve3", 0, 0
+                "Curve1", "Curve2", "Curve3", 0
             ),
             "Coil:Heating:WaterToAirHeatPump:EquationFit" = list(
                 "HWAHP", "WaterInlet", "WaterOutlet", "AirInlet", "AirOutlet",
-                "Autosize", "Autosize", "Autosize", 5.0, "Curve1", "Curve2"
+                "Autosize", "Autosize", "Autosize", 5., "Curve1", "Curve2"
             ),
             .all = FALSE
         )
@@ -2695,6 +2697,9 @@ test_that("Transition v22.2 --> v23.1", {
     )
 
     expect_s3_class(idfVU <- version_updater(idfOri, to), "Idf")
-    suppressWarnings(expect_warning(expect_s3_class(idfTR <- transition(idfOri, to), "Idf")))
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfVU$to_string(), idfTR$to_string())
 })
 # }}}
+
+# vim: set fdm=marker
