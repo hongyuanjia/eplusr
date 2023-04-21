@@ -21,17 +21,17 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
-        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
         if (length(x) > n) {
             # truncate the output
-            x <- c(head(x, n), '....', '')
+            x <- c(head(x, n), "....", "")
         } else {
             x <- c(x, "")
         }
-        x <- paste(x, collapse = '\n') # paste first n lines together
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
     hook_output(x, options)
 })
@@ -40,7 +40,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.1)) install_eplus(22.1)
 ```
 
 # How to control the maximum number of parallel simulations?
@@ -50,4 +49,3 @@ Use the `num_parallel` option:
 ```{r, eval = FALSE}
 eplusr_option(num_parallel = 2)
 ```
-
