@@ -1,8 +1,3 @@
-# NOTE: From EnergyPlus v23.1, the supported oldest version for transition is
-# v9.0. Have to install at least one version before v23.1 for testing older
-# version transitions
-if (!is_avail_eplus(22.2)) install_eplus(22.2, local = TRUE)
-
 # HELPER {{{
 test_that("Transition Helper", {
     skip_on_cran()
