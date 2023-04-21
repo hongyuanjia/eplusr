@@ -1425,3 +1425,5 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
     )))
 }
 # }}}
+
+# vim: set fdm=marker:

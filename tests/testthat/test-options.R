@@ -29,3 +29,4 @@ test_that("eplusr_option()", {
     expect_warning(with_speed(eplusr_option("validate_level")), "deprecated")
 })
 
+# vim: set fdm=marker:

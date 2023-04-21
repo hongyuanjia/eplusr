@@ -259,3 +259,5 @@ test_that("Validate method", {
     # }}}
 })
 # }}}
+
+# vim: set fdm=marker:

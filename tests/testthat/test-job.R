@@ -123,3 +123,5 @@ test_that("Job methods", {
     clean_wd(path_idf)
     unlink(c(path_idf, file.path(tempdir(), basename(path_epw))))
 })
+
+# vim: set fdm=marker:

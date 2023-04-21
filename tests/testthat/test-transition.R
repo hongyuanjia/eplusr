@@ -2702,4 +2702,4 @@ test_that("Transition v22.2 --> v23.1", {
 })
 # }}}
 
-# vim: set fdm=marker
+# vim: set fdm=marker:

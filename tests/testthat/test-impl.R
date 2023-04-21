@@ -129,3 +129,5 @@ test_that("Basic Table Implementation", {
     expect_equal(append_dt(data.table(a = 1, b = 1), data.table(a = c(1, 2), b = c(3, 4)), "a"), data.table(a = c(1, 2), b = c(3, 4)))
 })
 # }}}
+
+# vim: set fdm=marker:

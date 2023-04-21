@@ -251,3 +251,5 @@ set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = T
     obj
 }
 # }}}
+
+# vim: set fdm=marker:

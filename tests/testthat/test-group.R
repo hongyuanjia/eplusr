@@ -222,3 +222,5 @@ test_that("Group methods", {
     expect_equal(nrow(files), 114L)
     # }}}
 })
+
+# vim: set fdm=marker:

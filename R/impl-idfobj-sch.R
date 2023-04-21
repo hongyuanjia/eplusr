@@ -1001,3 +1001,5 @@ gcd <- function(x, y) {
     return(ifelse(r, gcd(y, r), y))
 }
 # }}}
+
+# vim: set fdm=marker:

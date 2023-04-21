@@ -665,3 +665,5 @@ test_that(".DollarNames.Idf", {
     expect_equal(.DollarNames.Idf(idf, "Ma"), "Material")
 })
 # }}}
+
+# vim: set fdm=marker:

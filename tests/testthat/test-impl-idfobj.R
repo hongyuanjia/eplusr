@@ -218,3 +218,5 @@ test_that("set_idfobj_comment", {
     expect_equal(set_idfobj_comment(idd_env, idf_env, 1, comment = c("a", "bb ccc"), append = NULL, width = 1L)$comment[[1]], c("a", "bb", "ccc"))
 })
 # }}}
+
+# vim: set fdm=marker:

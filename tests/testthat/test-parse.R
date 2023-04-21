@@ -582,3 +582,5 @@ test_that("parse_idf_file()", {
     expect_type(idf_parsed <- parse_idf_file(idf_str, LATEST_IDF_VER), "list")
 })
 # }}}
+
+# vim: set fdm=marker:

@@ -2161,3 +2161,5 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     res$PATH
 }
 # }}}
+
+# vim: set fdm=marker:

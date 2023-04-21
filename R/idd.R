@@ -1379,3 +1379,5 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
     idd
 }
 # }}}
+
+# vim: set fdm=marker:

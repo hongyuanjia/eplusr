@@ -4919,3 +4919,5 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     models
 }
 # }}}
+
+# vim: set fdm=marker:

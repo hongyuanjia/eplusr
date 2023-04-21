@@ -39,3 +39,5 @@ test_that("Install EnergyPlus v9.1 and above", {
         expect_s3_class(locate_eplus(), "numeric_version")
     }
 })
+
+# vim: set fdm=marker:

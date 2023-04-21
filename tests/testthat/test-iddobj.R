@@ -306,3 +306,5 @@ test_that("IddObject class", {
     expect_output(slash$print())
     expect_output(simple$print())
 })
+
+# vim: set fdm=marker:

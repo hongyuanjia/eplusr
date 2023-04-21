@@ -305,3 +305,5 @@ assert_valid <- function (validity, action = NULL, epw = FALSE) {
     TRUE
 }
 # }}}
+
+# vim: set fdm=marker:

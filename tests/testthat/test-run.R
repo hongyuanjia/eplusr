@@ -837,3 +837,5 @@ test_that("run_multi()", {
     expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
     checkmate::expect_list(res$stdout, "character")
 })
+
+# vim: set fdm=marker:

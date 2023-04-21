@@ -314,3 +314,5 @@ test_that("get_sch_type_limits()", {
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim4"), list(name = "lim4", range = list()))
 })
 # }}}
+
+# vim: set fdm=marker:

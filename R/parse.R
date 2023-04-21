@@ -1644,3 +1644,5 @@ insert_version <- function (x, ver) {
     }
 }
 # }}}
+
+# vim: set fdm=marker:

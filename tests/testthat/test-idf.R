@@ -1391,3 +1391,5 @@ test_that("[[<-.Idf and $<-.Idf", {
     # }}}
 })
 # }}}
+
+# vim: set fdm=marker:

@@ -499,3 +499,5 @@ test_that("Formatting", {
     expect_equal(format_comment(data.table(comment = list("a", NULL))), c("!a", NA))
     # }}}
 })
+
+# vim: set fdm=marker:

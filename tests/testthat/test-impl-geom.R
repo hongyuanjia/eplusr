@@ -291,3 +291,5 @@ test_that("subset_geom", {
     expect_equal(nrow(l$vertices), 4L)
 })
 # }}}
+
+# vim: set fdm=marker:

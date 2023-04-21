@@ -4624,3 +4624,5 @@ with_format_cols <- function (idd_env, idf_env, ...) {
     force(...)
 }
 # }}}
+
+# vim: set fdm=marker:

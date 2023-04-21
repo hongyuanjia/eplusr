@@ -107,3 +107,5 @@ idftext <- function(type = c("idf", "idd"), ver = LATEST_EPLUS_VER) {
     text
 }
 # }}}
+
+# vim: set fdm=marker:

@@ -403,3 +403,5 @@ print.MddFile <- function (x, ...) {
     invisible(x)
 }
 # }}}
+
+# vim: set fdm=marker:

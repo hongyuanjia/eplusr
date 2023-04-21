@@ -281,3 +281,5 @@ test_that("Idd S3 methods", {
     expect_false(idd != idd)
 })
 # }}}
+
+# vim: set fdm=marker:

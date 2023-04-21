@@ -95,3 +95,5 @@ test_that("IdfViewer Implemention", {
     rgl::close3d()
 })
 # }}}
+
+# vim: set fdm=marker:

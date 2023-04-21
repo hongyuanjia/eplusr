@@ -120,3 +120,5 @@ reload.ParametricJob <- function (x, ...) {
     }
     x
 }
+
+# vim: set fdm=marker:

@@ -920,3 +920,5 @@ param_print <- function (self, private) {
 `!=.ParametricJob` <- function (e1, e2) {
     Negate(`==.ParametricJob`)(e1, e2)
 }
+
+# vim: set fdm=marker:

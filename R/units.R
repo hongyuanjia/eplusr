@@ -193,3 +193,5 @@ FIELD_UNIT_TABLE <- fread(
 )
 # nocov end
 # }}}
+
+# vim: set fdm=marker:

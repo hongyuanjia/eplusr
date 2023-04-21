@@ -57,3 +57,5 @@ hvac_diagram <- function (eplus, path) {
     }
 }
 # }}}
+
+# vim: set fdm=marker:

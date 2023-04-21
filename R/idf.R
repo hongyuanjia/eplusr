@@ -3980,3 +3980,5 @@ empty_idf <- function (ver = "latest") {
     read_idf(text, ver)
 }
 # }}}
+
+# vim: set fdm=marker:

@@ -11,3 +11,5 @@ test_that("Units conversion", {
         units::set_units(1, "inch_H2O_39F")
     )
 })
+
+# vim: set fdm=marker:

@@ -151,3 +151,5 @@ utils::globalVariables(c(
 ))
 # }}}
 # nocov end
+
+# vim: set fdm=marker:

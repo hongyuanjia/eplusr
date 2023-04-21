@@ -965,3 +965,5 @@ COLOR_MAP <- list(
     )
 )
 # }}}
+
+# vim: set fdm=marker:

@@ -2649,3 +2649,5 @@ save_epw_file <- function (epw_data, epw_header, matched, path, overwrite = FALS
     normalizePath(path)
 }
 # }}}
+
+# vim: set fdm=marker:

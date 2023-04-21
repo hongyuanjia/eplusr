@@ -502,3 +502,5 @@ file_rename_if_exist <- function(from, to, err_title = NULL) {
 
     res
 }
+
+# vim: set fdm=marker:

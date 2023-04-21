@@ -177,3 +177,5 @@ test_that("Data extraction", {
     clean_wd(example$idf)
     unlink(c(example$idf, example$epw))
 })
+
+# vim: set fdm=marker:

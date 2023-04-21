@@ -58,3 +58,5 @@ test_that("Rdd", {
         )
     )
 })
+
+# vim: set fdm=marker:

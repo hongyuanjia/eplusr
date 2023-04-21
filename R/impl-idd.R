@@ -1077,3 +1077,5 @@ get_idd_string <- function (idd_env, class, leading = 4L, sep_at = 29L, sep_each
     unlist(out$out, use.names = FALSE)
 }
 # }}}
+
+# vim: set fdm=marker:

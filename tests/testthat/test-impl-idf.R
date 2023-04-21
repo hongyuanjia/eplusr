@@ -2676,3 +2676,5 @@ test_that("utilities", {
     expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "choice")$value_chr, "MediumRough")
 })
 # }}}
+
+# vim: set fdm=marker:
