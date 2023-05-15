@@ -494,3 +494,5 @@ test_that("EpwDate Class", {
     expect_equal({d <- epw_date(1:2);d[[1]] <- epw_date(3);d}, epw_date(c(3, 2)))
 })
 # }}}
+
+# vim: set fdm=marker:

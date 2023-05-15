@@ -4,7 +4,7 @@ test_that("Job methods", {
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
-    expect_silent(job <- eplus_job(path_idf, path_epw))
+    expect_s3_class(job <- eplus_job(path_idf, path_epw), "EplusJob")
 
     expect_equal(job$version(), numeric_version(LATEST_EPLUS_VER))
     expect_output(job$print())
@@ -17,7 +17,7 @@ test_that("Job methods", {
     )
 
     # can run job in waiting mode
-    expect_silent(job$run(wait = TRUE, echo = FALSE))
+    expect_s3_class(job$run(wait = TRUE, echo = FALSE), "EplusJob")
 
     # can refresh job status
     expect_equal(job$status(),
@@ -38,7 +38,7 @@ test_that("Job methods", {
         "level_index", "level", "message"
     ))
     expect_equal(attr(err, "eplus_version"), numeric_version(LATEST_EPLUS_VER))
-    expect_equal(attr(err, "eplus_build"), "c249759bad")
+    expect_equal(attr(err, "eplus_build"), ALL_EPLUS_RELEASE_COMMIT$commit[1])
     # New EnergyPlus version has removed the IDD version in ERR file
     expect_equal(attr(err, "idd_version"), NA)
     expect_equal(attr(err, "successful"), TRUE)
@@ -123,3 +123,5 @@ test_that("Job methods", {
     clean_wd(path_idf)
     unlink(c(path_idf, file.path(tempdir(), basename(path_epw))))
 })
+
+# vim: set fdm=marker:

@@ -191,21 +191,28 @@ test_that("Formatting", {
         )
     )
 
-    expect_type(idd88 <- parse_idd_file(find_idd_from_updater(8.8)), "list")
-    expect_equal(format_idd_relation(get_idd_relation(idd88, NULL, 21590, name = TRUE, class_ref = "all")[1:2])$fmt,
+    expect_type(idd_latest <- parse_idd_file(find_idd_from_updater(LATEST_EPLUS_VER)), "list")
+    expect_equal(format_idd_relation(get_idd_relation(
+        idd_latest, NULL,
+        field_id = idd_latest$field[
+            class_id == idd_latest$class[class_name == "AirLoopHVAC:OutdoorAirSystem:EquipmentList", class_id] &
+            field_name == "Component 1 Object Type",
+            field_id
+        ],
+        name = TRUE, class_ref = "all")[1:2])$fmt,
         c("Class: <AirLoopHVAC:OutdoorAirSystem:EquipmentList>",
           "└─ Field: <2: Component 1 Object Type>",
           "   p~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-          "   ├─ Class: <Fan:ConstantVolume>",
-          "   │  └─ Field: <1: Name>",
+          "   ├─ Class: <ZoneHVAC:TerminalUnit:VariableRefrigerantFlow>",
+          "   │  └─ Field: <1: Zone Terminal Unit Name>",
           "   │  ",
-          "   └─ Class: <Fan:VariableVolume>",
+          "   └─ Class: <Fan:SystemModel>",
           "      └─ Field: <1: Name>",
           "      "
         )
     )
 
-    expect_s3_class(pos <- format_possible(get_iddobj_possible(idd88, 3)), "IddFieldPossible")
+    expect_s3_class(pos <- format_possible(get_iddobj_possible(idd_latest, 4)), "IddFieldPossible")
     expect_equal(pos$fmt_auto,
         c("* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
           "* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
@@ -214,7 +221,7 @@ test_that("Formatting", {
     expect_equal(pos$fmt_default,
         c("* Default: \"NONE\"", "* Default: 0", "* Default: \"Suburbs\"",
           "* Default: 0.04", "* Default: 0.4", "* Default: \"FullExterior\"",
-          "* Default: 25", "* Default: 6")
+          "* Default: 25", "* Default: 1")
     )
     expect_equal(pos$fmt_choice,
         c("* Choice: <NA>",
@@ -231,8 +238,8 @@ test_that("Formatting", {
     expect_warning(format_header(special_format = TRUE))
     expect_equal(format_header(view_in_ip = TRUE)[2], "!-Option SortedOrder ViewInIPunits")
 
-    idd_parsed <- get_priv_env(use_idd(8.8, "auto"))$m_idd_env
-    idf_parsed <- parse_idf_file(idftext("idf", "8.8"))
+    idd_parsed <- get_priv_env(use_idd(LATEST_EPLUS_VER, "auto"))$m_idd_env
+    idf_parsed <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
     add_joined_cols(idd_parsed$field, idf_parsed$value, "field_id", c("field_index", "type_enum", "units", "ip_units"))
     # object
     expect_equal(format_objects(idf_parsed$object, component = "object")$out,
@@ -246,15 +253,15 @@ test_that("Formatting", {
     # value
     expect_equal(
         format_objects(get_idf_value(idd_parsed, idf_parsed, property = c("type_enum", "units", "ip_units")),
-            component = "value", merge = FALSE)$out[c(1,2,4,5)],
+            component = "value", merge = FALSE)$out[c(1, 2, 4, 5)],
         c('Value: <"WD01">',
           'Value: <"MediumSmooth">',
-          'Value: <0.115>',
-          'Value: <513>')
+          "Value: <0.115>",
+          "Value: <513>")
     )
     expect_equal(
         format_objects(get_idf_value(idd_parsed, idf_parsed),
-            component = "value", merge = TRUE)$out[c(1,2,4,5)],
+            component = "value", merge = TRUE)$out[c(1, 2, 4, 5)],
         c("1: \"WD01\",        !- Name",
           "2: \"MediumSmooth\",!- Roughness",
           "4: 0.115,         !- Conductivity {W/m-K}",
@@ -263,7 +270,7 @@ test_that("Formatting", {
     )
     expect_equal(
         format_objects(get_idf_value(idd_parsed, idf_parsed, property = c("units", "ip_units", "type_enum")),
-            component = c("object", "value"))$out[c(1,2,4,5)],
+            component = c("object", "value"))$out[c(1, 2, 4, 5)],
         c("[09<V>] Object [ID:1] <WD01>",
           "[05<V>] Object [ID:2] <WALL-1>",
           "[06<V>] Object [ID:4] <WD02>",
@@ -434,7 +441,7 @@ test_that("Formatting", {
           "!-      Use '!' comments if they need to be retained when using the IDFEditor."
         )
     )
-    expect_equal(fmt$format$class_id, c(1L, 55L, 90L, 103L))
+    expect_equal(fmt$format$class_id, c(1L, 56L, 92L, 109L))
     expect_equal(fmt$format$fmt[[2L]],
         list("!-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========",
              list(c("! this is a test comment for WD01"),
@@ -492,3 +499,5 @@ test_that("Formatting", {
     expect_equal(format_comment(data.table(comment = list("a", NULL))), c("!a", NA))
     # }}}
 })
+
+# vim: set fdm=marker:

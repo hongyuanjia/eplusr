@@ -746,3 +746,5 @@ add_csv_time <- function (time) {
     paste0("(", x, ") AND (", y, ")")
 }
 # }}}
+
+# vim: set fdm=marker:

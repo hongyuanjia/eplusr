@@ -21,17 +21,17 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
-        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
         if (length(x) > n) {
             # truncate the output
-            x <- c(head(x, n), '....', '')
+            x <- c(head(x, n), "....", "")
         } else {
             x <- c(x, "")
         }
-        x <- paste(x, collapse = '\n') # paste first n lines together
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
     hook_output(x, options)
 })
@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.1)) install_eplus(22.1)
+if (!is_avail_eplus(23.1)) install_eplus(23.1)
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
@@ -93,7 +93,7 @@ data of EnergyPlus configuration using `eplus_config()`.
 ```{r avail_eplus}
 avail_eplus()
 
-eplus_config(22.1)
+eplus_config(23.1)
 ```
 
 If your EnergyPlus was not installed in standard location, you can add that
@@ -101,14 +101,14 @@ location using `use_eplus()`. After adding, all models of that version will use
 this path to call EnergyPlus.
 
 ```{r use_eplus, eval = FALSE}
-use_eplus("C:/EnergyPlusV22-1-0")
+use_eplus("C:/EnergyPlusV23-1-0")
 ```
 
 If the needed version of EnergyPlus was not installed, you can use
 `install_eplus()` to install it.
 
 ```{r install, eval = FALSE}
-install_eplus(ver = 22.1)
+install_eplus(ver = 23.1)
 ```
 
 ## Download EnergyPlus IDD
@@ -116,15 +116,15 @@ install_eplus(ver = 22.1)
 Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
 `download_idd()` or set `download` to `TRUE` in `use_idd()`. The code below will
-download IDD file for EnergyPlus v22.1.0, parse it and create an `Idd` object
-that will be used whenever parsing all EnergyPlus models of version v22.1.
+download IDD file for EnergyPlus v23.1.0, parse it and create an `Idd` object
+that will be used whenever parsing all EnergyPlus models of version v23.1.
 
 ```{r idd_dl, eval = FALSE}
-path_idd <- download_idd(22.1, dir = tempdir())
+path_idd <- download_idd(23.1, dir = tempdir())
 use_idd(path_idd)
 
 # OR
-use_idd(22.1, download = TRUE)
+use_idd(23.1, download = TRUE)
 ```
 
 # Read and parse IDF
@@ -135,7 +135,7 @@ with additional heading lines showing the `Path`, `Version` of the model. The
 classes of objects in the model are ordered by groups and the number of objects
 in classes are shown in square bracket.
 
-Now let's read an IDF file distributed with EnergyPlus 22.1.0. As we have already
+Now let's read an IDF file distributed with EnergyPlus 23.1. As we have already
 got the IDD, we can just ignore the `idd` argument.
 
 **Note**: Once an EnergyPlus version `X.Y` is successfully located, all IDFs
@@ -145,7 +145,7 @@ simply `read_idf(path)` without specifying `idd`. This is because eplusr will
 use IDD files distributed with EnergyPlus VersionUpdater program.
 
 ```{r read, out.lines = 10}
-path <- file.path(eplus_config(22.1)$dir, "ExampleFiles/5Zone_Transformer.idf")
+path <- file.path(eplus_config(23.1)$dir, "ExampleFiles/5Zone_Transformer.idf")
 model <- read_idf(path)
 
 model
@@ -247,14 +247,14 @@ def_mat
 You can also achieve this using methods in `Idd` class.
 
 ```{r idd_obj, eval = FALSE}
-idd <- use_idd(22.1)
+idd <- use_idd(23.1)
 idd$Material
 
 # OR
 # idd$object("Material")
 
 # OR
-# idd_object(22.1, "Material")
+# idd_object(23.1, "Material")
 ```
 
 With the `IddObject`, you can easily get class and field properties using
@@ -523,9 +523,9 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 
 ```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-path_ddy <- file.path(eplus_config(22.1)$dir, "WeatherData",
+path_ddy <- file.path(eplus_config(23.1)$dir, "WeatherData",
   "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
-ddy <- read_idf(path_ddy, idd = model$version())
+ddy <- read_idf(path_ddy, idd = model$version(), encoding = "Latin-1")
 
 model$insert(ddy$SizingPeriod_DesignDay)
 

@@ -248,3 +248,5 @@ with_speed <- function (expr) {
     without_checking(expr)
 }
 # }}}
+
+# vim: set fdm=marker:

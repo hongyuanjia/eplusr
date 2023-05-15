@@ -535,3 +535,5 @@ test_that("download_weather()", {
     )})
 })
 # }}}
+
+# vim: set fdm=marker:

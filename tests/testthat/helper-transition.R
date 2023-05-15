@@ -10,3 +10,5 @@ temp_idf <- function(ver, ...) {
     idf
 }
 # }}}
+
+# vim: set fdm=marker:

@@ -4,6 +4,8 @@ test_that("table", {
 
     idf_env <- parse_idf_file(idftext("idf"))
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # OBJECT {{{
     expect_equal(get_idf_object(idd_env, idf_env, 1),
@@ -49,7 +51,8 @@ test_that("table", {
 
     expect_equal(get_idf_object_multi_scope(idd_env, idf_env)$object_id, 1:5)
     expect_equal(get_idf_object_multi_scope(idd_env, idf_env, 1, "Construction", "Thermal Zones and Surfaces"),
-        data.table(rleid = 1:3, class_id = c(56L, 91L, 108L),
+        data.table(rleid = 1:3,
+            class_id = get_idd_class(idd_env, c("Material", "Construction", "BuildingSurface:Detailed"))$class_id,
             class_name = c("Material", "Construction", "BuildingSurface:Detailed"),
             object_id = 1:3,
             object_name = c("WD01", "WALL-1", "WALL-1PF"),
@@ -131,6 +134,7 @@ test_that("table", {
     # }}}
 
     # VALUE {{{
+    class_name <- "Material"
     # get all value from current idf {{{
     expect_equal(nrow(get_idf_value(idd_env, idf_env)), 47L)
     expect_equal(names(get_idf_value(idd_env, idf_env)),
@@ -144,8 +148,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "Material")})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47))
     expect_equal(val$object_id, c(rep(1L, 9), rep(4L, 6)))
-    expect_equal(val$field_id, c(12589:12597, 12589:12594))
-    expect_equal(val$class_id, rep(56L, 15))
+    expect_equal(val$field_id, fld_id(c(1:9, 1:6)))
+    expect_equal(val$class_id, rep(cls_id(), 15))
     expect_equal(val$field_index, c(1:9, 1:6))
     expect_equal(val$field_name,
        c(
@@ -165,8 +169,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "Material", align = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -184,8 +188,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "Material", complete = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47))
     expect_equal(val$object_id, c(rep(1L, 9), rep(4L, 6)))
-    expect_equal(val$field_id, c(12589:12597, 12589:12594))
-    expect_equal(val$class_id, rep(56L, 15))
+    expect_equal(val$field_id, fld_id(c(1:9, 1:6)))
+    expect_equal(val$class_id, rep(cls_id(), 15))
     expect_equal(val$field_index, c(1:9, 1:6))
     expect_equal(val$field_name,
        c(
@@ -203,8 +207,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "Material", align = TRUE, complete = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -222,8 +226,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, "Material", all = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -247,8 +251,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"))})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47))
     expect_equal(val$object_id, c(rep(1L, 9), rep(4L, 6)))
-    expect_equal(val$field_id, c(12589:12597, 12589:12594))
-    expect_equal(val$class_id, rep(56L, 15))
+    expect_equal(val$field_id, fld_id(c(1:9, 1:6)))
+    expect_equal(val$class_id, rep(cls_id(), 15))
     expect_equal(val$field_index, c(1:9, 1:6))
     expect_equal(val$field_name,
        c(
@@ -267,8 +271,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), align = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -286,8 +290,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), complete = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47))
     expect_equal(val$object_id, c(rep(1L, 9), rep(4L, 6)))
-    expect_equal(val$field_id, c(12589:12597, 12589:12594))
-    expect_equal(val$class_id, rep(56L, 15))
+    expect_equal(val$field_id, fld_id(c(1:9, 1:6)))
+    expect_equal(val$class_id, rep(cls_id(), 15))
     expect_equal(val$field_index, c(1:9, 1:6))
     expect_equal(val$field_name,
        c(
@@ -305,8 +309,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), align = TRUE, complete = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -324,8 +328,8 @@ test_that("table", {
     expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), all = TRUE)})
     expect_equal(val$value_id, c(1:9, 41:44, 46:47, -1:-3))
     expect_equal(val$object_id, rep(c(1L, 4L), each = 9))
-    expect_equal(val$field_id, rep(12589:12597, 2))
-    expect_equal(val$class_id, rep(56L, 18))
+    expect_equal(val$field_id, fld_id(rep(1:9, 2)))
+    expect_equal(val$class_id, rep(cls_id(), 18))
     expect_equal(val$field_index, rep(1:9, 2))
     expect_equal(val$field_name,
        rep(
@@ -346,11 +350,12 @@ test_that("table", {
     # }}}
     # get value from field {{{
     # one class, multiple fields {{{
+    class_name <- "BuildingSurface:Detailed"
     expect_silent({val <- get_idf_value(idd_env, idf_env, "BuildingSurface:Detailed", field = 1:24)})
     expect_equal(val$value_id, c(15:38))
     expect_equal(val$object_id, rep(3L, 24))
-    expect_equal(val$field_id, 17188:17211)
-    expect_equal(val$class_id, rep(108L, 24))
+    expect_equal(val$field_id, fld_id(1:24))
+    expect_equal(val$class_id, rep(cls_id(), 24))
     expect_equal(val$field_index, 1:24)
     expect_equal(val$rleid, rep(1L, 24))
     expect_equal(val$class_name, rep("BuildingSurface:Detailed", 24))
@@ -358,11 +363,12 @@ test_that("table", {
     expect_equal(nrow(get_idf_value(idd_env, idf_env, "Material", field = c(8, 9), align = TRUE)), 4L)
     # }}}
     # one field for each class {{{
+    class_name <- c(rep("Material", 2), "BuildingSurface:Detailed")
     expect_silent({val <- get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 10))})
     expect_equal(val$value_id, c(4L, 44L, 24L))
     expect_equal(val$object_id, c(1L, 4L, 3L))
-    expect_equal(val$field_id, c(rep(12592L, 2), 17197L))
-    expect_equal(val$class_id, c(rep(56L, 2), 108L))
+    expect_equal(val$field_id, fld_id(c(rep(4L, 2), 10L)))
+    expect_equal(val$class_id, cls_id())
     expect_equal(val$field_index, c(rep(4L, 2), 10L))
     expect_equal(val$field_name, c(rep("Conductivity", 2), "View Factor to Ground"))
     expect_equal(val$rleid, c(1L, 1L, 2L))
@@ -412,18 +418,19 @@ test_that("table", {
     idf_env1$value <- idf_env1$value[0]
     expect_equal(init_idf_value(idd_env, idf_env1, "Material")$value_id, 1:6)
 
+    class_name <- "Material"
     expect_equal(init_idf_value(idd_env, idf_env, "Material"),
-        data.table(rleid = 1L, class_id = 56L, class_name = "Material",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Material",
             object_id = NA_integer_, object_name = NA_character_,
-            field_id = 12589:12594, field_index = 1:6,
+            field_id = fld_id(1:6), field_index = 1:6,
             field_name = c("Name", "Roughness", "Thickness", "Conductivity", "Density", "Specific Heat"),
             value_id = 48:53, value_chr = NA_character_, value_num = NA_real_
         )
     )
     expect_equal(init_idf_value(idd_env, idf_env, "Material", property = "is_name"),
-        data.table(rleid = 1L, class_id = 56L, class_name = "Material",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Material",
             object_id = NA_integer_, object_name = NA_character_,
-            field_id = 12589:12594, field_index = 1:6,
+            field_id = fld_id(1:6), field_index = 1:6,
             field_name = c("Name", "Roughness", "Thickness", "Conductivity", "Density", "Specific Heat"),
             value_id = 48:53, value_chr = NA_character_, value_num = NA_real_,
             is_name = c(TRUE, rep(FALSE, 5))
@@ -564,6 +571,8 @@ test_that("NAME DOTS", {
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idf_env <- get_priv_env(idf)$idf_env()
     idd_env <- get_priv_env(idf)$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # can stop if empty input
     expect_error(expand_idf_dots_name(idd_env, idf_env))
@@ -607,10 +616,11 @@ test_that("NAME DOTS", {
     )
 
     # can work with only object name inputs
+    class_name <- c("Construction", "Zone", "Exterior:Lights")
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"))[, -"comment"],
         data.table(rleid = 1:3,
-            class_id = c(91L, 105L, 287L),
+            class_id = cls_id(),
             class_name = c("Construction", "Zone", "Exterior:Lights"),
             object_id = c(16L, 18L, 51L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
@@ -623,7 +633,7 @@ test_that("NAME DOTS", {
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"), .keep_name = FALSE)[, -"comment"],
         data.table(rleid = 1:3,
-            class_id = c(91L, 105L, 287L),
+            class_id = cls_id(),
             class_name = c("Construction", "Zone", "Exterior:Lights"),
             object_id = c(16L, 18L, 51L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
@@ -632,10 +642,11 @@ test_that("NAME DOTS", {
     )
 
     # can work with both object ID and name inputs
+    class_name <- c("Version", "Construction")
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, 1L, Floor = "floor")[, -"comment"],
         data.table(rleid = 1:2,
-            class_id = c(1L, 91L),
+            class_id = cls_id(),
             class_name = c("Version", "Construction"),
             object_id = c(1L, 16L),
             object_name = c(NA_character_, "FLOOR"),
@@ -1007,6 +1018,8 @@ test_that("VALUE DOTS", {
     # read idf
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # can stop if duplicated class names are given
     expect_error(expand_idf_dots_value(idd_env, idf_env, Site_Location = list(), `Site:Location` = list(), .unique = TRUE))
@@ -1015,17 +1028,18 @@ test_that("VALUE DOTS", {
     expect_error(res <- expand_idf_dots_value(idd_env, idf_env, c(1) := list(..1 = LATEST_EPLUS_VER, 'Version Identifier' = LATEST_EPLUS_VER)), class = "eplusr_error_dots_multi_match")
 
     # only class id
+    class_name <- "Version"
     expect_type(res <- expand_idf_dots_value(idd_env, idf_env, c(1) := list(LATEST_EPLUS_VER), .empty = FALSE), "list")
     expect_equal(names(res), c("object", "value"))
     expect_equal(res$object,
-        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Version",
             object_id = NA_integer_, object_name = NA_character_,
             object_name_lower = NA_character_, comment = list()
         )
     )
     expect_equal(res$value,
-        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
-            object_id = NA_integer_, object_name = NA_character_, field_id = 1L,
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Version",
+            object_id = NA_integer_, object_name = NA_character_, field_id = fld_id(1L),
             field_index = 1L, field_name = "Version Identifier", value_id = NA_integer_,
             value_chr = LATEST_EPLUS_VER, value_num = NA_real_)
     )
@@ -1042,23 +1056,25 @@ test_that("VALUE DOTS", {
         ), "list"
     )
     expect_equal(names(res), c("object", "value"))
+    class_name <- c("RunPeriod", "RunPeriod", "Material", "Construction", "SimulationControl", "SimulationControl")
     expect_equal(res$object,
-        data.table(rleid = 1:6, class_id = c(23L, 23L, 56L, 91L, 2L, 2L),
-            class_name = c("RunPeriod", "RunPeriod", "Material", "Construction", "SimulationControl", "SimulationControl"),
+        data.table(rleid = 1:6, class_id = cls_id(),
+            class_name = class_name,
             object_id = NA_integer_, object_name = NA_character_,
             object_name_lower = NA_character_, comment = list()
         )
     )
 
+    class_name <- c(rep("RunPeriod", 18), rep("Material", 6), rep("Construction", 2), rep("SimulationControl", 14))
     expect_equal(
         ignore_attr = TRUE,
         res$value[, -"field_name"],
         data.table(
             rleid = c(rep(1L, 11), rep(2L, 7), rep(3L, 6), rep(4L, 2), rep(5L, 7), rep(6L, 7)),
-            class_id = c(rep(23L, 18), rep(56, 6), rep(91L, 2), rep(2L, 14)),
-            class_name = c(rep("RunPeriod", 18), rep("Material", 6), rep("Construction", 2), rep("SimulationControl", 14)),
+            class_id = cls_id(),
+            class_name = class_name,
             object_id = NA_integer_, object_name = NA_character_,
-            field_id = c(121:131, 121:127, 12589:12594, 16515:16516, 2:8, 2:8),
+            field_id = fld_id(c(1:11, 1:7, 1:6, 1:2, 1:7, 1:7)),
             field_index = c(1:11, 1:7, 1:6, 1:2, 1:7, 1:7),
             value_id = NA_integer_,
             value_chr = c(
@@ -1091,10 +1107,11 @@ test_that("VALUE DOTS", {
     # can work for empty objects
     expect_type(res <- expand_idf_dots_value(idd_env, idf_env, Output_Variable := list(), .type = "object"), "list")
     expect_equal(names(res), c("object", "value"))
+    class_name <- "Output:Variable"
     expect_equal(
         ignore_attr = TRUE,
         res$object,
-        data.table(rleid = 1L, class_id = 815L, class_name = "Output:Variable",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Output:Variable",
             object_id = 27:42, object_name = NA_character_,
             object_name_lower = NA_character_, comment = list()
         )
@@ -1102,9 +1119,9 @@ test_that("VALUE DOTS", {
     expect_equal(
         ignore_attr = TRUE,
         res$value[, -"value_chr"],
-        data.table(rleid = 1L, class_id = 815L, class_name = "Output:Variable",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "Output:Variable",
             object_id = rep(27:42, each = 3), object_name = NA_character_,
-            field_id = rep(64843:64845, 16), field_index = rep(1:3, 16),
+            field_id = fld_id(rep(1:3, 16)), field_index = rep(1:3, 16),
             field_name = rep(c("Key Value", "Variable Name", "Reporting Frequency"), 16),
             value_id = 272:319, value_num = NA_real_
         )
@@ -1496,6 +1513,8 @@ test_that("LITERAL DOTS", {
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idf_env <- get_priv_env(idf)$idf_env()
     idd_env <- get_priv_env(idf)$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     expect_error(expand_idf_dots_literal(idd_env, idf_env))
     expect_error(expand_idf_dots_literal(idd_env, idf_env, NULL))
@@ -1555,16 +1574,18 @@ test_that("LITERAL DOTS", {
         )
     )
     expect_equal(names(l), c("object", "value"))
+    class_name <- c("Material", "Construction", "Material", "Material", "Material:NoMass", "Material:NoMass")
     expect_equal(l$object,
         data.table(
-            rleid = 1:6, class_id = c(56L, 91L, 56L, 56L, 57L, 57L),
-            class_name = c("Material", "Construction", "Material", "Material", "Material:NoMass", "Material:NoMass"),
+            rleid = 1:6, class_id = cls_id(),
+            class_name = class_name,
             object_id = NA_integer_, object_name = NA_character_, object_name_lower = NA_character_,
             comment = c(list(" some comments;"), rep(list(NULL), 5L))
         )
     )
+    class_name <- c(rep("Material", 6), rep("Construction", 2), rep("Material", 12), rep("Material:NoMass", 12))
     expect_equal(l$value$rleid, c(rep(1L, 6), rep(2L, 2), rep(3:6, each = 6)))
-    expect_equal(l$value$class_id, c(rep(56L, 6), rep(91L, 2), rep(c(56L, 56L, 57L, 57L), each = 6)))
+    expect_equal(l$value$class_id, cls_id())
     expect_equal(l$value$object_id, rep(NA_integer_, 32))
     expect_equal(l$value$object_name, rep(NA_character_, 32))
     expect_equal(l$value$value_id, rep(NA_integer_, 32))
@@ -1588,10 +1609,11 @@ test_that("LITERAL DOTS", {
     )
 
     expect_equal(names(l), c("object", "value"))
+    class_name <- c(rep("Material", 2), rep("Material:NoMass", 4))
     expect_equal(l$object,
         data.table(
-            rleid = 1:6, class_id = c(rep(56L, 2), rep(57L, 4)),
-            class_name = c(rep("Material", 2), rep("Material:NoMass", 4)),
+            rleid = 1:6, class_id = cls_id(),
+            class_name = class_name,
             object_id = c(rep(14L, 2), 12L, 13L, 12L, 13L),
             object_name = c(rep("C5 - 4 IN HW CONCRETE", 2), rep(c("R13LAYER", "R31LAYER"), 2)),
             object_name_lower = c(rep("c5 - 4 in hw concrete", 2), rep(c("r13layer", "r31layer"), 2)),
@@ -1599,7 +1621,8 @@ test_that("LITERAL DOTS", {
         )
     )
     expect_equal(l$value$rleid, c(rep(1L, 6), rep(2:6, each = 6)))
-    expect_equal(l$value$class_id, c(rep(56L, 12), rep(57L, 24)))
+    class_name <- c(rep("Material", 12), rep("Material:NoMass", 24))
+    expect_equal(l$value$class_id, cls_id())
     expect_equal(l$value$object_id, c(rep(14L, 12), rep(c(12L, 13L, 12L, 13L), each = 6)))
     expect_equal(l$value$object_name, c(rep("C5 - 4 IN HW CONCRETE", 12), rep(rep(c("R13LAYER", "R31LAYER"), 2), each = 6)))
     expect_equal(l$value$value_id, c(rep(103:108, 2), rep(91:102, 2)))
@@ -1635,6 +1658,8 @@ test_that("make_idf_object_name", {
 
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # can stop if trying to assign names to objects that do not have name attribute
     expect_error(
@@ -1655,6 +1680,7 @@ test_that("make_idf_object_name", {
     )
 
     # can use additional columns as prefixes
+    class_name <- "Construction"
     expect_equal(
         {
             obj <- init_idf_object(idd_env, idf_env, rep("Construction", 2), name = FALSE)
@@ -1664,7 +1690,7 @@ test_that("make_idf_object_name", {
             set(obj, NULL, "prefix2", "Const")
             make_idf_object_name(idd_env, idf_env, obj, prefix_col = c("prefix1", "prefix2"), prefix_sep = "-", keep_na = FALSE)[]
         },
-        data.table(rleid = 1:2, class_id = 91L, class_name = "Construction",
+        data.table(rleid = 1:2, class_id = cls_id(), class_name = "Construction",
             group_id = 5L, object_id = 56:57,
             object_name = c("Construction", NA), object_name_lower = c("construction", NA),
             comment = list(),
@@ -1684,7 +1710,7 @@ test_that("make_idf_object_name", {
             set(obj, NULL, "prefix2", "Const")
             make_idf_object_name(idd_env, idf_env, obj, prefix_col = c("prefix1", "prefix2"), prefix_sep = "-", keep_na = TRUE)[]
         },
-        data.table(rleid = 1:2, class_id = 91L, class_name = "Construction",
+        data.table(rleid = 1:2, class_id = cls_id(), class_name = "Construction",
             group_id = 5L, object_id = 56:57,
             object_name = c("Construction", NA), object_name_lower = c("construction", NA),
             comment = list(),
@@ -1702,7 +1728,7 @@ test_that("make_idf_object_name", {
             set(obj, NULL, "prefix2", "2")
             make_idf_object_name(idd_env, idf_env, obj, prefix_col = c("prefix1", "prefix2"), prefix_sep = "-", use_old = FALSE)
         },
-        data.table(rleid = 1:2, class_id = 91L, class_name = "Construction",
+        data.table(rleid = 1:2, class_id = cls_id(), class_name = "Construction",
             group_id = 5L, object_id = 56:57,
             object_name = NA_character_, object_name_lower = NA_character_,
             comment = list(), prefix1 = "1", prefix2 = "2",
@@ -1721,7 +1747,7 @@ test_that("make_idf_object_name", {
             set(obj, 1L, "new_object_name_lower", "const")
             make_idf_object_name(idd_env, idf_env, obj, include_ori = FALSE)
         },
-        data.table(rleid = 1:2, class_id = 91L, class_name = "Construction",
+        data.table(rleid = 1:2, class_id = cls_id(), class_name = "Construction",
             group_id = 5L, object_id = 56:57,
             object_name = c("Construction", NA), object_name_lower = c("construction", NA),
             comment = list(),
@@ -1731,6 +1757,7 @@ test_that("make_idf_object_name", {
     )
 
     # can auto name and keep empty name
+    class_name <- c(rep("Construction", 3), "Coil:Cooling:Water")
     expect_equal(
         {
             obj <- init_idf_object(idd_env, idf_env, c(rep("Construction", 3), "Coil:Cooling:Water"), name = FALSE)
@@ -1738,8 +1765,8 @@ test_that("make_idf_object_name", {
             set(obj, 1L, "object_name_lower", "const")
             make_idf_object_name(idd_env, idf_env, obj, keep_na = FALSE)
         },
-        data.table(rleid = 1:4, class_id = c(rep(91L, 3), 407L),
-            class_name = c(rep("Construction", 3), "Coil:Cooling:Water"),
+        data.table(rleid = 1:4, class_id = cls_id(),
+            class_name = class_name,
             group_id = c(rep(5L, 3), 23L), object_id = 56:59,
             object_name = c("Const", rep(NA_character_, 3)),
             object_name_lower = c("const", rep(NA_character_, 3)),
@@ -1758,12 +1785,15 @@ test_that("Dup", {
     # read idf
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # can stop if version object
     expect_error(dup_idf_object(idd_env, idf_env, expand_idf_dots_name(idd_env, idf_env, 1)), class = "eplusr_error_dup_version")
     # can stop if duplicate unique object
     expect_error(dup_idf_object(idd_env, idf_env, expand_idf_dots_name(idd_env, idf_env, 3)), class = "eplusr_error_dup_unique")
 
+    class_name <- c(rep("RunPeriod", 2), rep("Material:NoMass", 2))
     expect_message(with_verbose(
         dup <- dup_idf_object(idd_env, idf_env, expand_idf_dots_name(idd_env, idf_env, 8, Annual = 8, nomass = 13, 13))),
         "RunPeriod.*R31LAYER 1"
@@ -1779,10 +1809,11 @@ test_that("Dup", {
             object_name = c("Run Period 1 1", "Annual", "nomass", "R31LAYER 1"),
             object_name_lower = c("run period 1 1", "annual", "nomass", "r31layer 1"),
             comment = list(),
-            class_id = c(23L, 23L, 57L, 57L)
+            class_id = cls_id()
         )
     )
     expect_equal(nrow(dup$value), 402)
+    class_name <- c(rep("RunPeriod", 26), rep("Material:NoMass", 12))
     expect_equal(
         ignore_attr = TRUE,
         dup$value[365:402],
@@ -1799,7 +1830,7 @@ test_that("Dup", {
               NA, NA, 5.456, 0.9, 0.75, 0.75,
               NA, NA, 5.456, 0.9, 0.75, 0.75),
             object_id = c(rep(56L, 13), rep(57L, 13), rep(58L, 6), rep(59L, 6)),
-            field_id = c(121:133, 121:133, 12598:12603, 12598:12603)
+            field_id = fld_id(c(1:13, 1:13, 1:6, 1:6))
         )
     )
     expect_equal(nrow(dup$reference), 21)
@@ -1816,6 +1847,8 @@ test_that("Add", {
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idf_env <- get_priv_env(idf)$m_idf_env
     idd_env <- get_priv_env(idf)$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     # can stop if adding version
     expect_error(
@@ -1885,15 +1918,17 @@ test_that("Add", {
             l <- add_idf_object(idd_env, idf_env, l$object, l$value, level = "none", unique = TRUE)
         }
     )
+    class_name <- c(rep("Material", 3), "Construction", "BuildingSurface:Detailed", "Zone")
     expect_equal(l$object[56:61],
         object = data.table(
             object_id = 56:61,
             object_name = c("Mat 1", "Mat 2", "Mat 3", "Const", "Surf", "Zone"),
             object_name_lower = c("mat 1", "mat 2", "mat 3", "const", "surf", "zone"),
             comment = list(),
-            class_id = c(56L, 56L, 56L, 91L, 108L, 105L)
+            class_id = cls_id()
         )
     )
+    class_name <- c(rep("Material", 18), rep("Construction", 4), rep("BuildingSurface:Detailed", 20), "Zone")
     expect_equal(l$value[365:407],
         data.table(
             value_id = 365:407,
@@ -1907,7 +1942,7 @@ test_that("Add", {
                 NA, NA, NA, NA, NA, NA, NA, NA, NA, "Zone"),
             value_num = NA_real_,
             object_id = c(rep(56L, 6), rep(57L, 6), rep(58L, 6), rep(59L, 4), rep(60L, 20), 61L),
-            field_id = c(rep(12589:12594, 3), 16515:16518, 17188:17207, 16671L)
+            field_id = fld_id(c(rep(1:6, 3), 1:4, 1:20, 1))
         )
     )
     expect_equal(l$reference[22:26],
@@ -2325,20 +2360,23 @@ test_that("Parsing IDF EDITOR Copy Contents", {
     # read idf
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
 
     text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
     writeClipboard(text)
     expect_type(l <- read_idfeditor_copy(idd_env, idf_env), "list")
+    class_name <- "BuildingSurface:Detailed"
     expect_equal(l$object,
-        data.table(rleid = 1L, class_id = 108L, class_name = "BuildingSurface:Detailed",
+        data.table(rleid = 1L, class_id = cls_id(), class_name = "BuildingSurface:Detailed",
             object_id = 1L, object_name = "Surface", object_name_lower = "surface",
             comment = list(NULL)
         )
     )
     expect_equal(l$value,
         data.table(
-            rleid = 1L, class_id = 108L, class_name = "BuildingSurface:Detailed",
-            object_id = 1L, object_name = "Surface", field_id = 17188:17210,
+            rleid = 1L, class_id = cls_id(), class_name = "BuildingSurface:Detailed",
+            object_id = 1L, object_name = "Surface", field_id = fld_id(1:23),
             field_index = 1:23,
             field_name = c("Name", "Surface Type", "Construction Name", "Zone Name",
                 "Space Name", "Outside Boundary Condition", "Outside Boundary Condition Object",
@@ -2561,6 +2599,10 @@ test_that("resolve external link", {
     # read idf
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
+    cls_id <- function() get_idd_class(idd_env, class_name)$class_id
+    fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
+
+    class_name <- "Schedule:File"
 
     expect_false(resolve_idf_external_link(idd_env, idf_env))
 
@@ -2580,11 +2622,12 @@ test_that("resolve external link", {
     # can keep the original link if copy is not required
     writeLines(",\n", f)
     expect_type(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), path, copy = FALSE), "logical")
-    expect_equal(l$value[field_id == 12581, normalizePath(value_chr)], normalizePath(f))
+
+    expect_equal(l$value[field_id == fld_id(3), normalizePath(value_chr)], normalizePath(f))
 
     expect_true(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), path, copy = TRUE))
     expect_true(file.exists(file.path(dir, basename(f))))
-    expect_equal(l$value[field_id == 12581, value_chr], basename(f))
+    expect_equal(l$value[field_id == fld_id(3), value_chr], basename(f))
 
     unlink(file.path(dir, basename(f)), force = TRUE)
 })
@@ -2633,3 +2676,5 @@ test_that("utilities", {
     expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "choice")$value_chr, "MediumRough")
 })
 # }}}
+
+# vim: set fdm=marker:

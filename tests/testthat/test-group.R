@@ -86,7 +86,7 @@ test_that("Group methods", {
 
     # Table {{{
     expect_error(grp$list_table())
-    expect_silent(lsts <- grp$list_table(c(1,2,4)))
+    expect_silent(lsts <- grp$list_table(c(1, 2, 4)))
     expect_type(lsts, "list")
     expect_equal(length(lsts), 3L)
 
@@ -97,35 +97,35 @@ test_that("Group methods", {
 
     # RDD & MDD {{{
     expect_error(grp$read_rdd(3))
-    expect_silent(rdds <- grp$read_rdd(c(1,2,4)))
+    expect_silent(rdds <- grp$read_rdd(c(1, 2, 4)))
     expect_s3_class(rdds, "data.table")
     expect_error(grp$read_mdd(3))
-    expect_silent(mdds <- grp$read_mdd(c(1,2,4)))
+    expect_silent(mdds <- grp$read_mdd(c(1, 2, 4)))
     expect_s3_class(mdds, "data.table")
     # }}}
 
     # Report Data Dict {{{
     expect_error(grp$report_data_dict(), class = "eplusr_error_job_error")
-    expect_s3_class(grp$report_data_dict(c(1,2,4,5)), "data.table")
-    expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "index"))
-    expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "case"))
+    expect_s3_class(grp$report_data_dict(c(1, 2, 4, 5)), "data.table")
+    expect_true(has_names(grp$report_data_dict(c(1, 2, 4, 5)), "index"))
+    expect_true(has_names(grp$report_data_dict(c(1, 2, 4, 5)), "case"))
     expect_equal(nrow(grp$report_data_dict(2)), 23)
     expect_equal(nrow(grp$report_data_dict("1zoneevapcooler")), 23)
     # }}}
 
     # Tabular Data {{{
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5))), 22464L)
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5),
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5))), 22472L)
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5),
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
             "Initialization Summary"
         ))),
         3134L
     )
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5), table_name = "Site and Source Energy")), 12 * 4)
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5), column_name = "Total Energy")), 4 * 4)
-    expect_equal(nrow(grp$tabular_data(c(1,2,4,5), row_name = "Total Site Energy")), 3 * 4)
-    expect_equal(nrow(grp$tabular_data(2)), 4114)
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), table_name = "Site and Source Energy")), 12 * 4)
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), column_name = "Total Energy")), 4 * 4)
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), row_name = "Total Site Energy")), 3 * 4)
+    expect_equal(nrow(grp$tabular_data(2)), 4116)
     expect_equal(nrow(grp$tabular_data(2,
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
@@ -134,7 +134,7 @@ test_that("Group methods", {
         777L
     )
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler", table_name = "Site and Source Energy")), 12)
-    expect_equal(nrow(grp$tabular_data("1zoneevapcooler" ,column_name = "Total Energy")), 4)
+    expect_equal(nrow(grp$tabular_data("1zoneevapcooler", column_name = "Total Energy")), 4)
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler", row_name = "Total Site Energy")), 3)
     # can convert to wide table
     expect_silent(tab <- grp$tabular_data("1zoneevapcooler", row_name = "Total Site Energy", wide = TRUE))
@@ -222,3 +222,5 @@ test_that("Group methods", {
     expect_equal(nrow(files), 114L)
     # }}}
 })
+
+# vim: set fdm=marker:

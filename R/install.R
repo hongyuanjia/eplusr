@@ -890,3 +890,5 @@ get_ver_from_eplus_path <- function (path) {
     )
 }
 # }}}
+
+# vim: set fdm=marker:

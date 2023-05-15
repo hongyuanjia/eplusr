@@ -57,7 +57,7 @@ CLASS_DEL_COMMON <- c(
 # transition {{{
 #' @importFrom checkmate assert_vector
 # TODO: how to give the names of saved files
-transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
+transition <- function(idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
     if (!is_idf(idf)) idf <- read_idf(idf)
 
     if (length(ver) != 1L || is.na(ver <- convert_to_idd_ver(ver))) {
@@ -107,11 +107,11 @@ transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
 
     if (is.null(dir)) {
         dir <- dirname(idf$path())
-    } else if (!dir.exists(dir)){
+    } else if (!dir.exists(dir)) {
         dir.create(dir, recursive = TRUE)
     }
 
-    save_new <- function (idf, dir, path) {
+    save_new <- function(idf, dir, path) {
         nm <- paste0(tools::file_path_sans_ext(basename(path)), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
         idf$save(file.path(dir, nm), overwrite = TRUE)
     }
@@ -127,7 +127,7 @@ transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
 # }}}
 
 # trans_apply {{{
-trans_apply <- function (idf, ver, keep_all) {
+trans_apply <- function(idf, ver, keep_all) {
     # get all versions needed to handle
     vers <- trans_upper_versions(idf, ver)
 
@@ -169,7 +169,7 @@ trans_apply <- function (idf, ver, keep_all) {
 trans_funs <- new.env(parent = emptyenv())
 # trans_720_800 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f720t800 <- function (idf) {
+trans_funs$f720t800 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 7.2)
 
     target_cls <- c(
@@ -332,7 +332,7 @@ trans_funs$f720t800 <- function (idf) {
     # }}}
 
     # standardize_vertices {{{
-    standardize_vertices <- function (idf, class, start) {
+    standardize_vertices <- function(idf, class, start) {
         dt <- trans_action(idf, class)
         if (nrow(dt)) dt[index >= start & is.na(value), value := "0.0"]
         dt
@@ -378,7 +378,7 @@ trans_funs$f720t800 <- function (idf) {
     # }}}
 
     # warning_reset {{{
-    warning_reset <- function (idf, class, index = NULL, old = NULL, new = NULL) {
+    warning_reset <- function(idf, class, index = NULL, old = NULL, new = NULL) {
         if (is.null(index)) return(trans_action(idf, class))
 
         dt <- trans_action(idf, class, reset = list(index, old, new))
@@ -421,13 +421,13 @@ trans_funs$f720t800 <- function (idf) {
     dt29 <- warning_reset(idf, "Chiller:Electric:EIR", 23L, "VariableFlow", "LeavingSetpointModulated")
     # }}}
     # 30: Chiller:Electric:ReformulatedEIR {{{
-    dt30 <- warning_reset(idf, "Chiller:Electric:ReformulatedEIR", 21L,"VariableFlow", "LeavingSetpointModulated")
+    dt30 <- warning_reset(idf, "Chiller:Electric:ReformulatedEIR", 21L, "VariableFlow", "LeavingSetpointModulated")
     # }}}
     # 31: Chiller:Absorption {{{
-    dt31 <- warning_reset(idf, "Chiller:Absorption", 23L,"VariableFlow", "LeavingSetpointModulated")
+    dt31 <- warning_reset(idf, "Chiller:Absorption", 23L, "VariableFlow", "LeavingSetpointModulated")
     # }}}
     # 32: Chiller:Absorption:Indirect {{{
-    dt32 <- warning_reset(idf, "Chiller:Absorption:Indirect", 16L,"VariableFlow", "LeavingSetpointModulated")
+    dt32 <- warning_reset(idf, "Chiller:Absorption:Indirect", 16L, "VariableFlow", "LeavingSetpointModulated")
     # }}}
 
     trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:32))))
@@ -437,7 +437,7 @@ trans_funs$f720t800 <- function (idf) {
 # }}}
 # trans_800_810 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f800t810 <- function (idf) {
+trans_funs$f800t810 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.0)
 
     target_cls <- c(
@@ -560,7 +560,7 @@ trans_funs$f800t810 <- function (idf) {
     }
     # }}}
     # update_hvactemplate_fan {{{
-    update_hvactemplate_fan <- function (new_idf, idf, class, min_fields) {
+    update_hvactemplate_fan <- function(new_idf, idf, class, min_fields) {
         dt <- trans_action(idf, class = class, min_fields = min_fields)
 
         if (!nrow(dt)) return(dt)
@@ -612,7 +612,7 @@ trans_funs$f800t810 <- function (idf) {
 # }}}
 # trans_810_820 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f810t820 <- function (idf) {
+trans_funs$f810t820 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.1)
 
     target_cls <- c(
@@ -760,7 +760,7 @@ trans_funs$f810t820 <- function (idf) {
 # }}}
 # trans_820_830 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f820t830 <- function (idf) {
+trans_funs$f820t830 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.2)
 
     target_cls <- c(
@@ -818,7 +818,7 @@ trans_funs$f820t830 <- function (idf) {
 # }}}
 # trans_830_840 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f830t840 <- function (idf) {
+trans_funs$f830t840 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.3)
 
     target_cls <- c(
@@ -1075,7 +1075,7 @@ trans_funs$f830t840 <- function (idf) {
 # }}}
 # trans_840_850 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f840t850 <- function (idf) {
+trans_funs$f840t850 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.4)
 
     target_cls <- c(
@@ -1098,7 +1098,7 @@ trans_funs$f840t850 <- function (idf) {
 # }}}
 # trans_850_860 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f850t860 <- function (idf) {
+trans_funs$f850t860 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.5)
 
     target_cls <- c(
@@ -1286,7 +1286,7 @@ trans_funs$f850t860 <- function (idf) {
     if (nrow(dt15)) {
         dt15 <- dt15[index <= 5L]
         nm_zone <- vcapply(unique(dt15$id),
-            function (id) {
+            function(id) {
                 zone <- with_silent(idf$object(id)$ref_to_object(2L, class = "Zone", depth = NULL)[[1L]])
                 if (!length(zone)) NA_character_ else zone$value(2)[[1L]]
             }
@@ -1325,12 +1325,12 @@ trans_funs$f850t860 <- function (idf) {
 
         # extract reference point name, zone name, and illuminance setpoint
         dt16_2 <- lapply(unique(dt16_1$id),
-            function (id) {
+            function(id) {
                 refp <- with_silent(idf$object(id)$ref_by_object(1L, class = "Daylighting:DELight:ReferencePoint"))
                 if (!length(refp)) {
                     data.table()
                 } else {
-                    dt <- rbindlist(lapply(refp, function (x) x$to_table(all = TRUE)))[index %in% c(1L, 6L, 7L)]
+                    dt <- rbindlist(lapply(refp, function(x) x$to_table(all = TRUE)))[index %in% c(1L, 6L, 7L)]
                     # update object id
                     set(dt, NULL, "id", id)
                     set(dt, NULL, "class", "Daylighting:Controls")
@@ -1351,22 +1351,22 @@ trans_funs$f850t860 <- function (idf) {
     if (nrow(dt17)) {
         # cal_mu_empd {{{
         # reference: CalculateMuEMPD() in UtilityRoutines.f90 under Transition
-        cal_mu_empd <- function (a, b, c, d, d_empd, density) {
+        cal_mu_empd <- function(a, b, c, d, d_empd, density) {
             TEMP <- 24
             RH <- 0.45
             P_ambient <- 101325
             Seconds <- 24L * 60L * 60L
 
             slope_MC <- a * b * RH ** (b - 1) + c * d * RH ** (d - 1)
-            PV_sat = psat_fn_tdb(TEMP) * 1000
-            diffusivity_EMPD = d_empd ** 2 * 3.1415926535 * slope_MC * density / (Seconds * PV_sat)
-            diffusivity_air = 2.0e-7 * (TEMP + 273.15) ** 0.81 / P_ambient
+            PV_sat <- psat_fn_tdb(TEMP) * 1000
+            diffusivity_EMPD <- d_empd ** 2 * 3.1415926535 * slope_MC * density / (Seconds * PV_sat)
+            diffusivity_air <- 2.0e-7 * (TEMP + 273.15) ** 0.81 / P_ambient
             diffusivity_air / diffusivity_EMPD
         }
         # }}}
         # psat_fn_tdb {{{
         # reference: GetSatVapPressFromDryBulb() in UtilityRoutines.f90 under Transition
-        psat_fn_tdb <- function (tdb) {
+        psat_fn_tdb <- function(tdb) {
             tk <- tdb + 273.15
             C1 <- -5674.5359
             C2 <- 6.3925247
@@ -1382,8 +1382,8 @@ trans_funs$f850t860 <- function (idf) {
             C12 <- -0.000000014452093
             C13 <- 6.5459673
             psat <- rep(NA_real_, length(tdb))
-            psat[tdb <= 0] = exp(C1/tk + C2 + C3*tk + C4*tk**2 + C5*tk**3 + C6*tk**4 + C7*log(tk)) / 1000
-            psat[tdb  > 0] = exp(C8/tk + C9 + C10*tk + C11*tk**2 + C12*tk**3 + C13*log(tk)) / 1000
+            psat[tdb <= 0] <- exp(C1/tk + C2 + C3*tk + C4*tk**2 + C5*tk**3 + C6*tk**4 + C7*log(tk)) / 1000
+            psat[tdb  > 0] <- exp(C8/tk + C9 + C10*tk + C11*tk**2 + C12*tk**3 + C13*log(tk)) / 1000
             psat
         }
         # }}}
@@ -1480,7 +1480,7 @@ trans_funs$f850t860 <- function (idf) {
 # }}}
 # trans_860_870 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f860t870 <- function (idf) {
+trans_funs$f860t870 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.6)
 
     target_cls <- c(
@@ -1561,28 +1561,28 @@ trans_funs$f860t870 <- function (idf) {
 # }}}
 # trans_870_880 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f870t880 <- function (idf) {
+trans_funs$f870t880 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.7)
 
     target_cls <- c(
-        "Output:Surfaces:List",                           # 1
-        "Table:TwoIndependentVariables",                  # 2
+        "Output:Surfaces:List",                            # 1
+        "Table:TwoIndependentVariables",                   # 2
        # Only used to check corresponding perimeter object
-       #"BuildingSurface:Detailed",                       # 3
+       #"BuildingSurface:Detailed",                        # 3
        # Only used to check corresponding perimeter object
-       #"Floor:Detailed",                                 # 4
-        "SurfaceProperty:ExposedFoundationPerimeter",     # 5
-        "Foundation:Kiva:Settings",                       # 6
-        "UnitarySystemPerformance:Multispeed",            # 7
-        "Coil:Cooling:DX:SingleSpeed",                    # 8
-        "Coil:Cooling:DX:TwoSpeed",                       # 9
-        "Coil:Cooling:DX:MultiSpeed",                     # 10
-        "Coil:Cooling:DX:VariableSpeed",                  # 11
-        "Coil:Cooling:DX:TwoStageWithHumidityControlMode",# 12
-        "ZoneHVAC:PackagedTerminalHeatPump",              # 13
-        "ZoneHVAC:IdealLoadsAirSystem",                   # 14
-        "ZoneControl:ContaminantController",              # 15
-        "AvailabilityManager:NightCycle"                  # 16
+       #"Floor:Detailed",                                  # 4
+        "SurfaceProperty:ExposedFoundationPerimeter",      # 5
+        "Foundation:Kiva:Settings",                        # 6
+        "UnitarySystemPerformance:Multispeed",             # 7
+        "Coil:Cooling:DX:SingleSpeed",                     # 8
+        "Coil:Cooling:DX:TwoSpeed",                        # 9
+        "Coil:Cooling:DX:MultiSpeed",                      # 10
+        "Coil:Cooling:DX:VariableSpeed",                   # 11
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode", # 12
+        "ZoneHVAC:PackagedTerminalHeatPump",               # 13
+        "ZoneHVAC:IdealLoadsAirSystem",                    # 14
+        "ZoneControl:ContaminantController",               # 15
+        "AvailabilityManager:NightCycle"                   # 16
     )
 
     new_idf <- trans_preprocess(idf, 8.8, target_cls)
@@ -1608,7 +1608,7 @@ trans_funs$f870t880 <- function (idf) {
             # check if surface has a corresponding perimeter object
             # if not, give a warning and add one
             dt3 <- rbindlist(lapply(obj_id,
-                function (i) {
+                function(i) {
                     perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
 
                     if (length(perim)) return(data.table())
@@ -1651,7 +1651,7 @@ trans_funs$f870t880 <- function (idf) {
             # check if surface has a corresponding perimeter object
             # if not, give a warning and add one
             dt4 <- rbindlist(lapply(obj_id,
-                function (i) {
+                function(i) {
                     perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
 
                     if (length(perim)) return(data.table())
@@ -1730,7 +1730,7 @@ trans_funs$f870t880 <- function (idf) {
 # }}}
 # trans_880_890 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f880t890 <- function (idf) {
+trans_funs$f880t890 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.8)
 
     target_cls <- c(
@@ -1868,7 +1868,7 @@ trans_funs$f880t890 <- function (idf) {
 # }}}
 # trans_890_900 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f890t900 <- function (idf) {
+trans_funs$f890t900 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 8.9)
 
     target_cls <- c(
@@ -1892,7 +1892,7 @@ trans_funs$f890t900 <- function (idf) {
         class = "AirflowNetwork:Distribution:Component:OutdoorAirFlow",
         insert = list(2,
             tryCatch(idf$object_name("OutdoorAir:Mixer", simplify = TRUE)[[1L]],
-                eplusr_error_invalid_class_name = function (e) NA_character_
+                eplusr_error_invalid_class_name = function(e) NA_character_
             )
         )
     )
@@ -1904,7 +1904,7 @@ trans_funs$f890t900 <- function (idf) {
     dt2 <- trans_action(idf, "AirflowNetwork:Distribution:Component:ReliefAirFlow",
         insert = list(2,
             tryCatch(idf$object_name("OutdoorAir:Mixer", simplify = TRUE)[[1L]],
-                eplusr_error_invalid_class_name = function (e) NA_character_
+                eplusr_error_invalid_class_name = function(e) NA_character_
             )
         )
     )
@@ -2138,7 +2138,7 @@ trans_funs$f890t900 <- function (idf) {
 
         # get zone that is being controled {{{
         fene_daylight_zone <- lapply(shadctrl,
-            function (ctrl) {
+            function(ctrl) {
                 # get all fenestrations that uses this control
                 fene <- with_silent(ctrl$ref_by_object("Name",
                     class = c("FenestrationSurface:Detailed", "Window", "GlazedDoor")
@@ -2152,7 +2152,7 @@ trans_funs$f890t900 <- function (idf) {
                     )
                 } else {
                     # use low-level API to speed up
-                    fene <- data.table(id_fene = viapply(fene, function (f) f$id()), name_fene = names(fene))
+                    fene <- data.table(id_fene = viapply(fene, function(f) f$id()), name_fene = names(fene))
 
                     surf <- get_idf_value(
                         get_priv_env(idf)$idd_env(),
@@ -2222,7 +2222,7 @@ trans_funs$f890t900 <- function (idf) {
         )
 
         # duplicate
-        dt11 <- rbindlist(lapply(seq.int(nrow(fene_daylight_zone)), function (i) {
+        dt11 <- rbindlist(lapply(seq.int(nrow(fene_daylight_zone)), function(i) {
             set(copy(dt11), NULL, "rleid", i)
         }))
 
@@ -2303,7 +2303,7 @@ trans_funs$f890t900 <- function (idf) {
 # }}}
 # trans_900_910 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f900t910 <- function (idf) {
+trans_funs$f900t910 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.0)
 
     target_cls <- c(
@@ -2339,7 +2339,7 @@ trans_funs$f900t910 <- function (idf) {
 # }}}
 # trans_910_920 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f910t920 <- function (idf) {
+trans_funs$f910t920 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.1)
 
     target_cls <- c(
@@ -2387,7 +2387,7 @@ trans_funs$f910t920 <- function (idf) {
 
     id_max <- 0L
     # init_var_dt {{{
-    init_var_dt <- function (dt, i_expr = NULL, min_max, type) {
+    init_var_dt <- function(dt, i_expr = NULL, min_max, type) {
         dt <- if (is.null(i_expr)) copy(dt) else dt[eval(i_expr)]
 
         # calculate fields should be added
@@ -2405,7 +2405,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # init_var_type {{{
-    init_var_type <- function (dt, index_cond = 3L) {
+    init_var_type <- function(dt, index_cond = 3L) {
         set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
         id_const <- dt[index == index_cond & value_lower == "linearinterpolationoftable", id]
         id_linear <- dt[index == index_cond & value_lower == "lagrangeinterpolationlinearextrapolation", id]
@@ -2430,7 +2430,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # init_list_dt {{{
-    init_list_dt <- function (dt, num) {
+    init_list_dt <- function(dt, num) {
         if (is.integer(num)) {
             dt <- dt[J(rep(1L, num + 1L)), on = "index"]
         } else if (is.data.frame(num)) {
@@ -2450,7 +2450,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # init_lookup_dt {{{
-    init_lookup_dt <- function (dt, i_expr = NULL, ref = 10L, min_max = 6L:7L, type = 9L, del = NULL) {
+    init_lookup_dt <- function(dt, i_expr = NULL, ref = 10L, min_max = 6L:7L, type = 9L, del = NULL) {
         dt <- if (is.null(i_expr)) copy(dt) else dt[eval(i_expr)]
         dt[, class := "Table:Lookup"]
 
@@ -2485,7 +2485,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # warn_removed_as_comment {{{
-    warn_removed_as_comment <- function (idf, class) {
+    warn_removed_as_comment <- function(idf, class) {
         warn(paste0("Class '", class, "' has been removed in EnergyPlus v9.2. ",
             "Objects in that class will be listed as comments in the new output file."
         ), "trans_910_920")
@@ -2494,7 +2494,7 @@ trans_funs$f910t920 <- function (idf) {
         cmt <- idf$to_string(class = class, header = FALSE, format = "new_top")
         sep <- which(stri_isempty(cmt))
         cmt <- apply2(c(1L, sep[-length(sep)] + 1L), sep - 1L,
-            function (start, end) cmt[start:end]
+            function(start, end) cmt[start:end]
         )
 
         # assign to object table
@@ -2503,7 +2503,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # warn_table_convert {{{
-    warn_table_convert <- function (dt, class, idx, ascending = NULL) {
+    warn_table_convert <- function(dt, class, idx, ascending = NULL) {
         dt_file <- dt[index == idx & !is.na(value)]
         if (!nrow(dt_file)) return(dt)
 
@@ -2529,7 +2529,7 @@ trans_funs$f910t920 <- function (idf) {
 
         # save
         files <- paste0(tools::file_path_sans_ext(basename(files)), "-New.csv")
-        apply2(tables, files, function (x, file) fwrite(x, file))
+        apply2(tables, files, function(x, file) fwrite(x, file))
 
         # update field value
         dt[index == idx & !is.na(value), value := normalizePath(files)]
@@ -2538,7 +2538,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # assert_integer {{{
-    assert_integer <- function (dt, idx = NULL, col = "value", name) {
+    assert_integer <- function(dt, idx = NULL, col = "value", name) {
         if (!is.null(idx)) dt <- dt[J(idx), on = "index"]
 
         set(dt, NULL, col, suppressWarnings(as.integer(dt[[col]])))
@@ -2549,7 +2549,7 @@ trans_funs$f910t920 <- function (idf) {
     }
     # }}}
     # obj_info {{{
-    obj_info <- function (dt, numbered = TRUE, collapse = "\n") {
+    obj_info <- function(dt, numbered = TRUE, collapse = "\n") {
         setnames(dt, c("id", "name", "class"), c("object_id", "object_name", "class_name"))
         get_object_info(dt, c("name", "id"), numbered = numbered, collapse = collapse)
     }
@@ -2790,7 +2790,7 @@ trans_funs$f910t920 <- function (idf) {
             by = c("id", "object_id"), flatten = FALSE, keep.by = FALSE
         )
         # reverse the order of independent variables and unlist
-        vars <- apply2(vars, asc, function (var, ascending) {
+        vars <- apply2(vars, asc, function(var, ascending) {
             var <- lapply(var, unlist, use.names = FALSE)
             if (!ascending[1L] && length(var) >= 1L) var[[1L]] <- rev(var[[1L]])
             if (!ascending[2L] && length(var) >= 2L) var[[2L]] <- rev(var[[2L]])
@@ -2799,17 +2799,17 @@ trans_funs$f910t920 <- function (idf) {
         vars <- lapply(vars, rev)
 
         # get combination
-        cj <- function (...) data.table::CJ(..., sorted = FALSE, unique = FALSE)
-        vars <- lapply(vars, function (x) do.call(cj, x))
+        cj <- function(...) data.table::CJ(..., sorted = FALSE, unique = FALSE)
+        vars <- lapply(vars, function(x) do.call(cj, x))
 
         # get output
         outs <- split(dt6_32[, list(id, value)], by = "id", keep.by = FALSE)
         outs <- lapply(outs, unlist, use.names = FALSE)
 
         # combine value and output
-        vals <- apply2(vars, outs, function (var, out) set(var, NULL, "value", out))
+        vals <- apply2(vars, outs, function(var, out) set(var, NULL, "value", out))
         # change order
-        vals <- lapply(vals, function (dt) setorderv(dt, rev(setdiff(names(dt), "value"))))
+        vals <- lapply(vals, function(dt) setorderv(dt, rev(setdiff(names(dt), "value"))))
         # replace with ordered values
         set(dt6_32, NULL, "value", as.character(unlist(lapply(vals, "[[", "value"))))
         dt6_3 <- rbindlist(list(dt6_31, dt6_32))
@@ -2901,7 +2901,7 @@ trans_funs$f910t920 <- function (idf) {
 # }}}
 # trans_920_930 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f920t930 <- function (idf) {
+trans_funs$f920t930 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.2)
 
     target_cls <- c(
@@ -2948,7 +2948,7 @@ trans_funs$f920t930 <- function (idf) {
     new_idf <- trans_preprocess(idf, 9.3, target_cls)
 
     # fix_fuel_types {{{
-    fix_fuel_types <- function (dt, idx) {
+    fix_fuel_types <- function(dt, idx) {
         if (!nrow(dt)) return(dt)
 
         input <- dt[J(idx), on = "index", nomatch = NULL]
@@ -3076,7 +3076,7 @@ trans_funs$f920t930 <- function (idf) {
     # }}}
 
     # replace_node {{{
-    replace_node <- function (dt, nodes, nodelists = NULL, index_exclude) {
+    replace_node <- function(dt, nodes, nodelists = NULL, index_exclude) {
         set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
 
         # check if the node is referenced directly
@@ -3425,7 +3425,7 @@ trans_funs$f920t930 <- function (idf) {
 # }}}
 # trans_930_940 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f930t940 <- function (idf) {
+trans_funs$f930t940 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.3)
 
     target_cls <- c(
@@ -3545,7 +3545,7 @@ trans_funs$f930t940 <- function (idf) {
 # }}}
 # trans_940_950 {{{
 #' @importFrom checkmate assert_true
-trans_funs$f940t950 <- function (idf) {
+trans_funs$f940t950 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.4)
 
     target_cls <- c(
@@ -3749,7 +3749,7 @@ trans_funs$f940t950 <- function (idf) {
 }
 # }}}
 # trans_950_960 {{{
-trans_funs$f950t960 <- function (idf) {
+trans_funs$f950t960 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.5)
 
     target_cls <- c(
@@ -3863,7 +3863,7 @@ trans_funs$f950t960 <- function (idf) {
 }
 # }}}
 # trans_960_2210 {{{
-trans_funs$f960t2210 <- function (idf) {
+trans_funs$f960t2210 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 9.6)
 
     target_cls <- c(
@@ -3884,7 +3884,7 @@ trans_funs$f960t2210 <- function (idf) {
 }
 # }}}
 # trans_2210_2220 {{{
-trans_funs$f2210t2220 <- function (idf) {
+trans_funs$f2210t2220 <- function(idf) {
     assert_true(idf$version()[, 1:2] == 22.1)
 
     target_cls <- c(
@@ -3978,6 +3978,17 @@ trans_funs$f2210t2220 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_2220_2310 {{{
+trans_funs$f2220t2310 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == 22.2)
+
+    new_idf <- trans_preprocess(idf, 23.1)
+
+    trans_process(new_idf, idf, data.table())
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
@@ -3985,7 +3996,7 @@ trans_funs$f2210t2220 <- function (idf) {
 # 3. update IDD data
 # 4. update version
 # 5. assign new uuid
-trans_preprocess <- function (idf, version, class = NULL) {
+trans_preprocess <- function(idf, version, class = NULL) {
     # clone old IDF
     new_idf <- idf$clone(deep = TRUE)
     # get new IDD
@@ -4121,7 +4132,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
 }
 # }}}
 # trans_process {{{
-trans_process <- function (new_idf, old_idf, dt) {
+trans_process <- function(new_idf, old_idf, dt) {
     if (!nrow(dt))  return(new_idf)
 
     # remove redundant empty fields
@@ -4149,16 +4160,16 @@ trans_process <- function (new_idf, old_idf, dt) {
 }
 # }}}
 # trans_postprocess {{{
-trans_postprocess <- function (idf, from, to) {
+trans_postprocess <- function(idf, from, to) {
     id_del <- NULL
     # reset_key {{{
-    reset_key <- function (dt, field_index = 1L) {
+    reset_key <- function(dt, field_index = 1L) {
         if (!nrow(dt)) return(dt)
         dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
     }
     # }}}
     # update_var {{{
-    update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
+    update_var <- function(dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
         if (!nrow(dt)) return(dt)
         if (!nrow(mapping)) return(dt)
 
@@ -4216,7 +4227,7 @@ trans_postprocess <- function (idf, from, to) {
 
             # there are duplicated old vars should add new rows {{{
             # remove the first case
-            if (has_chiller & has_heater) {
+            if (has_chiller && has_heater) {
                 dup <- mapping[duplicated(old)]
 
                 # update variable names
@@ -4265,7 +4276,7 @@ trans_postprocess <- function (idf, from, to) {
                         # also assign negative id for distinguishing purpose
                         id_ne <- if (!nrow(dt)) 0L else min(c(dt$id, 0L))
                         obj_wild <- rbindlist(lapply(id_ne - (1L:10L),
-                            function (dt, id) set(copy(dt), NULL, "id", id),
+                            function(dt, id) set(copy(dt), NULL, "id", id),
                             dt = obj_wild
                         ))
 
@@ -4297,7 +4308,7 @@ trans_postprocess <- function (idf, from, to) {
     }
     # }}}
     # reset_meter_resource {{{
-    reset_meter_resource <- function (dt, mapping, field_index, step = NULL, exclude = character(), idf) {
+    reset_meter_resource <- function(dt, mapping, field_index, step = NULL, exclude = character(), idf) {
         if (to != 9.4) return(dt)
         if (!nrow(dt)) return(dt)
         if (!nrow(mapping)) return(dt)
@@ -4453,7 +4464,7 @@ trans_postprocess <- function (idf, from, to) {
 
 # trans_action {{{
 #' @importFrom checkmate assert_true test_names
-trans_action <- function (idf, class, min_fields = 1L, all = FALSE, align = TRUE, ...) {
+trans_action <- function(idf, class, min_fields = 1L, all = FALSE, align = TRUE, ...) {
     assert_true(idf$is_valid_class(class, all = TRUE))
     if (!idf$is_valid_class(class)) return(data.table())
 
@@ -4478,7 +4489,7 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, align = TRUE
 }
 # }}}
 # trans_action_dt {{{
-trans_action_dt <- function (dt, ...) {
+trans_action_dt <- function(dt, ...) {
     act <- list(...)
     if (!length(act)) return(dt)
 
@@ -4581,13 +4592,13 @@ trans_action_dt <- function (dt, ...) {
 }
 # }}}
 # trans_upper_versions {{{
-trans_upper_versions <- function (idf, ver, patch = FALSE) {
+trans_upper_versions <- function(idf, ver, patch = FALSE) {
     # get all versions needed to handle
     all_vers <- standardize_ver(ALL_IDD_VER)
     vers <- all_vers[all_vers >= idf$version() & all_vers <= standardize_ver(ver)]
 
     # remove patch version
-    if (length(vers) & !patch) {
+    if (length(vers) && !patch) {
         vers <- vers[!duplicated(as.character(vers[, 1:2]))]
     }
 
@@ -4595,7 +4606,7 @@ trans_upper_versions <- function (idf, ver, patch = FALSE) {
 }
 # }}}
 # trans_fun_names {{{
-trans_fun_names <- function (vers) {
+trans_fun_names <- function(vers) {
     # get corresponding transition function names
     vers <- gsub(".", "", as.character(vers), fixed = TRUE)
     vers[vers == "901"] <- "900"
@@ -4606,7 +4617,7 @@ trans_fun_names <- function (vers) {
 }
 # }}}
 # trans_process_load {{{
-trans_process_load <- function (new_idf, old_idf, dt, empty = TRUE) {
+trans_process_load <- function(new_idf, old_idf, dt, empty = TRUE) {
     if (!nrow(dt)) return(new_idf)
 
     # get object table from old input
@@ -4652,13 +4663,13 @@ trans_process_load <- function (new_idf, old_idf, dt, empty = TRUE) {
 }
 # }}}
 # trans_table_convert {{{
-trans_table_convert <- function (path, ascending = c(TRUE, TRUE)) {
+trans_table_convert <- function(path, ascending = c(TRUE, TRUE)) {
     vars <- fread(path, nrows = 1, header = FALSE)
-    val_vars <- lapply(seq.int(vars$V1), function (row) unlist(fread(path, nrows = 1, skip = row)))
+    val_vars <- lapply(seq.int(vars$V1), function(row) unlist(fread(path, nrows = 1, skip = row)))
 
     # reorder if necessary
     if (any(!ascending) && vars$V1 >= 2L) {
-        val_vars <- apply2(val_vars, ascending, function (val, asc) if (!asc) rev(val) else val)
+        val_vars <- apply2(val_vars, ascending, function(val, asc) if (!asc) rev(val) else val)
     }
 
     # check consistency between value number specified and found
@@ -4726,7 +4737,7 @@ trans_table_convert <- function (path, ascending = c(TRUE, TRUE)) {
 #' }
 #' @export
 # version_updater {{{
-version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
+version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     # parse file
     if (!is_idf(idf)) idf <- read_idf(idf)
 
@@ -4748,7 +4759,7 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
     if (is.null(dir)) {
         dir <- dirname(idf$path())
-    } else if (!dir.exists(dir)){
+    } else if (!dir.exists(dir)) {
         dir.create(dir, recursive = TRUE)
     }
 
@@ -4764,8 +4775,8 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
         }
     }
 
-    latest_ver <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
-    if (!length(latest_ver)) {
+    newer_ep <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
+    if (!length(newer_ep)) {
         abort(paste0("EnergyPlus v", ver, " or newer are not installed."))
     }
 
@@ -4776,15 +4787,13 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     idf$save(file.path(dir, original), overwrite = TRUE)
 
     # get the directory of IDFVersionUpdater
-    # avoid to use IDFVersionUpdater v9.0 as there are fital errors
-    if (length(latest_ver[latest_ver[, 1:2] != 9.0])) latest_ver <- latest_ver[latest_ver[, 1:2] != 9.0]
-    path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
-    verbose_info("IDFVersionUpdater: ", normalizePath(path_updater, mustWork = FALSE))
+    # avoid to use IDFVersionUpdater v9.0 as there are fatal errors
+    if (length(newer_ep[newer_ep[, 1:2] != 9.0])) newer_ep <- newer_ep[newer_ep[, 1:2] != 9.0]
 
     # get upper versions toward target version
     vers <- trans_upper_versions(idf, ver)
 
-    # get fun names
+    # get transition executable names
     exe <- if (is_windows()) ".exe" else NULL
     from <- vers[-length(vers)]
     to <- vers[-1L]
@@ -4805,6 +4814,20 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     errors <- vector("list", 1L + length(to))
     names(errors) <- names(models)
 
+    # NOTE: From EnergyPlus v23.1, the supported oldest version for transition
+    # is v9.0. Should check if transitions below v9.0 are needed. If so, check
+    # if there is an installed EnergyPlus version lower than v23.1 and use
+    # transition executable from there when applicable.
+    path_updater <- file.path(eplus_config(max(newer_ep))$dir, "PreProcess/IDFVersionUpdater")
+    path_updater <- rep(path_updater, length(trans_exe))
+    if (any(vers < 9.0) && any(newer_ep >= 23.1) && any(newer_ep < 23.1)) {
+        path_updater[to <= 9.0] <- file.path(
+            eplus_config(max(newer_ep[newer_ep < 23.1]))$dir,
+            "PreProcess/IDFVersionUpdater"
+        )
+    }
+    names(path_updater) <- as.character(to)
+
     while (idf$version()[, 1:2] != max(to)[, 1:2]) {
         # restore paths
         paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
@@ -4814,23 +4837,25 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
         current_exe <- trans_exe[from[, 1:2] == idf$version()[, 1:2]]
         toward <- to[from[, 1:2] == idf$version()[, 1:2]]
+        updater <- path_updater[names(path_updater) == as.character(toward)]
 
+        verbose_info("IDFVersionUpdater: ", normalizePath(updater, mustWork = FALSE))
         verbose_info(
             "Input file: ", idf$path(), "\n",
             " From  Ver: ", idf$version(), "\n",
             "Toward Ver: ", toward
         )
 
-        trans_path <- file.path(path_updater, current_exe)
+        trans_path <- file.path(updater, current_exe)
 
         if (!file.exists(trans_path)) {
             abort(paste0("Transition executable ", surround(trans_path), " does not exist."))
         }
 
         job <- tryCatch(processx::run(trans_path, idf$path(), wd = path_updater),
-            error = function (e) {
+            error = function(e) {
                 if (grepl("System command error", conditionMessage(e))) {
-                    abort(paste0("Failed to update file ", idf$path()," from V", idf$version(), " to V", toward, ":\n", conditionMessage(e)))
+                    abort(paste0("Failed to update file ", idf$path(), " from V", idf$version(), " to V", toward, ":\n", conditionMessage(e)))
                 } else {
                     stop(e)
                 }
@@ -4838,7 +4863,7 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
         )
 
         if (job$status != 0L) {
-            abort(paste0("Failed to update file ", idf$path()," from V", idf$version(), " to V", toward, "."))
+            abort(paste0("Failed to update file ", idf$path(), " from V", idf$version(), " to V", toward, "."))
         }
 
         verbose_info("[", idf$version(), " --> ", toward, "] SUCCEEDED.\n")
@@ -4894,3 +4919,5 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     models
 }
 # }}}
+
+# vim: set fdm=marker:

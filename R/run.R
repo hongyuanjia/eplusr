@@ -2490,3 +2490,5 @@ post_process_sim_state <- function(state) {
     setcolorder(jobs, cols)
     jobs
 }
+
+# vim: set fdm=marker:

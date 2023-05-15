@@ -76,7 +76,7 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$report_data(day_type = "designday")), 0)
     expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)
 
-    expect_equal(nrow(sql$tabular_data()), 10501L)
+    expect_equal(nrow(sql$tabular_data()), 10503L)
     expect_equal(nrow(sql$tabular_data(
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
@@ -177,3 +177,5 @@ test_that("Data extraction", {
     clean_wd(example$idf)
     unlink(c(example$idf, example$epw))
 })
+
+# vim: set fdm=marker:

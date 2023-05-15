@@ -1,6 +1,6 @@
 {
-  "output_vars": "22.2.0",
-  "reportvar_rules": "22.2.0",
+  "output_vars": "23.1.0",
+  "reportvar_rules": "23.1.0",
   "weather_db": {
     "geojson": {
       "weather.geojson": "869e19e57234db92af187beb43db11d0"

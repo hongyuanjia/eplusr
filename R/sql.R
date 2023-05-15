@@ -641,3 +641,5 @@ format.EplusSql <- function (x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
 }
 # }}}
+
+# vim: set fdm=marker:

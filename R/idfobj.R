@@ -2043,3 +2043,5 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
     Negate(`==.IdfObject`)(e1, e2)
 }
 # }}}
+
+# vim: set fdm=marker:

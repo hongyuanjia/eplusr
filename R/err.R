@@ -422,3 +422,5 @@ format_errdt <- function (dt, info = TRUE) {
     dt$out
 }
 # }}}
+
+# vim: set fdm=marker:

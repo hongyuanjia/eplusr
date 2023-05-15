@@ -216,3 +216,5 @@ test_that("==.ParametricJob and !=.ParametricJob", {
     expect_true(param == param)
     expect_false(param != param)
 })
+
+# vim: set fdm=marker:

@@ -1213,3 +1213,5 @@ s_nm <- function (...) if (.globals$color) cli::style_italic(...) else c(...)
 # s_blk: style for blank {{{
 s_blk <- function (...) if (.globals$color) cli::style_underline(...) else c(...)
 # }}}
+
+# vim: set fdm=marker:

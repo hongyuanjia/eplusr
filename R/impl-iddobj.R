@@ -110,3 +110,5 @@ get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading
     c(str_cmt, str_cls, str_fld)
 }
 # }}}
+
+# vim: set fdm=marker:

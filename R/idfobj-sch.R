@@ -574,3 +574,5 @@ idfsch_cmpt_is_valid <- function (super, self, private, level = eplusr_option("v
     NextMethod()
 }
 # }}}
+
+# vim: set fdm=marker:

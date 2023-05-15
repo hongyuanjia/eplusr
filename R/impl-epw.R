@@ -1130,6 +1130,10 @@ format_epwdate_nthwkd <- function (x, last = FALSE) {
 }
 # }}}
 #' @export
+# as.character.EpwDate {{{
+as.character.EpwDate <- format.EpwDate
+# }}}
+#' @export
 # print.EpwDate {{{
 print.EpwDate <- function (x, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
@@ -2649,3 +2653,5 @@ save_epw_file <- function (epw_data, epw_header, matched, path, overwrite = FALS
     normalizePath(path)
 }
 # }}}
+
+# vim: set fdm=marker:

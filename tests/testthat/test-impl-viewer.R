@@ -12,7 +12,7 @@ test_that("IdfViewer Implemention", {
     rgl_init <- function (clear = TRUE) {
         new <- FALSE
         if (clear) {
-            if (rgl::cur3d() == 0) new <- TRUE else rgl::rgl.clear()
+            if (rgl::cur3d() == 0) new <- TRUE else rgl::clear3d()
         }
         if (!new) {
             dev <- rgl::cur3d()
@@ -95,3 +95,5 @@ test_that("IdfViewer Implemention", {
     rgl::close3d()
 })
 # }}}
+
+# vim: set fdm=marker:

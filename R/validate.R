@@ -762,3 +762,5 @@ print.EpwValidity <- function (x, ...) {
     invisible(x)
 }
 # }}}
+
+# vim: set fdm=marker:

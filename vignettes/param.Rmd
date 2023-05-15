@@ -23,17 +23,17 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
-        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
         if (length(x) > n) {
             # truncate the output
-            x <- c(head(x, n), '....', '')
+            x <- c(head(x, n), "....", "")
         } else {
             x <- c(x, "")
         }
-        x <- paste(x, collapse = '\n') # paste first n lines together
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
     hook_output(x, options)
 })
@@ -42,7 +42,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.1)) install_eplus(22.1)
+if (!is_avail_eplus(23.1)) install_eplus(23.1)
 
 library(dplyr)
 ```
@@ -74,8 +74,8 @@ and a weather file.
 library(eplusr)
 library(dplyr)
 
-path_model <- file.path(eplus_config(22.1)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
-path_weather <- file.path(eplus_config(22.1)$dir, "WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+path_model <- file.path(eplus_config(23.1)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
+path_weather <- file.path(eplus_config(23.1)$dir, "WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
 
 idf <- read_idf(path_model)
 idf$SimulationControl$Run_Simulation_for_Weather_File_Run_Periods <- "Yes"

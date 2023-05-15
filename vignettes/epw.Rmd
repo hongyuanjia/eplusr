@@ -21,17 +21,17 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
-        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
         if (length(x) > n) {
             # truncate the output
-            x <- c(head(x, n), '....', '')
+            x <- c(head(x, n), "....", "")
         } else {
             x <- c(x, "")
         }
-        x <- paste(x, collapse = '\n') # paste first n lines together
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
     hook_output(x, options)
 })
@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.1)) install_eplus(22.1)
+if (!is_avail_eplus(23.1)) install_eplus(23.1)
 ```
 
 This vignette introduces the `Epw` class which is designed to read and modify
@@ -120,7 +120,7 @@ Program" in EnergyPlus "Auxiliary Programs" documentation. An online version
 can be found [here](https://bigladdersoftware.com/epx/docs/).
 
 ```{r}
-path <- file.path(eplus_config(22.1)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+path <- file.path(eplus_config(23.1)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
 epw <- read_epw(path)
 epw

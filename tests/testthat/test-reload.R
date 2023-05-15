@@ -8,13 +8,13 @@ test_that("Reload", {
 
     example <- copy_example()
 
-    idd <- use_idd(8.8)
+    idd <- use_idd(LATEST_EPLUS_VER)
     idf <- read_idf(example$idf)
     epw <- read_epw(example$epw)
     job <- idf$run(NULL, tempdir(), echo = FALSE)
     grp <- group_job(idf, NULL)$run(tempdir())
     par <- param_job(idf, NULL)
-    par$apply_measure(function (x, y) x, 1:2)
+    par$apply_measure(function(x, y) x, 1:2)
     par$run(tempdir())
 
     f_idd <- tempfile(fileext = ".rds")
@@ -66,7 +66,7 @@ test_that("Reload", {
     expect_true(data.table::truelength(get_priv_env(idd)$idd_env()$field) > 0L)
     expect_true(data.table::truelength(get_priv_env(idd)$idd_env()$reference) > 0L)
 
-    expect_idf_reloaded <- function (idf) {
+    expect_idf_reloaded <- function(idf) {
         expect_true(data.table::truelength(get_priv_env(idf)$idd_env()$group) > 0L)
         expect_true(data.table::truelength(get_priv_env(idf)$idd_env()$class) > 0L)
         expect_true(data.table::truelength(get_priv_env(idf)$idd_env()$field) > 0L)
@@ -91,3 +91,5 @@ test_that("Reload", {
 
 })
 # }}}
+
+# vim: set fdm=marker:

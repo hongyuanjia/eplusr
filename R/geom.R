@@ -736,3 +736,5 @@ idfgeom_print <- function (self, private) {
     ))
 }
 # }}}
+
+# vim: set fdm=marker:

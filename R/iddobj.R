@@ -1976,3 +1976,5 @@ str.IddObject <- function (object, brief = FALSE, ...) {
     grep(pattern, c(x$field_name(), names(x)), value = TRUE)
 }
 # }}}
+
+# vim: set fdm=marker:

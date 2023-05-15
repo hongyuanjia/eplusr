@@ -338,3 +338,5 @@ test_that("$<-.IdfSchedule", {
     expect_equal(sch$`Schedule Type Limits Name`, "Fraction")
 })
 # }}}
+
+# vim: set fdm=marker:

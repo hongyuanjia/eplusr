@@ -183,3 +183,5 @@ is_linux <- function () Sys.info()["sysname"] == "Linux"
 # is_macos {{{
 is_macos <- function () Sys.info()["sysname"] == "Darwin"
 # }}}
+
+# vim: set fdm=marker:

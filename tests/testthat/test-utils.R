@@ -109,3 +109,5 @@ test_that("Utility functions", {
     expect_s3_class(catch_cnd(warn("")), "eplusr_warning")
     expect_s3_class(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
 })
+
+# vim: set fdm=marker:

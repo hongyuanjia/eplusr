@@ -45,3 +45,5 @@ test_that("IdfGeometry", {
     expect_output(geom$print())
 })
 # }}}
+
+# vim: set fdm=marker:

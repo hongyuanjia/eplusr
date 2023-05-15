@@ -67,3 +67,5 @@ test_that("IdfViewer class", {
     expect_output(viewer$print())
 })
 # }}}
+
+# vim: set fdm=marker:

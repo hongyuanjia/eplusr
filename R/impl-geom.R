@@ -1828,3 +1828,5 @@ get_area <- function (newall) {
     sqrt(sum(newall ^ 2)) / 2.0
 }
 # }}}
+
+# vim: set fdm=marker:

@@ -802,6 +802,15 @@ test_that("$update()", {
 test_that("$validate()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+    idd_parsed <- get_priv_env(idf$definition())$idd_env()
+    cls_id <- idd_parsed$class[
+        J(c("Construction", "Construction", "Construction", "BuildingSurface:Detailed")),
+        on = "class_name", class_id
+    ]
+    fld_id <- idd_parsed$field[
+        data.table(class_id = cls_id, field_index = c(3L, 4L, 5L, 4L)),
+        on = c("class_id", "field_index"),
+        field_id]
 
     expect_s3_class(val <- idf$validate(), "IdfValidity")
     expect_equal(val$missing_object, c("Building", "GlobalGeometryRules"))
@@ -818,11 +827,12 @@ test_that("$validate()", {
     expect_equal(nrow(val$invalid_range), 0)
     expect_equal(nrow(val$invalid_reference), 4)
     expect_equal(val$invalid_reference,
-        data.table(object_id = c(2L, 2L, 2L, 3L),
+        data.table(
+            object_id = c(2L, 2L, 2L, 3L),
             object_name = c("WALL-1", "WALL-1", "WALL-1", "WALL-1PF"),
-            class_id = c(91L, 91L, 91L, 108L),
+            class_id = cls_id,
             class_name = c("Construction", "Construction", "Construction", "BuildingSurface:Detailed"),
-            field_id = c(16517L, 16518L, 16519L, 17191L),
+            field_id = fld_id,
             field_index = c(3L, 4L, 5L, 4L),
             field_name = c("Layer 2", "Layer 3", "Layer 4", "Zone Name"),
             units = c(NA_character_, NA_character_, NA_character_, NA_character_),
@@ -1381,3 +1391,5 @@ test_that("[[<-.Idf and $<-.Idf", {
     # }}}
 })
 # }}}
+
+# vim: set fdm=marker:

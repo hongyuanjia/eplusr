@@ -1706,3 +1706,5 @@ format.EplusGroupJob <- function (x, ...) {
     Negate(`==.EplusGroupJob`)(e1, e2)
 }
 # }}}
+
+# vim: set fdm=marker:

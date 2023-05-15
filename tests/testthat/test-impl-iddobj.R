@@ -127,3 +127,5 @@ test_that("IddObject implementation", {
     # }}}
 })
 # }}}
+
+# vim: set fdm=marker:

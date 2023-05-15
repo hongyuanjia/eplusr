@@ -22,17 +22,17 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
-        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
         if (length(x) > n) {
             # truncate the output
-            x <- c(head(x, n), '....', '')
+            x <- c(head(x, n), "....", "")
         } else {
             x <- c(x, "")
         }
-        x <- paste(x, collapse = '\n') # paste first n lines together
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
     hook_output(x, options)
 })
@@ -41,7 +41,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.1)) install_eplus(22.1)
+if (!is_avail_eplus(23.1)) install_eplus(23.1)
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
@@ -65,7 +65,7 @@ related objects, including:
   `Daylighting` group
 
 ```{r}
-path_idf <- file.path(eplus_config(22.1)$dir, "ExampleFiles/HospitalLowEnergy.idf")
+path_idf <- file.path(eplus_config(23.1)$dir, "ExampleFiles/HospitalLowEnergy.idf")
 idf <- read_idf(path_idf)
 geom <- idf$geometry()
 geom
@@ -121,7 +121,7 @@ detailed class, including:
 * `Shading:Zone:Detailed`
 
 ```{r}
-path_simple <- file.path(eplus_config(22.1)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf")
+path_simple <- file.path(eplus_config(23.1)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf")
 simple <- read_idf(path_simple)
 
 simple$class_name(by_group = TRUE)["Thermal Zones and Surfaces"]
