@@ -1130,6 +1130,10 @@ format_epwdate_nthwkd <- function (x, last = FALSE) {
 }
 # }}}
 #' @export
+# as.character.EpwDate {{{
+as.character.EpwDate <- format.EpwDate
+# }}}
+#' @export
 # print.EpwDate {{{
 print.EpwDate <- function (x, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
