@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -152,22 +152,20 @@ definitions for fields. Starting from <code>Field 1</code>, the number
 of fields and positions are not set, and cannot really be described in
 the usual <code>Field #</code> manner.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/1ZoneUncontrolled.idf"</span>, package <span class="op">=</span> <span class="st">"eplusr"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">23.1</span>, <span class="st">"1ZoneUncontrolled.idf"</span><span class="op">)</span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
-<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-8-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-8-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="va">idf</span><span class="op">$</span><span class="fu">definition</span><span class="op">(</span><span class="st">"Schedule:Compact"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;IddObject: 'Schedule:Compact'&gt;</span></span>
 <span><span class="co">#&gt; ── MEMO ────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;   "Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:</span></span>
+<span><span class="co">#&gt;   "Irregular object. Does not follow the usual definition for fields. Fields A3... are:</span></span>
 <span><span class="co">#&gt; Through: Date</span></span>
 <span><span class="co">#&gt; For: Applicable days (ref: Schedule:Week:Compact)</span></span>
-<span><span class="co">#&gt; Interpolate: Yes/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"</span></span>
+<span><span class="co">#&gt; Interpolate: Average/Linear/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"</span></span>
 <span><span class="co">#&gt; Until: &lt;Time&gt; (ref: Schedule:Day:Interval)</span></span>
 <span><span class="co">#&gt; &lt;numeric value&gt;</span></span>
 <span><span class="co">#&gt; words "Through","For","Interpolate","Until" must be included."</span></span>
@@ -176,7 +174,7 @@ the usual <code>Field #</code> manner.</p>
 <span><span class="co">#&gt;   * Group: 'Schedules'</span></span>
 <span><span class="co">#&gt;   * Unique: FALSE</span></span>
 <span><span class="co">#&gt;   * Required: FALSE</span></span>
-<span><span class="co">#&gt;   * Total fields: 4500</span></span>
+<span><span class="co">#&gt;   * Total fields: 10000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── FIELDS ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;   1*: Name</span></span>
@@ -196,7 +194,7 @@ does not contain any schedule data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span>Schedule_Compact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"sch"</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">sch</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:56] `sch`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "sch",      !- Name</span></span>
 <span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span></span>
@@ -211,7 +209,7 @@ does not contain any schedule data.</p>
 arbitrary strings.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: -1"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:56] `sch`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "sch",         !- Name</span></span>
 <span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,     !- Schedule Type Limits Name</span></span>
@@ -234,14 +232,14 @@ schedule values.</p>
 <span><span class="co">#&gt;    Fields below should be characters but are not:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     Class: &lt;Schedule:Compact&gt;</span></span>
-<span><span class="co">#&gt;     └─ Object [ID:54] &lt;sch&gt;</span></span>
+<span><span class="co">#&gt;     └─ Object [ID:56] &lt;sch&gt;</span></span>
 <span><span class="co">#&gt;        └─ 6: "1";           !- Field 4</span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 <p>As a result, the output from <code>$value()</code> and
 <code>$to_table()</code> method is not very useful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="st">"1.0"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:56] `sch`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "sch",            !- Name</span></span>
 <span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span></span>
@@ -271,12 +269,12 @@ schedule values.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    id name            class index                     field          value</span></span>
-<span><span class="co">#&gt; 1: 54  sch Schedule:Compact     1                      Name            sch</span></span>
-<span><span class="co">#&gt; 2: 54  sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3: 54  sch Schedule:Compact     3                   Field 1 Through: 12/31</span></span>
-<span><span class="co">#&gt; 4: 54  sch Schedule:Compact     4                   Field 2   For: AllDays</span></span>
-<span><span class="co">#&gt; 5: 54  sch Schedule:Compact     5                   Field 3   Until: 24:00</span></span>
-<span><span class="co">#&gt; 6: 54  sch Schedule:Compact     6                   Field 4            1.0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1: 56  sch Schedule:Compact     1                      Name            sch</span></span>
+<span><span class="co">#&gt; 2: 56  sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3: 56  sch Schedule:Compact     3                   Field 1 Through: 12/31</span></span>
+<span><span class="co">#&gt; 4: 56  sch Schedule:Compact     4                   Field 2   For: AllDays</span></span>
+<span><span class="co">#&gt; 5: 56  sch Schedule:Compact     5                   Field 3   Until: 24:00</span></span>
+<span><span class="co">#&gt; 6: 56  sch Schedule:Compact     6                   Field 4            1.0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-the-idfschedulecompact-class">Introduce the <code>IdfScheduleCompact</code> class<a class="anchor" aria-label="anchor" href="#introduce-the-idfschedulecompact-class"></a>
@@ -330,7 +328,7 @@ of the core methods is given below.</p>
 <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> constructor.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">idf</span>, name <span class="op">=</span> <span class="st">"sch"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:54] `sch`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:56] `sch`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "sch",            !- Name</span></span>
 <span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,        !- Schedule Type Limits Name</span></span>
@@ -343,7 +341,7 @@ parent <code>Idf</code>, set <code>new</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IdfSchedule.html">schedule_compact</a></span><span class="op">(</span><span class="va">idf</span>, <span class="st">"sch1"</span>, new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:57] `sch1`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 1*: "sch1",     !- Name</span></span>
 <span><span class="co">#&gt; │─ 2 : &lt;"Blank"&gt;,  !- Schedule Type Limits Name</span></span>
@@ -411,7 +409,7 @@ described later. For now, neither <code>$set()</code> nor
 <span>    allotherday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    .check_range <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:57] `sch1`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span></span>
 <span><span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span></span>
@@ -572,7 +570,7 @@ values</li>
 <span><span class="co">#&gt; 10:    12/31              allotherday 24:00  0.00</span></span>
 <span></span>
 <span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:55] `sch1`</span></span>
+<span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:57] `sch1`</span></span>
 <span><span class="co">#&gt; Class: &lt;Schedule:Compact&gt;</span></span>
 <span><span class="co">#&gt; ├─ 01*: "sch1",             !- Name</span></span>
 <span><span class="co">#&gt; │─ 02 : "Fraction",         !- Schedule Type Limits Name</span></span>
@@ -892,7 +890,7 @@ time periods together into one (06:00 – 08:00).</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -160,13 +160,13 @@ weather used will be copied to the output directory. An
 information of the simulation and methods to collect simulation output.
 Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for details.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
-<span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span></code></pre></div>
 <div class="section level3">
@@ -180,9 +180,9 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
 <span><span class="co">#&gt; ExpandObjects Started.</span></span>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
-<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.024</span></span>
+<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.021</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 22.1.0-ed759b17ee, YMD=2022.12.13 03:25</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2023.05.16 16:17</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -195,11 +195,11 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpHd7IYk/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Version: '22.1.0'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-22-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-12-13 03:25:52' and completed successfully after 1.03 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpmbgtbq/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-05-16 16:17:47.385867' and completed successfully after 0.77 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -208,11 +208,11 @@ status.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpHd7IYk/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt; * Weather: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Version: '22.1.0'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-22-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-12-13 03:25:52' and completed successfully after 1.03 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpmbgtbq/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-05-16 16:17:47.385867' and completed successfully after 0.77 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -227,14 +227,14 @@ the <code>EplusJob</code> object or using the
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpHd7IYk/5Zone_Transformer.idf.</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpmbgtbq/5Zone_Transformer.idf.</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; * Model: '/tmp/RtmpHd7IYk/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt; * Weather: '/usr/local/EnergyPlus-22-1-0/WeatherData/USA_CA_San.Francisco.I...</span></span>
-<span><span class="co">#&gt; * EnergyPlus Version: '22.1.0'</span></span>
-<span><span class="co">#&gt; * EnergyPlus Path: '/usr/local/EnergyPlus-22-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2022-12-13 03:25:54' and is still running...</span></span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpmbgtbq/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '/usr/local/EnergyPlus-23-1-0/WeatherData/USA_CA_San.Francisco.Intl…</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-05-16 16:17:48.665561' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -260,8 +260,8 @@ the <code>EplusJob</code> object or using the
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span></span>
-<span><span class="co">#&gt;   * EnergyPlus version: 22.1.0 (ed759b17ee)</span></span>
-<span><span class="co">#&gt;   * Simulation started: 2022-12-13 03:25:00</span></span>
+<span><span class="co">#&gt;   * EnergyPlus version: 23.1.0 (87ed9199d4)</span></span>
+<span><span class="co">#&gt;   * Simulation started: 2023-05-16 16:17:00</span></span>
 <span><span class="co">#&gt;   * Terminated: FALSE</span></span>
 <span><span class="co">#&gt;   * Successful: TRUE</span></span>
 <span><span class="co">#&gt;   * Warning[W]: 1</span></span>
@@ -612,8 +612,8 @@ process of obtaining:</p>
 <h3 id="run-annual-simulation">Run annual simulation<a class="anchor" aria-label="anchor" href="#run-annual-simulation"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
-<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
 <span></span>
@@ -674,13 +674,13 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 14: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
 <span><span class="co">#&gt; 15: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
 <span><span class="co">#&gt;     table_name           row_name Electricity [kWh] Natural Gas [kWh]</span></span>
-<span><span class="co">#&gt;  1:   End Uses            Heating         142078.12          50331.57</span></span>
-<span><span class="co">#&gt;  2:   End Uses            Cooling          76258.47              0.00</span></span>
+<span><span class="co">#&gt;  1:   End Uses            Heating         142077.59          50331.57</span></span>
+<span><span class="co">#&gt;  2:   End Uses            Cooling          76534.54              0.00</span></span>
 <span><span class="co">#&gt;  3:   End Uses  Interior Lighting         168399.82              0.00</span></span>
 <span><span class="co">#&gt;  4:   End Uses  Exterior Lighting          64602.19              0.00</span></span>
 <span><span class="co">#&gt;  5:   End Uses Interior Equipment         296261.61              0.00</span></span>
 <span><span class="co">#&gt;  6:   End Uses Exterior Equipment              0.00              0.00</span></span>
-<span><span class="co">#&gt;  7:   End Uses               Fans          20001.32              0.00</span></span>
+<span><span class="co">#&gt;  7:   End Uses               Fans          20001.40              0.00</span></span>
 <span><span class="co">#&gt;  8:   End Uses              Pumps             73.94              0.00</span></span>
 <span><span class="co">#&gt;  9:   End Uses     Heat Rejection              0.00              0.00</span></span>
 <span><span class="co">#&gt; 10:   End Uses     Humidification              0.00              0.00</span></span>
@@ -688,7 +688,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 12:   End Uses      Water Systems              0.00          10030.80</span></span>
 <span><span class="co">#&gt; 13:   End Uses      Refrigeration              0.00              0.00</span></span>
 <span><span class="co">#&gt; 14:   End Uses         Generators              0.00              0.00</span></span>
-<span><span class="co">#&gt; 15:   End Uses     Total End Uses         767675.47          60362.37</span></span>
+<span><span class="co">#&gt; 15:   End Uses     Total End Uses         767951.09          60362.37</span></span>
 <span><span class="co">#&gt;     Gasoline [kWh] Diesel [kWh] Coal [kWh] Fuel Oil No 1 [kWh]</span></span>
 <span><span class="co">#&gt;  1:              0            0          0                   0</span></span>
 <span><span class="co">#&gt;  2:              0            0          0                   0</span></span>
@@ -943,10 +943,16 @@ using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class=
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="st">""</span>, <span class="va">proportion</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in sprintf("%s [%.2f%%]", category, proportion, "%"): one argument not</span></span>
-<span><span class="co">#&gt; used by format '%s [%.2f%%]'</span></span>
+<span><span class="co">#&gt; Warning: There was 1 warning in `mutate()`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `category = as.factor(sprintf("%s [%.2f%%]", category,</span></span>
+<span><span class="co">#&gt;   proportion, "%"))`.</span></span>
+<span><span class="co">#&gt; Caused by warning in `sprintf()`:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> one argument not used by format '%s [%.2f%%]'</span></span>
 <span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
 <p><img src="job_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
@@ -1028,7 +1034,7 @@ the <code>ParametricJob</code> class to run parametric simulations.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

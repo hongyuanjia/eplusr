@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -102,12 +102,10 @@
 <ul><li>Classes like <code>Branch</code> and <code>ZoneHVAC:EquipmentList</code> reference other objects in fields “Component X Object Type” and “Zone Equipment 1 Object Type”, but they do not have <code>\object-list</code> attributes. This makes it impossible to detect invalid field references.</li>
 <li>One possible way is to use <code>$search_value()</code> to detect if the values in those fields could be targeted or not.</li>
 </ul></li>
-<li><p>Model version conversion</p></li>
 <li><p>Fix extensible field names when they should be “A123” or “N123” but not self-explainary</p></li>
 <li><p>Apply multiple weather file to a seed in <code>ParametricJob</code> class</p></li>
 <li><p>Add external file dependency (e.g. file existance in <code>Schedule:File</code> class) checking in <code>$validate()</code>.</p></li>
 <li><p>Add function to reorder objects in a class</p></li>
-<li><p>Remove crayon dep</p></li>
 <li>
 <p>Add functionality to check location differences between epw and idf.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span> <span class="bu">std::</span>abs<span class="op">(</span> Latitude <span class="op">-</span> WeatherFileLatitude <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1.0</span> <span class="op">||</span> <span class="bu">std::</span>abs<span class="op">(</span> Longitude <span class="op">-</span> WeatherFileLongitude <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1.0</span> <span class="op">||</span> <span class="bu">std::</span>abs<span class="op">(</span> TimeZoneNumber <span class="op">-</span> WeatherFileTimeZone <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.0</span> <span class="op">||</span> <span class="bu">std::</span>abs<span class="op">(</span> Elevation <span class="op">-</span> WeatherFileElevation <span class="op">)</span> <span class="op">/</span> max<span class="op">(</span> Elevation<span class="op">,</span> <span class="fl">1.0</span> <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.10</span> <span class="op">)</span> <span class="op">{</span></span>
@@ -118,7 +116,6 @@
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    ShowContinueError<span class="op">(</span> <span class="st">"..Time Zone difference=["</span> <span class="op">+</span> RoundSigDigits<span class="op">(</span> <span class="bu">std::</span>abs<span class="op">(</span> TimeZoneNumber <span class="op">-</span> WeatherFileTimeZone <span class="op">),</span> <span class="dv">1</span> <span class="op">)</span> <span class="op">+</span> <span class="st">"] hour(s), Elevation difference=["</span> <span class="op">+</span> RoundSigDigits<span class="op">(</span> <span class="bu">std::</span>abs<span class="op">(</span> <span class="op">(</span> Elevation <span class="op">-</span> WeatherFileElevation <span class="op">)</span> <span class="op">/</span> max<span class="op">(</span> Elevation<span class="op">,</span> <span class="fl">1.0</span> <span class="op">)</span> <span class="op">)</span> <span class="op">*</span> <span class="fl">100.0</span><span class="op">,</span> <span class="dv">2</span> <span class="op">)</span> <span class="op">+</span> <span class="st">"] percent, ["</span> <span class="op">+</span> RoundSigDigits<span class="op">(</span> <span class="bu">std::</span>abs<span class="op">(</span> Elevation <span class="op">-</span> WeatherFileElevation <span class="op">),</span> <span class="dv">2</span> <span class="op">)</span> <span class="op">+</span> <span class="st">"] meters."</span> <span class="op">);</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </li>
-<li><p>Add a vignette about simulation data extraction and modifying models using functions.</p></li>
 <li><p>Use Rcpp to unlock environment. Reference: <a href="https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051" class="external-link uri">https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051</a></p></li>
 <li><p>Add <code>IdfObjectsClass</code> class to handle <code>IdfObject</code>s in same class.</p></li>
 <li><p>Use <code><a href="https://rdrr.io/r/utils/rcompgen.html" class="external-link">rc.options()</a></code> to register custom completor. Reference: <a href="https://github.com/jimhester/completeme" class="external-link uri">https://github.com/jimhester/completeme</a></p></li>
@@ -140,7 +137,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

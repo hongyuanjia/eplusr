@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
       <div class="hidden name"><code>geom.Rmd</code></div>
@@ -165,26 +165,26 @@ including:</p>
 <code>Daylighting</code> group</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/HospitalLowEnergy.idf"</span><span class="op">)</span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">geom</span></span>
 <span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-22-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
-<span><span class="co">#&gt;  * Version: '22.1.0'</span></span>
-<span><span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span></span>
-<span><span class="co">#&gt;  * North Axis: 0°</span></span>
-<span><span class="co">#&gt;  * Zone Num: 130</span></span>
-<span><span class="co">#&gt;  * Surface Num: 795</span></span>
-<span><span class="co">#&gt;  * SubSurface Num: 125</span></span>
-<span><span class="co">#&gt;  * Shading Num: 25</span></span>
-<span><span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span></span>
-<span><span class="co">#&gt;  * Coordinate System:</span></span>
+<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • Building: 'Large Hospital TSD Low-Energy Model'</span></span>
+<span><span class="co">#&gt;  • North Axis: 0°</span></span>
+<span><span class="co">#&gt;  • Zone Num: 130</span></span>
+<span><span class="co">#&gt;  • Surface Num: 795</span></span>
+<span><span class="co">#&gt;  • SubSurface Num: 125</span></span>
+<span><span class="co">#&gt;  • Shading Num: 25</span></span>
+<span><span class="co">#&gt;  • Dayl Ref Pnt Num: 48</span></span>
+<span><span class="co">#&gt;  %s Coordinate System:•</span></span>
 <span><span class="co">#&gt;    - Detailed: 'Relative'</span></span>
 <span><span class="co">#&gt;    - Simple:   'Relative'</span></span>
 <span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span></code></pre></div>
@@ -378,7 +378,7 @@ corresponding detailed class, including:</p>
 <li><code>Shading:Zone:Detailed</code></li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span></span>
 <span><span class="va">simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_simple</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span></span>
@@ -479,16 +479,16 @@ parent [Idf] accordingly.</p>
 <span></span>
 <span><span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-22-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
-<span><span class="co">#&gt;  * Version: '22.1.0'</span></span>
-<span><span class="co">#&gt;  * Building: 'Large Hospital TSD Low-Energy Model'</span></span>
-<span><span class="co">#&gt;  * North Axis: 0°</span></span>
-<span><span class="co">#&gt;  * Zone Num: 130</span></span>
-<span><span class="co">#&gt;  * Surface Num: 795</span></span>
-<span><span class="co">#&gt;  * SubSurface Num: 125</span></span>
-<span><span class="co">#&gt;  * Shading Num: 25</span></span>
-<span><span class="co">#&gt;  * Dayl Ref Pnt Num: 48</span></span>
-<span><span class="co">#&gt;  * Coordinate System:</span></span>
+<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • Building: 'Large Hospital TSD Low-Energy Model'</span></span>
+<span><span class="co">#&gt;  • North Axis: 0°</span></span>
+<span><span class="co">#&gt;  • Zone Num: 130</span></span>
+<span><span class="co">#&gt;  • Surface Num: 795</span></span>
+<span><span class="co">#&gt;  • SubSurface Num: 125</span></span>
+<span><span class="co">#&gt;  • Shading Num: 25</span></span>
+<span><span class="co">#&gt;  • Dayl Ref Pnt Num: 48</span></span>
+<span><span class="co">#&gt;  %s Coordinate System:•</span></span>
 <span><span class="co">#&gt;    - Detailed: 'World'</span></span>
 <span><span class="co">#&gt;    - Simple:   'Relative'</span></span>
 <span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span>
@@ -744,7 +744,7 @@ visualize simulation results dynamically.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/epw.Rmd" class="external-link"><code>vignettes/epw.Rmd</code></a></small>
       <div class="hidden name"><code>epw.Rmd</code></div>
@@ -217,7 +217,7 @@ data. For details on the data structure of EPW file, please see “Chapter
 2 - Weather Converter Program” in EnergyPlus “Auxiliary Programs”
 documentation. An online version can be found <a href="https://bigladdersoftware.com/epx/docs/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">epw</span></span>
@@ -314,7 +314,7 @@ restriction.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Classes 'data.table' and 'data.frame':   6 obs. of  36 variables:</span></span>
-<span><span class="co">#&gt;  $ datetime                                        : POSIXct, format: "2017-01-01 01:00:00" "2017-01-01 02:00:00" ...</span></span>
+<span><span class="co">#&gt;  $ datetime                                        : POSIXct, format: "2023-01-01 01:00:00" "2023-01-01 02:00:00" ...</span></span>
 <span><span class="co">#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999</span></span>
 <span><span class="co">#&gt;  $ month                                           : int  1 1 1 1 1 1</span></span>
 <span><span class="co">#&gt;  $ day                                             : int  1 1 1 1 1 1</span></span>
@@ -430,31 +430,34 @@ data.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">datetime</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  datetime</span></span>
-<span><span class="co">#&gt;    1: 2017-01-01 01:00:00</span></span>
-<span><span class="co">#&gt;    2: 2017-01-01 02:00:00</span></span>
-<span><span class="co">#&gt;    3: 2017-01-01 03:00:00</span></span>
-<span><span class="co">#&gt;    4: 2017-01-01 04:00:00</span></span>
-<span><span class="co">#&gt;    5: 2017-01-01 05:00:00</span></span>
+<span><span class="co">#&gt;    1: 2023-01-01 01:00:00</span></span>
+<span><span class="co">#&gt;    2: 2023-01-01 02:00:00</span></span>
+<span><span class="co">#&gt;    3: 2023-01-01 03:00:00</span></span>
+<span><span class="co">#&gt;    4: 2023-01-01 04:00:00</span></span>
+<span><span class="co">#&gt;    5: 2023-01-01 05:00:00</span></span>
 <span><span class="co">#&gt;   ---                    </span></span>
-<span><span class="co">#&gt; 8756: 2017-12-31 20:00:00</span></span>
-<span><span class="co">#&gt; 8757: 2017-12-31 21:00:00</span></span>
-<span><span class="co">#&gt; 8758: 2017-12-31 22:00:00</span></span>
-<span><span class="co">#&gt; 8759: 2017-12-31 23:00:00</span></span>
-<span><span class="co">#&gt; 8760: 2018-01-01 00:00:00</span></span>
+<span><span class="co">#&gt; 8756: 2023-12-31 20:00:00</span></span>
+<span><span class="co">#&gt; 8757: 2023-12-31 21:00:00</span></span>
+<span><span class="co">#&gt; 8758: 2023-12-31 22:00:00</span></span>
+<span><span class="co">#&gt; 8759: 2023-12-31 23:00:00</span></span>
+<span><span class="co">#&gt; 8760: 2024-01-01 00:00:00</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">d</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Data period #1 has been replaced with input data.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      Name StartDayOfWeek   StartDay     EndDay</span></span>
-<span><span class="co">#&gt;  1:  Data         Sunday 2017/ 1/ 1 2017/12/31</span></span>
+<span><span class="co">#&gt;  1:  Data         Sunday 2023/ 1/ 1 2023/12/31</span></span>
 <span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
 <p><code>Epw</code> class supports multiple data periods in a single EPW
 file:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span>start_year <span class="op">=</span> <span class="fl">2014</span>, align_wday <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Data period #1 'Data' seems like a real-year data starting from 2017/</span></span>
-<span><span class="co">#&gt; 1/ 1 to 2017/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span></span>
+<span><span class="co">#&gt; Warning: Invalid 'start_year' found for Data period #1 'Data' starting from</span></span>
+<span><span class="co">#&gt; 2023/ 1/ 1 to 2023/12/31. The original starting date falls in a leap year,</span></span>
+<span><span class="co">#&gt; however input 'start_year' is not a leap year. Invalid date time may occur.</span></span>
+<span><span class="co">#&gt; Warning: Data period #1 'Data' seems like a real-year data starting from 2023/</span></span>
+<span><span class="co">#&gt; 1/ 1 to 2023/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">d</span>, after <span class="op">=</span> <span class="fl">0L</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span></span>
@@ -467,7 +470,7 @@ file:</p>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">period</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    index  name start_day_of_week  start_day    end_day</span></span>
 <span><span class="co">#&gt; 1:     1 Data1         Wednesday 2014/ 1/ 1 2014/12/31</span></span>
-<span><span class="co">#&gt; 2:     2  Data            Sunday 2017/ 1/ 1 2017/12/31</span></span></code></pre></div>
+<span><span class="co">#&gt; 2:     2  Data            Sunday 2023/ 1/ 1 2023/12/31</span></span></code></pre></div>
 </div>
   </div>
 
@@ -488,7 +491,7 @@ file:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -189,14 +189,14 @@ release to parse the input IDF.</p>
 using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '22.1.0'</span></span>
+<span><span class="co">#&gt; [1] '23.1.0'</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $version</span></span>
-<span><span class="co">#&gt; [1] '22.1.0'</span></span>
+<span><span class="co">#&gt; [1] '23.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dir</span></span>
-<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-22-1-0"</span></span>
+<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-23-1-0"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $exe</span></span>
 <span><span class="co">#&gt; [1] "energyplus"</span></span></code></pre></div>
@@ -204,11 +204,11 @@ using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 add that location using <code><a href="../reference/use_eplus.html">use_eplus()</a></code>. After adding, all
 models of that version will use this path to call EnergyPlus.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV22-1-0"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">use_eplus</a></span><span class="op">(</span><span class="st">"C:/EnergyPlusV23-1-0"</span><span class="op">)</span></span></code></pre></div>
 <p>If the needed version of EnergyPlus was not installed, you can use
 <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">22.1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">23.1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
@@ -217,15 +217,15 @@ models of that version will use this path to call EnergyPlus.</p>
 whole EnergyPlus software. You can just download the IDD file of that
 version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code>
 to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will
-download IDD file for EnergyPlus v22.1.0, parse it and create an
+download IDD file for EnergyPlus v23.1.0, parse it and create an
 <code>Idd</code> object that will be used whenever parsing all
-EnergyPlus models of version v22.1.</p>
+EnergyPlus models of version v23.1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">22.1</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">23.1</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">22.1</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">23.1</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -237,7 +237,7 @@ similar style you see in IDF Editor, with additional heading lines
 showing the <code>Path</code>, <code>Version</code> of the model. The
 classes of objects in the model are ordered by groups and the number of
 objects in classes are shown in square bracket.</p>
-<p>Now let’s read an IDF file distributed with EnergyPlus 22.1.0. As we
+<p>Now let’s read an IDF file distributed with EnergyPlus 23.1. As we
 have already got the IDD, we can just ignore the <code>idd</code>
 argument.</p>
 <p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is
@@ -248,18 +248,18 @@ IDFs from v7.2 to v9.1 can be parsed using simply
 because eplusr will use IDD files distributed with EnergyPlus
 VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span></span>
 <span><span class="va">model</span></span>
 <span><span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  * Path: '/usr/local/EnergyPlus-22-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt;  * Version: '22.1.0'</span></span>
+<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Version: '23.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span></span>
 <span><span class="co">#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span></span>
@@ -599,14 +599,14 @@ marked with <code>*</code>. For example, you can get the
 <p>You can also achieve this using methods in <code>Idd</code>
 class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># idd$object("Material")</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="co"># idd_object(22.1, "Material")</span></span></code></pre></div>
+<span><span class="co"># idd_object(23.1, "Material")</span></span></code></pre></div>
 <p>With the <code>IddObject</code>, you can easily get class and field
 properties using methods it has.</p>
 <p>For example, you can get all default field values using
@@ -1040,7 +1040,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-12-13</span></span>
+<span><span class="co">#&gt; !2023-05-16</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1095,7 +1095,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2022-12-13</span></span>
+<span><span class="co">#&gt; !2023-05-16</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1257,20 +1257,20 @@ data from a “.ddy” file. You can achieve that using
 <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
-<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">22.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
+<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
 <span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
-<span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span>, encoding <span class="op">=</span> <span class="st">"Latin-1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">insert</span><span class="op">(</span><span class="va">ddy</span><span class="op">$</span><span class="va">SizingPeriod_DesignDay</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'SizingPeriod:DesignDay'&gt; [ID:331] `San Francisco Intl Ap Ann Htg 99.6% Condns DB`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"</span></span>
-<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Wind Speeds, 1%=12.8m/s, 2.5%...</span></span>
-<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Temperatures, Max Drybulb=1.8...</span></span>
-<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating Design Conditions Wind Speed=...</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Wind Speeds, 1%=12.8m/s, 2.5%=11.…</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Extreme Annual Temperatures, Max Drybulb=1.8°C M…</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating Design Conditions Wind Speed=2.2m…</span></span>
 <span><span class="co">#&gt; ! Coldest Month=JAN</span></span>
-<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating 99.6%, MaxDB=3.8�C</span></span>
+<span><span class="co">#&gt; ! San Francisco Intl Ap_CA_USA Annual Heating 99.6%, MaxDB=3.8°C</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;SizingPeriod:DesignDay&gt;</span></span>
 <span><span class="co">#&gt; ├─ 01*: "San Francisco Intl Ap Ann Htg 99.6% Condns DB",  !- Name</span></span>
@@ -1280,7 +1280,7 @@ data from a “.ddy” file. You can achieve that using
 <span><span class="co">#&gt; │─ 05 : 3.8,                !- Maximum Dry-Bulb Temperature {C}</span></span>
 <span><span class="co">#&gt; │─ 06 : 0,                  !- Daily Dry-Bulb Temperature Range {deltaC}</span></span>
 <span><span class="co">#&gt; │─ 07 : "DefaultMultipliers",  !- Dry-Bulb Temperature Range Modifier Type</span></span>
-<span><span class="co">#&gt; │─ 08 : &lt;"Blank"&gt;,          !- Dry-Bulb Temperature Range Modifier Day Sche...</span></span>
+<span><span class="co">#&gt; │─ 08 : &lt;"Blank"&gt;,          !- Dry-Bulb Temperature Range Modifier Day Schedule…</span></span>
 <span><span class="co">#&gt; │─ 09 : "Wetbulb",          !- Humidity Condition Type</span></span>
 <span><span class="va">....</span></span>
 <span></span>
@@ -1645,10 +1645,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpeylJDv/file21c12fc00a0e.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpKT0iEZ/file1d3a673258b1.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpeylJDv/file21c12fc00a0e.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpKT0iEZ/file1d3a673258b1.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -1677,7 +1677,7 @@ vignette <em>“Run simulation and data exploration”</em>.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

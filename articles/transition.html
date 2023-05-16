@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9008</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2022-12-13</h4>
+            <h4 data-toc-skip class="date">2023-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -196,14 +196,15 @@ process</p>
 <span><span class="co">#&gt; IDD v8.2.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.2.0 installation folder '/usr/local/EnergyPlus-8-2-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.2.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-2-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt; [1] '8.2.0'</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">23.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.3.0</span></span>
@@ -211,10 +212,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.3.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.3.0 installation folder '/usr/local/EnergyPlus-8-3-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.3.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-3-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV830.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.3.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.4.0</span></span>
@@ -222,10 +225,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.4.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.4.0 installation folder '/usr/local/EnergyPlus-8-4-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.4.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-4-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-4-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV840.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.4.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.5.0</span></span>
@@ -233,10 +238,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.5.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.5.0 installation folder '/usr/local/EnergyPlus-8-5-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.5.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-5-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-5-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV850.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.5.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.6.0</span></span>
@@ -244,10 +251,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.6.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.6.0 installation folder '/usr/local/EnergyPlus-8-6-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.6.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-6-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-6-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV860.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.6.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.7.0</span></span>
@@ -255,10 +264,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.7.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.7.0 installation folder '/usr/local/EnergyPlus-8-7-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.7.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-7-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-7-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV870.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.7.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.8.0</span></span>
@@ -266,10 +277,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.8.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-8-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-8-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-8-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-8-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-8-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV880.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.8.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.9.0</span></span>
@@ -277,10 +290,12 @@ process</p>
 <span><span class="co">#&gt; IDD v8.9.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v8.9.0 installation folder '/usr/local/EnergyPlus-8-9-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v8.9.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Failed</span></span>
+<span><span class="co">#&gt; Try to locate 'V8-9-0-Energy+.idd' in EnergyPlus v22.2.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater/V8-9-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV890.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.9.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 9.0.0</span></span>
@@ -289,10 +304,11 @@ process</p>
 <span><span class="co">#&gt; IDD v9.0.1 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.0.1 installation folder '/usr/local/EnergyPlus-9-0-1'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.0.1 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-0-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-0-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV900.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 9.0.1</span></span>
 <span><span class="co">#&gt; Toward Ver: 9.1.0</span></span>
@@ -300,21 +316,104 @@ process</p>
 <span><span class="co">#&gt; IDD v9.1.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.1.0 installation folder '/usr/local/EnergyPlus-9-1-0'.</span></span>
 <span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.1.0 is not available.</span></span>
-<span><span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v22.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-1-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-1-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-1-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV910.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 9.1.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 9.2.0</span></span>
 <span><span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt; IDD v9.2.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.2.0 installation folder '/usr/local/EnergyPlus-9-2-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-9-2-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.2.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-2-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-2-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV920.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.3.0</span></span>
+<span><span class="co">#&gt; [9.2.0 --&gt; 9.3.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.3.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.3.0 installation folder '/usr/local/EnergyPlus-9-3-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.3.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-3-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-3-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV930.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.3.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.4.0</span></span>
+<span><span class="co">#&gt; [9.3.0 --&gt; 9.4.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.4.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.4.0 installation folder '/usr/local/EnergyPlus-9-4-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.4.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-4-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-4-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV940.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.4.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.5.0</span></span>
+<span><span class="co">#&gt; [9.4.0 --&gt; 9.5.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.5.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.5.0 installation folder '/usr/local/EnergyPlus-9-5-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.5.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-5-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-5-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV950.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.5.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.6.0</span></span>
+<span><span class="co">#&gt; [9.5.0 --&gt; 9.6.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v9.6.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v9.6.0 installation folder '/usr/local/EnergyPlus-9-6-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.6.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-6-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V9-6-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV960.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.6.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 22.1.0</span></span>
+<span><span class="co">#&gt; [9.6.0 --&gt; 22.1.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v22.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.1.0 installation folder '/usr/local/EnergyPlus-22-1-0'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v22.1.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V22-1-0-Energy+.idd' in EnergyPlus v23.1.0 IDFVersionUpdater folder '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater'. --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater/V22-1-0-Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV2210.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 22.1.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 22.2.0</span></span>
+<span><span class="co">#&gt; [22.1.0 --&gt; 22.2.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v22.2.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v22.2.0 installation folder '/usr/local/EnergyPlus-22-2-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-22-2-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Start parsing...</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-23-1-0/PreProcess/IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV22220.idf</span></span>
+<span><span class="co">#&gt;  From  Ver: 22.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 23.1.0</span></span>
+<span><span class="co">#&gt; [22.2.0 --&gt; 23.1.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 275.402   2.878 277.264</span></span></code></pre></div>
+<span><span class="co">#&gt; 400.960   3.729 403.669</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
@@ -329,7 +428,7 @@ arguments as <code><a href="../reference/version_updater.html">version_updater()
 argument <code>save</code> to control whether to save the resultant
 <code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">9.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">23.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.3.0</span></span>
 <span><span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span></span>
@@ -360,16 +459,43 @@ argument <code>save</code> to control whether to save the resultant
 <span><span class="co">#&gt;  From  Ver: 9.1.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 9.2.0</span></span>
 <span><span class="co">#&gt; [9.1.0 --&gt; 9.2.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.3.0</span></span>
+<span><span class="co">#&gt; [9.2.0 --&gt; 9.3.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.3.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.4.0</span></span>
+<span><span class="co">#&gt; [9.3.0 --&gt; 9.4.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.4.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.5.0</span></span>
+<span><span class="co">#&gt; [9.4.0 --&gt; 9.5.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.5.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 9.6.0</span></span>
+<span><span class="co">#&gt; [9.5.0 --&gt; 9.6.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 9.6.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 22.1.0</span></span>
+<span><span class="co">#&gt; [9.6.0 --&gt; 22.1.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 22.1.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 22.2.0</span></span>
+<span><span class="co">#&gt; [22.1.0 --&gt; 22.2.0] SUCCEEDED.</span></span>
+<span><span class="co">#&gt;  From  Ver: 22.2.0</span></span>
+<span><span class="co">#&gt; Toward Ver: 23.1.0</span></span>
+<span><span class="co">#&gt; [22.2.0 --&gt; 23.1.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   5.150   0.052   5.202</span></span></code></pre></div>
-<p>It is about 53.3 times faster.</p>
+<span><span class="co">#&gt;   6.970   0.076   7.047</span></span></code></pre></div>
+<p>It is about 57.3 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that
 <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we
 compare the results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">verup</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span>, <span class="va">trans</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"sorted"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "    Yes,                     !- Use Weather File Snow Indicators"</span></span>
-<span><span class="co">#&gt; [2] "    ;                        !- Treat Weather as Actual"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "    15000;                   !- Maximum Figures in Shadow Overlap Calculations"</span></span>
+<span><span class="co">#&gt; [2] "    Yes,                     !- Use Weather File Snow Indicators"              </span></span>
+<span><span class="co">#&gt; [3] "    ;                        !- Treat Weather as Actual"                       </span></span>
+<span><span class="co">#&gt; [4] "    NATURALGAS,              !- Fuel Type"                                     </span></span>
+<span><span class="co">#&gt; [5] "    NATURALGAS,              !- Heater Fuel Type"                              </span></span>
+<span><span class="co">#&gt; [6] "    NATURALGAS,              !- Off Cycle Parasitic Fuel Type"                 </span></span>
+<span><span class="co">#&gt; [7] "    NATURALGAS,              !- On Cycle Parasitic Fuel Type"                  </span></span>
+<span><span class="co">#&gt; [8] "    Water Heater:WaterSystems:NaturalGas,  !- Key Name"</span></span></code></pre></div>
 <p>As we can see from below, there is only one difference between
 results from <code><a href="../reference/transition.html">transition()</a></code> and
 <code><a href="../reference/version_updater.html">version_updater()</a></code>:</p>
@@ -515,7 +641,7 @@ next new version of IDF by simply doing
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
