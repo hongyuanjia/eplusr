@@ -49,3 +49,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && !contains(github.event.head_commit.message, '[skip-website]') }}
         run: |
           Rscript -e 'pkgdown::build_site(preview = FALSE, install = FALSE)'
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ failure() }}
+        with:
+          limit-access-to-actor: true
