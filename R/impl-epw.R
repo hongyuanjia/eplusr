@@ -1551,7 +1551,8 @@ check_epw_data_type <- function (epw_data, type = NULL) {
     type_detected <- epw_data[, vcapply(.SD, typeof)]
     for (j in seq_along(type)) {
         if (type[[j]] == "integer") {
-            if (type_detected[[j]] == "integer") {
+            # handle integerish
+            if (type_detected[[j]] == "integer" || (type_detected[[j]] == "double" && checkmate::test_integerish(epw_data[[j]]))) {
                 # remove all derived S3 class
                 set(epw_data, NULL, j, as.integer(epw_data[[j]]))
             } else {
