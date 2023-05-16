@@ -3740,7 +3740,6 @@ trans_funs$f940t950 <- function(idf) {
         c(1L, 5L, 7:8, 11:13),
         14L
     )
-    dt11[order(id)]
     # }}}
 
     trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:11))))
