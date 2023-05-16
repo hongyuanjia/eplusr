@@ -4852,7 +4852,7 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
             abort(paste0("Transition executable ", surround(trans_path), " does not exist."))
         }
 
-        job <- tryCatch(processx::run(trans_path, idf$path(), wd = path_updater),
+        job <- tryCatch(processx::run(trans_path, idf$path(), wd = updater),
             error = function(e) {
                 if (grepl("System command error", conditionMessage(e))) {
                     abort(paste0("Failed to update file ", idf$path(), " from V", idf$version(), " to V", toward, ":\n", conditionMessage(e)))
