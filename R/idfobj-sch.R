@@ -418,9 +418,7 @@ idfsch_cmpt_set <- function (super, self, private, ..., .default = "min", .check
             abort(sprintf("Invalid time specification found for day type %s. Each schedule value should be named with a time value.",
                 collapse(unique(val$name[invld]))), "idfschcmpt_time")
         }
-        val[J(NA_integer_), on = "field_name", field_name :=
-            stri_sub(format(hms::hms(hours = field_index)), to = -4L)
-        ]
+        val[J(NA_character_), on = "field_name", field_name := sprintf("%02d:00", field_index)]
     }
 
     # check invalid number
@@ -475,7 +473,6 @@ idfsch_cmpt_update <- function (super, self, private, data, check_range = TRUE, 
 }
 # }}}
 # idfsch_cmpt_extract {{{
-#' @importFrom hms hms
 idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep = NULL) {
     l <- private$m_data
     meta <- copy(l$meta)
@@ -538,8 +535,13 @@ idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep 
     # clean
     set(val, NULL, "value_index", NULL)
 
-    # use hms
-    set(val, NULL, "time", hms::hms(minutes = val$time))
+    set(val, NULL, "time",
+        structure(
+            val$time, units = "secs",
+            # use hms if possible
+            class = c("hms"[requireNamespace("hms", quietly = TRUE)], "difftime")
+        )
+    )
     # set date
     set(val, NULL, "year_day", format(transform_sch_date(val$year_day)))
     val
