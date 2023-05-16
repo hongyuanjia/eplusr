@@ -53,7 +53,7 @@ number of fields and positions are not set, and cannot really be described in
 the usual `Field #` manner.
 
 ```{r}
-path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+path_idf <- path_eplus_example(23.1, "1ZoneUncontrolled.idf")
 idf <- read_idf(path_idf)
 idf$definition("Schedule:Compact")
 ```
