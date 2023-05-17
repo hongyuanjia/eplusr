@@ -1,7 +1,7 @@
 citHeader("To cite eplusr in publications use:")
 
-citEntry(
-    entry  = "article",
+bibentry(
+    bibtype  = "Article",
     title = "eplusr: A framework for integrating building energy simulation and data-driven analytics",
     author = c(person("Hongyuan", "Jia"), person("Adrian", "Chong")),
     year = "2020",
@@ -13,5 +13,4 @@ citEntry(
                         "eplusr: A framework for integrating building energy simulation and data-driven analytics.",
                         "Energy and Buildings 237: 110757.",
                         "https://doi.org/10.1016/j.enbuild.2021.110757")
-
 )
