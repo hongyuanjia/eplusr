@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.15.3.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
       </span>
     </div>
 
@@ -100,8 +100,11 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.16.0" id="eplusr-0160">eplusr 0.16.0<a class="anchor" aria-label="anchor" href="#eplusr-0160"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-16-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-16-0"></a></h3>
 <ul><li>Add support for EnergyPlus v22.1 (<a href="https://github.com/hongyuanjia/eplusr/issues/517" class="external-link">#517</a>).</li>
 <li>Add support for EnergyPlus v22.2 (<a href="https://github.com/hongyuanjia/eplusr/issues/530" class="external-link">#530</a>).</li>
 <li>Add support for EnergyPlus v23.1 (<a href="https://github.com/hongyuanjia/eplusr/issues/548" class="external-link">#548</a>).</li>
@@ -109,14 +112,14 @@
 <li>Add support <code>Space</code> in <code>IdfGeometry</code>. Results from <code>IdfGeometry$area()</code>, <code>IdfGeometry$tilt()</code> and <code>IdfGeometry$azimuth()</code> now include a new column <code>space</code> indicating the spaces where the surfaces are attached to. <code>IdfGeometry$view()</code> and <code>IdfViewer$show()</code> now can render by spaces (<a href="https://github.com/hongyuanjia/eplusr/issues/535" class="external-link">#535</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-16-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-16-0"></a></h3>
 <ul><li>
 <code>IdfGeometry$convert()</code> now work for EnergyPlus v9.6 and above (<a href="https://github.com/hongyuanjia/eplusr/issues/536" class="external-link">#536</a>).</li>
 <li>Now IMF files can be handled correctly (<a href="https://github.com/hongyuanjia/eplusr/issues/537" class="external-link">#537</a>).</li>
 <li>Now <code>idf$add()</code>, <code>idf$set()</code> and other methods accept any list inputs on the RHS instead of explicitly restricting to <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> (<a href="https://github.com/hongyuanjia/eplusr/issues/545" class="external-link">#545</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
+<h3 id="internal-refactor-0-16-0">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-0-16-0"></a></h3>
 <ul><li>Use testthat 3rd edition for parallel testing (<a href="https://github.com/hongyuanjia/eplusr/issues/478" class="external-link">#478</a>).</li>
 <li>Update minimal {data.table} version requirement to <code>1.14.6</code> to fix (<a href="https://github.com/hongyuanjia/eplusr/issues/415" class="external-link">#415</a>).</li>
 <li>Remove {crayon} and {progress} dependencies (<a href="https://github.com/hongyuanjia/eplusr/issues/432" class="external-link">#432</a>).</li>
