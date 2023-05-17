@@ -537,7 +537,7 @@ idfsch_cmpt_extract <- function (super, self, private, daytype = NULL, timestep 
 
     set(val, NULL, "time",
         structure(
-            val$time, units = "secs",
+            val$time * 60L, units = "secs",
             # use hms if possible
             class = c("hms"[requireNamespace("hms", quietly = TRUE)], "difftime")
         )
