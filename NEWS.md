@@ -23,6 +23,7 @@
 * Use testthat 3rd edition for parallel testing (#478).
 * Update minimal {data.table} version requirement to `1.14.6` to fix (#415).
 * Remove {crayon} and {progress} dependencies (#432).
+* Move {hms} to Suggest (#557).
 
 # eplusr 0.15.3
 
