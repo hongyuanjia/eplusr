@@ -4,7 +4,7 @@
 \alias{as_EpwDate}
 \title{Convert to EnergyPlus Weather File date}
 \usage{
-as_EpwDate(x, leapyear = TRUE, ...)
+as_EpwDate(x, leapyear = TRUE)
 }
 \arguments{
 \item{x}{An integer vector or a character vector.}

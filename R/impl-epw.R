@@ -901,12 +901,12 @@ ymd_to_md <- function (x) {
 #' @param leapyear Whether support leap year. Default: `TRUE`
 #' @export
 #' @keywords internal
-as_EpwDate <- function (x, leapyear = TRUE, ...) {
+as_EpwDate <- function (x, leapyear = TRUE) {
     UseMethod("as_EpwDate")
 }
 #' @export
 #' @keywords internal
-as_EpwDate.default <- function (x, leapyear = TRUE, ...) {
+as_EpwDate.default <- function (x, leapyear = TRUE) {
     stop("Missing method to convert <", class(x)[1L], "> object to <EpwDate>.")
 }
 #' @export
