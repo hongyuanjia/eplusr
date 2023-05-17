@@ -878,14 +878,35 @@ ymd_to_md <- function (x) {
 }
 # }}}
 # as_EpwDate {{{
+
+#' Convert to EnergyPlus Weather File date
+#'
+#' `as_EpwDate()` converts inputs to EnergyPlus Weather File (EPW) dates.
+#'
+#' @details
+#' EnergyPlus supports multiple formats of date specification
+#' Reference: Table 2.14, Chap 2 Weather Converter Program, Auxiliary Program
+#'
+#' Those formats include:
+#'
+#' 1. Julian day of year
+#' 2. num_Month/num_Day
+#' 3. num_Month/num_Day/num_Year (only for DataPeriod)
+#' 4. num_Day alpha_Month
+#' 5. alpha_Month num_Day
+#' 6. num Weekday In Month (only for Holiday/DaylightSavingPeriod)
+#' 7. last Weekday In Month (only for Holiday/DaylightSavingPeriod)
+#'
+#' @param x An integer vector or a character vector.
+#' @param leapyear Whether support leap year. Default: `TRUE`
 #' @export
 #' @keywords internal
-as_EpwDate <- function (x, ...) {
+as_EpwDate <- function (x, leapyear = TRUE, ...) {
     UseMethod("as_EpwDate")
 }
 #' @export
 #' @keywords internal
-as_EpwDate.default <- function (x, ...) {
+as_EpwDate.default <- function (x, leapyear = TRUE, ...) {
     stop("Missing method to convert <", class(x)[1L], "> object to <EpwDate>.")
 }
 #' @export
