@@ -394,6 +394,7 @@ test_that("parse_idd_file()", {
 
 # parse_idf_file() {{{
 test_that("parse_idf_file()", {
+    skip_on_cran()
     LATEST_IDF_VER <- stri_sub(LATEST_EPLUS_VER, to = -3L)
 
     # get version {{{

@@ -1,4 +1,7 @@
-# eplusr (development version)
+# eplusr 0.16.1
+
+This is a CRAN-only change that skips tests need IDD downloading (#561).
+No new feature is included.
 
 # eplusr 0.16.0
 

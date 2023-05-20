@@ -1,4 +1,4 @@
-# Version 0.16.0
+# Version 0.16.1
 
 ## Initial submission
 
@@ -11,6 +11,8 @@
 ### R CMD check results
 
 0 errors | 0 warnings | 0 note
+
+In this submission, I skipped tests that should be run locally.
 
 ### Reverse dependencies
 
