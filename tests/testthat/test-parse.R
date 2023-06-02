@@ -394,7 +394,6 @@ test_that("parse_idd_file()", {
 
 # parse_idf_file() {{{
 test_that("parse_idf_file()", {
-    skip_on_cran()
     LATEST_IDF_VER <- stri_sub(LATEST_EPLUS_VER, to = -3L)
 
     # get version {{{
@@ -417,7 +416,10 @@ test_that("parse_idf_file()", {
     )
     # }}}
 
-    expect_warning(idf_parsed <- parse_idf_file(idftext("idf", NULL), LATEST_IDF_VER), "Missing version field in input IDF")
+    idd <- try(use_idd(LATEST_EPLUS_VER, download = "auto"), silent = TRUE)
+    testthat::skip_if(inherits(idd, "eplusr_error_download_idd"))
+
+    expect_warning(idf_parsed <- parse_idf_file(idftext("idf", NULL), idd), "Missing version field in input IDF")
     idd_parsed <- get_priv_env(get_idd_from_ver(idf_parsed$version))$idd_env()
 
     # can parse Idf stored in strings
