@@ -1,7 +1,12 @@
-# eplusr 0.16.1
+# eplusr (development version)
 
-This is a CRAN-only change that skips tests need IDD downloading (#561).
-No new feature is included.
+## Bug fixes
+
+* Fix edge cases of IDF/IDD parsing (#566).
+
+## Internal refactor
+
+* Skips tests that need IDD downloading on CRAN (#561)
 
 # eplusr 0.16.0
 
