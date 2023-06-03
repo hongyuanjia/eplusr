@@ -707,9 +707,9 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
             nest[J(i[[id[[1L]]]]), on = c(id[[1L]]), .SD, .SDcols = -id[[1L]]]
         )
     } else if (!nrow(flat)) {
-        flat[i, on = c(id[[1L]])]
-    } else if (!nrow(nest)){
         nest[i, on = c(id[[1L]])]
+    } else if (!nrow(nest)) {
+        flat[i, on = c(id[[1L]])]
     } else {
         dt[0L, .SD, .SDcols = c(id, keep)]
     }
