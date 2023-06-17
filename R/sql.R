@@ -50,12 +50,12 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' if (is_avail_eplus(8.8)) {
+        #' if (is_avail_eplus("8.8")) {
         #'     idf_name <- "1ZoneUncontrolled.idf"
         #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
         #'
-        #'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-        #'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+        #'     idf_path <- path_eplus_example("8.8", idf_name)
+        #'     epw_path <- path_eplus_weather("8.8", epw_name)
         #'
         #'     # copy to tempdir and run the model
         #'     idf <- read_idf(idf_path)
@@ -67,7 +67,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' }
         #'
         #' @importFrom checkmate assert_file_exists
-        initialize = function (sql) {
+        initialize = function(sql) {
             assert_file_exists(sql, "r", "sql")
             private$m_path_sql <- normalizePath(sql, mustWork = TRUE)
             private$m_path_idf <- paste0(tools::file_path_sans_ext(private$m_path_sql), ".idf")
@@ -99,7 +99,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$path()
         #' }
         #'
-        path = function ()
+        path = function()
             sql_path(self, private),
         # }}}
 
@@ -120,7 +120,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$path_idf()
         #' }
         #'
-        path_idf = function ()
+        path_idf = function()
             sql_path_idf(self, private),
         # }}}
 
@@ -139,7 +139,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$list_table()
         #' }
         #'
-        list_table = function ()
+        list_table = function()
             sql_list_table(self, private),
         # }}}
 
@@ -162,7 +162,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$read_table("Zones")
         #' }
         #'
-        read_table = function (name)
+        read_table = function(name)
             sql_read_table(self, private, name),
         # }}}
 
@@ -199,7 +199,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$report_data_dict()
         #' }
         #'
-        report_data_dict = function ()
+        report_data_dict = function()
             sql_report_data_dict(self, private),
         # }}}
 
@@ -405,7 +405,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
         #' }
         #'
-        report_data = function (key_value = NULL, name = NULL, year = NULL,
+        report_data = function(key_value = NULL, name = NULL, year = NULL,
                                 tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                 interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -514,7 +514,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' sql$print()
         #' }
         #'
-        print = function ()
+        print = function()
             sql_print(self, private)
         # }}}
         # }}}
@@ -558,34 +558,34 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
 #' @author Hongyuan Jia
 #' @export
 # eplus_sql {{{
-eplus_sql <- function (sql) {
+eplus_sql <- function(sql) {
     EplusSql$new(sql)
 }
 # }}}
 
 # sql_path {{{
-sql_path <- function (self, private) private$m_path_sql
+sql_path <- function(self, private) private$m_path_sql
 # }}}
 # sql_path_idf {{{
-sql_path_idf <- function (self, private) private$m_path_idf
+sql_path_idf <- function(self, private) private$m_path_idf
 # }}}
 # sql_list_table {{{
-sql_list_table <- function (self, private) {
+sql_list_table <- function(self, private) {
     list_sql_table(private$m_path_sql)
 }
 # }}}
 # sql_read_table {{{
-sql_read_table <- function (self, private, table) {
+sql_read_table <- function(self, private, table) {
     read_sql_table(private$m_path_sql, table)
 }
 # }}}
 # sql_report_data_dict {{{
-sql_report_data_dict <- function (self, private) {
+sql_report_data_dict <- function(self, private) {
     get_sql_report_data_dict(private$m_path_sql)
 }
 # }}}
 # sql_report_data {{{
-sql_report_data <- function (self, private, key_value = NULL, name = NULL, year = NULL,
+sql_report_data <- function(self, private, key_value = NULL, name = NULL, year = NULL,
                              tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                              period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                              interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -601,7 +601,7 @@ sql_report_data <- function (self, private, key_value = NULL, name = NULL, year 
 }
 # }}}
 # sql_tabular_data {{{
-sql_tabular_data <- function (self, private, report_name = NULL, report_for = NULL,
+sql_tabular_data <- function(self, private, report_name = NULL, report_for = NULL,
                               table_name = NULL, column_name = NULL, row_name = NULL,
                               case = "auto", wide = FALSE, string_value = !wide) {
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_sql))
@@ -611,7 +611,7 @@ sql_tabular_data <- function (self, private, report_name = NULL, report_for = NU
 }
 # }}}
 # sql_print {{{
-sql_print <- function (self, private) {
+sql_print <- function(self, private) {
     cli::cat_rule("EnergyPlus SQLite Output")
 
     path_idf <- paste0(tools::file_path_sans_ext(private$m_path_sql), ".idf")
@@ -632,12 +632,12 @@ sql_print <- function (self, private) {
 # }}}
 # S3 EplusSql methods {{{
 #' @export
-str.EplusSql <- function (object, ...) {
+str.EplusSql <- function(object, ...) {
     object$print()
 }
 
 #' @export
-format.EplusSql <- function (x, ...) {
+format.EplusSql <- function(x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
 }
 # }}}

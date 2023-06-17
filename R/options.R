@@ -87,7 +87,7 @@ rm_global_cache <- function(type = c("idd", "epw", "eplus"), ver = NULL) {
 #' @export
 #' @author Hongyuan Jia
 # eplusr_option {{{
-eplusr_option <- function (...) {
+eplusr_option <- function(...) {
     opt <- list(...)
 
     if (!length(opt)) return(as.list.environment(.options, sorted = TRUE))
@@ -120,7 +120,7 @@ eplusr_option <- function (...) {
     count_opt <- c("num_parallel")
 
     # assign_onoff_opt {{{
-    assign_onoff_opt <- function (input, name) {
+    assign_onoff_opt <- function(input, name) {
         if (length(input[[name]])) {
             assert_flag(input[[name]], .var.name = name)
             .options[[name]] <- input[[name]]
@@ -128,7 +128,7 @@ eplusr_option <- function (...) {
     }
     # }}}
     # assign_choice_opt {{{
-    assign_choice_opt <- function (input, name) {
+    assign_choice_opt <- function(input, name) {
         if (length(input[[name]])) {
             assert_choice(input[[name]], choice_list[[name]], .var.name = name)
             .options[[name]] <- input[[name]]
@@ -136,7 +136,7 @@ eplusr_option <- function (...) {
     }
     # }}}
     # assign_count_opt {{{
-    assign_count_opt <- function (input, name) {
+    assign_count_opt <- function(input, name) {
         if (length(input[[name]])) {
             assert_count(input[[name]], positive = TRUE, .var.name = name)
             .options[[name]] <- as.integer(input[[name]])
@@ -190,7 +190,7 @@ eplusr_option <- function (...) {
 #' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 #'
 #' # temporarily disable verbose messages
-#' idf <- with_silent(read_idf(path_idf, use_idd(8.8, download = "auto")))
+#' idf <- with_silent(read_idf(path_idf, use_idd("8.8", download = "auto")))
 #'
 #' # temporarily disable checkings
 #' without_checking(idf$'BuildingSurface:Detailed' <- NULL)
@@ -199,7 +199,7 @@ eplusr_option <- function (...) {
 #' }
 #'
 # with_option {{{
-with_option <- function (opts, expr) {
+with_option <- function(opts, expr) {
     assert_list(opts, names = "named")
     # get options
     ori <- eplusr_option()
@@ -216,7 +216,7 @@ with_option <- function (opts, expr) {
 #' @name with_option
 #' @export
 # with_silent {{{
-with_silent <- function (expr) {
+with_silent <- function(expr) {
     with_option(list(verbose_info = FALSE), expr)
 }
 # }}}
@@ -224,7 +224,7 @@ with_silent <- function (expr) {
 #' @name with_option
 #' @export
 # with_verbose {{{
-with_verbose <- function (expr) {
+with_verbose <- function(expr) {
     with_option(list(verbose_info = TRUE), expr)
 }
 # }}}
@@ -232,7 +232,7 @@ with_verbose <- function (expr) {
 #' @name with_option
 #' @export
 # without_checking {{{
-without_checking <- function (expr) {
+without_checking <- function(expr) {
     with_option(list(validate_level = "none"), expr)
 }
 # }}}
@@ -243,7 +243,7 @@ without_checking <- function (expr) {
 #' @keywords internal
 #' @export
 # with_speed {{{
-with_speed <- function (expr) {
+with_speed <- function(expr) {
     .Deprecated("without_checking", "eplusr")
     without_checking(expr)
 }

@@ -48,12 +48,12 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' if (is_avail_eplus(8.8)) {
+        #' if (is_avail_eplus("8.8")) {
         #'     name_idf <- "1ZoneUncontrolled.idf"
         #'     name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
         #'
-        #'     path_idf <- path_eplus_example(8.8, name_idf)
-        #'     path_epw <- path_eplus_weather(8.8, name_epw)
+        #'     path_idf <- path_eplus_example("8.8", name_idf)
+        #'     path_epw <- path_eplus_weather("8.8", name_epw)
         #'
         #'     # create from local files
         #'     job <- eplus_job(path_idf, path_epw)
@@ -62,7 +62,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'     job <- eplus_job(read_idf(path_idf), read_epw(path_epw))
         #' }
         #' }
-        initialize = function (idf, epw) {
+        initialize = function(idf, epw) {
             job_initialize(self, private, idf, epw)
         },
         # }}}
@@ -82,7 +82,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$version()
         #' }
         #'
-        version = function ()
+        version = function()
             job_version(self, private),
         # }}}
 
@@ -107,7 +107,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$path("epw")
         #' }
         #'
-        path = function (type = c("all", "idf", "epw"))
+        path = function(type = c("all", "idf", "epw"))
             job_path(self, private, type),
         # }}}
 
@@ -182,7 +182,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$run(copy_external = TRUE)
         #' }
         #'
-        run = function (epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
+        run = function(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
             job_run(self, private, epw, dir, wait, force, echo, copy_external),
         # }}}
 
@@ -201,7 +201,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$kill()
         #' }
         #'
-        kill = function ()
+        kill = function()
             job_kill(self, private),
         # }}}
 
@@ -230,7 +230,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$status()
         #' }
         #'
-        status = function ()
+        status = function()
             job_status(self, private),
         # }}}
 
@@ -256,7 +256,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$errors(info = TRUE)
         #' }
         #'
-        errors = function (info = FALSE)
+        errors = function(info = FALSE)
             job_output_errors(self, private, info),
         # }}}
 
@@ -277,7 +277,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' # job$output_dir(open = TRUE)
         #' }
         #'
-        output_dir = function (open = FALSE)
+        output_dir = function(open = FALSE)
             job_output_dir(self, private, open),
         # }}}
 
@@ -380,7 +380,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$locate_output(full = TRUE)
         #' }
         #'
-        list_files = function (simplify = FALSE, full = FALSE)
+        list_files = function(simplify = FALSE, full = FALSE)
             job_list_files(self, private, simplify, full),
         # }}}
 
@@ -407,7 +407,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$locate_output(".expidf", strict = TRUE)
         #' }
         #'
-        locate_output = function (suffix = ".err", strict = TRUE)
+        locate_output = function(suffix = ".err", strict = TRUE)
             job_locate_output(self, private, suffix, strict, must_exist = strict),
         # }}}
 
@@ -426,7 +426,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$read_rdd()
         #' }
         #'
-        read_rdd = function ()
+        read_rdd = function()
             job_read_rdd(self, private),
         # }}}
 
@@ -445,7 +445,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$read_mdd()
         #' }
         #'
-        read_mdd = function ()
+        read_mdd = function()
             job_read_mdd(self, private),
         # }}}
 
@@ -464,7 +464,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$list_table()
         #' }
         #'
-        list_table = function ()
+        list_table = function()
             job_list_table(self, private),
         # }}}
 
@@ -487,7 +487,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$read_table("Zones")
         #' }
         #'
-        read_table = function (name)
+        read_table = function(name)
             job_read_table(self, private, name),
         # }}}
 
@@ -524,7 +524,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$report_data_dict()
         #' }
         #'
-        report_data_dict = function ()
+        report_data_dict = function()
             job_report_data_dict(self, private),
         # }}}
 
@@ -721,7 +721,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
         #' }
         #'
-        report_data = function (key_value = NULL, name = NULL, year = NULL,
+        report_data = function(key_value = NULL, name = NULL, year = NULL,
                                 tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                 interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -828,7 +828,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$print()
         #' }
         #'
-        print = function ()
+        print = function()
             job_print(self, private)
         # }}}
         # }}}
@@ -843,16 +843,16 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        uuid = function () private$m_log$uuid,
-        log_new_uuid = function () log_new_uuid(private$m_log),
+        uuid = function() private$m_log$uuid,
+        log_new_uuid = function() log_new_uuid(private$m_log),
 
-        seed_uuid = function () get_priv_env(private$m_idf)$m_log$uuid,
-        log_seed_uuid = function () private$m_log$seed_uuid <- get_priv_env(private$m_idf)$m_log$uuid,
-        cached_seed_uuid = function () private$m_log$seed_uuid,
+        seed_uuid = function() get_priv_env(private$m_idf)$m_log$uuid,
+        log_seed_uuid = function() private$m_log$seed_uuid <- get_priv_env(private$m_idf)$m_log$uuid,
+        cached_seed_uuid = function() private$m_log$seed_uuid,
 
-        is_unsaved = function () private$m_log$unsaved,
-        log_saved = function () log_saved(private$m_log),
-        log_unsaved = function () log_unsaved(private$m_log)
+        is_unsaved = function() private$m_log$unsaved,
+        log_saved = function() log_saved(private$m_log),
+        log_unsaved = function() log_unsaved(private$m_log)
         # }}}
     )
 )
@@ -873,13 +873,13 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 #' @name EplusJob
 #' @export
 # eplus_job {{{
-eplus_job <- function (idf, epw) {
+eplus_job <- function(idf, epw) {
     EplusJob$new(idf, epw)
 }
 # }}}
 
 # job_initialize {{{
-job_initialize <- function (self, private, idf, epw) {
+job_initialize <- function(self, private, idf, epw) {
     # add Output:SQLite and Output:VariableDictionary if necessary
     private$m_idf <- get_init_idf(idf)
     if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
@@ -894,12 +894,12 @@ job_initialize <- function (self, private, idf, epw) {
 }
 # }}}
 # job_version {{{
-job_version <- function (self, private) {
+job_version <- function(self, private) {
     private$m_idf$version()
 }
 # }}}
 # job_path {{{
-job_path <- function (self, private, type = c("all", "idf", "epw")) {
+job_path <- function(self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)
 
     path_epw <- if (is.null(private$m_epw_path)) NA_character_ else private$m_epw_path
@@ -910,7 +910,7 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 }
 # }}}
 # job_run {{{
-job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
+job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE, readvars = TRUE) {
     # stop if idf object has been changed accidentally
     if (!identical(private$seed_uuid(), private$cached_seed_uuid())) {
@@ -997,7 +997,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
 }
 # }}}
 # job_kill {{{
-job_kill <- function (self, private) {
+job_kill <- function(self, private) {
     if (is.null(private$m_job)) {
         verbose_info("The job has not been run yet.")
         return(invisible(FALSE))
@@ -1010,7 +1010,7 @@ job_kill <- function (self, private) {
         return(invisible(FALSE))
     }
 
-    k <- tryCatch(proc$kill(), error = function (e) FALSE)
+    k <- tryCatch(proc$kill(), error = function(e) FALSE)
 
     if (isTRUE(k)) {
         private$m_log$killed <- TRUE
@@ -1023,7 +1023,7 @@ job_kill <- function (self, private) {
 }
 # }}}
 # job_status {{{
-job_status <- function (self, private) {
+job_status <- function(self, private) {
     # init
     status <- list(
         run_before = FALSE, # if the model has been run before
@@ -1083,7 +1083,7 @@ job_status <- function (self, private) {
 }
 # }}}
 # job_output_dir {{{
-job_output_dir <- function (self, private, open = FALSE) {
+job_output_dir <- function(self, private, open = FALSE) {
     dir <- normalizePath(dirname(private$m_idf$path()), mustWork = FALSE)
     if (!open) return(dir)
     if (open) {
@@ -1108,7 +1108,7 @@ job_output_dir <- function (self, private, open = FALSE) {
 }
 # }}}
 # job_list_files {{{
-job_list_files <- function (self, private, simplify = FALSE, full = FALSE) {
+job_list_files <- function(self, private, simplify = FALSE, full = FALSE) {
     assert_flag(simplify)
     assert_flag(full)
 
@@ -1151,7 +1151,7 @@ job_list_files <- function (self, private, simplify = FALSE, full = FALSE) {
 }
 # }}}
 # job_locate_output {{{
-job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
+job_locate_output <- function(self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
     out <- paste0(tools::file_path_sans_ext(private$m_idf$path()), suffix)
 
     if (strict) {
@@ -1187,7 +1187,7 @@ job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, mu
 }
 # }}}
 # job_output_errors {{{
-job_output_errors <- function (self, private, info = FALSE) {
+job_output_errors <- function(self, private, info = FALSE) {
     path_err <- job_locate_output(self, private, ".err")
 
     err <- parse_err_file(path_err)
@@ -1196,14 +1196,14 @@ job_output_errors <- function (self, private, info = FALSE) {
 }
 # }}}
 # job_sql_path {{{
-job_sql_path <- function (self, private) {
+job_sql_path <- function(self, private) {
     path_sql <- job_locate_output(self, private, ".sql", must_exist = FALSE)
     checkmate::assert_file_exists(path_sql, "r", .var.name = "Simulation SQL output")
     path_sql
 }
 # }}}
 # job_rdd_path {{{
-job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
+job_rdd_path <- function(self, private, type = c("rdd", "mdd")) {
     type <- match.arg(type)
     path <- job_locate_output(self, private, paste0(".", type), must_exist = FALSE)
     name <- switch(type,
@@ -1217,32 +1217,32 @@ job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
 }
 # }}}
 # job_list_table {{{
-job_list_table <- function (self, private) {
+job_list_table <- function(self, private) {
     list_sql_table(job_sql_path(self, private))
 }
 # }}}
 # job_read_rdd {{{
-job_read_rdd <- function (self, private) {
+job_read_rdd <- function(self, private) {
     read_rdd(job_rdd_path(self, private, "rdd"))
 }
 # }}}
 # job_read_mdd {{{
-job_read_mdd <- function (self, private) {
+job_read_mdd <- function(self, private) {
     read_mdd(job_rdd_path(self, private, "mdd"))
 }
 # }}}
 # job_read_table {{{
-job_read_table <- function (self, private, table) {
+job_read_table <- function(self, private, table) {
     read_sql_table(job_sql_path(self, private), table)
 }
 # }}}
 # job_report_data_dict {{{
-job_report_data_dict <- function (self, private) {
+job_report_data_dict <- function(self, private) {
     get_sql_report_data_dict(job_sql_path(self, private))
 }
 # }}}
 # job_report_data {{{
-job_report_data <- function (self, private, key_value = NULL, name = NULL, year = NULL,
+job_report_data <- function(self, private, key_value = NULL, name = NULL, year = NULL,
                              tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                              period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                              interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -1258,7 +1258,7 @@ job_report_data <- function (self, private, key_value = NULL, name = NULL, year 
 }
 # }}}
 # job_tabular_data {{{
-job_tabular_data <- function (self, private, report_name = NULL, report_for = NULL,
+job_tabular_data <- function(self, private, report_name = NULL, report_for = NULL,
                               table_name = NULL, column_name = NULL, row_name = NULL,
                               case = "auto", wide = FALSE, string_value = !wide) {
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(job_sql_path(self, private)))
@@ -1268,7 +1268,7 @@ job_tabular_data <- function (self, private, report_name = NULL, report_for = NU
 }
 # }}}
 # job_print {{{
-job_print <- function (self, private) {
+job_print <- function(self, private) {
     path_epw <- if (is.null(private$m_epw_path)) NULL else private$m_epw_path
     print_job_header(title = "EnergPlus Simulation Job",
         path_idf = private$m_idf$path(),
@@ -1311,30 +1311,30 @@ job_print <- function (self, private) {
 
 # S3 EplusJob methods {{{
 #' @export
-str.EplusSql <- function (object, ...) {
+str.EplusSql <- function(object, ...) {
     object$print()
 }
 
 #' @export
-format.EplusSql <- function (x, ...) {
+format.EplusSql <- function(x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
 }
 
 #' @export
-`==.EplusJob` <- function (e1, e2) {
+`==.EplusJob` <- function(e1, e2) {
     if (!inherits(e2, "EplusJob")) return(FALSE)
     identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export
-`!=.EplusJob` <- function (e1, e2) {
+`!=.EplusJob` <- function(e1, e2) {
     Negate(`==.EplusJob`)(e1, e2)
 }
 # }}}
 
 # helper
 # get_init_idf {{{
-get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
+get_init_idf <- function(idf, sql = TRUE, dict = TRUE) {
     idf <- if (!is_idf(idf)) read_idf(idf) else idf$clone(deep = TRUE)
 
     if (is.null(idf$path())) {
@@ -1365,7 +1365,7 @@ get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
 # }}}
 # get_init_epw {{{
 #' @importFrom checkmate test_string
-get_init_epw <- function (epw) {
+get_init_epw <- function(epw) {
     if (checkmate::test_string(epw)) {
         if (!utils::file_test("-f", epw)) {
             abort(paste0("Input EPW file does not exist. ",
@@ -1398,7 +1398,7 @@ get_init_epw <- function (epw) {
 }
 # }}}
 # print_job_header {{{
-print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, path_epw,
+print_job_header <- function(title = "EnergyPlus Simulation Job", path_idf, path_epw,
                               eplus_ver = read_idf(path_idf)$version(),
                               name_idf = "Model", name_epw = "Weather") {
     cli::cat_rule(title, col = "green")

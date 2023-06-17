@@ -12,7 +12,7 @@ extract_reportvar_rules <- function(eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     to <- eplusr:::standardize_ver(m[, 3L])
 
     # only necessary for versions >= 7.2
-    i_72 <- from >= 7.2
+    i_72 <- from >= "7.2"
     from <- from[i_72]
     to <- to[i_72]
     paths <- paths[i_72]

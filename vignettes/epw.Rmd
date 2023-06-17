@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 ```
 
 This vignette introduces the `Epw` class which is designed to read and modify
@@ -120,7 +120,7 @@ Program" in EnergyPlus "Auxiliary Programs" documentation. An online version
 can be found [here](https://bigladdersoftware.com/epx/docs/).
 
 ```{r}
-path <- file.path(eplus_config(23.1)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+path <- path_eplus_weather("23.1", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
 epw <- read_epw(path)
 epw

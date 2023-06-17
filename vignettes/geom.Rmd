@@ -41,7 +41,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
@@ -121,7 +121,7 @@ detailed class, including:
 * `Shading:Zone:Detailed`
 
 ```{r}
-path_simple <- file.path(eplus_config(23.1)$dir, "ExampleFiles/4ZoneWithShading_Simple_1.idf")
+path_simple <- path_eplus_example("23.1", "4ZoneWithShading_Simple_1.idf")
 simple <- read_idf(path_simple)
 
 simple$class_name(by_group = TRUE)["Thermal Zones and Surfaces"]
@@ -218,7 +218,7 @@ Below shows the effects of each method:
 
 ```{r, eval = FALSE}
 viewer$background("grey50")
-``
+```
 
 ```{r, echo = FALSE}
 knitr::include_graphics("geom-viewer_background1.png")

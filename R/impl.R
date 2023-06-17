@@ -10,7 +10,7 @@ NULL
 
 # COMMON
 # recognize_input {{{
-recognize_input <- function (input, type = "class", underscore = FALSE, lower = FALSE) {
+recognize_input <- function(input, type = "class", underscore = FALSE, lower = FALSE) {
     if (underscore && lower) stop("underscore and lower cannot all be TRUE.")
     input <- assert_valid_type(input, name = type)
 
@@ -47,7 +47,7 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
 }
 # }}}
 # join_from_input {{{
-join_from_input <- function (dt, input, check = "group_id", allow.cartesian = TRUE) {
+join_from_input <- function(dt, input, check = "group_id", allow.cartesian = TRUE) {
     col_on <- names(input)[[1L]]
 
     res <- dt[input, on = col_on, allow.cartesian = allow.cartesian]
@@ -61,7 +61,7 @@ join_from_input <- function (dt, input, check = "group_id", allow.cartesian = TR
 }
 # }}}
 # check_bad_key {{{
-check_bad_key <- function (res, col_check, col_on, context = NULL) {
+check_bad_key <- function(res, col_check, col_on, context = NULL) {
     if (anyNA(res[[col_check]])) {
         if (has_names(res, "original")) {
             invld_cls <- res[is.na(get(col_check))][["original"]]
@@ -84,7 +84,7 @@ check_bad_key <- function (res, col_check, col_on, context = NULL) {
 }
 # }}}
 # add_joined_cols {{{
-add_joined_cols <- function (base, dt, on, cols) {
+add_joined_cols <- function(base, dt, on, cols) {
     on_dt <- if (!is.null(names(on))) names(on) else on
     nm <- if (!is.null(names(cols))) names(cols) else cols
     on <- unname(on)
@@ -93,14 +93,14 @@ add_joined_cols <- function (base, dt, on, cols) {
 }
 # }}}
 # del_redundant_cols {{{
-del_redundant_cols <- function (base, dt, col_on = names(dt)[[1L]]) {
+del_redundant_cols <- function(base, dt, col_on = names(dt)[[1L]]) {
     col_del <- setdiff(intersect(names(dt), names(base)), col_on)
     if (length(col_del)) set(dt, NULL, col_del, NULL)
     dt
 }
 # }}}
 # keep_same_cols {{{
-keep_same_cols <- function (base, dt) {
+keep_same_cols <- function(base, dt) {
     col_del <- setdiff(names(dt), intersect(names(dt), names(base)))
     if (length(col_del)) set(dt, NULL, col_del, NULL)
     setcolorder(dt, names(base))
@@ -110,27 +110,27 @@ keep_same_cols <- function (base, dt) {
 
 # LOG
 # log_new_uuid {{{
-log_new_uuid <- function (log) {
+log_new_uuid <- function(log) {
     log$uuid <- unique_id()
 }
 # }}}
 # log_new_order {{{
-log_new_order <- function (log, id) {
+log_new_order <- function(log, id) {
     log$order <- append_dt(log$order, data.table(object_id = id, object_order = 1L, "object_id"))
 }
 # }}}
 # log_add_order {{{
-log_add_order <- function (log, id) {
+log_add_order <- function(log, id) {
     log$order[J(id), on = "object_id", object_order := object_order + 1L]
 }
 # }}}
 # log_del_order {{{
-log_del_order <- function (log, id) {
+log_del_order <- function(log, id) {
     log$order <- log$order[!J(id), on = "object_id"]
 }
 # }}}
 # log_unsaved {{{
-log_unsaved <- function (log, which = NULL) {
+log_unsaved <- function(log, which = NULL) {
     if (is.null(which)) {
         which <- seq_along(log$unsaved)
     } else {
@@ -140,7 +140,7 @@ log_unsaved <- function (log, which = NULL) {
 }
 # }}}
 # log_saved {{{
-log_saved <- function (log, which = NULL) {
+log_saved <- function(log, which = NULL) {
     if (is.null(which)) {
         which <- seq_along(log$unsaved)
     } else {
@@ -152,42 +152,42 @@ log_saved <- function (log, which = NULL) {
 
 # UTILITIES
 # in_final_mode {{{
-in_final_mode <- function () {
+in_final_mode <- function() {
     eplusr_option("validate_level") == "final"
 }
 # }}}
 # in_ip_mode {{{
-in_ip_mode <- function () {
+in_ip_mode <- function() {
     eplusr_option("view_in_ip")
 }
 # }}}
 # in_verbose {{{
-in_verbose <- function () {
+in_verbose <- function() {
     eplusr_option("verbose_info")
 }
 # }}}
 # verbose_info {{{
-verbose_info <- function (...) {
+verbose_info <- function(...) {
     if (eplusr_option("verbose_info")) message(...)
 }
 # }}}
 # fast_subset {{{
 # very odd way to subset columns but is way faster
 # ref: https://github.com/Rdatatable/data.table/issues/3477
-fast_subset <- function (dt, cols) {
+fast_subset <- function(dt, cols) {
     setDT(unclass(dt)[cols])
 }
 # }}}
 
 # abort_bad_key {{{
-abort_bad_key <- function (key, value, context = NULL) {
+abort_bad_key <- function(key, value, context = NULL) {
     mes <- paste0("Invalid ", key, " found: ", collapse(value))
     if (!is.null(context)) mes <- paste(mes, context)
     abort(mes, value = value, class = paste0("invalid_", gsub(" ", "_", tolower(key))))
 }
 # }}}
 # abort_bad_field {{{
-abort_bad_field <- function (key, dt, ...) {
+abort_bad_field <- function(key, dt, ...) {
     h <- paste0("Invalid field ", key, " found:\n")
 
     mes <- switch(key,
@@ -199,13 +199,13 @@ abort_bad_field <- function (key, dt, ...) {
 }
 # }}}
 # errormsg_info {{{
-errormsg_info <- function (dt) {
+errormsg_info <- function(dt) {
     if (!has_names(dt, "rleid")) add_rleid(dt)
     dt[, `:=`(info = paste0(" #", lpad(rleid), "| Class ", surround(class_name)))]
 }
 # }}}
 # errormsg_field_index {{{
-errormsg_field_index <- function (dt) {
+errormsg_field_index <- function(dt) {
     dt <- dt[field_index < min_fields | field_index > num_fields,
         list(field_index = collapse(field_index)),
         by = list(rleid, class_name, min_fields, num_fields)
@@ -227,7 +227,7 @@ errormsg_field_index <- function (dt) {
 }
 # }}}
 # errormsg_field_name {{{
-errormsg_field_name <- function (dt) {
+errormsg_field_name <- function(dt) {
     dt <- dt[, list(field_name = collapse(field_name)),
         by = list(rleid, class_name)
     ]
@@ -240,19 +240,19 @@ errormsg_field_name <- function (dt) {
 # }}}
 
 # new_id {{{
-new_id <- function (dt, name, num) {
+new_id <- function(dt, name, num) {
     assert_names(names(dt), must.include = name)
     max(dt[[name]], na.rm = TRUE) + seq_len(num)
 }
 # }}}
 # add_rleid {{{
-add_rleid <- function (dt, prefix = NULL) {
+add_rleid <- function(dt, prefix = NULL) {
     if (!is.null(prefix)) prefix <- paste0(prefix, "_")
     set(dt, NULL, paste0(prefix, "rleid"), seq_len(nrow(dt)))
 }
 # }}}
 # append_dt {{{
-append_dt <- function (dt, new_dt, base_col = NULL) {
+append_dt <- function(dt, new_dt, base_col = NULL) {
     assert_names(names(new_dt), must.include = names(dt))
 
     if (!nrow(new_dt)) return(dt)
@@ -265,13 +265,13 @@ append_dt <- function (dt, new_dt, base_col = NULL) {
 }
 # }}}
 # unique_id {{{
-unique_id <- function () {
+unique_id <- function() {
     paste0("id-", stri_rand_strings(1, 10L), "-", as.integer(Sys.time()))
 }
 # }}}
 
 # assert_valid_type {{{
-assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lower = 1L, type = c("both", "id", "name")) {
+assert_valid_type <- function(x, name = NULL, len = NULL, null.ok = FALSE, lower = 1L, type = c("both", "id", "name")) {
     if (is.null(name)) name <- checkmate::vname(x)
     type <- match.arg(type)
 
@@ -291,7 +291,7 @@ assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lowe
 }
 # }}}
 # assert_valid {{{
-assert_valid <- function (validity, action = NULL, epw = FALSE) {
+assert_valid <- function(validity, action = NULL, epw = FALSE) {
     if (count_check_error(validity)) {
         m <- paste0(format_validity(validity, epw = epw), collapse = "\n")
         if (is.null(action)) {

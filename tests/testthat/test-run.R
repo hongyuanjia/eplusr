@@ -616,7 +616,7 @@ test_that("energyplus()", {
     if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") == "") {
         # NOTE: There is a bug in the basement preprocessor in EnergyPlus from v9.4 to v22.1
         # Ref: https://github.com/NREL/EnergyPlus/pull/9356
-        if (numeric_version(LATEST_EPLUS_VER) > 22.1) {
+        if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
             # can run Basement
             path_base <- copy_eplus_example(LATEST_EPLUS_VER, "LgOffVAVusingBasement.idf")
             expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))

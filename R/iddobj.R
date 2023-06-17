@@ -32,15 +32,15 @@ NULL
 #' @export
 #' @examples
 #' \dontrun{
-#' idd <- use_idd(8.8, download = "auto")
+#' idd <- use_idd("8.8", download = "auto")
 #'
 #' # get an IddObject using class name
 #' idd_object(idd, "Material")
-#' idd_object(8.8, "Material")
+#' idd_object("8.8", "Material")
 #' }
 #'
 # idd_object {{{
-idd_object <- function (parent, class) {
+idd_object <- function(parent, class) {
     IddObject$new(class, parent)
 }
 # }}}
@@ -69,7 +69,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
         #' }
         #'
-        initialize = function (class, parent) {
+        initialize = function(class, parent) {
             if (missing(parent)) {
                 abort(paste("IddObject can only be created based on a parent Idd object.",
                     "Please give 'parent', which should be either an IDD version or an 'Idd' object."
@@ -102,7 +102,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$version()
         #' }
         #'
-        version = function ()
+        version = function()
             iddobj_version(self, private),
         # }}}
 
@@ -120,7 +120,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$parent()
         #' }
         #'
-        parent = function ()
+        parent = function()
             iddobj_parent(self, private),
         # }}}
         # }}}
@@ -140,7 +140,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$group_name()
         #' }
         #'
-        group_name = function ()
+        group_name = function()
             iddobj_group_name(self, private),
         # }}}
 
@@ -160,7 +160,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$group_index()
         #' }
         #'
-        group_index = function ()
+        group_index = function()
             iddobj_group_index(self, private),
         # }}}
 
@@ -178,7 +178,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$class_name()
         #' }
         #'
-        class_name = function ()
+        class_name = function()
             iddobj_class_name(self, private),
         # }}}
 
@@ -198,7 +198,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$class_index()
         #' }
         #'
-        class_index = function ()
+        class_index = function()
             iddobj_class_index(self, private),
         # }}}
 
@@ -225,7 +225,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$class_format()
         #' }
         #'
-        class_format = function ()
+        class_format = function()
             iddobj_class_format(self, private),
         # }}}
 
@@ -244,7 +244,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$min_fields()
         #' }
         #'
-        min_fields = function ()
+        min_fields = function()
             iddobj_min_fields(self, private),
         # }}}
 
@@ -267,7 +267,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$num_fields()
         #' }
         #'
-        num_fields = function ()
+        num_fields = function()
             iddobj_num_fields(self, private),
         # }}}
 
@@ -286,7 +286,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$memo()
         #' }
         #'
-        memo = function ()
+        memo = function()
             iddobj_memo(self, private),
         # }}}
 
@@ -311,7 +311,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$num_extensible()
         #' }
         #'
-        num_extensible = function ()
+        num_extensible = function()
             iddobj_num_extensible(self, private),
         # }}}
 
@@ -336,7 +336,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$first_extensible_index()
         #' }
         #'
-        first_extensible_index = function ()
+        first_extensible_index = function()
             iddobj_first_extensible_index(self, private),
         # }}}
 
@@ -361,7 +361,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$extensible_group_num()
         #' }
         #'
-        extensible_group_num = function ()
+        extensible_group_num = function()
             iddobj_extensible_group_num(self, private),
         # }}}
         # }}}
@@ -402,7 +402,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$extensible_group_num()
         #' }
         #'
-        add_extensible_group = function (num = 1L)
+        add_extensible_group = function(num = 1L)
             iddobj_add_extensible_group(self, private, num),
         # }}}
 
@@ -441,7 +441,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$extensible_group_num()
         #' }
         #'
-        del_extensible_group = function (num = 1L)
+        del_extensible_group = function(num = 1L)
             iddobj_del_extensible_group(self, private, num),
         # }}}
         # }}}
@@ -465,7 +465,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_name()
         #' }
         #'
-        has_name = function ()
+        has_name = function()
             iddobj_has_name(self, private),
         # }}}
 
@@ -487,7 +487,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_required()
         #' }
         #'
-        is_required = function ()
+        is_required = function()
             iddobj_is_required(self, private),
         # }}}
 
@@ -509,7 +509,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_unique()
         #' }
         #'
-        is_unique = function ()
+        is_unique = function()
             iddobj_is_unique(self, private),
         # }}}
 
@@ -532,7 +532,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_extensible()
         #' }
         #'
-        is_extensible = function ()
+        is_extensible = function()
             iddobj_is_extensible(self, private),
         # }}}
         # }}}
@@ -574,7 +574,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_name(unit = TRUE, in_ip = TRUE)
         #' }
         #'
-        field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
+        field_name = function(index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_name(self, private, index, unit, in_ip),
         # }}}
 
@@ -602,7 +602,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_index = function (name = NULL)
+        field_index = function(name = NULL)
             iddobj_field_index(self, private, name),
         # }}}
 
@@ -637,7 +637,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_type = function (which = NULL)
+        field_type = function(which = NULL)
             iddobj_field_type(self, private, which = which),
         # }}}
 
@@ -666,7 +666,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_note = function (which = NULL)
+        field_note = function(which = NULL)
             iddobj_field_note(self, private, which),
         # }}}
 
@@ -697,7 +697,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_unit = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
+        field_unit = function(which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_unit(self, private, which, in_ip),
         # }}}
 
@@ -734,7 +734,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_default = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
+        field_default = function(which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_default(self, private, which, in_ip),
         # }}}
 
@@ -762,7 +762,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_choice(c("name", "sun exposure", "wind exposure"))
         #' }
         #'
-        field_choice = function (which = NULL)
+        field_choice = function(which = NULL)
             iddobj_field_choice(self, private, which),
         # }}}
 
@@ -810,7 +810,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_range = function (which = NULL)
+        field_range = function(which = NULL)
             iddobj_field_range(self, private, which),
         # }}}
 
@@ -884,7 +884,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"), class = NULL, group = NULL, depth = 0L, keep = FALSE)
+        field_relation = function(which = NULL, direction = c("all", "ref_by", "ref_to"), class = NULL, group = NULL, depth = 0L, keep = FALSE)
             iddobj_field_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth, keep = keep),
         # }}}
 
@@ -932,7 +932,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_possible(6:10)
         #' }
         #'
-        field_possible = function (which = NULL)
+        field_possible = function(which = NULL)
             iddobj_field_possible(self, private, which),
         # }}}
         # }}}
@@ -961,7 +961,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_valid_field_num(c(10, 14, 100))
         #' }
         #'
-        is_valid_field_num = function (num)
+        is_valid_field_num = function(num)
             iddobj_is_valid_field_num(self, private, num),
         # }}}
 
@@ -985,7 +985,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_extensible_index(c(10, 14, 100))
         #' }
         #'
-        is_extensible_index = function (index)
+        is_extensible_index = function(index)
             iddobj_is_extensible_index(self, private, index),
         # }}}
 
@@ -1013,7 +1013,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
         #' }
         #'
-        is_valid_field_name = function (name, strict = FALSE)
+        is_valid_field_name = function(name, strict = FALSE)
             iddobj_is_valid_field_name(self, private, name, strict),
         # }}}
 
@@ -1034,7 +1034,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_valid_field_index(1:10)
         #' }
         #'
-        is_valid_field_index = function (index)
+        is_valid_field_index = function(index)
             iddobj_is_valid_field_index(self, private, index),
         # }}}
 
@@ -1059,7 +1059,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_autosizable_field(c("name", "sun_exposure"))
         #' }
         #'
-        is_autosizable_field = function (which = NULL)
+        is_autosizable_field = function(which = NULL)
             iddobj_is_autosizable_field(self, private, which),
         # }}}
 
@@ -1084,7 +1084,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_autocalculatable_field(c("name", "sun_exposure"))
         #' }
         #'
-        is_autocalculatable_field = function (which = NULL)
+        is_autocalculatable_field = function(which = NULL)
             iddobj_is_autocalculatable_field(self, private, which),
         # }}}
 
@@ -1109,7 +1109,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_numeric_field(c("name", "sun_exposure"))
         #' }
         #'
-        is_numeric_field = function (which = NULL)
+        is_numeric_field = function(which = NULL)
             iddobj_is_numeric_field(self, private, which),
         # }}}
 
@@ -1134,7 +1134,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_real_field(c("name", "number of vertices"))
         #' }
         #'
-        is_real_field = function (which = NULL)
+        is_real_field = function(which = NULL)
             iddobj_is_real_field(self, private, which),
         # }}}
 
@@ -1159,7 +1159,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_integer_field(c("name", "number of vertices"))
         #' }
         #'
-        is_integer_field = function (which = NULL)
+        is_integer_field = function(which = NULL)
             iddobj_is_integer_field(self, private, which),
         # }}}
 
@@ -1183,7 +1183,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$is_required_field(c("name", "number of vertices"))
         #' }
         #'
-        is_required_field = function (which = NULL)
+        is_required_field = function(which = NULL)
             iddobj_is_required_field(self, private, which),
         # }}}
 
@@ -1220,7 +1220,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref(c("name", "zone name"))
         #' }
         #'
-        has_ref = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+        has_ref = function(which = NULL, class = NULL, group = NULL, depth = 0L)
             iddobj_has_ref(self, private, which, class = class, group = group, depth = depth),
         # }}}
 
@@ -1257,7 +1257,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref_to(c("name", "zone name"))
         #' }
         #'
-        has_ref_to = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+        has_ref_to = function(which = NULL, class = NULL, group = NULL, depth = 0L)
             iddobj_has_ref_to(self, private, which, class = class, group = group, depth = depth),
         # }}}
 
@@ -1294,7 +1294,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref_by(c("name", "zone name"))
         #' }
         #'
-        has_ref_by = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+        has_ref_by = function(which = NULL, class = NULL, group = NULL, depth = 0L)
             iddobj_has_ref_by(self, private, which, class = class, group = group, depth = depth),
         # }}}
         # }}}
@@ -1339,7 +1339,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$outputs()
         #' }
         #'
-        outputs = function ()
+        outputs = function()
             iddobj_outputs(self, private),
         # }}}
 
@@ -1369,7 +1369,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$to_table(TRUE)
         #' }
         #'
-        to_table = function (all = FALSE)
+        to_table = function(all = FALSE)
             iddobj_to_table(self, private, all),
         # }}}
 
@@ -1404,7 +1404,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$to_string(c("This", "will", "be", "comments"))
         #' }
         #'
-        to_string = function (comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
+        to_string = function(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
             iddobj_to_string(self, private, comment, leading, sep_at = sep_at, all = all),
         # }}}
         # }}}
@@ -1444,7 +1444,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$print(brief = TRUE)
         #' }
         #'
-        print = function (brief = FALSE)
+        print = function(brief = FALSE)
             iddobj_print(self, private, brief)
         # }}}
     ),
@@ -1456,85 +1456,85 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        idd_env = function () .subset2(get_priv_env(private$m_parent), "m_idd_env")
+        idd_env = function() .subset2(get_priv_env(private$m_parent), "m_idd_env")
         # }}}
     )
 )
 # }}}
 
 # iddobj_version {{{
-iddobj_version <- function (self, private) {
+iddobj_version <- function(self, private) {
     private$m_parent$version()
 }
 # }}}
 # iddobj_parent {{{
-iddobj_parent <- function (self, private) {
+iddobj_parent <- function(self, private) {
     private$m_parent
 }
 # }}}
 # iddobj_group_index {{{
-iddobj_group_index <- function (self, private) {
+iddobj_group_index <- function(self, private) {
     private$idd_env()$class[class_id == private$m_class_id, group_id]
 }
 # }}}
 # iddobj_group_name {{{
-iddobj_group_name <- function (self, private) {
+iddobj_group_name <- function(self, private) {
     grp_id <- iddobj_group_index(self, private)
     private$idd_env()$group[J(grp_id), on = "group_id", group_name]
 }
 # }}}
 # iddobj_class_index {{{
-iddobj_class_index <- function (self, private) {
+iddobj_class_index <- function(self, private) {
     private$m_class_id
 }
 # }}}
 # iddobj_class_name {{{
-iddobj_class_name <- function (self, private) {
+iddobj_class_name <- function(self, private) {
     private$idd_env()$class[J(private$m_class_id), on = "class_id", class_name]
 }
 # }}}
 # iddobj_class_data {{{
-iddobj_class_data <- function (self, private) {
+iddobj_class_data <- function(self, private) {
     private$idd_env()$class[J(private$m_class_id), on = "class_id"]
 }
 # }}}
 # iddobj_class_format {{{
-iddobj_class_format <- function (self, private) {
+iddobj_class_format <- function(self, private) {
     iddobj_class_data(self, private)$format
 }
 # }}}
 # iddobj_min_fields {{{
-iddobj_min_fields <- function (self, private) {
+iddobj_min_fields <- function(self, private) {
     iddobj_class_data(self, private)$min_fields
 }
 # }}}
 # iddobj_num_fields {{{
-iddobj_num_fields <- function (self, private) {
+iddobj_num_fields <- function(self, private) {
     iddobj_class_data(self, private)$num_fields
 }
 # }}}
 # iddobj_memo {{{
-iddobj_memo <- function (self, private) {
+iddobj_memo <- function(self, private) {
     iddobj_class_data(self, private)$memo[[1L]]
 }
 # }}}
 # iddobj_num_extensible {{{
-iddobj_num_extensible <- function (self, private) {
+iddobj_num_extensible <- function(self, private) {
     iddobj_class_data(self, private)$num_extensible
 }
 # }}}
 # iddobj_first_extensible_index {{{
-iddobj_first_extensible_index <- function (self, private) {
+iddobj_first_extensible_index <- function(self, private) {
     iddobj_class_data(self, private)$first_extensible
 }
 # }}}
 # iddobj_extensible_group_num {{{
-iddobj_extensible_group_num <- function (self, private) {
+iddobj_extensible_group_num <- function(self, private) {
     iddobj_class_data(self, private)$num_extensible_group
 }
 # }}}
 # iddobj_add_extensible_group {{{
-iddobj_add_extensible_group <- function (self, private, num) {
+iddobj_add_extensible_group <- function(self, private, num) {
     assert_count(num, positive = TRUE)
 
     iddenv <- get_priv_env(private$m_parent)$m_idd_env
@@ -1547,7 +1547,7 @@ iddobj_add_extensible_group <- function (self, private, num) {
 }
 # }}}
 # iddobj_del_extensible_group {{{
-iddobj_del_extensible_group <- function (self, private, num) {
+iddobj_del_extensible_group <- function(self, private, num) {
     assert_count(num, positive = TRUE)
 
     iddenv <- get_priv_env(private$m_parent)$m_idd_env
@@ -1560,27 +1560,27 @@ iddobj_del_extensible_group <- function (self, private, num) {
 }
 # }}}
 # iddobj_has_name {{{
-iddobj_has_name <- function (self, private) {
+iddobj_has_name <- function(self, private) {
     iddobj_class_data(self, private)$has_name
 }
 # }}}
 # iddobj_is_required {{{
-iddobj_is_required <- function (self, private) {
+iddobj_is_required <- function(self, private) {
     iddobj_class_data(self, private)$required_object
 }
 # }}}
 # iddobj_is_unique {{{
-iddobj_is_unique <- function (self, private) {
+iddobj_is_unique <- function(self, private) {
     iddobj_class_data(self, private)$unique_object
 }
 # }}}
 # iddobj_is_extensible {{{
-iddobj_is_extensible <- function (self, private) {
+iddobj_is_extensible <- function(self, private) {
     iddobj_class_data(self, private)$num_extensible > 0L
 }
 # }}}
 # iddobj_field_data {{{
-iddobj_field_data <- function (self, private, which = NULL, property = NULL, underscore = FALSE) {
+iddobj_field_data <- function(self, private, which = NULL, property = NULL, underscore = FALSE) {
     all <- if (is.null(which)) TRUE else FALSE
     get_idd_field(private$idd_env(), private$m_class_id, which,
         property, all = all, underscore = underscore, no_ext = TRUE
@@ -1588,7 +1588,7 @@ iddobj_field_data <- function (self, private, which = NULL, property = NULL, und
 }
 # }}}
 # iddobj_field_name {{{
-iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
+iddobj_field_name <- function(self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
     index <- assert_integerish(index, lower = 1L, any.missing = FALSE, null.ok = TRUE, coerce = TRUE)
 
     if (unit) {
@@ -1605,23 +1605,23 @@ iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip 
 }
 # }}}
 # iddobj_field_index {{{
-iddobj_field_index <- function (self, private, name = NULL) {
+iddobj_field_index <- function(self, private, name = NULL) {
     assert_character(name, any.missing = FALSE, null.ok = TRUE)
     iddobj_field_data(self, private, name, underscore = TRUE)$field_index
 }
 # }}}
 # iddobj_field_type {{{
-iddobj_field_type <- function (self, private, which = NULL) {
+iddobj_field_type <- function(self, private, which = NULL) {
     iddobj_field_data(self, private, which, "type", underscore = TRUE)$type
 }
 # }}}
 # iddobj_field_note {{{
-iddobj_field_note <- function (self, private, which = NULL) {
+iddobj_field_note <- function(self, private, which = NULL) {
     iddobj_field_data(self, private, which, "note", underscore = TRUE)$note
 }
 # }}}
 # iddobj_field_unit {{{
-iddobj_field_unit <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+iddobj_field_unit <- function(self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     fld <- iddobj_field_data(self, private, which, c("units", "ip_units"), underscore = TRUE)
 
     if (in_ip) {
@@ -1632,7 +1632,7 @@ iddobj_field_unit <- function (self, private, which = NULL, in_ip = eplusr_optio
 }
 # }}}
 # iddobj_field_default {{{
-iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+iddobj_field_default <- function(self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     fld <- iddobj_field_data(self, private, which, underscore = TRUE,
         c("default_chr", "default_num", "units", "ip_units", "type_enum")
     )
@@ -1644,12 +1644,12 @@ iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_op
 }
 # }}}
 # iddobj_field_choice {{{
-iddobj_field_choice <- function (self, private, which = NULL) {
+iddobj_field_choice <- function(self, private, which = NULL) {
     iddobj_field_data(self, private, which, "choice", underscore = TRUE)$choice
 }
 # }}}
 # iddobj_field_range {{{
-iddobj_field_range <- function (self, private, which = NULL) {
+iddobj_field_range <- function(self, private, which = NULL) {
     fld <- iddobj_field_data(self, private, which, c("type_enum", "has_range",
             "minimum", "lower_incbounds", "maximum", "upper_incbounds"), underscore = TRUE)
 
@@ -1663,7 +1663,7 @@ iddobj_field_range <- function (self, private, which = NULL) {
 }
 # }}}
 # iddobj_field_relation {{{
-iddobj_field_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by"),
+iddobj_field_relation <- function(self, private, which = NULL, direction = c("all", "ref_to", "ref_by"),
                                    class = NULL, group = NULL, depth = 0L, keep = FALSE) {
     direction <- match.arg(direction)
 
@@ -1681,13 +1681,13 @@ iddobj_field_relation <- function (self, private, which = NULL, direction = c("a
 }
 # }}}
 # iddobj_field_possible {{{
-iddobj_field_possible <- function (self, private, which = NULL) {
+iddobj_field_possible <- function(self, private, which = NULL) {
     fld <- iddobj_field_data(self, private, which, FIELD_COLS$property, underscore = TRUE)
     get_iddobj_possible(private$idd_env(), field_id = fld$field_id)
 }
 # }}}
 # iddobj_is_valid_field_num {{{
-iddobj_is_valid_field_num <- function (self, private, num) {
+iddobj_is_valid_field_num <- function(self, private, num) {
     num <- assert_integerish(num, lower = 1L, any.missing = FALSE, coerce = TRUE)
 
     cls <- iddobj_class_data(self, private)
@@ -1707,7 +1707,7 @@ iddobj_is_valid_field_num <- function (self, private, num) {
 }
 # }}}
 # iddobj_is_extensible_index {{{
-iddobj_is_extensible_index <- function (self, private, index) {
+iddobj_is_extensible_index <- function(self, private, index) {
     index <- assert_integerish(index, lower = 1L, any.missing = FALSE, coerce = TRUE)
 
     cls <- iddobj_class_data(self, private)
@@ -1718,7 +1718,7 @@ iddobj_is_extensible_index <- function (self, private, index) {
 }
 # }}}
 # iddobj_is_valid_field_name {{{
-iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
+iddobj_is_valid_field_name <- function(self, private, name, strict = FALSE) {
     fld <- iddobj_field_data(self, private, underscore = TRUE)
 
     name <- as.character(name)
@@ -1731,43 +1731,43 @@ iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
 }
 # }}}
 # iddobj_is_valid_field_index {{{
-iddobj_is_valid_field_index <- function (self, private, index) {
+iddobj_is_valid_field_index <- function(self, private, index) {
     index <- assert_integerish(index, lower = 1L, any.missing = FALSE, coerce = TRUE)
     index <= iddobj_class_data(self, private)$num_fields
 }
 # }}}
 # iddobj_is_autosizable_field {{{
-iddobj_is_autosizable_field <- function (self, private, which) {
+iddobj_is_autosizable_field <- function(self, private, which) {
     iddobj_field_data(self, private, which, "autosizable", underscore = TRUE)$autosizable
 }
 # }}}
 # iddobj_is_autocalculatable_field {{{
-iddobj_is_autocalculatable_field <- function (self, private, which) {
+iddobj_is_autocalculatable_field <- function(self, private, which) {
     iddobj_field_data(self, private, which, "autocalculatable", underscore = TRUE)$autocalculatable
 }
 # }}}
 # iddobj_is_numeric_field {{{
-iddobj_is_numeric_field <- function (self, private, which) {
+iddobj_is_numeric_field <- function(self, private, which) {
     iddobj_field_type(self, private, which) %chin% c("integer", "real")
 }
 # }}}
 # iddobj_is_integer_field {{{
-iddobj_is_integer_field <- function (self, private, which) {
+iddobj_is_integer_field <- function(self, private, which) {
     iddobj_field_type(self, private, which) == "integer"
 }
 # }}}
 # iddobj_is_real_field {{{
-iddobj_is_real_field <- function (self, private, which) {
+iddobj_is_real_field <- function(self, private, which) {
     iddobj_field_type(self, private, which) == "real"
 }
 # }}}
 # iddobj_is_required_field {{{
-iddobj_is_required_field <- function (self, private, which) {
+iddobj_is_required_field <- function(self, private, which) {
     iddobj_field_data(self, private, which, "required_field", underscore = TRUE)$required_field
 }
 # }}}
 # iddobj_has_ref {{{
-iddobj_has_ref <- function (self, private, which = NULL, class = NULL, group = NULL,
+iddobj_has_ref <- function(self, private, which = NULL, class = NULL, group = NULL,
                             depth = 0L, type = c("all", "ref_to", "ref_by")) {
     type <- match.arg(type)
 
@@ -1796,17 +1796,17 @@ iddobj_has_ref <- function (self, private, which = NULL, class = NULL, group = N
 }
 # }}}
 # iddobj_has_ref_by {{{
-iddobj_has_ref_by <- function (self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
+iddobj_has_ref_by <- function(self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
     iddobj_has_ref(self, private, which, class = class, group = group, depth = depth, type = "ref_by")
 }
 # }}}
 # iddobj_has_ref_to {{{
-iddobj_has_ref_to <- function (self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
+iddobj_has_ref_to <- function(self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
     iddobj_has_ref(self, private, which, class = class, group = group, depth = depth, type = "ref_to")
 }
 # }}}
 # iddobj_outputs {{{
-iddobj_outputs <- function (self, private) {
+iddobj_outputs <- function(self, private) {
     vars <- OUTPUT_VARS[[as.character(private$m_parent$version())]]
 
     if (!NROW(vars)) {
@@ -1822,19 +1822,19 @@ iddobj_outputs <- function (self, private) {
 }
 # }}}
 # iddobj_to_table {{{
-iddobj_to_table <- function (self, private, all = FALSE) {
+iddobj_to_table <- function(self, private, all = FALSE) {
     get_iddobj_table(private$idd_env(), private$m_class_id, all)
 }
 # }}}
 # iddobj_to_string {{{
-iddobj_to_string <- function (self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
+iddobj_to_string <- function(self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
     get_iddobj_string(private$idd_env(), private$m_class_id, comment = comment,
         leading = leading, sep_at = sep_at, all = all
     )
 }
 # }}}
 # iddobj_print {{{
-iddobj_print <- function (self, private, brief = FALSE) {
+iddobj_print <- function(self, private, brief = FALSE) {
     # CLASS {{{
     cls <- iddobj_class_data(self, private)
     cli::cat_line(paste0("<IddObject: ", surround(cls$class_name), ">"))
@@ -1908,7 +1908,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #'
 #' @export
 # format.IddObject {{{
-format.IddObject <- function (x, ver = TRUE, ...) {
+format.IddObject <- function(x, ver = TRUE, ...) {
     nm <- get_idd_class(get_priv_env(x)$idd_env(), get_priv_env(x)$m_class_id)$class_name
     if (isTRUE(ver)) {
         paste0("<IddObject: ", surround(nm), " v", x$version(), ">")
@@ -1941,21 +1941,21 @@ format.IddObject <- function (x, ver = TRUE, ...) {
 #'
 #' @export
 # as.character.IddObject {{{
-as.character.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
+as.character.IddObject <- function(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
     x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
 }
 # }}}
 
 #' @export
 # str.IddObject {{{
-str.IddObject <- function (object, brief = FALSE, ...) {
+str.IddObject <- function(object, brief = FALSE, ...) {
     object$print(brief)
 }
 # }}}
 
 #' @export
 # ==.IddObject {{{
-`==.IddObject` <- function (e1, e2) {
+`==.IddObject` <- function(e1, e2) {
     if (!is_iddobject(e2)) return(FALSE)
     identical(
         get_priv_env(get_priv_env(e1)$m_parent)$uuid(),
@@ -1965,14 +1965,14 @@ str.IddObject <- function (object, brief = FALSE, ...) {
 }
 
 #' @export
-`!=.IddObject` <- function (e1, e2) {
+`!=.IddObject` <- function(e1, e2) {
     Negate(`==.IddObject`)(e1, e2)
 }
 # }}}
 
 #' @export
 # .DollarNames.IddObject {{{
-.DollarNames.IddObject <- function (x, pattern = "") {
+.DollarNames.IddObject <- function(x, pattern = "") {
     grep(pattern, c(x$field_name(), names(x)), value = TRUE)
 }
 # }}}

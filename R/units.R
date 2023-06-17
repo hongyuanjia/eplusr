@@ -3,7 +3,7 @@ NULL
 
 # reg_custom_units {{{
 # nocov start
-reg_custom_units <- function () {
+reg_custom_units <- function() {
     tryCatch(
         {
             if (utils::packageVersion("units") < "0.7-0") {
@@ -21,8 +21,8 @@ reg_custom_units <- function () {
             }
             TRUE
         },
-        warning = function (w) NULL,
-        error = function (e) NULL
+        warning = function(w) NULL,
+        error = function(e) NULL
     )
 }
 # nocov end

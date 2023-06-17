@@ -25,7 +25,7 @@ NULL
 #'
 #' @name IdfViewer
 #' @export
-idf_viewer <- function (geometry) {
+idf_viewer <- function(geometry) {
     IdfViewer$new(geometry)
 }
 # }}}
@@ -58,7 +58,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' viewer <- idf_viewer(path_idf)
         #' viewer <- IdfViewer$new(path_idf)
         #' }
-        initialize = function (geometry) {
+        initialize = function(geometry) {
             if (!requireNamespace("rgl", quietly = TRUE)) {
                 abort(paste0(
                     "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
@@ -105,7 +105,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$parent()
         #' }
-        parent = function ()
+        parent = function()
             idfviewer_parent(self, private),
         # }}}
 
@@ -122,7 +122,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$geometry()
         #' }
-        geometry = function ()
+        geometry = function()
             idfviewer_geometry(self, private),
         # }}}
 
@@ -141,7 +141,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$device()
         #' }
-        device = function ()
+        device = function()
             idfviewer_device(self, private),
         # }}}
 
@@ -156,7 +156,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$background("blue")
         #' }
-        background = function (color = "white")
+        background = function(color = "white")
             idfviewer_background(self, private, color),
         # }}}
 
@@ -191,7 +191,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$viewpoint()
         #' }
-        viewpoint = function (look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL)
+        viewpoint = function(look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL)
             idfviewer_viewpoint(self, private, look_at, theta, phi, fov, zoom, scale),
         # }}}
 
@@ -207,7 +207,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$win_size(0, 0, 400, 500)
         #' }
-        win_size = function (left = 0, top = 0, right = 600, bottom = 600)
+        win_size = function(left = 0, top = 0, right = 600, bottom = 600)
             idfviewer_win_size(self, private, left, top, right, bottom),
         # }}}
 
@@ -241,7 +241,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$mouse_mode()
         #' }
-        mouse_mode = function (left = "trackball", right = "pan", middle = "fov", wheel = "pull")
+        mouse_mode = function(left = "trackball", right = "pan", middle = "fov", wheel = "pull")
             idfviewer_mouse_mode(self, private, left, right, middle, wheel),
         # }}}
 
@@ -272,7 +272,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$axis()
         #' }
-        axis = function (add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0)
+        axis = function(add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0)
             idfviewer_axis(self, private, add, expand, width, color, alpha),
         # }}}
 
@@ -299,7 +299,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$ground()
         #' }
-        ground = function (add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0)
+        ground = function(add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0)
             idfviewer_ground(self, private, add, expand, color, alpha),
         # }}}
 
@@ -326,7 +326,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$wireframe()
         #' }
-        wireframe = function (add = TRUE, width = 1.5, color = "black", alpha = 1.0)
+        wireframe = function(add = TRUE, width = 1.5, color = "black", alpha = 1.0)
             idfviewer_wireframe(self, private, add, width, color, alpha),
         # }}}
 
@@ -346,7 +346,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$x_ray()
         #' }
-        x_ray = function (on = TRUE)
+        x_ray = function(on = TRUE)
             idfviewer_x_ray(self, private, on),
         # }}}
 
@@ -379,7 +379,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$render_by()
         #' }
-        render_by = function (type = "surface_type")
+        render_by = function(type = "surface_type")
             idfviewer_render_by(self, private, type),
         # }}}
 
@@ -425,7 +425,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$show()
         #' }
-        show = function (type = "all", zone = NULL, space = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
+        show = function(type = "all", zone = NULL, space = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
             idfviewer_show(self, private, type, zone, surface, width = 1.5, dayl_color, dayl_size),
         # }}}
 
@@ -437,7 +437,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$top()
         #' }
-        focus = function ()
+        focus = function()
             idfviewer_focus(self, private),
         # }}}
 
@@ -449,7 +449,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$close()
         #' }
-        close = function ()
+        close = function()
             idfviewer_close(self, private),
         # }}}
 
@@ -477,7 +477,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' viewer$snapshot(tempfile(fileext = ".png"))
         #' }
         #'
-        snapshot = function (filename, webshot = FALSE, ...)
+        snapshot = function(filename, webshot = FALSE, ...)
             idfviewer_snapshot(self, private, filename, webshot, ...),
         # }}}
 
@@ -491,7 +491,7 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' \dontrun{
         #' viewer$print()
         #' }
-        print = function ()
+        print = function()
             idfviewer_print(self, private)
         # }}}
 
@@ -521,14 +521,14 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        uuid = function () private$m_log$uuid,
-        log_new_uuid = function () log_new_uuid(private$m_log),
+        uuid = function() private$m_log$uuid,
+        log_new_uuid = function() log_new_uuid(private$m_log),
 
-        geom_uuid = function () get_priv_env(private$m_geom)$m_log$uuid,
-        log_geom_uuid = function () private$m_log$geom_uuid <- get_priv_env(private$m_geom)$m_log$uuid,
-        cached_geom_uuid = function () private$m_log$geom_uuid,
+        geom_uuid = function() get_priv_env(private$m_geom)$m_log$uuid,
+        log_geom_uuid = function() private$m_log$geom_uuid <- get_priv_env(private$m_geom)$m_log$uuid,
+        cached_geom_uuid = function() private$m_log$geom_uuid,
 
-        geoms = function (opengl = TRUE) {
+        geoms = function(opengl = TRUE) {
             if (private$geom_uuid() != private$cached_geom_uuid() || is.null(private$m_log$geoms)) {
                 private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
                 private$m_log$geoms$in_opengl <- FALSE
@@ -568,17 +568,17 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
 # }}}
 
 # idfviewer_parent {{{
-idfviewer_parent <- function (self, private) {
+idfviewer_parent <- function(self, private) {
     private$m_geom$parent()
 }
 # }}}
 # idfviewer_geometry {{{
-idfviewer_geometry <- function (self, private) {
+idfviewer_geometry <- function(self, private) {
     private$m_geom
 }
 # }}}
 # idfviewer_device {{{
-idfviewer_device <- function (self, private) {
+idfviewer_device <- function(self, private) {
     # in case the window has been killed accidentally
     if (length(private$m_device) && !private$m_device %in% rgl::rgl.dev.list()) {
         private$m_device <- NULL
@@ -587,7 +587,7 @@ idfviewer_device <- function (self, private) {
 }
 # }}}
 # idfviewer_background {{{
-idfviewer_background <- function (self, private, color = "white") {
+idfviewer_background <- function(self, private, color = "white") {
     assert_string(color)
     private$m_background <- color
     if (!is.null(self$device())) rgl::bg3d(color = color)
@@ -595,7 +595,7 @@ idfviewer_background <- function (self, private, color = "white") {
 }
 # }}}
 # idfviewer_viewpoint {{{
-idfviewer_viewpoint <- function (self, private, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
+idfviewer_viewpoint <- function(self, private, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
     private$m_viewpoint <- list(look_at = look_at, theta = theta, phi = phi, fov = fov, zoom = zoom, scale = scale)
     if (is.null(self$device())) return(invisible())
     do.call(rgl_viewpoint, c(list(dev = private$m_device), private$m_viewpoint))
@@ -603,7 +603,7 @@ idfviewer_viewpoint <- function (self, private, look_at = "iso", theta = NULL, p
 }
 # }}}
 # idfviewer_win_size {{{
-idfviewer_win_size <- function (self, private, left = 0, top = 0, right = 600, bottom = 600) {
+idfviewer_win_size <- function(self, private, left = 0, top = 0, right = 600, bottom = 600) {
     assert_number(left, lower = 0, finite = TRUE)
     assert_number(top, lower = 0, finite = TRUE)
     assert_number(right, lower = 0, finite = TRUE)
@@ -617,7 +617,7 @@ idfviewer_win_size <- function (self, private, left = 0, top = 0, right = 600, b
 }
 # }}}
 # idfviewer_mouse_mode {{{
-idfviewer_mouse_mode <- function (self, private, left = "trackball", right = "pan", middle = "fov", wheel = "pull") {
+idfviewer_mouse_mode <- function(self, private, left = "trackball", right = "pan", middle = "fov", wheel = "pull") {
     choices <- c("none", "trackball", "xAxis", "yAxis", "zAxis", "polar", "zoom", "fov", "pull", "push", "pan")
     assert_choice(left, choices)
     assert_choice(right, choices)
@@ -641,7 +641,7 @@ idfviewer_mouse_mode <- function (self, private, left = "trackball", right = "pa
 }
 # }}}
 # idfviewer_axis {{{
-idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0) {
+idfviewer_axis <- function(self, private, add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0) {
     assert_flag(add)
     assert_number(expand, lower = 1.0)
     assert_number(width, lower = 1E-5, finite = TRUE)
@@ -680,7 +680,7 @@ idfviewer_axis <- function (self, private, add = TRUE, expand = 2.0, width = 1.5
 }
 # }}}
 # idfviewer_ground {{{
-idfviewer_ground <- function (self, private, add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0) {
+idfviewer_ground <- function(self, private, add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0) {
     assert_flag(add)
     assert_number(expand, lower = 1.0)
     assert_string(color)
@@ -720,7 +720,7 @@ idfviewer_ground <- function (self, private, add = TRUE, expand = 1.02, color = 
 }
 # }}}
 # idfviewer_wireframe {{{
-idfviewer_wireframe <- function (self, private, add = TRUE, width = 1.5, color = "black", alpha = 1.0) {
+idfviewer_wireframe <- function(self, private, add = TRUE, width = 1.5, color = "black", alpha = 1.0) {
     assert_flag(add)
     assert_number(width, lower = 1E-5, finite = TRUE)
     assert_string(color)
@@ -750,7 +750,7 @@ idfviewer_wireframe <- function (self, private, add = TRUE, width = 1.5, color =
 }
 # }}}
 # idfviewer_x_ray {{{
-idfviewer_x_ray <- function (self, private, on = TRUE) {
+idfviewer_x_ray <- function(self, private, on = TRUE) {
     assert_flag(on)
 
     private$m_x_ray <- on
@@ -769,7 +769,7 @@ idfviewer_x_ray <- function (self, private, on = TRUE) {
 }
 # }}}
 # idfviewer_render_by {{{
-idfviewer_render_by <- function (self, private, style = c("surface_type", "boundary", "construction", "zone", "space", "normal")) {
+idfviewer_render_by <- function(self, private, style = c("surface_type", "boundary", "construction", "zone", "space", "normal")) {
     assert_choice(style, c("surface_type", "boundary", "construction", "zone", "space", "normal"))
 
     private$m_render_by <- style
@@ -788,7 +788,7 @@ idfviewer_render_by <- function (self, private, style = c("surface_type", "bound
 }
 # }}}
 # idfviewer_show {{{
-idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = NULL,
+idfviewer_show <- function(self, private, type = "all", zone = NULL, surface = NULL,
                             width = 1.5, dayl_color = "red", dayl_size = 5) {
     geoms <- subset_geom(private$geoms(), type = type, zone = zone, surface = surface)
 
@@ -850,7 +850,7 @@ idfviewer_show <- function (self, private, type = "all", zone = NULL, surface = 
 }
 # }}}
 # idfviewer_focus {{{
-idfviewer_focus <- function (self, private) {
+idfviewer_focus <- function(self, private) {
     if (is.null(self$device())) {
         verbose_info("No viewer window found. Skip.")
     } else {
@@ -862,7 +862,7 @@ idfviewer_focus <- function (self, private) {
 }
 # }}}
 # idfviewer_close {{{
-idfviewer_close <- function (self, private) {
+idfviewer_close <- function(self, private) {
     if (is.null(self$device())) {
         verbose_info("No viewer window found. Skip.")
     } else {
@@ -874,7 +874,7 @@ idfviewer_close <- function (self, private) {
 }
 # }}}
 # idfviewer_snapshot {{{
-idfviewer_snapshot <- function (self, private, filename, webshot = FALSE, ...) {
+idfviewer_snapshot <- function(self, private, filename, webshot = FALSE, ...) {
     if (!rgl::rgl.useNULL() && !length(self$device())) {
         abort("No viewer window currently open. Please run '$show()' first.")
     }
@@ -883,7 +883,7 @@ idfviewer_snapshot <- function (self, private, filename, webshot = FALSE, ...) {
 }
 # }}}
 # idfviewer_print {{{
-idfviewer_print <- function (self, private) {
+idfviewer_print <- function(self, private) {
     cli::cat_rule("EnergPlus IDF Geometry Viewer", line = 1)
 
     if (is.null(private$m_geom$parent()$path())) {

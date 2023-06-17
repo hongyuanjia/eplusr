@@ -54,7 +54,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' }
         #' }
         #'
-        initialize = function (idfs, epws) {
+        initialize = function(idfs, epws) {
             # add Output:SQLite and Output:VariableDictionary if necessary
             input <- get_epgroup_input(idfs, epws, sql = TRUE, dict = TRUE)
 
@@ -135,7 +135,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE,
+        run = function(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE,
                         echo = wait, separate = TRUE, readvars = TRUE)
             epgroup_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
         # }}}
@@ -156,7 +156,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$kill()
         #' }
         #'
-        kill = function ()
+        kill = function()
             epgroup_kill(self, private),
         # }}}
 
@@ -194,7 +194,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$status()
         #' }
         #'
-        status = function ()
+        status = function()
             epgroup_status(self, private),
         # }}}
 
@@ -223,7 +223,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$errors(info = TRUE)
         #' }
         #'
-        errors = function (which = NULL, info = FALSE)
+        errors = function(which = NULL, info = FALSE)
             epgroup_output_errors(self, private, which, info),
         # }}}
 
@@ -249,7 +249,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$output_dir(c(1, 4))
         #' }
         #'
-        output_dir = function (which = NULL)
+        output_dir = function(which = NULL)
             epgroup_output_dir(self, private, which),
         # }}}
 
@@ -364,7 +364,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$locate_output(full = TRUE)
         #' }
         #'
-        list_files = function (which = NULL, simplify = FALSE, full = FALSE)
+        list_files = function(which = NULL, simplify = FALSE, full = FALSE)
             epgroup_list_files(self, private, which, simplify, full),
         # }}}
 
@@ -396,7 +396,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$locate_output(c(1, 4), ".expidf", strict = TRUE)
         #' }
         #'
-        locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
+        locate_output = function(which = NULL, suffix = ".err", strict = TRUE)
             epgroup_locate_output(self, private, which, suffix, strict),
         # }}}
 
@@ -420,7 +420,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$list_table(c(1, 4))
         #' }
         #'
-        list_table = function (which = NULL)
+        list_table = function(which = NULL)
             epgroup_list_table(self, private, which),
         # }}}
 
@@ -451,7 +451,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$read_table(c(1, 4), "Zones")
         #' }
         #'
-        read_table = function (which = NULL, name)
+        read_table = function(which = NULL, name)
             epgroup_read_table(self, private, which, name),
         # }}}
 
@@ -478,7 +478,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$read_rdd(c(1, 4))
         #' }
         #'
-        read_rdd = function (which = NULL)
+        read_rdd = function(which = NULL)
             epgroup_read_rdd(self, private, which),
         # }}}
 
@@ -505,7 +505,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$read_mdd(c(1, 4))
         #' }
         #'
-        read_mdd = function (which = NULL)
+        read_mdd = function(which = NULL)
             epgroup_read_mdd(self, private, which),
         # }}}
 
@@ -550,7 +550,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$report_data_dict(c(1, 4))
         #' }
         #'
-        report_data_dict = function (which = NULL)
+        report_data_dict = function(which = NULL)
             epgroup_report_data_dict(self, private, which),
         # }}}
 
@@ -753,7 +753,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$report_data(c(1, 4), dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
         #' }
         #'
-        report_data = function (which = NULL, key_value = NULL, name = NULL,
+        report_data = function(which = NULL, key_value = NULL, name = NULL,
                                 year = NULL, tz = "UTC", all = FALSE, wide = FALSE,
                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                 interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -869,7 +869,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$print()
         #' }
         #'
-        print = function ()
+        print = function()
             epgroup_print(self, private)
         # }}}
         # }}}
@@ -883,25 +883,25 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         m_log = NULL,
         # }}}
         # PRIVATE FUNCTIONS {{{
-        uuid = function () private$m_log$uuid,
-        log_new_uuid = function () log_new_uuid(private$m_log),
+        uuid = function() private$m_log$uuid,
+        log_new_uuid = function() log_new_uuid(private$m_log),
 
-        idf_uuid = function (which = NULL) {
+        idf_uuid = function(which = NULL) {
             idfs <- if (is.null(which)) private$m_idfs else private$m_idfs[which]
-            vcapply(idfs, function (idf) get_priv_env(idf)$uuid())
+            vcapply(idfs, function(idf) get_priv_env(idf)$uuid())
         },
-        log_idf_uuid = function (which = NULL) {
+        log_idf_uuid = function(which = NULL) {
             if (is.null(which)) which <- seq_along(private$m_idfs)
             private$m_log$idf_uuid[which] <- private$idf_uuid(which)
         },
-        cached_idf_uuid = function (which = NULL) {
+        cached_idf_uuid = function(which = NULL) {
             if (is.null(which)) which <- seq_along(private$m_log$idf_uuid)
             private$m_log$idf_uuid[which]
         },
 
-        is_unsaved = function () private$m_log$unsaved,
-        log_saved = function (which = NULL) log_saved(private$m_log, which),
-        log_unsaved = function (which = NULL) log_unsaved(private$m_log, which)
+        is_unsaved = function() private$m_log$unsaved,
+        log_saved = function(which = NULL) log_saved(private$m_log, which),
+        log_unsaved = function(which = NULL) log_unsaved(private$m_log, which)
         # }}}
     )
 )
@@ -924,13 +924,13 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
 #' @export
 #' @name EplusGroupJob
 # group_job {{{
-group_job <- function (idfs, epws) {
+group_job <- function(idfs, epws) {
     EplusGroupJob$new(idfs, epws)
 }
 # }}}
 
 # epgroup_run {{{
-epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
+epgroup_run <- function(self, private, output_dir = NULL, wait = TRUE,
                          force = FALSE, copy_external = FALSE, echo = wait,
                          separate = TRUE, readvars = TRUE) {
     # check if generated models have been modified outside
@@ -951,7 +951,7 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE,
 # }}}
 # epgroup_run_models {{{
 #' @importFrom checkmate test_names
-epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
+epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
                                 force = FALSE, copy_external = FALSE, echo = wait,
                                 separate = TRUE, readvars = TRUE) {
     assert_flag(wait)
@@ -959,7 +959,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
     assert_flag(separate)
     assert_flag(readvars)
 
-    path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
+    path_idf <- vcapply(private$m_idfs, function(idf) idf$path())
 
     if (checkmate::test_names(names(private$m_idfs))) {
         # for parametric job
@@ -1026,7 +1026,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
         # remove duplications
         dup <- duplicated(path_group)
         apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
-            function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
+            function(x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
         )
         private$log_idf_uuid(which(to_save))
         private$log_saved(which(to_save))
@@ -1037,7 +1037,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
     private$m_log$killed <- NULL
     private$m_job <- NULL
 
-    ver <- vcapply(private$m_idfs, function (idf) as.character(idf$version()))
+    ver <- vcapply(private$m_idfs, function(idf) as.character(idf$version()))
 
     # init job table
     jobs <- pre_job_inputs(path_group, path_epw, NULL, design_day, FALSE, ver)
@@ -1075,7 +1075,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE,
 }
 # }}}
 # epgroup_kill {{{
-epgroup_kill <- function (self, private) {
+epgroup_kill <- function(self, private) {
     if (is.null(private$m_job)) {
         verbose_info("The parametric job is not running.")
         return(invisible(FALSE))
@@ -1093,7 +1093,7 @@ epgroup_kill <- function (self, private) {
         return(invisible(FALSE))
     }
 
-    k <- tryCatch(proc$kill(), error = function (e) FALSE)
+    k <- tryCatch(proc$kill(), error = function(e) FALSE)
 
     if (isTRUE(k)) {
         verbose_info("The parametric job has been successfully killed.")
@@ -1106,7 +1106,7 @@ epgroup_kill <- function (self, private) {
 }
 # }}}
 # epgroup_status {{{
-epgroup_status <- function (self, private) {
+epgroup_status <- function(self, private) {
     status <- list(
         run_before = FALSE, # if the model has been run before
         alive = FALSE, # if simulation is still running
@@ -1123,12 +1123,12 @@ epgroup_status <- function (self, private) {
             status$job_status <- data.table(
                 index = seq_along(private$m_idfs),
                 status = "idle",
-                idf = vcapply(private$m_idfs, function (idf) idf$path())
+                idf = vcapply(private$m_idfs, function(idf) idf$path())
             )
             if (is.null(private$m_epws_path)) {
                 epw <- NA_character_
             } else {
-                epw <- vcapply(private$m_epws_path, function (epw) if (is.null(epw)) NA_character_ else epw)
+                epw <- vcapply(private$m_epws_path, function(epw) if (is.null(epw)) NA_character_ else epw)
             }
             set(status$job_status, NULL, "epw", epw)
         }
@@ -1165,7 +1165,7 @@ epgroup_status <- function (self, private) {
             exit_status <- proc$get_exit_status()
 
             # retrieve results
-            res <- tryCatch(proc$get_result(), error = function (e) data.table())
+            res <- tryCatch(proc$get_result(), error = function(e) data.table())
 
             if (!is.null(res)) {
                 # update job
@@ -1194,12 +1194,12 @@ epgroup_status <- function (self, private) {
 }
 # }}}
 # epgroup_output_dir {{{
-epgroup_output_dir <- function (self, private, which = NULL) {
+epgroup_output_dir <- function(self, private, which = NULL) {
     epgroup_job_from_which(self, private, which, keep_unsucess = TRUE)$output_dir
 }
 # }}}
 # epgroup_list_files {{{
-epgroup_list_files <- function (self, private, which = NULL, simplify = FALSE, full = FALSE) {
+epgroup_list_files <- function(self, private, which = NULL, simplify = FALSE, full = FALSE) {
     assert_flag(simplify)
     assert_flag(full)
 
@@ -1246,7 +1246,7 @@ epgroup_list_files <- function (self, private, which = NULL, simplify = FALSE, f
 }
 # }}}
 # epgroup_locate_output {{{
-epgroup_locate_output <- function (self, private, which = NULL, suffix = ".err", strict = TRUE, keep_unsucess = FALSE) {
+epgroup_locate_output <- function(self, private, which = NULL, suffix = ".err", strict = TRUE, keep_unsucess = FALSE) {
     job <- epgroup_job_from_which(self, private, which, keep_unsucess = keep_unsucess)
 
     out <- paste0(tools::file_path_sans_ext(job$model), suffix)
@@ -1260,7 +1260,7 @@ epgroup_locate_output <- function (self, private, which = NULL, suffix = ".err",
 }
 # }}}
 # epgroup_output_errors {{{
-epgroup_output_errors <- function (self, private, which, info = FALSE) {
+epgroup_output_errors <- function(self, private, which, info = FALSE) {
     # continue to parse err file for jobs having non-zero exits (#24)
     path_err <- epgroup_locate_output(self, private, which, ".err", keep_unsucess = TRUE)
 
@@ -1268,44 +1268,44 @@ epgroup_output_errors <- function (self, private, which, info = FALSE) {
 
     names(err) <- epgroup_case_from_which(self, private, which, name = TRUE)
 
-    if (!info) err <- lapply(err, function (x) x[!(level == "Info")])
+    if (!info) err <- lapply(err, function(x) x[!(level == "Info")])
 
     err
 }
 # }}}
 # epgroup_list_table {{{
-epgroup_list_table <- function (self, private, which = NULL) {
+epgroup_list_table <- function(self, private, which = NULL) {
     cases <- epgroup_case_from_which(self, private, which, name = TRUE)
     lists <- lapply(epgroup_sql_path(self, private, which), list_sql_table)
     setattr(lists, "names", cases)[]
 }
 # }}}
 # epgroup_read_table {{{
-epgroup_read_table <- function (self, private, which = NULL, table) {
+epgroup_read_table <- function(self, private, which = NULL, table) {
     tables <- lapply(epgroup_sql_path(self, private, which), read_sql_table, table)
     epgroup_combine_data(self, private, which, tables)[]
 }
 # }}}
 # epgroup_read_rdd {{{
-epgroup_read_rdd <- function (self, private, which = NULL) {
+epgroup_read_rdd <- function(self, private, which = NULL) {
     rdds <- lapply(epgroup_rdd_path(self, private, which, "rdd"), read_rdd)
     epgroup_combine_data(self, private, which, rdds)[]
 }
 # }}}
 # epgroup_read_mdd {{{
-epgroup_read_mdd <- function (self, private, which = NULL) {
+epgroup_read_mdd <- function(self, private, which = NULL) {
     mdds <- lapply(epgroup_rdd_path(self, private, which, "mdd"), read_mdd)
     epgroup_combine_data(self, private, which, mdds)[]
 }
 # }}}
 # epgroup_report_data_dict {{{
-epgroup_report_data_dict <- function (self, private, which) {
+epgroup_report_data_dict <- function(self, private, which) {
     dicts <- lapply(epgroup_sql_path(self, private, which), get_sql_report_data_dict)
     epgroup_combine_data(self, private, which, dicts)[]
 }
 # }}}
 # epgroup_report_data {{{
-epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
+epgroup_report_data <- function(self, private, which = NULL, key_value = NULL,
                                  name = NULL, year = NULL, tz = "GMT", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -1325,7 +1325,7 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
 }
 # }}}
 # epgroup_tabular_data {{{
-epgroup_tabular_data <- function (self, private, which = NULL, report_name = NULL, report_for = NULL,
+epgroup_tabular_data <- function(self, private, which = NULL, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   wide = FALSE, string_value = !wide) {
     l <- Map(get_sql_tabular_data,
@@ -1344,13 +1344,13 @@ epgroup_tabular_data <- function (self, private, which = NULL, report_name = NUL
     nm_all <- unique(unlist(lapply(l, names)))
     names(nm_all) <- nm_all
 
-    lapply(nm_all, function (nm) {
-        rbindlist(lapply(l, function (lst) lst[[nm]]), fill = TRUE)
+    lapply(nm_all, function(nm) {
+        rbindlist(lapply(l, function(lst) lst[[nm]]), fill = TRUE)
     })
 }
 # }}}
 # epgroup_print {{{
-epgroup_print <- function (self, private) {
+epgroup_print <- function(self, private) {
     cli::cat_rule("EnergPlus Group Simulation Job", col = "green")
     cli::cat_line(paste0("Grouped Jobs [", length(private$m_idfs), "]: "))
 
@@ -1360,16 +1360,16 @@ epgroup_print <- function (self, private) {
 
 # helper
 # get_epgroup_input {{{
-get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
+get_epgroup_input <- function(idfs, epws, sql = TRUE, dict = TRUE) {
     # check idf {{{
     if (is_idf(idfs)) {
         idfs <- list(get_init_idf(idfs, sql = sql, dict = dict))
     } else {
-        init_idf <- function (...) {
+        init_idf <- function(...) {
             tryCatch(get_init_idf(...),
-                eplusr_error_idf_not_local = function (e) e,
-                eplusr_error_idf_path_not_exist = function (e) e,
-                eplusr_error_idf_not_saved = function (e) e
+                eplusr_error_idf_not_local = function(e) e,
+                eplusr_error_idf_path_not_exist = function(e) e,
+                eplusr_error_idf_not_saved = function(e) e
             )
         }
         idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
@@ -1389,13 +1389,13 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
     # }}}
 
     # check epw paths {{{
-    get_epw <- function (epw) if (is.null(epw)) NA_character_ else get_init_epw(epw)
+    get_epw <- function(epw) if (is.null(epw)) NA_character_ else get_init_epw(epw)
 
-    epws <- lapply(epws, function (x) {
+    epws <- lapply(epws, function(x) {
         tryCatch(get_epw(x),
-            eplusr_error_epw_not_local = function (e) e,
-            eplusr_error_epw_path_not_exist = function (e) e,
-            eplusr_error_epw_not_saved = function (e) e
+            eplusr_error_epw_not_local = function(e) e,
+            eplusr_error_epw_path_not_exist = function(e) e,
+            eplusr_error_epw_not_saved = function(e) e
         )
     })
 
@@ -1427,7 +1427,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 }
 # }}}
 # epgroup_retrieve_data {{{
-epgroup_retrieve_data <- function (self, private, status) {
+epgroup_retrieve_data <- function(self, private, status) {
     if (!status$run_before) return(invisible())
 
     if (status$alive) {
@@ -1441,7 +1441,7 @@ epgroup_retrieve_data <- function (self, private, status) {
         if (status$successful) {
             if (inherits(private$m_job, "r_process")) {
                 private$m_job <- tryCatch(private$m_job$get_result(),
-                    error = function (e) {
+                    error = function(e) {
                         stop("Failed to retrieve output of parametric job. ", e, "\n",
                             private$m_log$stderr, call. = FALSE)
                     }
@@ -1456,7 +1456,7 @@ epgroup_retrieve_data <- function (self, private, status) {
 }
 # }}}
 # epgroup_job_from_which {{{
-epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE) {
+epgroup_job_from_which <- function(self, private, which, keep_unsucess = FALSE) {
     status <- epgroup_status(self, private)
 
     if (!isTRUE(status$run_before))
@@ -1507,7 +1507,7 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
 # }}}
 # epgroup_case_from_which {{{
 #' @importFrom checkmate test_names
-epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) {
+epgroup_case_from_which <- function(self, private, which = NULL, name = FALSE) {
     if (checkmate::test_named(private$m_idfs)) {
         nms <- names(private$m_idfs)
     } else {
@@ -1540,18 +1540,18 @@ epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) 
 }
 # }}}
 # epgroup_sql_path {{{
-epgroup_sql_path <- function (self, private, which) {
+epgroup_sql_path <- function(self, private, which) {
     epgroup_locate_output(self, private, which, ".sql")
 }
 # }}}
 # epgroup_rdd_path {{{
-epgroup_rdd_path <- function (self, private, which, type = c("rdd", "mdd")) {
+epgroup_rdd_path <- function(self, private, which, type = c("rdd", "mdd")) {
     type <- match.arg(type)
     epgroup_locate_output(self, private, which, paste0(".", type))
 }
 # }}}
 # epgroup_combine_data {{{
-epgroup_combine_data <- function (self, private, which, data, fill = TRUE) {
+epgroup_combine_data <- function(self, private, which, data, fill = TRUE) {
     index <- epgroup_case_from_which(self, private, which, name = FALSE)
     cases <- epgroup_case_from_which(self, private, which, name = TRUE)
 
@@ -1566,14 +1566,14 @@ epgroup_combine_data <- function (self, private, which, data, fill = TRUE) {
 }
 # }}}
 # epgroup_print_status {{{
-epgroup_print_status <- function (self, private, epw = TRUE) {
+epgroup_print_status <- function(self, private, epw = TRUE) {
     status <- epgroup_status(self, private)
     epgroup_retrieve_data(self, private, status)
 
     if (!is.null(names(private$m_idfs))) {
         nm_idf <- paste0(names(private$m_idfs), ".idf")
     } else {
-        nm_idf <- vcapply(private$m_idfs, function (x) basename(x$path()))
+        nm_idf <- vcapply(private$m_idfs, function(x) basename(x$path()))
     }
     if (!epw) {
         nm <- cli::ansi_strtrim(paste0(
@@ -1622,7 +1622,7 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
                 "IDLE       --> [IDF]", surround(names(private$m_idfs)[index]))]
             stderr <- paste0(lpad(job_status$index, "0"), "|" ,job_status$V2)
             safe_width <- getOption("width") - 2L
-            stderr_trunc <- vcapply(stderr, function (l) {
+            stderr_trunc <- vcapply(stderr, function(l) {
                 if (nchar(l) > safe_width) {
                     paste0(substr(l, 1, safe_width), "...")
                 } else {
@@ -1686,23 +1686,23 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
 
 # S3 EplusGroupJob methods {{{
 #' @export
-str.EplusGroupJob <- function (object, ...) {
+str.EplusGroupJob <- function(object, ...) {
     object$print()
 }
 
 #' @export
-format.EplusGroupJob <- function (x, ...) {
+format.EplusGroupJob <- function(x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
 }
 
 #' @export
-`==.EplusGroupJob` <- function (e1, e2) {
+`==.EplusGroupJob` <- function(e1, e2) {
     if (!inherits(e2, "EplusGroupJob")) return(FALSE)
     identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export
-`!=.EplusGroupJob` <- function (e1, e2) {
+`!=.EplusGroupJob` <- function(e1, e2) {
     Negate(`==.EplusGroupJob`)(e1, e2)
 }
 # }}}

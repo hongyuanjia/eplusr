@@ -52,7 +52,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' }
         #'
         #' @importFrom checkmate assert_count
-        initialize = function (object, class = NULL, parent) {
+        initialize = function(object, class = NULL, parent) {
             if (missing(parent) || (!is_idf(parent) && !is_epw(parent))) {
                 abort(paste("IdfObject can only be created based a parent Idf object.",
                     "Please give 'parent', which should be an Idf object.")
@@ -91,7 +91,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$version()
         #' }
         #'
-        version = function ()
+        version = function()
             idfobj_version(self, private),
         # }}}
 
@@ -109,7 +109,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$parent()
         #' }
         #'
-        parent = function ()
+        parent = function()
             idfobj_parent(self, private),
         # }}}
 
@@ -131,7 +131,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$id()
         #' }
         #'
-        id = function ()
+        id = function()
             idfobj_id(self, private),
         # }}}
 
@@ -160,7 +160,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' idf$Version$name()
         #' }
         #'
-        name = function ()
+        name = function()
             idfobj_name(self, private),
         # }}}
 
@@ -179,7 +179,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$group_name()
         #' }
         #'
-        group_name = function ()
+        group_name = function()
             idfobj_group_name(self, private),
         # }}}
 
@@ -198,7 +198,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$class_name()
         #' }
         #'
-        class_name = function ()
+        class_name = function()
             idfobj_class_name(self, private),
         # }}}
 
@@ -218,7 +218,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$definition()
         #' }
         #'
-        definition = function ()
+        definition = function()
             idfobj_definition(self, private),
         # }}}
 
@@ -280,7 +280,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$comment()
         #' }
         #'
-        comment = function (comment, append = TRUE, width = 0L)
+        comment = function(comment, append = TRUE, width = 0L)
             idfobj_comment(self, private, comment, append, width),
         # }}}
 
@@ -337,7 +337,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat[c("Name", "Density")]
         #' }
         #'
-        value = function (which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
+        value = function(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
             idfobj_value(self, private, which, all, simplify, unit),
         # }}}
 
@@ -413,7 +413,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$Thickness
         #' }
         #'
-        set = function (..., .default = TRUE, .empty = FALSE)
+        set = function(..., .default = TRUE, .empty = FALSE)
             idfobj_set(self, private, ..., .default = .default, .empty = .empty),
         # }}}
 
@@ -492,7 +492,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$value_possible()
         #' }
         #'
-        value_possible = function (which = NULL, type = c("auto", "default", "choice", "range", "source"))
+        value_possible = function(which = NULL, type = c("auto", "default", "choice", "range", "source"))
             idfobj_value_possible(self, private, which, type),
         # }}}
 
@@ -664,7 +664,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
         #' }
         #'
-        validate = function (level = eplusr_option("validate_level"))
+        validate = function(level = eplusr_option("validate_level"))
             idfobj_validate(self, private, level),
         # }}}
 
@@ -706,7 +706,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
         #' }
         #'
-        is_valid = function (level = eplusr_option("validate_level"))
+        is_valid = function(level = eplusr_option("validate_level"))
             idfobj_is_valid(self, private, level),
         # }}}
 
@@ -811,7 +811,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' roof$value_relation("name", direction = "ref_by")
         #' }
         #'
-        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+        value_relation = function(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
                                    object = NULL, class = NULL, group = NULL, depth = 0L, keep = FALSE,
                                    class_ref = c("both", "none", "all"))
             idfobj_value_relation(self, private, which, match.arg(direction),
@@ -880,7 +880,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$ref_to_object() # not referencing other objects
         #' }
         #'
-        ref_to_object = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L, class_ref = c("both", "none", "all"))
+        ref_to_object = function(which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L, class_ref = c("both", "none", "all"))
             idfobj_ref_to_object(self, private, which, object = NULL, class = class, group = group, depth = depth, class_ref = match.arg(class_ref)),
         # }}}
 
@@ -945,7 +945,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$ref_by_object() # referenced by construction "FLOOR"
         #' }
         #'
-        ref_by_object = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L, class_ref = c("both", "none", "all"))
+        ref_by_object = function(which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L, class_ref = c("both", "none", "all"))
             idfobj_ref_by_object(self, private, which, object = object, class = class, group = group, depth = depth, class_ref = match.arg(class_ref)),
         # }}}
 
@@ -990,7 +990,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' }
         #' }
         #'
-        ref_to_node = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L)
+        ref_to_node = function(which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L)
             idfobj_ref_to_node(self, private, which, object = NULL, class = class, group = group, depth = depth),
         # }}}
 
@@ -1053,7 +1053,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$has_ref_to()
         #' }
         #'
-        has_ref_to = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE, class_ref = c("both", "none", "all"))
+        has_ref_to = function(which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE, class_ref = c("both", "none", "all"))
             idfobj_has_ref_to(self, private, which, object = object, class = class, group = group, recursive = recursive, class_ref = match.arg(class_ref)),
         # }}}
 
@@ -1116,7 +1116,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$has_ref_by()
         #' }
         #'
-        has_ref_by = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE, class_ref = c("both", "none", "all"))
+        has_ref_by = function(which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE, class_ref = c("both", "none", "all"))
             idfobj_has_ref_by(self, private, which, object = object, class = class, group = group, recursive = recursive, class_ref = match.arg(class_ref)),
         # }}}
 
@@ -1156,7 +1156,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$has_ref_node()
         #' }
         #'
-        has_ref_node = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+        has_ref_node = function(which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
             idfobj_has_ref_node(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
@@ -1199,7 +1199,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$has_ref()
         #' }
         #'
-        has_ref = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+        has_ref = function(which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
             idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
@@ -1306,7 +1306,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRUE)
         #' }
         #'
-        to_table = function (string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE, group_ext = c("none", "group", "index"))
+        to_table = function(string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE, group_ext = c("none", "group", "index"))
             idfobj_to_table(self, private, all, string_value, unit, wide, match.arg(group_ext)),
         # }}}
 
@@ -1344,7 +1344,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$to_string(leading = 0)
         #' }
         #'
-        to_string = function (comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
+        to_string = function(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
             idfobj_to_string(self, private, comment, leading, sep_at, all),
         # }}}
 
@@ -1386,7 +1386,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$print(auto_sep = TRUE)
         #' }
         #'
-        print = function (comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE)
+        print = function(comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE)
             idfobj_print(self, private, comment, auto_sep, brief, all)
         # }}}
         # }}}
@@ -1401,9 +1401,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        idf_env = function () get_priv_env(private$m_parent)$idf_env(),
-        idd_env = function () get_priv_env(private$m_parent)$idd_env(),
-        log_env = function () get_priv_env(private$m_parent)$m_log
+        idf_env = function() get_priv_env(private$m_parent)$idf_env(),
+        idd_env = function() get_priv_env(private$m_parent)$idd_env(),
+        log_env = function() get_priv_env(private$m_parent)$m_log
         # }}}
     )
 )
@@ -1457,7 +1457,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 #' @export
 # idf_object {{{
 #' @importFrom checkmate assert_string
-idf_object <- function (parent, object = NULL, class = NULL) {
+idf_object <- function(parent, object = NULL, class = NULL) {
     if (missing(parent) || !is_idf(parent)) {
         abort(paste("IdfObject can only be created based a parent Idf object.",
             "Please give `parent`, which should be an Idf object.")
@@ -1495,27 +1495,27 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 # }}}
 
 # idfobj_version {{{
-idfobj_version <- function (self, private) {
+idfobj_version <- function(self, private) {
     private$m_parent$version()
 }
 # }}}
 # idfobj_parent {{{
-idfobj_parent <- function (self, private) {
+idfobj_parent <- function(self, private) {
     private$m_parent
 }
 # }}}
 # idfobj_id {{{
-idfobj_id <- function (self, private) {
+idfobj_id <- function(self, private) {
     private$m_object_id
 }
 # }}}
 # idfobj_name {{{
-idfobj_name <- function (self, private) {
+idfobj_name <- function(self, private) {
     private$idf_env()$object[J(private$m_object_id), on = "object_id", object_name]
 }
 # }}}
 # idfobj_group_name {{{
-idfobj_group_name <- function (self, private) {
+idfobj_group_name <- function(self, private) {
     private$idd_env()$group[
         J(private$idd_env()$class[J(private$m_class_id), on = "class_id", group_id]),
         on = "group_id",
@@ -1524,18 +1524,18 @@ idfobj_group_name <- function (self, private) {
 }
 # }}}
 # idfobj_class_name {{{
-idfobj_class_name <- function (self, private) {
+idfobj_class_name <- function(self, private) {
     private$idd_env()$class[J(private$m_class_id), on = "class_id", class_name]
 }
 # }}}
 # idfobj_definition {{{
-idfobj_definition <- function (self, private) {
+idfobj_definition <- function(self, private) {
     IddObject$new(private$m_class_id, get_priv_env(private$m_parent)$m_idd)
 }
 # }}}
 # idfobj_comment {{{
 #' @importFrom checkmate assert_character
-idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
+idfobj_comment <- function(self, private, comment, append = TRUE, width = 0L) {
     if (missing(comment)) {
         return(private$idf_env()$object[J(private$m_object_id), on = "object_id"]$comment[[1L]])
     }
@@ -1556,12 +1556,12 @@ idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
 }
 # }}}
 # idfobj_value {{{
-idfobj_value <- function (self, private, which = NULL, all = FALSE, simplify = FALSE, unit = FALSE) {
+idfobj_value <- function(self, private, which = NULL, all = FALSE, simplify = FALSE, unit = FALSE) {
     get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which, all, simplify, unit)
 }
 # }}}
 # idfobj_set {{{
-idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
+idfobj_set <- function(self, private, ..., .default = TRUE, .empty = FALSE) {
     # support value input in a list format
     lst <- list(...)
     if (!(length(lst) == 1L && is.list(lst[[1L]]))) lst <- list(lst)
@@ -1574,25 +1574,25 @@ idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
 }
 # }}}
 # idfobj_value_possible {{{
-idfobj_value_possible <- function (self, private, which = NULL, type = c("auto", "default", "choice", "range", "source")) {
+idfobj_value_possible <- function(self, private, which = NULL, type = c("auto", "default", "choice", "range", "source")) {
 
     get_idfobj_possible(private$idd_env(), private$idf_env(), private$m_object_id, which, type)
 }
 # }}}
 # idfobj_validate {{{
-idfobj_validate <- function (self, private, level = eplusr_option("validate_level")) {
+idfobj_validate <- function(self, private, level = eplusr_option("validate_level")) {
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
     val <- get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id)
     validate_on_level(private$idd_env(), private$idf_env(), obj, val, level)
 }
 # }}}
 # idfobj_is_valid {{{
-idfobj_is_valid <- function (self, private, level = eplusr_option("validate_level")) {
+idfobj_is_valid <- function(self, private, level = eplusr_option("validate_level")) {
     count_check_error(idfobj_validate(self, private, level)) == 0L
 }
 # }}}
 # idfobj_value_relation {{{
-idfobj_value_relation <- function (self, private, which = NULL,
+idfobj_value_relation <- function(self, private, which = NULL,
                                    direction = c("all", "ref_to", "ref_by", "node"),
                                    object = object, class = NULL, group = NULL, depth = 0L,
                                    keep = FALSE, class_ref = c("both", "none", "all")) {
@@ -1608,7 +1608,7 @@ idfobj_value_relation <- function (self, private, which = NULL,
 }
 # }}}
 # idfobj_ref_to_object {{{
-idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL,
+idfobj_ref_to_object <- function(self, private, which = NULL, object = NULL,
                                   class = NULL, group = NULL, depth = 0L,
                                   class_ref = c("both", "none", "all")) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
@@ -1645,7 +1645,7 @@ idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL,
 }
 # }}}
 # idfobj_ref_by_object {{{
-idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL,
+idfobj_ref_by_object <- function(self, private, which = NULL, object = NULL,
                                   class = NULL, group = NULL, depth = 0L,
                                   class_ref = c("both", "none", "all")) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
@@ -1682,7 +1682,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL,
 }
 # }}}
 # idfobj_ref_to_node {{{
-idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
+idfobj_ref_to_node <- function(self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
@@ -1716,7 +1716,7 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
 }
 # }}}
 # idfobj_has_ref {{{
-idfobj_has_ref <- function (self, private, which = NULL, object = NULL,
+idfobj_has_ref <- function(self, private, which = NULL, object = NULL,
                             class = NULL, group = NULL, type = c("all", "ref_to", "ref_by", "node"),
                             recursive = FALSE, class_ref = c("both", "none", "all")) {
     depth <- if (recursive) NULL else 0L
@@ -1750,7 +1750,7 @@ idfobj_has_ref <- function (self, private, which = NULL, object = NULL,
 }
 # }}}
 # idfobj_has_ref_to {{{
-idfobj_has_ref_to <- function (self, private, which = NULL, object = NULL,
+idfobj_has_ref_to <- function(self, private, which = NULL, object = NULL,
                                class = NULL, group = NULL, recursive = FALSE,
                                class_ref = c("both", "none", "all")) {
     idfobj_has_ref(self, private, which, object = object, class = class, group = group,
@@ -1758,7 +1758,7 @@ idfobj_has_ref_to <- function (self, private, which = NULL, object = NULL,
 }
 # }}}
 # idfobj_has_ref_by {{{
-idfobj_has_ref_by <- function (self, private, which = NULL, object = NULL,
+idfobj_has_ref_by <- function(self, private, which = NULL, object = NULL,
                                class = NULL, group = NULL, recursive = FALSE,
                                class_ref = c("both", "none", "all")) {
     idfobj_has_ref(self, private, which, object = object, class = class, group = group,
@@ -1766,12 +1766,12 @@ idfobj_has_ref_by <- function (self, private, which = NULL, object = NULL,
 }
 # }}}
 # idfobj_has_ref_node {{{
-idfobj_has_ref_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE) {
+idfobj_has_ref_node <- function(self, private, which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE) {
     idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive, type = "node")
 }
 # }}}
 # idfobj_to_table {{{
-idfobj_to_table <- function (self, private, all = FALSE, string_value = TRUE,
+idfobj_to_table <- function(self, private, all = FALSE, string_value = TRUE,
                              unit = TRUE, wide = FALSE, group_ext = c("none", "group", "index")) {
     get_idfobj_table(private$idd_env(), private$idf_env(), private$m_object_id,
         all = all, unit = unit, wide = wide, string_value = string_value,
@@ -1780,14 +1780,14 @@ idfobj_to_table <- function (self, private, all = FALSE, string_value = TRUE,
 }
 # }}}
 # idfobj_to_string {{{
-idfobj_to_string <- function (self, private, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+idfobj_to_string <- function(self, private, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
     get_idfobj_string(private$idd_env(), private$idf_env(), private$m_object_id,
         comment = comment, leading = leading, sep_at = sep_at, all = all
     )
 }
 # }}}
 # idfobj_print {{{
-idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief = FALSE, all = FALSE) {
+idfobj_print <- function(self, private, comment = TRUE, auto_sep = FALSE, brief = FALSE, all = FALSE) {
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
 
     if (is.na(obj$object_name)) {
@@ -1843,7 +1843,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' @examples
 #' \dontrun{
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-#'     idd = use_idd(8.8, download = "auto"))
+#'     idd = use_idd("8.8", download = "auto"))
 #'
 #' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 #' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
@@ -1853,7 +1853,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #'
 #' @export
 # format.IdfObject {{{
-format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
+format.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
     paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all), collapse = "\n")
 }
 # }}}
@@ -1867,7 +1867,7 @@ format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all
 #' @examples
 #' \dontrun{
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-#'     idd = use_idd(8.8, download = "auto"))
+#'     idd = use_idd("8.8", download = "auto"))
 #'
 #' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 #' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
@@ -1877,14 +1877,14 @@ format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all
 #'
 #' @export
 # as.character.IdfObject {{{
-as.character.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
+as.character.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
     x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
 }
 # }}}
 
 #' @export
 # str.IdfObject {{{
-str.IdfObject <- function (object, ...) {
+str.IdfObject <- function(object, ...) {
     object <- object$value()
     NextMethod()
 }
@@ -1892,7 +1892,7 @@ str.IdfObject <- function (object, ...) {
 
 #' @export
 # print.IdfObject {{{
-print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE, ...) {
+print.IdfObject <- function(x, comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE, ...) {
     x$print(comment = comment, auto_sep = auto_sep, brief = brief, all = all)
 }
 # }}}
@@ -1917,7 +1917,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
 #' @export
 # $.IdfObject {{{
-'$.IdfObject' <- function (x, name) {
+'$.IdfObject' <- function(x, name) {
     if (name %chin% ls(x)) return(NextMethod())
 
     self <- get_self_env(x)
@@ -1933,7 +1933,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
             get_idfobj_value(private$idd_env(), private$idf_env(),
                 private$m_object_id, which = fld_idx
             )[[1L]],
-            eplusr_error_invalid_field_name = function (e) NextMethod()
+            eplusr_error_invalid_field_name = function(e) NextMethod()
         )
     } else {
         NextMethod()
@@ -1956,7 +1956,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         if (checkmate::test_count(i, positive = TRUE) || i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
             tryCatch(
                 get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which = i)[[1L]],
-                eplusr_error_invalid_field_name = function (e) NextMethod()
+                eplusr_error_invalid_field_name = function(e) NextMethod()
             )
         } else {
             NextMethod()
@@ -1968,7 +1968,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 #' @export
 # $<-.IdfObject {{{
 #' @importFrom checkmate assert_scalar
-`$<-.IdfObject` <- function (x, name, value) {
+`$<-.IdfObject` <- function(x, name, value) {
     # all field names start with a capital letter
     if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
 
@@ -1984,7 +1984,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         if (is.null(value)) value <- list(NULL)
         names(value) <- name
         tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
-            eplusr_error_invalid_field_name = function (e) NextMethod())
+            eplusr_error_invalid_field_name = function(e) NextMethod())
 
         invisible(x)
     } else {
@@ -2016,7 +2016,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         if (is.null(value)) value <- list(NULL)
         names(value) <- nm
         tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
-            eplusr_error_invalid_field_name = function (e) NextMethod())
+            eplusr_error_invalid_field_name = function(e) NextMethod())
 
         invisible(x)
     } else {
@@ -2027,7 +2027,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
 #' @export
 # ==.IdfObject {{{
-`==.IdfObject` <- function (e1, e2) {
+`==.IdfObject` <- function(e1, e2) {
     if (!is_idfobject(e2)) return(FALSE)
     identical(
         get_priv_env(get_priv_env(e1)$m_parent)$m_log$uuid,
@@ -2039,7 +2039,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
 #' @export
 # !=.IdfObject {{{
-`!=.IdfObject` <- function (e1, e2) {
+`!=.IdfObject` <- function(e1, e2) {
     Negate(`==.IdfObject`)(e1, e2)
 }
 # }}}

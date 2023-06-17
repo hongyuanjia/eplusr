@@ -1,9 +1,9 @@
 test_that("IddObject class", {
 
-    expect_silent(idd <- Idd$new(idftext("idd", 9.9)))
+    expect_silent(idd <- Idd$new(idftext("idd", "9.9")))
     expect_silent(simple <- IddObject$new("TestSimple", idd))
     expect_silent(slash <- IddObject$new("TestSlash", idd))
-    expect_silent(slash <- idd_object(use_idd(idftext("idd", 9.9)), "TestSlash"))
+    expect_silent(slash <- idd_object(use_idd(idftext("idd", "9.9")), "TestSlash"))
 
     expect_error(idd_object(), "based on a parent Idd object", class = "eplusr_error")
 

@@ -35,7 +35,7 @@ NULL
 #'
 #' @keywords internal
 #' @export
-get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, property = NULL,
+get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, property = NULL,
                             underscore = FALSE, ignore_case = FALSE) {
     # if no object is specified
     if (is.null(object)) {
@@ -146,7 +146,7 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
 }
 # }}}
 # get_idf_object_id {{{
-get_idf_object_id <- function (idd_env, idf_env, class = NULL, simplify = FALSE) {
+get_idf_object_id <- function(idd_env, idf_env, class = NULL, simplify = FALSE) {
     obj <- get_idf_object(idd_env, idf_env, class)
     if (simplify) return(obj$object_id)
 
@@ -167,7 +167,7 @@ get_idf_object_id <- function (idd_env, idf_env, class = NULL, simplify = FALSE)
 }
 # }}}
 # get_idf_object_name {{{
-get_idf_object_name <- function (idd_env, idf_env, class = NULL, simplify = FALSE, lower = FALSE) {
+get_idf_object_name <- function(idd_env, idf_env, class = NULL, simplify = FALSE, lower = FALSE) {
     obj <- get_idf_object(idd_env, idf_env, class)
     col <- if (lower) "object_name_lower" else "object_name"
     if (simplify) return(obj[[col]])
@@ -189,7 +189,7 @@ get_idf_object_name <- function (idd_env, idf_env, class = NULL, simplify = FALS
 }
 # }}}
 # get_idf_object_num {{{
-get_idf_object_num <- function (idd_env, idf_env, class = NULL) {
+get_idf_object_num <- function(idd_env, idf_env, class = NULL) {
     if (is.null(class)) return(nrow(idf_env$object))
 
     cls_in <- recognize_input(class, "class")
@@ -228,7 +228,7 @@ get_idf_object_num <- function (idd_env, idf_env, class = NULL) {
 #'
 #' @keywords internal
 #' @export
-get_object_info <- function (dt_object, component = c("id", "name", "class"),
+get_object_info <- function(dt_object, component = c("id", "name", "class"),
                              by_class = FALSE, numbered = TRUE, collapse = NULL,
                              prefix = NULL, name_prefix = TRUE) {
     assert_subset(component, c("id", "name", "class"))
@@ -350,7 +350,7 @@ get_object_info <- function (dt_object, component = c("id", "name", "class"),
 #'
 #' @keywords internal
 #' @export
-init_idf_object <- function (idd_env, idf_env, class, property = NULL, underscore = FALSE, id = TRUE, name = TRUE) {
+init_idf_object <- function(idd_env, idf_env, class, property = NULL, underscore = FALSE, id = TRUE, name = TRUE) {
     obj <- get_idd_class(idd_env, class, underscore = underscore, property = property)
     set(obj, NULL, c("object_name", "object_name_lower", "comment"),
         list(NA_character_, NA_character_, list())
@@ -404,7 +404,7 @@ init_idf_object <- function (idd_env, idf_env, class, property = NULL, underscor
 #'
 #' @keywords internal
 #' @export
-make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
+make_idf_object_name <- function(idd_env, idf_env, dt_object, use_old = TRUE,
                                   prefix_col = NULL, prefix_sep = " ",
                                   keep_na = TRUE, include_ori = FALSE) {
     add_hasname <- FALSE
@@ -530,7 +530,7 @@ make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
                     num <- 0L
                 } else {
                     num <- apply2_int(all_name_lower, new_object_name_lower,
-                        function (all, new) {
+                        function(all, new) {
                             same <- sum(all == new)
                             num <- stri_match_first_regex(all, paste0("^", new, " (\\d+)$"))[, 2L]
                             num[is.na(num)] <- "0"
@@ -561,7 +561,7 @@ make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
 }
 # }}}
 # get_idf_object_multi_scope {{{
-get_idf_object_multi_scope <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+get_idf_object_multi_scope <- function(idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
     obj <- data.table()
 
     if (is.null(object) && is.null(class) && is.null(group)) {
@@ -641,7 +641,7 @@ get_idf_object_multi_scope <- function (idd_env, idf_env, object = NULL, class =
 #' @return A data.table containing specified columns.
 #' @keywords internal
 #' @export
-get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field = NULL,
+get_idf_value <- function(idd_env, idf_env, class = NULL, object = NULL, field = NULL,
                            property = NULL, underscore = FALSE, ignore_case = FALSE,
                            align = FALSE, complete = FALSE, all = FALSE) {
     obj <- get_idf_object(idd_env, idf_env, class, object, NULL, underscore, ignore_case)
@@ -794,7 +794,7 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
 #' @return A data.table containing specified columns.
 #' @keywords internal
 #' @export
-init_idf_value <- function (idd_env, idf_env, class, field = NULL, property = NULL,
+init_idf_value <- function(idd_env, idf_env, class, field = NULL, property = NULL,
                             underscore = FALSE, complete = FALSE, all = FALSE, default = TRUE,
                             id = TRUE) {
     prop <- c("type_enum", "units", "ip_units", "default_chr", "default_num")
@@ -845,7 +845,7 @@ init_idf_value <- function (idd_env, idf_env, class, field = NULL, property = NU
 #' @return A data.table
 #' @keywords internal
 #' @export
-standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice", "reference"), keep = TRUE) {
+standardize_idf_value <- function(idd_env, idf_env, dt_value, type = c("choice", "reference"), keep = TRUE) {
     type <- assert_subset(type, c("choice", "reference"), empty.ok = FALSE)
 
     prop <- "type_enum"
@@ -907,7 +907,7 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
 #'
 #' @keywords internal
 #' @export
-expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .property = NULL) {
+expand_idf_dots_name <- function(idd_env, idf_env, ..., .keep_name = TRUE, .property = NULL) {
     l <- list(...)
 
     # see https://github.com/mllg/checkmate/issues/146
@@ -978,7 +978,7 @@ expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .pro
 #' @inherit expand_idf_dots_value
 #' @keywords internal
 #' @export
-parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
+parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
                               .ref_assign = TRUE, .unique = FALSE,
                               .empty = FALSE, .env = parent.frame()) {
     l <- eval(substitute(alist(...)))
@@ -1199,8 +1199,8 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
             # indicate if vector value input
             if (any(len > 1L)) set(dt_in, i, "rhs_sgl", FALSE)
 
-            val_chr <- lapply(val, function (x) {x <- stri_trim_both(x); x[stri_isempty(x)] <- NA_character_;x})
-            val_num <- lapply(len, function (n) rep(NA_real_, n))
+            val_chr <- lapply(val, function(x) {x <- stri_trim_both(x); x[stri_isempty(x)] <- NA_character_;x})
+            val_num <- lapply(len, function(n) rep(NA_real_, n))
             val_num[isnum] <- lapply(val[isnum], as.double)
 
             set(dt_in, i, "value_chr", list(list(val_chr)))
@@ -1237,7 +1237,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
             }
 
             # check the length of values
-            val_lst <- apply2(val, len_val, function (v, l) {
+            val_lst <- apply2(val, len_val, function(v, l) {
                 if (is.null(v)) {
                     chr <- rep(NA_character_, len)
                     num <- rep(NA_real_, len)
@@ -1294,7 +1294,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
 
     len_obj <- each_length(dt_in$id)
     len_fld <- each_length(dt_in$field_index)
-    rep_each <- function (x, len) rep(x, each = len)
+    rep_each <- function(x, len) rep(x, each = len)
 
     obj <- dt_in[, list(
         rleid = rep(rleid, len_obj),
@@ -1308,7 +1308,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
         is_empty = rep(is_empty, len_obj)
     )]
 
-    each_rleid <- unlist(apply2(len_obj, len_fld, function (lo, lf) rep_each(seq_len(lo), lf)), FALSE, FALSE)
+    each_rleid <- unlist(apply2(len_obj, len_fld, function(lo, lf) rep_each(seq_len(lo), lf)), FALSE, FALSE)
     if (.scalar) {
         val <- dt_in[, list(
             rleid = unlist(rep(rleid, len_obj * len_fld), FALSE, FALSE),
@@ -1423,7 +1423,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
 #'
 #' @keywords internal
 #' @export
-expand_idf_dots_value <- function (idd_env, idf_env, ...,
+expand_idf_dots_value <- function(idd_env, idf_env, ...,
                                    .type = "class", .complete = TRUE, .all = FALSE,
                                    .scalar = TRUE, .pair = FALSE, .ref_assign = TRUE,
                                    .unique = TRUE, .empty = TRUE, .default = TRUE,
@@ -1670,13 +1670,13 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
 
                 # each field should be replicated by object number
                 if (!.sgl) {
-                    cls_val <- cls_val[, lapply(.SD, function (x) rep(x, obj_num)),
+                    cls_val <- cls_val[, lapply(.SD, function(x) rep(x, obj_num)),
                         .SDcols = -c("obj_num", "rhs_sgl"), by = "rleid"]
                 } else {
                     cls_val <- rbindlist(list(
                         # if Class := list(Fld1 = Val1, Fld2 = Val2), each field should
                         # be replicated by object number
-                        cls_val[J(TRUE), on = "rhs_sgl", nomatch = 0L, lapply(.SD, function (x) rep(x, obj_num)),
+                        cls_val[J(TRUE), on = "rhs_sgl", nomatch = 0L, lapply(.SD, function(x) rep(x, obj_num)),
                             .SDcols = -c("obj_num", "rhs_sgl"), by = "rleid"],
 
                         # if Class := list(Fld1 = c(Val1, Val2, Val3, ...)), no
@@ -1896,7 +1896,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
 }
 # }}}
 # match_idd_field {{{
-match_idd_field <- function (idd_env, dt_field) {
+match_idd_field <- function(idd_env, dt_field) {
     # need to verify field name
     i <- which(!is.na(dt_field$field_name))
     # need to verify field index
@@ -1986,14 +1986,14 @@ match_idd_field <- function (idd_env, dt_field) {
 #'
 #' @keywords internal
 #' @export
-expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .strict = TRUE, .complete = TRUE, .all = FALSE) {
+expand_idf_dots_object <- function(idd_env, idf_env, ..., .unique = TRUE, .strict = TRUE, .complete = TRUE, .all = FALSE) {
     l <- list(...)
 
     # stop if empty input
     if (!length(l)) abort("Assertion on 'Input' failed: Contains only missing values.", "dots_empty")
 
     # extract Idf meta
-    extract_idf <- function (x) {
+    extract_idf <- function(x) {
         list(version = get_priv_env(x)$m_version,
              uuid = get_priv_env(x)$uuid(),
              object_id = NA_integer_,
@@ -2002,7 +2002,7 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
         )
     }
     # extract IdfObject meta
-    extract_idfobj <- function (x) {
+    extract_idfobj <- function(x) {
         list(version = get_priv_env(get_priv_env(x)$m_parent)$m_version,
              uuid = get_priv_env(get_priv_env(x)$m_parent)$uuid(),
              object_id = get_priv_env(x)$m_object_id,
@@ -2010,13 +2010,13 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
              idf_env = list(get_priv_env(x)$idf_env())
         )
     }
-    extract_data <- function (x) {
+    extract_data <- function(x) {
         if (is_idf(x)) extract_idf(x) else if (is_idfobject(x)) extract_idfobj(x)
     }
 
     len <- rep(1L, length(l))
     is_nest <- logical(length(l))
-    d <- lapply(seq_along(l), function (i) {
+    d <- lapply(seq_along(l), function(i) {
         ll <- .subset2(l, i)
         if (is_idf(ll)) {
             extract_idf(ll)
@@ -2167,7 +2167,7 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
 #'
 #' @keywords internal
 #' @export
-expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .exact = FALSE) {
+expand_idf_dots_literal <- function(idd_env, idf_env, ..., .default = TRUE, .exact = FALSE) {
     l <- list(...)
 
     assert_list(l, c("character", "data.frame"), .var.name = "Input", min.len = 1L)
@@ -2205,11 +2205,11 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         parsed <- withCallingHandlers(
             parse_idf_file(chr_one, idd = ver, ref = FALSE),
 
-            eplusr_warning_use_hard_coded_idd = function (w) invokeRestart("muffleWarning"),
-            eplusr_warning_use_mismatch_idd = function (w) {same_ver <<- FALSE; invokeRestart("muffleWarning")},
+            eplusr_warning_use_hard_coded_idd = function(w) invokeRestart("muffleWarning"),
+            eplusr_warning_use_mismatch_idd = function(w) {same_ver <<- FALSE; invokeRestart("muffleWarning")},
 
             # modify messages if any error occurs
-            eplusr_error_parse_idf = function (e) {
+            eplusr_error_parse_idf = function(e) {
                 data <- e$data
 
                 # get the input number
@@ -2271,7 +2271,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
             # verify object name
             obj_chr_match <- tryCatch(
                 get_idf_object(idd_env, idf_env, obj_chr$class_id, obj_chr$object_name_lower, "has_name", ignore_case = TRUE),
-                eplusr_error_invalid_object_name = function (e) {
+                eplusr_error_invalid_object_name = function(e) {
                     nm <- obj_chr[J(e$value), on = "object_name_lower", paste0("'", object_name[1], "' (Class '", class_name[1], "')")]
                     abort(paste0("Assertion on 'Character Input' failed: ",
                         "Must be valid object names in current IDF, but unable to match name ", nm, "."),
@@ -2320,7 +2320,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         }
 
         df <- l[!is_chr]
-        dt <- lapply(seq_along(df), function (i) {
+        dt <- lapply(seq_along(df), function(i) {
             dt <- as.data.table(.subset2(df, i))
             assert_names(names(dt), must.include = nm_col, .var.name = paste0("DataFrame Input #", i))
 
@@ -2413,13 +2413,13 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         if (!.exact) {
             val_dt <- tryCatch(
                 get_idd_field(idd_env, obj_dt$class_name, obj_dt$num, complete = TRUE, property = "type_enum"),
-                eplusr_error_invalid_class_name = function (e) {
+                eplusr_error_invalid_class_name = function(e) {
                     invld <- obj_dt[J(e$value[[1L]]), on = "class_name", mult = "first"]
                     abort(paste0("Assertion on 'class column in DataFrame Input #", invld$rleid, "' failed: ",
                         "Must contain valid class names, but invalid one found {'", invld$class_name, "'}."),
                         "dots_format")
                 },
-                eplusr_error_invalid_field_index = function (e) {
+                eplusr_error_invalid_field_index = function(e) {
                     invld <- obj_dt[J(e$data$class_name[1L], e$data$field_in[1L]), on = c("class_name", "num"), mult = "first"]
                     abort(paste0("Assertion on 'index column in DataFrame Input #", invld$rleid, "' failed: ",
                         "Must contain valid field indices, but invalid one found {'", invld$num, "' (Class: '", invld$class_name, "')}. ",
@@ -2432,19 +2432,19 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         } else {
             val_dt <- tryCatch(
                 get_idf_value(idd_env, idf_env, obj_dt$class_name, obj_dt$object_id, obj_dt$num, property = "type_enum", complete = TRUE),
-                eplusr_error_invalid_class_name = function (e) {
+                eplusr_error_invalid_class_name = function(e) {
                     invld <- obj_dt[J(e$value[[1L]]), on = "class_name", mult = "first"]
                     abort(paste0("Assertion on 'class column in DataFrame Input #", invld$rleid, "' failed: ",
                         "Must contain valid class names, but invalid one found {'", invld$class_name, "'}."),
                         "dots_format")
                 },
-                eplusr_error_invalid_object_id = function (e) {
+                eplusr_error_invalid_object_id = function(e) {
                     invld <- obj_dt[J(e$value[[1L]]), on = "object_id", mult = "first"]
                     abort(paste0("Assertion on 'id column in DataFrame Input #", invld$rleid, "' failed: ",
                         "Must contain valid object IDs, but invalid one found {'", invld$object_id, "' (Class: '", invld$class_name, "')}."),
                         "dots_format")
                 },
-                eplusr_error_invalid_field_index = function (e) {
+                eplusr_error_invalid_field_index = function(e) {
                     invld <- obj_dt[J(e$data$class_name[1L], e$data$field_in[1L]), on = c("class_name", "num"), mult = "first"]
                     abort(paste0("Assertion on 'index column in DataFrame Input #", invld$rleid, "' failed: ",
                         "Must contain valid field indices, but invalid one found {'", invld$num, "' (Class: '", invld$class_name, "')}. ",
@@ -2531,7 +2531,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
 #'
 #' @keywords internal
 #' @export
-expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
+expand_idf_regex <- function(idd_env, idf_env, pattern, replacement = NULL,
                               class = NULL, ignore.case = FALSE, perl = FALSE,
                               fixed = FALSE, useBytes = FALSE) {
     assert_string(pattern)
@@ -2597,7 +2597,7 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
 #'
 #' @keywords internal
 #' @export
-dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("validate_level")) {
+dup_idf_object <- function(idd_env, idf_env, dt_object, level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
     # transform input names to lower case
     set(dt_object, NULL, "new_object_name_lower", stri_trans_tolower(dt_object$new_object_name))
@@ -2703,7 +2703,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
 #'
 #' @keywords internal
 #' @export
-add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
+add_idf_object <- function(idd_env, idf_env, dt_object, dt_value,
                             default = TRUE, unique = FALSE, empty = FALSE,
                             level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
@@ -2844,7 +2844,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
 #'
 #' @keywords internal
 #' @export
-set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE, level = eplusr_option("validate_level"), replace = FALSE) {
+set_idf_object <- function(idd_env, idf_env, dt_object, dt_value, empty = FALSE, level = eplusr_option("validate_level"), replace = FALSE) {
     chk <- level_checks(level)
     # stop if try to modify version
     if (any(invld <- dt_object$class_name == "Version")) {
@@ -2985,7 +2985,7 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
 #'
 #' @keywords internal
 #' @export
-del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by = FALSE,
+del_idf_object <- function(idd_env, idf_env, dt_object, ref_to = FALSE, ref_by = FALSE,
                             recursive = FALSE, force = FALSE, level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
 
@@ -3159,7 +3159,7 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
 #'
 #' @keywords internal
 #' @export
-purge_idf_object <- function (idd_env, idf_env, dt_object) {
+purge_idf_object <- function(idd_env, idf_env, dt_object) {
     # exclude objects that cannot be resources
     src <- dt_object[J(unique(idd_env$reference$src_class_id)), on = "class_id", nomatch = 0L]
 
@@ -3234,7 +3234,7 @@ purge_idf_object <- function (idd_env, idf_env, dt_object) {
 #'
 #' @keywords internal
 #' @export
-duplicated_idf_object <- function (idd_env, idf_env, dt_object) {
+duplicated_idf_object <- function(idd_env, idf_env, dt_object) {
     dt_value <- idf_env$value[J(dt_object$object_id), on = "object_id"]
     add_field_property(idd_env, dt_value, c("field_index", "src_enum"))
     add_joined_cols(dt_object, dt_value, "object_id", "class_id")
@@ -3273,7 +3273,7 @@ duplicated_idf_object <- function (idd_env, idf_env, dt_object) {
 #'
 #' @keywords internal
 #' @export
-unique_idf_object <- function (idd_env, idf_env, dt_object) {
+unique_idf_object <- function(idd_env, idf_env, dt_object) {
     dup <- duplicated_idf_object(idd_env, idf_env, dt_object)
 
     if (checkmate::allMissing(dup$unique_object_id)) {
@@ -3344,7 +3344,7 @@ unique_idf_object <- function (idd_env, idf_env, dt_object) {
 #'
 #' @keywords internal
 #' @export
-rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("validate_level")) {
+rename_idf_object <- function(idd_env, idf_env, dt_object, level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
     # stop if modifying same object multiple times
     if (anyDuplicated(dt_object$object_id)) {
@@ -3427,7 +3427,7 @@ rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_optio
 #'
 #' @keywords internal
 #' @export
-remove_empty_fields <- function (idd_env, idf_env, dt_value) {
+remove_empty_fields <- function(idd_env, idf_env, dt_value) {
     if (!has_names(dt_value, "required_field")) {
         add_field_property(idd_env, dt_value, "required_field")
         on.exit(set(dt_value, NULL, "required_field", NULL), add = TRUE)
@@ -3509,7 +3509,7 @@ remove_empty_fields <- function (idd_env, idf_env, dt_value) {
 #'
 #' @keywords internal
 #' @export
-remove_duplicated_objects <- function (idd_env, idf_env, dt_object, dt_value) {
+remove_duplicated_objects <- function(idd_env, idf_env, dt_object, dt_value) {
     # extract all object values in the same class
     # in order to distinguish input from original IDF, set id of objects
     # from IDF Editor to negative also note that dcast will automatically
@@ -3606,7 +3606,7 @@ remove_duplicated_objects <- function (idd_env, idf_env, dt_object, dt_value) {
 #'
 #' @keywords internal
 #' @export
-get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
+get_idf_relation <- function(idd_env, idf_env, object_id = NULL, value_id = NULL,
                               direction = c("ref_to", "ref_by"), depth = 0L, name = FALSE,
                               object = NULL, class = NULL, group = NULL, keep_all = FALSE,
                               class_ref = c("both", "none", "all"), match_all = FALSE) {
@@ -3728,7 +3728,7 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
 }
 # }}}
 # add_idf_relation_format_cols {{{
-add_idf_relation_format_cols <- function (idd_env, idf_env, ref) {
+add_idf_relation_format_cols <- function(idd_env, idf_env, ref) {
     # add all necessary columns for printing
     ref <- add_joined_cols(idf_env$object, ref, "object_id", c("class_id", "object_name"))
     ref <- add_joined_cols(idf_env$value, ref, "value_id",
@@ -3768,7 +3768,7 @@ add_idf_relation_format_cols <- function (idd_env, idf_env, ref) {
 #'
 #' @keywords internal
 #' @export
-get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
+get_idf_node_relation <- function(idd_env, idf_env, object_id = NULL, value_id = NULL,
                                    object = NULL, class = NULL, group = NULL,
                                    name = FALSE, keep_all = FALSE, depth = 0L) {
     assert(
@@ -3940,9 +3940,9 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
 #'        field, and reference.
 #' @param idf_env An environment or list contains IDF tables including object,
 #'        value, and reference.
-#' @param version The version of IDF file open by IDF Editor, e.g. `8.6`,
+#' @param version The version of IDF file open by IDF Editor, e.g. `"8.6"`,
 #'        `"8.8.0"`. If `NULL`, assume that the file has the same
-#'        version as current Idf object. Default: `NULL`.
+#'        version as current `Idf` object. Default: `NULL`.
 #' @param in_ip Set to `TRUE` if the IDF file is open with `Inch-Pound`
 #'        view option toggled. Numeric values will automatically
 #'        converted to SI units if necessary. Default: `FALSE`.
@@ -3956,7 +3956,7 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
 #'
 #' @keywords internal
 #' @export
-read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE) { # nocov start
+read_idfeditor_copy <- function(idd_env, idf_env, version = NULL, in_ip = FALSE) { # nocov start
     if (!is_windows()) {
         abort("Currently 'read_idfeditor_copy()' can only work on Windows platform.")
     }
@@ -3978,7 +3978,7 @@ read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE
 
     # ignore the warning of using given IDD
     parsed <- withCallingHandlers(parse_idf_file(text, idd = version, ref = FALSE),
-        eplusr_warning = function (w) invokeRestart("muffleWarning")
+        eplusr_warning = function(w) invokeRestart("muffleWarning")
     )
 
     # add class name
@@ -4077,7 +4077,7 @@ read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE
 #'
 #' @keywords internal
 #' @export
-get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
+get_idf_table <- function(idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
                            align = FALSE, all = FALSE, group_ext = c("none", "group", "index"),
                            force = FALSE, init = FALSE) {
@@ -4142,7 +4142,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                 by = c("rleid", "id", "name", "class", "extensible_group")
             ]
         } else if (group_ext == "index") {
-            fun <- if (string_value) function (x) unlist(x, FALSE, FALSE) else function (x) do.call(c, x)
+            fun <- if (string_value) function(x) unlist(x, FALSE, FALSE) else function(x) do.call(c, x)
             ext <- val[extensible_group > 0L][,
                 extensible_group := data.table::rowid(rleid, id, extensible_group)][,
                 list(index = NA_integer_, field = field[1L], value = list(fun(value))),
@@ -4184,7 +4184,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                     .SDcols = setdiff(cols, cols_ext)]
             } else {
                 # get unit attributes
-                unit <- val[, lapply(.SD, function (x) list(attr(x[[1]], "units"))), .SDcols = cols]
+                unit <- val[, lapply(.SD, function(x) list(attr(x[[1]], "units"))), .SDcols = cols]
 
                 val[, c(setdiff(cols, cols_ext)) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE),
                     .SDcols = setdiff(cols, cols_ext)]
@@ -4246,7 +4246,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 #'
 #' @export
 # dt_to_load {{{
-dt_to_load <- function (dt, string_value = TRUE) {
+dt_to_load <- function(dt, string_value = TRUE) {
     assert_data_frame(dt)
     assert_names(names(dt), must.include = c("id", "class"))
     assert_flag(string_value)
@@ -4276,7 +4276,7 @@ dt_to_load <- function (dt, string_value = TRUE) {
 
 # STRING
 # get_idf_string {{{
-get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
+get_idf_string <- function(idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
                             in_ip = FALSE, comment = TRUE, header = TRUE,
                             format = c("sorted", "new_top", "new_bot"),
                             leading = 4L, sep_at = 29L, flat = TRUE) {
@@ -4321,14 +4321,14 @@ get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, obj
     if (!flat) return(fmt)
 
     if (format == "sorted") {
-        combine_fmt <- function (lst) {
+        combine_fmt <- function(lst) {
             head <- if (is.null(lst[[1L]])) "" else c("", lst[[1L]], "")
-            c(head, unlist(lapply(lst[-1L], function (x) c(unlist(x, use.names = FALSE), "")), use.names = FALSE))
+            c(head, unlist(lapply(lst[-1L], function(x) c(unlist(x, use.names = FALSE), "")), use.names = FALSE))
         }
 
         body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
     } else {
-        combine_fmt <- function (lst) c(unlist(lst, use.names = FALSE), "")
+        combine_fmt <- function(lst) c(unlist(lst, use.names = FALSE), "")
 
         body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
     }
@@ -4345,7 +4345,7 @@ get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, obj
 
 # SAVE
 # save_idf {{{
-save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
+save_idf <- function(idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
                       format = c("sorted", "new_top", "new_bot"),
                       overwrite = FALSE, copy_external = TRUE, oldpath = path) {
     format <- match.arg(format)
@@ -4364,7 +4364,7 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
         d <- dirname(path)
         if (!dir.exists(d)) {
             tryCatch(dir.create(d, recursive = TRUE),
-                warning = function (w) stop("Failed to create directory ", surround(d))
+                warning = function(w) stop("Failed to create directory ", surround(d))
             )
         }
         new_file <- TRUE
@@ -4480,7 +4480,7 @@ extract_schema_path_from_xml <- function(xml) {
 # resolve_idf_external_link {{{
 #  auto change full file path in `Schedule:File` and other classes to relative
 #  path and copy those files into the same directory of the model
-resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) {
+resolve_idf_external_link <- function(idd_env, idf_env, old, new, copy = TRUE) {
     val <- get_idf_external_deps(idd_env, idf_env, dirname(old))
 
     if (!nrow(val)) return(FALSE)
@@ -4542,7 +4542,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
 
 # MISC
 # assign_new_id {{{
-assign_new_id <- function (idf_env, dt, type = c("object", "value"), keep = FALSE) {
+assign_new_id <- function(idf_env, dt, type = c("object", "value"), keep = FALSE) {
     type <- match.arg(type)
     col <- paste0(type, "_id")
     if (!keep) {
@@ -4565,7 +4565,7 @@ assign_new_id <- function (idf_env, dt, type = c("object", "value"), keep = FALS
 #'
 #' @keywords internal
 #' @export
-assign_idf_value_default <- function (idd_env, idf_env, dt_value) {
+assign_idf_value_default <- function(idd_env, idf_env, dt_value) {
     cols_add <- NULL
     if (!has_names(dt_value, "default_chr")) cols_add <- "default_chr"
     if (!has_names(dt_value, "default_num")) cols_add <- c(cols_add, "default_num")
@@ -4589,7 +4589,7 @@ assign_idf_value_default <- function (idd_env, idf_env, dt_value) {
 }
 # }}}
 # order_idf_data {{{
-order_idf_data <- function (lst) {
+order_idf_data <- function(lst) {
     setorderv(lst$object, "object_id")
     setorderv(lst$value, c("object_id", "field_id"))
 
@@ -4597,7 +4597,7 @@ order_idf_data <- function (lst) {
 }
 # }}}
 # add_idf_format_cols {{{
-add_idf_format_cols <- function (idd_env, idf_env) {
+add_idf_format_cols <- function(idd_env, idf_env) {
     # add class_id, class_name and field_index columns
     add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
     add_joined_cols(idd_env$class, idf_env$value, "class_id", "class_name")
@@ -4607,7 +4607,7 @@ add_idf_format_cols <- function (idd_env, idf_env) {
 }
 # }}}
 # del_idf_format_cols {{{
-del_idf_format_cols <- function (idd_env, idf_env) {
+del_idf_format_cols <- function(idd_env, idf_env) {
     # del class_id, class_name and field_index columns
     set(idf_env$value, NULL,
         c("class_id", "class_name", "field_index", "field_name", "units", "ip_units"),
@@ -4618,7 +4618,7 @@ del_idf_format_cols <- function (idd_env, idf_env) {
 }
 # }}}
 # with_format_cols {{{
-with_format_cols <- function (idd_env, idf_env, ...) {
+with_format_cols <- function(idd_env, idf_env, ...) {
     add_idf_format_cols(idd_env, idf_env)
     on.exit(del_idf_format_cols(idd_env, idf_env), add = TRUE)
     force(...)
