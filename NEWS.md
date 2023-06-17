@@ -6,7 +6,8 @@
 
 ## Internal refactor
 
-* Skips tests that need IDD downloading on CRAN (#561)
+* Use character input for `numeric_version()` (#565).
+* Skips tests that need IDD downloading on CRAN (#561).
 
 # eplusr 0.16.0
 
