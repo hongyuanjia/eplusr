@@ -57,6 +57,7 @@ convert_to_idd_ver <- function(ver, strict = FALSE, all_ver = c(ALL_IDD_VER, nam
 #' is_eplus_path("C:/EnergyPlusV9-0-0")
 #' is_eplus_path("/usr/local/EnergyPlus-9-0-1")
 #'
+#' \dontrun{
 #' is_idd(use_idd("8.8", download = "auto"))
 #'
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
@@ -67,7 +68,6 @@ convert_to_idd_ver <- function(ver, strict = FALSE, all_ver = c(ALL_IDD_VER, nam
 #'
 #' is_idfobject(idf_object(idf, 1))
 #'
-#' \dontrun{
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 #' }
 # is_eplus_ver {{{
