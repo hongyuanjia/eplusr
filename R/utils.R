@@ -168,8 +168,13 @@ os_type <- function() {
 
 # standardize_ver {{{
 standardize_ver <- function(ver, strict = FALSE, complete = TRUE) {
-    if (!strict && is.character(ver)) {
-        ver[ver == "latest"] <- LATEST_EPLUS_VER
+    if (is.character(ver)) {
+        if (!strict) {
+            ver[ver == "latest"] <- LATEST_EPLUS_VER
+        }
+        # in case of a single number
+        sgl <- grepl("^\\d+$", ver)
+        if (any(sgl)) ver[sgl] <- paste0(ver[sgl], ".0")
     }
 
     if (is.numeric(ver)) {
