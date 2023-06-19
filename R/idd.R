@@ -91,7 +91,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd <- use_idd(8.8, download = "auto")
         #' }
         #'
-        initialize = function (path, encoding = "unknown") {
+        initialize = function(path, encoding = "unknown") {
             # only store if input is a path
             if (is.character(path) && length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- normalizePath(path)
@@ -132,7 +132,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$version()
         #' }
         #'
-        version = function ()
+        version = function()
             idd_version(self, private),
         # }}}
 
@@ -151,7 +151,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$build()
         #' }
         #'
-        build = function ()
+        build = function()
             idd_build(self, private),
         # }}}
 
@@ -172,7 +172,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$path()
         #' }
         #'
-        path = function ()
+        path = function()
             idd_path(self, private),
 
         # group_name {{{
@@ -190,7 +190,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$group_name()
         #' }
         #'
-        group_name = function ()
+        group_name = function()
             idd_group_name(self, private),
         # }}}
 
@@ -212,7 +212,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$from_group(c("Version", "Schedule:Compact"))
         #' }
         #'
-        from_group = function (class)
+        from_group = function(class)
             idd_from_group(self, private, class),
         # }}}
 
@@ -242,7 +242,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$class_name(by_group = TRUE)
         #' }
         #'
-        class_name = function (index = NULL, by_group = FALSE)
+        class_name = function(index = NULL, by_group = FALSE)
             idd_class_name(self, private, index = index, by_group = by_group),
         # }}}
 
@@ -262,7 +262,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$required_class_name()
         #' }
         #'
-        required_class_name = function ()
+        required_class_name = function()
             idd_required_class_name(self, private),
         # }}}
 
@@ -282,7 +282,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$unique_class_name()
         #' }
         #'
-        unique_class_name = function ()
+        unique_class_name = function()
             idd_unique_class_name(self, private),
         # }}}
 
@@ -303,7 +303,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$extensible_class_name()
         #' }
         #'
-        extensible_class_name = function ()
+        extensible_class_name = function()
             idd_extensible_class_name(self, private),
         # }}}
 
@@ -325,7 +325,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$group_index()
         #' }
         #'
-        group_index = function (group = NULL)
+        group_index = function(group = NULL)
             idd_group_index(self, private, group),
         # }}}
 
@@ -349,7 +349,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$class_index()
         #' }
         #'
-        class_index = function (class = NULL, by_group = FALSE)
+        class_index = function(class = NULL, by_group = FALSE)
             idd_class_index(self, private, class, by_group = by_group),
         # }}}
         # }}}
@@ -378,7 +378,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$is_valid_group(c("Schedules", "Compliance Objects"))
         #' }
         #'
-        is_valid_group = function (group)
+        is_valid_group = function(group)
             idd_is_valid_group_name(self, private, group),
         # }}}
 
@@ -404,7 +404,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$is_valid_class(c("Building", "ShadowCalculation"))
         #' }
         #'
-        is_valid_class = function (class)
+        is_valid_class = function(class)
             idd_is_valid_class_name(self, private, class),
         # }}}
         # }}}
@@ -436,7 +436,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$object("Building")
         #' }
         #'
-        object = function (class)
+        object = function(class)
             idd_obj(self, private, class),
         # }}}
 
@@ -466,7 +466,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$objects(c("Version", "Material"))
         #' }
         #'
-        objects = function (class)
+        objects = function(class)
             idd_objects(self, private, class),
         # }}}
 
@@ -538,7 +538,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$object_relation("Construction", "ref_by")
         #' }
         #'
-        object_relation = function (which, direction = c("all", "ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
+        object_relation = function(which, direction = c("all", "ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
             idd_object_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth),
         # }}}
 
@@ -592,7 +592,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$objects_in_relation("Construction", "ref_by")
         #' }
         #'
-        objects_in_relation = function (which, direction = c("ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
+        objects_in_relation = function(which, direction = c("ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
             idd_objects_in_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth),
         # }}}
 
@@ -615,7 +615,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$objects_in_group("Schedules")
         #' }
         #'
-        objects_in_group = function (group)
+        objects_in_group = function(group)
             idd_objects_in_group(self, private, group = group),
         # }}}
         # }}}
@@ -649,7 +649,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$to_table(c("Construction", "Material"))
         #' }
         #'
-        to_table = function (class, all = FALSE)
+        to_table = function(class, all = FALSE)
             idd_to_table(self, private, class, all),
         # }}}
 
@@ -685,7 +685,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
         #' }
         #'
-        to_string = function (class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
+        to_string = function(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
             idd_to_string(self, private, class, leading, sep_at, sep_each, all),
         # }}}
         # }}}
@@ -705,7 +705,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$print()
         #' }
         #'
-        print = function ()
+        print = function()
             idd_print(self, private)
         # }}}
     ),
@@ -720,48 +720,48 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        uuid = function () private$m_log$uuid,
-        log_new_uuid = function () log_new_uuid(private$m_log),
+        uuid = function() private$m_log$uuid,
+        log_new_uuid = function() log_new_uuid(private$m_log),
 
-        idd_env = function () private$m_idd_env,
-        log_env = function () private$m_log
+        idd_env = function() private$m_idd_env,
+        log_env = function() private$m_log
         # }}}
     )
 )
 # }}}
 
 # idd_path {{{
-idd_path <- function (self, private) {
+idd_path <- function(self, private) {
     private$m_path
 }
 # }}}
 # idd_version {{{
-idd_version <- function (self, private) {
+idd_version <- function(self, private) {
     private$m_version
 }
 # }}}
 # idd_build {{{
-idd_build <- function (self, private) {
+idd_build <- function(self, private) {
     private$m_build
 }
 # }}}
 # idd_group_name {{{
-idd_group_name <- function (self, private) {
+idd_group_name <- function(self, private) {
     get_idd_group_name(private$m_idd_env)
 }
 # }}}
 # idd_from_group {{{
-idd_from_group <- function (self, private, class) {
+idd_from_group <- function(self, private, class) {
     get_idd_class(private$m_idd_env, class, "group_name")$group_name
 }
 # }}}
 # idd_group_index {{{
-idd_group_index <- function (self, private, group = NULL) {
+idd_group_index <- function(self, private, group = NULL) {
     get_idd_group_index(private$m_idd_env, group)
 }
 # }}}
 # idd_class_name {{{
-idd_class_name <- function (self, private, index = NULL, by_group = FALSE) {
+idd_class_name <- function(self, private, index = NULL, by_group = FALSE) {
     if (!by_group) return(get_idd_class(private$m_idd_env, index)$class_name)
     cls <- get_idd_class(private$m_idd_env, index, property = "group_name")
     res <- cls[, list(class_name = list(class_name)), by = "group_name"]
@@ -769,7 +769,7 @@ idd_class_name <- function (self, private, index = NULL, by_group = FALSE) {
 }
 # }}}
 # idd_class_index {{{
-idd_class_index <- function (self, private, class = NULL, by_group = FALSE) {
+idd_class_index <- function(self, private, class = NULL, by_group = FALSE) {
     if (!by_group) return(get_idd_class(private$m_idd_env, class)$class_id)
     cls <- get_idd_class(private$m_idd_env, class, property = "group_name")
     res <- cls[, list(class_id = list(class_id)), by = "group_name"]
@@ -777,44 +777,44 @@ idd_class_index <- function (self, private, class = NULL, by_group = FALSE) {
 }
 # }}}
 # idd_required_class_name {{{
-idd_required_class_name <- function (self, private) {
+idd_required_class_name <- function(self, private) {
     private$m_idd_env$class[required_object == TRUE, class_name]
 }
 # }}}
 # idd_unique_class_name {{{
-idd_unique_class_name <- function (self, private) {
+idd_unique_class_name <- function(self, private) {
     private$m_idd_env$class[unique_object == TRUE, class_name]
 }
 # }}}
 # idd_extensible_class_name {{{
-idd_extensible_class_name <- function (self, private) {
+idd_extensible_class_name <- function(self, private) {
     private$m_idd_env$class[num_extensible > 0L, class_name]
 }
 # }}}
 # idd_is_valid_group_name {{{
-idd_is_valid_group_name <- function (self, private, group) {
+idd_is_valid_group_name <- function(self, private, group) {
     group %chin% private$m_idd_env$group$group_name
 }
 # }}}
 # idd_is_valid_class_name {{{
-idd_is_valid_class_name <- function (self, private, class) {
+idd_is_valid_class_name <- function(self, private, class) {
     class %chin% private$m_idd_env$class$class_name
 }
 # }}}
 # idd_obj {{{
-idd_obj <- function (self, private, class) {
+idd_obj <- function(self, private, class) {
     IddObject$new(class, self)
 }
 # }}}
 # idd_objects {{{
-idd_objects <- function (self, private, class) {
+idd_objects <- function(self, private, class) {
     res <- lapply(class, IddObject$new, self)
     setattr(res, "names", class)
     res
 }
 # }}}
 # idd_object_relation {{{
-idd_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by"),
+idd_object_relation <- function(self, private, which, direction = c("all", "ref_to", "ref_by"),
                                  class = NULL, group = NULL, depth = 0L) {
     assert_scalar(which)
     direction <- match.arg(direction)
@@ -828,7 +828,7 @@ idd_object_relation <- function (self, private, which, direction = c("all", "ref
 }
 # }}}
 # idd_objects_in_relation {{{
-idd_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by"),
+idd_objects_in_relation <- function(self, private, which, direction = c("ref_to", "ref_by"),
                                      class = NULL, group = NULL, depth = 0L) {
     assert_scalar(which)
     direction <- match.arg(direction)
@@ -863,7 +863,7 @@ idd_objects_in_relation <- function (self, private, which, direction = c("ref_to
 }
 # }}}
 # idd_objects_in_group {{{
-idd_objects_in_group <- function (self, private, group) {
+idd_objects_in_group <- function(self, private, group) {
     assert_string(group)
 
     grp_id <- idd_group_index(self, private, group)
@@ -876,17 +876,17 @@ idd_objects_in_group <- function (self, private, group) {
 }
 # }}}
 # idd_to_table {{{
-idd_to_table <- function (self, private, class, all) {
+idd_to_table <- function(self, private, class, all) {
     get_idd_table(private$m_idd_env, class, all)
 }
 # }}}
 # idd_to_string {{{
-idd_to_string <- function (self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
+idd_to_string <- function(self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
     get_idd_string(private$m_idd_env, class, leading, sep_at, sep_each, all)
 }
 # }}}
 # idd_print {{{
-idd_print <- function (self, private) {
+idd_print <- function(self, private) {
     cli::cat_rule("EnergyPlus Input Data Dictionary")
     cli::cat_line("* ", c(
         paste0("Version", ": ", private$m_version),
@@ -898,7 +898,7 @@ idd_print <- function (self, private) {
 
 #' @export
 # [[.Idd {{{
-`[[.Idd` <- function (x, i) {
+`[[.Idd` <- function(x, i) {
     if (i %chin% ls(x)) return(NextMethod())
 
     private <- get_priv_env(x)
@@ -915,7 +915,7 @@ idd_print <- function (self, private) {
 
 #' @export
 # $.Idd {{{
-`$.Idd` <- function (x, i) {
+`$.Idd` <- function(x, i) {
     if (i %chin% ls(x)) return(NextMethod())
 
     private <- get_priv_env(x)
@@ -932,7 +932,7 @@ idd_print <- function (self, private) {
 
 #' @export
 # str.Idd {{{
-str.Idd <- function (object, ...) {
+str.Idd <- function(object, ...) {
     object$print()
 }
 # }}}
@@ -952,7 +952,7 @@ str.Idd <- function (object, ...) {
 #'
 #' @export
 # format.Idd {{{
-format.Idd <- function (x, ...) {
+format.Idd <- function(x, ...) {
     n <- length(x$class_index())
 
     if (is.na(x$build())) {
@@ -969,7 +969,7 @@ format.Idd <- function (x, ...) {
 
 #' @export
 # ==.Idd {{{
-`==.Idd` <- function (e1, e2) {
+`==.Idd` <- function(e1, e2) {
     if (!is_idd(e2)) return(FALSE)
     identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
@@ -977,7 +977,7 @@ format.Idd <- function (x, ...) {
 
 #' @export
 # !=.Idd {{{
-`!=.Idd` <- function (e1, e2) {
+`!=.Idd` <- function(e1, e2) {
     Negate(`==.Idd`)(e1, e2)
 }
 # }}}
@@ -990,7 +990,7 @@ format.Idd <- function (x, ...) {
 # }}}
 
 # read_idd {{{
-read_idd <- function (path, encoding = "unknown") {
+read_idd <- function(path, encoding = "unknown") {
     Idd$new(path, encoding = encoding)
 }
 # }}}
@@ -1000,7 +1000,7 @@ read_idd <- function (path, encoding = "unknown") {
 #' @param idd Either a path, a connection, or literal data (either a single
 #'     string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
 #'     file, usually named as `Energy+.idd`, or a valid version of IDD, e.g.
-#'     `8.9`, `"8.9.0"`.
+#'     `"8.9"`, `"8.9.0"`.
 #' @param download If `TRUE` and argument `idd`, the IDD file will be
 #'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
 #'     and saved to [tempdir()]. It will be parsed after it is downloaded
@@ -1009,7 +1009,7 @@ read_idd <- function (path, encoding = "unknown") {
 #'     currently not available. It is useful in case when you only want to edit
 #'     an EnergyPlus Input Data File (IDF) directly but do not want to install
 #'     whole EnergyPlus software. Default is `FALSE`.
-#' @param ver A valid EnergyPlus version, e.g. `8`, `8.7`, `"8.7"` or `"8.7.0"`.
+#' @param ver A valid EnergyPlus version, e.g. `"8"`, `"8.7"` or `"8.7.0"`.
 #'     For `download_idd()`, the special value `"latest"`, which is default,
 #'     means the latest version.
 #' @param dir A directory to indicate where to save the IDD file. Default:
@@ -1057,24 +1057,24 @@ read_idd <- function (path, encoding = "unknown") {
 #' avail_idd()
 #'
 #' # check if specific version of Idd is available
-#' is_avail_idd(8.5)
+#' is_avail_idd("8.5")
 #'
 #' # download latest IDD file from EnergyPlus GitHub repo
 #' str(download_idd("latest", tempdir()))
 #'
 #' # use specific version of Idd
 #' # only works if EnergyPlus v8.8 has been found or Idd v8.8 exists
-#' use_idd(8.8)
+#' use_idd("8.8")
 #'
 #' # If Idd object is currently not avail_idd, automatically download IDD file
 #' # from EnergyPlus GitHub repo and parse it
-#' use_idd(8.8, download = "auto")
+#' use_idd("8.8", download = "auto")
 #'
 #' # now Idd v8.8 should be available
-#' is_avail_idd(8.8)
+#' is_avail_idd("8.8")
 #'
 #' # get specific version of parsed Idd object
-#' use_idd(8.8)
+#' use_idd("8.8")
 #'
 #' avail_idd() # should contain "8.8.0"
 #' }
@@ -1084,14 +1084,14 @@ read_idd <- function (path, encoding = "unknown") {
 #' @export
 #' @author Hongyuan Jia
 # use_idd {{{
-use_idd <- function (idd, download = FALSE, encoding = "unknown") {
+use_idd <- function(idd, download = FALSE, encoding = "unknown") {
     if (is_idd(idd)) return(idd)
 
     assert_vector(idd, len = 1L)
 
     # if input is a file path or literal IDD string
     if (!is_idd_ver(idd)) {
-        return(tryCatch(read_idd(idd, encoding = encoding), eplusr_error_read_lines = function (e) {
+        return(tryCatch(read_idd(idd, encoding = encoding), eplusr_error_read_lines = function(e) {
             abort(paste0("Parameter 'idd' should be a valid version, a path, or ",
                 "a single character string of an EnergyPlus Input Data ",
                 "Dictionary (IDD) file (usually named 'Energy+.idd'). ",
@@ -1175,7 +1175,7 @@ use_idd <- function (idd, download = FALSE, encoding = "unknown") {
             }
         }
 
-        if (ver <= 8.3) encoding <- "Latin-1"
+        if (ver <= "8.3") encoding <- "Latin-1"
     }
 
     verbose_info("IDD file found: ", surround(idd), ".")
@@ -1189,7 +1189,7 @@ use_idd <- function (idd, download = FALSE, encoding = "unknown") {
 #' @rdname use_idd
 #' @export
 # download_idd {{{
-download_idd <- function (ver = "latest", dir = ".") {
+download_idd <- function(ver = "latest", dir = ".") {
     assert_vector(ver, len = 1L)
     ver <- standardize_ver(ver, complete = FALSE)
 
@@ -1268,7 +1268,7 @@ download_idd <- function (ver = "latest", dir = ".") {
 #' @rdname use_idd
 #' @export
 # avail_idd {{{
-avail_idd <- function () {
+avail_idd <- function() {
     res <- names(.globals$idd)
     if (!length(res)) return(NULL)
     sort(numeric_version(res))
@@ -1278,7 +1278,7 @@ avail_idd <- function () {
 #' @rdname use_idd
 #' @export
 # is_avail_idd {{{
-is_avail_idd <- function (ver) {
+is_avail_idd <- function(ver) {
     if (is.character(ver) && "latest" %chin% ver) {
         abort("'latest' notation for IDD version is not allowed here. Please give specific versions.", "ambiguous_idd_ver")
     }
@@ -1287,7 +1287,7 @@ is_avail_idd <- function (ver) {
 # }}}
 
 # find_idd_from_updater {{{
-find_idd_from_updater <- function (ver) {
+find_idd_from_updater <- function(ver) {
     ver <- standardize_ver(ver, strict = TRUE)
     # check if there are any EnergyPlus detected whose version is
     # newer than specified version
@@ -1327,13 +1327,13 @@ find_idd_from_updater <- function (ver) {
 # @param idf_ver NULL or a valid IDF version
 # @param idd NULL or valid input for [use_idd()]
 # @param warn If `TRUE`, extra warning message will be shown
-get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
+get_idd_from_ver <- function(idf_ver = NULL, idd = NULL, warn = TRUE) {
     if (!is.null(idf_ver)) {
         if (is.null(idd)) {
             # if input IDF has a version but neither that version of EnergyPlus
             # nor IDD is available, rewrite the message
             idd <- tryCatch(use_idd(idf_ver),
-                eplusr_error_locate_idd = function (e) {
+                eplusr_error_locate_idd = function(e) {
                     mes <- stri_replace_all_fixed(conditionMessage(e),
                         "You may want to set 'download'",
                         "You may want to use 'use_idd()' and set 'download'"

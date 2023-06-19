@@ -9,7 +9,7 @@ test_that("IdfViewer Implemention", {
     expect_type(geoms <- align_coord_system(geoms, "world", "world", "world"), "list")
     expect_s3_class(geoms$vertices2 <- triangulate_geoms(geoms), "data.table")
 
-    rgl_init <- function (clear = TRUE) {
+    rgl_init <- function(clear = TRUE) {
         new <- FALSE
         if (clear) {
             if (rgl::cur3d() == 0) new <- TRUE else rgl::clear3d()

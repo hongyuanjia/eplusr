@@ -40,8 +40,8 @@ test_that("Utility functions", {
     expect_equal(standardize_ver(c("1.0", "1.1.0.01")), numeric_version(c("1.0.0", "1.1.0")))
     expect_equal(standardize_ver(c("1.0", "1.1.0.01"), complete = FALSE), numeric_version(c("1.0", "1.1.0")))
 
-    expect_error(match_minor_ver(1), "numeric_version")
-    expect_error(match_minor_ver(numeric_version(1:2)), "length 1")
+    expect_error(match_minor_ver("1"), "numeric_version")
+    expect_error(match_minor_ver(numeric_version(c("1", "2"))), "length 1")
     expect_equal(match_minor_ver(numeric_version("0.0"), NULL), numeric_version(NA, strict = FALSE))
     expect_equal(match_minor_ver(numeric_version("0.0"), ALL_IDD_VER), numeric_version(NA, strict = FALSE))
     expect_equal(match_minor_ver(numeric_version("9.1"), ALL_IDD_VER), numeric_version("9.1.0"))

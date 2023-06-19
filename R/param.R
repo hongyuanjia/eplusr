@@ -40,9 +40,9 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
-        #' if (is_avail_eplus(8.8)) {
-        #'      path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
-        #'      path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+        #' if (is_avail_eplus("8.8")) {
+        #'      path_idf <- path_eplus_example("8.8", "5Zone_Transformer.idf")
+        #'      path_epw <- path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
         #'
         #'     # create from an IDF and an EPW
         #'     param <- param_job(path_idf, path_epw)
@@ -53,7 +53,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' }
         #' }
         #'
-        initialize = function (idf, epw) {
+        initialize = function(idf, epw) {
             # add Output:SQLite and Output:VariableDictionary if necessary
             idf <- get_init_idf(idf, sql = TRUE, dict = TRUE)
 
@@ -86,7 +86,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$version()
         #' }
         #'
-        version = function ()
+        version = function()
             param_version(self, private),
         # }}}
 
@@ -102,7 +102,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$seed()
         #' }
         #'
-        seed = function ()
+        seed = function()
             param_seed(self, private),
         # }}}
 
@@ -119,7 +119,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$weather()
         #' }
         #'
-        weather = function ()
+        weather = function()
             param_weather(self, private),
         # }}}
 
@@ -224,7 +224,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' )
         #' }
         #'
-        param = function (..., .names = NULL, .cross = FALSE)
+        param = function(..., .names = NULL, .cross = FALSE)
             param_param(self, private, ..., .names = .names, .cross = .cross),
         # }}}
 
@@ -253,7 +253,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @examples
         #' \dontrun{
         #' # create a measure to change the orientation of the building
-        #' rotate_building <- function (idf, degree = 0L) {
+        #' rotate_building <- function(idf, degree = 0L) {
         #'     if (!idf$is_valid_class("Building")) {
         #'        stop("Input model does not have a Building object")
         #'     }
@@ -293,7 +293,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' )
         #' }
         #'
-        apply_measure = function (measure, ..., .names = NULL)
+        apply_measure = function(measure, ..., .names = NULL)
             param_apply_measure(self, private, measure, ..., .names = .names),
         # }}}
 
@@ -327,7 +327,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$models()
         #' }
         #'
-        models = function (names = NULL)
+        models = function(names = NULL)
             param_models(self, private, names),
         # }}}
 
@@ -358,7 +358,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$cases()
         #' }
         #'
-        cases = function ()
+        cases = function()
             param_cases(self, private),
         # }}}
 
@@ -398,7 +398,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$save(tempdir(), separate = FALSE)
         #' }
         #'
-        save = function (dir = NULL, separate = TRUE, copy_external = FALSE)
+        save = function(dir = NULL, separate = TRUE, copy_external = FALSE)
             param_save(self, private, dir, separate, copy_external),
         # }}}
 
@@ -456,7 +456,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' print(param)
         #' }
         #'
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE, readvars = TRUE)
+        run = function(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE, readvars = TRUE)
             param_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
         # }}}
 
@@ -483,7 +483,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' param$print()
         #' }
         #'
-        print = function ()
+        print = function()
             param_print(self, private)
         # }}}
         # }}}
@@ -494,9 +494,9 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         m_seed = NULL,
         # }}}
         # PRIVATE FUNCTIONS {{{
-        seed_uuid = function () get_priv_env(private$m_seed)$m_log$uuid,
-        log_seed_uuid = function () private$m_log$seed_uuid <- private$seed_uuid(),
-        cached_seed_uuid = function () private$m_log$seed_uuid
+        seed_uuid = function() get_priv_env(private$m_seed)$m_log$uuid,
+        log_seed_uuid = function() private$m_log$seed_uuid <- private$seed_uuid(),
+        cached_seed_uuid = function() private$m_log$seed_uuid
         # }}}
     )
 )
@@ -517,23 +517,23 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 #' @name ParametricJob
 #' @export
 # param_job {{{
-param_job <- function (idf, epw) {
+param_job <- function(idf, epw) {
     ParametricJob$new(idf, epw)
 }
 # }}}
 
 # param_version {{{
-param_version <- function (self, private) {
+param_version <- function(self, private) {
     private$m_seed$version()
 }
 # }}}
 # param_seed {{{
-param_seed <- function (self, private) {
+param_seed <- function(self, private) {
     private$m_seed
 }
 # }}}
 # param_models {{{
-param_models <- function (self, private, names = NULL) {
+param_models <- function(self, private, names = NULL) {
     assert_character(names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
     if (!length(private$m_idfs)) {
         verbose_info("No parametric models have been created.")
@@ -560,12 +560,12 @@ param_models <- function (self, private, names = NULL) {
 }
 # }}}
 # param_weather {{{
-param_weather <- function (self, private) {
+param_weather <- function(self, private) {
     if (is.null(private$m_epws_path)) NULL else read_epw(private$m_epws_path)
 }
 # }}}
 # param_cases {{{
-param_cases <- function (self, private, param = NULL) {
+param_cases <- function(self, private, param = NULL) {
     if (is.null(private$m_idfs)) {
         verbose_info("No parametric models have been created.")
         return(NULL)
@@ -594,7 +594,7 @@ param_cases <- function (self, private, param = NULL) {
 }
 # }}}
 # param_param {{{
-param_param <- function (self, private, ..., .names = NULL, .cross = FALSE, .env = parent.frame()) {
+param_param <- function(self, private, ..., .names = NULL, .cross = FALSE, .env = parent.frame()) {
     assert_flag(.cross)
     assert_character(.names, null.ok = TRUE, any.missing = FALSE)
 
@@ -703,7 +703,7 @@ param_param <- function (self, private, ..., .names = NULL, .cross = FALSE, .env
 # }}}
 # param_apply_measure {{{
 #' @importFrom checkmate assert_function
-param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame()) {
+param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env = parent.frame()) {
     checkmate::assert_function(measure)
     assert_character(.names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
 
@@ -711,7 +711,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
         abort("'measure' function must have at least two argument", "param_measure")
     }
 
-    measure_wrapper <- function (idf, ..., .__PROGRESS_BAR__) {
+    measure_wrapper <- function(idf, ..., .__PROGRESS_BAR__) {
         cli::cli_progress_update(id = .__PROGRESS_BAR__$id, .envir = .__PROGRESS_BAR__$env)
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
@@ -797,7 +797,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE,
+param_run <- function(self, private, output_dir = NULL, wait = TRUE,
                        force = FALSE, copy_external = FALSE, echo = wait,
                        separate = TRUE, readvars = TRUE) {
     if (is.null(private$m_idfs)) {
@@ -826,7 +826,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE,
 # }}}
 # param_save {{{
 #' @importFrom checkmate assert_string
-param_save <- function (self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
+param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
     assert_string(dir, null.ok = TRUE)
     if (is.null(private$m_idfs)) {
         abort("No parametric models found since no measure has been applied.")
@@ -842,7 +842,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     if (!dir.exists(dir)) {
         # nocov start
         tryCatch(dir.create(dir, recursive = TRUE),
-            warning = function (w) {
+            warning = function(w) {
                 stop("Failed to create output directory: ",
                      surround(dir), call. = FALSE)
             }
@@ -861,7 +861,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 
     # save model
     path_param <- apply2_chr(private$m_idfs, path_param,
-        function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
+        function(x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
     )
     # copy weather
     path_epw <- private$m_epws_path
@@ -886,7 +886,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 }
 # }}}
 # param_print {{{
-param_print <- function (self, private) {
+param_print <- function(self, private) {
     print_job_header(title = "EnergPlus Parametric Simulation Job",
         path_idf = private$m_seed$path(),
         path_epw = private$m_epws_path,
@@ -911,13 +911,13 @@ param_print <- function (self, private) {
 # }}}
 
 #' @export
-`==.ParametricJob` <- function (e1, e2) {
+`==.ParametricJob` <- function(e1, e2) {
     if (!inherits(e2, "ParametricJob")) return(FALSE)
     identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export
-`!=.ParametricJob` <- function (e1, e2) {
+`!=.ParametricJob` <- function(e1, e2) {
     Negate(`==.ParametricJob`)(e1, e2)
 }
 

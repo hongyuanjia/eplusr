@@ -1,22 +1,22 @@
 test_that("Assertion functions", {
     expect_equal(convert_to_eplus_ver(8), numeric_version("8.0.0"))
-    expect_equal(convert_to_eplus_ver(c(8, 9), max = TRUE), numeric_version(c("8.0.0", "9.0.1")))
-    expect_equal(convert_to_eplus_ver(c(8, 9), max = FALSE), list(numeric_version(c("8.0.0")), numeric_version(c("9.0.0", "9.0.1"))))
+    expect_equal(convert_to_eplus_ver(c("8", "9"), max = TRUE), numeric_version(c("8.0.0", "9.0.1")))
+    expect_equal(convert_to_eplus_ver(c("8", "9"), max = FALSE), list(numeric_version(c("8.0.0")), numeric_version(c("9.0.0", "9.0.1"))))
 
-    expect_equal(convert_to_idd_ver(8), numeric_version("8.0.0"))
-    expect_equal(convert_to_idd_ver(c(8, 9), max = TRUE), numeric_version(c("8.0.0", "9.0.1")))
-    expect_equal(convert_to_idd_ver(c(8, 9), max = FALSE), list(numeric_version(c("8.0.0")), numeric_version(c("9.0.0", "9.0.1"))))
+    expect_equal(convert_to_idd_ver("8"), numeric_version("8.0.0"))
+    expect_equal(convert_to_idd_ver(c("8", "9"), max = TRUE), numeric_version(c("8.0.0", "9.0.1")))
+    expect_equal(convert_to_idd_ver(c("8", "9"), max = FALSE), list(numeric_version(c("8.0.0")), numeric_version(c("9.0.0", "9.0.1"))))
 
     expect_false(is_eplus_ver("a"))
-    expect_true(is_eplus_ver(8))
-    expect_true(is_eplus_ver(8.5))
+    expect_true(is_eplus_ver("8"))
+    expect_true(is_eplus_ver("8.5"))
     expect_true(is_eplus_ver("latest"))
     expect_false(is_eplus_ver("latest", strict = TRUE))
     expect_false(is_eplus_ver("8.8.8"))
 
     expect_false(is_idd_ver("a"))
-    expect_true(is_idd_ver(8))
-    expect_true(is_idd_ver(8.5))
+    expect_true(is_idd_ver("8"))
+    expect_true(is_idd_ver("8.5"))
     expect_true(is_idd_ver("latest"))
     expect_false(is_idd_ver("latest", strict = TRUE))
     expect_false(is_idd_ver("8.8.8"))
@@ -49,8 +49,8 @@ test_that("Assertion functions", {
     expect_false(is_epwdate(epw_date(-1)))
 
     expect_type(is_windows(), "logical")
-    expect_type(is_linux(), 'logical')
-    expect_type(is_macos(), 'logical')
+    expect_type(is_linux(), "logical")
+    expect_type(is_macos(), "logical")
 
     skip_on_cran()
     expect_false(is_idd(1))

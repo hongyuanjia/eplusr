@@ -15,24 +15,24 @@ RPFREQ <- c(
 )
 # }}}
 # conn_sql {{{
-conn_sql <- function (sql) {
+conn_sql <- function(sql) {
     RSQLite::dbConnect(RSQLite::SQLite(), sql)
 }
 # }}}
 # with_sql {{{
-with_sql <- function (sql, expr) {
+with_sql <- function(sql, expr) {
     on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
     force(expr)
 }
 # }}}
 # read_sql_table {{{
-read_sql_table <- function (sql, table) {
+read_sql_table <- function(sql, table) {
     con <- conn_sql(sql)
     with_sql(con, tidy_sql_name(setDT(RSQLite::dbReadTable(con, table)))[])
 }
 # }}}
 # get_sql_query {{{
-get_sql_query <- function (sql, query) {
+get_sql_query <- function(sql, query) {
     con <- conn_sql(sql)
     with_sql(con, {
         res <- RSQLite::dbGetQuery(con, query)
@@ -43,7 +43,7 @@ get_sql_query <- function (sql, query) {
 # }}}
 # get_sql_tabular_data_query {{{
 #' @importFrom checkmate assert_character
-get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
+get_sql_tabular_data_query <- function(report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
                                         row_name = NULL) {
     # basic view {{{
@@ -94,23 +94,23 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
 
     if (is.null(q)) return(view)
 
-    paste0( "SELECT * FROM (", view, ") WHERE ", q)
+    paste0("SELECT * FROM (", view, ") WHERE ", q)
 }
 # }}}
 # list_sql_table {{{
-list_sql_table <- function (sql) {
+list_sql_table <- function(sql) {
     con <- conn_sql(sql)
     with_sql(con, RSQLite::dbListTables(con))
 }
 # }}}
 # get_sql_report_data_dict {{{
-get_sql_report_data_dict <- function (sql) {
+get_sql_report_data_dict <- function(sql) {
     read_sql_table(sql, "ReportDataDictionary")
 }
 # }}}
 # get_sql_report_data {{{
 #' @importFrom checkmate assert_scalar
-get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
+get_sql_report_data <- function(sql, key_value = NULL, name = NULL, year = NULL,
                                  tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
@@ -144,7 +144,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 # }}}
 # get_sql_tabular_data {{{
 #' @importFrom checkmate assert_scalar
-get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
+get_sql_tabular_data <- function(sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   case = "auto", wide = FALSE, string_value = !wide, index = NULL) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
@@ -196,7 +196,7 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
 }
 # }}}
 # subset_sql_time {{{
-subset_sql_time <- function (time, year = NULL, tz = "UTC", period = NULL,
+subset_sql_time <- function(time, year = NULL, tz = "UTC", period = NULL,
                              month = NULL, day = NULL, hour = NULL, minute = NULL,
                              interval = NULL, simulation_days = NULL, day_type = NULL,
                              environment_name = NULL, datetime = TRUE) {
@@ -296,7 +296,7 @@ subset_sql_time <- function (time, year = NULL, tz = "UTC", period = NULL,
 }
 # }}}
 # subset_sql_report_data_dict {{{
-subset_sql_report_data_dict <- function (dict, key_value = NULL, name = NULL) {
+subset_sql_report_data_dict <- function(dict, key_value = NULL, name = NULL) {
     # ignore case
     set(dict, NULL, c("key_value_lower", "name_lower"),
         list(stri_trans_tolower(dict$key_value), stri_trans_tolower(dict$name))
@@ -345,7 +345,7 @@ subset_sql_report_data_dict <- function (dict, key_value = NULL, name = NULL) {
 }
 # }}}
 # subset_sql_environment_periods {{{
-subset_sql_environment_periods <- function (env, environment_name = NULL) {
+subset_sql_environment_periods <- function(env, environment_name = NULL) {
     if (is.null(environment_name)) return(setattr(env, "filtered", FALSE))
 
     assert_character(environment_name, any.missing = FALSE)
@@ -356,7 +356,7 @@ subset_sql_environment_periods <- function (env, environment_name = NULL) {
 }
 # }}}
 # create_sql_datetime {{{
-create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC") {
+create_sql_datetime <- function(time, first_day = NULL, year = NULL, tz = "UTC") {
     # get input year
     if (!is.null(year)) {
         year <- assert_count(year, positive = TRUE, coerce = TRUE)
@@ -425,14 +425,14 @@ create_sql_datetime <- function (time, first_day = NULL, year = NULL, tz = "UTC"
 }
 # }}}
 # complete_sql_time {{{
-complete_sql_time <- function (time) {
+complete_sql_time <- function(time) {
     if (!nrow(time)) return(time)
 
     # for annual
     cols <- c("datetime", "month", "day", "hour", "minute", "dst", "simulation_days", "day_type")
     cols <- cols[has_names(time, cols)]
 
-    update_cols <- function (dt, type, cols) {
+    update_cols <- function(dt, type, cols) {
         if (!any(i <- dt$interval_type == type)) return(dt)
 
         env <- call("%in%", as.name("environment_period_index"), unique(dt$environment_period_index[i]))
@@ -460,7 +460,7 @@ complete_sql_time <- function (time) {
 }
 # }}}
 # wide_tabular_data {{{
-wide_tabular_data <- function (dt, string_value = TRUE) {
+wide_tabular_data <- function(dt, string_value = TRUE) {
     # retain original column order
     cols <- unique(dt$column_name)
 
@@ -485,7 +485,7 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
 
     # coerece type
     if (!string_value && length(cols_num)) {
-        as_numeric <- function (x) suppressWarnings(as.numeric(x))
+        as_numeric <- function(x) suppressWarnings(as.numeric(x))
         dt[, c(cols_num) := lapply(.SD, as_numeric), .SDcols = cols_num]
     }
 
@@ -493,12 +493,12 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
 }
 # }}}
 # tidy_sql_name {{{
-tidy_sql_name <- function (x) {
+tidy_sql_name <- function(x) {
     setnames(x, stri_sub(gsub("([A-Z])", "_\\L\\1", names(x), perl = TRUE), 2L))
 }
 # }}}
 # read_report_data_sql {{{
-read_report_data_sql <- function (sql, env, dict, time,
+read_report_data_sql <- function(sql, env, dict, time,
                                   # dict
                                   key_value = NULL, name = NULL,
                                   # time
@@ -660,7 +660,7 @@ read_report_data_sql <- function (sql, env, dict, time,
 }
 # }}}
 # get_sql_reporting_freq {{{
-get_sql_reporting_freq <- function (freq) {
+get_sql_reporting_freq <- function(freq) {
     freq[freq == "HVAC System Timestep"] <- "Each Call"
     freq[freq == "Zone Timestep"] <- "TimeStep"
     freq[freq == "Run Period"] <- "RunPeriod"
@@ -669,7 +669,7 @@ get_sql_reporting_freq <- function (freq) {
 }
 # }}}
 # add_csv_variable {{{
-add_csv_variable <- function (dict) {
+add_csv_variable <- function(dict) {
     # change detailed level frequency to "Each Call"
     dict[, Variable := reporting_frequency]
     dict[J("HVAC System Timestep"), on = "reporting_frequency", Variable := "Each Call"]
@@ -684,7 +684,7 @@ add_csv_variable <- function (dict) {
 }
 # }}}
 # add_csv_time {{{
-add_csv_time <- function (time) {
+add_csv_time <- function(time) {
     if (!nrow(time)) set(time, NULL, "Date/Time", character())
 
     time[J(RPFREQ[c("Each Call", "TimeStep", "Hourly")]), on = "interval_type",
@@ -716,7 +716,7 @@ add_csv_time <- function (time) {
 # }}}
 
 # helper {{{
-.sql_sep <- function (x, ignore_case = TRUE) {
+.sql_sep <- function(x, ignore_case = TRUE) {
     if (is.character(x)) {
         if (ignore_case) {
             stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
@@ -727,7 +727,7 @@ add_csv_time <- function (time) {
         paste(x, sep = ",", collapse = ",")
     }
 }
-.sql_make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE, env = parent.frame()) {
+.sql_make <- function(arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE, env = parent.frame()) {
     a <- substitute(assertion, env)
     if (is.null(arg)) return(NULL)
     eval(a)
@@ -740,7 +740,7 @@ add_csv_time <- function (time) {
         paste0(sql_col, " IN (", .sql_sep(unique(arg), FALSE), ")")
     }
 }
-`%and%` <- function (x, y) {
+`%and%` <- function(x, y) {
     if (is.null(y)) return(x)
     if (is.null(x)) return(y)
     paste0("(", x, ") AND (", y, ")")

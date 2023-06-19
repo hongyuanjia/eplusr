@@ -41,18 +41,18 @@ current <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' path_eplus(8.8, "Energy+.idd")
+#' path_eplus("8.8", "Energy+.idd")
 #'
-#' path_eplus_processor(8.8, "EPMacro", strict = TRUE)
-#' path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)
+#' path_eplus_processor("8.8", "EPMacro", strict = TRUE)
+#' path_eplus_processor("8.8", "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)
 #'
-#' path_eplus_example(8.8, "1ZoneUncontrolled.idf")
-#' path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")
+#' path_eplus_example("8.8", "1ZoneUncontrolled.idf")
+#' path_eplus_example("8.8", "BasicFiles/Exercise1A.idf")
 #'
-#' path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+#' path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 #'
-#' path_eplus_dataset(8.8, "Boilers.idf")
-#' path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")
+#' path_eplus_dataset("8.8", "Boilers.idf")
+#' path_eplus_dataset("8.8", "FMUs/MoistAir.fmu")
 #' }
 #' @export
 #' @author Hongyuan Jia
@@ -120,7 +120,7 @@ path_eplus_dataset <- function(ver, file, strict = FALSE) {
 #' \dontrun{
 #' # run a test simulation
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
-#' epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData",
+#' epw_path <- path_eplus_weather("8.8",
 #'      "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 #' )
 #' dir <- file.path(tempdir(), "test")
@@ -352,7 +352,7 @@ get_eplus_output_name <- function(path, suffix_type = c("C", "L", "D")) {
     lapply(files, function(f) paste0(f$pre, f$ext))
 }
 
-eplus_exe <- function (eplus) {
+eplus_exe <- function(eplus) {
     if (checkmate::test_file_exists(eplus, "x") || (is_windows() && has_ext(eplus, "exe"))) {
         suppressMessages(use_eplus(dirname(eplus)))
         return(normalizePath(eplus, mustWork = TRUE))
@@ -360,7 +360,7 @@ eplus_exe <- function (eplus) {
 
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
     config <- tryCatch(eplus_config(eplus),
-        eplusr_warning_miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config")
+        eplusr_warning_miss_eplus_config = function(w) abort(conditionMessage(w), "miss_eplus_config")
     )
 
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
@@ -488,7 +488,7 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
         )
     } else {
         # nocov start
-        callback <- function () {
+        callback <- function() {
             if (!proc$is_alive()) return(NULL)
 
             k <- tryCatch(proc$kill(), error = function(e) FALSE)
@@ -2069,9 +2069,9 @@ handle_sim_events <- function(state) {
     run <- state$jobs$status == "running"
     if (!any(run)) return(state)
 
-    state$jobs[run & vlapply(process, function (x) !is.null(x) && !x$is_alive()),
+    state$jobs[run & vlapply(process, function(x) !is.null(x) && !x$is_alive()),
         c("stdout", "stderr", "exit_status", "result", "status", "end_time") := {
-            res <- lapply(process, function (p) p$get_result())
+            res <- lapply(process, function(p) p$get_result())
 
             # somehow get_exit_status() function may return NA after execution
             # of a (successful) command
@@ -2123,7 +2123,7 @@ do_sim <- function(state) {
     state
 }
 
-get_sim_status_string <- function (type, index, model, weather, exit_code = NULL) {
+get_sim_status_string <- function(type, index, model, weather, exit_code = NULL) {
     status <- c("running", "completed", "cancelled", "terminated")
     if (length(type) == 1L && type %in% status) {
         type <- switch(type,
@@ -2139,7 +2139,7 @@ get_sim_status_string <- function (type, index, model, weather, exit_code = NULL
         "[IDF]", surround(basename(model))
     )
 
-    has_epw <- !vlapply(weather, function (x) is.null(x) || is.na(x))
+    has_epw <- !vlapply(weather, function(x) is.null(x) || is.na(x))
 
     if (any(has_epw)) {
         mes[has_epw] <- paste0(mes, " + ", "[EPW]", surround(basename(unlist(weather[has_epw]))))
@@ -2358,10 +2358,10 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #' \dontrun{
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 #'
-#' if (is_avail_eplus(8.8)) {
+#' if (is_avail_eplus("8.8")) {
 #'     # run a single model
 #'     epw_path <- file.path(
-#'         eplus_config(8.8)$dir,
+#'         eplus_config("8.8")$dir,
 #'         "WeatherData",
 #'         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 #'     )
@@ -2369,7 +2369,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'     run_idf(idf_path, epw_path, output_dir = tempdir())
 #'
 #'     # run multiple model in parallel
-#'     idf_paths <- file.path(eplus_config(8.8)$dir, "ExampleFiles",
+#'     idf_paths <- file.path(eplus_config("8.8")$dir, "ExampleFiles",
 #'         c("1ZoneUncontrolled.idf", "1ZoneUncontrolledFourAlgorithms.idf")
 #'     )
 #'     epw_paths <- rep(epw_path, times = 2L)

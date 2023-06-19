@@ -48,8 +48,8 @@ NULL
 #' # run simulation and get the err file
 #' idf_name <- "1ZoneUncontrolled.idf"
 #' epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-#' idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-#' epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#' idf_path <- path_eplus_example("8.8", idf_name)
+#' epw_path <- path_eplus_weather("8.8", epw_name)
 #' job <- eplus_job(idf_path, epw_path)
 #' job$run(dir = tempdir())
 #'
@@ -61,7 +61,7 @@ NULL
 #' @author Hongyuan Jia
 #' @importFrom checkmate assert_file_exists
 # read_rdd {{{
-read_rdd <- function (path) {
+read_rdd <- function(path) {
     assert_file_exists(path, "r", "rdd")
     parse_rdd_file(path)[]
 }
@@ -71,14 +71,14 @@ read_rdd <- function (path) {
 #' @importFrom checkmate assert_file_exists
 #' @export
 # read_mdd {{{
-read_mdd <- function (path) {
+read_mdd <- function(path) {
     assert_file_exists(path, "r", "mdd")
     parse_rdd_file(path, mdd = TRUE)[]
 }
 # }}}
 
 # parse_rdd_file {{{
-parse_rdd_file <- function (path, mdd = FALSE) {
+parse_rdd_file <- function(path, mdd = FALSE) {
     rdd <- data.table(index = integer(), reported_time_step = character(),
         report_type = character(), variable = character(), units = character()
     )
@@ -122,7 +122,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
         rdd <- tryCatch(
             fread(path, skip = 2, sep = ",", header = FALSE, drop = drop_num,
                 col.names = c("variable", "step_type_units")),
-            error = function (e) {
+            error = function(e) {
                 e$message <- paste0("Failed to read ", if (mdd) "MDD" else "RDD", " data.\n", e$message)
                 stop(e, call. = FALSE)
             }
@@ -148,7 +148,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
     } else {
         rdd <- tryCatch(
             fread(path, skip = 1, sep = ",", header = TRUE, col.names = c("reported_time_step", "report_type", "variable_unit")),
-            error = function (e) {e$message <- paste0("Failed to read RDD/MDD data.\n", e$message); stop(e)}
+            error = function(e) {e$message <- paste0("Failed to read RDD/MDD data.\n", e$message); stop(e)}
         )
         set(rdd, NULL, c("variable", "units"), as.data.table(stri_split_fixed(rdd$variable_unit, " [", n = 2, simplify = TRUE)))
         set(rdd, NULL, "variable_unit", NULL)
@@ -255,7 +255,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
 #' @export
 #' @importFrom checkmate assert_string
 # rdd_to_load {{{
-rdd_to_load <- function (rdd, key_value, reporting_frequency) {
+rdd_to_load <- function(rdd, key_value, reporting_frequency) {
     if (!is_rdd(rdd)) abort("'rdd' must be an RddFile object")
 
     # copy the original
@@ -306,7 +306,7 @@ rdd_to_load <- function (rdd, key_value, reporting_frequency) {
 #' @rdname rdd_to_load
 #' @export
 # mdd_to_load {{{
-mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
+mdd_to_load <- function(mdd, reporting_frequency, class = c("Output:Meter",
                                                              "Output:Meter:MeterFileOnly",
                                                              "Output:Meter:Cumulative",
                                                              "Output:Meter:Cumulative:MeterFileOnly")) {
@@ -350,7 +350,7 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
 # }}}
 
 # validate_report_freq {{{
-validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
+validate_report_freq <- function(reporting_frequency, scalar = TRUE) {
     if (scalar) assert_string(reporting_frequency)
 
     all_freq <- c("Detailed", "Timestep", "Hourly", "Daily", "Monthly",
@@ -366,7 +366,7 @@ validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
 
 #' @export
 # print.RddFile {{{
-print.RddFile <- function (x, ...) {
+print.RddFile <- function(x, ...) {
     cli::cat_rule("EnergyPlus Report Data Dictionary File", line = 2)
 
     if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {
@@ -386,7 +386,7 @@ print.RddFile <- function (x, ...) {
 
 #' @export
 # print.MddFile {{{
-print.MddFile <- function (x, ...) {
+print.MddFile <- function(x, ...) {
     cli::cat_rule("EnergyPlus Meter Data Dictionary File", line = 2)
 
     if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {

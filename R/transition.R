@@ -16,7 +16,7 @@ CLASS_DEL_COMMON <- c(
 #' specified version.
 #'
 #' @param idf An [Idf] object or a path of IDF file.
-#' @param ver A valid EnergyPlus IDD version, e.g. `9`, `8.8`, or `"8.8.0"`.
+#' @param ver A valid EnergyPlus IDD version, e.g. `"9"`, `"8.8"`, or `"8.8.0"`.
 #' @param save If `TRUE`, the models will be saved into specified directory.
 #' Default: `FALSE`.
 #' @param dir Only applicable when `save` is `TRUE`. The directory to save the
@@ -34,9 +34,9 @@ CLASS_DEL_COMMON <- c(
 #' @author Hongyuan Jia
 #' @examples
 #' \dontrun{
-#' if (any(avail_eplus()) > 7.2) {
+#' if (any(avail_eplus()) > "7.2") {
 #'     # create an empty IDF
-#'     idf <- empty_idf(7.2)
+#'     idf <- empty_idf("7.2")
 #'
 #'     # convert it from v7.2 to the latest EnergyPlus installed
 #'     transition(idf, max(avail_eplus()))
@@ -65,7 +65,7 @@ transition <- function(idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
     }
     ver <- ver[, 1:2]
 
-    if (idf$version() < 7.2) {
+    if (idf$version() < "7.2") {
         abort(paste0("Input IDF has version ", surround(idf$version()), ". ",
             "Currently only EnergyPlus v7.2 and above are suppored."
         ))
@@ -170,7 +170,7 @@ trans_funs <- new.env(parent = emptyenv())
 # trans_720_800 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f720t800 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 7.2)
+    assert_true(idf$version()[, 1:2] == "7.2")
 
     target_cls <- c(
         "ShadowCalculation",                                       # 1
@@ -207,7 +207,7 @@ trans_funs$f720t800 <- function(idf) {
         "Chiller:Absorption:Indirect"                              # 32
     )
 
-    new_idf <- trans_preprocess(idf, 8.0, target_cls)
+    new_idf <- trans_preprocess(idf, "8.0", target_cls)
 
     # 1: ShadowCalculation {{{
     dt1 <- trans_action(idf, "ShadowCalculation", insert = list(1L, "AverageOverDaysInFrequency"))
@@ -438,7 +438,7 @@ trans_funs$f720t800 <- function(idf) {
 # trans_800_810 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f800t810 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.0)
+    assert_true(idf$version()[, 1:2] == "8.0")
 
     target_cls <- c(
         "People",                                            # 1
@@ -458,7 +458,7 @@ trans_funs$f800t810 <- function(idf) {
         "HVACTemplate:System:UnitaryHeatPump:AirToAir"       # 15
     )
 
-    new_idf <- trans_preprocess(idf, 8.1, target_cls)
+    new_idf <- trans_preprocess(idf, "8.1", target_cls)
 
     # 1: People {{{
     dt1 <- trans_action(idf, "People",
@@ -613,7 +613,7 @@ trans_funs$f800t810 <- function(idf) {
 # trans_810_820 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f810t820 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.1)
+    assert_true(idf$version()[, 1:2] == "8.1")
 
     target_cls <- c(
         "ZoneHVAC:UnitVentilator",                       # 1
@@ -634,7 +634,7 @@ trans_funs$f810t820 <- function(idf) {
         "ZoneHVAC:LowTemperatureRadiant:Electric"        # 16
     )
 
-    new_idf <- trans_preprocess(idf, 8.2, target_cls)
+    new_idf <- trans_preprocess(idf, "8.2", target_cls)
 
     # 1: ZoneHVAC:UnitVentilator {{{
     dt1 <- trans_action(idf, "ZoneHVAC:UnitVentilator", min_fields = 16L,
@@ -761,7 +761,7 @@ trans_funs$f810t820 <- function(idf) {
 # trans_820_830 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f820t830 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.2)
+    assert_true(idf$version()[, 1:2] == "8.2")
 
     target_cls <- c(
         "Chiller:Electric:ReformulatedEIR",           # 1
@@ -771,7 +771,7 @@ trans_funs$f820t830 <- function(idf) {
         "EvaporativeCooler:Direct:ResearchSpecial"    # 5
     )
 
-    new_idf <- trans_preprocess(idf, 8.3, target_cls)
+    new_idf <- trans_preprocess(idf, "8.3", target_cls)
 
     # 1: Chiller:Electric:ReformulatedEIR {{{
     dt1 <- trans_action(idf, "Chiller:Electric:ReformulatedEIR", min_fields = 10L,
@@ -819,7 +819,7 @@ trans_funs$f820t830 <- function(idf) {
 # trans_830_840 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f830t840 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.3)
+    assert_true(idf$version()[, 1:2] == "8.3")
 
     target_cls <- c(
         "Coil:WaterHeating:AirToWaterHeatPump",     # 1
@@ -842,7 +842,7 @@ trans_funs$f830t840 <- function(idf) {
         "ZoneAirMassFlowConservation"               # 18
     )
 
-    new_idf <- trans_preprocess(idf, 8.4, target_cls)
+    new_idf <- trans_preprocess(idf, "8.4", target_cls)
 
     # 1: Coil:WaterHeating:AirToWaterHeatPump {{{
     dt1 <- trans_action(idf, class = c("Coil:WaterHeating:AirToWaterHeatPump:Pumped" = "Coil:WaterHeating:AirToWaterHeatPump"))
@@ -1076,13 +1076,13 @@ trans_funs$f830t840 <- function(idf) {
 # trans_840_850 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f840t850 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.4)
+    assert_true(idf$version()[, 1:2] == "8.4")
 
     target_cls <- c(
         "EnergyManagementSystem:Actuator" # 1
     )
 
-    new_idf <- trans_preprocess(idf, 8.5, target_cls)
+    new_idf <- trans_preprocess(idf, "8.5", target_cls)
 
     # 1: EnergyManagementSystem:Actuator {{{
     dt <- trans_action(idf, "EnergyManagementSystem:Actuator",
@@ -1099,7 +1099,7 @@ trans_funs$f840t850 <- function(idf) {
 # trans_850_860 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f850t860 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.5)
+    assert_true(idf$version()[, 1:2] == "8.5")
 
     target_cls <- c(
         "Exterior:FuelEquipment",                             # 1
@@ -1129,7 +1129,7 @@ trans_funs$f850t860 <- function(idf) {
         value_chr := "Coil:Heating:Fuel"
     ]
 
-    new_idf <- trans_preprocess(idf, 8.6, target_cls)
+    new_idf <- trans_preprocess(idf, "8.6", target_cls)
 
     # 1: Exterior:FuelEquipment {{{
     dt1 <- trans_action(idf, "Exterior:FuelEquipment",
@@ -1481,7 +1481,7 @@ trans_funs$f850t860 <- function(idf) {
 # trans_860_870 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f860t870 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.6)
+    assert_true(idf$version()[, 1:2] == "8.6")
 
     target_cls <- c(
         "Coil:Cooling:DX:MultiSpeed",                # 1
@@ -1495,7 +1495,7 @@ trans_funs$f860t870 <- function(idf) {
         "AirflowNetwork:Distribution:Component:Duct" # 9
     )
 
-    new_idf <- trans_preprocess(idf, 8.7, target_cls)
+    new_idf <- trans_preprocess(idf, "8.7", target_cls)
 
     # 1: Coil:Cooling:DX:MultiSpeed {{{
     dt1 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed",
@@ -1562,7 +1562,7 @@ trans_funs$f860t870 <- function(idf) {
 # trans_870_880 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f870t880 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.7)
+    assert_true(idf$version()[, 1:2] == "8.7")
 
     target_cls <- c(
         "Output:Surfaces:List",                            # 1
@@ -1585,7 +1585,7 @@ trans_funs$f870t880 <- function(idf) {
         "AvailabilityManager:NightCycle"                   # 16
     )
 
-    new_idf <- trans_preprocess(idf, 8.8, target_cls)
+    new_idf <- trans_preprocess(idf, "8.8", target_cls)
 
     # 1: Output:Surfaces:List {{{
     dt1 <- trans_action(idf, "Output:Surfaces:List",
@@ -1731,7 +1731,7 @@ trans_funs$f870t880 <- function(idf) {
 # trans_880_890 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f880t890 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.8)
+    assert_true(idf$version()[, 1:2] == "8.8")
 
     target_cls <- c(
         "ZoneHVAC:EquipmentList",          # 1
@@ -1744,7 +1744,7 @@ trans_funs$f880t890 <- function(idf) {
         "Schedule:Compact"                 # 8
     )
 
-    new_idf <- trans_preprocess(idf, 8.9, target_cls)
+    new_idf <- trans_preprocess(idf, "8.9", target_cls)
 
     # 1: ZoneHVAC:EquipmentList {{{
     dt1 <- trans_action(idf, "ZoneHVAC:EquipmentList", insert = list(2, "SequentialLoad"))
@@ -1869,7 +1869,7 @@ trans_funs$f880t890 <- function(idf) {
 # trans_890_900 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f890t900 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 8.9)
+    assert_true(idf$version()[, 1:2] == "8.9")
 
     target_cls <- c(
         "AirflowNetwork:Distribution:Component:OutdoorAirFlow", # 1
@@ -1885,7 +1885,7 @@ trans_funs$f890t900 <- function(idf) {
         "WindowProperty:ShadingControl"                         # 11
     )
 
-    new_idf <- trans_preprocess(idf, 9.0, target_cls)
+    new_idf <- trans_preprocess(idf, "9.0", target_cls)
 
     # 1: AirflowNetwork:Distribution:Component:OutdoorAirFlow {{{
     dt1 <- trans_action(idf,
@@ -2304,14 +2304,14 @@ trans_funs$f890t900 <- function(idf) {
 # trans_900_910 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f900t910 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.0)
+    assert_true(idf$version()[, 1:2] == "9.0")
 
     target_cls <- c(
         "HybridModel:Zone",      # 1
         "ZoneHVAC:EquipmentList" # 2
     )
 
-    new_idf <- trans_preprocess(idf, 9.1, target_cls)
+    new_idf <- trans_preprocess(idf, "9.1", target_cls)
 
     # 1: HybridModel:Zone {{{
     dt1 <- trans_action(idf, "HybridModel:Zone", all = 9L,
@@ -2340,7 +2340,7 @@ trans_funs$f900t910 <- function(idf) {
 # trans_910_920 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f910t920 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.1)
+    assert_true(idf$version()[, 1:2] == "9.1")
 
     target_cls <- c(
         "Foundation:Kiva",               # 1
@@ -2353,7 +2353,7 @@ trans_funs$f910t920 <- function(idf) {
         "ZoneHVAC:EquipmentList"         # 8
     )
 
-    new_idf <- trans_preprocess(idf, 9.2, target_cls)
+    new_idf <- trans_preprocess(idf, "9.2", target_cls)
 
     # 1: Foundation:Kiva {{{
     dt1 <- trans_action(idf, "Foundation:Kiva", insert = list(2L))
@@ -2902,7 +2902,7 @@ trans_funs$f910t920 <- function(idf) {
 # trans_920_930 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f920t930 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.2)
+    assert_true(idf$version()[, 1:2] == "9.2")
 
     target_cls <- c(
         "AirConditioner:VariableRefrigerantFlow",       # 1
@@ -2945,7 +2945,7 @@ trans_funs$f920t930 <- function(idf) {
         "ZoneHVAC:HybridUnitaryHVAC"                    # 38
     )
 
-    new_idf <- trans_preprocess(idf, 9.3, target_cls)
+    new_idf <- trans_preprocess(idf, "9.3", target_cls)
 
     # fix_fuel_types {{{
     fix_fuel_types <- function(dt, idx) {
@@ -3426,7 +3426,7 @@ trans_funs$f920t930 <- function(idf) {
 # trans_930_940 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f930t940 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.3)
+    assert_true(idf$version()[, 1:2] == "9.3")
 
     target_cls <- c(
         "Construction:InternalSource",                 # 1
@@ -3442,7 +3442,7 @@ trans_funs$f930t940 <- function(idf) {
         "ZoneHVAC:HybridUnitaryHVAC"                   # 9
     )
 
-    new_idf <- trans_preprocess(idf, 9.4, target_cls)
+    new_idf <- trans_preprocess(idf, "9.4", target_cls)
 
     # 1: Construction:InternalSource {{{
     dt1 <- trans_action(idf, "Construction:InternalSource", insert = list(6, "0.0"))
@@ -3546,7 +3546,7 @@ trans_funs$f930t940 <- function(idf) {
 # trans_940_950 {{{
 #' @importFrom checkmate assert_true
 trans_funs$f940t950 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.4)
+    assert_true(idf$version()[, 1:2] == "9.4")
 
     target_cls <- c(
         "Construction:AirBoundary",                    # 1
@@ -3562,7 +3562,7 @@ trans_funs$f940t950 <- function(idf) {
         "ZoneHVAC:Baseboard:RadiantConvective:Steam"   # 11
     )
 
-    new_idf <- trans_preprocess(idf, 9.5, target_cls)
+    new_idf <- trans_preprocess(idf, "9.5", target_cls)
     NUM_ADDED <- 0L
 
     # 1: Construction:AirBoundary {{{
@@ -3749,7 +3749,7 @@ trans_funs$f940t950 <- function(idf) {
 # }}}
 # trans_950_960 {{{
 trans_funs$f950t960 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.5)
+    assert_true(idf$version()[, 1:2] == "9.5")
 
     target_cls <- c(
         "AirflowNetwork:MultiZone:ReferenceCrackConditions", # 1
@@ -3775,7 +3775,7 @@ trans_funs$f950t960 <- function(idf) {
         "Wall:Interzone"                                     # 21
     )
 
-    new_idf <- trans_preprocess(idf, 9.6, target_cls)
+    new_idf <- trans_preprocess(idf, "9.6", target_cls)
 
     # 1: AirflowNetwork:MultiZone:ReferenceCrackConditions {{{
     dt1 <- trans_action(idf, "AirflowNetwork:MultiZone:ReferenceCrackConditions",
@@ -3863,13 +3863,13 @@ trans_funs$f950t960 <- function(idf) {
 # }}}
 # trans_960_2210 {{{
 trans_funs$f960t2210 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 9.6)
+    assert_true(idf$version()[, 1:2] == "9.6")
 
     target_cls <- c(
         "PythonPlugin:SearchPaths" # 1
     )
 
-    new_idf <- trans_preprocess(idf, 22.1, target_cls)
+    new_idf <- trans_preprocess(idf, "22.1", target_cls)
 
     # 1: PythonPlugin:SearchPaths {{{
     dt1 <- trans_action(idf, "PythonPlugin:SearchPaths",
@@ -3884,7 +3884,7 @@ trans_funs$f960t2210 <- function(idf) {
 # }}}
 # trans_2210_2220 {{{
 trans_funs$f2210t2220 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 22.1)
+    assert_true(idf$version()[, 1:2] == "22.1")
 
     target_cls <- c(
         "Coil:Cooling:DX:CurveFit:Speed",              # 1
@@ -3898,7 +3898,7 @@ trans_funs$f2210t2220 <- function(idf) {
         "Coil:Heating:WaterToAirHeatPump:EquationFit"  # 9
     )
 
-    new_idf <- trans_preprocess(idf, 22.2, target_cls)
+    new_idf <- trans_preprocess(idf, "22.2", target_cls)
 
     # 1: Coil:Cooling:DX:CurveFit:Speed {{{
     dt1 <- trans_action(idf, "Coil:Cooling:DX:CurveFit:Speed", insert = list(9L))
@@ -3979,9 +3979,9 @@ trans_funs$f2210t2220 <- function(idf) {
 # }}}
 # trans_2220_2310 {{{
 trans_funs$f2220t2310 <- function(idf) {
-    assert_true(idf$version()[, 1:2] == 22.2)
+    assert_true(idf$version()[, 1:2] == "22.2")
 
-    new_idf <- trans_preprocess(idf, 23.1)
+    new_idf <- trans_preprocess(idf, "23.1")
 
     trans_process(new_idf, idf, data.table())
 
@@ -4207,7 +4207,7 @@ trans_postprocess <- function(idf, from, to) {
         }]
 
         # special case from v7.2 to v8.0 {{{
-        if (nrow(mapping) && unique(mapping$from) == 7.2) {
+        if (nrow(mapping) && unique(mapping$from) == "7.2") {
             has_chiller <- any(idf$is_valid_class(c(
                 "Chiller:Electric:EIR",
                 "Chiller:Electric:ReformulatedEIR",
@@ -4308,7 +4308,7 @@ trans_postprocess <- function(idf, from, to) {
     # }}}
     # reset_meter_resource {{{
     reset_meter_resource <- function(dt, mapping, field_index, step = NULL, exclude = character(), idf) {
-        if (to != 9.4) return(dt)
+        if (to != "9.4") return(dt)
         if (!nrow(dt)) return(dt)
         if (!nrow(mapping)) return(dt)
 
@@ -4350,7 +4350,7 @@ trans_postprocess <- function(idf, from, to) {
     # special case from v9.3 to v9.4 {{{
     mtr_custom <- character()
     map <- data.table()
-    if (to == 9.4) {
+    if (to == "9.4") {
         # extract names of Meter:Custom and Meter:CustomDecrement
         cls <- c("Meter:Custom", "Meter:CustomDecrement")
         cls <- cls[idf$is_valid_class(cls)]
@@ -4401,7 +4401,7 @@ trans_postprocess <- function(idf, from, to) {
     # 5: Output:Table:Annual {{{
     # Output:Table:Annual was first added in EnergyPlus v8.4
     dt5 <- data.table()
-    if (from >= 8.4) {
+    if (from >= "8.4") {
         dt5 <- trans_action(idf, "Output:Table:Annual", min_fields = 6L)
         dt5 <- update_var(dt5, rep_vars, 4L, step = 3L, idf = idf)
         dt5 <- reset_meter_resource(dt5, map, 4L, step = 3L, exclude = mtr_custom)
@@ -4718,9 +4718,9 @@ trans_table_convert <- function(path, ascending = c(TRUE, TRUE)) {
 #' @author Hongyuan Jia
 #' @examples
 #' \dontrun{
-#' if (any(avail_eplus()) > 7.2) {
+#' if (any(avail_eplus()) > "7.2") {
 #'     # create an empty IDF
-#'     idf <- empty_idf(7.2)
+#'     idf <- empty_idf("7.2")
 #'     idf$save(tempfile(fileext = ".idf"))
 #'
 #'     # convert it from v7.2 to the latest EnergyPlus installed
@@ -4810,7 +4810,7 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     names(errors) <- names(models)
 
     # avoid to use IDFVersionUpdater v9.0 as there are fatal errors
-    if (length(newer_ep[newer_ep[, 1:2] != 9.0])) newer_ep <- newer_ep[newer_ep[, 1:2] != 9.0]
+    if (length(newer_ep[newer_ep[, 1:2] != "9.0"])) newer_ep <- newer_ep[newer_ep[, 1:2] != "9.0"]
 
     # NOTE: From EnergyPlus v23.1, the supported oldest version for transition
     # is v9.0. Should check if transitions below v9.0 are needed. If so, check
@@ -4822,13 +4822,13 @@ version_updater <- function(idf, ver, dir = NULL, keep_all = FALSE) {
     path_updater <- rep(path_updater, length(trans_exe))
 
     # check if there are available EnergyPlus < v23.1
-    if (any(vers < 9.0) && max(newer_ep) >= 23.1 &&
-        any(is_lower_ep <- avail_eplus() > max(vers[vers < 9.0]) & avail_eplus() < 23.1)) {
+    if (any(vers < "9.0") && max(newer_ep) >= "23.1" &&
+        any(is_lower_ep <- avail_eplus() > max(vers[vers < "9.0"]) & avail_eplus() < "23.1")) {
         lower_ep <- avail_eplus()[is_lower_ep]
         # avoid to use IDFVersionUpdater v9.0 as there are fatal errors
-        if (length(lower_ep[lower_ep[, 1:2] != 9.0])) lower_ep <- lower_ep[lower_ep[, 1:2] != 9.0]
+        if (length(lower_ep[lower_ep[, 1:2] != "9.0"])) lower_ep <- lower_ep[lower_ep[, 1:2] != "9.0"]
 
-        path_updater[to <= 9.0] <- file.path(
+        path_updater[to <= "9.0"] <- file.path(
             eplus_config(max(lower_ep))$dir, "PreProcess/IDFVersionUpdater"
         )
     }

@@ -148,7 +148,7 @@ parse_idd_file <- function(path, epw = FALSE, encoding = "unknown") {
 
     # ConnectorList references are missing until v9.1
     # See https://github.com/NREL/EnergyPlus/issues/7172
-    if (idd_version < 9.1) {
+    if (idd_version < "9.1") {
         id_conlst <- dt_class[J("ConnectorList"), on = "class_name", class_id]
         dt_field[J(id_conlst, c(3L, 5L)), on = c("class_id", "field_index"), `:=`(
             object_list = list("plantconnectors")
@@ -162,7 +162,7 @@ parse_idd_file <- function(path, epw = FALSE, encoding = "unknown") {
     # Object-list property missing in HeatPump:PlantLoop:EIR:Cooling A9 since
     # v9.3
     # See https://github.com/NREL/EnergyPlus/issues/7837
-    if (idd_version >= 9.3) {
+    if (idd_version >= "9.3") {
         id_clg <- dt_class[J("HeatPump:PlantLoop:EIR:Cooling"), on = "class_name", class_id]
         dt_field[J(id_clg, 7L), on = c("class_id", "field_index"), `:=`(
             object_list = list("plhpheatingnames"),
@@ -183,7 +183,7 @@ parse_idd_file <- function(path, epw = FALSE, encoding = "unknown") {
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd = NULL, ref = TRUE, encoding = "unknown") {
+parse_idf_file <- function(path, idd = NULL, ref = TRUE, encoding = "unknown") {
     # read IDF string and get version first to get corresponding IDD
     idf_dt <- read_lines(path, encoding = encoding)
     # delete blank lines
@@ -193,7 +193,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE, encoding = "unknown") 
 
     if (has_ext(path, "ddy")) {
         idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
-            eplusr_warning = function (w) invokeRestart("muffleWarning")
+            eplusr_warning = function(w) invokeRestart("muffleWarning")
         )
     } else {
         idd <- get_idd_from_ver(idf_ver, idd)
@@ -268,7 +268,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE, encoding = "unknown") 
 # }}}
 
 # get_idd_ver {{{
-get_idd_ver <- function (idd_dt) {
+get_idd_ver <- function(idd_dt) {
     ver_line <- idd_dt$string[[1L]]
 
     if (!stri_startswith_fixed(ver_line, "!IDD_Version")) {
@@ -284,7 +284,7 @@ get_idd_ver <- function (idd_dt) {
 # }}}
 
 # get_idd_build {{{
-get_idd_build <- function (idd_dt) {
+get_idd_build <- function(idd_dt) {
     build_line <- idd_dt$string[[2L]]
 
     if (!stri_startswith_fixed(build_line, "!IDD_BUILD")) {
@@ -296,7 +296,7 @@ get_idd_build <- function (idd_dt) {
 # }}}
 
 # get_idf_ver {{{
-get_idf_ver <- function (idf_dt) {
+get_idf_ver <- function(idf_dt) {
     is_ver <- stri_startswith_fixed(idf_dt$string, "Version",
         opts_fixed = stringi::stri_opts_fixed(case_insensitive = TRUE)
     )
@@ -328,7 +328,7 @@ get_idf_ver <- function (idf_dt) {
 # }}}
 
 # clean_idd_lines {{{
-clean_idd_lines <- function (dt) {
+clean_idd_lines <- function(dt) {
     # trucate to characters left of ! in order to handle cases when there are
     # inline comments starting with "!", e.g.
     # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
@@ -345,7 +345,7 @@ clean_idd_lines <- function (dt) {
 # }}}
 
 # sep_idd_lines {{{
-sep_idd_lines <- function (dt, col = "string") {
+sep_idd_lines <- function(dt, col = "string") {
     # mark first slash
     set(dt, NULL, "slash_loc", stri_locate_first_fixed(dt$string, "\\")[, 1L])
 
@@ -432,7 +432,7 @@ sep_idd_lines <- function (dt, col = "string") {
 # }}}
 
 # mark_idd_lines {{{
-mark_idd_lines <- function (dt, type_enum) {
+mark_idd_lines <- function(dt, type_enum) {
     setindexv(dt, "slash_key")
 
     # add type indicator
@@ -474,7 +474,7 @@ mark_idd_lines <- function (dt, type_enum) {
 # }}}
 
 # sep_group_table {{{
-sep_group_table <- function (dt, type_enum) {
+sep_group_table <- function(dt, type_enum) {
     setindexv(dt, "type")
 
     is_group <- dt[J(type_enum$group), on = "type", which = TRUE, nomatch = 0L]
@@ -519,7 +519,7 @@ sep_group_table <- function (dt, type_enum) {
 # }}}
 
 # sep_class_table {{{
-sep_class_table <- function (dt, type_enum) {
+sep_class_table <- function(dt, type_enum) {
     setindexv(dt, "type")
     dt[J(type_enum$class), on = "type", `:=`(
         class_id = seq_along(body),
@@ -623,7 +623,7 @@ sep_class_table <- function (dt, type_enum) {
 # }}}
 
 # get_field_table {{{
-get_field_table <- function (dt, type_enum) {
+get_field_table <- function(dt, type_enum) {
     # add row indicator
     set(dt, NULL, "row", seq_len(nrow(dt)))
 
@@ -682,7 +682,7 @@ get_field_table <- function (dt, type_enum) {
 # }}}
 
 # dcast_slash {{{
-dcast_slash <- function (dt, id, keys, keep = NULL) {
+dcast_slash <- function(dt, id, keys, keep = NULL) {
     if (!is.null(keep)) assert_names(names(dt), must.include = keep)
 
     f <- stats::as.formula(paste0(paste0(id[[1L]], collapse = "+"), "~slash_key"))
@@ -694,7 +694,7 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     setindexv(i, id[[1L]])
 
     flat <- unique(dt[J(keys$flat), on = "slash_key", nomatch = 0L], by = c(id[[1L]], "slash_key"))
-    if (nrow(flat)) flat <- dcast.data.table(flat , f, value.var = "slash_value")
+    if (nrow(flat)) flat <- dcast.data.table(flat, f, value.var = "slash_value")
 
     nest <- dt[J(keys$nest), on = "slash_key", nomatch = 0L,
         {list(slash_value = list(slash_value))}, by = c(id[[1L]], "slash_key")
@@ -717,31 +717,31 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
 # }}}
 
 # complete_property {{{
-complete_property <- function (dt, type, ref, epw = FALSE) {
+complete_property <- function(dt, type, ref, epw = FALSE) {
     type <- match.arg(type, c("class", "field"))
     keys <- switch(type, class = IDD_SLASHKEY$class, field = IDD_SLASHKEY$field)
 
     # get slash type from slash key
-    slash_type <- function (key) {
+    slash_type <- function(key) {
         types <- IDD_SLASHKEY$type
-        chk <- vapply(types, function (type) key %in% type, logical(1L))
+        chk <- vapply(types, function(type) key %in% type, logical(1L))
         names(types)[chk]
     }
 
     # get slash type checking function from slash key
-    slash_is_type <- function (key) {
+    slash_is_type <- function(key) {
         switch(slash_type(key), lgl = is.logical, int = is.integer, dbl = is.double,
             chr = is.character, lst = is.list)
     }
 
     # get slash type conversion function from slash key
-    slash_as_type <- function (key) {
+    slash_as_type <- function(key) {
         switch(slash_type(key), lgl = as.logical, int = as.integer, dbl = as.double,
             chr = as.character, lst = c)
     }
 
     # get slash initial value from slash key
-    slash_init_value <- function (key) {
+    slash_init_value <- function(key) {
         res <- switch(slash_type(key), lgl = "FALSE", lst = list(), NA_character_)
         slash_as_type(key)(res)
     }
@@ -772,7 +772,7 @@ complete_property <- function (dt, type, ref, epw = FALSE) {
 # }}}
 
 # parse_class_property {{{
-parse_class_property <- function (dt, ref) {
+parse_class_property <- function(dt, ref) {
     # rename column names to lower case
     nms <- stri_replace_all_fixed(names(dt), "-", "_")
     setnames(dt, nms)
@@ -821,7 +821,7 @@ parse_class_property <- function (dt, ref) {
 # }}}
 
 # parse_field_property {{{
-parse_field_property <- function (dt, ref, epw = FALSE) {
+parse_field_property <- function(dt, ref, epw = FALSE) {
     # rename column names to lower case
     nms <- stri_replace_all_fixed(names(dt), "-", "_")
     setnames(dt, nms)
@@ -879,7 +879,7 @@ parse_field_property <- function (dt, ref, epw = FALSE) {
 # }}}
 
 # parse_field_property_extensible_group {{{
-parse_field_property_extensible_group <- function (dt, ref) {
+parse_field_property_extensible_group <- function(dt, ref) {
     ext <- dt[begin_extensible == TRUE, list(class_id, field_index)]
     # only count once
     ext <- ext[, list(first_extensible = field_index[1L]), by = class_id]
@@ -926,7 +926,7 @@ parse_field_property_extensible_group <- function (dt, ref) {
 # }}}
 
 # parse_field_property_name {{{
-parse_field_property_name <- function (dt) {
+parse_field_property_name <- function(dt) {
     # add name indicator
     set(dt, NULL, "is_name", FALSE)
     ## name fields:
@@ -956,7 +956,7 @@ parse_field_property_name <- function (dt) {
 # }}}
 
 # parse_field_property_default {{{
-parse_field_property_default <- function (dt) {
+parse_field_property_default <- function(dt) {
     set(dt, NULL, "default_num", NA_real_)
     set(dt, NULL, "default_chr", dt$default)
     dt[type_enum <= IDDFIELD_TYPE$real, `:=`(default_num = suppressWarnings(as.double(default)))]
@@ -965,7 +965,7 @@ parse_field_property_default <- function (dt) {
 # }}}
 
 # parse_field_property_missing {{{
-parse_field_property_missing <- function (dt) {
+parse_field_property_missing <- function(dt) {
     set(dt, NULL, "missing_num", NA_real_)
     set(dt, NULL, "missing_chr", dt$missing)
     dt[type_enum <= IDDFIELD_TYPE$real, `:=`(missing_num = suppressWarnings(as.double(missing)))]
@@ -974,7 +974,7 @@ parse_field_property_missing <- function (dt) {
 # }}}
 
 # parse_field_property_range {{{
-parse_field_property_range <- function (dt) {
+parse_field_property_range <- function(dt) {
     set(dt, NULL, c("has_range", "lower_incbounds", "upper_incbounds"), FALSE)
 
     setnames(dt, c("minimum>", "maximum<"), c("minimum_u", "maximum_l"))
@@ -989,7 +989,7 @@ parse_field_property_range <- function (dt) {
 # }}}
 
 # parse_field_property_exist {{{
-parse_field_property_exist <- function (dt) {
+parse_field_property_exist <- function(dt) {
     set(dt, NULL, c("has_exist", "exist_lower_incbounds", "exist_upper_incbounds"), FALSE)
 
     setnames(dt, c("exist_minimum>", "exist_maximum<"), c("exist_minimum_u", "exist_maximum_l"))
@@ -1015,7 +1015,7 @@ parse_field_property_exist <- function (dt) {
 # }}}
 
 # parse_field_reference_table {{{
-parse_field_reference_table <- function (dt) {
+parse_field_reference_table <- function(dt) {
     # mark source type
     set(dt, NULL, "src_enum", IDDFIELD_SOURCE$none)
 
@@ -1094,7 +1094,7 @@ parse_field_reference_table <- function (dt) {
 # }}}
 
 # sep_idf_lines {{{
-sep_idf_lines <- function (dt, type_enum) {
+sep_idf_lines <- function(dt, type_enum) {
     # mark location of first occurrence "!" and "!-"
     dt[, `:=`(excl_loc = stri_locate_first_fixed(string, "!")[, 1L])]
     dt[, `:=`(spcl_loc = stri_locate_first_fixed(string, "!-")[, 1L])]
@@ -1117,7 +1117,7 @@ sep_idf_lines <- function (dt, type_enum) {
 # }}}
 
 # mark_idf_lines {{{
-mark_idf_lines <- function (dt, type_enum) {
+mark_idf_lines <- function(dt, type_enum) {
     # add type indicator
     set(dt, NULL, "type", type_enum$unknown)
 
@@ -1171,7 +1171,7 @@ mark_idf_lines <- function (dt, type_enum) {
 # }}}
 
 # sep_header_options {{{
-sep_header_options <- function (dt, type_enum) {
+sep_header_options <- function(dt, type_enum) {
     dt_opt <- dt[J(type_enum$special), on = "type"]
     dt <- dt[!dt_opt, on = "line"]
 
@@ -1192,7 +1192,7 @@ sep_header_options <- function (dt, type_enum) {
     )
 
     # helper
-    get_option <- function (header, value) {
+    get_option <- function(header, value) {
         if (header %in% names(opts)) {
             opt <- opts[[header]]
             vals <- stri_split_fixed(value, " ", omit_empty = TRUE)[[1L]]
@@ -1224,7 +1224,7 @@ sep_header_options <- function (dt, type_enum) {
 # }}}
 
 # sep_object_table {{{
-sep_object_table <- function (dt, type_enum, idd) {
+sep_object_table <- function(dt, type_enum, idd) {
     # object id
     left <- dt[J(type_enum$value_last), on = "type", list(line, object_id = seq_along(line)), nomatch = 0L]
     dt <- left[dt, on = "line", roll = -Inf]
@@ -1288,7 +1288,7 @@ sep_object_table <- function (dt, type_enum, idd) {
     dt_object <- dt[type <= type_enum$object_value, .SD, .SDcols = c("object_id", "class_id", "comment", "type")]
 
     # clean comment
-    clean_comment <- function (x, type) {
+    clean_comment <- function(x, type) {
         x <- x[type == type_enum$comment]
         if (!length(x)) NULL else x
     }
@@ -1310,7 +1310,7 @@ sep_object_table <- function (dt, type_enum, idd) {
 # }}}
 
 # get_value_table {{{
-get_value_table <- function (dt, idd, escape = FALSE) {
+get_value_table <- function(dt, idd, escape = FALSE) {
     # count value number per line
     set(dt, NULL, "value_count", stri_count_fixed(dt$body, ",") + stri_endswith_fixed(dt$body, ";"))
 
@@ -1367,7 +1367,7 @@ get_value_table <- function (dt, idd, escape = FALSE) {
             c("type_enum", "src_enum", "is_name", "units", "ip_units"),
             complete = TRUE
         ),
-        eplusr_error_invalid_field_index = function (e) e
+        eplusr_error_invalid_field_index = function(e) e
     )
 
     # issue parse error if invalid field number found
@@ -1412,7 +1412,7 @@ get_value_table <- function (dt, idd, escape = FALSE) {
 # }}}
 
 # update_object_name {{{
-update_object_name <- function (dt_object, dt_value) {
+update_object_name <- function(dt_object, dt_value) {
     if (!nrow(dt_value)) return(dt_object)
     dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value_chr, object_name_lower = stri_trans_tolower(value_chr)),
@@ -1430,7 +1430,7 @@ update_object_name <- function (dt_object, dt_value) {
 # }}}
 
 # convert_value_unit {{{
-convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
+convert_value_unit <- function(idd_env, dt_value, from, to, type = "value") {
     from <- match.arg(from, c("si", "ip"))
     to <- match.arg(to, c("si", "ip"))
 
@@ -1468,7 +1468,7 @@ convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
 # }}}
 
 # get_value_reference_map {{{
-get_value_reference_map <- function (idd_env, src, value, all = TRUE) {
+get_value_reference_map <- function(idd_env, src, value, all = TRUE) {
     empty <- data.table(
             object_id = integer(0L),     value_id = integer(0L),
         src_object_id = integer(0L), src_value_id = integer(0L),
@@ -1555,17 +1555,17 @@ get_value_reference_map <- function (idd_env, src, value, all = TRUE) {
 # }}}
 
 # parse_issue {{{
-parse_warn <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
+parse_warn <- function(type = c("idf", "idd", "err", "epw"), title, data = NULL,
                         num = NULL, prefix = NULL, suffix = NULL, post = NULL,
                         stop = TRUE, subtype = NULL, loc_name = "Line") {
     parse_issue(type, title, data, num, prefix, suffix, post, stop = FALSE, subtype, loc_name)
 }
-parse_error <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
+parse_error <- function(type = c("idf", "idd", "err", "epw"), title, data = NULL,
                          num = NULL, prefix = NULL, suffix = NULL, post = NULL,
                          stop = TRUE, subtype = NULL, loc_name = "Line") {
     parse_issue(type, title, data, num, prefix, suffix, post, stop = TRUE, subtype, loc_name)
 }
-parse_issue <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
+parse_issue <- function(type = c("idf", "idd", "err", "epw"), title, data = NULL,
                          num = NULL, prefix = NULL, suffix = NULL, post = NULL,
                          stop = TRUE, subtype = NULL, loc_name = "Line") {
 
@@ -1633,7 +1633,7 @@ parse_issue <- function (type = c("idf", "idd", "err", "epw"), title, data = NUL
 # }}}
 
 # insert_version {{{
-insert_version <- function (x, ver) {
+insert_version <- function(x, ver) {
     if (is.character(x)) {
         paste0(x, "Version, ", standardize_ver(ver)[, 1L:2L], ";")
     } else if (inherits(x, "data.table") && all(has_names(x, c("line", "string")))) {

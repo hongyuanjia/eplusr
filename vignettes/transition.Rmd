@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(22.2)) install_eplus(22.2)
+if (!is_avail_eplus("22.2")) install_eplus("22.2")
 ```
 
 # Motivation
@@ -91,7 +91,7 @@ could still take several minutes to complete the update process
 path <- "RefBldgLargeOfficeNew2004_Chicago.idf"
 read_idf(path)$version()
 
-(t_vu <- system.time(verup <- version_updater(path, 23.1)))
+(t_vu <- system.time(verup <- version_updater(path, "23.1")))
 ```
 
 # Introduce `transition()`
@@ -106,7 +106,7 @@ as `version_updater()` except it has an additional argument `save` to control
 whether to save the resultant `Idf` objects to IDF files or not.
 
 ```{r}
-(t_tr <- system.time(trans <- transition(path, 23.1)))
+(t_tr <- system.time(trans <- transition(path, "23.1")))
 ```
 
 It is about `r round(t_vu["elapsed"]/t_tr["elapsed"], 1)` times faster.

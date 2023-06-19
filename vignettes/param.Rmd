@@ -42,7 +42,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 
 library(dplyr)
 ```
@@ -74,8 +74,8 @@ and a weather file.
 library(eplusr)
 library(dplyr)
 
-path_model <- file.path(eplus_config(23.1)$dir, "ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf")
-path_weather <- file.path(eplus_config(23.1)$dir, "WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+path_model <- path_eplus_example("23.1", "RefBldgMediumOfficeNew2004_Chicago.idf")
+path_weather <- path_eplus_weather("23.1", "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
 
 idf <- read_idf(path_model)
 idf$SimulationControl$Run_Simulation_for_Weather_File_Run_Periods <- "Yes"
@@ -105,7 +105,7 @@ value.
 
 ```{r}
 # create a measure for modifying LPD
-set_lpd <- function (idf, lpd = NA) {
+set_lpd <- function(idf, lpd = NA) {
     # keep the original if applicable
     if (is.na(lpd)) return(idf)
 
@@ -117,7 +117,7 @@ set_lpd <- function (idf, lpd = NA) {
 }
 
 # create a measure for reducing plug loads during off-work time
-set_nightplug <- function (idf, frac = NA) {
+set_nightplug <- function(idf, frac = NA) {
     # keep the original if applicable
     if (is.na(frac)) return(idf)
 
@@ -148,7 +148,7 @@ chained together.
 
 ```{r}
 # combine two measures into one
-ecm <- function (idf, lpd, nightplug_frac) {
+ecm <- function(idf, lpd, nightplug_frac) {
     idf <- set_lpd(idf, lpd)
     idf <- set_nightplug(idf, nightplug_frac)
     idf

@@ -4,7 +4,7 @@
 NULL
 
 # `%||%` {{{
-`%||%` <- function (x, y) {
+`%||%` <- function(x, y) {
     if (is.null(x)) {
         y
     } else {
@@ -14,7 +14,7 @@ NULL
 # }}}
 
 # collapse {{{
-collapse <- function (x, out = "'", or = FALSE, max_num = 5L) {
+collapse <- function(x, out = "'", or = FALSE, max_num = 5L) {
     if (is.null(out)) {
         s <- as.character(x)
     } else {
@@ -47,7 +47,7 @@ collapse <- function (x, out = "'", or = FALSE, max_num = 5L) {
 # }}}
 
 # surround {{{
-surround <- function (x, out = "'") {
+surround <- function(x, out = "'") {
     if (is.null(out)) return(as.character(x))
     out <- as.character(out)
     if (length(out) == 1L) {
@@ -78,7 +78,7 @@ surround <- function (x, out = "'") {
 #' @keywords internal
 #' @export
 #' @name get_env
-get_self_env <- function (x) {
+get_self_env <- function(x) {
     .subset2(.subset2(x, ".__enclos_env__"), "self")
 }
 # }}}
@@ -87,7 +87,7 @@ get_self_env <- function (x) {
 #' @keywords internal
 #' @export
 #' @name get_env
-get_priv_env <- function (x) {
+get_priv_env <- function(x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
 }
 # }}}
@@ -96,7 +96,7 @@ get_priv_env <- function (x) {
 #' @keywords internal
 #' @export
 #' @name get_env
-get_super_env <- function (x) {
+get_super_env <- function(x) {
     .subset2(.subset2(x, ".__enclos_env__"), "super")
 }
 # }}}
@@ -122,8 +122,8 @@ read_lines <- function(input, trim = TRUE, encoding = "unknown", ...) {
     dt <- tryCatch(
         fread(input = input, sep = NULL, header = FALSE, col.names = "string",
             encoding = encoding, strip.white = FALSE, ...),
-        warning = function (w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
-        error = function (e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
+        warning = function(w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
+        error = function(e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
@@ -139,7 +139,7 @@ read_lines <- function(input, trim = TRUE, encoding = "unknown", ...) {
 # write_lines {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
-write_lines <- function (x, file = "", append = FALSE) {
+write_lines <- function(x, file = "", append = FALSE) {
     if (inherits(x, "data.table")) {
         assert_names(names(x), must.include = "string")
         fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE, append = append)
@@ -152,7 +152,7 @@ write_lines <- function (x, file = "", append = FALSE) {
 
 # os_type: Return operation system type {{{
 # nocov start
-os_type <- function () {
+os_type <- function() {
     if (.Platform$OS.type == 'windows') {
         "windows"
     } else if (Sys.info()[['sysname']] == 'Darwin') {
@@ -167,9 +167,14 @@ os_type <- function () {
 # }}}
 
 # standardize_ver {{{
-standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
-    if (!strict && is.character(ver)) {
-        ver[ver == "latest"] <- LATEST_EPLUS_VER
+standardize_ver <- function(ver, strict = FALSE, complete = TRUE) {
+    if (is.character(ver)) {
+        if (!strict) {
+            ver[ver == "latest"] <- LATEST_EPLUS_VER
+        }
+        # in case of a single number
+        sgl <- grepl("^\\d+$", ver)
+        if (any(sgl)) ver[sgl] <- paste0(ver[sgl], ".0")
     }
 
     if (is.numeric(ver)) {
@@ -193,7 +198,7 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
 # }}}
 
 # match_minor_ver {{{
-match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), max = TRUE, verbose = TRUE) {
+match_minor_ver <- function(ver, all_ver, type = c("idd", "eplus"), max = TRUE, verbose = TRUE) {
     checkmate::assert_class(ver, "numeric_version")
     checkmate::assert_vector(ver, len = 1L)
     if (!length(all_ver)) return(numeric_version(NA, strict = FALSE))
@@ -230,7 +235,7 @@ match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), max = TRUE,
 # }}}
 
 # vec_depth {{{
-vec_depth <- function (x) {
+vec_depth <- function(x) {
     if (is.null(x)) {
         0L
     } else if (is.atomic(x)) {
@@ -245,61 +250,61 @@ vec_depth <- function (x) {
 # }}}
 
 # vlapply {{{
-vlapply <- function (x, fun, ..., use.names = TRUE) {
+vlapply <- function(x, fun, ..., use.names = TRUE) {
     vapply(x, FUN = fun, FUN.VALUE = logical(1L), ..., USE.NAMES = use.names)
 }
 # }}}
 
 # viapply {{{
-viapply <- function (x, fun, ..., use.names = TRUE) {
+viapply <- function(x, fun, ..., use.names = TRUE) {
     vapply(x, FUN = fun, FUN.VALUE = integer(1L), ..., USE.NAMES = use.names)
 }
 # }}}
 
 # vcapply {{{
-vcapply <- function (x, fun, ..., use.names = TRUE) {
+vcapply <- function(x, fun, ..., use.names = TRUE) {
     vapply(x, FUN = fun, FUN.VALUE = character(1L), ..., USE.NAMES = use.names)
 }
 # }}}
 
 # apply2 {{{
-apply2 <- function (x, y, fun, more_args = NULL, simplify = FALSE, use.names = TRUE) {
+apply2 <- function(x, y, fun, more_args = NULL, simplify = FALSE, use.names = TRUE) {
     mapply(FUN = fun, x, y, MoreArgs = more_args, SIMPLIFY = simplify, USE.NAMES = use.names)
 }
 # }}}
 
 # apply2_int {{{
-apply2_int <- function (x, y, fun, more_args = NULL) {
+apply2_int <- function(x, y, fun, more_args = NULL) {
     as.integer(unlist(apply2(x, y, fun, more_args)))
 }
 # }}}
 
 # apply2_lgl {{{
-apply2_lgl <- function (x, y, fun, more_args = NULL) {
+apply2_lgl <- function(x, y, fun, more_args = NULL) {
     as.logical(unlist(apply2(x, y, fun, more_args)))
 }
 # }}}
 
 # apply2_chr {{{
-apply2_chr <- function (x, y, fun, more_args = NULL) {
+apply2_chr <- function(x, y, fun, more_args = NULL) {
     as.character(unlist(apply2(x, y, fun, more_args)))
 }
 # }}}
 
 # lower_name {{{
-lower_name <- function (name) {
+lower_name <- function(name) {
     stri_trans_tolower(underscore_name(name))
 }
 # }}}
 
 # underscore_name {{{
-underscore_name <- function (name, merge = TRUE) {
+underscore_name <- function(name, merge = TRUE) {
     stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
 }
 # }}}
 
 # make_filename {{{
-make_filename <- function (x, len = 100, unique = TRUE) {
+make_filename <- function(x, len = 100, unique = TRUE) {
     # reference: https://stackoverflow.com/questions/6730009/validate-a-file-name-on-windows/6804755#6804755
     x <- stri_replace_all_charclass(x, "[<>:\"/\\\\|?*\\x00-\\x1F]", "_")
     # cannot start with "."
@@ -316,7 +321,7 @@ make_filename <- function (x, len = 100, unique = TRUE) {
 
 # abort {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
-abort <- function (message, class = NULL, call = NULL, ...) {
+abort <- function(message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
@@ -330,7 +335,7 @@ abort <- function (message, class = NULL, call = NULL, ...) {
 
 # warn {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
-warn <- function (message, class = NULL, call = NULL, ...) {
+warn <- function(message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
@@ -343,7 +348,7 @@ warn <- function (message, class = NULL, call = NULL, ...) {
 # }}}
 
 # names2 {{{
-names2 <- function (x, default = NA_character_) {
+names2 <- function(x, default = NA_character_) {
     nm <- names(x)
     if (is.null(nm)) {
         return(rep(default, length(x)))
@@ -355,13 +360,13 @@ names2 <- function (x, default = NA_character_) {
 # }}}
 
 # each_length {{{
-each_length <- function (x) {
+each_length <- function(x) {
     viapply(x, length)
 }
 # }}}
 
 # ranger {{{
-ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
+ranger <- function(minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
     assert_number(minimum, na.ok = TRUE)
     assert_number(maximum, na.ok = TRUE)
     assert_flag(lower_incbounds)
@@ -377,18 +382,18 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
 # }}}
 
 # fmt_* {{{
-fmt_dbl <- function (x, digits = 2L) sprintf(paste0("%.", digits, "f"), x)
-fmt_int <- function (x, digits = 1L) sprintf(paste0("%.", digits, "f"), x)
+fmt_dbl <- function(x, digits = 2L) sprintf(paste0("%.", digits, "f"), x)
+fmt_int <- function(x, digits = 1L) sprintf(paste0("%.", digits, "f"), x)
 # }}}
 
 # wday {{{
-wday <- function (x, label = FALSE) {
+wday <- function(x, label = FALSE) {
     lubridate::wday(x, label = label, abbr = FALSE, week_start = 1L, locale = "C")
 }
 # }}}
 
 # match_in_vec {{{
-match_in_vec <- function (x, vec, abbr = NULL, label = FALSE) {
+match_in_vec <- function(x, vec, abbr = NULL, label = FALSE) {
     x <- stri_trans_tolower(x)
     vecl <- stri_trans_tolower(vec)
     if (is.null(abbr)) abbr <- stri_sub(vecl, to = 3L)
@@ -418,6 +423,7 @@ copy_list <- function(x) {
 }
 # }}}
 
+# file_copy {{{
 file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = NULL) {
     from <- normalizePath(from, mustWork = TRUE)
     to <- normalizePath(to, mustWork = FALSE)
@@ -454,7 +460,9 @@ file_copy <- function(from, to, copy.date = TRUE, copy.mode = TRUE, err_title = 
 
     to
 }
+# }}}
 
+# file_rename {{{
 file_rename <- function(from, to, err_title = NULL) {
     from <- normalizePath(from, mustWork = TRUE)
     to <- normalizePath(to, mustWork = FALSE)
@@ -491,7 +499,9 @@ file_rename <- function(from, to, err_title = NULL) {
 
     to
 }
+# }}}
 
+# file_rename_if_exist {{{
 file_rename_if_exist <- function(from, to, err_title = NULL) {
     from <- normalizePath(from, mustWork = FALSE)
     to <- normalizePath(to, mustWork = FALSE)
@@ -502,5 +512,6 @@ file_rename_if_exist <- function(from, to, err_title = NULL) {
 
     res
 }
+# }}}
 
 # vim: set fdm=marker:

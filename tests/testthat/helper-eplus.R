@@ -3,5 +3,5 @@ if (identical(Sys.getenv("NOT_CRAN"), "true") && !is_avail_eplus(LATEST_EPLUS_VE
     # NOTE: From EnergyPlus v23.1, the supported oldest version for transition
     # is v9.0. Have to install at least one version before v23.1 for testing
     # older version transitions
-    if (!is_avail_eplus(22.2)) install_eplus(22.2, local = TRUE)
+    if (!is_avail_eplus("22.2")) install_eplus("22.2", local = TRUE)
 }

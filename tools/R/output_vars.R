@@ -1,5 +1,5 @@
 # get all TeX files of I/O ref
-get_tex_paths <- function (dir_src) {
+get_tex_paths <- function(dir_src) {
     dir <- file.path(dir_src, "doc/input-output-reference/src/overview")
     files <- list.files(dir, "group-.+[.]tex", ignore.case = TRUE, full.names = TRUE)
 
@@ -16,14 +16,14 @@ comment_out_lines <- function(path, lines) {
 }
 
 # get paths of Markdown files converted from TeX files using Pandoc
-get_md_paths <- function (dir_src, dir = tempdir(), ver = 9.4) {
+get_md_paths <- function(dir_src, dir = tempdir(), ver = "9.4") {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     paths <- get_tex_paths(dir_src)
     vapply(paths, convert_to_md, character(1), dir = dir, ver = ver)
 }
 
 # Convert TeX to Markdown using Pandoc
-convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
+convert_to_md <- function(path, dir = tempdir(), ver = "9.4") {
     stopifnot(file.copy(path, dir, overwrite = TRUE))
 
     file <- normalizePath(file.path(dir, basename(path)), mustWork = FALSE)
@@ -60,7 +60,7 @@ convert_to_md <- function(path, dir = tempdir(), ver = 9.4) {
                 # NOTE: there is a LaTeX error in one \paragraph in
                 # "group-exterior-energy-use-equipment.tex" in EnergyPlus v9.0.0
                 # have to fix it manually
-                if (numeric_version(ver) >= 9.0 && numeric_version(ver) < 9.1 &&
+                if (numeric_version(ver) >= "9.0" && numeric_version(ver) < "9.1" &&
                     basename(file) == "group-exterior-energy-use-equipment.tex") {
                     l <- readLines(file, warn = FALSE)
                     l[185] <- gsub(")", "}", l[185], fixed = TRUE)
@@ -101,7 +101,7 @@ get_md_h_levels <- function(doc) {
 }
 
 # extract all output variables from Markdown file
-extract_outputs <- function (path, ver = 9.4) {
+extract_outputs <- function(path, ver = "9.4") {
     cat(sprintf(" --> Processing file '%s'...\n", path))
     doc <- read_md_dt(path)[!J("rmd_yaml"), on = "type"]
     data.table::set(doc, NULL, "label", NULL)
@@ -149,7 +149,7 @@ extract_outputs <- function (path, ver = 9.4) {
     data.table::setcolorder(out, c("reported_time_step", "report_type", "variable", "units"))
 }
 
-extract_outputs_from_heading_level <- function (doc, level, pattern = "Output", parent = NULL) {
+extract_outputs_from_heading_level <- function(doc, level, pattern = "Output", parent = NULL) {
     levels <- get_md_h_levels(doc)
     nm_sec <- function(level) {
         if (any(mis <- !level %in% levels)) {
@@ -552,14 +552,14 @@ post_process_outputs <- function(file, doc, out, ver) {
     out
 }
 
-extract_output_vars <- function (eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
+extract_output_vars <- function(eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     # get all possible released tags
     tags <- git2r::tags(eplus_src)
     on.exit(git2r::checkout(eplus_src, "develop"), add = TRUE)
 
     # LaTeX doc was added since v8.5.0
     eplus_ver <- numeric_version(ver)
-    eplus_ver <- paste0("v", eplus_ver[eplus_ver >= 8.5])
+    eplus_ver <- paste0("v", eplus_ver[eplus_ver >= "8.5"])
 
     if (!any(is_mis <- eplus_ver %in% names(tags))) {
         stop(sprintf("Failed to find EnergyPlus version %s.", paste0(eplus_ver[is_mis], collapse = ", ")))

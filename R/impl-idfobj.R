@@ -8,7 +8,7 @@ NULL
 
 # IDF OBJECT
 # get_idfobj_value {{{
-get_idfobj_value <- function (idd_env, idf_env, object, which = NULL, all = FALSE,
+get_idfobj_value <- function(idd_env, idf_env, object, which = NULL, all = FALSE,
                               simplify = FALSE, unit = FALSE, underscore = FALSE) {
     val <- get_idf_value(idd_env, idf_env, NULL, object, which, NULL, all = all, align = TRUE, underscore = underscore)
     if (simplify) return(val$value_chr)
@@ -21,7 +21,7 @@ get_idfobj_value <- function (idd_env, idf_env, object, which = NULL, all = FALS
 # }}}
 # get_value_list {{{
 #' @importFrom checkmate assert_names
-get_value_list <- function (dt_value, unit = FALSE) {
+get_value_list <- function(dt_value, unit = FALSE) {
     assert_names(names(dt_value), must.include = c("value_chr", "value_num", "type_enum"))
 
     res <- as.list(dt_value[["value_chr"]])
@@ -60,7 +60,7 @@ get_value_list <- function (dt_value, unit = FALSE) {
             unit <- FIELD_UNIT_TABLE[J(dt_value[[input]][u]), on = c(paste0(prefix, "_name")),
                 mult = "first", .SD, .SDcols = c(col)]
 
-            res[u] <- apply2(res[u], unit[[col]], function (val, unit) {
+            res[u] <- apply2(res[u], unit[[col]], function(val, unit) {
                 units::set_units(val, unit, mode = "standard")
             })
         }
@@ -71,7 +71,7 @@ get_value_list <- function (dt_value, unit = FALSE) {
 # }}}
 # get_idfobj_possible {{{
 #' @importFrom checkmate assert_subset
-get_idfobj_possible <- function (idd_env, idf_env, object, field = NULL,
+get_idfobj_possible <- function(idd_env, idf_env, object, field = NULL,
                                  type = c("auto", "default", "choice", "range", "source")) {
     assert_subset(type, c("auto", "default", "choice", "range", "source"), FALSE)
 
@@ -148,7 +148,7 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field = NULL,
 }
 # }}}
 # get_idfobj_relation {{{
-get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
+get_idfobj_relation <- function(idd_env, idf_env, object_id = NULL, value_id = NULL,
                                  name = TRUE, direction = c("ref_to", "ref_by", "node", "all"),
                                  object = NULL, class = NULL, group = NULL,
                                  keep_all = FALSE, depth = 0L, class_ref = c("both", "none", "all")) {
@@ -186,7 +186,7 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
 }
 # }}}
 # get_idfobj_table {{{
-get_idfobj_table <- function (idd_env, idf_env, object_id, all = FALSE,
+get_idfobj_table <- function(idd_env, idf_env, object_id, all = FALSE,
                               unit = TRUE, wide = FALSE, string_value = TRUE, group_ext = "none") {
     get_idf_table(idd_env, idf_env, NULL, object_id, all = all, unit = unit,
         wide = wide, string_value = string_value, group_ext = group_ext
@@ -194,7 +194,7 @@ get_idfobj_table <- function (idd_env, idf_env, object_id, all = FALSE,
 }
 # }}}
 # get_idfobj_string {{{
-get_idfobj_string <- function (idd_env, idf_env, object_id, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+get_idfobj_string <- function(idd_env, idf_env, object_id, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
     val <- get_idf_value(idd_env, idf_env, object = object_id, property = c("units", "ip_units"), all = all)
 
     cls <- paste0(val$class_name[[1L]], ",")
@@ -217,7 +217,7 @@ get_idfobj_string <- function (idd_env, idf_env, object_id, comment = TRUE, lead
 # }}}
 # set_idfobj_comment {{{
 #' @importFrom checkmate assert_count test_flag
-set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = TRUE, width = 0L) {
+set_idfobj_comment <- function(idd_env, idf_env, object_id, comment, append = TRUE, width = 0L) {
     obj <- get_idf_object(idd_env, idf_env, object = object_id)
 
     if (is.null(comment)) {

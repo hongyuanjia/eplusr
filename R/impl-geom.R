@@ -3,22 +3,22 @@ get_first_vertex_field_index <- function(ver) {
         "Zone" = 3L,
 
         # NOTE: handle 'Space' class added in EnergyPlus v9.6
-        "BuildingSurface:Detailed" = if (ver < 9.6) 11L else 12L,
-        "Wall:Detailed" = if (ver < 9.6) 10L else 11L,
-        "RoofCeiling:Detailed" = if (ver < 9.6) 10L else 11L,
-        "Floor:Detailed" = if (ver < 9.6) 10L else 11L,
+        "BuildingSurface:Detailed"     = if (ver < "9.6") 11L else 12L,
+        "Wall:Detailed"                = if (ver < "9.6") 10L else 11L,
+        "RoofCeiling:Detailed"         = if (ver < "9.6") 10L else 11L,
+        "Floor:Detailed"               = if (ver < "9.6") 10L else 11L,
 
         # NOTE: 7th 'Shading Control Name' field has been removed in EnergyPlus v9.0
-        "FenestrationSurface:Detailed" = if (ver < 9.0) 11L else 10L,
+        "FenestrationSurface:Detailed" = if (ver < "9.0") 11L else 10L,
 
-        "Shading:Site:Detailed" = 4L,
-        "Shading:Building:Detailed" = 4L,
-        "Shading:Zone:Detailed" = 5L
+        "Shading:Site:Detailed"        = 4L,
+        "Shading:Building:Detailed"    = 4L,
+        "Shading:Zone:Detailed"        = 5L
     )
 }
 
 # get_geom_class {{{
-get_geom_class <- function (idf, object = NULL) {
+get_geom_class <- function(idf, object = NULL) {
     # geometry and daylighting points
     cls <- idf$class_name(by_group = TRUE)[c("Thermal Zones and Surfaces", "Daylighting")]
     cls <- data.table(class = unlist(cls))
@@ -45,7 +45,7 @@ get_geom_class <- function (idf, object = NULL) {
 # }}}
 
 # get_global_geom_rules {{{
-get_global_geom_rules <- function (idf) {
+get_global_geom_rules <- function(idf) {
     if (!idf$is_valid_class("GlobalGeometryRules")) {
         warn("No 'GlobalGeometryRules' object found in current IDF. Assuming all defaults.",
             "geom_no_global_geom_rules"
@@ -101,7 +101,7 @@ get_global_geom_rules <- function (idf) {
 # }}}
 
 # get_building_transformation {{{
-get_building_transformation <- function (idf) {
+get_building_transformation <- function(idf) {
     if (!idf$is_valid_class("Building")) {
         warn("Could not find 'Building' object, assuming 0 rotation", "geom_no_building")
 
@@ -126,7 +126,7 @@ get_building_transformation <- function (idf) {
 # }}}
 
 # get_zone_transformation {{{
-get_zone_transformation <- function (idf) {
+get_zone_transformation <- function(idf) {
     if (!idf$is_valid_class("Zone")) {
         zone <- data.table(id = integer(), name = character(), x = double(), y = double(), z = double())
     } else {
@@ -154,7 +154,7 @@ get_zone_transformation <- function (idf) {
 }
 # }}}
 
-get_spaces <- function (idf) {
+get_spaces <- function(idf) {
     if (!idf$is_valid_class("Space")) {
         space <- data.table(id = integer(), name = character(), type = character(), zone = character())
     } else {
@@ -171,7 +171,7 @@ get_spaces <- function (idf) {
 }
 
 # extract_geom {{{
-extract_geom <- function (idf, object = NULL) {
+extract_geom <- function(idf, object = NULL) {
     geom_class <- get_geom_class(idf, object)
 
     # get current global geometry rules
@@ -220,7 +220,7 @@ extract_geom <- function (idf, object = NULL) {
 # }}}
 
 # extract_geom_surface {{{
-extract_geom_surface <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_surface <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
 
     if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
@@ -239,14 +239,14 @@ extract_geom_surface <- function (idf, geom_class = NULL, object = NULL) {
 # }}}
 
 # extract_geom_surface_detailed {{{
-extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_surface_detailed <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
     geom_class <- geom_class[J("Surface", "Detailed"), on = c("category", "subtype"), nomatch = NULL]
 
     if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
 
     # NOTE: handle 'Space' class added in EnergyPlus v9.6
-    has_space <- idf$version() > 9.5
+    has_space <- idf$version() > "9.5"
 
     # fields needed
     fld <- get_idd_field(get_priv_env(idf)$idd_env(), "BuildingSurface:Detailed",
@@ -288,7 +288,7 @@ extract_geom_surface_detailed <- function (idf, geom_class = NULL, object = NULL
 # }}}
 
 # extract_geom_surface_simple {{{
-extract_geom_surface_simple <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_surface_simple <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
     geom_class <- geom_class[category == "Surface" & subtype != "Detailed"]
 
@@ -357,7 +357,7 @@ extract_geom_surface_simple <- function (idf, geom_class = NULL, object = NULL) 
     ]
 
     # NOTE: handle 'Space' class added in EnergyPlus v9.6
-    has_space <- idf$version() > 9.5
+    has_space <- idf$version() > "9.5"
     if (!has_space) set(dt, NULL, "space_name", NA_character_)
     setnames(dt, c("object_id", "class_name"), c("id", "class"))
     setcolorder(dt, c("id", "name", "class", "surface_type",
@@ -367,7 +367,7 @@ extract_geom_surface_simple <- function (idf, geom_class = NULL, object = NULL) 
 # }}}
 
 # extract_geom_subsurface {{{
-extract_geom_subsurface <- function (idf, geom_class = NULL, object = NULL, surface = NULL) {
+extract_geom_subsurface <- function(idf, geom_class = NULL, object = NULL, surface = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
 
     if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
@@ -386,7 +386,7 @@ extract_geom_subsurface <- function (idf, geom_class = NULL, object = NULL, surf
 # }}}
 
 # extract_geom_subsurface_detailed {{{
-extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_subsurface_detailed <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
 
     # currently only 'FenestrationSurface:Detailed' is the defailed geometry
@@ -422,7 +422,7 @@ extract_geom_subsurface_detailed <- function (idf, geom_class = NULL, object = N
 # }}}
 
 # extract_geom_subsurface_simple {{{
-extract_geom_subsurface_simple <- function (idf, geom_class = NULL, object = NULL, surface = NULL) {
+extract_geom_subsurface_simple <- function(idf, geom_class = NULL, object = NULL, surface = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
     geom_class <- geom_class[category == "SubSurface" & subtype != "Detailed"]
 
@@ -497,7 +497,7 @@ extract_geom_subsurface_simple <- function (idf, geom_class = NULL, object = NUL
             if (is.null(trans[[1L]])) {
                 list(NA_real_, NA_real_, NA_real_)
             } else {
-                vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) trans[[1L]] %*% x)[1:3,]
+                vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function(x) trans[[1L]] %*% x)[1:3,]
                 list(vert[1L,], vert[2L,], vert[3L,])
             }
         }
@@ -509,7 +509,7 @@ extract_geom_subsurface_simple <- function (idf, geom_class = NULL, object = NUL
 # }}}
 
 # extract_geom_shading {{{
-extract_geom_shading <- function (idf, geom_class = NULL, object = NULL, subsurface = NULL) {
+extract_geom_shading <- function(idf, geom_class = NULL, object = NULL, subsurface = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
 
     if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
@@ -528,7 +528,7 @@ extract_geom_shading <- function (idf, geom_class = NULL, object = NULL, subsurf
 # }}}
 
 # extract_geom_shading_detailed {{{
-extract_geom_shading_detailed <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_shading_detailed <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
     geom_class <- geom_class[J("Shading", "Detailed"), on = c("category", "misc"), nomatch = NULL]
 
@@ -566,7 +566,7 @@ extract_geom_shading_detailed <- function (idf, geom_class = NULL, object = NULL
 # }}}
 
 # extract_geom_shading_simple {{{
-extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, subsurface = NULL) {
+extract_geom_shading_simple <- function(idf, geom_class = NULL, object = NULL, subsurface = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
     geom_class <- geom_class[category == "Shading" & misc != "Detailed"]
 
@@ -647,9 +647,9 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
             bound_verts <- subsurf$vertices[subsurf$trans, on = "id", by = .EACHI,
                 {
                     align_inv <- solve(i.trans[[1L]])
-                    align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) align_inv %*% x)[1:3,]
-                    r_x <- range(align_vert[1,])
-                    r_y <- range(align_vert[2,])
+                    align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function(x) align_inv %*% x)[1:3, ]
+                    r_x <- range(align_vert[1, ])
+                    r_y <- range(align_vert[2, ])
                     list(min_x = r_x[[1L]], max_x = r_x[[2L]], min_y = r_y[[1L]], max_y = r_y[[2L]])
                 }
             ]
@@ -677,8 +677,8 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
                     x <- c(max_x + right_extension, max_x + right_extension, min_x - left_extension, min_x - left_extension)
                     y <- c(max_y + height + depth * cos(deg_to_rad(tilt_angle)), max_y + height, max_y + height, max_y + height + depth * cos(deg_to_rad(tilt_angle)))
                     z <- c(depth * sin(deg_to_rad(tilt_angle)), 0.0, 0.0, depth * sin(deg_to_rad(tilt_angle)))
-                    vert <- apply(matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L), 1, function (x) trans[[1L]] %*% x)[1:3,]
-                    list(index = 1:4, x = vert[1L,], y = vert[2L,], z = vert[3L,])
+                    vert <- apply(matrix(c(x, y, z, rep(1.0, 4L)), ncol = 4L), 1, function(x) trans[[1L]] %*% x)[1:3, ]
+                    list(index = 1:4, x = vert[1L, ], y = vert[2L, ], z = vert[3L, ])
                 }
             }]
 
@@ -730,10 +730,10 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
             bound_verts <- subsurf$vertices[subsurf$trans, on = "id", by = .EACHI,
                 {
                     align_inv <- solve(i.trans[[1L]])
-                    align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) align_inv %*% x)[1:3,]
+                    align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function(x) align_inv %*% x)[1:3, ]
 
-                    r_x <- range(align_vert[1,])
-                    r_y <- range(align_vert[2,])
+                    r_x <- range(align_vert[1, ])
+                    r_y <- range(align_vert[2, ])
                     list(min_x = r_x[[1L]], max_x = r_x[[2L]], min_y = r_y[[1L]], max_y = r_y[[2L]])
                 }
             ]
@@ -772,7 +772,7 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
                     lz <- c(left_depth * sin(deg_to_rad(left_tilt_angle)),
                             left_depth * sin(deg_to_rad(left_tilt_angle)),
                             0.0, 0.0)
-                    lvert <- apply(matrix(c(lx, ly, lz, rep(1.0, 4L)), ncol = 4L), 1, function (x) trans[[1L]] %*% x)[1:3,]
+                    lvert <- apply(matrix(c(lx, ly, lz, rep(1.0, 4L)), ncol = 4L), 1, function(x) trans[[1L]] %*% x)[1:3, ]
 
                     rx <- c(max_x + right_extension + right_depth * cos(deg_to_rad(right_tilt_angle)),
                             max_x + right_extension + right_depth * cos(deg_to_rad(right_tilt_angle)),
@@ -782,13 +782,13 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
                     rz <- c(right_depth * sin(deg_to_rad(right_tilt_angle)),
                             right_depth * sin(deg_to_rad(right_tilt_angle)),
                             0.0, 0.0)
-                    rvert <- apply(matrix(c(rx, ry, rz, rep(1.0, 4L)), ncol = 4L), 1, function (x) trans[[1L]] %*% x)[1:3,]
+                    rvert <- apply(matrix(c(rx, ry, rz, rep(1.0, 4L)), ncol = 4L), 1, function(x) trans[[1L]] %*% x)[1:3, ]
 
                     # set id of right fins to negative to distinguish
                     list(new_id = c(rep(.BY$id, 4L), rep(-.BY$id, 4L)), index = rep(1:4, 2),
-                         x = c(lvert[1L,], rvert[1L,]),
-                         y = c(lvert[2L,], rvert[2L,]),
-                         z = c(lvert[3L,], rvert[3L,])
+                         x = c(lvert[1L, ], rvert[1L, ]),
+                         y = c(lvert[2L, ], rvert[2L, ]),
+                         z = c(lvert[3L, ], rvert[3L, ])
                     )
                 }
             }]
@@ -818,13 +818,13 @@ extract_geom_shading_simple <- function (idf, geom_class = NULL, object = NULL, 
 # }}}
 
 # extract_geom_daylighting_point {{{
-extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NULL) {
+extract_geom_daylighting_point <- function(idf, geom_class = NULL, object = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf, object)
 
     # Previous v8.6, normal daylighting control ref pnts are saved in
     # 'Daylighting:Controls' and DE daylighting in
     # 'Daylighting:DELight:ReferencePoint'
-    if (idf$version() > 8.5) {
+    if (idf$version() > "8.5") {
         geom_class <- geom_class[J("Daylighting", "ReferencePoint"), on = c("category", "subtype"), nomatch = NULL]
 
         if (!nrow(geom_class)) return(list(meta = data.table(), vertices = data.table()))
@@ -919,7 +919,7 @@ extract_geom_daylighting_point <- function (idf, geom_class = NULL, object = NUL
 # }}}
 
 # convert_geom {{{
-convert_geom <- function (idf, geoms = NULL, type = c("surface", "subsurface", "shading")) {
+convert_geom <- function(idf, geoms = NULL, type = c("surface", "subsurface", "shading")) {
     assert_subset(type, c("surface", "subsurface", "shading"), empty.ok = FALSE)
 
     if (is.null(geoms)) geoms <- extract_geom(idf)
@@ -978,7 +978,7 @@ convert_geom <- function (idf, geoms = NULL, type = c("surface", "subsurface", "
 # }}}
 
 # convert_geom_simple {{{
-convert_geom_simple <- function (idf, geom, target_class, field_keep = NULL, first_vertex) {
+convert_geom_simple <- function(idf, geom, target_class, field_keep = NULL, first_vertex) {
     if (!nrow(geom$meta)) return(list(object = data.table(), value = data.table(), map = data.table()))
 
     # init object table {{{
@@ -1038,7 +1038,7 @@ convert_geom_simple <- function (idf, geom, target_class, field_keep = NULL, fir
 # }}}
 
 # convert_geom_surface_simple {{{
-convert_geom_surface_simple <- function (idf, geom = NULL) {
+convert_geom_surface_simple <- function(idf, geom = NULL) {
     if (is.null(geom)) {
         geom <- extract_geom_surface_simple(idf)
     } else {
@@ -1058,7 +1058,7 @@ convert_geom_surface_simple <- function (idf, geom = NULL) {
 # }}}
 
 # convert_geom_subsurface_simple {{{
-convert_geom_subsurface_simple <- function (idf, geom = NULL) {
+convert_geom_subsurface_simple <- function(idf, geom = NULL) {
     if (is.null(geom)) {
         geom <- extract_geom_subsurface_simple(idf)
     } else {
@@ -1077,7 +1077,7 @@ convert_geom_subsurface_simple <- function (idf, geom = NULL) {
 # }}}
 
 # convert_geom_shading_simple {{{
-convert_geom_shading_simple <- function (idf, geom = NULL) {
+convert_geom_shading_simple <- function(idf, geom = NULL) {
     if (is.null(geom)) {
         geom <- extract_geom_shading_simple(idf)
     } else {
@@ -1195,7 +1195,7 @@ convert_geom_shading_simple <- function (idf, geom = NULL) {
 # }}}
 
 # subset_geom {{{
-subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
+subset_geom <- function(geoms, type = c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"),
                          zone = NULL, surface = NULL, space = NULL) {
     assert_subset(type, c("all", "floor", "wall", "roof", "window", "door", "shading", "daylighting"))
     zone <- assert_valid_type(unique(zone), "Zone ID|Name", null.ok = TRUE)
@@ -1361,7 +1361,7 @@ subset_geom <- function (geoms, type = c("all", "floor", "wall", "roof", "window
 # }}}
 
 # align_coord_system {{{
-align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighting = NULL) {
+align_coord_system <- function(geoms, detailed = NULL, simple = NULL, daylighting = NULL) {
     assert_choice(detailed, c("world", "relative"), null.ok = TRUE)
     assert_choice(simple, c("world", "relative"), null.ok = TRUE)
     assert_choice(daylighting, c("world", "relative"), null.ok = TRUE)
@@ -1513,7 +1513,7 @@ align_coord_system <- function (geoms, detailed = NULL, simple = NULL, daylighti
 # }}}
 
 # set_geom_vertices {{{
-set_geom_vertices <- function (idf, geom, digits = NULL) {
+set_geom_vertices <- function(idf, geom, digits = NULL) {
     if (!NROW(geom$meta)) return(idf)
 
     # only works for detailed geometry classes
@@ -1547,7 +1547,7 @@ set_geom_vertices <- function (idf, geom, digits = NULL) {
 # }}}
 
 # add_zone_space_name {{{
-add_zone_space_name <- function (geoms) {
+add_zone_space_name <- function(geoms) {
     if (!nrow(geoms$surface)) return(geoms)
 
     if (nrow(geoms$subsurface)) {
@@ -1565,7 +1565,7 @@ add_zone_space_name <- function (geoms) {
 # }}}
 
 # del_zone_space_name {{{
-del_zone_space_name <- function (geoms) {
+del_zone_space_name <- function(geoms) {
     if (nrow(geoms$subsurface) && has_names(geoms$subsurface, "zone_name")) {
         set(geoms$subsurface, NULL, c("zone_name", "space_name"), NULL)
     }
@@ -1577,7 +1577,7 @@ del_zone_space_name <- function (geoms) {
 # }}}
 
 # remove_incomplete_vertices {{{
-remove_incomplete_vertices <- function (vertices) {
+remove_incomplete_vertices <- function(vertices) {
     # only keep rows that have valid x, y, z values from the beginning
     vertices_valid <- na.omit(vertices, cols = c("x", "y", "z"))
     if (nrow(vertices_valid) != nrow(vertices)) {
@@ -1591,7 +1591,7 @@ remove_incomplete_vertices <- function (vertices) {
 # }}}
 
 # reverse_idf_detailed_vertices {{{
-reverse_idf_detailed_vertices <- function (idf, geom_class = NULL) {
+reverse_idf_detailed_vertices <- function(idf, geom_class = NULL) {
     if (is.null(geom_class)) geom_class <- get_geom_class(idf)
 
     detailed <- geom_class[J("Detailed"), on = "subtype", nomatch = NULL]
@@ -1622,7 +1622,7 @@ reverse_idf_detailed_vertices <- function (idf, geom_class = NULL) {
 # }}}
 
 # apply_upper_left_corner_rule {{{
-apply_upper_left_corner_rule <- function (vertices) {
+apply_upper_left_corner_rule <- function(vertices) {
     trans <- align_face(vertices)
 
     vertices[trans, on = "id", by = .EACHI,
@@ -1631,7 +1631,7 @@ apply_upper_left_corner_rule <- function (vertices) {
                 list(x, y, z)
             } else {
                 trans_inv <- solve(i.trans[[1L]])
-                align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function (x) trans_inv %*% x)[1:3,]
+                align_vert <- apply(matrix(c(x, y, z, rep(1.0, .N)), ncol = 4L), 1, function(x) trans_inv %*% x)[1:3,]
 
                 if (any(align_vert[3L, ] >= 0.001)) abort("invalid align transformation")
 
@@ -1661,7 +1661,7 @@ apply_upper_left_corner_rule <- function (vertices) {
 # }}}
 
 # get_vertices_from_specs {{{
-get_vertices_from_specs <- function (azimuth, tilt, length, height, x0, y0, z0) {
+get_vertices_from_specs <- function(azimuth, tilt, length, height, x0, y0, z0) {
     cos_azimuth <- cos(deg_to_rad(azimuth))
     sin_azimuth <- sin(deg_to_rad(azimuth))
     cos_tilt <- cos(deg_to_rad(tilt))
@@ -1671,23 +1671,23 @@ get_vertices_from_specs <- function (azimuth, tilt, length, height, x0, y0, z0) 
     y_init <- list(height, 0.0, 0.0, height)
 
     x <- mapply(
-        function (x, y) x0 - cos_azimuth * x - cos_tilt * sin_azimuth * y,
+        function(x, y) x0 - cos_azimuth * x - cos_tilt * sin_azimuth * y,
         x = x_init, y = y_init, SIMPLIFY = FALSE
     )
 
     y <- mapply(
-        function (x, y) y0 + sin_azimuth * x - cos_tilt * cos_azimuth * y,
+        function(x, y) y0 + sin_azimuth * x - cos_tilt * cos_azimuth * y,
         x = x_init, y = y_init, SIMPLIFY = FALSE
     )
 
-    z <- lapply(y_init, function (y) z0 + sin_tilt * y)
+    z <- lapply(y_init, function(y) z0 + sin_tilt * y)
 
     list(x = x, y = y, z = z)
 }
 # }}}
 
 # align_face {{{
-align_face <- function (vertices) {
+align_face <- function(vertices) {
     norm <- get_outward_normal(vertices)
     # get z' with outward normal
     norm[, by = "id", trans := list(list(align_z_prime(x, y, z)))]
@@ -1727,7 +1727,7 @@ align_face <- function (vertices) {
 # }}}
 
 # get_newall_vector {{{
-get_newall_vector <- function (vertices) {
+get_newall_vector <- function(vertices) {
     # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
     vertices[, by = "id", {
         nx <- seq_len(.N) %% .N + 1L
@@ -1742,7 +1742,7 @@ get_newall_vector <- function (vertices) {
 # }}}
 
 # get_outward_normal {{{
-get_outward_normal <- function (vertices) {
+get_outward_normal <- function(vertices) {
     # calculate normal vector of surfaces using Newell Method
     # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
     vertices <- get_newall_vector(vertices)
@@ -1752,7 +1752,7 @@ get_outward_normal <- function (vertices) {
 # }}}
 
 # align_z_prime {{{
-align_z_prime <- function (x, y, z) {
+align_z_prime <- function(x, y, z) {
     axis_x <- c(1, 0, 0)
     axis_y <- c(0, 1, 0)
     axis_z <- c(0, 0, 1)
@@ -1795,15 +1795,15 @@ normalize <- function(v) v / sqrt(sum(v^2))
 # }}}
 
 # deg_to_rad {{{
-deg_to_rad <- function (x) x / 180 * pi
+deg_to_rad <- function(x) x / 180 * pi
 # }}}
 
 # rad_to_deg {{{
-rad_to_deg <- function (x) x / pi * 180
+rad_to_deg <- function(x) x / pi * 180
 # }}}
 
 # get_angle {{{
-get_angle <- function (v1, v2) {
+get_angle <- function(v1, v2) {
     normalize(v1) %*% normalize(v2)
     d <- rad_to_deg(acos(normalize(v1) %*% normalize(v2)))[1]
     if (v1[[1]] < 0) d <- d + 180
@@ -1812,19 +1812,19 @@ get_angle <- function (v1, v2) {
 # }}}
 
 # get_tilt {{{
-get_tilt <- function (out_norm) {
+get_tilt <- function(out_norm) {
     get_angle(out_norm, c(0, 0, 1))
 }
 # }}}
 
 # get_azimuth {{{
-get_azimuth <- function (out_norm) {
+get_azimuth <- function(out_norm) {
     get_angle(out_norm, c(0, 1, 0))
 }
 # }}}
 
 # get_area {{{
-get_area <- function (newall) {
+get_area <- function(newall) {
     sqrt(sum(newall ^ 2)) / 2.0
 }
 # }}}

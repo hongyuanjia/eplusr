@@ -72,7 +72,7 @@ test_that("Transition Helper", {
     # }}}
 
     # preprocess {{{
-    expect_s3_class(new_idf <- trans_preprocess(idf, 8.9, "Construction"), "Idf")
+    expect_s3_class(new_idf <- trans_preprocess(idf, "8.9", "Construction"), "Idf")
     expect_equal(new_idf$version(), numeric_version("8.9.0"))
     expect_false(new_idf$is_valid_class("Construction"))
     expect_false(get_priv_env(new_idf)$uuid() == get_priv_env(idf)$uuid())
@@ -80,11 +80,11 @@ test_that("Transition Helper", {
 
     # versions {{{
     expect_equal(
-        trans_upper_versions(idf, 9.1, patch = TRUE),
+        trans_upper_versions(idf, "9.1", patch = TRUE),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.0.1", "9.1.0"))
     )
     expect_equal(
-        trans_upper_versions(idf, 9.1),
+        trans_upper_versions(idf, "9.1"),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.1.0"))
     )
     # }}}
@@ -101,11 +101,11 @@ test_that("Transition Helper", {
 test_that("Transition v7.2 --> v8.0", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 7.2
-    to <- 8.0
+    from <- "7.2"
+    to <- "8.0"
     expect_s3_class(
         class = "Idf",
-        idfOri <- temp_idf(7.2,
+        idfOri <- temp_idf("7.2",
             ShadowCalculation = list(),
             "Coil:Heating:DX:MultiSpeed" = list("Coil"),
             "EnergyManagementSystem:OutputVariable" = list("Variable [m]"),
@@ -310,7 +310,7 @@ test_that("Transition v7.2 --> v8.0", {
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(
-            7.2,
+            "7.2",
             "Chiller:Electric:EIR" := list(paste0("Chiller", 1:2)),
             "ChillerHeater:Absorption:DirectFired" := list(paste0("Heater", 1:2)),
             "Output:Variable" := list(
@@ -327,7 +327,7 @@ test_that("Transition v7.2 --> v8.0", {
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(
-            7.2,
+            "7.2",
             "Chiller:Electric:EIR" := list(paste0("Chiller", 1:2)),
             "ChillerHeater:Absorption:DirectFired" := list(paste0("Heater", 1:2)),
             "Output:Variable" := list("*", c(
@@ -341,7 +341,7 @@ test_that("Transition v7.2 --> v8.0", {
 
     # VersionUpdater does not create "Diesel" output variables for both Chiller
     # and ChillerHeater
-    expect_warning(idfTR <- transition(idfOri, 8), "Default values")
+    expect_warning(idfTR <- transition(idfOri, "8"), "Default values")
     expect_equal(
         idfTR$to_table(class = "Output:Variable")[index == 2, sort(value)],
         c(
@@ -369,8 +369,8 @@ test_that("Transition v7.2 --> v8.0", {
 test_that("Transition v8.0 --> v8.1", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.0
-    to <- 8.1
+    from <- "8.0"
+    to <- "8.1"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -507,8 +507,8 @@ test_that("Transition v8.0 --> v8.1", {
 test_that("Transition v8.1 --> v8.2", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.1
-    to <- 8.2
+    from <- "8.1"
+    to <- "8.2"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -636,8 +636,8 @@ test_that("Transition v8.1 --> v8.2", {
 test_that("Transition v8.2 --> v8.3", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.2
-    to <- 8.3
+    from <- "8.2"
+    to <- "8.3"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -683,8 +683,8 @@ test_that("Transition v8.2 --> v8.3", {
 test_that("Transition v8.3 --> v8.4", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.3
-    to <- 8.4
+    from <- "8.3"
+    to <- "8.4"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -865,8 +865,8 @@ test_that("Transition v8.3 --> v8.4", {
 test_that("Transition v8.4 --> v8.5", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.4
-    to <- 8.5
+    from <- "8.4"
+    to <- "8.5"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -894,8 +894,8 @@ test_that("Transition v8.4 --> v8.5", {
 test_that("Transition v8.5 --> v8.6", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.5
-    to <- 8.6
+    from <- "8.5"
+    to <- "8.6"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1118,8 +1118,8 @@ test_that("Transition v8.5 --> v8.6", {
 test_that("Transition v8.6 --> v8.7", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.6
-    to <- 8.7
+    from <- "8.6"
+    to <- "8.7"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1199,8 +1199,8 @@ test_that("Transition v8.6 --> v8.7", {
 test_that("Transition v8.7 --> v8.8", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.7
-    to <- 8.8
+    from <- "8.7"
+    to <- "8.8"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1327,8 +1327,8 @@ test_that("Transition v8.7 --> v8.8", {
 test_that("Transition v8.8 --> v8.9", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.8
-    to <- 8.9
+    from <- "8.8"
+    to <- "8.9"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1409,8 +1409,8 @@ test_that("Transition v8.8 --> v8.9", {
 test_that("Transition v8.9 --> v9.0", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 8.9
-    to <- 9.0
+    from <- "8.9"
+    to <- "9.0"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1507,8 +1507,8 @@ test_that("Transition v8.9 --> v9.0", {
 test_that("Transition v9.0 --> v9.1", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 9.0
-    to <- 9.1
+    from <- "9.0"
+    to <- "9.1"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -1536,8 +1536,8 @@ test_that("Transition v9.0 --> v9.1", {
 test_that("Transition v9.1 --> v9.2", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 9.1
-    to <- 9.2
+    from <- "9.1"
+    to <- "9.2"
     unlink(file.path(tempdir(), "test.csv"))
     writeLines("", file.path(tempdir(), "test.csv"))
     expect_s3_class(
@@ -1813,8 +1813,8 @@ test_that("Transition v9.1 --> v9.2", {
 test_that("Transition v9.2 --> v9.3", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 9.2
-    to <- 9.3
+    from <- "9.2"
+    to <- "9.3"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -2007,8 +2007,8 @@ test_that("Transition v9.2 --> v9.3", {
 test_that("Transition v9.3 --> v9.4", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 9.3
-    to <- 9.4
+    from <- "9.3"
+    to <- "9.4"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -2093,8 +2093,8 @@ test_that("Transition v9.3 --> v9.4", {
 test_that("Transition v9.4 --> v9.5", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
-    from <- 9.4
-    to <- 9.5
+    from <- "9.4"
+    to <- "9.5"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -2282,8 +2282,8 @@ test_that("Transition v9.5 --> v9.6", {
     if (!is_avail_eplus(9.6)) install_eplus(9.6, local = TRUE)
     expect_true(is_avail_eplus(9.6))
 
-    from <- 9.5
-    to <- 9.6
+    from <- "9.5"
+    to <- "9.6"
     expect_s3_class(
         class = "Idf",
         idfOri <- temp_idf(from,
@@ -2478,8 +2478,8 @@ test_that("Transition v9.6 --> v22.1", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
 
-    from <- 9.6
-    to <- 22.1
+    from <- "9.6"
+    to <- "22.1"
 
     expect_s3_class(
         class = "Idf",
@@ -2503,8 +2503,8 @@ test_that("Transition v22.1 --> v22.2", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
 
-    from <- 22.1
-    to <- 22.2
+    from <- "22.1"
+    to <- "22.2"
 
     expect_s3_class(
         class = "Idf",
@@ -2683,8 +2683,8 @@ test_that("Transition v22.2 --> v23.1", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
 
-    from <- 22.2
-    to <- 23.1
+    from <- "22.2"
+    to <- "23.1"
 
     expect_s3_class(
         class = "Idf",

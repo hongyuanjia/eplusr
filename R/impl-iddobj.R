@@ -2,7 +2,7 @@
 NULL
 
 # get_iddobj_relation {{{
-get_iddobj_relation <- function (idd_env, class_id, field_id = NULL,
+get_iddobj_relation <- function(idd_env, class_id, field_id = NULL,
                                  direction = c("ref_to", "ref_by", "all"), depth = 0L, name = FALSE,
                                  class = NULL, group = NULL, keep_all = FALSE,
                                  class_ref = c("both", "none", "all"), match_all = FALSE) {
@@ -42,7 +42,7 @@ get_iddobj_relation <- function (idd_env, class_id, field_id = NULL,
 }
 # }}}
 # get_iddobj_possible {{{
-get_iddobj_possible <- function (idd_env, class_id = NULL, field_id = NULL) {
+get_iddobj_possible <- function(idd_env, class_id = NULL, field_id = NULL) {
     all <- if (is.null(field_id)) TRUE else FALSE
     if (all) {
         cls_id <- class_id
@@ -83,7 +83,7 @@ get_iddobj_possible <- function (idd_env, class_id = NULL, field_id = NULL) {
 # }}}
 
 # get_iddobj_table {{{
-get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
+get_iddobj_table <- function(idd_env, class_id = NULL, all = FALSE) {
     fld <- get_idd_field(idd_env, class_id, all = all)[
         , .SD, .SDcols = c("class_name", "field_index", "field_name")
     ]
@@ -94,7 +94,7 @@ get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
 }
 # }}}
 # get_iddobj_string {{{
-get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
+get_iddobj_string <- function(idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
     fld <- get_idd_field(idd_env, class_id, property = c("units", "ip_units"), all = all)
     # add fake value in order to correctly format
     set(fld, NULL, "value_chr", NA_character_)

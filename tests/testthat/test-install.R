@@ -4,10 +4,10 @@ test_that("Install EnergyPlus v9.0 and below", {
 
     expect_equal(sort(as.character(avail_eplus())), sort(names(.globals$eplus)))
 
-    if (is_avail_eplus(8.8)) {
-        expect_error(install_eplus(8.8, local = TRUE))
+    if (is_avail_eplus("8.8")) {
+        expect_error(install_eplus("8.8", local = TRUE))
     } else {
-        install_eplus(8.8, local = TRUE)
+        install_eplus("8.8", local = TRUE)
     }
 })
 

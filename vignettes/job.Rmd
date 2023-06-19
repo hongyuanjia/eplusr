@@ -42,7 +42,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 
 library(dplyr)
 library(ggplot2)

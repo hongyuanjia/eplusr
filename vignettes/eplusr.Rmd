@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
@@ -93,7 +93,7 @@ data of EnergyPlus configuration using `eplus_config()`.
 ```{r avail_eplus}
 avail_eplus()
 
-eplus_config(23.1)
+eplus_config("23.1")
 ```
 
 If your EnergyPlus was not installed in standard location, you can add that
@@ -108,7 +108,7 @@ If the needed version of EnergyPlus was not installed, you can use
 `install_eplus()` to install it.
 
 ```{r install, eval = FALSE}
-install_eplus(ver = 23.1)
+install_eplus(ver = "23.1")
 ```
 
 ## Download EnergyPlus IDD
@@ -120,11 +120,11 @@ download IDD file for EnergyPlus v23.1.0, parse it and create an `Idd` object
 that will be used whenever parsing all EnergyPlus models of version v23.1.
 
 ```{r idd_dl, eval = FALSE}
-path_idd <- download_idd(23.1, dir = tempdir())
+path_idd <- download_idd("23.1", dir = tempdir())
 use_idd(path_idd)
 
 # OR
-use_idd(23.1, download = TRUE)
+use_idd("23.1", download = TRUE)
 ```
 
 # Read and parse IDF
@@ -145,7 +145,7 @@ simply `read_idf(path)` without specifying `idd`. This is because eplusr will
 use IDD files distributed with EnergyPlus VersionUpdater program.
 
 ```{r read, out.lines = 10}
-path <- file.path(eplus_config(23.1)$dir, "ExampleFiles/5Zone_Transformer.idf")
+path <- path_eplus_example("23.1", "5Zone_Transformer.idf")
 model <- read_idf(path)
 
 model
@@ -247,7 +247,7 @@ def_mat
 You can also achieve this using methods in `Idd` class.
 
 ```{r idd_obj, eval = FALSE}
-idd <- use_idd(23.1)
+idd <- use_idd("23.1")
 idd$Material
 
 # OR
@@ -523,8 +523,7 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 
 ```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-path_ddy <- file.path(eplus_config(23.1)$dir, "WeatherData",
-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+path_ddy <- path_eplus_weatehr("23.1", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 ddy <- read_idf(path_ddy, idd = model$version(), encoding = "Latin-1")
 
 model$insert(ddy$SizingPeriod_DesignDay)

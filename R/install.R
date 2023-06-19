@@ -9,7 +9,7 @@ NULL
 #' Download specified version of EnergyPlus for your platform from GitHub and
 #' install it.
 #'
-#' @param ver The EnergyPlus version number, e.g., `8.7`. For `download_eplus()`
+#' @param ver The EnergyPlus version number, e.g., `"8.7"`. For `download_eplus()`
 #'        and `install_eplus()`, the special value `"latest"`, which is the
 #'        default, means the latest version supported by eplusr.
 #'
@@ -102,23 +102,23 @@ NULL
 #' install_eplus("latest")
 #'
 #' # for a specific version of EnergyPlus
-#' download_eplus(8.8, dir = tempdir())
-#' install_eplus(8.8)
+#' download_eplus("8.8", dir = tempdir())
+#' install_eplus("8.8")
 #'
 #' # force to reinstall
-#' install_eplus(8.8, force = TRUE)
+#' install_eplus("8.8", force = TRUE)
 #'
 #' # install EnergyPlus in your home directory
-#' install_eplus(8.8, local = TRUE, force = TRUE)
+#' install_eplus("8.8", local = TRUE, force = TRUE)
 #'
 #' # custom EnergyPlus install home directory
-#' install_eplus(8.8, dir = "~/MyPrograms", local = TRUE, force = TRUE)
+#' install_eplus("8.8", dir = "~/MyPrograms", local = TRUE, force = TRUE)
 #' }
 #' @author Hongyuan Jia
 #' @export
 #' @importFrom checkmate assert_string
 # install_eplus {{{
-install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...) {
+install_eplus <- function(ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...) {
     checkmate::assert_atomic_vector(ver, any.missing = FALSE, len = 1L)
     ver <- standardize_ver(ver)
 
@@ -173,7 +173,7 @@ install_eplus_from_file <- function(ver, inst, local = FALSE, dir = NULL, ...) {
 #' @name install_eplus
 #' @export
 # uninstall_eplus {{{
-uninstall_eplus <- function (ver) {
+uninstall_eplus <- function(ver) {
     ver <- standardize_ver(ver)
 
     # stop if cannot locate EnergyPlus
@@ -206,7 +206,7 @@ uninstall_eplus <- function (ver) {
 #' @name install_eplus
 #' @export
 # download_eplus {{{
-download_eplus <- function (ver = "latest", dir) {
+download_eplus <- function(ver = "latest", dir) {
     ver <- match_minor_ver(standardize_ver(ver, complete = FALSE), ALL_EPLUS_VER, "eplus")
     url <- eplus_download_url(ver)
     file <- basename(url)
@@ -225,7 +225,7 @@ download_eplus <- function (ver = "latest", dir) {
 # }}}
 
 # eplus_download_url: get EnergyPlus installer download URL {{{
-eplus_download_url <- function (ver) {
+eplus_download_url <- function(ver) {
     cmt <- eplus_release_commit(ver)
 
     if (!length(cmt))
@@ -236,13 +236,13 @@ eplus_download_url <- function (ver) {
     os <- switch(os_type(), windows = "Windows", macos = "Darwin", linux = "Linux")
 
     # handle EnergyPlus v9.4 and above on Linux and macOS
-    if (ver >= 9.4) {
+    if (ver >= "9.4") {
         if (is_macos()) {
             os <- sprintf("%s-macOS10.15", os)
         } else if (is_linux()) {
             # detect ubuntu version
             osrel <- tryCatch(readLines("/etc/os-release", warn = FALSE),
-                error = function (e) NULL
+                error = function(e) NULL
             )
 
             # if fail to read, use Ubuntu 20.04
@@ -260,7 +260,7 @@ eplus_download_url <- function (ver) {
                     # if fail to get version, use Ubuntu 20.04
                     if (!length(vers)) {
                         os <- sprintf("%s-Ubuntu20.04", os)
-                    } else if (any(vers >= 20.04)) {
+                    } else if (any(vers >= "20.04")) {
                         os <- sprintf("%s-Ubuntu20.04", os)
                     } else {
                         os <- sprintf("%s-Ubuntu18.04", os)
@@ -293,10 +293,10 @@ eplus_release_commit <- function(ver) {
 }
 # }}}
 # download_file: same as download.file except that it creates the target directory if necessary {{{
-download_file <- function (url, dest) {
+download_file <- function(url, dest) {
     if (file.exists(dest))
         tryCatch(unlink(dest),
-            warning = function (w) {
+            warning = function(w) {
                 stop("Failed to delete the existing file ",
                     surround(dest), "before downloading.", call. = FALSE)
             }
@@ -311,7 +311,7 @@ download_file <- function (url, dest) {
 }
 # }}}
 # install_eplus_win {{{
-install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
+install_eplus_win <- function(ver, exec, local = FALSE, dir = NULL) {
     ver <- standardize_ver(ver)
     if (is.null(dir)) {
         if (local) {
@@ -324,7 +324,7 @@ install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     dir <- normalizePath(file.path(dir, paste0("EnergyPlusV", gsub("\\.", "-", ver))), mustWork = FALSE)
 
-    if (ver >= 9.2) {
+    if (ver >= "9.2") {
         install_eplus_qt(ver, exec, dir, local = local)
     } else {
         system(sprintf("%s /S /D=%s", exec, dir))
@@ -332,7 +332,7 @@ install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
 }
 # }}}
 # get_win_user_path {{{
-get_win_user_path <- function (error = FALSE) {
+get_win_user_path <- function(error = FALSE) {
     appdata <- Sys.getenv("LOCALAPPDATA", "")
     if (appdata != "") return(normalizePath(appdata))
 
@@ -368,13 +368,13 @@ sudo_on_mac <- function(cmd) {
 }
 # }}}
 # install_eplus_macos {{{
-install_eplus_macos <- function (ver, exec, local = FALSE) {
+install_eplus_macos <- function(ver, exec, local = FALSE) {
     ver <- standardize_ver(ver)
     no_ext <- tools::file_path_sans_ext(basename(exec))
 
     # mount
     system(sprintf("hdiutil mount %s", exec))
-    if (ver < 9.1) {
+    if (ver < "9.1") {
         if (local) {
             res <- system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
         } else {
@@ -396,7 +396,7 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
 # }}}
 # install_eplus_linux {{{
 #' @importFrom checkmate assert_string
-install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
+install_eplus_linux <- function(ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
     ver <- standardize_ver(ver)
 
     if (local) {
@@ -420,7 +420,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     # EnergyPlus installation are broken since 9.1.0, which extract all files
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
-    if (ver == 9.1) {
+    if (ver == "9.1") {
         if (Sys.which("sed") != "") {
             # copy the original installer
             temp_exec <- file.path(tempdir(), paste0("patched-", basename(exec)))
@@ -450,7 +450,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     system(sprintf('chmod +x %s', exec))
     # installers for EnergyPlus v9.2 and above should provide the full path
     # of EnergyPlus install directory
-    if (ver >= 9.2) dir <- dir_eplus
+    if (ver >= "9.2") dir <- dir_eplus
     if (local) {
         system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
         system(sprintf('chmod -R a+w %s', dir_eplus))
@@ -461,8 +461,8 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
 }
 # }}}
 # patch_eplus_linux_sh {{{
-patch_eplus_linux_sh <- function (ver, exec) {
-    if (ver == 9.1) {
+patch_eplus_linux_sh <- function(ver, exec) {
+    if (ver == "9.1") {
         system(sprintf("sed -i '%is/%s/%s/' %s",
             77,
             "\\${install_directory}",
@@ -485,7 +485,7 @@ patch_eplus_linux_sh <- function (ver, exec) {
 }
 # }}}
 # install_eplus_qt {{{
-install_eplus_qt <- function (ver, exec, dir, local = FALSE, verbose = FALSE) {
+install_eplus_qt <- function(ver, exec, dir, local = FALSE, verbose = FALSE) {
     ver <- standardize_ver(ver)
     # create a tempfile of QTIFW control script
     ctrl <- tempfile(fileext = ".qs")
@@ -524,7 +524,7 @@ install_eplus_qt <- function (ver, exec, dir, local = FALSE, verbose = FALSE) {
 
         Controller.prototype.LicenseAgreementPageCallback = function() {
         ",
-        if (ver < 9.6) {
+        if (ver < "9.6") {
         "
             gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
         "
@@ -563,10 +563,10 @@ install_eplus_qt <- function (ver, exec, dir, local = FALSE, verbose = FALSE) {
 }
 # }}}
 # uninstall_eplus_win {{{
-uninstall_eplus_win <- function (ver, dir) {
+uninstall_eplus_win <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
-    if (ver >= 9.2) {
+    if (ver >= "9.2") {
         uninstall_eplus_qt(ver, dir)
     } else {
         uninstaller <- normalizePath(file.path(dir, "Uninstall.exe"), mustWork = FALSE)
@@ -585,10 +585,10 @@ uninstall_eplus_win <- function (ver, dir) {
 }
 # }}}
 # uninstall_eplus_macos {{{
-uninstall_eplus_macos <- function (ver, dir) {
+uninstall_eplus_macos <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
-    if (ver >= 9.2) {
+    if (ver >= "9.2") {
         uninstall_eplus_qt(ver, dir)
     } else {
         # test if EnergyPlus directory is accessible for current user
@@ -601,7 +601,7 @@ uninstall_eplus_macos <- function (ver, dir) {
 }
 # }}}
 # uninstall_eplus_qt {{{
-uninstall_eplus_qt <- function (ver, dir) {
+uninstall_eplus_qt <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
     ext <- if (is_windows()) ".exe" else ""
@@ -622,7 +622,7 @@ uninstall_eplus_qt <- function (ver, dir) {
 }
 # }}}
 # uninstall_eplus_linux {{{
-uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
+uninstall_eplus_linux <- function(ver, dir, force = FALSE) {
     ver <- standardize_ver(ver)
     uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
     if (!file.exists(uninstaller)) {
@@ -658,10 +658,9 @@ uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
 #'
 #' @details
 #'
-#' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version
-#'     cache in eplusr. That cache will be used to get corresponding
-#'     [Idd] object when parsing IDF files and call corresponding
-#'     EnergyPlus to run models.
+#' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version cache in
+#' eplusr. That cache will be used to get corresponding [Idd] object when
+#' parsing IDF files and call corresponding EnergyPlus to run models.
 #'
 #' `eplus_config()` returns the a list of configure data of specified version of
 #' EnergyPlus. If no data found, an empty list will be returned.
@@ -688,19 +687,19 @@ uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
 #' @examples
 #' \dontrun{
 #' # add specific version of EnergyPlus
-#' use_eplus(8.9)
+#' use_eplus("8.9")
 #' use_eplus("8.8.0")
 #'
 #' # get configure data of specific EnergyPlus version if avaiable
-#' eplus_config(8.6)
+#' eplus_config("8.6")
 #' }
 #'
 #' # get all versions of avaiable EnergyPlus
 #' avail_eplus()
 #'
 #' # check if specific version of EnergyPlus is available
-#' is_avail_eplus(8.5)
-#' is_avail_eplus(8.8)
+#' is_avail_eplus("8.5")
+#' is_avail_eplus("8.8")
 #'
 #' @seealso [download_eplus()] and [install_eplus()] for downloading and
 #' installing EnergyPlus
@@ -708,7 +707,7 @@ uninstall_eplus_linux <- function (ver, dir, force = FALSE) {
 #' @export
 # use_eplus {{{
 #' @importFrom checkmate assert_vector
-use_eplus <- function (eplus) {
+use_eplus <- function(eplus) {
     assert_vector(eplus, len = 1L)
 
     ver <- convert_to_eplus_ver(eplus, strict = TRUE, max = FALSE)[[1L]]
@@ -760,7 +759,7 @@ use_eplus <- function (eplus) {
                 "installation path ", surround(c(dir_cache, eplus_dir)), collapse = "\n")
             abort(paste0(msg, fail, "\nPlease specify explicitly the path of EnergyPlus installation."), "locate_eplus")
         }
-    } else if (is_eplus_path(eplus)){
+    } else if (is_eplus_path(eplus)) {
         ver <- get_ver_from_eplus_path(eplus)
         eplus_dir <- eplus
     } else {
@@ -786,7 +785,7 @@ use_eplus <- function (eplus) {
                  "New location: ", surround(eplus_dir))
     }
 
-    if (ver < 8.3) {
+    if (ver < "8.3") {
         verbose_info("NOTE: Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
             "This is because eplusr uses EnergyPlus command line interface ",
             "which is available only in EnergyPlus v8.3 and above. ",
@@ -801,7 +800,7 @@ use_eplus <- function (eplus) {
 #' @rdname use_eplus
 #' @export
 # eplus_config {{{
-eplus_config <- function (ver) {
+eplus_config <- function(ver) {
     assert_vector(ver, len = 1L)
     ver_m <- convert_to_eplus_ver(ver, all_ver = names(.globals$eplus))
 
@@ -817,7 +816,7 @@ eplus_config <- function (ver) {
 #' @rdname use_eplus
 #' @export
 # avail_eplus {{{
-avail_eplus <- function () {
+avail_eplus <- function() {
     res <- names(.globals$eplus)
     if (!length(res)) return(NULL)
     sort(numeric_version(res))
@@ -827,7 +826,7 @@ avail_eplus <- function () {
 #' @rdname use_eplus
 #' @export
 # is_avail_eplus {{{
-is_avail_eplus <- function (ver) {
+is_avail_eplus <- function(ver) {
     length(suppressWarnings(eplus_config(ver))) > 0L
 }
 # }}}
@@ -835,10 +834,10 @@ is_avail_eplus <- function (ver) {
 #' @rdname use_eplus
 #' @export
 # locate_eplus {{{
-locate_eplus <- function () {
-    find_eplus <- function (ver) {
+locate_eplus <- function() {
+    find_eplus <- function(ver) {
         suppressMessages(tryCatch(use_eplus(ver),
-            error = function (e) NULL))
+            error = function(e) NULL))
     }
 
     lapply(rev(ALL_EPLUS_RELEASE_COMMIT$version), find_eplus)
@@ -847,7 +846,7 @@ locate_eplus <- function () {
 }
 # }}}
 # eplus_default_path {{{
-eplus_default_path <- function (ver, local = FALSE) {
+eplus_default_path <- function(ver, local = FALSE) {
     if (anyNA(ver <- convert_to_eplus_ver(ver))) {
         stop("'ver' must be a vector of valid EnergyPlus versions")
     }
@@ -878,11 +877,11 @@ eplus_default_path <- function (ver, local = FALSE) {
 }
 # }}}
 # get_ver_from_eplus_path {{{
-get_ver_from_eplus_path <- function (path) {
+get_ver_from_eplus_path <- function(path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
     tryCatch(get_idd_ver(read_lines(idd_file, nrows = 1L)),
-        error = function (e) {
+        error = function(e) {
             stop("Failed to parse EnergyPlus version using IDD ",
                 surround(idd_file), ".\n", conditionMessage(e)
             )

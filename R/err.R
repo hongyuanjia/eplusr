@@ -58,14 +58,14 @@ NULL
 #' }
 #' @importFrom checkmate assert_file
 # read_err {{{
-read_err <- function (path) {
+read_err <- function(path) {
     checkmate::assert_file(path, extension = c("err", "vcperr"))
     parse_err_file(path)
 }
 # }}}
 
 # parse_err_file {{{
-parse_err_file <- function (path) {
+parse_err_file <- function(path) {
     # data
     err <- data.table(index = integer(), envir_index = integer(),
         envir = character(), level_index = integer(), level = character(),
@@ -302,7 +302,7 @@ parse_err_file <- function (path) {
 #' @return An `ErrFile` object, invisibly.
 #' @export
 # print.ErrFile {{{
-print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
+print.ErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("EnergyPlus Error File", line = 2)
 
     if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {
@@ -343,7 +343,7 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
 # }}}
 
 # print.TransitionErrFile {{{
-print.TransitionErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
+print.TransitionErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("IDFVersionUpdater Error File", line = 2)
 
     path <- attr(x, "path")
@@ -381,7 +381,7 @@ print.TransitionErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
 # }}}
 
 # format_errdt {{{
-format_errdt <- function (dt, info = TRUE) {
+format_errdt <- function(dt, info = TRUE) {
     # add row id
     set(dt, NULL, "id", seq_len(nrow(dt)))
     # line wrap long message and extend 8 spaces

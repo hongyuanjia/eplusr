@@ -41,7 +41,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus(23.1)) install_eplus(23.1)
+if (!is_avail_eplus("23.1")) install_eplus("23.1")
 ```
 
 # The `Schedule:Compact` class
@@ -53,7 +53,7 @@ number of fields and positions are not set, and cannot really be described in
 the usual `Field #` manner.
 
 ```{r}
-path_idf <- path_eplus_example(23.1, "1ZoneUncontrolled.idf")
+path_idf <- path_eplus_example("23.1", "1ZoneUncontrolled.idf")
 idf <- read_idf(path_idf)
 idf$definition("Schedule:Compact")
 ```
