@@ -51,12 +51,12 @@ automatically created if it does not exists.
 ## ------------------------------------------------
 
 \dontrun{
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     name_idf <- "1ZoneUncontrolled.idf"
     name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    path_idf <- path_eplus_example(8.8, name_idf)
-    path_epw <- path_eplus_weather(8.8, name_epw)
+    path_idf <- path_eplus_example("8.8", name_idf)
+    path_epw <- path_eplus_weather("8.8", name_epw)
 
     # create from local files
     job <- eplus_job(path_idf, path_epw)
@@ -364,12 +364,12 @@ An \code{EplusJob} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     name_idf <- "1ZoneUncontrolled.idf"
     name_epw <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    path_idf <- path_eplus_example(8.8, name_idf)
-    path_epw <- path_eplus_weather(8.8, name_epw)
+    path_idf <- path_eplus_example("8.8", name_idf)
+    path_epw <- path_eplus_weather("8.8", name_epw)
 
     # create from local files
     job <- eplus_job(path_idf, path_epw)

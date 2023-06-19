@@ -30,7 +30,7 @@ Format an \link{IddObject} into a character vector in the same way as in IDF Edi
 \examples{
 \dontrun{
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-    idd = use_idd(8.8, download = "auto"))
+    idd = use_idd("8.8", download = "auto"))
 
 # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]

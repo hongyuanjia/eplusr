@@ -40,9 +40,9 @@ automatically created if it does not exists, like \link{Idf} class does.
 ## ------------------------------------------------
 
 \dontrun{
-if (is_avail_eplus(8.8)) {
-     path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
-     path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+if (is_avail_eplus("8.8")) {
+     path_idf <- path_eplus_example("8.8", "5Zone_Transformer.idf")
+     path_epw <- path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
     param <- param_job(path_idf, path_epw)
@@ -131,7 +131,7 @@ param$param(
 
 \dontrun{
 # create a measure to change the orientation of the building
-rotate_building <- function (idf, degree = 0L) {
+rotate_building <- function(idf, degree = 0L) {
     if (!idf$is_valid_class("Building")) {
        stop("Input model does not have a Building object")
     }
@@ -301,9 +301,9 @@ A \code{ParametricJob} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-if (is_avail_eplus(8.8)) {
-     path_idf <- path_eplus_example(8.8, "5Zone_Transformer.idf")
-     path_epw <- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+if (is_avail_eplus("8.8")) {
+     path_idf <- path_eplus_example("8.8", "5Zone_Transformer.idf")
+     path_epw <- path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
     param <- param_job(path_idf, path_epw)
@@ -561,7 +561,7 @@ The modified \code{ParametricJob} object itself, invisibly.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 # create a measure to change the orientation of the building
-rotate_building <- function (idf, degree = 0L) {
+rotate_building <- function(idf, degree = 0L) {
     if (!idf$is_valid_class("Building")) {
        stop("Input model does not have a Building object")
     }

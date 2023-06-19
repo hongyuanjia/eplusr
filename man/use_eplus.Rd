@@ -38,10 +38,9 @@ available EnergyPlus is found;
 Configure which version of EnergyPlus to use
 }
 \details{
-\code{use_eplus()} adds an EnergyPlus version into the EnergyPlus version
-cache in eplusr. That cache will be used to get corresponding
-\link{Idd} object when parsing IDF files and call corresponding
-EnergyPlus to run models.
+\code{use_eplus()} adds an EnergyPlus version into the EnergyPlus version cache in
+eplusr. That cache will be used to get corresponding \link{Idd} object when
+parsing IDF files and call corresponding EnergyPlus to run models.
 
 \code{eplus_config()} returns the a list of configure data of specified version of
 EnergyPlus. If no data found, an empty list will be returned.
@@ -59,19 +58,19 @@ available or not.
 \examples{
 \dontrun{
 # add specific version of EnergyPlus
-use_eplus(8.9)
+use_eplus("8.9")
 use_eplus("8.8.0")
 
 # get configure data of specific EnergyPlus version if avaiable
-eplus_config(8.6)
+eplus_config("8.6")
 }
 
 # get all versions of avaiable EnergyPlus
 avail_eplus()
 
 # check if specific version of EnergyPlus is available
-is_avail_eplus(8.5)
-is_avail_eplus(8.8)
+is_avail_eplus("8.5")
+is_avail_eplus("8.8")
 
 }
 \seealso{

@@ -20,11 +20,11 @@ corresponding \link{IddObject}. For details, see \link{IddObject}.
 }
 \examples{
 \dontrun{
-idd <- use_idd(8.8, download = "auto")
+idd <- use_idd("8.8", download = "auto")
 
 # get an IddObject using class name
 idd_object(idd, "Material")
-idd_object(8.8, "Material")
+idd_object("8.8", "Material")
 }
 
 }

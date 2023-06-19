@@ -49,18 +49,18 @@ folder in EnergyPlus installation directory.
 }
 \examples{
 \dontrun{
-path_eplus(8.8, "Energy+.idd")
+path_eplus("8.8", "Energy+.idd")
 
-path_eplus_processor(8.8, "EPMacro", strict = TRUE)
-path_eplus_processor(8.8, "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)
+path_eplus_processor("8.8", "EPMacro", strict = TRUE)
+path_eplus_processor("8.8", "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)
 
-path_eplus_example(8.8, "1ZoneUncontrolled.idf")
-path_eplus_example(8.8, "BasicFiles/Exercise1A.idf")
+path_eplus_example("8.8", "1ZoneUncontrolled.idf")
+path_eplus_example("8.8", "BasicFiles/Exercise1A.idf")
 
-path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 
-path_eplus_dataset(8.8, "Boilers.idf")
-path_eplus_dataset(8.8, "FMUs/MoistAir.fmu")
+path_eplus_dataset("8.8", "Boilers.idf")
+path_eplus_dataset("8.8", "FMUs/MoistAir.fmu")
 }
 }
 \author{
