@@ -25,7 +25,7 @@ a target version to update to and a directory to save the new models."><meta pro
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -118,7 +118,7 @@ a target version to update to and a directory to save the new models.</p>
 
 
 <dt>ver</dt>
-<dd><p>A valid EnergyPlus IDD version, e.g. <code>9</code>, <code>8.8</code>, or <code>"8.8.0"</code>.</p></dd>
+<dd><p>A valid EnergyPlus IDD version, e.g. <code>"9"</code>, <code>"8.8"</code>, or <code>"8.8.0"</code>.</p></dd>
 
 
 <dt>dir</dt>
@@ -156,9 +156,9 @@ contains all error messages from transition error (.VCpErr) files.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">7.2</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="st">"7.2"</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="co"># create an empty IDF</span></span></span>
-<span class="r-in"><span>    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="empty_idf.html">empty_idf</a></span><span class="op">(</span><span class="fl">7.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="empty_idf.html">empty_idf</a></span><span class="op">(</span><span class="st">"7.2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">idf</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># convert it from v7.2 to the latest EnergyPlus installed</span></span></span>

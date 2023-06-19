@@ -24,7 +24,7 @@ install it."><meta property="og:image" content="https://hongyuanjia.github.io/ep
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -116,7 +116,7 @@ install it.</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>ver</dt>
-<dd><p>The EnergyPlus version number, e.g., <code>8.7</code>. For <code>download_eplus()</code>
+<dd><p>The EnergyPlus version number, e.g., <code>"8.7"</code>. For <code>download_eplus()</code>
 and <code>install_eplus()</code>, the special value <code>"latest"</code>, which is the
 default, means the latest version supported by eplusr.</p></dd>
 
@@ -215,17 +215,17 @@ may be required.</p>
 <span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># for a specific version of EnergyPlus</span></span></span>
-<span class="r-in"><span><span class="fu">download_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">download_eplus</span><span class="op">(</span><span class="st">"8.8"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"8.8"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># force to reinstall</span></span></span>
-<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"8.8"</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># install EnergyPlus in your home directory</span></span></span>
-<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"8.8"</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># custom EnergyPlus install home directory</span></span></span>
-<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="fl">8.8</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_eplus</span><span class="op">(</span><span class="st">"8.8"</span>, dir <span class="op">=</span> <span class="st">"~/MyPrograms"</span>, local <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

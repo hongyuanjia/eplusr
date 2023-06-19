@@ -26,7 +26,7 @@ For details on ParametricJob, please see ParametricJob class."><meta property="o
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -211,9 +211,9 @@ when <code>$run()</code> method is called. Note this needs at least one
 <div class="section">
 <h4 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-if (is_avail_eplus(8.8)) {
-     path_idf &lt;- path_eplus_example(8.8, "5Zone_Transformer.idf")
-     path_epw &lt;- path_eplus_weather(8.8, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+if (is_avail_eplus("8.8")) {
+     path_idf &lt;- path_eplus_example("8.8", "5Zone_Transformer.idf")
+     path_epw &lt;- path_eplus_weather("8.8", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     # create from an IDF and an EPW
     param &lt;- param_job(path_idf, path_epw)
@@ -459,7 +459,7 @@ measure. Under the hook, <code><a href="https://rdrr.io/r/base/mapply.html" clas
 <h4 id="examples-5">Examples<a class="anchor" aria-label="anchor" href="#examples-5"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # create a measure to change the orientation of the building
-rotate_building &lt;- function (idf, degree = 0L) {
+rotate_building &lt;- function(idf, degree = 0L) {
     if (!idf$is_valid_class("Building")) {
        stop("Input model does not have a Building object")
     }
@@ -785,9 +785,9 @@ param$print()
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>     <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>     <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="st">"8.8"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>     <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="st">"8.8"</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>     <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="st">"8.8"</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># create from an IDF and an EPW</span></span></span>
 <span class="r-in"><span>    <span class="va">param</span> <span class="op">&lt;-</span> <span class="fu">param_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span></span>
@@ -876,7 +876,7 @@ param$print()
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># create a measure to change the orientation of the building</span></span></span>
-<span class="r-in"><span><span class="va">rotate_building</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">idf</span>, <span class="va">degree</span> <span class="op">=</span> <span class="fl">0L</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">rotate_building</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">idf</span>, <span class="va">degree</span> <span class="op">=</span> <span class="fl">0L</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">idf</span><span class="op">$</span><span class="fu">is_valid_class</span><span class="op">(</span><span class="st">"Building"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>       <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input model does not have a Building object"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>

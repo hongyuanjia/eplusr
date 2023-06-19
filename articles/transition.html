@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2023-06-17</h4>
+            <h4 data-toc-skip class="date">2023-06-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -203,7 +203,7 @@ process</p>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt; [1] '8.2.0'</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">23.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">t_vu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">verup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/version_updater.html">version_updater</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"23.1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; IDFVersionUpdater: /usr/local/EnergyPlus-22-2-0/PreProcess/IDFVersionUpdater</span></span>
 <span><span class="co">#&gt; Input file: /home/runner/work/eplusr/eplusr/vignettes/RefBldgLargeOfficeNew2004_ChicagoV820.idf</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
@@ -413,7 +413,7 @@ process</p>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 434.908   3.914 437.662</span></span></code></pre></div>
+<span><span class="co">#&gt; 469.811   4.277 473.036</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
@@ -428,7 +428,7 @@ arguments as <code><a href="../reference/version_updater.html">version_updater()
 argument <code>save</code> to control whether to save the resultant
 <code>Idf</code> objects to IDF files or not.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="fl">23.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">t_tr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transition.html">transition</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"23.1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  From  Ver: 8.2.0</span></span>
 <span><span class="co">#&gt; Toward Ver: 8.3.0</span></span>
 <span><span class="co">#&gt; [8.2.0 --&gt; 8.3.0] SUCCEEDED.</span></span>
@@ -481,7 +481,7 @@ argument <code>save</code> to control whether to save the resultant
 <span><span class="co">#&gt; Toward Ver: 23.1.0</span></span>
 <span><span class="co">#&gt; [22.2.0 --&gt; 23.1.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   7.218   0.049   7.268</span></span></code></pre></div>
+<span><span class="co">#&gt;   7.771   0.080   7.852</span></span></code></pre></div>
 <p>It is about 60.2 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that
 <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we

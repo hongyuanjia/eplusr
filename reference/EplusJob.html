@@ -26,7 +26,7 @@ for running EnergyPlus simulation and collecting outputs."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -208,12 +208,12 @@ automatically created if it does not exists.</p>
 <div class="section">
 <h4 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     name_idf &lt;- "1ZoneUncontrolled.idf"
     name_epw &lt;-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    path_idf &lt;- path_eplus_example(8.8, name_idf)
-    path_epw &lt;- path_eplus_weather(8.8, name_epw)
+    path_idf &lt;- path_eplus_example("8.8", name_idf)
+    path_epw &lt;- path_eplus_weather("8.8", name_epw)
 
     # create from local files
     job &lt;- eplus_job(path_idf, path_epw)
@@ -1175,12 +1175,12 @@ job$print()
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="fl">8.8</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="use_eplus.html">is_avail_eplus</a></span><span class="op">(</span><span class="st">"8.8"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">name_idf</span> <span class="op">&lt;-</span> <span class="st">"1ZoneUncontrolled.idf"</span></span></span>
 <span class="r-in"><span>    <span class="va">name_epw</span> <span class="op">&lt;-</span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_idf</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="fl">8.8</span>, <span class="va">name_epw</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="st">"8.8"</span>, <span class="va">name_idf</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="st">"8.8"</span>, <span class="va">name_epw</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># create from local files</span></span></span>
 <span class="r-in"><span>    <span class="va">job</span> <span class="op">&lt;-</span> <span class="fu">eplus_job</span><span class="op">(</span><span class="va">path_idf</span>, <span class="va">path_epw</span><span class="op">)</span></span></span>

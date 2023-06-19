@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2023-06-17</h4>
+            <h4 data-toc-skip class="date">2023-06-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -191,7 +191,7 @@ using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] '23.1.0'</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="st">"23.1"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $version</span></span>
 <span><span class="co">#&gt; [1] '23.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -208,7 +208,7 @@ models of that version will use this path to call EnergyPlus.</p>
 <p>If the needed version of EnergyPlus was not installed, you can use
 <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="fl">23.1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"23.1"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
@@ -221,11 +221,11 @@ download IDD file for EnergyPlus v23.1.0, parse it and create an
 <code>Idd</code> object that will be used whenever parsing all
 EnergyPlus models of version v23.1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="fl">23.1</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="st">"23.1"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">23.1</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"23.1"</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -248,7 +248,7 @@ IDFs from v7.2 to v9.1 can be parsed using simply
 because eplusr will use IDD files distributed with EnergyPlus
 VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
@@ -599,7 +599,7 @@ marked with <code>*</code>. For example, you can get the
 <p>You can also achieve this using methods in <code>Idd</code>
 class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"23.1"</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
@@ -1040,7 +1040,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2023-06-17</span></span>
+<span><span class="co">#&gt; !2023-06-19</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1095,7 +1095,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2023-06-17</span></span>
+<span><span class="co">#&gt; !2023-06-19</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1257,8 +1257,7 @@ data from a “.ddy” file. You can achieve that using
 <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
-<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData"</span>,</span>
-<span>  <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
+<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
 <span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span>, encoding <span class="op">=</span> <span class="st">"Latin-1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">insert</span><span class="op">(</span><span class="va">ddy</span><span class="op">$</span><span class="va">SizingPeriod_DesignDay</span><span class="op">)</span></span>
@@ -1645,10 +1644,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpSKcqUH/file1ced5c045315.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpsU6bE2/file1d076f349543.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpSKcqUH/file1ced5c045315.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpsU6bE2/file1d076f349543.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
