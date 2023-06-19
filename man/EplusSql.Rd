@@ -40,12 +40,12 @@ make sure the output data in the SQLite is correct and reliable.
 ## ------------------------------------------------
 
 \dontrun{
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+    idf_path <- path_eplus_example("8.8", idf_name)
+    epw_path <- path_eplus_weather("8.8", epw_name)
 
     # copy to tempdir and run the model
     idf <- read_idf(idf_path)
@@ -222,12 +222,12 @@ An \code{EplusSql} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+    idf_path <- path_eplus_example("8.8", idf_name)
+    epw_path <- path_eplus_weather("8.8", epw_name)
 
     # copy to tempdir and run the model
     idf <- read_idf(idf_path)

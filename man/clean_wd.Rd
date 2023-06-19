@@ -24,7 +24,7 @@ running EnergyPlus models using \code{\link[=run_idf]{run_idf()}} and \code{\lin
 \dontrun{
 # run a test simulation
 idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
-epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData",
+epw_path <- path_eplus_weather("8.8",
      "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 )
 dir <- file.path(tempdir(), "test")

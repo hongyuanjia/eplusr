@@ -65,8 +65,8 @@ file.
 \code{is_epw()} returns \code{TRUE} if input is an Epw object.
 }
 \examples{
-is_eplus_ver(8.8)
-is_eplus_ver(8.0)
+is_eplus_ver("8.8")
+is_eplus_ver("8.0")
 is_eplus_ver("latest", strict = FALSE)
 
 is_idd_ver("9.0.1")
@@ -75,17 +75,17 @@ is_idd_ver("8.0.1")
 is_eplus_path("C:/EnergyPlusV9-0-0")
 is_eplus_path("/usr/local/EnergyPlus-9-0-1")
 
-is_idd(use_idd(8.8, download = "auto"))
+\dontrun{
+is_idd(use_idd("8.8", download = "auto"))
 
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-    idd = use_idd(8.8, download = "auto"))
+    idd = use_idd("8.8", download = "auto"))
 is_idf(idf)
 
-is_iddobject(idd_object(8.8, "Version"))
+is_iddobject(idd_object("8.8", "Version"))
 
 is_idfobject(idf_object(idf, 1))
 
-\dontrun{
 is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 }
 }

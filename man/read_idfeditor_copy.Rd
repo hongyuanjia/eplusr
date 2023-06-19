@@ -13,9 +13,9 @@ field, and reference.}
 \item{idf_env}{An environment or list contains IDF tables including object,
 value, and reference.}
 
-\item{version}{The version of IDF file open by IDF Editor, e.g. \code{8.6},
+\item{version}{The version of IDF file open by IDF Editor, e.g. \code{"8.6"},
 \code{"8.8.0"}. If \code{NULL}, assume that the file has the same
-version as current Idf object. Default: \code{NULL}.}
+version as current \code{Idf} object. Default: \code{NULL}.}
 
 \item{in_ip}{Set to \code{TRUE} if the IDF file is open with \code{Inch-Pound}
 view option toggled. Numeric values will automatically

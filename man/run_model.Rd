@@ -158,10 +158,10 @@ paths or copy them into the output directory, based on your choice.
 \dontrun{
 idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 
-if (is_avail_eplus(8.8)) {
+if (is_avail_eplus("8.8")) {
     # run a single model
     epw_path <- file.path(
-        eplus_config(8.8)$dir,
+        eplus_config("8.8")$dir,
         "WeatherData",
         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
     )
@@ -169,7 +169,7 @@ if (is_avail_eplus(8.8)) {
     run_idf(idf_path, epw_path, output_dir = tempdir())
 
     # run multiple model in parallel
-    idf_paths <- file.path(eplus_config(8.8)$dir, "ExampleFiles",
+    idf_paths <- file.path(eplus_config("8.8")$dir, "ExampleFiles",
         c("1ZoneUncontrolled.idf", "1ZoneUncontrolledFourAlgorithms.idf")
     )
     epw_paths <- rep(epw_path, times = 2L)

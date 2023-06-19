@@ -37,7 +37,7 @@ These functions evaluate an expression with temporary eplusr options
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 
 # temporarily disable verbose messages
-idf <- with_silent(read_idf(path_idf, use_idd(8.8, download = "auto")))
+idf <- with_silent(read_idf(path_idf, use_idd("8.8", download = "auto")))
 
 # temporarily disable checkings
 without_checking(idf$'BuildingSurface:Detailed' <- NULL)

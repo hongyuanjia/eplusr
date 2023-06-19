@@ -523,7 +523,7 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 
 ```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-path_ddy <- path_eplus_weatehr("23.1", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+path_ddy <- path_eplus_weather("23.1", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 ddy <- read_idf(path_ddy, idd = model$version(), encoding = "Latin-1")
 
 model$insert(ddy$SizingPeriod_DesignDay)

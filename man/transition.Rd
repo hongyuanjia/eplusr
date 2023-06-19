@@ -9,7 +9,7 @@ transition(idf, ver, keep_all = FALSE, save = FALSE, dir = NULL)
 \arguments{
 \item{idf}{An \link{Idf} object or a path of IDF file.}
 
-\item{ver}{A valid EnergyPlus IDD version, e.g. \code{9}, \code{8.8}, or \code{"8.8.0"}.}
+\item{ver}{A valid EnergyPlus IDD version, e.g. \code{"9"}, \code{"8.8"}, or \code{"8.8.0"}.}
 
 \item{keep_all}{If \code{TRUE}, a list will be return which contains all
 \link{Idf} objects of intermediate versions. The list will be named using first
@@ -35,9 +35,9 @@ specified version.
 }
 \examples{
 \dontrun{
-if (any(avail_eplus()) > 7.2) {
+if (any(avail_eplus()) > "7.2") {
     # create an empty IDF
-    idf <- empty_idf(7.2)
+    idf <- empty_idf("7.2")
 
     # convert it from v7.2 to the latest EnergyPlus installed
     transition(idf, max(avail_eplus()))

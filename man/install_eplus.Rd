@@ -13,7 +13,7 @@ uninstall_eplus(ver)
 download_eplus(ver = "latest", dir)
 }
 \arguments{
-\item{ver}{The EnergyPlus version number, e.g., \code{8.7}. For \code{download_eplus()}
+\item{ver}{The EnergyPlus version number, e.g., \code{"8.7"}. For \code{download_eplus()}
 and \code{install_eplus()}, the special value \code{"latest"}, which is the
 default, means the latest version supported by eplusr.}
 
@@ -120,17 +120,17 @@ download_eplus("latest", dir = tempdir())
 install_eplus("latest")
 
 # for a specific version of EnergyPlus
-download_eplus(8.8, dir = tempdir())
-install_eplus(8.8)
+download_eplus("8.8", dir = tempdir())
+install_eplus("8.8")
 
 # force to reinstall
-install_eplus(8.8, force = TRUE)
+install_eplus("8.8", force = TRUE)
 
 # install EnergyPlus in your home directory
-install_eplus(8.8, local = TRUE, force = TRUE)
+install_eplus("8.8", local = TRUE, force = TRUE)
 
 # custom EnergyPlus install home directory
-install_eplus(8.8, dir = "~/MyPrograms", local = TRUE, force = TRUE)
+install_eplus("8.8", dir = "~/MyPrograms", local = TRUE, force = TRUE)
 }
 }
 \author{

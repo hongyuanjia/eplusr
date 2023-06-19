@@ -19,7 +19,7 @@ is_avail_idd(ver)
 \item{idd}{Either a path, a connection, or literal data (either a single
 string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
 file, usually named as \code{Energy+.idd}, or a valid version of IDD, e.g.
-\code{8.9}, \code{"8.9.0"}.}
+\code{"8.9"}, \code{"8.9.0"}.}
 
 \item{download}{If \code{TRUE} and argument \code{idd}, the IDD file will be
 downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
@@ -34,7 +34,7 @@ whole EnergyPlus software. Default is \code{FALSE}.}
 \verb{"Latin-1" and }"UTF-8"\verb{. The default is }"unknown"` which means that the
 file is encoded in the native encoding.}
 
-\item{ver}{A valid EnergyPlus version, e.g. \code{8}, \code{8.7}, \code{"8.7"} or \code{"8.7.0"}.
+\item{ver}{A valid EnergyPlus version, e.g. \code{"8"}, \code{"8.7"} or \code{"8.7.0"}.
 For \code{download_idd()}, the special value \code{"latest"}, which is default,
 means the latest version.}
 
@@ -86,24 +86,24 @@ from the latest EnergyPlus detected.
 avail_idd()
 
 # check if specific version of Idd is available
-is_avail_idd(8.5)
+is_avail_idd("8.5")
 
 # download latest IDD file from EnergyPlus GitHub repo
 str(download_idd("latest", tempdir()))
 
 # use specific version of Idd
 # only works if EnergyPlus v8.8 has been found or Idd v8.8 exists
-use_idd(8.8)
+use_idd("8.8")
 
 # If Idd object is currently not avail_idd, automatically download IDD file
 # from EnergyPlus GitHub repo and parse it
-use_idd(8.8, download = "auto")
+use_idd("8.8", download = "auto")
 
 # now Idd v8.8 should be available
-is_avail_idd(8.8)
+is_avail_idd("8.8")
 
 # get specific version of parsed Idd object
-use_idd(8.8)
+use_idd("8.8")
 
 avail_idd() # should contain "8.8.0"
 }
