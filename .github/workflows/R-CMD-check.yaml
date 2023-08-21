@@ -9,6 +9,18 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
+      os:
+        type: string
+        description: 'Only run for specified OS'
+        required: false
+        default: "all"
 
 name: R-CMD-check
 
@@ -51,8 +63,9 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
 
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && (inputs.os == matrix.config.os || inputs.os == 'all') }}
         with:
           limit-access-to-actor: true
