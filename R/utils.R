@@ -201,7 +201,7 @@ standardize_ver <- function(ver, strict = FALSE, complete = TRUE) {
 match_minor_ver <- function(ver, all_ver, type = c("idd", "eplus"), max = TRUE, verbose = TRUE) {
     checkmate::assert_class(ver, "numeric_version")
     checkmate::assert_vector(ver, len = 1L)
-    if (!length(all_ver)) return(numeric_version(NA, strict = FALSE))
+    if (!length(all_ver)) return(numeric_version(NA_character_, strict = FALSE))
     all_ver <- unique(all_ver)
     ori_ver <- ver
 
@@ -212,7 +212,7 @@ match_minor_ver <- function(ver, all_ver, type = c("idd", "eplus"), max = TRUE, 
     }
 
     if (!length(ver)) {
-        ver <- numeric_version(NA, strict = FALSE)
+        ver <- numeric_version(NA_character_, strict = FALSE)
     } else if (length(ver) > 1L) {
         if (max) {
             ver <- max(ver)

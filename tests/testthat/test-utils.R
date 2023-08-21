@@ -34,7 +34,7 @@ test_that("Utility functions", {
     expect_equal(underscore_name(read_lines(test_path("file/latin1"), encoding = "Latin-1")$string)[1], "N13_field_Young_s_modulus")
 
     expect_equal(standardize_ver("latest"), numeric_version(LATEST_EPLUS_VER))
-    expect_equal(standardize_ver("latest", strict = TRUE), numeric_version(NA, strict = FALSE))
+    expect_equal(standardize_ver("latest", strict = TRUE), numeric_version(NA_character_, strict = FALSE))
     expect_equal(standardize_ver(c(1, 1.1)), numeric_version(c("1.0.0", "1.1.0")))
     expect_equal(standardize_ver(c(1, 1.1), complete = FALSE), numeric_version(c("1.0", "1.1")))
     expect_equal(standardize_ver(c("1.0", "1.1.0.01")), numeric_version(c("1.0.0", "1.1.0")))
@@ -42,8 +42,8 @@ test_that("Utility functions", {
 
     expect_error(match_minor_ver("1"), "numeric_version")
     expect_error(match_minor_ver(numeric_version(c("1", "2"))), "length 1")
-    expect_equal(match_minor_ver(numeric_version("0.0"), NULL), numeric_version(NA, strict = FALSE))
-    expect_equal(match_minor_ver(numeric_version("0.0"), ALL_IDD_VER), numeric_version(NA, strict = FALSE))
+    expect_equal(match_minor_ver(numeric_version("0.0"), NULL), numeric_version(NA_character_, strict = FALSE))
+    expect_equal(match_minor_ver(numeric_version("0.0"), ALL_IDD_VER), numeric_version(NA_character_, strict = FALSE))
     expect_equal(match_minor_ver(numeric_version("9.1"), ALL_IDD_VER), numeric_version("9.1.0"))
     expect_equal(match_minor_ver(numeric_version("9.0"), ALL_IDD_VER), numeric_version("9.0.1"))
     expect_equal(match_minor_ver(numeric_version("9.0"), ALL_EPLUS_VER, max = FALSE, verbose = FALSE),

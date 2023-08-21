@@ -80,8 +80,8 @@ parse_err_file <- function(path) {
 
         att <- list(
             path = normalizePath(path, mustWork = FALSE),
-            from = numeric_version(NA, strict = FALSE),
-            to = numeric_version(NA, strict = FALSE),
+            from = numeric_version(NA_character_, strict = FALSE),
+            to = numeric_version(NA_character_, strict = FALSE),
             successful = FALSE
         )
     } else {
@@ -89,7 +89,7 @@ parse_err_file <- function(path) {
 
         att <- list(
             path = normalizePath(path, mustWork = FALSE),
-            eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
+            eplus_version = numeric_version(NA_character_, strict = FALSE), eplus_build = NA_character_,
             datetime = as.POSIXct(NA), idd_version = NA,
             successful = FALSE, terminated = FALSE
         )
