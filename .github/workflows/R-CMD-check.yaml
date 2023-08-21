@@ -23,13 +23,15 @@ jobs:
         config:
           - {os: windows-latest, r: 'release', not_cran: false}
           - {os: macOS-latest,   r: 'release', not_cran: false}
-          - {os: ubuntu-latest,  r: 'release', not_cran: true, _EPLUSR_SKIP_TESTS_TRANSITION_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_: true, _EPLUSR_SKIP_TESTS_BASEMENT_: true}
+          - {os: ubuntu-latest,  r: 'devel',   not_cran: true, _EPLUSR_SKIP_TESTS_TRANSITION_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_: true, _EPLUSR_SKIP_TESTS_BASEMENT_: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: true
       NOT_CRAN: ${{ matrix.config.not_cran }}
       RGL_USE_NULL: true
+      # for check non-character input in `base::numeric_version()`
+      _R_CHECK_STOP_ON_INVALID_NUMERIC_VERSION_INPUTS_: true
       DISPLAY: 99 # for rgl
 
     steps:
