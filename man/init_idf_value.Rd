@@ -50,9 +50,6 @@ with default values. Default: \code{TRUE}.}
 
 \item{id}{If \code{TRUE}, new value id will be added in column \code{value_id} based
 on current existing value ids found in \code{idf_env}. Default: \code{TRUE}.}
-
-\item{object}{An integer vector of valid object IDs or a character vector
-of valid object names. Default: \code{NULL}.}
 }
 \value{
 A data.table containing specified columns.

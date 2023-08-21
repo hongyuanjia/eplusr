@@ -769,8 +769,6 @@ get_idf_value <- function(idd_env, idf_env, class = NULL, object = NULL, field =
 #'        value, and reference.
 #' @param class An integer vector of valid class indexes or a character vector
 #'        of valid class names. Default: `NULL`.
-#' @param object An integer vector of valid object IDs or a character vector
-#'        of valid object names. Default: `NULL`.
 #' @param field An integer vector of valid field indexes or a character
 #'        vector of valid field names (can be in in underscore style). `class`
 #'        and `field` should have the same length.
