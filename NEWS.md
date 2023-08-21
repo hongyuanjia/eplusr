@@ -1,3 +1,9 @@
+# eplusr (development version)
+
+## Bug fixes
+
+* Use `NA_character_` instead of `NA` for `numeric_version()` (#572).
+
 # eplusr 0.16.1
 
 ## Bug fixes
