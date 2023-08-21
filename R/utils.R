@@ -180,6 +180,7 @@ standardize_ver <- function(ver, strict = FALSE, complete = TRUE) {
     if (is.numeric(ver)) {
         int <- (!is.na(ver)) & (is.integer(ver) | (is.numeric(ver) & (ver == trunc(ver))))
         if (any(int)) ver[int] <- paste0(ver[int], ".0")
+        ver <- as.character(ver)
     }
 
     if (!inherits(ver, "numeric_version")) ver <- numeric_version(ver, strict = FALSE)

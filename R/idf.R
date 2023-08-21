@@ -3507,7 +3507,7 @@ idf_set_output_files <- function(idf, sql = FALSE, dict = FALSE) {
     if (!is_idf(idf)) idf <- read_idf(idf)
     modified <- FALSE
     cls <- "Output:Control:Files"
-    if (idf$version() < 9.4 || !idf$is_valid_class(cls)) return(modified)
+    if (idf$version() < "9.4" || !idf$is_valid_class(cls)) return(modified)
 
     obj <- idf$object_unique(cls)
     val <- obj$value(all = TRUE)
