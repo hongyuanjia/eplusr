@@ -3,10 +3,10 @@
   "reportvar_rules": "23.1.0",
   "weather_db": {
     "geojson": {
-      "weather.geojson": "869e19e57234db92af187beb43db11d0"
+      "weather.geojson": "8188fdbc745176a5408ae27735faa0a5"
     },
     "kml": {
-      "AMTUes_EPW_Processing_locations.kml": "a04081eae85c6e01287ef7146ef1050f",
+      "AMTUes_EPW_Processing_locations.kml": "8147933e2f7ba0eba4173b85c0b9502b",
       "ArgTMY_EPW_Processing_locations.kml": "bdd4950b44b694f47e97a64fd35115c8",
       "BBSR_EPW_Processing_locations.kml": "bfd6bd4d181bc99f46d56d2723d040a3",
       "CityUHK_EPW_Processing_locations.kml": "c85a14c2b754705cd31e480d3bc6e1ee",
@@ -26,23 +26,27 @@
       "NIWA_EPW_Processing_locations.kml": "7985c68777c57a15e9d913d5fbf30a30",
       "Normals_EPW_Processing_locations.kml": "aac2e2a9ae4589cd6799df8ac4a8c0f5",
       "PHIKO_EPW_Processing_locations.kml": "59986cf38393ccfa3b116ac1fb2eb6e0",
-      "Reg1_Africa_TMYx_EPW_Processing_locations.kml": "927c07e99d97e6807ef7de050f382371",
-      "Reg2_Asia_TMYx_EPW_Processing_locations.kml": "1f0cf30c42bc36c64a4b84141428959f",
-      "Reg2_Reg6_Russia_TMYx_EPW_Processing_locations.kml": "7eafd008339122af518dcf99a841b677",
-      "Reg3_South_America_TMYx_EPW_Processing_locations.kml": "5d092d1ec9e7fbba0bac94fef68e1d23",
-      "Reg4_Canada_TMYx_EPW_Processing_locations.kml": "207fabcd6c1a980fef8a6f0893ee3dbb",
-      "Reg4_NA_CA_Caribbean_TMYx_EPW_Processing_locations.kml": "cab02f4e9725815074b436ec59334b91",
-      "Reg4_USA_TMYx_EPW_Processing_locations.kml": "851d886aa8fb26bafbf7805345bf9860",
-      "Reg5_Southwest_Pacific_TMYx_EPW_Processing_locations.kml": "e08ce3b42d8e3ec1b8c9f6f3b6efdb77",
-      "Reg6_Europe_TMYx_EPW_Processing_locations.kml": "cc6ccd135e8156c2ac3d7cf612cd20b7",
-      "Reg7_Antarctica_TMYx_EPW_Processing_locations.kml": "26a2db3516934f95fd6372fc7dc840e2",
+      "Reg1_Africa_TMYx_EPW_Processing_locations.kml": "57213b168ba995c35319d089a17ba645",
+      "Reg2_Asia_TMYx_EPW_Processing_locations.kml": "afa9d33e0c47fd42eb96c7c716357a2e",
+      "Reg2_Reg6_Russia_TMYx_EPW_Processing_locations.kml": "ed419637632258ede449450524edd3f7",
+      "Reg3_South_America_TMYx_EPW_Processing_locations.kml": "94db2c70778c0e8e76b15039ed6a0886",
+      "Reg4_Canada_TMYx_EPW_Processing_locations.kml": "f2f1ea8bc5bbe76f7d70a0b5c81bc634",
+      "Reg4_NA_CA_Caribbean_TMYx_EPW_Processing_locations.kml": "d9a7968fd132ee12dc6afdce222cccb6",
+      "Reg4_USA_TMYx_EPW_Processing_locations.kml": "c412bfdc67713980ab50ee50ea85fc05",
+      "Reg5_Southwest_Pacific_TMYx_EPW_Processing_locations.kml": "e07291491a98a3b16170e56bfc8d92c1",
+      "Reg6_Europe_TMYx_EPW_Processing_locations.kml": "9b153c18ed5263c0631e7fada8767b0e",
+      "Reg7_Antarctica_TMYx_EPW_Processing_locations.kml": "54e98ad9713b711f735360f83ec438e2",
+      "Region4_Canada_NRC_Future_Avg_Year_EPW_Processing_locations.kml": "bd25f20e845523750c93e767e23fa04b",
+      "Region4_Canada_NRC_Future_Extreme_Cold_Year_EPW_Processing_locations.kml": "95865b84d228e8f3885d819704a54263",
+      "Region4_Canada_NRC_Future_Extreme_Warm_Year_EPW_Processing_locations.kml": "4b05db2824de35122a6b3242bbbf7a1d",
+      "Region4_Canada_NRC_Future_TMY_Year_EPW_Processing_locations.kml": "28942e0ae7792aa1bb1df0475d7f5e64",
       "RMY2012_EPW_Processing_locations.kml": "f4c6964cf6492e430de7750213d57912",
       "TMY_EPW_Processing_locations.kml": "63b0742fea0c8dd33983d597a02eea80",
       "TMY3a_EPW_Processing_locations.kml": "3ec6df40ae58ae9de56b2580cce1d11f",
       "TurTMY_EPW_Processing_locations.kml": "bebd6dbbd9ea0e05d19f221d6be8dadb"
     },
     "country_code": {
-      "country_codes.csv": "48421e3ee0e1f23e66fc63d3951b34d7"
+      "country_codes.csv": "c9bb1661f4b1e40d011fab1d96872dcd"
     }
   }
 }

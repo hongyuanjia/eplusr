@@ -25,7 +25,16 @@ download_kml <- function(dir = tempdir()) {
     dest <- file.path(dir, kml)
 
     for (i in seq_along(links)) {
-        try(download.file(links[i], dest[i], mode = "wb"), silent = TRUE)
+        try(download.file(links[i], dest[i], "libcurl", mode = "wb"), silent = TRUE)
+
+        # fix corrupt kml file
+        if (basename(dest[[i]]) == "Reg6_Europe_TMYx_EPW_Processing_locations.kml" && file.exists(dest[[i]])) {
+            l <- readLines(dest[[i]])
+            if (!stringi::stri_startswith_fixed(l[[1L]], "<?xml")) {
+                l[1L] <- stringi::stri_extract_first_regex(l[[1L]], "\\<\\?xml.+\\>")
+                writeLines(l, dest[[i]], useBytes = TRUE)
+            }
+        }
     }
 
     normalizePath(dest, mustWork = FALSE)[file.exists(dest)]
