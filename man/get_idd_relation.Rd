@@ -53,14 +53,6 @@ option.}
 \item{match_all}{If \code{TRUE}, relation search will continue even though one
 relation has been found. If \code{FALSE}, searching is stopped whenever one
 relation is found in specified classes/groups. Default: \code{FALSE}.}
-
-\item{underscore}{If \code{TRUE}, input class name and field names will be
-converted into underscore style name first and column \code{class_name_us}
-and \code{field_name_us} will be used for matching.}
-
-\item{keep}{If \code{TRUE}, all inputs are returned regardless they have any
-relations with other fields or not. If \code{FALSE}, only input that have
-relations with other fields are returned. Default: \code{FALSE}.}
 }
 \value{
 A data.table.

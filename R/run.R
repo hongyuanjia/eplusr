@@ -977,7 +977,7 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
 
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
     # just for test purpose
-    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < 8.3)
+    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < "8.3")
 
     # cannot set annual and design_day if energy
     if (any(annual, design_day) && legacy) {
@@ -1528,7 +1528,7 @@ run_energyplus <- function(
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
     # just for test purpose
-    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < 8.3)
+    legacy <- getOption("eplusr.eplus_legacy", eplus_ver < "8.3")
 
     file <- list()
     run <- list()

@@ -83,7 +83,7 @@ parse_rdd_file <- function(path, mdd = FALSE) {
         report_type = character(), variable = character(), units = character()
     )
 
-    eplus_version <- numeric_version(NA, strict = FALSE)
+    eplus_version <- numeric_version(NA_character_, strict = FALSE)
     eplus_build <- NA_character_
     datetime <- as.POSIXct(NA)
 

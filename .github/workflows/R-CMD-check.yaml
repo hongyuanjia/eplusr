@@ -9,6 +9,18 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
+      os:
+        type: string
+        description: 'Only run for specified OS'
+        required: false
+        default: "all"
 
 name: R-CMD-check
 
@@ -23,13 +35,15 @@ jobs:
         config:
           - {os: windows-latest, r: 'release', not_cran: false}
           - {os: macOS-latest,   r: 'release', not_cran: false}
-          - {os: ubuntu-latest,  r: 'release', not_cran: true, _EPLUSR_SKIP_TESTS_TRANSITION_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_: true, _EPLUSR_SKIP_TESTS_BASEMENT_: true}
+          - {os: ubuntu-latest,  r: 'devel',   not_cran: true, _EPLUSR_SKIP_TESTS_TRANSITION_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_EPW_: true, _EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_: true, _EPLUSR_SKIP_TESTS_BASEMENT_: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: true
       NOT_CRAN: ${{ matrix.config.not_cran }}
       RGL_USE_NULL: true
+      # for check non-character input in `base::numeric_version()`
+      _R_CHECK_STOP_ON_INVALID_NUMERIC_VERSION_INPUTS_: true
       DISPLAY: 99 # for rgl
 
     steps:
@@ -49,8 +63,9 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
 
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && (inputs.os == matrix.config.os || inputs.os == 'all') }}
         with:
           limit-access-to-actor: true

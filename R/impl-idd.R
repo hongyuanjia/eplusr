@@ -622,18 +622,12 @@ combine_input_and_relation <- function(input, ref, type, direction) {
 #'        `class_id` is given.
 #' @param direction The relation direction to extract. Should be one of
 #'        `"ref_to"` or `"ref_by"`.
-#' @param underscore If `TRUE`, input class name and field names will be
-#'        converted into underscore style name first and column `class_name_us`
-#'        and `field_name_us` will be used for matching.
 #' @param depth If > 0, the relation is searched recursively. If `NULL`,
 #'        all possible recursive relations are returned. Default: `0`.
 #' @param name If `TRUE`, additional formatting columns are added and an
 #'        `IddRelation` object is returned. Default: `FALSE`.
 #' @param class,group A character vector of group names used for searching
 #'        relations. Default: `NULL`.
-#' @param keep If `TRUE`, all inputs are returned regardless they have any
-#'        relations with other fields or not. If `FALSE`, only input that have
-#'        relations with other fields are returned. Default: `FALSE`.
 #' @param class_ref Specify how to handle class-name-references. There are 3
 #'        options in total, i.e. `"none"`, `"both"` and `"all"`, with `"both"`
 #'        being the default.
@@ -652,9 +646,9 @@ combine_input_and_relation <- function(input, ref, type, direction) {
 #' @keywords internal
 #' @export
 get_idd_relation <- function(idd_env, class_id = NULL, field_id = NULL,
-                              direction = c("ref_to", "ref_by"), depth = 0L, name = FALSE,
-                              class = NULL, group = NULL, keep_all = FALSE,
-                              class_ref = c("both", "none", "all"), match_all = FALSE) {
+                             direction = c("ref_to", "ref_by"), depth = 0L, name = FALSE,
+                             class = NULL, group = NULL, keep_all = FALSE,
+                             class_ref = c("both", "none", "all"), match_all = FALSE) {
     assert_count(depth, null.ok = TRUE)
     if (is.null(depth)) depth <- Inf
     direction <- match.arg(direction)
