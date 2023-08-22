@@ -4,22 +4,25 @@ update_weather_db <- function(eplus_src = NULL, force = FALSE, dir_assets = here
 
     if (is.null(dir_assets)) {
         dir_assets <- here::here("tools/data/weather_db")
-        if (!dir.exists(dir_assets)) dir.create(dir_assets, recursive = TRUE)
-
-        dir_assets_json <- file.path(dir_assets, "EnergyPlus")
-        if (!dir.exists(dir_assets_json)) dir.create(dir_assets_json)
-        geojson <- download_geojson(eplus_src, file.path(dir_assets, "EnergyPlus"))
-
-        dir_assets_kml <- file.path(dir_assets, "OneBuilding")
-        if (!dir.exists(dir_assets_kml)) dir.create(dir_assets_kml)
-        kml <- download_kml(dir_assets_kml)
-
-        country_code <- download_countrycode(dir_assets)
-    } else {
-        geojson <- normalizePath(file.path(dir_assets, "EnergyPlus/weather.geojson"), mustWork = TRUE)
-        kml <- normalizePath(list.files(file.path(dir_assets, "OneBuilding"), "\\.kml$", full.names = TRUE), mustWork = TRUE)
-        country_code <- normalizePath(file.path(dir_assets, "country_codes.csv"), mustWork = TRUE)
+        if (force && !dir.exists(dir_assets)) dir.create(dir_assets, recursive = TRUE)
     }
+
+    dir_assets_json <- file.path(dir_assets, "EnergyPlus")
+    if (force && !dir.exists(dir_assets_json)) dir.create(dir_assets_json)
+
+    dir_assets_kml <- file.path(dir_assets, "OneBuilding")
+    if (force && !dir.exists(dir_assets_kml)) dir.create(dir_assets_kml)
+
+    if (!force) {
+        geojson <- normalizePath(file.path(dir_assets_json, "weather.geojson"), mustWork = TRUE)
+        kml <- normalizePath(list.files(dir_assets_kml, "\\.kml$", full.names = TRUE), mustWork = TRUE)
+        country_code <- normalizePath(file.path(dir_assets, "country_codes.csv"), mustWork = TRUE)
+    } else {
+        geojson <- download_geojson(eplus_src, file.path(dir_assets, "EnergyPlus"))
+        kml <- download_kml(dir_assets_kml)
+        country_code <- download_countrycode(dir_assets)
+    }
+
     kml <- sort(kml)
 
     # current hash

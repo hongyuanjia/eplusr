@@ -4,6 +4,10 @@
 
 * Use `NA_character_` instead of `NA` for `numeric_version()` (#572).
 
+## New features
+
+* Update weather database for `OneBuilding` (#574).
+
 # eplusr 0.16.1
 
 ## Bug fixes
