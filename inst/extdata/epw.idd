@@ -1,5 +1,5 @@
-!IDD_Version 1.0.0
-!IDD_BUILD 2020-07-20
+!IDD_Version 2.0.0
+!IDD_BUILD 2023-07-04
 ! **************************************************************************
 ! EnergyPlus Weather Format Specification
 !
@@ -205,82 +205,86 @@ DESIGN CONDITIONS,
         \type real
         \minimum -360
         \maximum +360
+    N17, \field Weather and Shielding Factor (WSF)
+        \note This factor is based on geographical location and is used in ventilation calculations as per ASHRAE Standard 62.2-2019.
+        \units 1/h
+        \type real
     A4, \field Condition 1 Cooling Design Condition Type
         \type choice
         \key Cooling
         \default Cooling
-    N17, \field Condition 1 Hottest Month
+    N18, \field Condition 1 Hottest Month
         \type integer
         \minimum 1
         \maximum 12
-    N18, \field Condition 1 Daily Temperature Range for Hottest Month
+    N19, \field Condition 1 Daily Temperature Range for Hottest Month
         \note Daily temperature range for hottest month
         \note [defined as mean of the difference between daily maximum
         \note and daily minimum dry-bulb temperatures for hottest month]
         \units C
         \type real
         \minimum 0
-    N19, \field Condition 1 0.4% Cooling Dry-Bulb Temperature
+    N20, \field Condition 1 0.4% Cooling Dry-Bulb Temperature
         \note Dry-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N20, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 0.4% Cooling Dry-Bulb Temperature
+    N21, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 0.4% Cooling Dry-Bulb Temperature
         \note Mean coincident wet-bulb temperature to
         \note Dry-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N21, \field Condition 1 1.0% Cooling Dry-Bulb Temperature
+    N22, \field Condition 1 1.0% Cooling Dry-Bulb Temperature
         \note Dry-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N22, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 1.0% Cooling Dry-Bulb Temperature
+    N23, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 1.0% Cooling Dry-Bulb Temperature
         \note Mean coincident wet-bulb temperature to
         \note Dry-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N23, \field Condition 1 2.0% Cooling Dry-Bulb Temperature
+    N24, \field Condition 1 2.0% Cooling Dry-Bulb Temperature
         \note Mean coincident wet-bulb temperature to
         \note Dry-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N24, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 2.0% Cooling Dry-Bulb Temperature
+    N25, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 2.0% Cooling Dry-Bulb Temperature
         \note mean coincident wet-bulb temperature to
         \note Dry-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence (warm conditions)
         \units C
         \type real
-    N25, \field Condition 1 0.4% Cooling Wet-Bulb Temperature
+    N26, \field Condition 1 0.4% Cooling Wet-Bulb Temperature
         \note Wet-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence
         \units C
         \type real
-    N26, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Wet-Bulb Temperature
+    N27, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Wet-Bulb Temperature
         \note Mean coincident dry-bulb temperature to
         \note Wet-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence
         \units C
         \type real
-    N27, \field Condition 1 1.0% Cooling Wet-Bulb Temperature
+    N28, \field Condition 1 1.0% Cooling Wet-Bulb Temperature
         \note Wet-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N28, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Wet-Bulb Temperature
+    N29, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Wet-Bulb Temperature
         \note Mean coincident dry-bulb temperature to
         \note Wet-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N29, \field Condition 1 2.0% Cooling Wet-Bulb Temperature
+    N30, \field Condition 1 2.0% Cooling Wet-Bulb Temperature
         \note Wet-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N30, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Wet-Bulb Temperature
+    N31, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Wet-Bulb Temperature
         \note mean coincident dry-bulb temperature to
         \note Wet-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N31, \field Condition 1 Mean Coincident Wind Speed for 0.4% Cooling Dry-Bulb Temperature
+    N32, \field Condition 1 Mean Coincident Wind Speed for 0.4% Cooling Dry-Bulb Temperature
         \note Mean wind speed coincident with 0.4% dry-bulb temperature
         \units m/s
         \type real
         \minimum 0
-    N32, \field Condition 1 Most Frequent Wind Direction for 0.4% Cooling Dry-Bulb Temperature
+    N33, \field Condition 1 Most Frequent Wind Direction for 0.4% Cooling Dry-Bulb Temperature
         \note Corresponding most frequent wind direction
         \note Mean wind speed coincident with 0.4% dry-bulb temperature
         \note degrees true from north (east = 90 deg)
@@ -288,27 +292,27 @@ DESIGN CONDITIONS,
         \type real
         \minimum -360
         \maximum +360
-    N33, \field Condition 1 Condition 1 0.4% Cooling Dew-point Temperature
+    N34, \field Condition 1 Condition 1 0.4% Cooling Dew-point Temperature
         \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
         \units C
         \type real
-    N34, \field Condition 1 Humidity Ratio for 0.4% Cooling Dew-point Temperature
+    N35, \field Condition 1 Humidity Ratio for 0.4% Cooling Dew-point Temperature
         \note Humidity ratio corresponding to
         \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
         \units
         \type real
         \units gWater/kgDryAir
         \minimum 0
-    N35, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Dew-point Temperature
+    N36, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Dew-point Temperature
         \note Mean coincident dry-bulb temperature to
         \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
         \units C
         \type real
-    N36, \field Condition 1 1.0% Cooling Dew-point Temperature
+    N37, \field Condition 1 1.0% Cooling Dew-point Temperature
         \note Dew-point temperature corresponding to 1.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N37, \field Condition 1 Humidity Ratio for 1.0% Cooling Dew-point Temperature
+    N38, \field Condition 1 Humidity Ratio for 1.0% Cooling Dew-point Temperature
         \note Humidity ratio corresponding to
         \note Dew-point temperature corresponding to 1.0,% annual cumulative frequency of occurrence
         \note calculated at the standard atmospheric pressure at elevation of station
@@ -316,16 +320,16 @@ DESIGN CONDITIONS,
         \type real
         \units gWater/kgDryAir
         \minimum 0
-    N38, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Dew-point Temperature
+    N39, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Dew-point Temperature
         \note Mean coincident dry-bulb temperature to
         \note Dew-point temperature corresponding to 1.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N39, \field Condition 1 2.0% Cooling Dew-point Temperature
+    N40, \field Condition 1 2.0% Cooling Dew-point Temperature
         \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N40, \field Condition 1 Humidity Ratio for 2.0% Cooling Dew-point Temperature
+    N41, \field Condition 1 Humidity Ratio for 2.0% Cooling Dew-point Temperature
         \note Humidity ratio corresponding to
         \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
         \note calculated at the standard atmospheric pressure at elevation of station
@@ -333,43 +337,43 @@ DESIGN CONDITIONS,
         \type real
         \units gWater/kgDryAir
         \minimum 0
-    N41, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Dew-point Temperature
+    N42, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Dew-point Temperature
         \note Mean coincident dry-bulb temperature to
         \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N42, \field Condition 1 0.4 Cooling Enthalpy
+    N43, \field Condition 1 0.4 Cooling Enthalpy
         \note Enthalpy corresponding to 0.4% annual cumulative frequency of occurrence
         \units kJ/kg
         \type real
         \minimum> 0
-    N43, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Enthalpy
+    N44, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Enthalpy
         \note Mean coincident dry-bulb temperature to
         \note Enthalpy corresponding to 0.4% annual cumulative frequency of occurrence
         \units C
         \type real
-    N44, \field Condition 1 1.0 Cooling Enthalpy
+    N45, \field Condition 1 1.0 Cooling Enthalpy
         \note Enthalpy corresponding to 1.0% annual cumulative frequency of occurrence
         \units kJ/kg
         \type real
         \minimum> 0
-    N45, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Enthalpy
+    N46, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Enthalpy
         \note Mean coincident dry-bulb temperature to
         \note Enthalpy corresponding to 1.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N46, \field Condition 1 2.0% Cooling Enthalpy
+    N47, \field Condition 1 2.0% Cooling Enthalpy
         \note Mean coincident dry-bulb temperature to
         \note Enthalpy corresponding to 2.0% annual cumulative frequency of occurrence
         \units kJ/kg
         \type real
         \minimum> 0
-    N47, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Enthalpy
+    N48, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Enthalpy
         \note mean coincident dry-bulb temperature to
         \note Enthalpy corresponding to 2.0% annual cumulative frequency of occurrence
         \units C
         \type real
-    N48, \field Condition 1 Number of Hours (>= 8AM & <= 4PM) with Dry-Bulb Temperature in [12.8, 20.6] C
+    N49, \field Condition 1 Number of Hours (>= 8AM & <= 4PM) with Dry-Bulb Temperature in [12.8, 20.6] C
         \note Number of hours between 8 AM and 4 PM (inclusive) with dry-bulb temperature between 12.8 and 20.6 C
         \type real
         \minimum 0
@@ -377,60 +381,60 @@ DESIGN CONDITIONS,
         \type choice
         \key Extremes
         \default Extremes
-    N49, \field Condition 1 1.0% Extreme Wind Speed
+    N50, \field Condition 1 1.0% Extreme Wind Speed
         \note Wind speed corresponding to 1.0% annual cumulative frequency of occurrence
         \units m/s
         \type real
         \minimum 0
-    N50, \field Condition 1 2.5% Extreme Wind Speed
+    N51, \field Condition 1 2.5% Extreme Wind Speed
         \note Wind speed corresponding to 2.5% annual cumulative frequency of occurrence
         \units m/s
         \type real
         \minimum 0
-    N51, \field Condition 1 5.0% Extreme Wind Speed
+    N52, \field Condition 1 5.0% Extreme Wind Speed
         \note Wind speed corresponding 5.0% annual cumulative frequency of occurrence
         \units m/s
         \type real
         \minimum 0
-    N52, \field Condition 1 Extreme Maximum Wet-Bulb Temperature
+    N53, \field Condition 1 Extreme Maximum Wet-Bulb Temperature
         \units C
         \type real
-    N53, \field Condition 1 Mean of Extreme Annual Minimum Dry-Bulb Temperature
+    N54, \field Condition 1 Mean of Extreme Annual Minimum Dry-Bulb Temperature
         \units C
         \type real
-    N54, \field Condition 1 Mean of Extreme Annual Maximum Dry-Bulb Temperature
+    N55, \field Condition 1 Mean of Extreme Annual Maximum Dry-Bulb Temperature
         \units C
         \type real
-    N55, \field Condition 1 Standard Deviation of Extreme Annual Minimum Dry-Bulb Temperature
-        \units C
-        \type real
-        \minimum 0
-    N56, \field Condition 1 Standard Deviation of Extreme Annual Maximum Dry-Bulb Temperature
+    N56, \field Condition 1 Standard Deviation of Extreme Annual Minimum Dry-Bulb Temperature
         \units C
         \type real
         \minimum 0
-    N57, \field Condition 1 5-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+    N57, \field Condition 1 Standard Deviation of Extreme Annual Maximum Dry-Bulb Temperature
         \units C
         \type real
-    N58, \field Condition 1 5-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+        \minimum 0
+    N58, \field Condition 1 5-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N59, \field Condition 1 10-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+    N59, \field Condition 1 5-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N60, \field Condition 1 10-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+    N60, \field Condition 1 10-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N61, \field Condition 1 20-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+    N61, \field Condition 1 10-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N62, \field Condition 1 20-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+    N62, \field Condition 1 20-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N63, \field Condition 1 50-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+    N63, \field Condition 1 20-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
         \units C
         \type real
-    N64; \field Condition 1 50-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+    N64, \field Condition 1 50-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N65; \field Condition 1 50-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
         \units C
         \type real
 

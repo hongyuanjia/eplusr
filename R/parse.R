@@ -16,7 +16,7 @@ NULL
 
 # IDD_SLASHKEY {{{
 # nocov start
-IDD_SLASHKEY <- list (
+IDD_SLASHKEY <- list(
     class = list(
         flat = c("unique-object", "required-object", "min-fields", "format",
             "extensible"),
@@ -885,7 +885,7 @@ parse_field_property_extensible_group <- function(dt, ref) {
     ext <- ext[, list(first_extensible = field_index[1L]), by = class_id]
 
     # handle the case when there is no extensible fields
-    if (!has_names(ref, "extensible") | !nrow(ext)) {
+    if (!has_names(ref, "extensible") || !nrow(ext)) {
         set(dt, NULL, "extensible_group", 0L)
         return(dt)
     }
