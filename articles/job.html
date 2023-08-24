@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.1.9003</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2023-08-22</h4>
+            <h4 data-toc-skip class="date">2023-08-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -180,9 +180,9 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
 <span><span class="co">#&gt; ExpandObjects Started.</span></span>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
-<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.026</span></span>
+<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.021</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2023.08.22 07:53</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2023.08.24 02:09</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -195,11 +195,11 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/Rtmpebf1ih/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/RtmpcEOZEt/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-22 07:53:48.176237' and completed successfully after 1.21 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-24 02:09:36.514209' and completed successfully after 0.79 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -208,11 +208,11 @@ status.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/Rtmpebf1ih/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/RtmpcEOZEt/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-22 07:53:48.176237' and completed successfully after 1.21 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-24 02:09:36.514209' and completed successfully after 0.79 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -227,14 +227,14 @@ the <code>EplusJob</code> object or using the
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpebf1ih/5Zone_Transformer.idf.</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpcEOZEt/5Zone_Transformer.idf.</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/Rtmpebf1ih/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/RtmpcEOZEt/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '/usr/local/EnergyPlus-23-1-0/WeatherData/USA_CA_San.Francisco.Intl…</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-22 07:53:50.125304' and is still running...</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2023-08-24 02:09:37.829695' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -261,7 +261,7 @@ the <code>EplusJob</code> object or using the
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt;   * EnergyPlus version: 23.1.0 (87ed9199d4)</span></span>
-<span><span class="co">#&gt;   * Simulation started: 2023-08-22 07:53:00</span></span>
+<span><span class="co">#&gt;   * Simulation started: 2023-08-24 02:09:00</span></span>
 <span><span class="co">#&gt;   * Terminated: FALSE</span></span>
 <span><span class="co">#&gt;   * Successful: TRUE</span></span>
 <span><span class="co">#&gt;   * Warning[W]: 1</span></span>
