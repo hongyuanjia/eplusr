@@ -197,7 +197,7 @@ Hongyuan Jia and Adrian Chong
 
 The project is released under the terms of MIT License.
 
-Copyright © 2016-2021 Hongyuan Jia and Adrian Chong
+Copyright © 2016-2023 Hongyuan Jia and Adrian Chong
 
 ------------------------------------------------------------------------
 
