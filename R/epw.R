@@ -210,7 +210,6 @@ Epw <- R6::R6Class(classname = "Epw",
             private$m_data <- epw_file$data
 
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$ver_specs <- private$m_idd$version_specs()
             private$m_log$matched <- epw_file$matched
             private$m_log$unit <- FALSE
             private$m_log$miss_na <- FALSE
@@ -1387,8 +1386,7 @@ epw_definition <- function(self, private, class) {
 # epw_location {{{
 epw_location <- function(self, private,
                          city, state_province, country, data_source,
-                         wmo_number, latitude, longitude, time_zone, elevation)
-{
+                         wmo_number, latitude, longitude, time_zone, elevation) {
     l <- list()
     if (!missing(city))           l$city           <- city
     if (!missing(state_province)) l$state_province <- state_province
@@ -1484,10 +1482,10 @@ epw_design_condition <- function(self, private) {
     )
     # }}}
 
-    if (private$m_log$ver_specs == "before_2021") {
+    if (private$m_idd$version_specs() == "before_2021") {
         # removing 'Weather and Shielding Factor (WSF)'
         nm <- nm[-20L]
-    } else if (private$m_log$ver_specs == "after_2021") {
+    } else if (private$m_idd$version_specs() == "after_2021") {
         # removing 'Condition 1 Extreme Maximum Wet-Bulb Temperature'
         nm <- nm[-59L]
     }
@@ -1613,7 +1611,8 @@ epw_holiday <- function(self, private, leapyear, dst, holiday) {
 
     idf_set(self, private, ..(EPW_CLASS$holiday) := l, .default = FALSE, .empty = TRUE)
 
-    withCallingHandlers(parse_epw_header_holiday(private$idd_env(), private$idf_env()),
+    withCallingHandlers(
+        parse_epw_header_holiday(private$idd_env(), private$idf_env()),
         eplusr_warning_epw_header_num_field = function(w) invokeRestart("muffleWarning"),
         eplusr_error_parse_epw_header = function(e) {
             # restore header value
@@ -1765,7 +1764,7 @@ epw_data <- function(self, private, period = 1L, start_year = NULL, align_wday =
 # epw_abnormal_data {{{
 epw_abnormal_data <- function(self, private, period = 1L, cols = NULL,
                               keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
-    get_epw_data_abnormal(provate$idd_env(), private$idf_env(), private$m_data,
+    get_epw_data_abnormal(private$idd_env(), private$idf_env(), private$m_data,
         private$m_log$matched, period, cols, keep_all, type)
 }
 # }}}
@@ -1875,8 +1874,7 @@ epw_purge <- function(self, private) {
     if (private$m_log$purged) {
         verbose_info("Redundant data has already been purged before. Skip...")
     } else {
-        purged <- purge_epw_data_redundant(private$idd_env(), private$idf_env(),
-            private$m_data, private$m_log$matched)
+        purged <- purge_epw_data_redundant(private$idf_env(), private$m_data, private$m_log$matched)
         if (nrow(purged$data) != nrow(private$m_data)) {
             private$log_unsaved()
             private$log_new_uuid()
@@ -1943,8 +1941,9 @@ epw_add <- function(self, private, data, realyear = FALSE, name = NULL,
 # epw_set {{{
 epw_set <- function(self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, period = 1L) {
-    lst <- set_epw_data(private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched,
-        data, realyear, name, start_day_of_week, period)
+    lst <- set_epw_data(private$idd_env(), private$idf_env(), private$m_data,
+        private$m_log$matched, data, realyear, name, start_day_of_week, period
+    )
 
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
 
@@ -1975,7 +1974,7 @@ epw_set <- function(self, private, data, realyear = FALSE, name = NULL,
 # }}}
 # epw_del {{{
 epw_del <- function(self, private, period) {
-    lst <- del_epw_data(private$m_data, private$idf_env(), private$m_log$matched, period)
+    lst <- del_epw_data(private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched, period)
 
     if (in_verbose()) p <- self$period()
 
@@ -2027,7 +2026,8 @@ epw_save <- function(self, private, path = NULL, overwrite = FALSE, purge = FALS
     # fill all NAs with missing code
     fill <- if (!private$m_log$miss_filled || !private$m_log$range_filled) TRUE else FALSE
 
-    p <- save_epw_file(private$m_data, private$idf_env(), private$m_log$matched,
+    p <- save_epw_file(
+        private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched,
         path, overwrite, fmt_digit = format_digit,
         fill = fill,
         missing = private$m_log$miss_filled,

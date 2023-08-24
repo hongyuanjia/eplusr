@@ -2103,7 +2103,7 @@ drop_epw_data_unit <- function(idd_env, epw_data) {
 }
 # }}}
 # purge_epw_data_redundant {{{
-purge_epw_data_redundant <- function(epw_data, epw_header, matched) {
+purge_epw_data_redundant <- function(epw_header, epw_data, matched) {
     add_rleid(epw_data)
     ln <- matched[, list(rleid = seq(row, length.out = num)), by = "index"]
 
@@ -2163,7 +2163,7 @@ set_epw_data <- function(idd_env, epw_header, epw_data, matched, data, realyear 
 del_epw_data <- function(idd_env, epw_header, epw_data, matched, period) {
     assert_count(period, positive = TRUE)
     dp <- parse_epw_header_period(idd_env, epw_header)
-    m <- match_epw_data_period(idd_env, matched, period)
+    m <- match_epw_data_period(matched, period)
 
     # check if this is the only data period.
     # If so, stop. Since it makes no sense to create an EPW without any data
@@ -2426,7 +2426,7 @@ merge_epw_new_data <- function(idd_env, epw_header, epw_data, matched, data, tar
         set(data, NULL, "datetime", stringi::stri_datetime_create(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime), lenient = TRUE))
     }
 
-    m <- match_epw_data(idd_env, data, header, target_period)
+    m <- match_epw_data(idd_env, header, data, target_period)
 
     # update datetime components
     set(data, NULL, c("year", "month", "day", "hour", "minute"),
@@ -2624,7 +2624,7 @@ format_epw_header <- function(idd_env, header) {
 # }}}
 # format_epw_data {{{
 format_epw_data <- function(idd_env, epw_header, epw_data, fmt_digit = FALSE, fill = FALSE, purge = FALSE, ...) {
-    if (purge) epw_data <- purge_epw_data_redundant(epw_data, epw_header, matched)
+    if (purge) epw_data <- purge_epw_data_redundant(epw_header, epw_data, matched)
 
     d <- epw_data[, -"datetime"]
 

@@ -288,10 +288,10 @@ test_that("parse_idd_file()", {
     expect_type(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
 
     # can get Idd version
-    expect_equal(idd_parsed$version, as.numeric_version("1.0.0"))
+    expect_equal(idd_parsed$version, as.numeric_version("2.0.0"))
 
     # can get Idd build
-    expect_equal(idd_parsed$build, "2020-07-20")
+    expect_equal(idd_parsed$build, "2023-07-04")
 
     # can parse group data
     expect_equal(idd_parsed$group$group_id, 1:2)
@@ -311,7 +311,7 @@ test_that("parse_idd_file()", {
     # can parse class property data
     expect_equal(idd_parsed$class$format, rep("standard", 9))
     expect_equal(idd_parsed$class$min_fields, c(9, 1, 1, 1, 4, 0, 0, 6, 35))
-    expect_equal(idd_parsed$class$num_fields, c(9, 69, 5, 17, 6, 1, 1, 6, 35))
+    expect_equal(idd_parsed$class$num_fields, c(9, 70, 5, 17, 6, 1, 1, 6, 35))
     expect_equal(idd_parsed$class$last_required, c(9, 1, 1, 1, 4, 0, 0, 6, 35))
     expect_equal(idd_parsed$class$has_name, rep(FALSE, 9))
     expect_equal(idd_parsed$class$required_object, c(rep(TRUE, 8), FALSE))
@@ -321,7 +321,7 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$class$num_extensible_group, c(0, 1, 1, 1, 1, 1, 1, 1, 0))
 
     # can parse field index data
-    expect_equal(idd_parsed$field$field_id, 1:149)
+    expect_equal(idd_parsed$field$field_id, 1:150)
 
     # can parse field property data
     expect_s3_class(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
