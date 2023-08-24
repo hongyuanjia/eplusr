@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* Support design condition specs from ASHRAE HOF 2021 (#571).
 * Use `NA_character_` instead of `NA` for `numeric_version()` (#572).
 
 ## New features
