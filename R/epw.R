@@ -10,10 +10,12 @@
 NULL
 
 # EpwIdd {{{
-EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = FALSE, lock_objects = FALSE,
+EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = TRUE, lock_objects = FALSE,
     inherit = Idd,
     public = list(
-        initialize = function(path, encoding = "unknown") {
+        initialize = function(path, encoding = "unknown", version = "before_2021") {
+            checkmate::assert_choice(version, c("before_2021", "after_2021"))
+
             # add a uuid
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$uuid <- unique_id()
@@ -21,17 +23,56 @@ EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = FALSE, lock_objects = FA
             idd_file <- parse_idd_file(path, epw = TRUE, encoding = encoding)
             private$m_version <- idd_file$version
             private$m_build <- idd_file$build
+            private$m_ver_specs <- version
 
             private$m_idd_env <- list2env(
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
 
+            # use the DESIGON CONDITIONS specs before ASHRAE HOF 2021 by default
+            private$m_idd_env <- private$transform(private$m_idd_env, version)
             # add current idd to .globals
-            .globals$epw <- self
+            .globals$epw[[version]] <- self
+
+            self
         },
 
-        print = function()
-            epwidd_print(self, private)
+        version_specs = function() {
+            private$m_ver_specs
+        },
+
+        print = function() epwidd_print(self, private)
+    ),
+
+    private = list(
+        # a field to store the DESIGN CONDITIONS specs version
+        m_ver_specs = NULL,
+
+        # transform the field table to match the DESIGN CONDITIONS specs before
+        # ASHRAE HOF 2021 and after
+        transform = function(idd_env, dc_ver = c("before_2021", "after_2021")) {
+            checkmate::assert_choice(dc_ver, c("before_2021", "after_2021"))
+
+            # this is design conditions from ASHRAE HOF 2021
+            if (dc_ver == "after_2021") {
+                # removing 'Condition 1 Extreme Maximum Wet-Bulb Temperature'
+                cls_id <- idd_env$class[J(EPW_CLASS$design), on = "class_name", class_id]
+                idd_env$field <- idd_env$field[!J(cls_id, "Condition 1 Extreme Maximum Wet-Bulb Temperature"),
+                    on = c("class_id", "field_name")]
+            # this is design conditions before ASHRAE HOF 2021
+            } else if (dc_ver == "before_2021") {
+                # removing 'Weather and Shielding Factor (WSF)'
+                cls_id <- idd_env$class[J(EPW_CLASS$design), on = "class_name", class_id]
+                idd_env$field <- idd_env$field[!J(cls_id, "Weather and Shielding Factor (WSF)"),
+                    on = c("class_id", "field_name")]
+            }
+
+            # regenerate field index and id
+            set(idd_env$field, NULL, "field_id", seq.int(nrow(idd_env$field)))
+            set(idd_env$field, NULL, "field_index", rowidv(idd_env$field, "class_id"))
+
+            idd_env
+        }
     )
 )
 # }}}
@@ -39,9 +80,10 @@ EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = FALSE, lock_objects = FA
 epwidd_print <- function(self, private) {
     cli::cat_rule("EnergyPlus Weather File Data Dictionary")
     cli::cat_line("* ", c(
-        paste0("Version", ": ", private$m_version),
-        paste0("Build", ": ", private$m_build),
-        paste0("Total Class", ": ", nrow(private$m_idd_env$class))
+        paste0("Version:",       private$m_version),
+        paste0("Build:",         private$m_build),
+        paste0("Specs Version:", private$m_ver_specs),
+        paste0("Total Class:",   nrow(private$m_idd_env$class))
     ))
 }
 # }}}
@@ -161,11 +203,10 @@ Epw <- R6::R6Class(classname = "Epw",
                 private$m_path <- normalizePath(path)
             }
 
-            private$m_idd <- get_epw_idd()
-
-            epw_file <- parse_epw_file(path, idd = private$m_idd, encoding = encoding)
+            epw_file <- parse_epw_file(path, encoding = encoding)
 
             private$m_idf_env <- list2env(epw_file$header, parent = emptyenv())
+            private$m_idd <- get_epw_idd(attr(epw_file$header, "version_specs"))
             private$m_data <- epw_file$data
 
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
@@ -1272,7 +1313,7 @@ Epw <- R6::R6Class(classname = "Epw",
         log_add_order = function(id) log_add_order(private$m_log, id),
         log_del_order = function(id) log_del_order(private$m_log, id),
 
-        idd_env = function() get_priv_env(private$m_idd)$m_idd_env,
+        idd_env = function() get_priv_env(private$m_idd)$idd_env(),
         idf_env = function() private$m_idf_env,
 
         update_idf_env = function(lst) {
@@ -1338,30 +1379,30 @@ epw_path <- function(self, private) {
 # }}}
 # epw_definition {{{
 epw_definition <- function(self, private, class) {
+    assert_valid_type(class, len = 1L)
     IddObject$new(class, private$m_idd)
 }
 # }}}
 # epw_location {{{
 epw_location <- function(self, private,
-                          city, state_province, country, data_source,
-                          wmo_number, latitude, longitude, time_zone, elevation)
-{
+                         city, state_province, country, data_source,
+                         wmo_number, latitude, longitude, time_zone, elevation) {
     l <- list()
-    if (!missing(city)) l$city <- city
+    if (!missing(city))           l$city           <- city
     if (!missing(state_province)) l$state_province <- state_province
-    if (!missing(country)) l$country <- country
-    if (!missing(data_source)) l$data_source <- data_source
-    if (!missing(wmo_number)) l$wmo_number <- wmo_number
-    if (!missing(latitude)) l$latitude <- latitude
-    if (!missing(longitude)) l$longitude <- longitude
-    if (!missing(time_zone)) l$time_zone <- time_zone
-    if (!missing(elevation)) l$elevation <- elevation
+    if (!missing(country))        l$country        <- country
+    if (!missing(data_source))    l$data_source    <- data_source
+    if (!missing(wmo_number))     l$wmo_number     <- wmo_number
+    if (!missing(latitude))       l$latitude       <- latitude
+    if (!missing(longitude))      l$longitude      <- longitude
+    if (!missing(time_zone))      l$time_zone      <- time_zone
+    if (!missing(elevation))      l$elevation      <- elevation
 
     if (length(l)) {
         idf_set(self, private, ..(EPW_CLASS$location) := l, .default = FALSE, .empty = TRUE)
     }
 
-    parse_epw_header_location(private$idf_env())
+    parse_epw_header_location(private$idd_env(), private$idf_env())
 }
 # }}}
 # epw_design_condition {{{
@@ -1387,92 +1428,104 @@ epw_design_condition <- function(self, private) {
         "coldest_month_mcdb_1.0",                          #[18] dbl
         "mcws_99.6_db",                                    #[19] dbl
         "pcwd_99.6_db",                                    #[20] dbl
-        "cooling",                                         #[21] chr
-        "hotest_month",                                    #[22] int
-        "hotest_month_db_range",                           #[23] dbl
-        "cooling_db_0.4",                                  #[24] dbl
-        "cooling_mcwb_0.4",                                #[25] dbl
-        "cooling_db_1.0",                                  #[26] dbl
-        "cooling_mcwb_1.0",                                #[27] dbl
-        "cooling_db_2.0",                                  #[28] dbl
-        "cooling_mcwb_2.0",                                #[29] dbl
-        "evaporation_wb_0.4",                              #[30] dbl
-        "evaporation_mcdb_0.4",                            #[31] dbl
-        "evaporation_wb_1.0",                              #[32] dbl
-        "evaporation_mcdb_1.0",                            #[33] dbl
-        "evaporation_wb_2.0",                              #[34] dbl
-        "evaporation_mcdb_2.0",                            #[35] dbl
-        "mcws_0.4_db",                                     #[36] dbl
-        "pcwd_0.4_db",                                     #[37] dbl
-        "dehumification_dp_0.4",                           #[38] dbl
-        "dehumification_hr_0.4",                           #[39] dbl
-        "dehumification_mcdb_0.4",                         #[40] dbl
-        "dehumification_dp_1.0",                           #[41] dbl
-        "dehumification_hr_1.0",                           #[42] dbl
-        "dehumification_mcdb_1.0",                         #[43] dbl
-        "dehumification_dp_2.0",                           #[44] dbl
-        "dehumification_hr_2.0",                           #[45] dbl
-        "dehumification_mcdb_2.0",                         #[46] dbl
-        "enthalpy_0.4",                                    #[47] dbl
-        "mcdb_0.4",                                        #[48] dbl
-        "enthalpy_1.0",                                    #[49] dbl
-        "mcdb_1.0",                                        #[50] dbl
-        "enthalpy_2.0",                                    #[51] dbl
-        "mcdb_2.0",                                        #[52] dbl
-        "hours_8_to_4_12.8_20.6",                          #[53] dbl
-        "extremes",                                        #[54] chr
-        "extreme_annual_ws_1.0",                           #[55] dbl
-        "extreme_annual_ws_2.5",                           #[56] dbl
-        "extreme_annual_ws_5.0",                           #[57] dbl
-        "extreme_max_wb",                                  #[58] dbl
-        "extreme_annual_db_mean_min",                      #[59] dbl
-        "extreme_annual_db_mean_max",                      #[60] dbl
-        "extreme_annual_db_sd_min",                        #[61] dbl
-        "extreme_annual_db_sd_max",                        #[62] dbl
-        "5_year_return_period_values_of_extreme_db_min",   #[63] dbl
-        "5_year_return_period_values_of_extreme_db_max",   #[64] dbl
-        "10_year_return_period_values_of_extreme_db_min",  #[65] dbl
-        "10_year_return_period_values_of_extreme_db_max",  #[66] dbl
-        "20_year_return_period_values_of_extreme_db_min",  #[67] dbl
-        "20_year_return_period_values_of_extreme_db_max",  #[68] dbl
-        "50_year_return_period_values_of_extreme_db_min",  #[69] dbl
-        "50_year_return_period_values_of_extreme_db_max"   #[70] dbl
+        "wsf",                                             #[21] dbl
+        "cooling",                                         #[22] chr
+        "hotest_month",                                    #[23] int
+        "hotest_month_db_range",                           #[24] dbl
+        "cooling_db_0.4",                                  #[25] dbl
+        "cooling_mcwb_0.4",                                #[26] dbl
+        "cooling_db_1.0",                                  #[27] dbl
+        "cooling_mcwb_1.0",                                #[28] dbl
+        "cooling_db_2.0",                                  #[29] dbl
+        "cooling_mcwb_2.0",                                #[30] dbl
+        "evaporation_wb_0.4",                              #[31] dbl
+        "evaporation_mcdb_0.4",                            #[32] dbl
+        "evaporation_wb_1.0",                              #[33] dbl
+        "evaporation_mcdb_1.0",                            #[34] dbl
+        "evaporation_wb_2.0",                              #[35] dbl
+        "evaporation_mcdb_2.0",                            #[36] dbl
+        "mcws_0.4_db",                                     #[37] dbl
+        "pcwd_0.4_db",                                     #[38] dbl
+        "dehumification_dp_0.4",                           #[39] dbl
+        "dehumification_hr_0.4",                           #[40] dbl
+        "dehumification_mcdb_0.4",                         #[41] dbl
+        "dehumification_dp_1.0",                           #[42] dbl
+        "dehumification_hr_1.0",                           #[43] dbl
+        "dehumification_mcdb_1.0",                         #[44] dbl
+        "dehumification_dp_2.0",                           #[45] dbl
+        "dehumification_hr_2.0",                           #[46] dbl
+        "dehumification_mcdb_2.0",                         #[47] dbl
+        "enthalpy_0.4",                                    #[48] dbl
+        "mcdb_0.4",                                        #[49] dbl
+        "enthalpy_1.0",                                    #[50] dbl
+        "mcdb_1.0",                                        #[51] dbl
+        "enthalpy_2.0",                                    #[52] dbl
+        "mcdb_2.0",                                        #[53] dbl
+        "hours_8_to_4_12.8_20.6",                          #[54] dbl
+        "extremes",                                        #[55] chr
+        "extreme_annual_ws_1.0",                           #[56] dbl
+        "extreme_annual_ws_2.5",                           #[57] dbl
+        "extreme_annual_ws_5.0",                           #[58] dbl
+        "extreme_max_wb",                                  #[59] dbl
+        "extreme_annual_db_mean_min",                      #[60] dbl
+        "extreme_annual_db_mean_max",                      #[61] dbl
+        "extreme_annual_db_sd_min",                        #[62] dbl
+        "extreme_annual_db_sd_max",                        #[63] dbl
+        "5_year_return_period_values_of_extreme_db_min",   #[64] dbl
+        "5_year_return_period_values_of_extreme_db_max",   #[65] dbl
+        "10_year_return_period_values_of_extreme_db_min",  #[66] dbl
+        "10_year_return_period_values_of_extreme_db_max",  #[67] dbl
+        "20_year_return_period_values_of_extreme_db_min",  #[68] dbl
+        "20_year_return_period_values_of_extreme_db_max",  #[69] dbl
+        "50_year_return_period_values_of_extreme_db_min",  #[70] dbl
+        "50_year_return_period_values_of_extreme_db_max"   #[71] dbl
     )
     # }}}
-    val <- parse_epw_header_design(private$idf_env(), strict = TRUE)$value
+
+    if (private$m_idd$version_specs() == "before_2021") {
+        # removing 'Weather and Shielding Factor (WSF)'
+        nm <- nm[-20L]
+    } else if (private$m_idd$version_specs() == "after_2021") {
+        # removing 'Condition 1 Extreme Maximum Wet-Bulb Temperature'
+        nm <- nm[-59L]
+    }
+
+    val <- parse_epw_header_design(private$idd_env(), private$idf_env(), strict = TRUE)$value
     setattr(val, "names", nm)
 
+    ind <- match(c("heating", "cooling", "extremes"), nm)
+
     list(source = val$source,
-        heating = val[5:19],
-        cooling = val[21:52],
-        extremes = val[53:69]
+        heating = val[seq(ind[1L] + 1L, ind[2L] - 1L)],
+        cooling = val[seq(ind[2L] + 1L, ind[3L] - 1L)],
+        extremes = val[seq(ind[3L] + 1L, length(val))]
     )
 }
 # }}}
 # epw_typical_extreme_period {{{
 epw_typical_extreme_period <- function(self, private) {
-    parse_epw_header_typical(private$idf_env(), strict = TRUE)
+    parse_epw_header_typical(private$idd_env(), private$idf_env(), strict = TRUE)
 }
 # }}}
 # epw_ground_temperature {{{
 epw_ground_temperature <- function(self, private) {
-    parse_epw_header_ground(private$idf_env(), strict = TRUE)
+    parse_epw_header_ground(private$idd_env(), private$idf_env(), strict = TRUE)
 }
 # }}}
 # epw_holiday {{{
 epw_holiday <- function(self, private, leapyear, dst, holiday) {
     if (missing(leapyear) && missing(dst) && missing(holiday)) {
-        return(parse_epw_header_holiday(private$idf_env()))
+        return(parse_epw_header_holiday(private$idd_env(), private$idf_env()))
     }
 
-    hol <- parse_epw_header_holiday(private$idf_env())
+    hol <- parse_epw_header_holiday(private$idd_env(), private$idf_env())
     l <- list()
 
     if (!missing(leapyear)) {
         assert_flag(leapyear)
         l$"..1" <- if (leapyear) "Yes" else "No"
 
-        period <- parse_epw_header_period(private$idf_env())
+        period <- parse_epw_header_period(private$idd_env(), private$idf_env())
 
         # note that parsed start and end day in data period can only be
         # either md or ymd type
@@ -1484,7 +1537,7 @@ epw_holiday <- function(self, private, leapyear, dst, holiday) {
         # Feb 29, e.g. [01/02, 02/28]
         # for ymd type, if that period covers multiple years, e.g.
         # [2007-01-01, 2009-01-01], there is a need to check 2008-02-28
-        if (hol$leapyear & !leapyear) {
+        if (hol$leapyear && !leapyear) {
             for (i in seq_along(s)) {
                 # in case ymd format that spans multiple years
                 feb29 <- lubridate::make_date(c(lubridate::year(s[i]) : lubridate::year(e[i])), 2, 29)
@@ -1505,7 +1558,7 @@ epw_holiday <- function(self, private, leapyear, dst, holiday) {
         # for md type, it is ok to change only if that period does not
         # across Feb, e.g. [01/02, 02/28], [03/01, 12/31]
         # for ymd type, it is always OK
-        } else if (!hol$leapyear & leapyear) {
+        } else if (!hol$leapyear && leapyear) {
             is_md <- is_epwdate_type(s, "md")
             if (any(is_md)) {
                 s_md <- s[is_md]
@@ -1558,7 +1611,8 @@ epw_holiday <- function(self, private, leapyear, dst, holiday) {
 
     idf_set(self, private, ..(EPW_CLASS$holiday) := l, .default = FALSE, .empty = TRUE)
 
-    withCallingHandlers(parse_epw_header_holiday(private$idf_env()),
+    withCallingHandlers(
+        parse_epw_header_holiday(private$idd_env(), private$idf_env()),
         eplusr_warning_epw_header_num_field = function(w) invokeRestart("muffleWarning"),
         eplusr_error_parse_epw_header = function(e) {
             # restore header value
@@ -1622,7 +1676,7 @@ epw_interval <- function(self, private) {
 # }}}
 # epw_period {{{
 epw_period <- function(self, private, period, name, start_day_of_week) {
-    p <- parse_epw_header_period(private$idf_env())
+    p <- parse_epw_header_period(private$idd_env(), private$idf_env())
 
     if (!missing(period)) {
         period <- assert_count(period, coerce = TRUE)
@@ -1653,7 +1707,8 @@ epw_period <- function(self, private, period, name, start_day_of_week) {
 
     idf_set(self, private, ..(EPW_CLASS$period) := l, .default = FALSE, .empty = TRUE)
 
-    withCallingHandlers(parse_epw_header_period(private$idf_env())$period[period],
+    withCallingHandlers(
+        parse_epw_header_period(private$idd_env(), private$idf_env())$period[period],
         eplusr_warning_epw_header_num_field = function(w) invokeRestart("muffleWarning"),
         eplusr_error_parse_epw_header = function(e) {
             # restore header value
@@ -1671,22 +1726,22 @@ epw_period <- function(self, private, period, name, start_day_of_week) {
 # }}}
 # epw_missing_code {{{
 epw_missing_code <- function(self, private) {
-    get_epw_data_missing_code()[]
+    get_epw_data_missing_code(private$idd_env())[]
 }
 # }}}
 # epw_initial_missing_value {{{
 epw_initial_missing_value <- function(self, private) {
-    get_epw_data_init_value()[]
+    get_epw_data_init_value(private$idd_env())[]
 }
 # }}}
 # epw_range_exist {{{
 epw_range_exist <- function(self, private) {
-    get_epw_data_range("exist")
+    get_epw_data_range(private$idd_env(), "exist")
 }
 # }}}
 # epw_range_valid {{{
 epw_range_valid <- function(self, private) {
-    get_epw_data_range("valid")
+    get_epw_data_range(private$idd_env(), "valid")
 }
 # }}}
 # epw_fill_action {{{
@@ -1696,9 +1751,9 @@ epw_fill_action <- function(self, private, type = c("missing", "out_of_range")) 
 # }}}
 # epw_data {{{
 epw_data <- function(self, private, period = 1L, start_year = NULL, align_wday = TRUE,
-                      tz = "UTC", update = FALSE, line = FALSE) {
-    d <- get_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
-        period, start_year, align_wday, tz, update)
+                     tz = "UTC", update = FALSE, line = FALSE) {
+    d <- get_epw_data(private$idd_env(), private$idf_env(), private$m_data,
+        private$m_log$matched, period, start_year, align_wday, tz, update)
 
     assert_flag(line)
 
@@ -1708,14 +1763,14 @@ epw_data <- function(self, private, period = 1L, start_year = NULL, align_wday =
 # }}}
 # epw_abnormal_data {{{
 epw_abnormal_data <- function(self, private, period = 1L, cols = NULL,
-                               keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
-    get_epw_data_abnormal(private$m_data, private$idf_env(), private$m_log$matched,
-        period, cols, keep_all, type)
+                              keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
+    get_epw_data_abnormal(private$idd_env(), private$idf_env(), private$m_data,
+        private$m_log$matched, period, cols, keep_all, type)
 }
 # }}}
 # epw_redundant_data {{{
 epw_redundant_data <- function(self, private) {
-    get_epw_data_redundant(private$m_data, private$idf_env(), private$m_log$matched)
+    get_epw_data_redundant(private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched)
 }
 # }}}
 # epw_make_na {{{
@@ -1740,8 +1795,8 @@ epw_make_na <- function(self, private, missing = FALSE, out_of_range = FALSE) {
             private$m_log$range_filled <- FALSE
         }
     }
-    private$m_data <- make_epw_data_na(private$m_data, private$idf_env(), private$m_log$matched,
-        period = NULL, missing = missing, out_of_range = out_of_range
+    private$m_data <- make_epw_data_na(private$idd_env(), private$idf_env(), private$m_data,
+        private$m_log$matched, period = NULL, missing = missing, out_of_range = out_of_range
     )
     invisible(self)
 }
@@ -1779,7 +1834,8 @@ epw_fill_abnormal <- function(self, private, missing = FALSE, out_of_range = FAL
         }
     }
 
-    private$m_data <- fill_epw_data_abnormal(private$m_data, private$idf_env(),
+    private$m_data <- fill_epw_data_abnormal(
+        private$idd_env(), private$idf_env(), private$m_data,
         private$m_log$matched, NULL, NULL, missing, out_of_range, special,
         private$m_log$miss_na, private$m_log$range_na
     )
@@ -1796,7 +1852,7 @@ epw_add_unit <- function(self, private) {
     if (private$m_log$unit) {
         verbose_info("Units have been already added before. Skip...")
     } else {
-        private$m_data <- add_epw_data_unit(private$m_data)
+        private$m_data <- add_epw_data_unit(private$idd_env(), private$m_data)
         private$m_log$unit <- TRUE
     }
     invisible(self)
@@ -1807,7 +1863,7 @@ epw_drop_unit <- function(self, private) {
     if (!private$m_log$unit) {
         verbose_info("Units have been already dropped before. Skip...")
     } else {
-        private$m_data <- drop_epw_data_unit(private$m_data)
+        private$m_data <- drop_epw_data_unit(private$idd_env(), private$m_data)
         private$m_log$unit <- FALSE
     }
     invisible(self)
@@ -1818,7 +1874,7 @@ epw_purge <- function(self, private) {
     if (private$m_log$purged) {
         verbose_info("Redundant data has already been purged before. Skip...")
     } else {
-        purged <- purge_epw_data_redundant(private$m_data, private$idf_env(), private$m_log$matched)
+        purged <- purge_epw_data_redundant(private$idf_env(), private$m_data, private$m_log$matched)
         if (nrow(purged$data) != nrow(private$m_data)) {
             private$log_unsaved()
             private$log_new_uuid()
@@ -1831,11 +1887,12 @@ epw_purge <- function(self, private) {
 # }}}
 # epw_align_data_status {{{
 epw_align_data_status <- function(self, private, data, period = NULL) {
-    data <- make_epw_data_na(data, private$idf_env(), private$m_log$matched,
+    data <- make_epw_data_na(private$idd_env(), private$idf_env(), data, private$m_log$matched,
         period, missing = private$m_log$miss_na, out_of_range = private$m_log$range_na
     )
 
-    data <- fill_epw_data_abnormal(data, private$idf_env(),
+    data <- fill_epw_data_abnormal(
+        private$idd_env(), private$idf_env(), data,
         private$m_log$matched, period, NULL,
         private$m_log$miss_filled,
         private$m_log$range_filled,
@@ -1843,7 +1900,7 @@ epw_align_data_status <- function(self, private, data, period = NULL) {
         private$m_log$miss_na, private$m_log$range_na
     )
 
-    if (private$m_log$unit) data <- add_epw_data_unit(data)
+    if (private$m_log$unit) data <- add_epw_data_unit(private$idd_env(), data)
 
     data
 }
@@ -1851,7 +1908,7 @@ epw_align_data_status <- function(self, private, data, period = NULL) {
 # epw_add {{{
 epw_add <- function(self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, after = 0L) {
-    lst <- add_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
+    lst <- add_epw_data(private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched,
         data, realyear, name, start_day_of_week, after)
 
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
@@ -1884,8 +1941,9 @@ epw_add <- function(self, private, data, realyear = FALSE, name = NULL,
 # epw_set {{{
 epw_set <- function(self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, period = 1L) {
-    lst <- set_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
-        data, realyear, name, start_day_of_week, period)
+    lst <- set_epw_data(private$idd_env(), private$idf_env(), private$m_data,
+        private$m_log$matched, data, realyear, name, start_day_of_week, period
+    )
 
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
 
@@ -1916,7 +1974,7 @@ epw_set <- function(self, private, data, realyear = FALSE, name = NULL,
 # }}}
 # epw_del {{{
 epw_del <- function(self, private, period) {
-    lst <- del_epw_data(private$m_data, private$idf_env(), private$m_log$matched, period)
+    lst <- del_epw_data(private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched, period)
 
     if (in_verbose()) p <- self$period()
 
@@ -1968,7 +2026,8 @@ epw_save <- function(self, private, path = NULL, overwrite = FALSE, purge = FALS
     # fill all NAs with missing code
     fill <- if (!private$m_log$miss_filled || !private$m_log$range_filled) TRUE else FALSE
 
-    p <- save_epw_file(private$m_data, private$idf_env(), private$m_log$matched,
+    p <- save_epw_file(
+        private$idd_env(), private$idf_env(), private$m_data, private$m_log$matched,
         path, overwrite, fmt_digit = format_digit,
         fill = fill,
         missing = private$m_log$miss_filled,
@@ -1988,13 +2047,13 @@ epw_save <- function(self, private, path = NULL, overwrite = FALSE, purge = FALS
 epw_print <- function(self, private) {
     cli::cat_rule("EnergyPlus Weather File", line = 2)
 
-    cli::cat_line(format_epw_meta(private$idf_env()))
+    cli::cat_line(format_epw_meta(private$idd_env(), private$idf_env()))
 
     cli::cat_line()
 
     cli::cat_rule("Data Periods")
 
-    period <- parse_epw_header_period(private$idf_env())
+    period <- parse_epw_header_period(private$idd_env(), private$idf_env())
     print(period$period[,
        list(Name = name,
         `StartDayOfWeek` = get_epw_wday(start_day_of_week, label = TRUE),

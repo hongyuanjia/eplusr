@@ -1,15 +1,16 @@
 # Epw Header {{{
 test_that("Epw Header", {
     # IDD
-    expect_s3_class(idd <- get_epw_idd(), "Idd")
+    expect_s3_class(idd <- get_epw_idd("before_2021"), "Idd")
+    idd_env <- get_priv_env(idd)$idd_env()
 
     # PARSE {{{
-    expect_error(parse_epw_header("Wrong\n"), class = "eplusr_error_parse_epw_header_name")
-    expect_error(parse_epw_header("LOCATION,;;\n"), class = "eplusr_error_parse_epw_header_line")
-    expect_error(parse_epw_header(paste0("LOCATION", strrep(",", 11), "\n")), class = "eplusr_error_parse_epw_header_field")
+    expect_error(parse_epw_header(idd_env, "Wrong\n"), class = "eplusr_error_parse_epw_header_name")
+    expect_error(parse_epw_header(idd_env, "LOCATION,;;\n"), class = "eplusr_error_parse_epw_header_line")
+    expect_error(parse_epw_header(idd_env, paste0("LOCATION", strrep(",", 11), "\n")), class = "eplusr_error_parse_epw_header_field")
 
     # can stop if missing header
-    expect_s3_class(err <- catch_cnd(parse_epw_header("LOCATION\n")), "eplusr_error_validity_check")
+    expect_s3_class(err <- catch_cnd(parse_epw_header(idd_env, "LOCATION\n")), "eplusr_error_validity_check")
     expect_equal(err$data$missing_object, c(
         "DESIGN CONDITIONS",
         "TYPICAL/EXTREME PERIODS",
@@ -21,13 +22,13 @@ test_that("Epw Header", {
     ))
 
     # can stop if invalid type
-    expect_s3_class(err <- catch_cnd(parse_epw_header("DESIGN CONDITIONS,a\n")), "eplusr_error_validity_check")
+    expect_s3_class(err <- catch_cnd(parse_epw_header(idd_env, "DESIGN CONDITIONS,a\n")), "eplusr_error_validity_check")
     expect_equal(err$data$invalid_numeric$class_name, "DESIGN CONDITIONS")
     expect_equal(err$data$invalid_numeric$field_index, 1L)
 
     # can fill "0" for empty headers
     expect_type(type = "list",
-        h <- parse_epw_header(
+        h <- parse_epw_header(idd_env,
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -43,8 +44,6 @@ test_that("Epw Header", {
     expect_equal(h$value[object_id %in% c(2, 3, 4), value_num], rep(0, 3))
     expect_equal(h$value[object_id %in% c(6, 7), value_chr], rep(NA_character_, 2))
 
-    get_idf_value(get_epw_idd_env(), h, EPW_CLASS[[paste0("comment", 1)]])
-
     # can fix mismatched extensible group and value of number field
     suppressWarnings(expect_warning(
         {
@@ -56,7 +55,7 @@ test_that("Epw Header", {
                 paste("DESIGN CONDITIONS", n, "src", "", grp, sep = ",", collapse = ",")
             }
 
-            h <- parse_epw_header(paste0(
+            h <- parse_epw_header(idd_env, paste0(
                 "
                 LOCATION,city,state,country,type,wmo,1,2,3,4
                 ", DC(0, 1), "
@@ -79,7 +78,7 @@ test_that("Epw Header", {
 
     # can stop if invalid EpwDate
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -94,7 +93,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -109,7 +108,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -124,7 +123,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -139,7 +138,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -154,7 +153,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -169,7 +168,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -184,7 +183,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -199,7 +198,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     expect_warning(
-        h <- parse_epw_header(paste0(
+        h <- parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -214,7 +213,7 @@ test_that("Epw Header", {
     )
     expect_equal(h$value[object_id == 8L, value_chr][6], "2016/12/31")
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -229,7 +228,7 @@ test_that("Epw Header", {
         class = "eplusr_error_parse_epw"
     )
     suppressWarnings(expect_warning(
-        h <- parse_epw_header(paste0(
+        h <- parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -245,7 +244,7 @@ test_that("Epw Header", {
     ))
     expect_equal(h$value[object_id == 8L, value_chr][6], " 3/21")
     expect_warning(
-        h <- parse_epw_header(paste0(
+        h <- parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -259,7 +258,7 @@ test_that("Epw Header", {
         ))
     )
     expect_error(
-        h <- parse_epw_header(paste0(
+        h <- parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -275,7 +274,7 @@ test_that("Epw Header", {
     )
 
     expect_error(
-        suppressWarnings(h <- parse_epw_header(paste0(
+        suppressWarnings(h <- parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -291,7 +290,7 @@ test_that("Epw Header", {
     )
 
     expect_error(
-        parse_epw_header(paste0(
+        parse_epw_header(idd_env, paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -310,7 +309,7 @@ test_that("Epw Header", {
     # VALUE {{{
     idd <- get_epw_idd()
     idd_env <- get_priv_env(idd)$idd_env()
-    idf_env <- parse_epw_header(
+    idf_env <- parse_epw_header(idd_env,
         "
         LOCATION,city,state,country,type,wmo,1,2,3,4
         DESIGN CONDITIONS
@@ -327,7 +326,7 @@ test_that("Epw Header", {
     # FORMAT {{{
     idd_env <- get_priv_env(idd)$idd_env()
     expect_type(type = "list",
-        h <- parse_epw_header(
+        h <- parse_epw_header(idd_env,
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -341,7 +340,7 @@ test_that("Epw Header", {
         )
     )
 
-    expect_equal(format_epw_header(h),
+    expect_equal(format_epw_header(idd_env, h),
         c("LOCATION,city,state,country,type,wmo,1.00,2.00,3.0,4.0",
           "DESIGN CONDITIONS,0",
           "TYPICAL/EXTREME PERIODS,0",
@@ -353,7 +352,7 @@ test_that("Epw Header", {
         )
     )
 
-    expect_equal(format_epw_meta(h),
+    expect_equal(format_epw_meta(idd_env, h),
         c("[Location ]: city, state, country",
           "             {N 1\u00B00'}, {E 2\u00B00'}, {UTC+03:00}",
           "[Elevation]: 4m above see level",
@@ -371,7 +370,7 @@ test_that("Epw Header", {
 test_that("Epw Data", {
     idd <- get_epw_idd()
     idd_env <- get_priv_env(idd)$idd_env()
-    idf_env <- parse_epw_header(
+    idf_env <- parse_epw_header(idd_env,
         "
         LOCATION,city,state,country,type,wmo,1,2,3,4
         DESIGN CONDITIONS
@@ -384,17 +383,17 @@ test_that("Epw Data", {
         "
     )
 
-    expect_error(parse_epw_data("\n\n\n\n\n\n\n\n,,,"), class = "eplusr_error_parse_epw_data_column")
+    expect_error(parse_epw_data(idd_env, "\n\n\n\n\n\n\n\n,,,"), class = "eplusr_error_parse_epw_data_column")
 
     hd <- "1\n2\n3\n4\n5\n6\n7\n8"
     dh <- paste0(rep("a", 35), collapse = ",")
     rw <- init_idf_value(idd_env, idf_env, "WEATHER DATA", property = "type")
 
     val <- paste0(copy(rw)[type == "integer", value_chr := "a"]$value_chr, collapse = ",")
-    expect_error(parse_epw_data(paste(hd, dh, val, sep = "\n")), class = "eplusr_error_parse_epw_data_type")
+    expect_error(parse_epw_data(idd_env, paste(hd, dh, val, sep = "\n")), class = "eplusr_error_parse_epw_data_type")
 
     val <- paste0(copy(rw)[type == "real", value_chr := "a"]$value_chr, collapse = ",")
-    expect_error(parse_epw_data(paste(hd, dh, val, sep = "\n")), class = "eplusr_error_parse_epw_data_type")
+    expect_error(parse_epw_data(idd_env, paste(hd, dh, val, sep = "\n")), class = "eplusr_error_parse_epw_data_type")
 
     skip_on_cran()
 

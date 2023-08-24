@@ -17,17 +17,17 @@
 
 # HELPER
 # combine_date {{{
-combine_date <- function (year = NULL, month, day, hour, minute = NULL) {
+combine_date <- function(year = NULL, month, day, hour, minute = NULL) {
     y <- if (!is.null(year)) paste0(year, "/") else ""
     m <- if (!is.null(minute)) minite else "XX"
     paste0(y, month, "/", day, " ", lpad(hour, "0", 2L), ":", m)
 }
 # }}}
 # std_atm_press {{{
-std_atm_press <- function (elevation) 101325 * (1 - 2.25577e-05 * elevation)^5.2559
+std_atm_press <- function(elevation) 101325 * (1 - 2.25577e-05 * elevation)^5.2559
 # }}}
 # as_date {{{
-as_date <- function (x, ...) {
+as_date <- function(x, ...) {
     as.Date(lubridate::as_date(x, ...))
 }
 # }}}
@@ -126,17 +126,15 @@ EPWDATE_YEAR <- list(
 
 # IDD
 # get_epw_idd {{{
-get_epw_idd <- function () {
-    if (!length(.globals$epw)) {
-        .globals$epw <- EpwIdd$new(system.file("extdata/epw.idd", package = "eplusr"))
+get_epw_idd <- function(version = "before_2021") {
+    if (!length(.globals$epw) || !length(.globals$epw[[version]])) {
+        EpwIdd$new(
+            system.file("extdata/epw.idd", package = "eplusr"),
+            version = version
+        )
     }
 
-    .globals$epw
-}
-# }}}
-# get_epw_idd_env {{{
-get_epw_idd_env <- function () {
-    get_priv_env(get_epw_idd())$idd_env()
+    .globals$epw[[version]]
 }
 # }}}
 
@@ -175,12 +173,17 @@ get_epw_idd_env <- function () {
 #    01:00:00, Hour of 2 corresponds to the period between 01:00:01 to 02:00:00,
 #    and etc. The minute column is **not used** to determine currently sub-hour
 #    time.
-parse_epw_file <- function (path, idd = NULL, encoding = "unknown") {
+parse_epw_file <- function(path, encoding = "unknown") {
+    # get the correct EPW specs
+    idd <- get_epw_idd(get_epw_ver_specs(path))
+    idd_env <- get_priv_env(idd)$idd_env()
+
     # read and parse header
-    epw_header <- parse_epw_header(path, encoding = encoding)
+    epw_header <- parse_epw_header(idd_env, path, encoding = encoding)
+    attr(epw_header, "version_specs") <- idd$version_specs()
 
     # read core weather data
-    epw_data <- parse_epw_data(path, encoding = encoding)
+    epw_data <- parse_epw_data(idd_env, path, encoding = encoding)
 
     # add line indicator
     set(epw_data, NULL, "line", seq_len(nrow(epw_data)))
@@ -189,7 +192,7 @@ parse_epw_file <- function (path, idd = NULL, encoding = "unknown") {
     epw_data[, datetime := stringi::stri_datetime_create(year, month, day, hour, tz = "UTC", lenient = TRUE)]
 
     # match date time
-    matched <- match_epw_data(epw_data, epw_header)
+    matched <- match_epw_data(idd_env, epw_header, epw_data)
 
     # clean and set column order
     set(epw_data, NULL, "line", NULL)
@@ -199,10 +202,38 @@ parse_epw_file <- function (path, idd = NULL, encoding = "unknown") {
 }
 # }}}
 ## HEADER
-# parse_epw_header {{{
-parse_epw_header <- function (path, strict = FALSE, encoding = "unknown") {
-    idd_env <- get_epw_idd_env()
+# get_epw_ver_specs {{{
+# guess the version of DESIGN CONDITIONS specs
+get_epw_ver_specs <- function(path, encoding = "unknown") {
+    dt_in <- read_lines(path, nrows = 8L, encoding = encoding)
 
+    # in case header does not any fields, e.g. "LOCATION\n"
+    dt_in[!stri_detect_fixed(string, ","), string := paste0(string, ",")]
+
+    str <- stri_split_fixed(dt_in$string, ",")
+    cls <- stri_trans_toupper(vapply(str, .subset2, "", 1L))
+    ind <- match(EPW_CLASS$design, cls)
+    val <- stri_trans_toupper(str[[ind]][-1L])
+
+    # in case of invalid EPW file, use the original one by default
+    if (is.na(ind) || length(val) < 20L) return("before_2021")
+
+    # Handle design conditions in ASHRAE HOF 2021, which adds a new field named
+    # 'Wind shelter factor' in heating conditions and removes an existing field
+    # named 'Condition 1 Extreme Maximum Wet-Bulb Temperature'.
+    # Newer EPW files from climate.building.org use those design conditions.
+    # See #571
+    # this is design conditions from ASHRAE HOF 2021
+    if (stri_trim_both(val[[20L]]) != "COOLING") {
+        "after_2021"
+        # this is design conditions before ASHRAE HOF 2021
+    } else {
+        "before_2021"
+    }
+}
+# }}}
+# parse_epw_header {{{
+parse_epw_header <- function(idd_env, path, strict = FALSE, encoding = "unknown") {
     dt_in <- read_lines(path, nrows = 8L, encoding = encoding)
 
     # in case header does not any fields, e.g. "LOCATION\n"
@@ -222,7 +253,7 @@ parse_epw_header <- function (path, strict = FALSE, encoding = "unknown") {
 
     # object table
     dt <- tryCatch(sep_object_table(dt_in, type_enum, idd_env),
-        eplusr_error_parse_idf_class = function (e) {
+        eplusr_error_parse_idf_class = function(e) {
             parse_error("epw", "Invalid header name", e$data, subtype = "header_name")
         }
     )
@@ -250,7 +281,7 @@ parse_epw_header <- function (path, strict = FALSE, encoding = "unknown") {
     # now it is save to set escape to TRUE since only comments can have multiple
     # semicolons
     dt_value <- tryCatch(get_value_table(dt, idd_env, escape = TRUE),
-        eplusr_error_parse_idf_field = function (e) {
+        eplusr_error_parse_idf_field = function(e) {
             d <- e$data[, list(field_index = max(field_index)), by = c("line", "string", "class_id")]
             add_rleid(d)
             add_class_property(idd_env, d, c("class_name", "min_fields", "num_fields"))
@@ -303,14 +334,16 @@ parse_epw_header <- function (path, strict = FALSE, encoding = "unknown") {
         }
     }
 
-    validate_epw_header(header, strict = strict)
+    validate_epw_header(idd_env, header, strict = strict)
     header
 }
 # }}}
 # parse_epw_header_location {{{
-parse_epw_header_location <- function (header, strict = FALSE, transform = TRUE) {
+parse_epw_header_location <- function(idd_env, header, strict = FALSE, transform = TRUE) {
     if (!transform) return(header)
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$location, property = c("type_enum", "field_name_us"))
+    val <- get_idf_value(idd_env, header, EPW_CLASS$location,
+        property = c("type_enum", "field_name_us")
+    )
     nm <- val$field_name_us
     val <- get_value_list(val)
     setattr(val, "names", nm)
@@ -318,23 +351,23 @@ parse_epw_header_location <- function (header, strict = FALSE, transform = TRUE)
 }
 # }}}
 # parse_epw_header_design {{{
-parse_epw_header_design <- function (header, strict = FALSE, transform = TRUE) {
-    obj <- get_idf_object(get_epw_idd_env(), header, EPW_CLASS$design, property = "num_extensible_group")
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$design, property = c("extensible_group", "type_enum"))
+parse_epw_header_design <- function(idd_env, header, strict = FALSE, transform = TRUE) {
+    obj <- get_idf_object(idd_env, header, EPW_CLASS$design, property = "num_extensible_group")
+    val <- get_idf_value(idd_env, header, EPW_CLASS$design, property = c("extensible_group", "type_enum"))
 
     update_epw_header_num_field(header, obj, val, strict = strict)
 
     if (!transform) return(header)
 
     if (nrow(val) == 1L) return(list())
-    get_idf_table(get_epw_idd_env(), header, EPW_CLASS$design, string_value = FALSE)[
+    get_idf_table(idd_env, header, EPW_CLASS$design, string_value = FALSE)[
         , list(index, field, value)]
 }
 # }}}
 # parse_epw_header_typical {{{
-parse_epw_header_typical <- function (header, strict = FALSE, transform = TRUE) {
-    obj <- get_idf_object(get_epw_idd_env(), header, EPW_CLASS$typical, property = "num_extensible_group")
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$typical, property = "extensible_group")
+parse_epw_header_typical <- function(idd_env, header, strict = FALSE, transform = TRUE) {
+    obj <- get_idf_object(idd_env, header, EPW_CLASS$typical, property = "num_extensible_group")
+    val <- get_idf_value(idd_env,  header, EPW_CLASS$typical, property = "extensible_group")
 
     update_epw_header_num_field(header, obj, val, strict = strict)
 
@@ -370,9 +403,9 @@ parse_epw_header_typical <- function (header, strict = FALSE, transform = TRUE) 
 }
 # }}}
 # parse_epw_header_ground {{{
-parse_epw_header_ground <- function (header, strict = FALSE, transform = TRUE) {
-    obj <- get_idf_object(get_epw_idd_env(), header, EPW_CLASS$ground, property = "num_extensible_group")
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$ground, property = "extensible_group")
+parse_epw_header_ground <- function(idd_env, header, strict = FALSE, transform = TRUE) {
+    obj <- get_idf_object(idd_env, header, EPW_CLASS$ground, property = "num_extensible_group")
+    val <- get_idf_value(idd_env,  header, EPW_CLASS$ground, property = "extensible_group")
 
     update_epw_header_num_field(header, obj, val, strict = strict)
 
@@ -380,7 +413,7 @@ parse_epw_header_ground <- function (header, strict = FALSE, transform = TRUE) {
 
     if (nrow(val) == 1L) return(data.table())
 
-    val <- get_idf_table(get_epw_idd_env(), header, EPW_CLASS$ground, group_ext = "index", wide = TRUE)
+    val <- get_idf_table(idd_env, header, EPW_CLASS$ground, group_ext = "index", wide = TRUE)
     set(val, NULL, 2:4, NULL)
     setnames(val, c("index", "depth", "soil_conductivity", "soil_density",
             "soil_specific_heat", MONTH))
@@ -390,9 +423,9 @@ parse_epw_header_ground <- function (header, strict = FALSE, transform = TRUE) {
 }
 # }}}
 # parse_epw_header_holiday {{{
-parse_epw_header_holiday <- function (header, strict = FALSE, transform = TRUE) {
-    obj <- get_idf_object(get_epw_idd_env(), header, EPW_CLASS$holiday, property = "num_extensible_group")
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$holiday, property = "extensible_group")
+parse_epw_header_holiday <- function(idd_env, header, strict = FALSE, transform = TRUE) {
+    obj <- get_idf_object(idd_env, header, EPW_CLASS$holiday, property = "num_extensible_group")
+    val <- get_idf_value(idd_env,  header, EPW_CLASS$holiday, property = "extensible_group")
 
     update_epw_header_num_field(header, obj, val, 4L, strict = strict)
 
@@ -402,8 +435,7 @@ parse_epw_header_holiday <- function (header, strict = FALSE, transform = TRUE) 
     # if dst start date and end date should have same existence status
     if (any((dst["start_day"] != "0" && dst["end_day"] == "0") ||
             (dst["start_day"] == "0" && dst["end_day"] != "0"))
-    )
-    {
+    ) {
         parse_error("epw", paste("Invalid", obj$class_name[[1L]], "header"), num = 1,
             post = sprintf("Invalid Daylight Saving Start/End Day pair found: ('%s', '%s'). %s",
                 dst["start_day"], dst["end_day"], "Should both be '0' or neither be '0'."
@@ -453,16 +485,18 @@ parse_epw_header_holiday <- function (header, strict = FALSE, transform = TRUE) 
 }
 # }}}
 # parse_epw_header_period {{{
-parse_epw_header_period <- function (header, strict = FALSE, transform = TRUE) {
-    obj <- get_idf_object(get_epw_idd_env(), header, EPW_CLASS$period, property = "num_extensible_group")
-    val <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$period, property = "extensible_group")
+parse_epw_header_period <- function(idd_env, header, strict = FALSE, transform = TRUE) {
+    obj <- get_idf_object(idd_env, header, EPW_CLASS$period, property = "num_extensible_group")
+    val <- get_idf_value(idd_env,  header, EPW_CLASS$period, property = "extensible_group")
 
     update_epw_header_num_field(header, obj, val, strict = strict)
 
     interval <- val$value_num[[2L]]
     # check interval {{{
-    if (60L %% interval != 0L){
-        issue_epw_header_parse_error_single(obj, val[2L], 1L, " does not result in integral number of minutes between records.")
+    if (60L %% interval != 0L) {
+        issue_epw_header_parse_error_single(obj, val[2L], 1L,
+            " does not result in integral number of minutes between records."
+        )
     }
     # }}}
 
@@ -493,10 +527,10 @@ parse_epw_header_period <- function (header, strict = FALSE, transform = TRUE) {
     }
 
     # update year value according to leapyear element in HOLIDAYS header
-    hol <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$holiday, field = "LeapYear Observed")
+    hol <- get_idf_value(idd_env, header, EPW_CLASS$holiday, field = "LeapYear Observed")
     # in case holiday header is broken
     if (is.na(hol$value_chr)) issue_epw_header_parse_error_single(
-        get_idf_object(get_epw_idd_env(), header, EPW_CLASS$holiday), hol
+        get_idf_object(idd_env, header, EPW_CLASS$holiday), hol
     )
     ly <- if (tolower(hol$value_chr) == "yes") TRUE else FALSE
 
@@ -576,8 +610,7 @@ parse_epw_header_period <- function (header, strict = FALSE, transform = TRUE) {
     if (!ly &&
         any(ld <- format(as.Date.EpwDate(start_day), "%m-%d") == "02-29" |
                   format(as.Date.EpwDate(end_day), "%m-%d") == "02-29")
-    )
-    {
+    ) {
         i <- which(ld)
         invld <- val[J(i), on = "extensible_group"]
         parse_error("epw", paste("Invalid", obj$class_name[[1L]], "header"), num = sum(i),
@@ -642,38 +675,38 @@ parse_epw_header_period <- function (header, strict = FALSE, transform = TRUE) {
 }
 # }}}
 # validate_epw_header {{{
-validate_epw_header <- function (header, strict = FALSE) {
-    # validation against IDD
-    valid <- validate_epw_header_basic(header)
+validate_epw_header <- function(idd_env, header, strict = FALSE) {
+    # validation against IDD_env
+    valid <- validate_epw_header_basic(idd_env, header)
     assert_valid(valid, epw = TRUE)
 
-    parse_epw_header_design(header, strict = strict, transform = FALSE)
-    parse_epw_header_typical(header, strict = strict, transform = FALSE)
-    parse_epw_header_ground(header, strict = strict, transform = FALSE)
-    parse_epw_header_holiday(header, strict = strict, transform = FALSE)
-    parse_epw_header_period(header, strict = strict, transform = FALSE)
+    parse_epw_header_design(idd_env,  header, strict = strict, transform = FALSE)
+    parse_epw_header_typical(idd_env, header, strict = strict, transform = FALSE)
+    parse_epw_header_ground(idd_env,  header, strict = strict, transform = FALSE)
+    parse_epw_header_holiday(idd_env, header, strict = strict, transform = FALSE)
+    parse_epw_header_period(idd_env,  header, strict = strict, transform = FALSE)
 
     header
 }
 # }}}
 # validate_epw_header_basic {{{
-validate_epw_header_basic <- function (header, class = NULL, field = NULL) {
+validate_epw_header_basic <- function(idd_env, header, class = NULL, field = NULL) {
     chk <- level_checks()
     chk$auto_field <- FALSE
     chk$reference <- FALSE
 
     if (is.null(class)) {
-        valid <- validate_on_level(get_epw_idd_env(), header, level = chk)
+        valid <- validate_on_level(idd_env, header, level = chk)
     } else {
-        dt_object <- get_idf_object(get_epw_idd_env(), header, class)
-        dt_value <- get_idf_value(get_epw_idd_env(), header, class, field = field)
-        valid <- validate_on_level(get_epw_idd_env(), header, dt_object, dt_value, level = chk)
+        dt_object <- get_idf_object(idd_env, header, class)
+        dt_value <- get_idf_value(idd_env, header, class, field = field)
+        valid <- validate_on_level(idd_env, header, dt_object, dt_value, level = chk)
     }
 
     # exclude incomplete extensible group for soil properties fields in 'GROUND
     # TEMPERATURES'
     if (nrow(valid$incomplete_extensible) && EPW_CLASS$ground %chin% valid$incomplete_extensible$class_name) {
-        add_field_property(get_epw_idd_env(), valid$incomplete_extensible, "extensible_group")
+        add_field_property(idd_env, valid$incomplete_extensible, "extensible_group")
         valid$incomplete_extensible[extensible_group > 0,
             extensible_field_index := seq_len(.N), by = c("object_id", "extensible_group")]
 
@@ -695,7 +728,7 @@ validate_epw_header_basic <- function (header, class = NULL, field = NULL) {
 }
 # }}}
 # update_epw_header_num_field {{{
-update_epw_header_num_field <- function (header, dt_object, dt_value, i = 1L, strict = FALSE) {
+update_epw_header_num_field <- function(header, dt_object, dt_value, i = 1L, strict = FALSE) {
     if ((num <- max(dt_value$extensible_group)) > 0 && !is.na(dt_value$value_num[i]) && dt_value$value_num[i] != num) {
         if (strict) {
             parse_error("epw", paste("Invalid", dt_object$class_name, "header"), num = 1,
@@ -731,7 +764,7 @@ update_epw_header_num_field <- function (header, dt_object, dt_value, i = 1L, st
 }
 # }}}
 # issue_epw_header_parse_error_single {{{
-issue_epw_header_parse_error_single <- function (obj, val, i = NULL, msg_post = "") {
+issue_epw_header_parse_error_single <- function(obj, val, i = NULL, msg_post = "") {
     if (is.null(i)) i <- seq_len(nrow(val))
     parse_error("epw", paste("Invalid", obj$class_name[[1L]], "header"), num = length(i),
         post = sprintf(" #%s| Invalid %s found: '%s'%s",
@@ -742,7 +775,9 @@ issue_epw_header_parse_error_single <- function (obj, val, i = NULL, msg_post = 
 }
 # }}}
 # issue_epw_header_parse_error_conn {{{
-issue_epw_header_parse_error_conn <- function (obj, val, i, index1, index2, fmt_conn = ", with %s being '%s'", msg_pre = NULL, stop = TRUE) {
+issue_epw_header_parse_error_conn <- function(obj, val, i, index1, index2,
+                                              fmt_conn = ", with %s being '%s'",
+                                              msg_pre = NULL, stop = TRUE) {
     title <- paste("Invalid", obj$class_name[[1L]], "header")
     fmt <- paste0(" #%s| Invalid %s found: '%s'", fmt_conn)
     post <- sprintf(fmt, lpad(seq_along(i), "0"),
@@ -764,7 +799,7 @@ issue_epw_header_parse_error_conn <- function (obj, val, i, index1, index2, fmt_
 # }}}
 # get_epw_wday {{{
 DAYOFWEEK <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-get_epw_wday <- function (x, label = FALSE, abbr = FALSE, monday_start = TRUE){
+get_epw_wday <- function(x, label = FALSE, abbr = FALSE, monday_start = TRUE){
     wd <- if (monday_start) DAYOFWEEK else c(DAYOFWEEK[7L], DAYOFWEEK[-7L])
 
     res <- if (label) rep(NA_character_, length(x)) else rep(NA_integer_, length(x))
@@ -799,7 +834,7 @@ get_epw_wday <- function (x, label = FALSE, abbr = FALSE, monday_start = TRUE){
 # }}}
 # get_epw_month {{{
 MONTH <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-get_epw_month <- function (x, label = FALSE){
+get_epw_month <- function(x, label = FALSE){
     match_in_vec(x, MONTH, label = label)
 }
 # }}}
@@ -826,16 +861,16 @@ get_epw_month <- function (x, label = FALSE){
 # 7. last Weekday In Month (only for Holiday/DaylightSavingPeriod) [type: 5L]
 # }}}
 # epw_date {{{
-epw_date <- function (x, leapyear = TRUE) {
+epw_date <- function(x, leapyear = TRUE) {
     as_EpwDate(x, leapyear = leapyear)
 }
-init_epwdate_vctr <- function (len, init = NA) {
+init_epwdate_vctr <- function(len, init = NA) {
     structure(rep(as.Date(init), len), class = c("EpwDate", "Date"))
 }
-assign_epwdate <- function (x) {
+assign_epwdate <- function(x) {
     setattr(x, "class", c("EpwDate", "Date"))
 }
-get_epwdate_type <- function (x) {
+get_epwdate_type <- function(x) {
     y <- as.integer(lubridate::year(x))
     res <- rep(EPWDATE_TYPE$invalid, length(x))
     res[y >= EPWDATE_YEAR$leap$zero & y <= EPWDATE_YEAR$noleap$zero] <- EPWDATE_TYPE$zero
@@ -846,7 +881,7 @@ get_epwdate_type <- function (x) {
     res[                              y >  EPWDATE_YEAR$noleap$last] <- EPWDATE_TYPE$ymd
     res
 }
-is_epwdate_type <- function (x, type) {
+is_epwdate_type <- function(x, type) {
     get_epwdate_type(x) %in% unlist(EPWDATE_TYPE[type], use.names = FALSE)
 }
 set_epwdate_year <- function(x, year) {
@@ -854,7 +889,7 @@ set_epwdate_year <- function(x, year) {
     lubridate::year(tmp) <- year
     assign_epwdate(tmp)
 }
-align_epwdate_type <- function (x, to) {
+align_epwdate_type <- function(x, to) {
     if (length(to) != 1L) assert_same_len(x, to)
     t <- get_epwdate_type(x)
     # only for julian and month day
@@ -862,7 +897,7 @@ align_epwdate_type <- function (x, to) {
     x[can_align] <- set_epwdate_year(x[can_align], lubridate::year(to[can_align]))
     x
 }
-reset_epwdate_year <- function (x, leapyear) {
+reset_epwdate_year <- function(x, leapyear) {
     # expect empty and real year
     t <- get_epwdate_type(x)
     if (any(t == EPWDATE_TYPE$nth | t == EPWDATE_TYPE$last)) warning("Cannot reset year of nth or last format date.")
@@ -870,7 +905,7 @@ reset_epwdate_year <- function (x, leapyear) {
     x[t == EPWDATE_TYPE$md] <- set_epwdate_year(x[t == EPWDATE_TYPE$md], if (leapyear) EPWDATE_YEAR$leap$md else EPWDATE_YEAR$noleap$md)
     x
 }
-ymd_to_md <- function (x) {
+ymd_to_md <- function(x) {
     is_leap <- lubridate::leap_year(as_date(x))
     x[is_leap] <- set_epwdate_year(x[is_leap], EPWDATE_YEAR$leap$md)
     x[!is_leap] <- set_epwdate_year(x[!is_leap], EPWDATE_YEAR$noleap$md)
@@ -901,18 +936,18 @@ ymd_to_md <- function (x) {
 #' @param leapyear Whether support leap year. Default: `TRUE`
 #' @export
 #' @keywords internal
-as_EpwDate <- function (x, leapyear = TRUE) {
+as_EpwDate <- function(x, leapyear = TRUE) {
     UseMethod("as_EpwDate")
 }
 #' @export
 #' @keywords internal
-as_EpwDate.default <- function (x, leapyear = TRUE) {
+as_EpwDate.default <- function(x, leapyear = TRUE) {
     stop("Missing method to convert <", class(x)[1L], "> object to <EpwDate>.")
 }
 #' @export
 #' @keywords internal
 # as_EpwDate.integer {{{
-as_EpwDate.integer <- function (x, leapyear = TRUE) {
+as_EpwDate.integer <- function(x, leapyear = TRUE) {
     res <- init_epwdate_vctr(length(x))
 
     if (length(x) == 0L) return(res)
@@ -932,7 +967,7 @@ as_EpwDate.integer <- function (x, leapyear = TRUE) {
 # as_EpwDate.numeric {{{
 #' @export
 #' @keywords internal
-as_EpwDate.numeric <- function (x, leapyear = TRUE) {
+as_EpwDate.numeric <- function(x, leapyear = TRUE) {
     res <- init_epwdate_vctr(length(x))
     if (length(x) == 0L) return(res)
 
@@ -951,7 +986,7 @@ as_EpwDate.numeric <- function (x, leapyear = TRUE) {
 # as_EpwDate.character {{{
 #' @export
 #' @keywords internal
-as_EpwDate.character <- function (x, leapyear = TRUE) {
+as_EpwDate.character <- function(x, leapyear = TRUE) {
     res <- init_epwdate_vctr(length(x))
     if (length(x) == 0L) return(res)
 
@@ -1000,7 +1035,7 @@ as_EpwDate.logical <- as_EpwDate.integer
 # as_EpwDate.Date {{{
 #' @export
 #' @keywords internal
-as_EpwDate.Date <- function (x, ...) {
+as_EpwDate.Date <- function(x, ...) {
     # treat as default "yyyy-mm-dd" format
     assign_epwdate(copy(x))
 }
@@ -1008,7 +1043,7 @@ as_EpwDate.Date <- function (x, ...) {
 # as_EpwDate.POSIXt{{{
 #' @export
 #' @keywords internal
-as_EpwDate.POSIXt <- function (x, ...) {
+as_EpwDate.POSIXt <- function(x, ...) {
     # treat as default "yyyy-mm-dd" format
     assign_epwdate(as_date(x))
 }
@@ -1016,10 +1051,10 @@ as_EpwDate.POSIXt <- function (x, ...) {
 # as_EpwDate.EpwDate {{{
 #' @export
 #' @keywords internal
-as_EpwDate.EpwDate <- function (x, ...) x
+as_EpwDate.EpwDate <- function(x, ...) x
 # }}}
 # parse_epwdate_md {{{
-parse_epwdate_md <- function (x, leapyear = TRUE) {
+parse_epwdate_md <- function(x, leapyear = TRUE) {
     res <- as_date(lubridate::parse_date_time(
         paste0(2000L, "-", x), "Ymd", tz = "UTC", quiet = TRUE
     ))
@@ -1030,14 +1065,14 @@ parse_epwdate_md <- function (x, leapyear = TRUE) {
 }
 # }}}
 # parse_epwdate_ymd {{{
-parse_epwdate_ymd <- function (year, month, day, leapyear = TRUE) {
+parse_epwdate_ymd <- function(year, month, day, leapyear = TRUE) {
     res <- as_date(lubridate::make_date(year, month, day))
     res[is.na(res)] <- as_date(lubridate::make_date(day, year, month))
     res
 }
 # }}}
 # parse_epwdate_wday {{{
-parse_epwdate_wday <- function (x, leapyear = TRUE) {
+parse_epwdate_wday <- function(x, leapyear = TRUE) {
     res <- init_epwdate_vctr(length(x))
     if (length(x) == 0L) return(res)
 
@@ -1094,7 +1129,7 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
     # get the weekday of first/last day in month
     wkd1 <- wday(ref_day)
     # locate_wkd {{{
-    locate_wkd <- function (wkd, ref_day, wkd1, n) {
+    locate_wkd <- function(wkd, ref_day, wkd1, n) {
         # for example: wkd1 Sat(6), wkd Mon(1)
         if (wkd1 > wkd) {
             if (n == 0L) {
@@ -1123,13 +1158,13 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
 # }}}
 # }}}
 # is_EpwDate {{{
-is_EpwDate <- function (x) {
+is_EpwDate <- function(x) {
     inherits(x, "EpwDate")
 }
 # }}}
 #' @export
 # format.EpwDate {{{
-format.EpwDate <- function (x, m_spc = TRUE, ...) {
+format.EpwDate <- function(x, m_spc = TRUE, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
     Sys.setlocale("LC_TIME", "C")
     t <- get_epwdate_type(x)
@@ -1142,14 +1177,14 @@ format.EpwDate <- function (x, m_spc = TRUE, ...) {
     res[t == 5L] <- format_epwdate_nthwkd(x[t == 5L], last = TRUE)
     res
 }
-format_epwdate_julian <- function (x) {
+format_epwdate_julian <- function(x) {
     suffix <- rep("th", length(x))
     suffix[x == 1L] <- "st"
     suffix[x == 2L] <- "nd"
     suffix[x == 3L] <- "rd"
     paste0(x, suffix, " day")
 }
-format_epwdate_nthwkd <- function (x, last = FALSE) {
+format_epwdate_nthwkd <- function(x, last = FALSE) {
     if (last) {
         n <- "Last"
         suffix <- ""
@@ -1174,7 +1209,7 @@ as.character.EpwDate <- format.EpwDate
 # }}}
 #' @export
 # print.EpwDate {{{
-print.EpwDate <- function (x, ...) {
+print.EpwDate <- function(x, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
     Sys.setlocale("LC_TIME", "C")
     t <- get_epwdate_type(x)
@@ -1192,56 +1227,55 @@ print.EpwDate <- function (x, ...) {
 # }}}
 #' @export
 # [.EpwDate {{{
-`[.EpwDate` <- function (x, i) {
+`[.EpwDate` <- function(x, i) {
     NextMethod("[")
 }
 # }}}
 #' @export
 # [[.EpwDate {{{
-`[[.EpwDate` <- function (x, i) {
+`[[.EpwDate` <- function(x, i) {
     NextMethod("[[")
 }
 # }}}
 #' @export
 # [<-.EpwDate {{{
-`[<-.EpwDate` <- function (x, ..., value) {
+`[<-.EpwDate` <- function(x, ..., value) {
     assign_epwdate(NextMethod("[<-.Date", value = value, ...))
 }
 # }}}
 #' @export
 # [[<-.EpwDate {{{
-`[[<-.EpwDate` <- function (x, ..., value) {
+`[[<-.EpwDate` <- function(x, ..., value) {
     assign_epwdate(NextMethod("[[", value = value, ...))
 }
 # }}}
 #' @export
 # c.EpwDate {{{
-c.EpwDate <- function (...) {
+c.EpwDate <- function(...) {
     assign_epwdate(c.Date(...))
 }
 # }}}
 #' @export
 # as.Date.EpwDate {{{
-as.Date.EpwDate <- function (x, ...) {
+as.Date.EpwDate <- function(x, ...) {
     class(x) <- "Date"
     x
 }
 # }}}
 #' @export
 # as.POSIXct.EpwDate {{{
-as.POSIXct.EpwDate <- function (x, ...) {
+as.POSIXct.EpwDate <- function(x, ...) {
     lubridate::force_tz(lubridate::as_datetime(as.Date.EpwDate(x)), tzone = "UTC")
 }
 # }}}
 # }}}
 ## DATA
 # parse_epw_data {{{
-parse_epw_data <- function (path, encoding = "unknown") {
+parse_epw_data <- function(idd_env, path, encoding = "unknown") {
     num_header <- 8L
 
-    idd_env <- get_epw_idd_env()
     cls <- idd_env$class[J(EPW_CLASS$data), on = "class_name"]
-    type <- unlist(get_epw_data_type())
+    type <- unlist(get_epw_data_type(idd_env))
 
     # parse the rest of file {{{
     # colnames refers to column "Long Name" in Table 2.8 in
@@ -1259,10 +1293,11 @@ parse_epw_data <- function (path, encoding = "unknown") {
     # As documented, fread will only promote a column to a higher type if
     # colClasses requests it. It won't downgrade a column to a lower type since
     # NAs would result.
+
     # This means that even if a column is specified as integer in colClasses, it
     # still could be resulted as character or double.
     epw_data <- suppressWarnings(fread(path, skip = num_header, col.names = names(type), colClasses = type))
-    epw_data <- check_epw_data_type(epw_data, type)
+    epw_data <- check_epw_data_type(idd_env, epw_data, type)
     # }}}
 
     # handle abnormal values of present weather codes
@@ -1272,7 +1307,8 @@ parse_epw_data <- function (path, encoding = "unknown") {
         stri_sub(present_weather_codes[stri_sub(present_weather_codes, -1L, -1L) == "'"], -1L, -1L) <- ""
         # if not a 9-length string, including empty string "", replace with default missing code
         present_weather_codes[nchar(present_weather_codes) != 9L] <-
-            get_idd_field(idd_env, EPW_CLASS$data, "present_weather_codes", underscore = TRUE, property = "missing_chr")$missing_chr
+            get_idd_field(idd_env, EPW_CLASS$data, "present_weather_codes",
+                underscore = TRUE, property = "missing_chr")$missing_chr
         # replace non-digits with "9"
         stri_replace_all_charclass(present_weather_codes, "[^0-9]", "9")
     }]
@@ -1281,9 +1317,9 @@ parse_epw_data <- function (path, encoding = "unknown") {
 }
 # }}}
 # match_epw_data {{{
-match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
-    dp <- parse_epw_header_period(epw_header)
-    holiday <- parse_epw_header_holiday(epw_header)
+match_epw_data <- function(idd_env, epw_header, epw_data, period = NULL, tz = "UTC") {
+    dp <- parse_epw_header_period(idd_env, epw_header)
+    holiday <- parse_epw_header_holiday(idd_env, epw_header)
     data_period <- match_epw_data_period(dp$period, period)
 
     # check if real year
@@ -1312,7 +1348,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
         }
     } else {
         matched <- rbindlist(use.names = TRUE,
-            lapply(split(data_period, by = "index"), function (dp) {
+            lapply(split(data_period, by = "index"), function(dp) {
                 on <- col_on
                 if (!realyear[dp$index]) on <- setdiff(on, "year")
                 m <- dt[dp, on = col_on, mult = "first"]
@@ -1336,7 +1372,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
     }
 
     # check core weather data range on the row of first day, just as EnergyPlus does
-    range <- get_epw_data_range("valid", unlist(EPW_REPORT_RANGE, FALSE, FALSE))
+    range <- get_epw_data_range(idd_env, "valid", unlist(EPW_REPORT_RANGE, FALSE, FALSE))
     line_range <- check_epw_data_range(epw_data[matched$line], range)
     if (length(line_range)) {
         # only show the first invalid for each data period
@@ -1349,7 +1385,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
         }]
 
         # get field name
-        nm <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data, invld$variable, underscore = TRUE)$field_name
+        nm <- get_idd_field(idd_env, EPW_CLASS$data, invld$variable, underscore = TRUE)$field_name
         set(invld, NULL, "field_name", nm)
 
         # construct message
@@ -1363,7 +1399,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
     }
 
     # validate_datetime_range {{{
-    validate_datetime_range <- function (dt, matched, realyear) {
+    validate_datetime_range <- function(dt, matched, realyear) {
         datetime <- dt$datetime
         if (length(datetime) - matched$line + 1L < matched$num) {
             parse_error("epw", paste("Invalid WEATHER DATA"), subtype = "data",
@@ -1439,7 +1475,7 @@ match_epw_data <- function (epw_data, epw_header, period = NULL, tz = "UTC") {
 }
 # }}}
 # get_epw_datetime_range {{{
-get_epw_datetime_range <- function (start, end, interval, leapyear = FALSE, realyear = FALSE) {
+get_epw_datetime_range <- function(start, end, interval, leapyear = FALSE, realyear = FALSE) {
     if (is_epwdate(start)) start <- reset_epwdate_year(start, leapyear)
     if (is_epwdate(end)) end <- reset_epwdate_year(end, leapyear)
 
@@ -1463,7 +1499,7 @@ get_epw_datetime_range <- function (start, end, interval, leapyear = FALSE, real
 }
 # }}}
 # get_epw_datetime_year {{{
-get_epw_datetime_year <- function (start_year, start_day, end_day, num, step) {
+get_epw_datetime_year <- function(start_year, start_day, end_day, num, step) {
     # update year value
     #  year value does not change
     if (lubridate::year(start_day) == lubridate::year(end_day)) {
@@ -1484,7 +1520,7 @@ get_epw_datetime_year <- function (start_year, start_day, end_day, num, step) {
 }
 # }}}
 # get_epw_data_range {{{
-get_epw_data_range <- function (type = c("valid", "exist"), field = NULL) {
+get_epw_data_range <- function(idd_env, type = c("valid", "exist"), field = NULL) {
     type <- match.arg(type)
     prop <- c("type_enum", "field_name_us")
 
@@ -1494,7 +1530,7 @@ get_epw_data_range <- function (type = c("valid", "exist"), field = NULL) {
         prop <- c(prop, "has_exist", "exist_minimum", "exist_lower_incbounds", "exist_maximum", "exist_upper_incbounds")
     }
 
-    fld <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data, field, prop, underscore = TRUE)
+    fld <- get_idd_field(idd_env, EPW_CLASS$data, field, prop, underscore = TRUE)
 
     if (type == "exist") {
         setnames(fld,
@@ -1516,8 +1552,8 @@ get_epw_data_range <- function (type = c("valid", "exist"), field = NULL) {
 }
 # }}}
 # get_epw_data_missing_code {{{
-get_epw_data_missing_code <- function () {
-    fld <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data,
+get_epw_data_missing_code <- function(idd_env) {
+    fld <- get_idd_field(idd_env, EPW_CLASS$data,
         property = c("missing_chr", "missing_num", "field_name_us", "type_enum"))[
         !J(NA_character_), on = "missing_chr"]
 
@@ -1527,8 +1563,8 @@ get_epw_data_missing_code <- function () {
 }
 # }}}
 # get_epw_data_init_value {{{
-get_epw_data_init_value <- function () {
-    fld <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data,
+get_epw_data_init_value <- function(idd_env) {
+    fld <- get_idd_field(idd_env, EPW_CLASS$data,
         property = c("default_chr", "default_num", "field_name_us", "type_enum"))[
         !J(NA_character_), on = "default_chr"]
 
@@ -1537,7 +1573,7 @@ get_epw_data_init_value <- function () {
 }
 # }}}
 # get_epw_data_fill_action {{{
-get_epw_data_fill_action <- function (type = c("missing", "out_of_range")) {
+get_epw_data_fill_action <- function(type = c("missing", "out_of_range")) {
     type <- match.arg(type)
     if (type == "missing") {
         EPW_REPORT_MISSING
@@ -1547,16 +1583,18 @@ get_epw_data_fill_action <- function (type = c("missing", "out_of_range")) {
 }
 # }}}
 # get_epw_data_unit {{{
-get_epw_data_unit <- function (field = NULL) {
-    fld <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data, field, c("units", "field_name_us"), underscore = TRUE)[
+get_epw_data_unit <- function(idd_env, field = NULL) {
+    fld <- get_idd_field(idd_env, EPW_CLASS$data, field, c("units", "field_name_us"), underscore = TRUE)[
         !J(NA_character_), on = "units"]
 
     setattr(as.list(fld$units), "names", fld$field_name_us)
 }
 # }}}
 # get_epw_data_type {{{
-get_epw_data_type <- function (field = NULL) {
-    fld <- get_idd_field(get_epw_idd_env(), EPW_CLASS$data, field, c("type", "field_name_us"), underscore = TRUE)
+get_epw_data_type <- function(idd_env, field = NULL) {
+    fld <- get_idd_field(idd_env, EPW_CLASS$data, field,
+        c("type", "field_name_us"), underscore = TRUE
+    )
 
     fld[J("real"), on = "type", type := "double"]
     fld[J("alpha"), on = "type", type := "character"]
@@ -1564,13 +1602,13 @@ get_epw_data_type <- function (field = NULL) {
 }
 # }}}
 # check_epw_data_range{{{
-check_epw_data_range <- function (epw_data, range, merge = TRUE) {
-    m <- epw_data[, apply2(.SD, range, function (x, y) !is.na(x) & in_range(x, y)), .SDcols = names(range)]
+check_epw_data_range <- function(epw_data, range, merge = TRUE) {
+    m <- epw_data[, apply2(.SD, range, function(x, y) !is.na(x) & in_range(x, y)), .SDcols = names(range)]
 
-    if (!merge) return(lapply(m, function (x) which(!x)))
+    if (!merge) return(lapply(m, function(x) which(!x)))
 
     assert_names(names(epw_data), must.include = "line")
-    m[, c(names(range)) := lapply(.SD, function (x) {x[x == FALSE] <- NA;x}), .SDcols = names(range)]
+    m[, c(names(range)) := lapply(.SD, function(x) {x[x == FALSE] <- NA;x}), .SDcols = names(range)]
     set(m, NULL, "line", epw_data$line)
 
     # store abnormal variables. See #326
@@ -1580,8 +1618,8 @@ check_epw_data_range <- function (epw_data, range, merge = TRUE) {
 }
 # }}}
 # check_epw_data_type{{{
-check_epw_data_type <- function (epw_data, type = NULL) {
-    if (is.null(type)) type <- unlist(get_epw_data_type())
+check_epw_data_type <- function(idd_env, epw_data, type = NULL) {
+    if (is.null(type)) type <- unlist(get_epw_data_type(idd_env))
     assert_names(names(type))
     assert_data_table(epw_data)
     assert_names(names(epw_data), must.include = names(type))
@@ -1591,13 +1629,18 @@ check_epw_data_type <- function (epw_data, type = NULL) {
     for (j in seq_along(type)) {
         if (type[[j]] == "integer") {
             # handle integerish
-            if (type_detected[[j]] == "integer" || (type_detected[[j]] == "double" && checkmate::test_integerish(epw_data[[j]]))) {
+            if (
+                type_detected[[j]] == "integer" ||
+                (
+                    type_detected[[j]] == "double" && checkmate::test_integerish(epw_data[[j]])
+                )
+            ) {
                 # remove all derived S3 class
                 set(epw_data, NULL, j, as.integer(epw_data[[j]]))
             } else {
                 parse_error("epw", "Failed to parse variables as integer", num = 1L,
                     post = paste0("Failed variables: ",
-                        get_idd_field(get_epw_idd_env(), EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
+                        get_idd_field(idd_env, EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
                     subtype = "data_type"
                 )
             }
@@ -1609,7 +1652,7 @@ check_epw_data_type <- function (epw_data, type = NULL) {
             } else {
                 parse_error("epw", "Failed to parse variables as double", num = 1L,
                     post = paste0("Failed variables: ",
-                        get_idd_field(get_epw_idd_env(), EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
+                        get_idd_field(idd_env, EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
                     subtype = "data_type"
                 )
             }
@@ -1626,8 +1669,8 @@ check_epw_data_type <- function (epw_data, type = NULL) {
 # DATA
 # get_epw_data {{{
 #' @importFrom checkmate assert_flag assert_scalar assert_count
-get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year = NULL,
-                          align_wday = FALSE, tz = "UTC", update = FALSE) {
+get_epw_data <- function(idd_env, epw_header, epw_data, matched, period = 1L, start_year = NULL,
+                         align_wday = FALSE, tz = "UTC", update = FALSE) {
     assert_count(period)
     assert_count(start_year, null.ok = TRUE)
     assert_flag(align_wday)
@@ -1635,7 +1678,7 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
     assert_flag(update)
 
     # get data periods
-    dp <- parse_epw_header_period(epw_header, TRUE)
+    dp <- parse_epw_header_period(idd_env, epw_header, TRUE)
     if (period > nrow(dp$period)) {
         abort(paste0("Invalid data period index found. EPW contains only ",
             nrow(dp$period), " data period(s) but ", surround(period), " is specified."
@@ -1646,7 +1689,7 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
     p <- dp$period[period]
 
     # leap year
-    leapyear <- parse_epw_header_holiday(epw_header, TRUE)$leapyear
+    leapyear <- parse_epw_header_holiday(idd_env, epw_header, TRUE)$leapyear
 
     # get match info
     m <- matched[period]
@@ -1788,19 +1831,19 @@ get_epw_data <- function (epw_data, epw_header, matched, period = 1L, start_year
 # }}}
 # get_epw_data_abnormal {{{
 #' @importFrom checkmate assert_count assert_flag
-get_epw_data_abnormal <- function (epw_data, epw_header, matched, period = 1L, cols = NULL,
-                                   keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
+get_epw_data_abnormal <- function(idd_env, epw_header, epw_data, matched, period = 1L, cols = NULL,
+                                  keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
     assert_count(period)
     assert_flag(keep_all)
     assert_character(cols, null.ok = TRUE, any.missing = FALSE)
     type <- match.arg(type)
 
-    d <- get_epw_data(epw_data, epw_header, matched, period)
+    d <- get_epw_data(idd_env, epw_header, epw_data, matched, period)
     set(d, NULL, "line", seq(matched[period]$row + 8L, length.out = matched[period]$num))
 
     if (type == "both") type <- c("missing", "out_of_range")
 
-    ln <- locate_epw_data_abnormal(d, cols, "missing" %chin% type, "out_of_range" %chin% type, merge = TRUE)
+    ln <- locate_epw_data_abnormal(idd_env, d, cols, "missing" %chin% type, "out_of_range" %chin% type, merge = TRUE)
     # get abnormal variables. See #326
     if (is.null(cols)) {
         cols <- unique(c(attr(ln$missing, "variable"), attr(ln$out_of_range, "variable")))
@@ -1821,7 +1864,7 @@ get_epw_data_abnormal <- function (epw_data, epw_header, matched, period = 1L, c
 }
 # }}}
 # get_epw_data_redundant {{{
-get_epw_data_redundant <- function (epw_data, epw_header, matched, line = FALSE, revert = FALSE) {
+get_epw_data_redundant <- function(idd_env, epw_header, epw_data, matched, line = FALSE, revert = FALSE) {
     add_rleid(epw_data)
     rleid <- matched[, list(rleid = seq(row, length.out = num)), by = "index"]$rleid
 
@@ -1848,7 +1891,7 @@ get_epw_data_redundant <- function (epw_data, epw_header, matched, line = FALSE,
 # }}}
 # locate_epw_data_abnormal {{{
 # Logic directly derived from WeatherManager.cc in EnergyPlus source code
-locate_epw_data_abnormal <- function (epw_data, field = NULL, missing = FALSE, out_of_range = FALSE, merge = FALSE) {
+locate_epw_data_abnormal <- function(idd_env, epw_data, field = NULL, missing = FALSE, out_of_range = FALSE, merge = FALSE) {
     if (merge) {
         line_miss <- integer()
         line_range <- integer()
@@ -1858,12 +1901,12 @@ locate_epw_data_abnormal <- function (epw_data, field = NULL, missing = FALSE, o
     }
 
     if (missing) {
-        exist <- get_epw_data_range("exist", field = field)
+        exist <- get_epw_data_range(idd_env, "exist", field = field)
         line_miss <- check_epw_data_range(epw_data, exist, merge = merge)
     }
 
     if (out_of_range) {
-        valid <- get_epw_data_range("valid", field = field)
+        valid <- get_epw_data_range(idd_env, "valid", field = field)
         line_range <- check_epw_data_range(epw_data, valid, merge = merge)
     }
 
@@ -1871,7 +1914,7 @@ locate_epw_data_abnormal <- function (epw_data, field = NULL, missing = FALSE, o
 }
 # }}}
 # match_epw_data_period {{{
-match_epw_data_period <- function (matched, period = NULL) {
+match_epw_data_period <- function(matched, period = NULL) {
     if (is.null(period)) return(matched)
 
     assert_integerish(period, lower = 1L, any.missing = FALSE)
@@ -1886,15 +1929,15 @@ match_epw_data_period <- function (matched, period = NULL) {
 # }}}
 # make_epw_data_na {{{
 # Logic directly derived from WeatherManager.cc in EnergyPlus source code
-make_epw_data_na <- function (epw_data, epw_header, matched, period = NULL,
-                              field = NULL, missing = FALSE, out_of_range = FALSE) {
+make_epw_data_na <- function(idd_env, epw_header, epw_data, matched, period = NULL,
+                             field = NULL, missing = FALSE, out_of_range = FALSE) {
     if (!missing && !out_of_range) return(epw_data)
 
     matched <- match_epw_data_period(matched, period)
     rleid <- matched[, list(rleid = seq(row, length.out = num)), by = "index"]$rleid
     d <- epw_data[rleid]
 
-    line <- locate_epw_data_abnormal(d, field, missing, out_of_range, merge = FALSE)
+    line <- locate_epw_data_abnormal(idd_env, d, field, missing, out_of_range, merge = FALSE)
     cols <- if (missing) names(line$missing) else names(line$out_of_range)
 
     for (name in cols) {
@@ -1906,9 +1949,9 @@ make_epw_data_na <- function (epw_data, epw_header, matched, period = NULL,
 }
 # }}}
 # fill_epw_data_abnormal {{{
-fill_epw_data_abnormal <- function (epw_data, epw_header, matched, period = NULL,
-                                    field = NULL, missing = TRUE, out_of_range = TRUE,
-                                    special = FALSE, miss_na = FALSE, range_na = FALSE) {
+fill_epw_data_abnormal <- function(idd_env, epw_header, epw_data, matched, period = NULL,
+                                   field = NULL, missing = TRUE, out_of_range = TRUE,
+                                   special = FALSE, miss_na = FALSE, range_na = FALSE) {
     if (!missing && !out_of_range) return(epw_data)
 
     # get data
@@ -1917,10 +1960,10 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, matched, period = NULL
     d <- epw_data[rleid]
 
     # get missing code
-    code <- get_epw_data_missing_code()
+    code <- get_epw_data_missing_code(idd_env)
 
     # get all abnormal row indices
-    ln <- locate_epw_data_abnormal(d, field, missing, out_of_range, merge = FALSE)
+    ln <- locate_epw_data_abnormal(idd_env, d, field, missing, out_of_range, merge = FALSE)
 
     if (!special) {
         for (name in names(code)) {
@@ -1932,12 +1975,12 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, matched, period = NULL
     }
 
     # get initial value for first missing value
-    init <- get_epw_data_init_value()
+    init <- get_epw_data_init_value(idd_env)
 
     # get atmospheric pressure at current elevation
-    elev <- parse_epw_header_location(epw_header, EPW_CLASS$location)$elevation
+    elev <- parse_epw_header_location(idd_env, epw_header, EPW_CLASS$location)$elevation
     if (is.na(elev)) {
-        valid <- validate_epw_header_basic(epw_header, EPW_CLASS$location, field = "Elevation")
+        valid <- validate_epw_header_basic(idd_env, epw_header, EPW_CLASS$location, field = "Elevation")
         assert_valid(valid, epw = TRUE)
     }
     atpres <- std_atm_press(epw_header$location$elevation)
@@ -1945,7 +1988,7 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, matched, period = NULL
     m <- ln$missing
     r <- ln$out_of_range
     # just in case
-    if (missing & out_of_range) assert_same_len(m, r)
+    if (missing && out_of_range) assert_same_len(m, r)
 
     # add previous valid line index {{{
     if (missing) {
@@ -1991,7 +2034,7 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, matched, period = NULL
 }
 # }}}
 # fill_epw_data_abnormal_special {{{
-fill_epw_data_abnormal_special <- function (epw_data, loc, action, init_value, code, na_made = FALSE) {
+fill_epw_data_abnormal_special <- function(epw_data, loc, action, init_value, code, na_made = FALSE) {
     # for each variable
     for (name in names(loc)) {
         if (!length(loc[[name]])) next
@@ -2034,8 +2077,8 @@ fill_epw_data_abnormal_special <- function (epw_data, loc, action, init_value, c
 }
 # }}}
 # add_epw_data_unit {{{
-add_epw_data_unit <- function (epw_data) {
-    unit <- get_epw_data_unit()
+add_epw_data_unit <- function(idd_env, epw_data) {
+    unit <- get_epw_data_unit(idd_env)
 
     # change to standard SI units
     u <- FIELD_UNIT_TABLE[J(unlist(unit)), on = "si_name", mult = "first"][
@@ -2049,8 +2092,8 @@ add_epw_data_unit <- function (epw_data) {
 }
 # }}}
 # drop_epw_data_unit {{{
-drop_epw_data_unit <- function (epw_data) {
-    unit <- get_epw_data_unit()
+drop_epw_data_unit <- function(idd_env, epw_data) {
+    unit <- get_epw_data_unit(idd_env)
     for (nm in names(unit)) {
         if (inherits(epw_data[[nm]], "units")) {
             set(epw_data, NULL, nm, units::drop_units(epw_data[[nm]]))
@@ -2060,7 +2103,7 @@ drop_epw_data_unit <- function (epw_data) {
 }
 # }}}
 # purge_epw_data_redundant {{{
-purge_epw_data_redundant <- function (epw_data, epw_header, matched) {
+purge_epw_data_redundant <- function(epw_header, epw_data, matched) {
     add_rleid(epw_data)
     ln <- matched[, list(rleid = seq(row, length.out = num)), by = "index"]
 
@@ -2096,9 +2139,9 @@ purge_epw_data_redundant <- function (epw_data, epw_header, matched) {
 # }}}
 # add_epw_data {{{
 #' @importFrom checkmate assert_data_frame assert_names assert_flag
-add_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
-                          name = NULL, start_day_of_week = NULL, after = 0L) {
-    merge_epw_new_data(epw_data, epw_header, matched, data, after,
+add_epw_data <- function(idd_env, epw_header, epw_data, matched, data, realyear = FALSE,
+                         name = NULL, start_day_of_week = NULL, after = 0L) {
+    merge_epw_new_data(idd_env, epw_header, epw_data, matched, data, after,
         reset = FALSE, realyear = realyear, name = name,
         start_day_of_week = start_day_of_week
     )
@@ -2107,9 +2150,9 @@ add_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
 # set_epw_data {{{
 #' @importFrom checkmate assert_data_frame assert_names assert_flag
 #' @importFrom checkmate assert_string assert_count
-set_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
-                          name = NULL, start_day_of_week = NULL, period = 1L) {
-    merge_epw_new_data(epw_data, epw_header, matched, data, period,
+set_epw_data <- function(idd_env, epw_header, epw_data, matched, data, realyear = FALSE,
+                         name = NULL, start_day_of_week = NULL, period = 1L) {
+    merge_epw_new_data(idd_env, epw_header, epw_data, matched, data, period,
         reset = TRUE, realyear = realyear, name = name,
         start_day_of_week = start_day_of_week
     )
@@ -2117,9 +2160,9 @@ set_epw_data <- function (epw_data, epw_header, matched, data, realyear = FALSE,
 # }}}
 # del_epw_data {{{
 #' @importFrom checkmate assert_count
-del_epw_data <- function (epw_data, epw_header, matched, period) {
+del_epw_data <- function(idd_env, epw_header, epw_data, matched, period) {
     assert_count(period, positive = TRUE)
-    dp <- parse_epw_header_period(epw_header)
+    dp <- parse_epw_header_period(idd_env, epw_header)
     m <- match_epw_data_period(matched, period)
 
     # check if this is the only data period.
@@ -2132,13 +2175,13 @@ del_epw_data <- function (epw_data, epw_header, matched, period) {
         ))
     }
 
-    val <- get_idf_table(get_epw_idd_env(), epw_header, EPW_CLASS$period)
+    val <- get_idf_table(idd_env, epw_header, EPW_CLASS$period)
     prev <- (period - 1L) * 4L + 2L
     val[J(1L), on = "index", value := as.character(nrow(matched) - 1L)]
     val[index > prev, value := c(value[-(1:4)], rep(NA_character_, 4L))]
 
-    lst <- expand_idf_dots_literal(get_epw_idd_env(), epw_header, val, .default = FALSE)
-    epw_header <- set_idf_object(get_epw_idd_env(), epw_header, lst$object, lst$value, level = "final")
+    lst <- expand_idf_dots_literal(idd_env, epw_header, val, .default = FALSE)
+    epw_header <- set_idf_object(idd_env, epw_header, lst$object, lst$value, level = "final")
 
     epw_data <- epw_data[-seq(m$row, length.out = m$num)]
     matched <- matched[-period][, index := .I]
@@ -2151,11 +2194,11 @@ del_epw_data <- function (epw_data, epw_header, matched, period) {
 # }}}
 # merge_epw_new_data {{{
 #' @importFrom checkmate assert_posixct
-merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_period,
-                                reset = FALSE, realyear = FALSE, name = NULL,
-                                start_day_of_week = NULL) {
+merge_epw_new_data <- function(idd_env, epw_header, epw_data, matched, data, target_period,
+                               reset = FALSE, realyear = FALSE, name = NULL,
+                               start_day_of_week = NULL) {
     # drop units
-    epw_data <- drop_epw_data_unit(epw_data)
+    epw_data <- drop_epw_data_unit(idd_env, epw_data)
 
     assert_data_frame(data)
     assert_names(names(data), must.include = setdiff(names(epw_data), c("year", "month", "day", "hour", "minute")))
@@ -2168,8 +2211,8 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     header$value <- copy(epw_header$value)
     header$reference <- copy(epw_header$reference)
 
-    holiday <- parse_epw_header_holiday(header)
-    period <- parse_epw_header_period(header)
+    holiday <- parse_epw_header_holiday(idd_env, header)
+    period <- parse_epw_header_period(idd_env, header)
 
     # get current data period and other periods {{{
     if (reset) {
@@ -2234,8 +2277,8 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
     set(data, NULL, "datetime", force_tz(data$datetime, "UTC"))
 
     # check other column types
-    type <- get_epw_data_type(setdiff(names(epw_data), c("datetime", "year", "month", "day", "hour", "minute")))
-    data <- check_epw_data_type(data, unlist(type))
+    type <- get_epw_data_type(idd_env, setdiff(names(epw_data), c("datetime", "year", "month", "day", "hour", "minute")))
+    data <- check_epw_data_type(idd_env, data, unlist(type))
 
     # get start and end day
     # assume that datetime is sorted
@@ -2305,7 +2348,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
             }
         }
         # reset leap year indicator
-        id <- get_idf_value(get_epw_idd_env(), header, EPW_CLASS$holiday, field = 1L)$value_id
+        id <- get_idf_value(idd_env, header, EPW_CLASS$holiday, field = 1L)$value_id
         header$value[J(id), on = "value_id", value_chr := ifelse(leapyear, "Yes", "No")]
     }
     # }}}
@@ -2343,11 +2386,11 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
         lst[sprintf("Data Period %i Start Day", p_other$index)] <- format(p_other$start_day)
         lst[sprintf("Data Period %i End Day", p_other$index)] <- format(p_other$end_day)
     }
-    lst <- expand_idf_dots_value(get_epw_idd_env(), header,
+    lst <- expand_idf_dots_value(idd_env, header,
         ..(EPW_CLASS$period) := lst, .default = FALSE, .type = "object"
     )
-    header <- set_idf_object(get_epw_idd_env(), header, lst$object, lst$value, empty = TRUE, level = "final")
-    parse_epw_header_period(header)
+    header <- set_idf_object(idd_env, header, lst$object, lst$value, empty = TRUE, level = "final")
+    parse_epw_header_period(idd_env, header)
     # }}}
 
     # match datetime {{{
@@ -2383,7 +2426,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
         set(data, NULL, "datetime", stringi::stri_datetime_create(data$year, data$month, data$day, data$hour, tz = lubridate::tz(data$datetime), lenient = TRUE))
     }
 
-    m <- match_epw_data(data, header, target_period)
+    m <- match_epw_data(idd_env, header, data, target_period)
 
     # update datetime components
     set(data, NULL, c("year", "month", "day", "hour", "minute"),
@@ -2397,7 +2440,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
 
     # update table {{{
     # drop units
-    data <- drop_epw_data_unit(data)
+    data <- drop_epw_data_unit(idd_env, data)
 
     if (reset) {
         m_prev <- matched[index == target_period]
@@ -2441,7 +2484,7 @@ merge_epw_new_data <- function (epw_data, epw_header, matched, data, target_peri
 }
 # }}}
 # find_nearst_wday_year {{{
-find_nearst_wday_year <- function (date, week_day, year = NULL, leap_year = FALSE) {
+find_nearst_wday_year <- function(date, week_day, year = NULL, leap_year = FALSE) {
     m <- month(date)
     d <- mday(date)
 
@@ -2463,7 +2506,7 @@ find_nearst_wday_year <- function (date, week_day, year = NULL, leap_year = FALS
 }
 # }}}
 # create_epw_datetime_components {{{
-create_epw_datetime_components <- function (start, end, interval, tz = "UTC", leapyear = FALSE) {
+create_epw_datetime_components <- function(start, end, interval, tz = "UTC", leapyear = FALSE) {
     if (is_epwdate(start)) start <- reset_epwdate_year(start, leapyear)
     if (is_epwdate(end)) end <- reset_epwdate_year(end, leapyear)
 
@@ -2499,17 +2542,17 @@ create_epw_datetime_components <- function (start, end, interval, tz = "UTC", le
 
 # FORMAT
 # format_epw {{{
-format_epw <- function (epw_data, epw_header, fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...) {
+format_epw <- function(idd_env, epw_header, epw_data, fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...) {
     list(
-        header = format_epw_header(epw_header),
-        data = format_epw_data(epw_data, epw_header, fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...)
+        header = format_epw_header(idd_env, epw_header),
+        data = format_epw_data(idd_env, epw_header, epw_data, fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...)
     )
 }
 # }}}
 # format_epw_header {{{
-format_epw_header <- function (header) {
-    val <- get_idf_value(get_epw_idd_env(), header, property = c("choice", "type", "extensible_group"))
-    header$value <- standardize_idf_value(get_epw_idd_env(), header, val, type = "choice")
+format_epw_header <- function(idd_env, header) {
+    val <- get_idf_value(idd_env, header, property = c("choice", "type", "extensible_group"))
+    header$value <- standardize_idf_value(idd_env, header, val, type = "choice")
 
     # store original numeric values
     val_num <- val$value_num
@@ -2560,7 +2603,7 @@ format_epw_header <- function (header) {
 
     set(header$value, NULL, "value_num", NULL)
 
-    fmt <- get_idf_string(get_epw_idd_env(), header, header = FALSE, comment = FALSE,
+    fmt <- get_idf_string(idd_env, header, header = FALSE, comment = FALSE,
         format = "new_top", leading = 0, sep_at = -1, flat = FALSE
     )
     fmt <- lapply(fmt$format$fmt, "[[", 2L)
@@ -2571,7 +2614,7 @@ format_epw_header <- function (header) {
     set(header$value, NULL, setdiff(names(header$value), cols), NULL)
     setcolorder(header$value, cols)
 
-    vcapply(fmt, function (s) {
+    vcapply(fmt, function(s) {
         # remove trailing semicolon
         s[length(s)] <- stri_sub(s[length(s)], to = -2L)
 
@@ -2580,12 +2623,12 @@ format_epw_header <- function (header) {
 }
 # }}}
 # format_epw_data {{{
-format_epw_data <- function (epw_data, epw_header, fmt_digit = FALSE, fill = FALSE, purge = FALSE, ...) {
-    if (purge) epw_data <- purge_epw_data_redundant(epw_data, epw_header, matched)
+format_epw_data <- function(idd_env, epw_header, epw_data, fmt_digit = FALSE, fill = FALSE, purge = FALSE, ...) {
+    if (purge) epw_data <- purge_epw_data_redundant(epw_header, epw_data, matched)
 
     d <- epw_data[, -"datetime"]
 
-    if (fill) d <- fill_epw_data_abnormal(d, epw_header, matched, ...)
+    if (fill) d <- fill_epw_data_abnormal(idd_env, d, epw_header, matched, ...)
 
     # EPW_FORMAT {{{
     EPW_FORMAT <- list(
@@ -2608,9 +2651,9 @@ format_epw_data <- function (epw_data, epw_header, fmt_digit = FALSE, fill = FAL
         visibility = fmt_int,
         ceiling_height = as.integer,
         precipitable_water = as.integer,
-        aerosol_optical_depth = function (x) fmt_dbl(x, 4L),
+        aerosol_optical_depth = function(x) fmt_dbl(x, 4L),
         snow_depth = as.integer,
-        albedo = function (x) fmt_dbl(x, 3L),
+        albedo = function(x) fmt_dbl(x, 3L),
         liquid_precip_depth = fmt_int,
         liquid_precip_rate = fmt_int
     )
@@ -2627,9 +2670,7 @@ format_epw_data <- function (epw_data, epw_header, fmt_digit = FALSE, fill = FAL
 }
 # }}}
 # format_epw_meta {{{
-format_epw_meta <- function (header) {
-    idd_env <- get_epw_idd_env()
-
+format_epw_meta <- function(idd_env, header) {
     loc <- get_idf_value(idd_env, header, EPW_CLASS$location, property = c("field_name_us", "type_enum"))
     loc <- setattr(get_value_list(loc), "names", loc$field_name_us)
     leapyear <- get_idf_value(idd_env, header, EPW_CLASS$holiday, field = 1L)$value_chr
@@ -2671,8 +2712,8 @@ format_epw_meta <- function (header) {
 
 # SAVE
 # save_epw_file {{{
-save_epw_file <- function (epw_data, epw_header, matched, path, overwrite = FALSE,
-                           fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...) {
+save_epw_file <- function(idd_env, epw_header, epw_data, matched, path, overwrite = FALSE,
+                          fmt_digit = TRUE, fill = FALSE, purge = FALSE, ...) {
     if (!file.exists(path)) {
         new_file <- TRUE
     } else {
@@ -2682,7 +2723,7 @@ save_epw_file <- function (epw_data, epw_header, matched, path, overwrite = FALS
         }
     }
 
-    l <- format_epw(epw_data, epw_header, fmt_digit = fmt_digit, fill = fill, purge = FALSE, ...)
+    l <- format_epw(idd_env, epw_header, epw_data, fmt_digit = fmt_digit, fill = fill, purge = FALSE, ...)
     write_lines(l$header, path)
     fwrite(l$data, path, append = TRUE)
 
