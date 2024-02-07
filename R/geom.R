@@ -728,7 +728,7 @@ idfgeom_print <- function(self, private) {
     cli::cat_line(sprintf(" %s SubSurface Num: %s", cli::symbol$bullet, NROW(geoms$subsurface)))
     cli::cat_line(sprintf(" %s Shading Num: %s", cli::symbol$bullet, NROW(geoms$shading)))
     cli::cat_line(sprintf(" %s Dayl Ref Pnt Num: %s", cli::symbol$bullet, NROW(geoms$daylighting_point)))
-    cli::cat_line(" %s Coordinate System:", cli::symbol$bullet)
+    cli::cat_line(sprintf(" %s Coordinate System:", cli::symbol$bullet))
     cli::cat_line(c(
         sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "world", "World", "Relative")),
         sprintf("   - Simple:   '%s'", ifelse(geoms$rules$rectangular_surface_coordinate_system == "world", "World", "Relative")),
