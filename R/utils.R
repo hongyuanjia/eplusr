@@ -166,6 +166,68 @@ os_type <- function() {
 # nocov end
 # }}}
 
+# os_version: Return operation system version {{{
+os_version <- function(num_ver = FALSE) {
+    os <- os_type()
+
+    if (os == "windows") {
+        ver <- Sys.info()[["release"]]
+        ver <- stri_extract_first_regex(ver, "\\d+([.]\\d+)")
+    } else if (os == "macos") {
+        # Ref: https://stackoverflow.com/questions/32433629/how-to-check-the-os-x-version-from-r
+        ver <- system("sw_vers -productVersion", intern = TRUE)
+        # just in case
+        if (!length(ver) || !nchar(ver)) ver <- NA_character_
+    } else if (os == "linux") {
+        # Ref: https://stackoverflow.com/questions/14292750/programmatically-determining-ubuntu-distribution-and-architecture
+        osrel <- try(readLines("/etc/os-release"), silent = TRUE)
+        if (inherits(osrel, "try-error")) {
+            ver <- NA_character_
+        } else {
+            ver <- stringi::stri_match_first_regex(osrel, "^VERSION_ID\\s*=\\s*(.+)")[, 2L]
+            if (!length(ver)) {
+                ver <- NA_character_
+            } else if (length(ver) > 1L) {
+                # should not happen
+                ver <- NA_character_
+            }
+        }
+    } else {
+        ver <- NA_character_
+    }
+
+    if (num_ver) ver <- numeric_version(ver, FALSE)
+    ver
+}
+# }}}
+
+# linux_dist: Return Linux distribution {{{
+# Ref: https://www.tecmint.com/check-linux-os-version/
+# Ref: https://stackoverflow.com/questions/14292750/programmatically-determining-ubuntu-distribution-and-architecture
+linux_dist <- function() {
+    if (os_type() != "linux") return(NA_character_)
+
+    osrel <- c(
+        "gentoo"    = "/etc/genoo-release",
+        "redhat"    = "/etc/redhat-release",
+        "fedora"    = "/etc/fedora-release",
+        "arch"      = "/etc/arch-release",
+        "suse"      = "/etc/SuSE-release",
+        "slackware" = "/etc/slackware-version",
+        "centos"    = "/etc/centos-release",
+        "ubuntu"    = "/etc/lsb-release",
+        "debian"    = "/etc/debian_version"
+    )
+
+    dist <- "unknown"
+    for (d in names(osrel)) {
+        if (file.exists(osrel[d])) dist <- d
+    }
+
+    dist
+}
+# }}}
+
 # standardize_ver {{{
 standardize_ver <- function(ver, strict = FALSE, complete = TRUE) {
     if (is.character(ver)) {
