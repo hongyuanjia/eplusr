@@ -28,7 +28,6 @@ ALL_IDD_VER <- c(
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
     "version , commit
-     23.2.0  , 7636e6b3e9
      23.1.0  , 87ed9199d4
      22.2.0  , c249759bad
      22.1.0  , ed759b17ee
