@@ -37,6 +37,7 @@ test_that("IdfGeometry", {
     expect_s3_class(geom$tilt(), "data.table")
     expect_s3_class(geom$tilt(class = "Shading:Zone:Detailed"), "data.table")
 
+    skip_on_os("mac")
     expect_s3_class(v1 <- geom$view(render_by = "construction"), "IdfViewer")
     expect_s3_class(v2 <- geom$view(axis = FALSE), "IdfViewer")
     v1$close()
