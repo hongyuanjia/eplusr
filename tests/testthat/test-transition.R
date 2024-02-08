@@ -2276,6 +2276,8 @@ test_that("Transition v9.5 --> v9.6", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
 
+    # do not install EnergyPlus if not on CI
+    skip_if_not(testthat:::on_ci())
     # Only install EnergyPlus v9.6 for testing v9.5 to v9.6 transition, because
     # this version of transition breaks `Wall:Detailed`, `Floor:Detailed`, etc.
     # See: https://github.com/NREL/EnergyPlus/issues/9172
