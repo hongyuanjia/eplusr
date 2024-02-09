@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2023-08-26</h4>
+            <h4 data-toc-skip class="date">2024-02-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -268,13 +268,14 @@ schedule values.</p>
 <span><span class="co">#&gt; [1] "1.0"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    id name            class index                     field          value</span></span>
-<span><span class="co">#&gt; 1: 56  sch Schedule:Compact     1                      Name            sch</span></span>
-<span><span class="co">#&gt; 2: 56  sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3: 56  sch Schedule:Compact     3                   Field 1 Through: 12/31</span></span>
-<span><span class="co">#&gt; 4: 56  sch Schedule:Compact     4                   Field 2   For: AllDays</span></span>
-<span><span class="co">#&gt; 5: 56  sch Schedule:Compact     5                   Field 3   Until: 24:00</span></span>
-<span><span class="co">#&gt; 6: 56  sch Schedule:Compact     6                   Field 4            1.0</span></span></code></pre></div>
+<span><span class="co">#&gt;       id   name            class index                     field          value</span></span>
+<span><span class="co">#&gt;    &lt;int&gt; &lt;char&gt;           &lt;char&gt; &lt;int&gt;                    &lt;char&gt;         &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:    56    sch Schedule:Compact     1                      Name            sch</span></span>
+<span><span class="co">#&gt; 2:    56    sch Schedule:Compact     2 Schedule Type Limits Name           &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3:    56    sch Schedule:Compact     3                   Field 1 Through: 12/31</span></span>
+<span><span class="co">#&gt; 4:    56    sch Schedule:Compact     4                   Field 2   For: AllDays</span></span>
+<span><span class="co">#&gt; 5:    56    sch Schedule:Compact     5                   Field 3   Until: 24:00</span></span>
+<span><span class="co">#&gt; 6:    56    sch Schedule:Compact     6                   Field 4            1.0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-the-idfschedulecompact-class">Introduce the <code>IdfScheduleCompact</code> class<a class="anchor" aria-label="anchor" href="#introduce-the-idfschedulecompact-class"></a>
@@ -539,7 +540,7 @@ e.g. <code>as.difftime(1:24, units = "hours")</code>
 </li>
 <li>
 <code>ITime</code>: <code>ITime</code> objects constructed using
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>,
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>,
 e.g. <code>as.ITime("01:30:00")</code>
 </li>
 </ul>
@@ -549,25 +550,26 @@ e.g. <code>as.ITime("01:30:00")</code>
 values</li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
+<code class="sourceCode R"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
 <span>    daytype <span class="op">=</span> <span class="st">"weekday, summerdesignday"</span>,</span>
 <span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"7:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span>
 <span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span>
-<span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span>
+<span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">val</span></span>
-<span><span class="co">#&gt;     year_day                  daytype  time value</span></span>
-<span><span class="co">#&gt;  1:    12/31 weekday, summerdesignday  6:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31 weekday, summerdesignday  7:00  0.50</span></span>
-<span><span class="co">#&gt;  3:    12/31 weekday, summerdesignday  8:00  0.50</span></span>
-<span><span class="co">#&gt;  4:    12/31 weekday, summerdesignday 12:00  0.95</span></span>
-<span><span class="co">#&gt;  5:    12/31 weekday, summerdesignday 13:30  0.60</span></span>
-<span><span class="co">#&gt;  6:    12/31 weekday, summerdesignday 14:00  0.80</span></span>
-<span><span class="co">#&gt;  7:    12/31 weekday, summerdesignday 18:00  0.95</span></span>
-<span><span class="co">#&gt;  8:    12/31 weekday, summerdesignday 19:00  0.20</span></span>
-<span><span class="co">#&gt;  9:    12/31 weekday, summerdesignday 24:00  0.00</span></span>
-<span><span class="co">#&gt; 10:    12/31              allotherday 24:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day                  daytype   time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31 weekday, summerdesignday   6:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31 weekday, summerdesignday   7:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31 weekday, summerdesignday   8:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31 weekday, summerdesignday  12:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31 weekday, summerdesignday  13:30  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31 weekday, summerdesignday  14:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31 weekday, summerdesignday  18:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31 weekday, summerdesignday  19:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31 weekday, summerdesignday  24:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31              allotherday  24:00  0.00</span></span>
 <span></span>
 <span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span>, check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'Schedule:Compact'&gt; [ID:57] `sch1`</span></span>
@@ -626,17 +628,18 @@ vector. Used for the <code>Until:</code> fields.</li>
 </ul>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id                 daytype     time value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
-<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
-<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
-<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
-<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
-<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
-<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
-<span><span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 10:    12/31  2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
+<span><span class="co">#&gt;     year_day    id                 daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;                  &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31     1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31     1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31     1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31     1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31     1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31     1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31     1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31     1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31     2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
 <p>By default, grouped day types are concatenated together using
 <code>,</code>. The compacted day types, e.g. <code>Weekday</code> and
 <code>AllOtherDay</code> are kept. If you want to expand all possible
@@ -648,46 +651,46 @@ extracted, with the <code>id</code> column showing their original
 group.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1          Monday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31  1          Monday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt;  3:    12/31  1          Monday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt;  4:    12/31  1          Monday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt;  5:    12/31  1          Monday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt;  6:    12/31  1          Monday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt;  7:    12/31  1          Monday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt;  8:    12/31  1          Monday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt;  9:    12/31  1          Monday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 10:    12/31  1         Tuesday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 11:    12/31  1         Tuesday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 12:    12/31  1         Tuesday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 13:    12/31  1         Tuesday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 14:    12/31  1         Tuesday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 15:    12/31  1         Tuesday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 16:    12/31  1         Tuesday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 17:    12/31  1         Tuesday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 18:    12/31  1         Tuesday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 19:    12/31  1       Wednesday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 20:    12/31  1       Wednesday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 21:    12/31  1       Wednesday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 22:    12/31  1       Wednesday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 23:    12/31  1       Wednesday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 24:    12/31  1       Wednesday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 25:    12/31  1       Wednesday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 26:    12/31  1       Wednesday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 27:    12/31  1       Wednesday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 28:    12/31  1        Thursday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 29:    12/31  1        Thursday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 30:    12/31  1        Thursday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 31:    12/31  1        Thursday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 32:    12/31  1        Thursday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 33:    12/31  1        Thursday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 34:    12/31  1        Thursday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 35:    12/31  1        Thursday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 36:    12/31  1        Thursday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 37:    12/31  1          Friday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 38:    12/31  1          Friday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 39:    12/31  1          Friday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;          &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1          Monday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31     1          Monday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31     1          Monday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31     1          Monday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31     1          Monday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31     1          Monday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31     1          Monday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31     1          Monday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31     1          Monday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31     1         Tuesday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31     1         Tuesday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31     1         Tuesday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31     1         Tuesday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31     1         Tuesday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31     1         Tuesday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31     1         Tuesday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31     1         Tuesday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31     1         Tuesday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31     1       Wednesday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 20:    12/31     1       Wednesday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 21:    12/31     1       Wednesday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 22:    12/31     1       Wednesday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 23:    12/31     1       Wednesday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 24:    12/31     1       Wednesday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 25:    12/31     1       Wednesday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 26:    12/31     1       Wednesday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 27:    12/31     1       Wednesday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 28:    12/31     1        Thursday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 29:    12/31     1        Thursday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 30:    12/31     1        Thursday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 31:    12/31     1        Thursday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 32:    12/31     1        Thursday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 33:    12/31     1        Thursday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 34:    12/31     1        Thursday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 35:    12/31     1        Thursday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 36:    12/31     1        Thursday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 37:    12/31     1          Friday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 38:    12/31     1          Friday 07:00:00  0.50</span></span>
 <span><span class="va">....</span></span>
 <span><span class="co"># OR sch$extract(daytype = "expand")</span></span></code></pre></div>
 <div class="section level4">
@@ -712,29 +715,30 @@ i.e. <code>Weekend</code>, <code>WinterDesignDay</code> and
 <code>AllOtherDay</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>daytype <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 19:    12/31  2         Weekend 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 20:    12/31  2 WinterDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;          &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1         Weekday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31     1         Weekday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31     1         Weekday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31     1         Weekday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31     1         Weekday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31     1         Weekday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31     1         Weekday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31     1         Weekday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31     1         Weekday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31     1 SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31     1 SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31     1 SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31     1 SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31     1 SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31     1 SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31     1 SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31     1 SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31     1 SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31     2         Weekend 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 20:    12/31     2 WinterDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31     2     AllOtherDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
 <span><span class="co"># OR sch$extract(daytype = "compact")</span></span></code></pre></div>
 <p>If you want to specify your own grouped day types, you can directly
 pass a character vector to <code>daytype</code>. All other days except
@@ -744,29 +748,30 @@ possible.</p>
 separately. We can achieve it by:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekday"</span>, <span class="st">"saturday"</span>, <span class="st">"sunday"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id         daytype     time value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1         Weekday 06:00:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31  1         Weekday 07:00:00  0.50</span></span>
-<span><span class="co">#&gt;  3:    12/31  1         Weekday 08:00:00  0.50</span></span>
-<span><span class="co">#&gt;  4:    12/31  1         Weekday 12:00:00  0.95</span></span>
-<span><span class="co">#&gt;  5:    12/31  1         Weekday 13:30:00  0.60</span></span>
-<span><span class="co">#&gt;  6:    12/31  1         Weekday 14:00:00  0.80</span></span>
-<span><span class="co">#&gt;  7:    12/31  1         Weekday 18:00:00  0.95</span></span>
-<span><span class="co">#&gt;  8:    12/31  1         Weekday 19:00:00  0.20</span></span>
-<span><span class="co">#&gt;  9:    12/31  1         Weekday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 10:    12/31  1 SummerDesignDay 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 11:    12/31  1 SummerDesignDay 07:00:00  0.50</span></span>
-<span><span class="co">#&gt; 12:    12/31  1 SummerDesignDay 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 13:    12/31  1 SummerDesignDay 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 14:    12/31  1 SummerDesignDay 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 15:    12/31  1 SummerDesignDay 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 16:    12/31  1 SummerDesignDay 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 17:    12/31  1 SummerDesignDay 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 18:    12/31  1 SummerDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 19:    12/31  2        Saturday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 20:    12/31  2          Sunday 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 21:    12/31  2     AllOtherDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt;     year_day id         daytype     time value</span></span></code></pre></div>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;          &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1         Weekday 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31     1         Weekday 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  3:    12/31     1         Weekday 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  4:    12/31     1         Weekday 12:00:00  0.95</span></span>
+<span><span class="co">#&gt;  5:    12/31     1         Weekday 13:30:00  0.60</span></span>
+<span><span class="co">#&gt;  6:    12/31     1         Weekday 14:00:00  0.80</span></span>
+<span><span class="co">#&gt;  7:    12/31     1         Weekday 18:00:00  0.95</span></span>
+<span><span class="co">#&gt;  8:    12/31     1         Weekday 19:00:00  0.20</span></span>
+<span><span class="co">#&gt;  9:    12/31     1         Weekday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 10:    12/31     1 SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 11:    12/31     1 SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt; 12:    12/31     1 SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 13:    12/31     1 SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 14:    12/31     1 SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 15:    12/31     1 SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 16:    12/31     1 SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31     1 SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 18:    12/31     1 SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 19:    12/31     2        Saturday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 20:    12/31     2          Sunday 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31     2     AllOtherDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="compact-or-expand-schedule-times">Compact or expand schedule times<a class="anchor" aria-label="anchor" href="#compact-or-expand-schedule-times"></a>
@@ -779,65 +784,66 @@ values.</p>
 <code>timestep</code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"3 hour"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id                 daytype     time      value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 03:00:00 0.20000000</span></span>
-<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 06:00:00 0.20000000</span></span>
-<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 09:00:00 0.65000000</span></span>
-<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 12:00:00 0.95000000</span></span>
-<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 15:00:00 0.75000000</span></span>
-<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 18:00:00 0.95000000</span></span>
-<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 21:00:00 0.06666667</span></span>
-<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 24:00:00 0.00000000</span></span>
-<span><span class="co">#&gt;  9:    12/31  2             AllOtherDay 03:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 10:    12/31  2             AllOtherDay 06:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 11:    12/31  2             AllOtherDay 09:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 12:    12/31  2             AllOtherDay 12:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 13:    12/31  2             AllOtherDay 15:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 14:    12/31  2             AllOtherDay 18:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 15:    12/31  2             AllOtherDay 21:00:00 0.00000000</span></span>
-<span><span class="co">#&gt; 16:    12/31  2             AllOtherDay 24:00:00 0.00000000</span></span>
+<span><span class="co">#&gt;     year_day    id                 daytype     time      value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;                  &lt;char&gt;    &lt;hms&gt;      &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1 Weekday,SummerDesignDay 03:00:00 0.20000000</span></span>
+<span><span class="co">#&gt;  2:    12/31     1 Weekday,SummerDesignDay 06:00:00 0.20000000</span></span>
+<span><span class="co">#&gt;  3:    12/31     1 Weekday,SummerDesignDay 09:00:00 0.65000000</span></span>
+<span><span class="co">#&gt;  4:    12/31     1 Weekday,SummerDesignDay 12:00:00 0.95000000</span></span>
+<span><span class="co">#&gt;  5:    12/31     1 Weekday,SummerDesignDay 15:00:00 0.75000000</span></span>
+<span><span class="co">#&gt;  6:    12/31     1 Weekday,SummerDesignDay 18:00:00 0.95000000</span></span>
+<span><span class="co">#&gt;  7:    12/31     1 Weekday,SummerDesignDay 21:00:00 0.06666667</span></span>
+<span><span class="co">#&gt;  8:    12/31     1 Weekday,SummerDesignDay 24:00:00 0.00000000</span></span>
+<span><span class="co">#&gt;  9:    12/31     2             AllOtherDay 03:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 10:    12/31     2             AllOtherDay 06:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 11:    12/31     2             AllOtherDay 09:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 12:    12/31     2             AllOtherDay 12:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 13:    12/31     2             AllOtherDay 15:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 14:    12/31     2             AllOtherDay 18:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 15:    12/31     2             AllOtherDay 21:00:00 0.00000000</span></span>
+<span><span class="co">#&gt; 16:    12/31     2             AllOtherDay 24:00:00 0.00000000</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     year_day id                 daytype     time value</span></span>
-<span><span class="co">#&gt;  1:    12/31  1 Weekday,SummerDesignDay 01:00:00  0.20</span></span>
-<span><span class="co">#&gt;  2:    12/31  1 Weekday,SummerDesignDay 02:00:00  0.20</span></span>
-<span><span class="co">#&gt;  3:    12/31  1 Weekday,SummerDesignDay 03:00:00  0.20</span></span>
-<span><span class="co">#&gt;  4:    12/31  1 Weekday,SummerDesignDay 04:00:00  0.20</span></span>
-<span><span class="co">#&gt;  5:    12/31  1 Weekday,SummerDesignDay 05:00:00  0.20</span></span>
-<span><span class="co">#&gt;  6:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
-<span><span class="co">#&gt;  7:    12/31  1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
-<span><span class="co">#&gt;  8:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
-<span><span class="co">#&gt;  9:    12/31  1 Weekday,SummerDesignDay 09:00:00  0.95</span></span>
-<span><span class="co">#&gt; 10:    12/31  1 Weekday,SummerDesignDay 10:00:00  0.95</span></span>
-<span><span class="co">#&gt; 11:    12/31  1 Weekday,SummerDesignDay 11:00:00  0.95</span></span>
-<span><span class="co">#&gt; 12:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 13:    12/31  1 Weekday,SummerDesignDay 13:00:00  0.60</span></span>
-<span><span class="co">#&gt; 14:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.70</span></span>
-<span><span class="co">#&gt; 15:    12/31  1 Weekday,SummerDesignDay 15:00:00  0.95</span></span>
-<span><span class="co">#&gt; 16:    12/31  1 Weekday,SummerDesignDay 16:00:00  0.95</span></span>
-<span><span class="co">#&gt; 17:    12/31  1 Weekday,SummerDesignDay 17:00:00  0.95</span></span>
-<span><span class="co">#&gt; 18:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 19:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 20:    12/31  1 Weekday,SummerDesignDay 20:00:00  0.00</span></span>
-<span><span class="co">#&gt; 21:    12/31  1 Weekday,SummerDesignDay 21:00:00  0.00</span></span>
-<span><span class="co">#&gt; 22:    12/31  1 Weekday,SummerDesignDay 22:00:00  0.00</span></span>
-<span><span class="co">#&gt; 23:    12/31  1 Weekday,SummerDesignDay 23:00:00  0.00</span></span>
-<span><span class="co">#&gt; 24:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 25:    12/31  2             AllOtherDay 01:00:00  0.00</span></span>
-<span><span class="co">#&gt; 26:    12/31  2             AllOtherDay 02:00:00  0.00</span></span>
-<span><span class="co">#&gt; 27:    12/31  2             AllOtherDay 03:00:00  0.00</span></span>
-<span><span class="co">#&gt; 28:    12/31  2             AllOtherDay 04:00:00  0.00</span></span>
-<span><span class="co">#&gt; 29:    12/31  2             AllOtherDay 05:00:00  0.00</span></span>
-<span><span class="co">#&gt; 30:    12/31  2             AllOtherDay 06:00:00  0.00</span></span>
-<span><span class="co">#&gt; 31:    12/31  2             AllOtherDay 07:00:00  0.00</span></span>
-<span><span class="co">#&gt; 32:    12/31  2             AllOtherDay 08:00:00  0.00</span></span>
-<span><span class="co">#&gt; 33:    12/31  2             AllOtherDay 09:00:00  0.00</span></span>
-<span><span class="co">#&gt; 34:    12/31  2             AllOtherDay 10:00:00  0.00</span></span>
-<span><span class="co">#&gt; 35:    12/31  2             AllOtherDay 11:00:00  0.00</span></span>
-<span><span class="co">#&gt; 36:    12/31  2             AllOtherDay 12:00:00  0.00</span></span>
-<span><span class="co">#&gt; 37:    12/31  2             AllOtherDay 13:00:00  0.00</span></span>
-<span><span class="co">#&gt; 38:    12/31  2             AllOtherDay 14:00:00  0.00</span></span>
-<span><span class="co">#&gt; 39:    12/31  2             AllOtherDay 15:00:00  0.00</span></span>
+<span><span class="co">#&gt;     year_day    id                 daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;                  &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    12/31     1 Weekday,SummerDesignDay 01:00:00  0.20</span></span>
+<span><span class="co">#&gt;  2:    12/31     1 Weekday,SummerDesignDay 02:00:00  0.20</span></span>
+<span><span class="co">#&gt;  3:    12/31     1 Weekday,SummerDesignDay 03:00:00  0.20</span></span>
+<span><span class="co">#&gt;  4:    12/31     1 Weekday,SummerDesignDay 04:00:00  0.20</span></span>
+<span><span class="co">#&gt;  5:    12/31     1 Weekday,SummerDesignDay 05:00:00  0.20</span></span>
+<span><span class="co">#&gt;  6:    12/31     1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt;  7:    12/31     1 Weekday,SummerDesignDay 07:00:00  0.50</span></span>
+<span><span class="co">#&gt;  8:    12/31     1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt;  9:    12/31     1 Weekday,SummerDesignDay 09:00:00  0.95</span></span>
+<span><span class="co">#&gt; 10:    12/31     1 Weekday,SummerDesignDay 10:00:00  0.95</span></span>
+<span><span class="co">#&gt; 11:    12/31     1 Weekday,SummerDesignDay 11:00:00  0.95</span></span>
+<span><span class="co">#&gt; 12:    12/31     1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 13:    12/31     1 Weekday,SummerDesignDay 13:00:00  0.60</span></span>
+<span><span class="co">#&gt; 14:    12/31     1 Weekday,SummerDesignDay 14:00:00  0.70</span></span>
+<span><span class="co">#&gt; 15:    12/31     1 Weekday,SummerDesignDay 15:00:00  0.95</span></span>
+<span><span class="co">#&gt; 16:    12/31     1 Weekday,SummerDesignDay 16:00:00  0.95</span></span>
+<span><span class="co">#&gt; 17:    12/31     1 Weekday,SummerDesignDay 17:00:00  0.95</span></span>
+<span><span class="co">#&gt; 18:    12/31     1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 19:    12/31     1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 20:    12/31     1 Weekday,SummerDesignDay 20:00:00  0.00</span></span>
+<span><span class="co">#&gt; 21:    12/31     1 Weekday,SummerDesignDay 21:00:00  0.00</span></span>
+<span><span class="co">#&gt; 22:    12/31     1 Weekday,SummerDesignDay 22:00:00  0.00</span></span>
+<span><span class="co">#&gt; 23:    12/31     1 Weekday,SummerDesignDay 23:00:00  0.00</span></span>
+<span><span class="co">#&gt; 24:    12/31     1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 25:    12/31     2             AllOtherDay 01:00:00  0.00</span></span>
+<span><span class="co">#&gt; 26:    12/31     2             AllOtherDay 02:00:00  0.00</span></span>
+<span><span class="co">#&gt; 27:    12/31     2             AllOtherDay 03:00:00  0.00</span></span>
+<span><span class="co">#&gt; 28:    12/31     2             AllOtherDay 04:00:00  0.00</span></span>
+<span><span class="co">#&gt; 29:    12/31     2             AllOtherDay 05:00:00  0.00</span></span>
+<span><span class="co">#&gt; 30:    12/31     2             AllOtherDay 06:00:00  0.00</span></span>
+<span><span class="co">#&gt; 31:    12/31     2             AllOtherDay 07:00:00  0.00</span></span>
+<span><span class="co">#&gt; 32:    12/31     2             AllOtherDay 08:00:00  0.00</span></span>
+<span><span class="co">#&gt; 33:    12/31     2             AllOtherDay 09:00:00  0.00</span></span>
+<span><span class="co">#&gt; 34:    12/31     2             AllOtherDay 10:00:00  0.00</span></span>
+<span><span class="co">#&gt; 35:    12/31     2             AllOtherDay 11:00:00  0.00</span></span>
+<span><span class="co">#&gt; 36:    12/31     2             AllOtherDay 12:00:00  0.00</span></span>
+<span><span class="co">#&gt; 37:    12/31     2             AllOtherDay 13:00:00  0.00</span></span>
+<span><span class="co">#&gt; 38:    12/31     2             AllOtherDay 14:00:00  0.00</span></span>
 <span><span class="va">....</span></span></code></pre></div>
 <p>As described above, the <code>time</code> column is a
 <code>hms</code> vector. It is handy for plotting since <code>hms</code>
@@ -858,16 +864,17 @@ the same schedule value (0.5). The following table has compact these 2
 time periods together into one (06:00 – 08:00).</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span>timestep <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    year_day id                 daytype     time value</span></span>
-<span><span class="co">#&gt; 1:    12/31  1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
-<span><span class="co">#&gt; 2:    12/31  1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
-<span><span class="co">#&gt; 3:    12/31  1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
-<span><span class="co">#&gt; 4:    12/31  1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
-<span><span class="co">#&gt; 5:    12/31  1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
-<span><span class="co">#&gt; 6:    12/31  1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
-<span><span class="co">#&gt; 7:    12/31  1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
-<span><span class="co">#&gt; 8:    12/31  1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt; 9:    12/31  2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
+<span><span class="co">#&gt;    year_day    id                 daytype     time value</span></span>
+<span><span class="co">#&gt;      &lt;char&gt; &lt;int&gt;                  &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:    12/31     1 Weekday,SummerDesignDay 06:00:00  0.20</span></span>
+<span><span class="co">#&gt; 2:    12/31     1 Weekday,SummerDesignDay 08:00:00  0.50</span></span>
+<span><span class="co">#&gt; 3:    12/31     1 Weekday,SummerDesignDay 12:00:00  0.95</span></span>
+<span><span class="co">#&gt; 4:    12/31     1 Weekday,SummerDesignDay 13:30:00  0.60</span></span>
+<span><span class="co">#&gt; 5:    12/31     1 Weekday,SummerDesignDay 14:00:00  0.80</span></span>
+<span><span class="co">#&gt; 6:    12/31     1 Weekday,SummerDesignDay 18:00:00  0.95</span></span>
+<span><span class="co">#&gt; 7:    12/31     1 Weekday,SummerDesignDay 19:00:00  0.20</span></span>
+<span><span class="co">#&gt; 8:    12/31     1 Weekday,SummerDesignDay 24:00:00  0.00</span></span>
+<span><span class="co">#&gt; 9:    12/31     2             AllOtherDay 24:00:00  0.00</span></span></code></pre></div>
 </div>
 </div>
 </div>

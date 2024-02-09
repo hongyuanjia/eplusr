@@ -26,7 +26,7 @@ parent Idf object, using $object(), $objects_in_class() and equivalent."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -697,7 +697,7 @@ also be retrieved using <code>idfobj$definition()$field_range()</code>.</p></li>
 <div class="section">
 <h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
 <p><code>$value_possible()</code> returns an <code>IdfValuePossible</code> object
-which is a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with at most 15
+which is a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with at most 15
 columns:</p><ul><li><p><code>class_id</code>: index of class that current <code>IdfObject</code> belongs to</p></li>
 <li><p><code>class_name</code>: name of class that current <code>IdfObject</code> belongs to</p></li>
 <li><p><code>object_id</code>: ID of current <code>IdfObject</code></p></li>
@@ -826,7 +826,7 @@ integer field values.</p></li>
 <li><p><code>invalid_reference</code>: Result of <code>reference</code> checking.</p></li>
 </ul><p>Except <code>missing_object</code>, which is a character vector of class names
 that are missing, all other elements are
-<a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 9 columns containing data
+<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 9 columns containing data
 of invalid field values:</p><ul><li><p><code>object_id</code>: IDs of objects that contain invalid values</p></li>
 <li><p><code>object_name</code>: names of objects that contain invalid values</p></li>
 <li><p><code>class_id</code>: indexes of classes that invalid objects belong to</p></li>
@@ -1072,8 +1072,8 @@ may do not have relation.</p>
 <div class="section">
 <h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
 <p>An <code>IdfRelation</code> object, which is a list of 3
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code>, <code>ref_by</code> and <code>node</code>.
-Each <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 24 columns.</p>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code>, <code>ref_by</code> and <code>node</code>.
+Each <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 24 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-14">Examples<a class="anchor" aria-label="anchor" href="#examples-14"></a></h4>
@@ -1688,7 +1688,7 @@ mat$has_ref()
 <p></p><div class="arguments"><dl><dt><code>string_value</code></dt>
 <dd><p>If <code>TRUE</code>, all field values are returned as
 character. If <code>FALSE</code>, <code>value</code> column in returned
-<a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is a list column with
+<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is a list column with
 each value stored as corresponding type. Note that if the
 value of numeric field is set to <code>"Autosize"</code> or
 <code>"Autocalculate"</code>, it is left as it is, leaving the returned
@@ -1719,7 +1719,7 @@ class that objects belong to will be returned. Default:
 <dt><code>group_ext</code></dt>
 <dd><p>Should be one of <code>"none"</code>, <code>"group"</code> or <code>"index"</code>.
 If not <code>"none"</code>, <code>value</code> column in returned
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> will be converted into a list.
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> will be converted into a list.
 If <code>"group"</code>, values from extensible fields will be grouped by the
 extensible group they belong to. For example, coordinate
 values of each vertex in class <code>BuildingSurface:Detailed</code> will
@@ -1734,7 +1734,7 @@ Default: <code>"none"</code>.</p></dd>
 </div>
 <div class="section">
 <h4 id="details-22">Details<a class="anchor" aria-label="anchor" href="#details-22"></a></h4>
-<p><code>$to_table()</code> returns a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
+<p><code>$to_table()</code> returns a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
 contains core data of current <code>IdfObject</code>. It has 6 columns:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
 <li><p><code>name</code>: Character type. Object names.</p></li>
 <li><p><code>class</code>: Character type. Current class name.</p></li>
@@ -1758,7 +1758,7 @@ resulting field names will be <code>Vertex X-coordinate</code>, <code>Vertex Y-c
 
 <div class="section">
 <h4 id="returns-21">Returns<a class="anchor" aria-label="anchor" href="#returns-21"></a></h4>
-<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
+<p>A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
 <code>wide</code> is <code>FALSE</code>) or at least 6 columns (if <code>wide</code> is <code>TRUE</code>).</p>
 </div>
 <div class="section">

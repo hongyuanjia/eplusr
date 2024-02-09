@@ -26,7 +26,7 @@ IddObject provides detailed information of curtain class."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -138,7 +138,7 @@ IDF file of that version.</p>
 package is used to speed up the whole IDD parsing process and store the
 results. However, it will still take about 2-3 sec per IDD. Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
-<a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> format. Every IDD will be parsed and stored in
+<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> format. Every IDD will be parsed and stored in
 four tables:</p><ul><li><p><code>group</code>: contains group index and group names.</p></li>
 <li><p><code>class</code>: contains class names and properties.</p></li>
 <li><p><code>field</code>: contains field names and field properties.</p></li>
@@ -838,8 +838,8 @@ described below.</p>
 <div class="section">
 <h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
 <p>An <code>IddRelation</code> object, which is a list of 3
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code> and <code>ref_by</code>.
-Each <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 12 columns.</p>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code> and <code>ref_by</code>.
+Each <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 12 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-16">Examples<a class="anchor" aria-label="anchor" href="#examples-16"></a></h4>
@@ -999,16 +999,16 @@ specified class will be returned. Default: <code>FALSE</code>.</p></dd>
 </div>
 <div class="section">
 <h4 id="details-19">Details<a class="anchor" aria-label="anchor" href="#details-19"></a></h4>
-<p><code>$to_table()</code> returns a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
+<p><code>$to_table()</code> returns a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
 contains basic data of specified classes.
-The returned <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> has 3 columns:</p><ul><li><p><code>class</code>: Character type. Current class name.</p></li>
+The returned <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> has 3 columns:</p><ul><li><p><code>class</code>: Character type. Current class name.</p></li>
 <li><p><code>index</code>: Integer type. Field indexes.</p></li>
 <li><p><code>field</code>: Character type. Field names.</p></li>
 </ul></div>
 
 <div class="section">
 <h4 id="returns-19">Returns<a class="anchor" aria-label="anchor" href="#returns-19"></a></h4>
-<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 3 columns.</p>
+<p>A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 3 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-19">Examples<a class="anchor" aria-label="anchor" href="#examples-19"></a></h4>
@@ -1132,8 +1132,8 @@ idd$print()
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Starting to download the IDD file from EnergyPlus GitHub repo...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/RtmpOonVUP.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> IDD file found: '/tmp/RtmpOonVUP/V8-8-0-Energy+.idd'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/Rtmppzys8e.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> IDD file found: '/tmp/Rtmppzys8e/V8-8-0-Energy+.idd'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Start parsing...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Parsing completed.</span>
 <span class="r-in"><span></span></span>

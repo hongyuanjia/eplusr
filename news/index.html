@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -98,6 +98,13 @@
       <small>Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Now <code><a href="../reference/install_eplus.html">install_eplus()</a></code> can choose the installer most suitable for current OS version (<a href="https://github.com/hongyuanjia/eplusr/issues/579" class="external-link">#579</a>).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.16.2" id="eplusr-0162">eplusr 0.16.2<small>2023-08-25</small><a class="anchor" aria-label="anchor" href="#eplusr-0162"></a></h2>
 <div class="section level3">
@@ -374,7 +381,7 @@
 <li><p>Now <code>Idf$insert()</code> can directly take an <code>Idf</code> object or a list of <code>Idf</code> objects as input. And also <code>Version</code> objects in input will be directly skipped instead of giving an error (<a href="https://github.com/hongyuanjia/eplusr/issues/245" class="external-link">#245</a>).</p></li>
 <li><p>A new option <code>all</code> has been added in <code>IdfObject$print()</code> with default being <code>FALSE</code>. If <code>TRUE</code>, all fields defined in [Idd] are printed even they do not exist in current object (<a href="https://github.com/hongyuanjia/eplusr/issues/247" class="external-link">#247</a>).</p></li>
 <li><p>New S3 methods of <code>==</code> for all classes are added, i.e. <code>==.Idf</code>, <code>==.IdfObject</code>, <code>==.Idd</code>, <code>==.IddObject</code>, <code>==.Epw</code>, <code>==.EplusJob</code>, <code>==.EplusSql</code>, <code>==.EplusGroupJob</code>, <code>==.ParametricJob</code>. The negate methods are also added. This makes it quite easy to check the equality of R6 objects of these types (<a href="https://github.com/hongyuanjia/eplusr/issues/250" class="external-link">#250</a>).</p></li>
-<li><p>A new Generic function <code><a href="../reference/reload.html">reload()</a></code> is added. eplusr relies heavily on the <code>data.table</code> package. The core data of all main classes in eplusr are saved as <code>data.table</code>s. This introduces a problem when loading saved <code>Idf</code> objects or other class objects via an <code>*.RDS</code> and <code>*.RData</code> file on disk: the stored <code>data.table</code>s lose their column over-allocation. <code><a href="../reference/reload.html">reload()</a></code> is a helper function that calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">data.table::setDT()</a></code> on all internal <code>data.table</code>s to make sure they are initialized properly. It is recommended to call <code><a href="../reference/reload.html">reload()</a></code> on each <code>Idd</code>, <code>Idf</code> and other class object in eplusr loaded with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> or <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>, to make sure all eplusr’s functionaries works properly (<a href="https://github.com/hongyuanjia/eplusr/issues/251" class="external-link">#251</a>).</p></li>
+<li><p>A new Generic function <code><a href="../reference/reload.html">reload()</a></code> is added. eplusr relies heavily on the <code>data.table</code> package. The core data of all main classes in eplusr are saved as <code>data.table</code>s. This introduces a problem when loading saved <code>Idf</code> objects or other class objects via an <code>*.RDS</code> and <code>*.RData</code> file on disk: the stored <code>data.table</code>s lose their column over-allocation. <code><a href="../reference/reload.html">reload()</a></code> is a helper function that calls <code><a href="https://rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">data.table::setDT()</a></code> on all internal <code>data.table</code>s to make sure they are initialized properly. It is recommended to call <code><a href="../reference/reload.html">reload()</a></code> on each <code>Idd</code>, <code>Idf</code> and other class object in eplusr loaded with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> or <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>, to make sure all eplusr’s functionaries works properly (<a href="https://github.com/hongyuanjia/eplusr/issues/251" class="external-link">#251</a>).</p></li>
 <li><p>The implementation of <code>EplusSql$report_data()</code> has been refactored, resulting in a ~200% speed-up (<a href="https://github.com/hongyuanjia/eplusr/issues/259" class="external-link">#259</a>).</p></li>
 <li>
 <p>Now <code>day_type</code> in <code>EplusSql$report_data()</code> has a few new options (<a href="https://github.com/hongyuanjia/eplusr/issues/259" class="external-link">#259</a>):</p>
@@ -398,7 +405,7 @@
 <li><p>A new <code>IdfScheduleCompact</code> class is introduced. A constructor function <code><a href="../reference/IdfSchedule.html">schedule_compact()</a></code> is added. <code>IdfScheduleCompact</code> class provides more detailed methods to add, modify and extract schedule values. For more details, see <code><a href="../articles/schedule.html">vignette("schedule")</a></code> (<a href="https://github.com/hongyuanjia/eplusr/issues/256" class="external-link">#256</a>).</p></li>
 <li><p>New <code>IdfGeometry</code> and <code>IdfViewer</code> classes are introduced. <code>IdfGeometry</code> is designed to extract data for all geometry objects and perform geometric operations on them, while <code>IdfViewer</code> is to view IDF geoemtry in 3D using the rgl package in a similar way as OpenStudio SketchUp Plugin. <code>Idf$geometry()</code> and <code>Idf$view()</code> methods are added to directly create an <code>IdfGeometry</code> and <code>IdfViewer</code> object based on current <code>Idf</code> object, respectively (<a href="https://github.com/hongyuanjia/eplusr/issues/296" class="external-link">#296</a>).</p></li>
 <li><p>A <code>plot.Idf</code> method is added which is basically a wrapper of <code>Idf$view()</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/296" class="external-link">#296</a>).</p></li>
-<li><p>Now eplusr can utilize the CSV output for report data extraction. Benefiting from the fantastic <code><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread</a></code>, this approach can be as 3~10X faster compared to the SQLite approach. eplusr will still use the SQLite if the CSV output is not available.</p></li>
+<li><p>Now eplusr can utilize the CSV output for report data extraction. Benefiting from the fantastic <code><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread</a></code>, this approach can be as 3~10X faster compared to the SQLite approach. eplusr will still use the SQLite if the CSV output is not available.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="major-changes-0-13-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-13-0"></a></h3>

@@ -24,7 +24,7 @@ EnergyPlus SQLite output file."><meta property="og:image" content="https://hongy
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -292,12 +292,12 @@ sql$list_table()
 <h4 id="details-3">Details<a class="anchor" aria-label="anchor" href="#details-3"></a></h4>
 <p><code>$read_table()</code> takes a valid table <code>name</code> of those from
 <a href="../../eplusr/html/EplusSql.html#method-list_table"><code>$list_table()</code></a>
-and returns that table data in a <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> format.</p>
+and returns that table data in a <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> format.</p>
 </div>
 
 <div class="section">
 <h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
 </div>
 <div class="section">
 <h4 id="examples-4">Examples<a class="anchor" aria-label="anchor" href="#examples-4"></a></h4>
@@ -319,7 +319,7 @@ sql$read_table("Zones")
 
 <div class="section">
 <h4 id="details-4">Details<a class="anchor" aria-label="anchor" href="#details-4"></a></h4>
-<p><code>$report_data_dict()</code> returns a <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> which
+<p><code>$report_data_dict()</code> returns a <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> which
 contains all information about report data.</p>
 <p>For details on the meaning of each columns, please see "2.20.2.1
 ReportDataDictionary Table" in EnergyPlus "Output Details and
@@ -328,7 +328,7 @@ Examples" documentation.</p>
 
 <div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 10 columns:</p><ul><li><p><code>report_data_dictionary_index</code>: The integer used to link the
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 10 columns:</p><ul><li><p><code>report_data_dictionary_index</code>: The integer used to link the
 dictionary data to the variable data. Mainly useful when joining
 different tables</p></li>
 <li><p><code>is_meter</code>: Whether report data is a meter data. Possible values:
@@ -418,7 +418,7 @@ IDF file without extension is used. Default: <code>"auto"</code>.</p></dd>
 
 <dt><code>all</code></dt>
 <dd><p>If <code>TRUE</code>, extra columns are also included in the returned
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p></dd>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p></dd>
 
 
 <dt><code>wide</code></dt>
@@ -490,11 +490,11 @@ obtained using:</p>
 <div class="section">
 <h4 id="details-5">Details<a class="anchor" aria-label="anchor" href="#details-5"></a></h4>
 <p><code>$report_data()</code> extracts the report data in a
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> using key values, variable names and other
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> using key values, variable names and other
 specifications.</p>
 <p><code>$report_data()</code> can also directly take all or subset output from
 <code>$report_data_dict()</code> as input, and extract all data specified.</p>
-<p>The returned column numbers varies depending on <code>all</code> argument.</p><ul><li><p><code>all</code> is <code>FALSE</code>, the returned <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> has 6 columns:</p><ul><li><p><code>case</code>: Simulation case specified using <code>case</code> argument</p></li>
+<p>The returned column numbers varies depending on <code>all</code> argument.</p><ul><li><p><code>all</code> is <code>FALSE</code>, the returned <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> has 6 columns:</p><ul><li><p><code>case</code>: Simulation case specified using <code>case</code> argument</p></li>
 <li><p><code>datetime</code>: The date time of simulation result</p></li>
 <li><p><code>key_value</code>: Key name of the data</p></li>
 <li><p><code>name</code>: Actual report data name</p></li>
@@ -555,7 +555,7 @@ and date time components are also returned, including:
 
 <div class="section">
 <h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
 </div>
 <div class="section">
 <h4 id="examples-6">Examples<a class="anchor" aria-label="anchor" href="#examples-6"></a></h4>
@@ -653,8 +653,8 @@ numeric columns indicate column that:</p><ul><li><p>columns that have associated
 <div class="section">
 <h4 id="details-6">Details<a class="anchor" aria-label="anchor" href="#details-6"></a></h4>
 <p><code>$tabular_data()</code> extracts the tabular data in a
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> using report, table, column and row name
-specifications. The returned <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> has
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> using report, table, column and row name
+specifications. The returned <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> has
 9 columns:</p><ul><li><p><code>case</code>: Simulation case specified using <code>case</code> argument</p></li>
 <li><p><code>index</code>: Tabular data index</p></li>
 <li><p><code>report_name</code>: The name of the report that the record belongs to</p></li>
@@ -670,8 +670,8 @@ specifications. The returned <code><a href="https://Rdatatable.gitlab.io/data.ta
 
 <div class="section">
 <h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 9 columns (when <code>wide</code> is
-<code>FALSE</code>) or a named list of <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s where the
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 9 columns (when <code>wide</code> is
+<code>FALSE</code>) or a named list of <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s where the
 names are the combination of <code>report_name</code>, <code>report_for</code> and
 <code>table_name</code>.</p>
 </div>

@@ -25,7 +25,7 @@ as [EnergyPlus/WeatherManager.cc] in EnergyPlus, with some simplifications."><me
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -462,7 +462,7 @@ epw$design_condition()
 
 <div class="section">
 <h4 id="details-5">Details<a class="anchor" aria-label="anchor" href="#details-5"></a></h4>
-<p><code>$typical_extreme_period()</code> returns the parsed values of <code>TYPICAL/EXTREME PERIOD</code> header in a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> format with 6
+<p><code>$typical_extreme_period()</code> returns the parsed values of <code>TYPICAL/EXTREME PERIOD</code> header in a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> format with 6
 columns:</p><ul><li><p><code>index</code>: Integer type. The index of typical or extreme period record</p></li>
 <li><p><code>name</code>: Character type. The name of typical or extreme period record</p></li>
 <li><p><code>type</code>: Character type. The type of period. Possible value: <code>typical</code> and
@@ -475,7 +475,7 @@ period</p></li>
 
 <div class="section">
 <h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 6 columns.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 6 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-5">Examples<a class="anchor" aria-label="anchor" href="#examples-5"></a></h4>
@@ -497,7 +497,7 @@ epw$typical_extreme_period()
 <div class="section">
 <h4 id="details-6">Details<a class="anchor" aria-label="anchor" href="#details-6"></a></h4>
 <p><code>$ground_temperature()</code> returns the parsed values of <code>GROUND TEMPERATURE</code>
-header in a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> format with 17 columns:</p><ul><li><p><code>index</code>: Integer type. The index of ground temperature record</p></li>
+header in a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> format with 17 columns:</p><ul><li><p><code>index</code>: Integer type. The index of ground temperature record</p></li>
 <li><p><code>depth</code>: Numeric type. The depth of the ground temperature is measured</p></li>
 <li><p><code>soil_conductivity</code>: Numeric type. The soil conductivity at measured depth</p></li>
 <li><p><code>soil_density</code>: Numeric type. The soil density at measured depth</p></li>
@@ -508,7 +508,7 @@ temperature for each month.</p></li>
 
 <div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 17 columns.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> with 17 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-6">Examples<a class="anchor" aria-label="anchor" href="#examples-6"></a></h4>
@@ -556,8 +556,8 @@ of <code>HOLIDAYS/DAYLIGHT SAVINGS</code> header is returned. It returns a list 
 elements:</p><ul><li><p><code>leapyear</code>: A single logical vector. <code>TRUE</code> means that the weather data
 contains leap year data</p></li>
 <li><p><code>dst</code>: A Date vector contains the start and end day of daylight saving time</p></li>
-<li><p><code>holiday</code>: A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> contains 2 columns. If
-no holiday specified, an empty <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></p><ul><li><p><code>name</code>: Name of the holiday</p></li>
+<li><p><code>holiday</code>: A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> contains 2 columns. If
+no holiday specified, an empty <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></p><ul><li><p><code>name</code>: Name of the holiday</p></li>
 <li><p><code>day</code>: Date of the holiday</p></li>
 </ul></li>
 </ul><p>Validation process below is performed when changing the <code>leapyear</code>
@@ -772,7 +772,7 @@ periods in current <code>Epw</code> is returned.</p>
 
 <div class="section">
 <h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
-<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 5 columns:</p><ul><li><p><code>index</code>: Integer type. The index of data period.</p></li>
+<p>A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 5 columns:</p><ul><li><p><code>index</code>: Integer type. The index of data period.</p></li>
 <li><p><code>name</code>: Character type. The name of data period.</p></li>
 <li><p><code>start_day_of_week</code>: Character type. The start day of week of data period.</p></li>
 <li><p><code>start_day</code>: Date (EpwDate) type. The start day of data period.</p></li>
@@ -1029,7 +1029,7 @@ invalid date time.</p></li>
 
 <div class="section">
 <h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 36 columns.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 36 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-18">Examples<a class="anchor" aria-label="anchor" href="#examples-18"></a></h4>
@@ -1102,14 +1102,14 @@ Basically, there are 2 types of abnormal data in <code>Epw</code>, i.e. missing
 values and out-of-range values. Sometimes, it may be useful to
 extract and inspect those data especially when inserting measured
 weather data. <code>$abnormal_data()</code> does this.</p>
-<p>In the returned <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>, a column named <code>line</code>
+<p>In the returned <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>, a column named <code>line</code>
 is created indicating the line numbers where abnormal data occur in
 the actual EPW file.</p>
 </div>
 
 <div class="section">
 <h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>.</p>
 </div>
 <div class="section">
 <h4 id="examples-19">Examples<a class="anchor" aria-label="anchor" href="#examples-19"></a></h4>
@@ -1153,14 +1153,14 @@ epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
 belong to any data period. This data can be further removed using
 <a href="../../eplusr/html/Epw.html#method-purge"><code>$purge()</code></a>`
 method described below.</p>
-<p>In the returned <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>, a column named <code>line</code>
+<p>In the returned <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>, a column named <code>line</code>
 is created indicating the line numbers where redundant data occur in
 the actual EPW file.</p>
 </div>
 
 <div class="section">
 <h4 id="returns-19">Returns<a class="anchor" aria-label="anchor" href="#returns-19"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 37 columns.</p>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 37 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-20">Examples<a class="anchor" aria-label="anchor" href="#examples-20"></a></h4>
@@ -1435,7 +1435,7 @@ epw$purge()
 <div class="section">
 <h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
-<dd><p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of new weather data to add
+<dd><p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of new weather data to add
 or set. Validation is performed according to rules described
 above.</p></dd>
 
@@ -1523,7 +1523,7 @@ try(epw$add(epw$data()), silent = TRUE)
 <div class="section">
 <h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
-<dd><p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of new weather data to add
+<dd><p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of new weather data to add
 or set. Validation is performed according to rules described
 above.</p></dd>
 

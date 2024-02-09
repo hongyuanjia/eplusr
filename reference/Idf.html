@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -117,7 +117,7 @@ to present a single object in IDF. Both <code>Idf</code> and <a href="IdfObject.
 functions for helping modify the data in IDF so it complies with the
 underlying IDD (EnergyPlus Input Data Dictionary).</p>
 <p>Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
-data in different <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>s. So to modify an EnergyPlus model
+data in different <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>s. So to modify an EnergyPlus model
 in eplusr is equal to change the data in those IDF tables accordingly, in the
 context of specific IDD data. This means that a corresponding <a href="Idd.html">Idd</a> object is
 needed whenever creating an <code>Idf</code> object. eplusr provides several
@@ -128,7 +128,7 @@ and modify EnergyPlus models.</p>
 <p>Internally, the powerful <a href="https://cran.r-project.org/package=data.table" class="external-link">data.table</a>
 package is used to speed up the whole IDF parsing process and store the
 results. Under the hook, eplusr uses a SQL-like structure to store both IDF
-and IDD data in <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> format. Every IDF will be parsed and
+and IDD data in <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> format. Every IDF will be parsed and
 stored in three tables:</p><ul><li><p><code>object</code>: contains object IDs, names and comments.</p></li>
 <li><p><code>value</code>: contains field values</p></li>
 <li><p><code>reference</code>: contains cross-reference data of field values.</p></li>
@@ -1232,8 +1232,8 @@ those objects can be further easily extracted using
 <div class="section">
 <h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
 <p>An <code>IdfRelation</code> object, which is a list of 3
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code>, <code>ref_by</code> and <code>node</code>.
-Each <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 24 columns.</p>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code>, <code>ref_by</code> and <code>node</code>.
+Each <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> contains 24 columns.</p>
 </div>
 <div class="section">
 <h4 id="examples-18">Examples<a class="anchor" aria-label="anchor" href="#examples-18"></a></h4>
@@ -1922,7 +1922,7 @@ is performed on the whole <code>Idf</code>.</p></dd>
 <div class="section">
 <h4 id="details-26">Details<a class="anchor" aria-label="anchor" href="#details-26"></a></h4>
 <p><code>$duplicated()</code> takes an integer vector of object IDs or a character
-vectors of object names, and returns a <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>
+vectors of object names, and returns a <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>
 to show whether input objects contain duplications or not.</p>
 <p>Here duplicated objects refer to objects whose field values are the
 same except the names. Object comments are just ignored during
@@ -1931,7 +1931,7 @@ comparison.</p>
 
 <div class="section">
 <h4 id="returns-26">Returns<a class="anchor" aria-label="anchor" href="#returns-26"></a></h4>
-<p>A <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 4 columns:</p><ul><li><p><code>class</code>: Character. Names of classes that input objects belong to</p></li>
+<p>A <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 4 columns:</p><ul><li><p><code>class</code>: Character. Names of classes that input objects belong to</p></li>
 <li><p><code>id</code>: Integer. Input object IDs</p></li>
 <li><p><code>name</code>: Character. Input object names</p></li>
 <li><p><code>duplicate</code>: Integer. The IDs of objects that input objects
@@ -2654,7 +2654,7 @@ integer field values.</p></li>
 <li><p><code>invalid_reference</code>: Result of <code>reference</code> checking.</p></li>
 </ul><p>Except <code>missing_object</code>, which is a character vector of class names
 that are missing, all other elements are
-<a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 9 columns containing data
+<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 9 columns containing data
 of invalid field values:</p><ul><li><p><code>object_id</code>: IDs of objects that contain invalid values</p></li>
 <li><p><code>object_name</code>: names of objects that contain invalid values</p></li>
 <li><p><code>class_id</code>: indexes of classes that invalid objects belong to</p></li>
@@ -2902,7 +2902,7 @@ classed in current <code>Idf</code> object is converted. Default: <code>NULL</co
 <dt><code>string_value</code></dt>
 <dd><p>If <code>TRUE</code>, all field values are returned as
 character. If <code>FALSE</code>, <code>value</code> column in returned
-<a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is a list column with
+<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is a list column with
 each value stored as corresponding type. Note that if the
 value of numeric field is set to <code>"Autosize"</code> or
 <code>"Autocalculate"</code>, it is left as it is, leaving the returned
@@ -2940,7 +2940,7 @@ class that objects belong to will be returned. Default:
 <dt><code>group_ext</code></dt>
 <dd><p>Should be one of <code>"none"</code>, <code>"group"</code> or <code>"index"</code>.
 If not <code>"none"</code>, <code>value</code> column in returned
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> will be converted into a list.
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> will be converted into a list.
 If <code>"group"</code>, values from extensible fields will be grouped by the
 extensible group they belong to. For example, coordinate
 values of each vertex in class <code>BuildingSurface:Detailed</code> will
@@ -2970,9 +2970,9 @@ possible new object IDs. Default: <code>FALSE</code>.</p></dd>
 </div>
 <div class="section">
 <h4 id="details-38">Details<a class="anchor" aria-label="anchor" href="#details-38"></a></h4>
-<p><code>$to_table()</code> returns a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
+<p><code>$to_table()</code> returns a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> that
 contains core data of specified objects.
-The returned <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> has 5 columns:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
+The returned <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> has 5 columns:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
 <li><p><code>name</code>: Character type. Object names.</p></li>
 <li><p><code>class</code>: Character type. Current class name.</p></li>
 <li><p><code>index</code>: Integer type. Field indexes.</p></li>
@@ -2995,7 +2995,7 @@ resulting field names will be <code>Vertex X-coordinate</code>, <code>Vertex Y-c
 
 <div class="section">
 <h4 id="returns-38">Returns<a class="anchor" aria-label="anchor" href="#returns-38"></a></h4>
-<p>A <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
+<p>A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> with 6 columns (if
 <code>wide</code> is <code>FALSE</code>) or at least 6 columns (if <code>wide</code> is <code>TRUE</code>).</p>
 </div>
 <div class="section">
@@ -3063,7 +3063,7 @@ idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 <div class="section">
 <h4 id="arguments-37">Arguments<a class="anchor" aria-label="anchor" href="#arguments-37"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>full</code></dt>
-<dd><p>If <code>TRUE</code>, a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is
+<dd><p>If <code>TRUE</code>, a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> is
 returned giving details about the objects and fields that use those
 external file dependencies. Default: <code>FALSE</code>.</p></dd>
 
@@ -3092,7 +3092,7 @@ will also be extracted.</p>
 <div class="section">
 <h4 id="returns-39">Returns<a class="anchor" aria-label="anchor" href="#returns-39"></a></h4>
 <p>When <code>full</code> is <code>FALSE</code>, which is the default, a character vector.</p>
-<p>When <code>full</code> is <code>TRUE</code>, a <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> of 8
+<p>When <code>full</code> is <code>TRUE</code>, a <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> of 8
 columns:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
 <li><p><code>name</code>: Character type. Object names.</p></li>
 <li><p><code>class</code>: Character type. Current class name.</p></li>

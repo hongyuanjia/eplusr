@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2023-08-26</h4>
+            <h4 data-toc-skip class="date">2024-02-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/epw.Rmd" class="external-link"><code>vignettes/epw.Rmd</code></a></small>
       <div class="hidden name"><code>epw.Rmd</code></div>
@@ -366,54 +366,57 @@ this.</p>
 data occur in the actual EPW file.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       line            datetime year month day hour minute albedo</span></span>
-<span><span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0    999</span></span>
-<span><span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0    999</span></span>
-<span><span class="co">#&gt;    3:  755 1977-02-01 03:00:00 1977     2   1    3      0    999</span></span>
-<span><span class="co">#&gt;    4:  756 1977-02-01 04:00:00 1977     2   1    4      0    999</span></span>
-<span><span class="co">#&gt;    5:  757 1977-02-01 05:00:00 1977     2   1    5      0    999</span></span>
-<span><span class="co">#&gt;   ---                                                           </span></span>
-<span><span class="co">#&gt; 2156: 5836 1985-08-31 20:00:00 1985     8  31   20      0    999</span></span>
-<span><span class="co">#&gt; 2157: 5837 1985-08-31 21:00:00 1985     8  31   21      0    999</span></span>
-<span><span class="co">#&gt; 2158: 5838 1985-08-31 22:00:00 1985     8  31   22      0    999</span></span>
-<span><span class="co">#&gt; 2159: 5839 1985-08-31 23:00:00 1985     8  31   23      0    999</span></span>
-<span><span class="co">#&gt; 2160: 5840 1985-09-01 00:00:00 1985     8  31   24      0    999</span></span></code></pre></div>
+<span><span class="co">#&gt;        line            datetime  year month   day  hour minute albedo</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;              &lt;POSc&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;num&gt;</span></span>
+<span><span class="co">#&gt;    1:   753 1977-02-01 01:00:00  1977     2     1     1      0    999</span></span>
+<span><span class="co">#&gt;    2:   754 1977-02-01 02:00:00  1977     2     1     2      0    999</span></span>
+<span><span class="co">#&gt;    3:   755 1977-02-01 03:00:00  1977     2     1     3      0    999</span></span>
+<span><span class="co">#&gt;    4:   756 1977-02-01 04:00:00  1977     2     1     4      0    999</span></span>
+<span><span class="co">#&gt;    5:   757 1977-02-01 05:00:00  1977     2     1     5      0    999</span></span>
+<span><span class="co">#&gt;   ---                                                                </span></span>
+<span><span class="co">#&gt; 2156:  5836 1985-08-31 20:00:00  1985     8    31    20      0    999</span></span>
+<span><span class="co">#&gt; 2157:  5837 1985-08-31 21:00:00  1985     8    31    21      0    999</span></span>
+<span><span class="co">#&gt; 2158:  5838 1985-08-31 22:00:00  1985     8    31    22      0    999</span></span>
+<span><span class="co">#&gt; 2159:  5839 1985-08-31 23:00:00  1985     8    31    23      0    999</span></span>
+<span><span class="co">#&gt; 2160:  5840 1985-09-01 00:00:00  1985     8    31    24      0    999</span></span></code></pre></div>
 <p>You can use <code>$make_na()</code> to turn all abnormal data into
 NAs:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">epw</span><span class="op">$</span><span class="fu">make_na</span><span class="op">(</span>missing <span class="op">=</span> <span class="cn">TRUE</span>, out_of_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       line            datetime year month day hour minute albedo</span></span>
-<span><span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0     NA</span></span>
-<span><span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0     NA</span></span>
-<span><span class="co">#&gt;    3:  755 1977-02-01 03:00:00 1977     2   1    3      0     NA</span></span>
-<span><span class="co">#&gt;    4:  756 1977-02-01 04:00:00 1977     2   1    4      0     NA</span></span>
-<span><span class="co">#&gt;    5:  757 1977-02-01 05:00:00 1977     2   1    5      0     NA</span></span>
-<span><span class="co">#&gt;   ---                                                           </span></span>
-<span><span class="co">#&gt; 2156: 5836 1985-08-31 20:00:00 1985     8  31   20      0     NA</span></span>
-<span><span class="co">#&gt; 2157: 5837 1985-08-31 21:00:00 1985     8  31   21      0     NA</span></span>
-<span><span class="co">#&gt; 2158: 5838 1985-08-31 22:00:00 1985     8  31   22      0     NA</span></span>
-<span><span class="co">#&gt; 2159: 5839 1985-08-31 23:00:00 1985     8  31   23      0     NA</span></span>
-<span><span class="co">#&gt; 2160: 5840 1985-09-01 00:00:00 1985     8  31   24      0     NA</span></span></code></pre></div>
+<span><span class="co">#&gt;        line            datetime  year month   day  hour minute albedo</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;              &lt;POSc&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;num&gt;</span></span>
+<span><span class="co">#&gt;    1:   753 1977-02-01 01:00:00  1977     2     1     1      0     NA</span></span>
+<span><span class="co">#&gt;    2:   754 1977-02-01 02:00:00  1977     2     1     2      0     NA</span></span>
+<span><span class="co">#&gt;    3:   755 1977-02-01 03:00:00  1977     2     1     3      0     NA</span></span>
+<span><span class="co">#&gt;    4:   756 1977-02-01 04:00:00  1977     2     1     4      0     NA</span></span>
+<span><span class="co">#&gt;    5:   757 1977-02-01 05:00:00  1977     2     1     5      0     NA</span></span>
+<span><span class="co">#&gt;   ---                                                                </span></span>
+<span><span class="co">#&gt; 2156:  5836 1985-08-31 20:00:00  1985     8    31    20      0     NA</span></span>
+<span><span class="co">#&gt; 2157:  5837 1985-08-31 21:00:00  1985     8    31    21      0     NA</span></span>
+<span><span class="co">#&gt; 2158:  5838 1985-08-31 22:00:00  1985     8    31    22      0     NA</span></span>
+<span><span class="co">#&gt; 2159:  5839 1985-08-31 23:00:00  1985     8    31    23      0     NA</span></span>
+<span><span class="co">#&gt; 2160:  5840 1985-09-01 00:00:00  1985     8    31    24      0     NA</span></span></code></pre></div>
 <p>Or use <code>$fill_abnormal()</code> to fill NAs back to missing
 codes:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">epw</span><span class="op">$</span><span class="fu">fill_abnormal</span><span class="op">(</span>missing <span class="op">=</span> <span class="cn">TRUE</span>, out_of_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epw</span><span class="op">$</span><span class="fu">abnormal_data</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"albedo"</span>, keep_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       line            datetime year month day hour minute albedo</span></span>
-<span><span class="co">#&gt;    1:  753 1977-02-01 01:00:00 1977     2   1    1      0    999</span></span>
-<span><span class="co">#&gt;    2:  754 1977-02-01 02:00:00 1977     2   1    2      0    999</span></span>
-<span><span class="co">#&gt;    3:  755 1977-02-01 03:00:00 1977     2   1    3      0    999</span></span>
-<span><span class="co">#&gt;    4:  756 1977-02-01 04:00:00 1977     2   1    4      0    999</span></span>
-<span><span class="co">#&gt;    5:  757 1977-02-01 05:00:00 1977     2   1    5      0    999</span></span>
-<span><span class="co">#&gt;   ---                                                           </span></span>
-<span><span class="co">#&gt; 2156: 5836 1985-08-31 20:00:00 1985     8  31   20      0    999</span></span>
-<span><span class="co">#&gt; 2157: 5837 1985-08-31 21:00:00 1985     8  31   21      0    999</span></span>
-<span><span class="co">#&gt; 2158: 5838 1985-08-31 22:00:00 1985     8  31   22      0    999</span></span>
-<span><span class="co">#&gt; 2159: 5839 1985-08-31 23:00:00 1985     8  31   23      0    999</span></span>
-<span><span class="co">#&gt; 2160: 5840 1985-09-01 00:00:00 1985     8  31   24      0    999</span></span></code></pre></div>
+<span><span class="co">#&gt;        line            datetime  year month   day  hour minute albedo</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;              &lt;POSc&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;num&gt;</span></span>
+<span><span class="co">#&gt;    1:   753 1977-02-01 01:00:00  1977     2     1     1      0    999</span></span>
+<span><span class="co">#&gt;    2:   754 1977-02-01 02:00:00  1977     2     1     2      0    999</span></span>
+<span><span class="co">#&gt;    3:   755 1977-02-01 03:00:00  1977     2     1     3      0    999</span></span>
+<span><span class="co">#&gt;    4:   756 1977-02-01 04:00:00  1977     2     1     4      0    999</span></span>
+<span><span class="co">#&gt;    5:   757 1977-02-01 05:00:00  1977     2     1     5      0    999</span></span>
+<span><span class="co">#&gt;   ---                                                                </span></span>
+<span><span class="co">#&gt; 2156:  5836 1985-08-31 20:00:00  1985     8    31    20      0    999</span></span>
+<span><span class="co">#&gt; 2157:  5837 1985-08-31 21:00:00  1985     8    31    21      0    999</span></span>
+<span><span class="co">#&gt; 2158:  5838 1985-08-31 22:00:00  1985     8    31    22      0    999</span></span>
+<span><span class="co">#&gt; 2159:  5839 1985-08-31 23:00:00  1985     8    31    23      0    999</span></span>
+<span><span class="co">#&gt; 2160:  5840 1985-09-01 00:00:00  1985     8    31    24      0    999</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -430,6 +433,7 @@ data.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">datetime</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  datetime</span></span>
+<span><span class="co">#&gt;                    &lt;POSc&gt;</span></span>
 <span><span class="co">#&gt;    1: 2023-01-01 01:00:00</span></span>
 <span><span class="co">#&gt;    2: 2023-01-01 02:00:00</span></span>
 <span><span class="co">#&gt;    3: 2023-01-01 03:00:00</span></span>
@@ -468,9 +472,10 @@ file:</p>
 <span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">period</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    index  name start_day_of_week  start_day    end_day</span></span>
-<span><span class="co">#&gt; 1:     1 Data1         Wednesday 2014/ 1/ 1 2014/12/31</span></span>
-<span><span class="co">#&gt; 2:     2  Data            Sunday 2023/ 1/ 1 2023/12/31</span></span></code></pre></div>
+<span><span class="co">#&gt;    index   name start_day_of_week  start_day    end_day</span></span>
+<span><span class="co">#&gt;    &lt;int&gt; &lt;char&gt;            &lt;char&gt;  &lt;EpwDate&gt;  &lt;EpwDate&gt;</span></span>
+<span><span class="co">#&gt; 1:     1  Data1         Wednesday 2014/ 1/ 1 2014/12/31</span></span>
+<span><span class="co">#&gt; 2:     2   Data            Sunday 2023/ 1/ 1 2023/12/31</span></span></code></pre></div>
 </div>
   </div>
 

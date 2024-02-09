@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -124,18 +124,18 @@ used.</p></dd>
     <h2>Value</h2>
     
 
-<p>The input object with its internal <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s
+<p>The input object with its internal <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s
 properly initialized.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>eplusr relies heavily on the <a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> package.
+    <p>eplusr relies heavily on the <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a> package.
 The core data of all main classes in eplusr are saved as
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s. This introduces a problem when loading saved
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s. This introduces a problem when loading saved
 <a href="Idf.html">Idf</a> objects or other class objects via an <code>*.RDS</code> and <code>*.RData</code> file on
-disk: the stored <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s lose their column
+disk: the stored <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s lose their column
 over-allocation. <code>reload()</code> is a helper function that calls
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">data.table::setDT()</a></code> on all internal <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s to make
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">data.table::setDT()</a></code> on all internal <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code>s to make
 sure they are initialized properly.</p>
 <p>It is recommended to call <code>reload()</code> on each <a href="Idd.html">Idd</a>, <a href="Idf.html">Idf</a> and other
 class object in eplusr loaded with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> or <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>, to make sure all

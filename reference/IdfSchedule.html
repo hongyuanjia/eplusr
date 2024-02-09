@@ -28,7 +28,7 @@ schedule values."><meta property="og:image" content="https://hongyuanjia.github.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
       </span>
     </div>
 
@@ -356,7 +356,7 @@ equivalents, e.g.  <code>hms::hms(minutes = 30, hours = 1)</code>, and
 <li><p><code>difftime</code>: <code>difftime</code> objects constructed using <code><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime()</a></code>
 or equivalents, e.g. <code>as.difftime(1:24, units = "hours")</code></p></li>
 <li><p><code>ITime</code>: <code>ITime</code> objects constructed using
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>, e.g. <code>as.ITime("01:30:00")</code></p></li>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>, e.g. <code>as.ITime("01:30:00")</code></p></li>
 </ul></li>
 <li><p><code>value</code>: Numeric type. Used for the actual schedule values</p></li>
 </ul></dd>
@@ -537,7 +537,7 @@ values will be compacted. Default: <code>NULL</code>.</p></dd>
 <div class="section">
 <h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p><code>NULL</code> if current schedule is empty. Otherwise, a
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 5 columns:</p><ul><li><p><code>year_day</code>: Character type. Used for the <code>Through:</code> fields.
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table()</a></code> of 5 columns:</p><ul><li><p><code>year_day</code>: Character type. Used for the <code>Through:</code> fields.
 Day specifications in <code>mm/dd</code> format</p></li>
 <li><p><code>id</code>: Integer type. The group index of day types</p></li>
 <li><p><code>daytype</code>: Character type. Used for the <code>For:</code> fields. All possible
@@ -624,17 +624,17 @@ sch$extract(timestep = "30 mins")
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span></span>
 <span class="r-in"><span>    daytype <span class="op">=</span> <span class="st">"weekday,summerdesignday"</span>,</span></span>
 <span class="r-in"><span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>,</span></span>
 <span class="r-in"><span>    time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sch</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">val</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
