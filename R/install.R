@@ -226,62 +226,145 @@ download_eplus <- function(ver = "latest", dir) {
 
 # eplus_download_url: get EnergyPlus installer download URL {{{
 eplus_download_url <- function(ver) {
+    base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
+
     cmt <- eplus_release_commit(ver)
 
-    if (!length(cmt))
-        stop("Failed to get installer data for EnergyPlus v", ver, ". ",
-             "All available version are: ",
-             collapse(ALL_EPLUS_RELEASE_COMMIT[order(version), version]), ".", call. = FALSE)
+    if (!length(cmt)) {
+        abort(
+            "Failed to get installer data for EnergyPlus v", ver, ". ",
+            "All available version are: ",
+            collapse(ALL_EPLUS_RELEASE_COMMIT[order(version), version]), "."
+        )
+    }
 
-    os <- switch(os_type(), windows = "Windows", macos = "Darwin", linux = "Linux")
+    # get operating system
+    os <- os_type()
+    if (os == "unknown") abort("Unsupported operating system.")
+    ostype <- switch(os,
+        windows = "Windows", macos = "Darwin", linux = "Linux"
+    )
 
-    # handle EnergyPlus v9.4 and above on Linux and macOS
-    if (ver >= "9.4") {
-        if (is_macos()) {
-            os <- sprintf("%s-macOS10.15", os)
-        } else if (is_linux()) {
-            # detect ubuntu version
-            osrel <- tryCatch(readLines("/etc/os-release", warn = FALSE),
-                error = function(e) NULL
+    # get installer file extension
+    ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+
+    # get architecture
+    info_arch <- Sys.info()[["machine"]]
+    if (info_arch %in% c("x86-64", "x86_64")) {
+        arch <- "x86_64"
+    } else {
+        arch <- info_arch
+        # stop if it is a 32-bit system for Linux
+        if (arch == "i386" && os != "windows") {
+            abort("EnergyPlus does not provide 32-bit version installer for macOS and Linux.")
+        }
+        # NOTE: check Windows i386 support for EnergyPlus 24.1.0 and above
+    }
+
+    # EnergyPlus v9.4 and above provide different installers for various
+    # Ubuntu distribution and macOS versions and should be handled differently
+    if (os == "windows" || !cmt$version %in% names(ALL_EPLUS_OSVER)) {
+        # no macOS arm64 installer provided for ENergyPlus v9.4 and below
+        if (arch == "arm64") {
+            verbose_info(
+                "EnergyPlus does not provide v", cmt$version, " installer for ",
+                if (ostype == "Darwin") "macOS" else ostype, " arm64 platform. ",
+                "The x86_64 installer will be used instead."
             )
+            arch <- "x86_64"
+        }
 
-            # if fail to read, use Ubuntu 20.04
-            if (is.null(osrel)) {
-                os <- sprintf("%s-Ubuntu20.04", os)
+        file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, ostype, arch, ext)
+        return(paste0(base_url, "v", cmt$version, "/", file))
+    }
+
+    # if arm64 installer is not provided, use the x86_64 one
+    if (arch == "arm64" && is.null(ALL_EPLUS_OSVER[[cmt$version]][[os]][[arch]])) {
+        verbose_info(
+            "EnergyPlus does not provide v", cmt$version, " installer for ", ostype, " arm64 platform. ",
+            "The x86_64 installer will be used instead."
+        )
+        arch <- "x86_64"
+    }
+
+    idx_osver <- NA_integer_
+    osver_cur <- os_version()
+    osver_cur_num <- numeric_version(osver_cur, FALSE)
+    osvers_nm <- ALL_EPLUS_OSVER[[cmt$version]][[os]][[arch]]
+    osvers <- gsub(os, "", osvers_nm, ignore.case = TRUE)
+    dist <- linux_dist()
+
+    # use the latest installer if not Ubuntu
+    if (os == "linux" && dist != "ubuntu") {
+        idx_osver <- length(osvers)
+        verbose_info(
+            "Current distribution is ", dist, ". ",
+            "Currently, EnergyPlus only provides installers for Ubuntu. ",
+            "The latest installer for Ubuntu ", osvers[idx_osver], " will be used."
+        )
+    }
+
+    if (in_verbose()) osname <- if (os == "macos") "macOS" else "Ubuntu"
+
+    # use the latest installer if fail to get the os version
+    if (is.na(idx_osver) && (is.na(osver_cur) || is.na(osver_cur_num))) {
+        idx_osver <- length(osvers)
+
+        verbose_info(
+            "Failed to determine the current ", osname, " version. ",
+            "The latest installer for ", osname, " ", osvers[idx_osver], " will be used."
+        )
+    }
+
+    if (is.na(idx_osver)) {
+        # check if the exact version is supported
+        if (osver_cur %in% osvers) {
+            idx_osver <- which(osvers == osver_cur)
+        } else {
+            osver_cur_num <- numeric_version(osver_cur, FALSE)
+            osvers_num <- numeric_version(osvers)
+
+            # if the major version is not supported, use the nearest installer
+            if (!length(idx_major <- which(osver_cur_num[, 1L] == osvers_num[, 1L]))) {
+                idx_osver <- which.min(abs(
+                    as.numeric(osver_cur_num[, 1L]) - as.numeric(osvers_num[, 1L])
+                ))
+
+                verbose_info(
+                    "EnergyPlus does not provide v", cmt$version, " installer for ", osname,  " ", osver_cur, ". ",
+                    "The nearest installer for ", osname, " ", osvers[idx_osver], " will be used."
+                )
             } else {
-                # test if Ubuntu
-                if (!any(grepl("^ID\\s*=\\s*ubuntu", osrel))) {
-                    os <- sprintf("%s-Ubuntu20.04", os)
-                # get Ubuntu version
+                # only minor version mismatches
+                if (length(idx_major) == 1L) {
+                   idx_osver <- idx_major
+                # in case multiple major version matches
                 } else {
-                    vers <- stringi::stri_match_first_regex(osrel, "^BUILD_ID\\s*=\\s*(.+)")[, 2L]
-                    vers <- numeric_version(vers, strict = FALSE)
-                    vers <- vers[!is.na(vers)]
-                    # if fail to get version, use Ubuntu 20.04
-                    if (!length(vers)) {
-                        os <- sprintf("%s-Ubuntu20.04", os)
-                    } else if (any(vers >= "20.04")) {
-                        os <- sprintf("%s-Ubuntu20.04", os)
+                    # if no minor version, use the latest installer
+                    if (is.na(osver_cur_num[, 2L])) {
+                        idx_osver <- idx_major[osvers_num[idx_major] == max(osvers_num[idx_major])]
                     } else {
-                        os <- sprintf("%s-Ubuntu18.04", os)
+                        idx_osver <- idx_major[which.min(abs(
+                            as.numeric(osver_cur_num[, 2L]) - as.numeric(osvers_num[idx_major][, 2L])
+                        ))]
                     }
                 }
+                verbose_info(
+                    "EnergyPlus does not provide v", cmt$version, " installer for ", osname,  " ", osver_cur, ". ",
+                    "Installer for ", osname, " ", osvers[idx_major], " is available and will be used.",
+                )
             }
         }
     }
 
-    if (!is_windows() ||
-        identical(Sys.info()[['machine']], "x86-64") ||
-        identical(Sys.info()[['machine']], "x86_64")) {
-        arch <- "x86_64"
-    } else {
-        arch <- "i386"
+    if (is.na(idx_osver)) {
+        abort("Failed to determine the installer for EnergyPlus v", cmt$version, ".")
     }
+    osver <- osvers_nm[idx_osver]
 
-    ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
-
-    base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
-    file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, os, arch, ext)
+    file <- sprintf("EnergyPlus-%s-%s-%s-%s-%s.%s",
+        cmt$version, cmt$commit, ostype, osver, arch, ext
+    )
     paste0(base_url, "v", cmt$version, "/", file)
 }
 # }}}

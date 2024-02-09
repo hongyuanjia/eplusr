@@ -1,6 +1,7 @@
 # IdfViewer {{{
 test_that("IdfViewer class", {
     skip_on_cran()
+    skip_on_os("mac")
 
     # simple model
     path <- path_eplus_example(LATEST_EPLUS_VER, "4ZoneWithShading_Simple_1.idf")

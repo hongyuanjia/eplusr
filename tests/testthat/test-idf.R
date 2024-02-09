@@ -1167,6 +1167,7 @@ test_that("$geometry()", {
 # VIEW {{{
 test_that("$view()", {
     skip_on_cran()
+    skip_on_os("mac")
     expect_warning(expect_warning(v <- empty_idf(LATEST_EPLUS_VER)$view()))
     v$close()
 

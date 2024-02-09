@@ -48,6 +48,80 @@ ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
      8.3.0   , 6d97d074ea
     "
 )
+
+# data for OS version specific EnergyPlus installers
+ALL_EPLUS_OSVER <- list(
+    "23.2.0" = list(
+        macos = list(
+            x86_64 = c("macOS10.15", "macOS11.6", "macOS12.1"),
+            arm64  = c("macOS12.1")
+        ),
+        linux = list(
+            # Ubuntu18.04 support dropped
+            x86_64 = c("Ubuntu20.04", "Ubuntu22.04"),
+            arm64  = c("Ubuntu22.04")
+        )
+    ),
+    "23.1.0" = list(
+        macos = list(
+            x86_64 = c("macOS10.15", "macOS11.6", "macOS12.1"),
+            arm64  = c("macOS12.1")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04", "Ubuntu22.04"),
+            # arm64 support added
+            arm64  = c("Ubuntu22.04")
+        )
+    ),
+    "22.2.0" = list(
+        macos = list(
+            x86_64 = c("macOS10.15", "macOS11.6", "macOS12.1"),
+            arm64  = c("macOS12.1")
+        ),
+        linux = list(
+            # Ubuntu22.04 support added
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04", "Ubuntu22.04")
+        )
+    ),
+    "22.1.0" = list(
+        macos = list(
+            # macOS12.1 support added
+            x86_64 = c("macOS10.15", "macOS11.6", "macOS12.1"),
+            # arm64 support added again
+            arm64  = c("macOS12.1")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04")
+        )
+    ),
+    "9.6.0" = list(
+        macos = list(
+            # no arm64 support for macOS11.6
+            x86_64 = c("macOS10.15", "macOS11.6")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04")
+        )
+    ),
+    "9.5.0" = list(
+        macos = list(
+            x86_64 = c("macOS10.15", "macOS11.2"),
+            # arm64 support added
+            arm64  = c("macOS11.2")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04")
+        )
+    ),
+    "9.4.0" = list(
+        macos = list(
+            x86_64 = c("macOS10.15")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu18.04", "Ubuntu20.04")
+        )
+    )
+)
 # }}}
 # MACRO_DICT {{{
 MACRO_DICT <-

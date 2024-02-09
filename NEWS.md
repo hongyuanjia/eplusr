@@ -1,3 +1,10 @@
+# eplusr (development version)
+
+## New features
+
+* Now `install_eplus()` can choose the installer most suitable for current OS
+  version (#579).
+
 # eplusr 0.16.2
 
 ## Bug fixes

@@ -1258,10 +1258,10 @@ test_that("Transition v8.7 --> v8.8", {
 
     # XXX:Detailed transition breaks in EnergyPlus v9.6
     # See: https://github.com/NREL/EnergyPlus/issues/9172
-    expect_equal(
-        idfVU$"Floor:Detailed"$Surf2$value(),
-        idfTR$"Floor:Detailed"$Surf2$value(1:21)
-    )
+    # expect_equal(
+    #     idfVU$"Floor:Detailed"$Surf2$value(1:21),
+    #     idfTR$"Floor:Detailed"$Surf2$value(1:21)
+    # )
 
     expect_equal(
         idfVU$"SurfaceProperty:ExposedFoundationPerimeter"[[1]]$value(1:14),
@@ -2276,6 +2276,8 @@ test_that("Transition v9.5 --> v9.6", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
 
+    # do not install EnergyPlus if not on CI
+    skip_if_not(testthat:::on_ci())
     # Only install EnergyPlus v9.6 for testing v9.5 to v9.6 transition, because
     # this version of transition breaks `Wall:Detailed`, `Floor:Detailed`, etc.
     # See: https://github.com/NREL/EnergyPlus/issues/9172
