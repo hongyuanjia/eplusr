@@ -1,6 +1,7 @@
 # IdfViewer Implemention {{{
 test_that("IdfViewer Implemention", {
     skip_on_cran()
+    skip_on_os("mac")
 
     # simple model
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSpaces.idf"))

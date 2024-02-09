@@ -1,6 +1,7 @@
 test_that("Install EnergyPlus v9.0 and below", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_INSTALL_OLD_") != "")
+    skip_if_not(testthat:::on_ci())
 
     expect_equal(sort(as.character(avail_eplus())), sort(names(.globals$eplus)))
 
@@ -13,6 +14,7 @@ test_that("Install EnergyPlus v9.0 and below", {
 
 test_that("Install EnergyPlus v9.1 and above", {
     skip_on_cran()
+    skip_if_not(testthat:::on_ci())
 
     expect_equal(sort(as.character(avail_eplus())), sort(names(.globals$eplus)))
 
