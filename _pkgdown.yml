@@ -139,6 +139,7 @@ reference:
       - read_rdd
       - read_mdd
       - print.ErrFile
+      - print.TransitionErrFile
 
   - title: Data Helpers
     desc: Help to create and format IDF data
