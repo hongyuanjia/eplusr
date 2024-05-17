@@ -5,6 +5,11 @@
 * Now `install_eplus()` can choose the installer most suitable for current OS
   version (#579).
 
+* Now `install_eplus()` gains a new `portable` parameter. If set to `TRUE`, it
+  the `zip` (on Windows) and `tar.gz` (on macOS and Linux) file provided for
+  EnergyPlus v8.8 and above and directly uncompressed it into the target
+  directory (#583).
+
 # eplusr 0.16.2
 
 ## Bug fixes
