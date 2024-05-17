@@ -24,7 +24,7 @@ install it."><meta property="og:image" content="https://hongyuanjia.github.io/ep
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9002</span>
       </span>
     </div>
 
@@ -106,11 +106,18 @@ install it.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, local <span class="op">=</span> <span class="cn">FALSE</span>, dir <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_eplus</span><span class="op">(</span></span>
+<span>  ver <span class="op">=</span> <span class="st">"latest"</span>,</span>
+<span>  local <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  portable <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">uninstall_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">download_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, <span class="va">dir</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">download_eplus</span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span>, <span class="va">dir</span>, portable <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -137,10 +144,10 @@ Default: <code>"."</code>.</p></li>
 <li><p>For <code>install_eplus()</code>, the installer will always be saved into
 <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code>. But you can use <code>dir</code> to specify the <strong>parent</strong> directory
 of EnergyPlus installation, i.e. the <strong>parent</strong> directory of
-<code>EnergyPlusVX-Y-0</code> on Windows and <code>EnergyPlus-X-Y-0</code> on Linux. macOS is
-not supported. If <code>NULL</code>, the default installation path will be used.
-See details for more information. Please note that <code>dir</code> does not work
-on macOS and EnergyPlus will always be installed into the default
+<code>EnergyPlusVX-Y-0</code> on Windows and <code>EnergyPlus-X-Y-0</code> on Linux and macOS.
+If <code>NULL</code>, the default installation path will be used.
+See details for more information. Please note that <code>dir</code> only works
+when on macOS and EnergyPlus will always be installed into the default
 location. Default: <code>NULL</code>.</p></li>
 </ul></dd>
 
@@ -151,6 +158,11 @@ installed. Setting to <code>TRUE</code> if you want to install the downloaded
 EnergyPlus anyway. Please note that this may results in multiple
 EnergyPlus installations of the same version at different locations.
 eplusr will only use the first EnergyPlus installation. Default: <code>FALSE</code>.</p></dd>
+
+
+<dt>portable</dt>
+<dd><p>Whether to download the portable version of EnergyPlus. Only
+works for EnergyPlus v8.8 and above. Default: <code>FALSE</code>.</p></dd>
 
 
 <dt>...</dt>
@@ -188,12 +200,12 @@ to your home corresponding directory by setting <code>local</code> to <code>TRUE
 <li><p><code>C:\Users\&lt;User&gt;\AppData\Local\EnergyPlusVX-Y-0</code> if environment
 variable <code>"LOCALAPPDATA"</code> is not set</p></li>
 </ul></li>
-<li><p>macOS: <code>/Users/&lt;User&gt;/Applications/EnergyPlus-X-Y-0</code></p></li>
+<li><p>macOS: <code>/Users/User/Applications/EnergyPlus-X-Y-0</code></p></li>
 <li><p>Linux: <code>"~/.local/EnergyPlus-X-Y-0"</code></p></li>
 </ul><p>On Windows and Linux, you can also specify your custom directory using the
 <code>dir</code> argument. Remember to change <code>local</code> to <code>FALSE</code> in order to ask for
 administrator privileges if you do not have the write access to that
-directory.</p>
+directory. On macOS, <code>dir</code> only works when <code>portable</code> is set to <code>TRUE</code>.</p>
 <p>Please note that when <code>local</code> is set to <code>FALSE</code>, no symbolic links
 will be created, since this process requires administrative privileges.</p>
 <p><code>uninstall_eplus()</code> tries to uninstall specified version of EnergyPlus
