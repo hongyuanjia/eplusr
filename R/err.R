@@ -342,6 +342,18 @@ print.ErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
 }
 # }}}
 
+#' Print EnergyPlus Transition Error File
+#'
+#' `TransitionErrFile` is mainly used to extract and print data in an EnergyPlus
+#' Transition Error File (`.vcperr`).
+#'
+#' @param x An `TransitionErrFile` created using [read_err()].
+#' @param brief If `TRUE`, only summary data is printed. Default: `FALSE`.
+#' @param info If `FALSE`, informative messages are excluded. Only warnings and
+#' errors are printed. Default: `TRUE`.
+#' @param ... Further arguments passed to or from other methods.
+#' @return An `TransitionErrFile` object, invisibly.
+#' @export
 # print.TransitionErrFile {{{
 print.TransitionErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("IDFVersionUpdater Error File", line = 2)

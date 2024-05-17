@@ -9,26 +9,26 @@ output:
 library(knitr)
 
 # the default output hook
-hook_output = knitr::knit_hooks$get('output')
+hook_output <- knitr::knit_hooks$get("output")
 knitr::knit_hooks$set(output = function(x, options) {
-  if (!is.null(n <- options$out.lines)) {
-    x <- unlist(strsplit(x, '\n', fixed = TRUE))
-    if (length(x) > n) {
-      # truncate the output
-      x <- c(head(x, n), '....', '')
-    } else {
-      x <- c(x, "")
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, "\n", fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), "....", "")
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = "\n") # paste first n lines together
     }
-    x <- paste(x, collapse = '\n') # paste first n lines together
-  }
-  hook_output(x, options)
+    hook_output(x, options)
 })
 
 knitr::opts_knit$set(root.dir = tempdir())
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
+    collapse = TRUE,
+    comment = "#>",
+    fig.path = "README-"
 )
 
 # Make sure the date is shown in English format not Chinese.
@@ -76,7 +76,12 @@ install.packages("eplusr")
 Alternatively, you can install the development version from GitHub.
 
 ```{r gh-installation, eval = FALSE}
-install.packages("eplusr", repos = "https://hongyuanjia.r-universe.dev")
+install.packages("eplusr",
+    repos = c(
+        hongyuanjia = "https://hongyuanjia.r-universe.dev",
+        cran = "https://cran.r-project.org"
+    )
+)
 ```
 
 Since running the IDF files requires EnergyPlus (https://energyplus.net),

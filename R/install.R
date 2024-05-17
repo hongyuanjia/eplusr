@@ -140,7 +140,7 @@ install_eplus <- function(ver = "latest", local = FALSE, dir = NULL, force = FAL
     dl <- download_eplus(ver, tempdir(), portable = portable)
     inst <- attr(dl, "file")
 
-    path <- install_eplus_from_file(ver, inst, local = local, dir = dir, portable = portable, ...)
+    path <- install_eplus_from_file(ver, inst, local = local, dir = dir, ...)
 
     res <- 0L
     attr(res, "path") <- path
