@@ -890,7 +890,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param class_ref Specify how to handle class-name-references. Class
         #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
-        #'        many class names of objects, instaed of refering to specific
+        #'        many class names of objects, instead of referring to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
         #'        `"both"` and `"all"`, with `"both"` being the default.
         #'     * `"none"`: just ignore class-name-references. It is a reasonable
@@ -1920,7 +1920,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'   filled with corresponding type of values.
         #' * `choice`: Check if all choice fields are filled with valid choice
         #'   values.
-        #' * `range`: Check if all numeric fields have values within prescibed
+        #' * `range`: Check if all numeric fields have values within prescribed
         #'   ranges.
         #' * `reference`: Check if all fields whose values refer to other fields
         #'   are valid.

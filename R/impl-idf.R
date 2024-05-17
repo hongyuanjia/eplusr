@@ -3949,7 +3949,7 @@ get_idf_node_relation <- function(idd_env, idf_env, object_id = NULL, value_id =
 #' References in the input is not parsed and `reference` in the returned list is
 #' always a zero-row table.
 #'
-#' @return The copyied object data from IDF Editor in a named list of 3
+#' @return The copied object data from IDF Editor in a named list of 3
 #' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
 #'
 #' @keywords internal

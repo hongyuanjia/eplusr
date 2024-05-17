@@ -317,7 +317,7 @@ model$objects_in_class("Material")
 Also, you can get all objects in a single class using `"$"` or `"[["`. Class
 names can be given in underscore-style. For example, you can just use
 `model$Material_NoMass` instead of `` model$`Material:Nomass` `` to save some
-typings.
+typing.
 
 ```{r obj_in_cls_shortcut_1, out.lines = 30}
 model$Material_NoMass
@@ -398,7 +398,7 @@ which works on multiple objects, and the other way is using methods in
 
 Object IDs will be appended after new objects are added, and the most-newly
 added object will always have the max ID. Object IDs will never be reused, even
-when their binded objects have been deleted.
+when their bound objects have been deleted.
 
 ## Duplicate existing objects (`Idf$dup()`)
 

@@ -59,7 +59,7 @@ the same time. Default: \code{FALSE}.}
 \code{model}. Note that \code{design_day} and \code{annual} cannot be all \code{TRUE} at
 the same time. Default: \code{FALSE}.}
 
-\item{expand_obj}{Whether to run ExpandObject preprocessor before simulation.
+\item{expand_obj}{Whether to run ExpandObjects preprocessor before simulation.
 Default: TRUE.}
 
 \item{wait}{If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
@@ -98,7 +98,7 @@ should have the same length as \code{model}.}
 If \code{wait} is \code{FALSE}, the \link[callr:r_bg]{R process} is directly returned.
 You can get the results by calling \code{result <- proc$get_result()} (\code{proc} is
 the returned process). Please note that in this case, \code{result$process} will
-alwasy be \code{NULL}. But you can easily assign it by running \code{result$process <- proc}
+always be \code{NULL}. But you can easily assign it by running \code{result$process <- proc}
 \itemize{
 \item For \code{rum_multi()}, if \code{wait} is TRUE, a
 \link[data.table:data.table]{data.table} of 12 columns:\tabular{rlll}{

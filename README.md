@@ -178,7 +178,7 @@ Please see these vignettes and articles about {eplusr}
   parametric analysis on EnergyPlus models, including sensitivity
   analysis, Bayesian calibration and optimization.
 
-## Acknowledgement
+## Acknowledgment
 
 I would like to thank many open source projects who have heavily
 inspired the development of eplusr package, especially these below:

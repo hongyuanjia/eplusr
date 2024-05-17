@@ -133,10 +133,10 @@ unlink(verup$path())
 # How the transition works
 
 During version updates, some classes in the original IDF are removed, some
-classes are splitted into several classes, some fields are removed and there is
+classes are split into several classes, some fields are removed and there is
 no way to extract those information back. For example, from EnergyPlus v8.8 to
 v8.9, one single object in class `GroundHeatExchanger:Vertical` will be
-splitted into 4 different objects in class:
+split into 4 different objects in class:
 
 * `GroundHeatExchanger:System`,
 * `GroundHeatExchanger:Vertical:Properties`,

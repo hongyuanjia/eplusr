@@ -1407,11 +1407,11 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' - `D`: **Dash**, e.g. `eplus-table.csv`.
 #'
 #' @param epmacro \[`logical(1)`\]\cr
-#' If `TRUE`, EPMacro processor is called perior to simulation. Only applicable
+#' If `TRUE`, EPMacro processor is called prior to simulation. Only applicable
 #' if input file is an `IMF` file. Default: `TRUE`.
 #'
 #' @param expand_obj \[`logical(1)`\]\cr
-#' If `TRUE`, ExpandObjects processor is called perior to simulation. Should be
+#' If `TRUE`, ExpandObjects processor is called prior to simulation. Should be
 #' `TRUE` if calling Basement or Slab preprocessors is desired. Default: `TRUE`.
 #'
 #' @param annual \[`logical(1)`\]\cr
@@ -1433,7 +1433,7 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' `TRUE`.
 #'
 #' @param echo \[`logical(1)`\]\cr
-#' Wheter to show standard output and error from EnergyPlus and its pre- and
+#' Whether to show standard output and error from EnergyPlus and its pre- and
 #' post- processors. Default: `TRUE`.
 #'
 #' @param wait \[`logical(1)`\]\cr
@@ -2260,7 +2260,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'        `model`. Note that `design_day` and `annual` cannot be all `TRUE` at
 #'        the same time. Default: `FALSE`.
 #'
-#' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
+#' @param expand_obj Whether to run ExpandObjects preprocessor before simulation.
 #'        Default: TRUE.
 #'
 #' @param echo Only applicable when `wait` is `TRUE`. Whether to show standard
@@ -2311,7 +2311,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'   If `wait` is `FALSE`, the [R process][callr::r_bg()] is directly returned.
 #'   You can get the results by calling `result <- proc$get_result()` (`proc` is
 #'   the returned process). Please note that in this case, `result$process` will
-#'   alwasy be `NULL`. But you can easily assign it by running `result$process
+#'   always be `NULL`. But you can easily assign it by running `result$process
 #'   <- proc`
 #'
 #' * For `rum_multi()`, if `wait` is TRUE, a

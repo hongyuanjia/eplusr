@@ -46,7 +46,7 @@ if (!is_avail_eplus("23.1")) install_eplus("23.1")
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
 `IdfGeometry` is designed to extract data for all geometry objects and perform
-geometric operations on them, while `IdfViewer` is to view IDF geoemtry in 3D
+geometric operations on them, while `IdfViewer` is to view IDF geometry in 3D
 using the [rgl](https://cran.r-project.org/package=rgl) package in a similar
 way as OpenStudio SketchUp Plugin.
 

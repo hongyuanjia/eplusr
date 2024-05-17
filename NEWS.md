@@ -133,9 +133,9 @@
 * Now force re-installation of EnergyPlus `install_eplus(force = TRUE)` has been
   updated to support all platforms, including macOS (#477).
 * `install_eplus()` has been updated to behave smarter on macOS (#477).
-* `run_idf()` and `run_multi()` have been refactored to mimick the `Epl-run.bat`
+* `run_idf()` and `run_multi()` have been refactored to mimic the `Epl-run.bat`
   procedure. It supports to call the `Basement` and `Slab` processors. Now the
-  requirement of EnergyPlus >=v8.3 for running simulations has been droppped
+  requirement of EnergyPlus >=v8.3 for running simulations has been dropped
   Now simulations with FMU, including obFMU are supported. (#467).
 * `HVAC-Diagram` will be called when running simulations to make sure the `svg`
   output of HVAC diagram can be generated. Therefore, `hvac_diagram()`
@@ -436,7 +436,7 @@
   see `vignette("schedule")` (#256).
 * New `IdfGeometry` and `IdfViewer` classes are introduced. `IdfGeometry` is
   designed to extract data for all geometry objects and perform geometric
-  operations on them, while `IdfViewer` is to view IDF geoemtry in 3D using the
+  operations on them, while `IdfViewer` is to view IDF geometry in 3D using the
   rgl package in a similar way as OpenStudio SketchUp Plugin. `Idf$geometry()`
   and `Idf$view()` methods are added to directly create an `IdfGeometry` and
   `IdfViewer` object based on current `Idf` object, respectively (#296).
@@ -504,7 +504,7 @@
   parsing (#267).
 * `[[.IdfObject` now only accept standard field names. No underscore-style
   names are allowed.
-* The suffix of automatcially created names in `Idf$dup()` has been changed
+* The suffix of automatically created names in `Idf$dup()` has been changed
   from `_X` to ` X`.
 * The `warning` parameter in `read_epw()`, `Epw$add()` and `Epw$set()` has been
   deprecated (#298).
@@ -571,7 +571,7 @@
 * Fix parallel simulations on macOS (#194).
 * Now `eplus_config()` will always return the expanded EnergyPlus path (#196).
 * Now `group_job()` will return more informative error messages when input
-  contains `Idf` objects that havn't been saved (#204).
+  contains `Idf` objects that haven't been saved (#204).
 * Fix error in `EplusGroupJob$run()` when custom `dir` is specified (#205).
 
 # eplusr 0.11.0
@@ -723,7 +723,7 @@
   later package.
 * All messages can be suppressed by setting the `verbose_info` option to
   `FALSE`.
-* `$delete()` method in `Epw` class has been deprecatd in flavor of `$del()` to
+* `$delete()` method in `Epw` class has been deprecated in flavor of `$del()` to
   provide a similar API as `Idf` class.
 * When `all` is `TRUE` in `$report_data()` in `EplusSql`, `EplusJob` and
   `ParametricJob` class, an extra column `environment_period_index` is returned
@@ -1362,7 +1362,7 @@ break changes. Detailed updates per class are as follow:
 ## Bug fixes
 
 * Fix errors in `$status()`, `$output_dir()` and `$locate_output()` in
-  `ParametricJob` class when `which` arg is not given (#12).
+  `ParametricJob` class when `which` argument is not given (#12).
 
 * Fix idf input version parsing in `param_job` (#13).
 

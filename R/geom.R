@@ -355,7 +355,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' @param wireframe If `TRUE`, the wireframe of each surface will be
         #'        shown. Default: `TRUE`.
         #'
-        #' @param x_ray If `TRUE`, all surfaces wll be rendered translucently.
+        #' @param x_ray If `TRUE`, all surfaces will be rendered translucently.
         #'        Default: `FALSE`.
         #'
         #' @return An [IdfViewer] object

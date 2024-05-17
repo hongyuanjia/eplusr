@@ -163,7 +163,7 @@ param$apply_measure(ecm,
 )
 ```
 
-After parametric models have been created, you can retrive the summary of the
+After parametric models have been created, you can retrieve the summary of the
 parameter values and model names using `$cases()`.
 
 ```{r}
@@ -205,7 +205,7 @@ After calling the `$run()` method to conduct parallel runs of simulations, the
 tidy data interface can be used to extract any simulation outputs of interest
 using `$report_data()`, `$tabular_data()`, etc.
 
-In this example, the building energy consumptions of all six
+In this example, the building energy consumption of all six
 models are extracted using one line of code.
 The resulting data format is the same as that of a single simulation and is
 equivalent to bind rows from six tables into one tidy table.

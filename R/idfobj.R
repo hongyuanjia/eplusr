@@ -533,7 +533,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'   filled with corresponding type of values.
         #' * `choice`: Check if all choice fields are filled with valid choice
         #'   values.
-        #' * `range`: Check if all numeric fields have values within prescibed
+        #' * `range`: Check if all numeric fields have values within prescribed
         #'   ranges.
         #' * `reference`: Check if all fields whose values refer to other fields
         #'   are valid.

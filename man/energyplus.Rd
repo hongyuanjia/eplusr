@@ -134,7 +134,7 @@ object is returned. Extra steps are needed to collect the results after the
 process completes.}
 
 \item{echo}{[\code{logical(1)}]\cr
-Wheter to show standard output and error from EnergyPlus and its pre- and
+Whether to show standard output and error from EnergyPlus and its pre- and
 post- processors. Default: \code{TRUE}.}
 
 \item{eplus}{[\code{character(1)} or \code{NULL}]\cr
@@ -178,11 +178,11 @@ A path of an EnergyPlus standard output (\code{.eso}) or EnergyPlus meter output
 A path of an EnergyPlus branch node details (\code{.bnd}) file.}
 
 \item{epmacro}{[\code{logical(1)}]\cr
-If \code{TRUE}, EPMacro processor is called perior to simulation. Only applicable
+If \code{TRUE}, EPMacro processor is called prior to simulation. Only applicable
 if input file is an \code{IMF} file. Default: \code{TRUE}.}
 
 \item{expand_obj}{[\code{logical(1)}]\cr
-If \code{TRUE}, ExpandObjects processor is called perior to simulation. Should be
+If \code{TRUE}, ExpandObjects processor is called prior to simulation. Should be
 \code{TRUE} if calling Basement or Slab preprocessors is desired. Default: \code{TRUE}.}
 
 \item{eso_to_ip}{[\code{logical(1)}]\cr

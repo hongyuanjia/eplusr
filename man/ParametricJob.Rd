@@ -411,7 +411,7 @@ Set parameters for parametric simulations
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Lists of paramter definitions. Please see above on the
+\item{\code{...}}{Lists of parameter definitions. Please see above on the
 syntax.}
 
 \item{\code{.names}}{A character vector of the parameter names. If \code{NULL},
@@ -439,7 +439,7 @@ a valid object ID or name. Note object ID should be denoted with
 two periods \code{..}, e.g. \code{..10} indicates the object with ID \code{10}, It
 will set that specific field in that object as one parameter.
 \item \code{.(object, object) := list(field = c(value1, value2, ...))}:
-Simimar like above, but note the use of \code{.()} in the left hand
+Similar like above, but note the use of \code{.()} in the left hand
 side.  You can put multiple object ID or names in \code{.()}. It will
 set the field of all specified objects as one parameter.
 \item \code{class := list(field = c(value1, value2, ...))}: Note the use of
@@ -547,7 +547,7 @@ If \code{NULL}, the new \code{Idf}s will be named in format
 \subsection{Details}{
 \verb{$apply_measure()} allows to apply a measure to an \link{Idf} and creates
 parametric models for analysis. Basically, a measure is just a
-function that takes an \link{Idf} object and other arguements as input, and
+function that takes an \link{Idf} object and other argument input, argument
 returns a modified \link{Idf} object as output. Use \code{...} to supply
 different arguments, \strong{except for the first \code{Idf} argument}, to that
 measure. Under the hook, \code{\link[base:mapply]{base::mapply()}} is used to create multiple
@@ -632,7 +632,7 @@ returned. Default: \code{NULL}.}
 \link{Idf} object and
 \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
 method. Model names are assigned in the same way as the \code{.names}
-arugment in
+argument in
 \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
 If no measure has been applied, \code{NULL} is returned. Note that it is
 not recommended to conduct any extra modification on those models

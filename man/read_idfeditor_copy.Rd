@@ -22,7 +22,7 @@ view option toggled. Numeric values will automatically
 converted to SI units if necessary. Default: \code{FALSE}.}
 }
 \value{
-The copyied object data from IDF Editor in a named list of 3
+The copied object data from IDF Editor in a named list of 3
 \code{\link[data.table:data.table]{data.table::data.table()}}s, i.e. \code{object}, \code{value} and \code{reference}.
 }
 \description{

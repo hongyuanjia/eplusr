@@ -142,7 +142,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'   two periods `..`, e.g. `..10` indicates the object with ID `10`, It
         #'   will set that specific field in that object as one parameter.
         #' * `.(object, object) := list(field = c(value1, value2, ...))`:
-        #'   Simimar like above, but note the use of `.()` in the left hand
+        #'   Similar like above, but note the use of `.()` in the left hand
         #'   side.  You can put multiple object ID or names in `.()`. It will
         #'   set the field of all specified objects as one parameter.
         #' * `class := list(field = c(value1, value2, ...))`: Note the use of
@@ -171,7 +171,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' )
         #' ```
         #'
-        #' @param ... Lists of paramter definitions. Please see above on the
+        #' @param ... Lists of parameter definitions. Please see above on the
         #'        syntax.
         #'
         #' @param .names A character vector of the parameter names. If `NULL`,
@@ -235,7 +235,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @details
         #' `$apply_measure()` allows to apply a measure to an [Idf] and creates
         #' parametric models for analysis. Basically, a measure is just a
-        #' function that takes an [Idf] object and other arguements as input, and
+        #' function that takes an [Idf] object and other argument input, argument
         #' returns a modified [Idf] object as output. Use `...` to supply
         #' different arguments, **except for the first `Idf` argument**, to that
         #' measure. Under the hook, [base::mapply()] is used to create multiple
@@ -306,7 +306,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' [Idf] object and
         #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
         #' method. Model names are assigned in the same way as the `.names`
-        #' arugment in
+        #' argument in
         #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
         #' If no measure has been applied, `NULL` is returned. Note that it is
         #' not recommended to conduct any extra modification on those models

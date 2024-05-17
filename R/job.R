@@ -113,7 +113,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
         # run {{{
         #' @description
-        #' Run simulationA
+        #' Run simulation
         #'
         #' @details
         #' `$run()` runs the simulation using input IDF and EPW file. If `wait`
@@ -316,7 +316,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' | 17  | `epmdet`     | EPMacro inputs echo                                                   |
         #' | 18  | `epmidf`     | EPMacro IDF output                                                    |
         #' | 19  | `epw`        | EnergyPlus Weather File input                                         |
-        #' | 20  | `err`        | EnergyPlus error summarry                                             |
+        #' | 20  | `err`        | EnergyPlus error summary                                             |
         #' | 21  | `eso`        | EnergyPlus standard output                                            |
         #' | 22  | `experr`     | ExpandObjects error summary                                           |
         #' | 23  | `expidf`     | ExpandObjects IDF output                                              |
@@ -338,7 +338,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' | 39  | `rdd`        | EnergyPlus report variable names                                      |
         #' | 40  | `rvaudit`    | ReadVarsESO input echo                                                |
         #' | 41  | `sci`        | EnergyPlus cost benefit calculation information                       |
-        #' | 42  | `screen`     | EnergyPlus window scrren transmittance map output                     |
+        #' | 42  | `screen`     | EnergyPlus window screen transmittance map output                     |
         #' | 43  | `shading`    | EnergyPlus surface shading CSV output                                 |
         #' | 44  | `shd`        | EnergyPlus surface shading combination report                         |
         #' | 45  | `slab_ger`   | Slab error summary                                                    |

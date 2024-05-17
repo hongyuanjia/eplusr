@@ -566,7 +566,7 @@ will be rendered as red.
 \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
 shown. Default: \code{TRUE}.}
 
-\item{\code{x_ray}}{If \code{TRUE}, all surfaces wll be rendered translucently.
+\item{\code{x_ray}}{If \code{TRUE}, all surfaces will be rendered translucently.
 Default: \code{FALSE}.}
 
 \item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the

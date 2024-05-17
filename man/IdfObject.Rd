@@ -1075,7 +1075,7 @@ definitions, i.e. character, numeric and integer fields should be
 filled with corresponding type of values.
 \item \code{choice}: Check if all choice fields are filled with valid choice
 values.
-\item \code{range}: Check if all numeric fields have values within prescibed
+\item \code{range}: Check if all numeric fields have values within prescribed
 ranges.
 \item \code{reference}: Check if all fields whose values refer to other fields
 are valid.
