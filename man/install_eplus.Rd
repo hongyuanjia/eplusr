@@ -6,11 +6,18 @@
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
-install_eplus(ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...)
+install_eplus(
+  ver = "latest",
+  local = FALSE,
+  dir = NULL,
+  force = FALSE,
+  portable = FALSE,
+  ...
+)
 
 uninstall_eplus(ver)
 
-download_eplus(ver = "latest", dir)
+download_eplus(ver = "latest", dir, portable = FALSE)
 }
 \arguments{
 \item{ver}{The EnergyPlus version number, e.g., \code{"8.7"}. For \code{download_eplus()}
@@ -32,10 +39,10 @@ Default: \code{"."}.
 \item For \code{install_eplus()}, the installer will always be saved into
 \code{\link[=tempdir]{tempdir()}}. But you can use \code{dir} to specify the \strong{parent} directory
 of EnergyPlus installation, i.e. the \strong{parent} directory of
-\code{EnergyPlusVX-Y-0} on Windows and \code{EnergyPlus-X-Y-0} on Linux. macOS is
-not supported. If \code{NULL}, the default installation path will be used.
-See details for more information. Please note that \code{dir} does not work
-on macOS and EnergyPlus will always be installed into the default
+\code{EnergyPlusVX-Y-0} on Windows and \code{EnergyPlus-X-Y-0} on Linux and macOS.
+If \code{NULL}, the default installation path will be used.
+See details for more information. Please note that \code{dir} only works
+when on macOS and EnergyPlus will always be installed into the default
 location. Default: \code{NULL}.
 }}
 
@@ -44,6 +51,9 @@ installed. Setting to \code{TRUE} if you want to install the downloaded
 EnergyPlus anyway. Please note that this may results in multiple
 EnergyPlus installations of the same version at different locations.
 eplusr will only use the first EnergyPlus installation. Default: \code{FALSE}.}
+
+\item{portable}{Whether to download the portable version of EnergyPlus. Only
+works for EnergyPlus v8.8 and above. Default: \code{FALSE}.}
 
 \item{...}{Other arguments to be passed to the installer. Current only one
 additional argument exists and is only for Linux:
@@ -95,14 +105,14 @@ The user level EnergyPlus installation path is:
 \item \verb{C:\Users\<User>\AppData\Local\EnergyPlusVX-Y-0} if environment
 variable \code{"LOCALAPPDATA"} is not set
 }
-\item macOS: \verb{/Users/<User>/Applications/EnergyPlus-X-Y-0}
+\item macOS: \verb{/Users/User/Applications/EnergyPlus-X-Y-0}
 \item Linux: \code{"~/.local/EnergyPlus-X-Y-0"}
 }
 
 On Windows and Linux, you can also specify your custom directory using the
 \code{dir} argument. Remember to change \code{local} to \code{FALSE} in order to ask for
 administrator privileges if you do not have the write access to that
-directory.
+directory. On macOS, \code{dir} only works when \code{portable} is set to \code{TRUE}.
 
 Please note that when \code{local} is set to \code{FALSE}, no symbolic links
 will be created, since this process requires administrative privileges.
