@@ -171,7 +171,7 @@ the same time. Default: <code>FALSE</code>.</p></dd>
 
 
 <dt>expand_obj</dt>
-<dd><p>Whether to run ExpandObject preprocessor before simulation.
+<dd><p>Whether to run ExpandObjects preprocessor before simulation.
 Default: TRUE.</p></dd>
 
 
@@ -203,7 +203,7 @@ should have the same length as <code>model</code>.</p></dd>
 </ul><table class="table table"><tr><td>No.</td><td>Column</td><td>Type</td><td>Description</td></tr><tr><td>1</td><td><code>idf</code></td><td><code>character(1)</code></td><td>Full path of input IDF file</td></tr><tr><td>2</td><td><code>epw</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Full path of input EPW file</td></tr><tr><td>3</td><td><code>version</code></td><td><code>character(1)</code></td><td>Version of called EnergyPlus</td></tr><tr><td>4</td><td><code>exit_status</code></td><td><code>integer(1)</code> or <code>NULL</code></td><td>Exit status of EnergyPlus. <code>NULL</code> if terminated or <code>wait</code> is <code>FALSE</code></td></tr><tr><td>5</td><td><code>start_time</code></td><td><code>POSIXct(1)</code></td><td>Start of time of simulation</td></tr><tr><td>6</td><td><code>end_time</code></td><td><code>POSIXct(1)</code> or <code>NULL</code></td><td>End of time of simulation. <code>NULL</code> if <code>wait</code> is <code>FALSE</code></td></tr><tr><td>7</td><td><code>output_dir</code></td><td><code>character(1)</code></td><td>Full path of simulation output directory</td></tr><tr><td>8</td><td><code>energyplus</code></td><td><code>character(1)</code></td><td>Full path of called EnergyPlus executable</td></tr><tr><td>9</td><td><code>stdout</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Standard output of EnergyPlus during simulation</td></tr><tr><td>10</td><td><code>stderr</code></td><td><code>character(1)</code> or <code>NULL</code></td><td>Standard error of EnergyPlus during simulation</td></tr><tr><td>11</td><td><code>process</code></td><td><a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">r_process</a></td><td>A process object which called EnergyPlus and ran the simulation</td></tr></table><p>If <code>wait</code> is <code>FALSE</code>, the <a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">R process</a> is directly returned.
 You can get the results by calling <code>result &lt;- proc$get_result()</code> (<code>proc</code> is
 the returned process). Please note that in this case, <code>result$process</code> will
-alwasy be <code>NULL</code>. But you can easily assign it by running <code>result$process &lt;- proc</code></p>
+always be <code>NULL</code>. But you can easily assign it by running <code>result$process &lt;- proc</code></p>
 
 
 <ul><li><p>For <code>rum_multi()</code>, if <code>wait</code> is TRUE, a

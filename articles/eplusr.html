@@ -743,7 +743,7 @@ returned.</p>
 <code>"$"</code> or <code>"[["</code>. Class names can be given in
 underscore-style. For example, you can just use
 <code>model$Material_NoMass</code> instead of
-<code>model$`Material:Nomass`</code> to save some typings.</p>
+<code>model$`Material:Nomass`</code> to save some typing.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span></span>
 <span><span class="co">#&gt; $CP01</span></span>
@@ -891,7 +891,7 @@ different strictness level (<code>none</code>, <code>draft</code>,
 </blockquote>
 <p>Object IDs will be appended after new objects are added, and the
 most-newly added object will always have the max ID. Object IDs will
-never be reused, even when their binded objects have been deleted.</p>
+never be reused, even when their bound objects have been deleted.</p>
 <div class="section level3">
 <h3 id="duplicate-existing-objects-idfdup">Duplicate existing objects (<code>Idf$dup()</code>)<a class="anchor" aria-label="anchor" href="#duplicate-existing-objects-idfdup"></a>
 </h3>
@@ -1661,11 +1661,11 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpJXWTbj/file1d6316c1a0ec.idf"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpFzCSXD/file1d24399cd2bf.idf"</span></span></code></pre></div>
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpJXWTbj/file1d6316c1a0ec.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpFzCSXD/file1d24399cd2bf.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>

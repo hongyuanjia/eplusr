@@ -274,7 +274,7 @@ Different measures can be chained together.</p>
 <span><span class="co">#&gt; [4]: 0.6Frac</span></span>
 <span><span class="co">#&gt; [5]: 0.2Frac</span></span>
 <span><span class="co">#&gt; [6]: LED+0.2Frac</span></span></code></pre></div>
-<p>After parametric models have been created, you can retrive the
+<p>After parametric models have been created, you can retrieve the
 summary of the parameter values and model names using
 <code>$cases()</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -306,27 +306,27 @@ investigations.</p>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
 <span><span class="co">#&gt; 4|RUNNING --&gt; [IDF]'0.6Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; 2|COMPLETED --&gt; [IDF]'T5.idf' +</span></span>
+<span><span class="co">#&gt; 4|COMPLETED --&gt; [IDF]'0.6Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]</span></span>
 <span><span class="co">#&gt; 5|RUNNING --&gt; [IDF]'0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]3|COMPLETED --&gt; [IDF]'LED.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]1|COMPLETED --&gt; [IDF]'Ori.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]6|RUNNING --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]6|RUNNING --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]1|COMPLETED --&gt; [IDF]'Ori.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]2|COMPLETED --&gt; [IDF]'T5.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]4|COMPLETED --&gt; [IDF]'0.6Frac.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]3|COMPLETED --&gt; [IDF]'LED.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s]6|COMPLETED --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s]6|COMPLETED --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 54.4s][5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 26.1s]</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 53s][5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 23.1s]</span></span>
 <span><span class="co">#&gt; 5|COMPLETED --&gt; [IDF]'0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 26.1s][6/6] | 100% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> [Elapsed: 1m 28.4s]</span></span>
+<span><span class="co">#&gt; [5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 23.1s][6/6] | 100% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> [Elapsed: 1m 30s]</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/RtmpU2IHBu/MediumOffice.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/RtmpyjqP5P/MediumOffice.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '/usr/local/EnergyPlus-23-1-0/WeatherData/USA_IL_Chicago-OHare.Intl…</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
@@ -338,7 +338,7 @@ investigations.</p>
 <span><span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2024-05-17 03:30:38.473694' and completed successfully after 1.47 mins.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2024-05-17 07:27:30.430981' and completed successfully after 1.5 mins.</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
@@ -360,12 +360,12 @@ investigations.</p>
 <span><span class="co">#&gt; $job_status</span></span>
 <span><span class="co">#&gt;    index    status                                         idf</span></span>
 <span><span class="co">#&gt;    &lt;int&gt;    &lt;char&gt;                                      &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpU2IHBu/Ori/Ori.idf</span></span>
-<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpU2IHBu/T5/T5.idf</span></span>
-<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpU2IHBu/LED/LED.idf</span></span>
-<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpU2IHBu/0.6Frac/0.6Frac.idf</span></span>
-<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpU2IHBu/0.2Frac/0.2Frac.idf</span></span>
-<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpU2IHBu/LED+0.2Frac/LED+0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpyjqP5P/Ori/Ori.idf</span></span>
+<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpyjqP5P/T5/T5.idf</span></span>
+<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpyjqP5P/LED/LED.idf</span></span>
+<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpyjqP5P/0.6Frac/0.6Frac.idf</span></span>
+<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpyjqP5P/0.2Frac/0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpyjqP5P/LED+0.2Frac/LED+0.2Frac.idf</span></span>
 <span><span class="co">#&gt;                                                                                      epw</span></span>
 <span><span class="co">#&gt;                                                                                   &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: /usr/local/EnergyPlus-23-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>
@@ -427,7 +427,7 @@ compare results of different simulated design options.</p>
 of simulations, the tidy data interface can be used to extract any
 simulation outputs of interest using <code>$report_data()</code>,
 <code>$tabular_data()</code>, etc.</p>
-<p>In this example, the building energy consumptions of all six models
+<p>In this example, the building energy consumption of all six models
 are extracted using one line of code. The resulting data format is the
 same as that of a single simulation and is equivalent to bind rows from
 six tables into one tidy table. A <code>case</code> column is prepended
