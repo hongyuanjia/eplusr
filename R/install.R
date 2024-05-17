@@ -140,7 +140,7 @@ install_eplus <- function(ver = "latest", local = FALSE, dir = NULL, force = FAL
     dl <- download_eplus(ver, tempdir(), portable = portable)
     inst <- attr(dl, "file")
 
-    path <- install_eplus_from_file(ver, inst, local = local, dir = dir, ...)
+    path <- install_eplus_from_file(ver, inst, local = local, dir = dir, portable = portable, ...)
 
     res <- 0L
     attr(res, "path") <- path
@@ -503,7 +503,7 @@ install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable =
     no_ext <- tools::file_path_sans_ext(basename(exec))
 
     if ((portable && is.null(dir)) || ver >= "9.1") {
-        ver_dash <- gsub("\\.", "-", ver)
+        ver_dash <- gsub(".", "-", ver, fixed = TRUE)
         if (local) {
             dir <- normalizePath(file.path("~/Applications", paste0("EnergyPlus-", ver_dash)), mustWork = FALSE)
         } else {
@@ -561,7 +561,7 @@ install_eplus_linux <- function(ver, exec, local = FALSE, dir = NULL, dir_bin = 
 
     if (portable) {
         # install using the portable version
-        res <- install_eplus_portable(ver, exec, dir)
+        res <- install_eplus_portable(ver, exec, dir_eplus)
     } else {
         # EnergyPlus installation are broken since 9.1.0, which extract all files
         # directly into `/usr/local.
@@ -719,7 +719,7 @@ install_eplus_portable <- function(ver, file, dir) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     ext <- tools::file_ext(file)
 
-    tmpdir <- tempfile(tmpdir = dir)
+    tmpdir <- tempfile(tmpdir = dirname(dir))
     dir.create(tmpdir)
     on.exit(unlink(tmpdir, recursive = TRUE, force = TRUE), add = TRUE)
 
@@ -734,17 +734,17 @@ install_eplus_portable <- function(ver, file, dir) {
     }
 
     epdir <- list.files(list.files(tmpdir, full.names = TRUE), full.names = TRUE)
-    dest <- file.path(dir, basename(epdir))
 
     # file.rename only works if dest does not exist or is empty
-    if (!dir.exists(dest) || length(list.files(dest)) == 0L) {
-        res <- file.rename(epdir, dest)
+    files <- list.files(epdir, full.names = TRUE)
+    if (length(list.files(dir)) == 0L) {
+        res <- file.rename(files, file.path(dir, basename(files)))
     } else {
-        res <- file.copy(epdir, dest, overwrite = TRUE, recursive = TRUE)
+        res <- file.copy(files, dir, overwrite = TRUE, recursive = TRUE, copy.date = TRUE)
     }
 
     res <- as.integer(!all(res))
-    attr(res, "path") <- dest
+    attr(res, "path") <- dir
     res
 }
 # }}}
