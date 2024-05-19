@@ -142,9 +142,6 @@ install_eplus <- function(ver = "latest", local = FALSE, dir = NULL, force = FAL
 
     path <- install_eplus_from_file(ver, inst, local = local, dir = dir, portable = portable, ...)
 
-    # add newly installed EnergyPlus to dictionary
-    use_eplus(path)
-
     res <- 0L
     attr(res, "path") <- path
     attr(res, "installer") <- inst
@@ -157,9 +154,9 @@ install_eplus_from_file <- function(ver, inst, local = FALSE, dir = NULL, portab
     ver <- standardize_ver(ver)
     verbose_info(sprintf("Starting to install EnergyPlus v%s...", ver))
 
-    if (!local)
+    if (!local && !portable)
         verbose_info("NOTE: Administrative privileges required during installation. ",
-            "Please make sure R is running with an administrator acount or equivalent.")
+            "Please make sure R is running with an administrator account or equivalent.")
 
     res <- switch(
         os_type(),
@@ -170,8 +167,12 @@ install_eplus_from_file <- function(ver, inst, local = FALSE, dir = NULL, portab
 
     if (res != 0L) abort(paste0("Failed to install EnergyPlus v", ver, "."))
 
-    path <- eplus_default_path(ver, local = local)
+    path <- attr(res, "path")
     verbose_info(sprintf("EnergyPlus v%s successfully installed into '%s'.", ver, path))
+
+    # add newly installed EnergyPlus to dictionary
+    use_eplus(path)
+
     path
 }
 # }}}
@@ -448,14 +449,16 @@ install_eplus_win <- function(ver, exec, local = FALSE, dir = NULL, portable = F
 
     if (portable) {
         # install using the portable version
-        install_eplus_portable(ver, exec, dir)
+        res <- install_eplus_portable(ver, exec, dir)
     } else {
         if (ver >= "9.2") {
-            install_eplus_qt(ver, exec, dir, local = local)
+            res <- install_eplus_qt(ver, exec, dir, local = local)
         } else {
-            system(sprintf("%s /S /D=%s", exec, dir))
+            res <- system(sprintf("%s /S /D=%s", exec, dir))
         }
+        attr(res, "path") <- dir
     }
+    res
 }
 # }}}
 # get_win_user_path {{{
@@ -500,7 +503,7 @@ install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable =
     no_ext <- tools::file_path_sans_ext(basename(exec))
 
     if ((portable && is.null(dir)) || ver >= "9.1") {
-        ver_dash <- gsub("\\.", "-", ver)
+        ver_dash <- gsub(".", "-", ver, fixed = TRUE)
         if (local) {
             dir <- normalizePath(file.path("~/Applications", paste0("EnergyPlus-", ver_dash)), mustWork = FALSE)
         } else {
@@ -523,8 +526,10 @@ install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable =
             } else {
                 res <- sudo_on_mac(sprintf("installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
             }
+            attr(res, "path") <- eplus_default_path(ver, local = local)
         } else {
             res <- install_eplus_qt(ver, exec, dir, local = local)
+            attr(res, "path") <- dir
         }
         system(sprintf("hdiutil unmount /Volumes/%s/", no_ext))
     }
@@ -554,50 +559,55 @@ install_eplus_linux <- function(ver, exec, local = FALSE, dir = NULL, dir_bin = 
     ver_dash <- gsub("\\.", "-", ver)
     dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
 
-    # install using the portable version
-    if (portable) return(install_eplus_portable(ver, exec, dir_eplus))
-
-    # EnergyPlus installation are broken since 9.1.0, which extract all files
-    # directly into `/usr/local.
-    # see https://github.com/NREL/EnergyPlus/issues/7256
-    if (ver == "9.1") {
-        if (Sys.which("sed") != "") {
-            # copy the original installer
-            temp_exec <- file.path(tempdir(), paste0("patched-", basename(exec)))
-            flag <- file.copy(exec, temp_exec, overwrite = TRUE, copy.date = TRUE)
-            if (!flag) {
-                abort(paste0(
-                    "Failed to create a temporary copy of EnergyPlus installer '",
-                    dir, "' at temporary directory '", tempdir(), "'."
-                ))
-            }
-            patch_eplus_linux_sh(ver, temp_exec)
-            exec <- temp_exec
-        } else {
-            message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
-                "fails to extract files into correct directory ('", dir_eplus, "'). ",
-                "eplusr uses 'sed' to fix the issue before running the installation, ",
-                "but 'sed' is not found on current system. ",
-                "Please remember to manually move corresponding files ",
-                "from '", dir, "' to '", dir_eplus, "' in order to make sure ",
-                "eplusr can locate EnergyPlus v", ver, "correctly.",
-                "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
-            )
-        }
-    }
-
-    # EnergyPlus v9.3 and above provide a QtIFW based installer for Linux
-    system(sprintf('chmod +x %s', exec))
-    # installers for EnergyPlus v9.2 and above should provide the full path
-    # of EnergyPlus install directory
-    if (ver >= "9.2") dir <- dir_eplus
-    if (local) {
-        system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
-        system(sprintf('chmod -R a+w %s', dir_eplus))
+    if (portable) {
+        # install using the portable version
+        res <- install_eplus_portable(ver, exec, dir_eplus)
     } else {
-        system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
-        system(sprintf('sudo chmod -R a+w %s', dir_eplus))
+        # EnergyPlus installation are broken since 9.1.0, which extract all files
+        # directly into `/usr/local.
+        # see https://github.com/NREL/EnergyPlus/issues/7256
+        if (ver == "9.1") {
+            if (Sys.which("sed") != "") {
+                # copy the original installer
+                temp_exec <- file.path(tempdir(), paste0("patched-", basename(exec)))
+                flag <- file.copy(exec, temp_exec, overwrite = TRUE, copy.date = TRUE)
+                if (!flag) {
+                    abort(paste0(
+                        "Failed to create a temporary copy of EnergyPlus installer '",
+                        dir, "' at temporary directory '", tempdir(), "'."
+                    ))
+                }
+                patch_eplus_linux_sh(ver, temp_exec)
+                exec <- temp_exec
+            } else {
+                message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
+                    "fails to extract files into correct directory ('", dir_eplus, "'). ",
+                    "eplusr uses 'sed' to fix the issue before running the installation, ",
+                    "but 'sed' is not found on current system. ",
+                    "Please remember to manually move corresponding files ",
+                    "from '", dir, "' to '", dir_eplus, "' in order to make sure ",
+                    "eplusr can locate EnergyPlus v", ver, "correctly.",
+                    "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
+                )
+            }
+        }
+
+        # EnergyPlus v9.3 and above provide a QtIFW based installer for Linux
+        system(sprintf('chmod +x %s', exec))
+        # installers for EnergyPlus v9.2 and above should provide the full path
+        # of EnergyPlus install directory
+        if (ver >= "9.2") dir <- dir_eplus
+        if (local) {
+            res <- system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
+            res <- res + system(sprintf('chmod -R a+w %s', dir_eplus))
+        } else {
+            res <- system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
+            res <- res + system(sprintf('sudo chmod -R a+w %s', dir_eplus))
+        }
+        attr(res, "path") <- dir_eplus
     }
+
+    res
 }
 # }}}
 # patch_eplus_linux_sh {{{
@@ -709,7 +719,7 @@ install_eplus_portable <- function(ver, file, dir) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     ext <- tools::file_ext(file)
 
-    tmpdir <- tempfile(tmpdir = dir)
+    tmpdir <- tempfile(tmpdir = dirname(dir))
     dir.create(tmpdir)
     on.exit(unlink(tmpdir, recursive = TRUE, force = TRUE), add = TRUE)
 
@@ -724,16 +734,18 @@ install_eplus_portable <- function(ver, file, dir) {
     }
 
     epdir <- list.files(list.files(tmpdir, full.names = TRUE), full.names = TRUE)
-    dest <- file.path(dir, basename(epdir))
 
     # file.rename only works if dest does not exist or is empty
-    if (!dir.exists(dest) || length(list.files(dest)) == 0L) {
-        res <- file.rename(epdir, dest)
+    files <- list.files(epdir, full.names = TRUE)
+    if (length(list.files(dir)) == 0L) {
+        res <- file.rename(files, file.path(dir, basename(files)))
     } else {
-        res <- file.copy(epdir, dest, overwrite = TRUE, recursive = TRUE)
+        res <- file.copy(files, dir, overwrite = TRUE, recursive = TRUE, copy.date = TRUE)
     }
 
-    as.integer(!all(res))
+    res <- as.integer(!all(res))
+    attr(res, "path") <- dir
+    res
 }
 # }}}
 # uninstall_eplus_win {{{
