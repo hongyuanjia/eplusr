@@ -719,7 +719,14 @@ install_eplus_portable <- function(ver, file, dir) {
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     ext <- tools::file_ext(file)
 
-    tmpdir <- tempfile(tmpdir = dirname(dir))
+    # It is possible that unzip fails due to very long path on Windows So first
+    # unzip it in R's temporary directory and then move the extracted files to
+    # the target directory
+    if (is_windows()) {
+        tmpdir <- tempfile("epinst-")
+    } else {
+        tmpdir <- tempfile(tmpdir = dirname(dir))
+    }
     dir.create(tmpdir)
     on.exit(unlink(tmpdir, recursive = TRUE, force = TRUE), add = TRUE)
 
@@ -739,6 +746,13 @@ install_eplus_portable <- function(ver, file, dir) {
     files <- list.files(epdir, full.names = TRUE)
     if (length(list.files(dir)) == 0L) {
         res <- file.rename(files, file.path(dir, basename(files)))
+        # file.rename is error-prone, so check if the file is moved successfully
+        # if not, copy it
+        if (!all(res)) {
+            res <- file.copy(files[!res], file.path(dir, basename(files))[!res],
+                overwrite = TRUE, recursive = TRUE, copy.date = TRUE
+            )
+        }
     } else {
         res <- file.copy(files, dir, overwrite = TRUE, recursive = TRUE, copy.date = TRUE)
     }
