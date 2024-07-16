@@ -10,6 +10,10 @@
   EnergyPlus v8.8 and above and directly uncompressed it into the target
   directory (#583).
 
+* Now parameter `readvars` is added in `Idf$run()` and `EplusJob$run()` to
+  control whether to run `ReadVarsESO` after simulation finishes. If CSV outputs
+  are not needed, setting it to false can speed things up (#589).
+
 ## Bug fixes
 
 * Provide more meaningful error messages when installing unsupported EnergyPlus
