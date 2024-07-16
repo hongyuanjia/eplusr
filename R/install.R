@@ -263,12 +263,12 @@ eplus_download_url <- function(ver, portable = FALSE) {
 
     cmt <- eplus_release_commit(ver)
 
-    if (!length(cmt)) {
-        abort(
+    if (!nrow(cmt)) {
+        abort(paste0(
             "Failed to get installer data for EnergyPlus v", ver, ". ",
             "All available version are: ",
             collapse(ALL_EPLUS_RELEASE_COMMIT[order(version), version]), "."
-        )
+        ))
     }
 
     # get operating system
@@ -398,7 +398,7 @@ eplus_download_url <- function(ver, portable = FALSE) {
     }
 
     if (is.na(idx_osver)) {
-        abort("Failed to determine the installer for EnergyPlus v", cmt$version, ".")
+        abort(paste0("Failed to determine the installer for EnergyPlus v", cmt$version, "."))
     }
     osver <- osvers_nm[idx_osver]
 

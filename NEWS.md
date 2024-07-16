@@ -10,6 +10,11 @@
   EnergyPlus v8.8 and above and directly uncompressed it into the target
   directory (#583).
 
+## Bug fixes
+
+* Provide more meaningful error messages when installing unsupported EnergyPlus
+  version (#590)
+
 # eplusr 0.16.2
 
 ## Bug fixes
