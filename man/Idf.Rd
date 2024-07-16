@@ -794,6 +794,9 @@ idf$run(epw, dir = tempdir(), wait = FALSE)
 # copy all external files into the directory run simulation
 idf$run(epw, dir = tempdir(), copy_external = TRUE)
 
+# run simulation without generating CSV files from ESO output
+idf$run(epw, dir = tempdir(), readvars = FALSE)
+
 # check for simulation errors
 job$errors()
 
@@ -4002,7 +4005,8 @@ Run simulation using EnergyPlus
   wait = TRUE,
   force = FALSE,
   copy_external = FALSE,
-  echo = wait
+  echo = wait,
+  readvars = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -4036,6 +4040,12 @@ will have all files needed for the model to run. Default is
 \item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to show
 standard output and error from EnergyPlus. Default: same as
 \code{wait}.}
+
+\item{\code{readvars}}{If \code{TRUE}, the \code{ReadVarESO} post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to \code{FALSE} can speed up the simulation if there are
+hundreds of output variables or meters. Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -4091,6 +4101,9 @@ idf$run(epw, dir = tempdir(), wait = FALSE)
 
 # copy all external files into the directory run simulation
 idf$run(epw, dir = tempdir(), copy_external = TRUE)
+
+# run simulation without generating CSV files from ESO output
+idf$run(epw, dir = tempdir(), readvars = FALSE)
 
 # check for simulation errors
 job$errors()

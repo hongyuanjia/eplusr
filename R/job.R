@@ -180,10 +180,13 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'
         #' # copy external files used in the model to simulation output directory
         #' job$run(copy_external = TRUE)
+        #'
+        #' # run simulation without generating CSV files from ESO output
+        #' job$run(epw, dir = tempdir(), readvars = FALSE)
         #' }
         #'
-        run = function(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
-            job_run(self, private, epw, dir, wait, force, echo, copy_external),
+        run = function(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE, readvars = TRUE)
+            job_run(self, private, epw, dir, wait, force, echo, copy_external, readvars),
         # }}}
 
         # kill {{{
