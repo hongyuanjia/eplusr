@@ -11,6 +11,12 @@ extract_reportvar_rules <- function(eplus_src, ver = eplusr:::ALL_EPLUS_VER) {
     from <- eplusr:::standardize_ver(m[, 2L])
     to <- eplusr:::standardize_ver(m[, 3L])
 
+    # make sure the order is correct
+    ord <- order(from)
+    paths <- paths[ord]
+    to <- to[ord]
+    from <- from[ord]
+
     # only necessary for versions >= 7.2
     i_72 <- from >= "7.2"
     from <- from[i_72]
