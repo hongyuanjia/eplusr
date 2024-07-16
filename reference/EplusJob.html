@@ -301,7 +301,8 @@ job$path("epw")
 <span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  echo <span class="op">=</span> <span class="va">wait</span>,</span>
-<span>  copy_external <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  copy_external <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  readvars <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -398,6 +399,9 @@ job$run(echo = FALSE)
 
 # copy external files used in the model to simulation output directory
 job$run(copy_external = TRUE)
+
+# run simulation without generating CSV files from ESO output
+job$run(epw, dir = tempdir(), readvars = FALSE)
 }
 
 </code></pre></div><p></p></div>
@@ -1234,6 +1238,9 @@ job$print()
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># copy external files used in the model to simulation output directory</span></span></span>
 <span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>copy_external <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run simulation without generating CSV files from ESO output</span></span></span>
+<span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">epw</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, readvars <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>

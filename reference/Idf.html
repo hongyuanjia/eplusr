@@ -3236,7 +3236,8 @@ idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
 <span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  copy_external <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  echo <span class="op">=</span> <span class="va">wait</span></span>
+<span>  echo <span class="op">=</span> <span class="va">wait</span>,</span>
+<span>  readvars <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -3280,6 +3281,14 @@ will have all files needed for the model to run. Default is
 <dd><p>Only applicable when <code>wait</code> is <code>TRUE</code>. Whether to show
 standard output and error from EnergyPlus. Default: same as
 <code>wait</code>.</p></dd>
+
+
+<dt><code>readvars</code></dt>
+<dd><p>If <code>TRUE</code>, the <code>ReadVarESO</code> post-processor will run
+to generate CSV files from the ESO output. Since those CSV
+files are never used when extracting simulation data in eplusr,
+setting it to <code>FALSE</code> can speed up the simulation if there are
+hundreds of output variables or meters. Default: <code>TRUE</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -3333,6 +3342,9 @@ idf$run(epw, dir = tempdir(), wait = FALSE)
 
 # copy all external files into the directory run simulation
 idf$run(epw, dir = tempdir(), copy_external = TRUE)
+
+# run simulation without generating CSV files from ESO output
+idf$run(epw, dir = tempdir(), readvars = FALSE)
 
 # check for simulation errors
 job$errors()
@@ -4339,6 +4351,9 @@ idf$print("field", order = FALSE)
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># copy all external files into the directory run simulation</span></span></span>
 <span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">epw</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, copy_external <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run simulation without generating CSV files from ESO output</span></span></span>
+<span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">epw</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, readvars <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># check for simulation errors</span></span></span>
 <span class="r-in"><span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span></span></span>
