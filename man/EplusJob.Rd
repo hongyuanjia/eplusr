@@ -110,6 +110,9 @@ job$run(echo = FALSE)
 
 # copy external files used in the model to simulation output directory
 job$run(copy_external = TRUE)
+
+# run simulation without generating CSV files from ESO output
+job$run(epw, dir = tempdir(), readvars = FALSE)
 }
 
 
@@ -464,7 +467,8 @@ Run simulation
   wait = TRUE,
   force = FALSE,
   echo = wait,
-  copy_external = FALSE
+  copy_external = FALSE,
+  readvars = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -547,6 +551,9 @@ job$run(echo = FALSE)
 
 # copy external files used in the model to simulation output directory
 job$run(copy_external = TRUE)
+
+# run simulation without generating CSV files from ESO output
+job$run(epw, dir = tempdir(), readvars = FALSE)
 }
 
 }
