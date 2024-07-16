@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   eplusr: eplusr.html
@@ -10,8 +10,7 @@ articles:
   param: param.html
   schedule: schedule.html
   transition: transition.html
-last_built: 2024-05-25T14:30Z
+last_built: 2024-07-16T02:50Z
 urls:
   reference: https://hongyuanjia.github.io/eplusr/reference
   article: https://hongyuanjia.github.io/eplusr/articles
-

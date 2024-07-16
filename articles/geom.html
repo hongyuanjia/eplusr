@@ -6,12 +6,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Work with geometry • eplusr</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -20,8 +14,6 @@
 <script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="Work with geometry">
-<meta property="og:description" content="eplusr">
-<meta property="og:image" content="https://hongyuanjia.github.io/eplusr/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -34,7 +26,7 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -48,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9005</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.2.9006</span>
       </span>
     </div>
 
@@ -57,7 +49,7 @@
 <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -66,7 +58,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -107,7 +99,7 @@
 <li>
   <a href="https://github.com/hongyuanjia/eplusr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -116,7 +108,7 @@
           <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
       </form>
-      
+
     </div>
 <!--/.nav-collapse -->
   </div>
@@ -124,7 +116,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -133,9 +125,9 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2024-05-25</h4>
+            <h4 data-toc-skip class="date">2024-07-16</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/HEAD/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/geom.Rmd" class="external-link"><code>vignettes/geom.Rmd</code></a></small>
       <div class="hidden name"><code>geom.Rmd</code></div>
 
     </div>
@@ -171,9 +163,8 @@ including:</p>
 <span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
 <span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
-<span><span class="co">#&gt; Parsing completed.</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parsing completed.</span></span>
+<span><span class="va">geom</span> <span class="op">&lt;-</span> <span class="va">idf</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">geom</span></span>
 <span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
@@ -196,7 +187,7 @@ including:</p>
 <div class="section level3">
 <h3 id="get-geometry-rules">Get geometry rules<a class="anchor" aria-label="anchor" href="#get-geometry-rules"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $starting_vertex_position</span></span>
 <span><span class="co">#&gt; [1] "upperleftcorner"</span></span>
@@ -216,7 +207,7 @@ including:</p>
 <div class="section level3">
 <h3 id="get-surface-area">Get surface area<a class="anchor" aria-label="anchor" href="#get-surface-area"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         id                                               name</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                                             &lt;char&gt;</span></span>
@@ -244,7 +235,7 @@ current <code>Idf</code>. You can specify <code>class</code> and
 <code>object</code> to only calculate objects of interest. This is also
 true for the <code>$azimuth()</code> and <code>$tilt()</code>
 methods.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"Shading:Zone:Detailed"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        id                                                    name</span></span>
 <span><span class="co">#&gt;     &lt;int&gt;                                                  &lt;char&gt;</span></span>
@@ -269,7 +260,7 @@ methods.</p>
 <span><span class="va">....</span></span></code></pre></div>
 <p>With <code>net</code> being <code>TRUE</code>, the window and door
 areas will be excluded in the results of surfaces.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span></span>
 <span><span class="co">#&gt;         id                             name                    class</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                           &lt;char&gt;                   &lt;char&gt;</span></span>
@@ -291,9 +282,8 @@ areas will be excluded in the results of surfaces.</p>
 <span><span class="co">#&gt;   3:            Floor 1 Cafe   &lt;NA&gt;   Wall  76.18049</span></span>
 <span><span class="co">#&gt;   4:            Floor 1 Cafe   &lt;NA&gt;   Wall  76.18049</span></span>
 <span><span class="co">#&gt;   5:           Floor 1 Clean   &lt;NA&gt;   Wall  18.58061</span></span>
-<span><span class="va">....</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>net <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span></span>
+<span><span class="va">....</span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">area</span><span class="op">(</span>net <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Wall"</span><span class="op">]</span></span>
 <span><span class="co">#&gt;         id                             name                    class</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                           &lt;char&gt;                   &lt;char&gt;</span></span>
 <span><span class="co">#&gt;   1:   155                           25C85A BuildingSurface:Detailed</span></span>
@@ -319,7 +309,7 @@ areas will be excluded in the results of surfaces.</p>
 <div class="section level3">
 <h3 id="get-surface-azimuth-and-tilt">Get surface azimuth and tilt<a class="anchor" aria-label="anchor" href="#get-surface-azimuth-and-tilt"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">azimuth</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         id                                               name</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                                             &lt;char&gt;</span></span>
@@ -341,9 +331,8 @@ areas will be excluded in the results of surfaces.</p>
 <span><span class="co">#&gt;   3: BuildingSurface:Detailed              Floor 1 Cafe   &lt;NA&gt;        Wall</span></span>
 <span><span class="co">#&gt;   4: BuildingSurface:Detailed              Floor 1 Cafe   &lt;NA&gt;     Ceiling</span></span>
 <span><span class="co">#&gt;   5: BuildingSurface:Detailed              Floor 1 Cafe   &lt;NA&gt;        Wall</span></span>
-<span><span class="va">....</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">tilt</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">....</span></span>
+<span><span class="va">geom</span><span class="op">$</span><span class="fu">tilt</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         id                                               name</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                                             &lt;char&gt;</span></span>
 <span><span class="co">#&gt;   1:   154                                  Floor 1 Cafe Slab</span></span>
@@ -380,7 +369,7 @@ corresponding detailed class, including:</p>
 <li><code>Shading:Building:Detailed</code></li>
 <li><code>Shading:Zone:Detailed</code></li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"4ZoneWithShading_Simple_1.idf"</span><span class="op">)</span></span>
 <span><span class="va">simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_simple</span><span class="op">)</span></span>
 <span></span>
@@ -391,16 +380,14 @@ corresponding detailed class, including:</p>
 <span><span class="co">#&gt;  [7] "Ceiling:Interzone"   "Floor:Adiabatic"     "Floor:Interzone"    </span></span>
 <span><span class="co">#&gt; [10] "Window"              "Door"                "Window:Interzone"   </span></span>
 <span><span class="co">#&gt; [13] "Shading:Site"        "Shading:Building"    "Shading:Overhang"   </span></span>
-<span><span class="co">#&gt; [16] "Shading:Fin"</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; [16] "Shading:Fin"</span></span>
+<span></span>
 <span><span class="va">simple</span><span class="op">$</span><span class="fu">geometry</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">convert</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Empty 'Daylighting Reference Point Coordinate System' found in</span></span>
 <span><span class="co">#&gt; 'GlobalGeometryRules'. Assuming 'Relative'.</span></span>
 <span><span class="co">#&gt; Warning: Empty 'Daylighting Reference Point Coordinate System' found in</span></span>
-<span><span class="co">#&gt; 'GlobalGeometryRules'. Assuming 'Relative'.</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; 'GlobalGeometryRules'. Assuming 'Relative'.</span></span>
+<span></span>
 <span><span class="va">simple</span><span class="op">$</span><span class="fu">class_name</span><span class="op">(</span>by_group <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="st">"Thermal Zones and Surfaces"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $`Thermal Zones and Surfaces`</span></span>
 <span><span class="co">#&gt; [1] "GlobalGeometryRules"          "Zone"                        </span></span>
@@ -410,7 +397,7 @@ corresponding detailed class, including:</p>
 <p>An attribute named <code>mapping</code> is attached in the converted
 <code>Idf</code> object which contains the meta data of objects before
 and after the conversion.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">simple</span>, <span class="st">"mapping"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     ori_id                       ori_name         ori_class new_id</span></span>
 <span><span class="co">#&gt;      &lt;int&gt;                         &lt;char&gt;            &lt;char&gt;  &lt;int&gt;</span></span>
@@ -441,7 +428,7 @@ and after the conversion.</p>
 specified coordinate systems, e.g. from world to relative, and vice
 versa. Besides, it also updates the <code>GlobalGeometryRules</code> in
 parent [Idf] accordingly.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">rules</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $starting_vertex_position</span></span>
 <span><span class="co">#&gt; [1] "upperleftcorner"</span></span>
@@ -456,9 +443,8 @@ parent [Idf] accordingly.</p>
 <span><span class="co">#&gt; [1] "relative"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $rectangular_surface_coordinate_system</span></span>
-<span><span class="co">#&gt; [1] "relative"</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; [1] "relative"</span></span>
+<span></span>
 <span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        id              name                    class index</span></span>
 <span><span class="co">#&gt;     &lt;int&gt;            &lt;char&gt;                   &lt;char&gt; &lt;int&gt;</span></span>
@@ -480,9 +466,8 @@ parent [Idf] accordingly.</p>
 <span><span class="co">#&gt; 16:   154 Floor 1 Cafe Slab BuildingSurface:Detailed    16</span></span>
 <span><span class="co">#&gt; 17:   154 Floor 1 Cafe Slab BuildingSurface:Detailed    17</span></span>
 <span><span class="co">#&gt; 18:   154 Floor 1 Cafe Slab BuildingSurface:Detailed    18</span></span>
-<span><span class="va">....</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="va">....</span></span>
+<span></span>
 <span><span class="va">geom</span><span class="op">$</span><span class="fu">coord_system</span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── EnergPlus IDF Geometry ──────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/HospitalLowEnergy.idf'</span></span>
@@ -497,9 +482,8 @@ parent [Idf] accordingly.</p>
 <span><span class="co">#&gt;  • Coordinate System:</span></span>
 <span><span class="co">#&gt;    - Detailed: 'World'</span></span>
 <span><span class="co">#&gt;    - Simple:   'Relative'</span></span>
-<span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt;    - Daylighting: 'Relative'</span></span>
+<span></span>
 <span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        id              name                    class index</span></span>
 <span><span class="co">#&gt;     &lt;int&gt;            &lt;char&gt;                   &lt;char&gt; &lt;int&gt;</span></span>
@@ -533,7 +517,7 @@ e.g. <code>BuildingSurface:Detailed</code>,
 <p><code>$round_digits()</code> may be useful for clean up IDF files
 generated using OpenStudio which often gives vertices with long trailing
 digits.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">geom</span><span class="op">$</span><span class="fu">round_digits</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">geom</span><span class="op">$</span><span class="fu">parent</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span><span class="st">"Floor 1 Cafe Slab"</span><span class="op">)</span></span>
@@ -574,7 +558,7 @@ to further tweak the viewer scene.</p>
 projection.</li>
 <li>Wheel: Zoom</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span> <span class="op">&lt;-</span> <span class="va">geom</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_default.png" style="display: block; margin: auto;"></p>
 <div class="section level3">
@@ -635,70 +619,70 @@ ground.</td>
 <div class="section level4">
 <h4 id="change-background">Change background<a class="anchor" aria-label="anchor" href="#change-background"></a>
 </h4>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"grey50"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_background1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">background</span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_background2.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-viewpoint">Change viewpoint<a class="anchor" aria-label="anchor" href="#change-viewpoint"></a>
 </h4>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"top"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_viewpoint1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">viewpoint</span><span class="op">(</span><span class="st">"iso"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_viewpoint2.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-axis-style">Change axis style<a class="anchor" aria-label="anchor" href="#change-axis-style"></a>
 </h4>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_axis.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">axis</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_noaxis.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-ground-style">Change ground style<a class="anchor" aria-label="anchor" href="#change-ground-style"></a>
 </h4>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">ground</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="turn-onoff-x-ray-style">Turn on/off X-ray style<a class="anchor" aria-label="anchor" href="#turn-onoff-x-ray-style"></a>
 </h4>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_xray.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">x_ray</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="change-render-style">Change render style<a class="anchor" aria-label="anchor" href="#change-render-style"></a>
 </h4>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"zone"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_zone_color.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">render_by</span><span class="op">(</span><span class="st">"surface_type"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="turn-onoff-components">Turn on/off components<a class="anchor" aria-label="anchor" href="#turn-onoff-components"></a>
 </h4>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>zone <span class="op">=</span> <span class="st">"floor 7 clean"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_zone.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>surface <span class="op">=</span> <span class="st">"MOB Floor 5 Perimeter 2 Ext Wall"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_surface.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"wall"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_show_wall.png" style="display: block; margin: auto;"></p>
 </div>
@@ -708,7 +692,7 @@ ground.</td>
 </h3>
 <p><code>$snapshot()</code> captures the current rgl view and saves it
 as an image file to disk.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">viewer</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">viewer</span><span class="op">$</span><span class="fu">snapshot</span><span class="op">(</span><span class="st">"view.png"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="geom-viewer_ground.png" style="display: block; margin: auto;"></p>
@@ -736,9 +720,7 @@ visualize simulation results dynamically.</p>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -751,17 +733,17 @@ visualize simulation results dynamically.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script><script>
   docsearch({
-    
-    
+
+
     apiKey: '158ff4599f27d2efdd371e5200cdb538',
     indexName: 'eplusr',
     inputSelector: 'input#search-input.form-control',
