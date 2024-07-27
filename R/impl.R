@@ -78,6 +78,12 @@ check_bad_key <- function(res, col_check, col_on, context = NULL) {
             col_key <- "name"
         }
         col_key <- paste(stri_replace_first_regex(col_on, "_.*", ""), col_key)
+        if (length(context) > 1L) {
+            if (length(context) != length(invld_cls)) {
+                stop("Internal error: The length of context should be 1 or equal to the length of invalid keys")
+            }
+            context <- context[[1L]]
+        }
         abort_bad_key(col_key, invld_cls, context = context)
     }
     res
