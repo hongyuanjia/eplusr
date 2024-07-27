@@ -13,7 +13,10 @@
 ## Bug fixes
 
 * Provide more meaningful error messages when installing unsupported EnergyPlus
-  version (#590)
+  version (#590).
+
+* Give correct error messages when querying multiple `IdfObject`s with both class
+  and object info given (#594).
 
 # eplusr 0.16.2
 
