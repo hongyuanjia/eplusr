@@ -18,6 +18,8 @@
 * Give correct error messages when querying multiple `IdfObject`s with both class
   and object info given (#594).
 
+* Fix AMY EPW file parsing (#596).
+
 # eplusr 0.16.2
 
 ## Bug fixes
