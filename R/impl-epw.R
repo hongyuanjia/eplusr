@@ -1513,7 +1513,7 @@ get_epw_datetime_year <- function(start_year, start_day, end_day, num, step) {
     } else {
         lubridate::year(seq(
             as_datetime(start_day) + lubridate::minutes(step),
-            as_datetime(end_day) + lubridate::days(24L),
+            as_datetime(end_day) + lubridate::hours(24L),
             by = paste(step, "mins")
         ))
     }
