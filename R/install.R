@@ -731,10 +731,10 @@ install_eplus_portable <- function(ver, file, dir) {
     on.exit(unlink(tmpdir, recursive = TRUE, force = TRUE), add = TRUE)
 
     if (ext == "zip") {
-        unzip(file, overwrite = TRUE, exdir = tmpdir)
+        utils::unzip(file, overwrite = TRUE, exdir = tmpdir)
         res <- 0L
     } else if (ext == "gz" && tools::file_ext(tools::file_path_sans_ext(file)) == "tar") {
-        res <- untar(file, exdir = tmpdir)
+        res <- utils::untar(file, exdir = tmpdir)
         if (res != 0L) return(res)
     } else {
         abort("Unsupported portable EnergyPlus installer file format.")
