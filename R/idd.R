@@ -1224,7 +1224,8 @@ download_idd <- function(ver = "latest", dir = ".") {
         latest_ver <- LATEST_EPLUS_VER
     }
 
-    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/")
+    # from v23.2.0, the IDD file is stored in a dedicated folder 'versions'
+    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/versions/")
 
     ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
 
