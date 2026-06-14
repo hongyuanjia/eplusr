@@ -502,7 +502,7 @@ install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable =
     ver <- standardize_ver(ver)
     no_ext <- tools::file_path_sans_ext(basename(exec))
 
-    if ((portable && is.null(dir)) || ver >= "9.1") {
+    if ((portable && is.null(dir)) || (!portable && ver >= "9.1")) {
         ver_dash <- gsub(".", "-", ver, fixed = TRUE)
         if (local) {
             dir <- normalizePath(file.path("~/Applications", paste0("EnergyPlus-", ver_dash)), mustWork = FALSE)
@@ -740,7 +740,8 @@ install_eplus_portable <- function(ver, file, dir) {
         abort("Unsupported portable EnergyPlus installer file format.")
     }
 
-    epdir <- list.files(list.files(tmpdir, full.names = TRUE), full.names = TRUE)
+    epdir <- list.files(tmpdir, full.names = TRUE)
+    if (!(length(epdir) == 1L && dir.exists(epdir))) epdir <- tmpdir
 
     # file.rename only works if dest does not exist or is empty
     files <- list.files(epdir, full.names = TRUE)

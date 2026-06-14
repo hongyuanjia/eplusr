@@ -1224,15 +1224,17 @@ download_idd <- function(ver = "latest", dir = ".") {
         latest_ver <- LATEST_EPLUS_VER
     }
 
-    # from v23.2.0, the IDD file is stored in a dedicated folder 'versions'
-    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/versions/")
-
     ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
 
     ver <- as.character(ver)
     if (ver == latest_ver) {
+        base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/")
         file_url <- "Energy%2B.idd.in"
     } else {
+        # From v23.2.0, historical IDDs are stored in a dedicated 'versions'
+        # folder while the latest Energy+.idd.in remains directly under 'idd'.
+        base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/")
+        if (numeric_version(latest_ver) >= numeric_version("23.2.0")) base_url <- paste0(base_url, "versions/")
         file_url <- paste0("V", ver_dash, "-Energy%2B.idd")
     }
 

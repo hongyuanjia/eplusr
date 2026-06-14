@@ -3988,6 +3988,493 @@ trans_funs$f2220t2310 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_2310_2320 {{{
+trans_funs$f2310t2320 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "23.1")
+
+    target_cls <- c(
+        "Coil:Cooling:DX:TwoSpeed",                              # 1
+        "Coil:Cooling:DX:CurveFit:Performance",                  # 2
+        "Coil:Cooling:DX:SingleSpeed",                           # 3
+        "Coil:Cooling:DX:MultiSpeed",                            # 4
+        "Coil:Cooling:DX:VariableSpeed",                         # 5
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode",       # 6
+        "Coil:Heating:DX:SingleSpeed",                           # 7
+        "Coil:Heating:DX:MultiSpeed",                            # 8
+        "Coil:Heating:DX:VariableSpeed",                         # 9
+        "Coil:WaterHeating:AirToWaterHeatPump:Pumped",           # 10
+        "Coil:WaterHeating:AirToWaterHeatPump:Wrapped",          # 11
+        "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",    # 12
+        "DistrictHeating",                                       # 13
+        "Branch",                                                # 14
+        "PlantEquipmentList",                                    # 15
+        "PlantEquipmentOperation:ComponentSetpoint",             # 16
+        "EnergyManagementSystem:MeteredOutputVariable",          # 17
+        "Exterior:FuelEquipment",                                # 18
+        "OtherEquipment",                                        # 19
+        "PythonPlugin:OutputVariable",                           # 20
+        "WaterHeater:Mixed",                                     # 21
+        "WaterHeater:Stratified",                                # 22
+        "ZoneHVAC:HybridUnitaryHVAC",                            # 23
+        "Meter:Custom",                                          # 24
+        "Meter:CustomDecrement",                                 # 25
+        "LifeCycleCost:UsePriceEscalation",                      # 26
+        "LifeCycleCost:UseAdjustment",                           # 27
+        "HVACTemplate:Zone:WaterToAirHeatPump",                  # 28
+        "AirLoopHVAC:UnitarySystem",                             # 29
+        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",                # 30
+        "ZoneHVAC:WaterToAirHeatPump",                           # 31
+        "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",   # 32
+        "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",   # 33
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit",           # 34
+        "Coil:Heating:WaterToAirHeatPump:EquationFit",           # 35
+        "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"# 36
+    )
+
+    new_idf <- trans_preprocess(idf, "23.2", target_cls)
+
+    value_at <- function(dt, field_index) {
+        value <- dt[list(field_index), on = "index", value]
+        if (!length(value)) NA_character_ else value[[1L]]
+    }
+
+    value_lower <- function(value) {
+        stri_trans_tolower(stri_trim_both(value))
+    }
+
+    replace_value <- function(dt, field_index, old, new) {
+        if (!nrow(dt)) return(dt)
+        field_index <- field_index[field_index <= max(dt$index)]
+        if (!length(field_index)) return(dt)
+
+        set(dt, NULL, "value_lower", value_lower(dt$value))
+        dt[J(field_index, value_lower(old)), on = c("index", "value_lower"), value := new]
+        set(dt, NULL, "value_lower", NULL)
+        dt
+    }
+
+    replace_resource <- function(dt, field_index, district = TRUE) {
+        if (district) dt <- replace_value(dt, field_index, "DistrictHeating", "DistrictHeatingWater")
+        replace_value(dt, field_index, "Steam", "DistrictHeatingSteam")
+    }
+
+    replace_component <- function(dt, field_index) {
+        replace_value(dt, field_index, "DistrictHeating", "DistrictHeating:Water")
+    }
+
+    field_seq <- function(dt, start, step) {
+        if (!nrow(dt) || start > max(dt$index)) return(integer())
+        seq.int(start, max(dt$index), by = step)
+    }
+
+    remap_object <- function(obj, old_index, new_index, blank_index = integer(),
+                             blank_value = rep(NA_character_, length(blank_index)),
+                             max_index = NULL) {
+        rows <- list()
+
+        old_index <- as.integer(old_index)
+        new_index <- as.integer(new_index)
+        use <- old_index <= max(obj$index)
+        if (length(old_index) && any(use)) {
+            old_index_use <- old_index[use]
+            new_index_use <- new_index[use]
+            src <- obj[J(old_index_use), on = "index", nomatch = 0L]
+            if (nrow(src)) {
+                src[, old_index := index]
+                src[, index := new_index_use[match(old_index, old_index_use)]]
+                set(src, NULL, "old_index", NULL)
+                rows[[length(rows) + 1L]] <- src
+            }
+        }
+
+        if (length(blank_index)) {
+            blank <- obj[rep(1L, length(blank_index))]
+            set(blank, NULL, "index", as.integer(blank_index))
+            set(blank, NULL, "field", NA_character_)
+            set(blank, NULL, "value", rep(blank_value, length.out = length(blank_index)))
+            rows[[length(rows) + 1L]] <- blank
+        }
+
+        if (!length(rows)) return(obj)
+
+        out <- rbindlist(rows, use.names = TRUE)
+        if (!is.null(max_index)) out <- out[index <= max_index]
+        setorderv(out, c("id", "index"))
+        out <- out[!duplicated(out, by = c("id", "index"), fromLast = TRUE)]
+        out
+    }
+
+    remap_dt <- function(dt, old_index, new_index, blank_index = integer(),
+                         blank_value = rep(NA_character_, length(blank_index)),
+                         max_index = NULL) {
+        if (!nrow(dt)) return(dt)
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            remap_object(dt[list(obj_id), on = "id"], old_index, new_index, blank_index, blank_value, max_index)
+        }), use.names = TRUE)
+    }
+
+    parent_delete_shift_dt <- function(dt, keep_to, delete, reduce_if_gt = NULL) {
+        if (!nrow(dt)) return(dt)
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+
+            if (is.null(reduce_if_gt) || cur_args > reduce_if_gt) {
+                new_args <- cur_args - length(delete)
+            } else {
+                new_args <- cur_args
+            }
+            if (new_args < 1L) return(obj[0L])
+
+            old_index <- c(
+                seq_len(min(keep_to, cur_args)),
+                if (cur_args > max(delete)) seq.int(max(delete) + 1L, cur_args) else integer()
+            )
+            new_index <- c(
+                seq_len(min(keep_to, cur_args)),
+                if (cur_args > max(delete)) seq.int(min(delete), cur_args - length(delete)) else integer()
+            )
+
+            blank_index <- setdiff(seq_len(new_args), new_index)
+            out <- remap_object(obj, old_index, new_index,
+                blank_index = blank_index,
+                blank_value = "",
+                max_index = new_args
+            )
+            out[index <= new_args & is.na(value), value := ""]
+            out
+        }), use.names = TRUE)
+    }
+
+    make_latent_info <- function() {
+        info <- list()
+
+        add_info <- function(dt, parent_type, h_type, h_name, c_type, c_name,
+                             max_cycling, heat_pump_time, fraction, delay,
+                             create_h, create_c) {
+            if (!nrow(dt)) return(NULL)
+            lapply(unique(dt$id), function(obj_id) {
+                obj <- dt[list(obj_id), on = "id"]
+                heating_type <- value_at(obj, h_type)
+                cooling_type <- value_at(obj, c_type)
+                data.table(
+                    parent_id = obj_id,
+                    parent_type = parent_type,
+                    parent_name = value_at(obj, 1L),
+                    parent_name_lower = value_lower(value_at(obj, 1L)),
+                    curve_name = paste0(value_at(obj, 1L), "-AutogeneratedPLFCurve"),
+                    heating_type_lower = value_lower(heating_type),
+                    heating_name_lower = value_lower(value_at(obj, h_name)),
+                    cooling_type_lower = value_lower(cooling_type),
+                    cooling_name_lower = value_lower(value_at(obj, c_name)),
+                    max_cycling = value_at(obj, max_cycling),
+                    heat_pump_time = value_at(obj, heat_pump_time),
+                    fraction = value_at(obj, fraction),
+                    delay = value_at(obj, delay),
+                    create_curve =
+                        heating_type %chin% create_h || cooling_type %chin% create_c ||
+                        value_lower(heating_type) %chin% value_lower(create_h) ||
+                        value_lower(cooling_type) %chin% value_lower(create_c)
+                )
+            })
+        }
+
+        info <- c(info, add_info(
+            trans_action(idf, "AirLoopHVAC:UnitarySystem", min_fields = 45L),
+            "AirLoopHVAC:UnitarySystem",
+            12L, 13L, 15L, 16L, 42L, 43L, 44L, 45L,
+            c(
+                "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+                "Coil:Heating:WaterToAirHeatPump:EquationFit"
+            ),
+            c(
+                "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+                "Coil:Cooling:WaterToAirHeatPump:EquationFit"
+            )
+        ))
+
+        info <- c(info, add_info(
+            trans_action(idf, "AirLoopHVAC:UnitaryHeatPump:WaterToAir", min_fields = 18L),
+            "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+            9L, 10L, 12L, 13L, 15L, 16L, 17L, 18L,
+            c(
+                "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+                "Coil:Heating:WaterToAirHeatPump:EquationFit"
+            ),
+            c(
+                "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+                "Coil:Cooling:WaterToAirHeatPump:EquationFit"
+            )
+        ))
+
+        info <- c(info, add_info(
+            trans_action(idf, "ZoneHVAC:WaterToAirHeatPump", min_fields = 22L),
+            "ZoneHVAC:WaterToAirHeatPump",
+            15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L,
+            "Coil:Heating:WaterToAirHeatPump:EquationFit",
+            "Coil:Cooling:WaterToAirHeatPump:EquationFit"
+        ))
+
+        if (!length(info)) return(data.table())
+        rbindlist(info, use.names = TRUE)
+    }
+
+    trim_sig_digits <- function(value, digits = 5L) {
+        value <- as.numeric(value)
+        if (is.na(value)) return(NA_character_)
+
+        scale <- 10^digits
+        truncated <- sign(value) * floor(abs(value) * scale) / scale
+        sprintf(paste0("%.", digits, "f"), truncated)
+    }
+
+    make_latent_curves <- function(latent) {
+        if (!nrow(latent)) return(data.table())
+        latent <- latent[create_curve %in% TRUE]
+        if (!nrow(latent)) return(data.table())
+
+        rbindlist(lapply(seq_len(nrow(latent)), function(i) {
+            tau <- suppressWarnings(as.numeric(latent$heat_pump_time[[i]]))
+            nmax <- suppressWarnings(as.numeric(latent$max_cycling[[i]]))
+            if (is.na(tau)) tau <- 60
+            if (is.na(nmax)) nmax <- 2.5
+
+            latent_a <- 4 * tau * (nmax / 3600.0)
+            latent_cd <- latent_a * (1 - exp(-1 / latent_a))
+
+            data.table(
+                id = -latent$parent_id[[i]],
+                name = latent$curve_name[[i]],
+                class = "Curve:Linear",
+                index = 1:9,
+                field = NA_character_,
+                value = c(
+                    latent$curve_name[[i]],
+                    trim_sig_digits(1 - latent_cd),
+                    trim_sig_digits(latent_cd),
+                    "0.0",
+                    "1.0",
+                    "0.0",
+                    "1.0",
+                    "Dimensionless",
+                    "Dimensionless"
+                )
+            )
+        }), use.names = TRUE)
+    }
+
+    find_latent <- function(latent, coil_type, coil_name, side = c("cooling", "heating")) {
+        side <- match.arg(side)
+        if (!nrow(latent)) return(latent[0L])
+        type_col <- paste0(side, "_type_lower")
+        name_col <- paste0(side, "_name_lower")
+        latent[
+            get(type_col) == value_lower(coil_type) &
+            get(name_col) == value_lower(coil_name)
+        ][1L]
+    }
+
+    dx_cooling_variable_speed <- function(dt, latent) {
+        if (!nrow(dt)) return(dt)
+
+        old_index <- c(1:9, 10:14, 15:25)
+        new_index <- c(1:9, 13:17, 19:29)
+        for (i in 0:9) {
+            old_index <- c(old_index, seq.int(26L + i * 10L, 35L + i * 10L))
+            new_index <- c(new_index, seq.int(32L + i * 12L, 41L + i * 12L))
+        }
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+            new_args <- 4L + sum(cur_args >= seq.int(25L, 115L, by = 10L)) * 2L
+            max_index <- cur_args + new_args
+            blank_index <- c(10:12, 18L)
+            for (i in which(cur_args >= seq.int(25L, 115L, by = 10L))) {
+                blank_index <- c(blank_index, 30L + (i - 1L) * 12L, 31L + (i - 1L) * 12L)
+            }
+            blank_index <- blank_index[blank_index <= max_index]
+            blank_value <- rep(NA_character_, length(blank_index))
+
+            latent_match <- find_latent(latent, "Coil:Cooling:DX:VariableSpeed", value_at(obj, 1L), "cooling")
+            if (nrow(latent_match)) {
+                j <- match(c(10L, 11L, 12L), blank_index)
+                if (!is.na(j[[1L]])) blank_value[[j[[1L]]]] <- latent_match$max_cycling
+                if (!is.na(j[[2L]])) blank_value[[j[[2L]]]] <- latent_match$heat_pump_time
+                if (!is.na(j[[3L]])) blank_value[[j[[3L]]]] <- latent_match$delay
+            }
+
+            remap_object(obj, old_index, new_index, blank_index, blank_value, max_index)
+        }), use.names = TRUE)
+    }
+
+    dx_heating_variable_speed <- function(dt) {
+        if (!nrow(dt)) return(dt)
+
+        old_index <- c(1:13, 14:21)
+        new_index <- c(1:13, 15:22)
+        for (i in 0:9) {
+            old_index <- c(old_index, seq.int(22L + i * 7L, 28L + i * 7L))
+            new_index <- c(new_index, seq.int(25L + i * 9L, 31L + i * 9L))
+        }
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+            new_args <- 1L + sum(cur_args >= seq.int(21L, 84L, by = 7L)) * 2L
+            max_index <- cur_args + new_args
+            blank_index <- 14L
+            for (i in which(cur_args >= seq.int(21L, 84L, by = 7L))) {
+                blank_index <- c(blank_index, 23L + (i - 1L) * 9L, 24L + (i - 1L) * 9L)
+            }
+            blank_index <- blank_index[blank_index <= max_index]
+
+            remap_object(obj, old_index, new_index, blank_index, max_index = max_index)
+        }), use.names = TRUE)
+    }
+
+    latent_child <- function(dt, latent, coil_type, side, old_index, new_index,
+                             blank_index, value_index, max_index_fun) {
+        if (!nrow(dt)) return(dt)
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            latent_match <- find_latent(latent, coil_type, value_at(obj, 1L), side)
+            if (!nrow(latent_match)) return(obj)
+
+            cur_args <- max(obj$index)
+            max_index <- max_index_fun(cur_args)
+            mapped_index <- new_index[old_index <= cur_args]
+            blank_index_obj <- setdiff(blank_index[blank_index <= max_index], mapped_index)
+            blank_value <- rep(NA_character_, length(blank_index_obj))
+
+            for (i in seq_along(value_index)) {
+                value_name <- names(value_index)[[i]]
+                j <- match(unname(value_index[[i]]), blank_index_obj)
+                if (!is.na(j)) blank_value[[j]] <- latent_match[[value_name]]
+            }
+
+            remap_object(obj, old_index, new_index, blank_index_obj, blank_value, max_index)
+        }), use.names = TRUE)
+    }
+
+    latent <- make_latent_info()
+    dt_curve <- make_latent_curves(latent)
+
+    # 1-12: DX and water-heating coil crankcase heater / rating metric fields {{{
+    dt1 <- trans_action(idf, "Coil:Cooling:DX:TwoSpeed",
+        insert = list(7:8),
+        insert = list(21:22)
+    )
+    dt2 <- trans_action(idf, "Coil:Cooling:DX:CurveFit:Performance", insert = list(3L))
+    dt3 <- trans_action(idf, "Coil:Cooling:DX:SingleSpeed", insert = list(27L))
+    dt4 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed", insert = list(13L))
+    dt5 <- dx_cooling_variable_speed(trans_action(idf, "Coil:Cooling:DX:VariableSpeed"), latent)
+    dt6 <- trans_action(idf, "Coil:Cooling:DX:TwoStageWithHumidityControlMode", insert = list(6L))
+    dt7 <- trans_action(idf, "Coil:Heating:DX:SingleSpeed", insert = list(20L))
+    dt8 <- trans_action(idf, "Coil:Heating:DX:MultiSpeed", insert = list(8L))
+    dt9 <- dx_heating_variable_speed(trans_action(idf, "Coil:Heating:DX:VariableSpeed"))
+    dt10 <- trans_action(idf, "Coil:WaterHeating:AirToWaterHeatPump:Pumped", insert = list(20L))
+    dt11 <- trans_action(idf, "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", insert = list(13L))
+    dt12 <- trans_action(idf, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", insert = list(19L))
+    # }}}
+
+    # 13-16: DistrictHeating object and component type references {{{
+    dt13 <- trans_action(idf, c("DistrictHeating:Water" = "DistrictHeating"))
+    dt14 <- replace_component(trans_action(idf, "Branch"), field_seq(trans_action(idf, "Branch"), 3L, 4L))
+    dt15 <- replace_component(trans_action(idf, "PlantEquipmentList"), field_seq(trans_action(idf, "PlantEquipmentList"), 2L, 2L))
+    dt16 <- replace_component(trans_action(idf, "PlantEquipmentOperation:ComponentSetpoint"),
+        field_seq(trans_action(idf, "PlantEquipmentOperation:ComponentSetpoint"), 2L, 6L)
+    )
+    # }}}
+
+    # 17-27: resource type enum replacements {{{
+    dt17 <- replace_resource(trans_action(idf, "EnergyManagementSystem:MeteredOutputVariable"), 5L)
+    dt18 <- replace_resource(trans_action(idf, "Exterior:FuelEquipment"), 2L)
+    dt19 <- replace_resource(trans_action(idf, "OtherEquipment"), 2L)
+    dt20 <- replace_resource(trans_action(idf, "PythonPlugin:OutputVariable"), 6L)
+    dt21 <- replace_resource(trans_action(idf, "WaterHeater:Mixed"), c(11L, 15L, 18L))
+    dt22 <- replace_resource(trans_action(idf, "WaterHeater:Stratified"), c(17L, 24L))
+    dt23 <- replace_resource(trans_action(idf, "ZoneHVAC:HybridUnitaryHVAC"), c(20L, 21L, 22L))
+    dt24 <- replace_resource(trans_action(idf, "Meter:Custom"), 2L)
+    dt25 <- replace_resource(trans_action(idf, "Meter:CustomDecrement"), 2L)
+    dt26 <- replace_resource(trans_action(idf, "LifeCycleCost:UsePriceEscalation"), 2L, district = FALSE)
+    dt27 <- replace_resource(trans_action(idf, "LifeCycleCost:UseAdjustment"), 2L, district = FALSE)
+    # }}}
+
+    # 28-31: parent object latent field removal and PLF curve generation {{{
+    dt28 <- trans_action(idf, "HVACTemplate:Zone:WaterToAirHeatPump", delete = list(29L))
+    dt29 <- parent_delete_shift_dt(trans_action(idf, "AirLoopHVAC:UnitarySystem"), 41L, 42:45, reduce_if_gt = 42L)
+    dt30 <- parent_delete_shift_dt(trans_action(idf, "AirLoopHVAC:UnitaryHeatPump:WaterToAir", min_fields = 18L), 14L, 15:18)
+    dt31 <- parent_delete_shift_dt(trans_action(idf, "ZoneHVAC:WaterToAirHeatPump", min_fields = 22L), 18L, 19:22)
+    # }}}
+
+    # 32-36: child coils receive latent degradation fields from parent objects {{{
+    dt32 <- latent_child(
+        trans_action(idf, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"),
+        latent,
+        "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+        "cooling",
+        1:27,
+        1:27,
+        1:31,
+        c(curve_name = 28L, max_cycling = 29L, heat_pump_time = 30L, delay = 31L),
+        function(cur_args) 31L
+    )
+    dt33 <- latent_child(
+        trans_action(idf, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation"),
+        latent,
+        "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+        "heating",
+        1:24,
+        1:24,
+        1:25,
+        c(curve_name = 25L),
+        function(cur_args) 25L
+    )
+    dt34 <- latent_child(
+        trans_action(idf, "Coil:Cooling:WaterToAirHeatPump:EquationFit"),
+        latent,
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+        "cooling",
+        c(1:16, 17:18),
+        c(1:16, 18:19),
+        1:22,
+        c(curve_name = 17L, max_cycling = 20L, heat_pump_time = 21L, delay = 22L),
+        function(cur_args) 22L
+    )
+    dt35 <- latent_child(
+        trans_action(idf, "Coil:Heating:WaterToAirHeatPump:EquationFit"),
+        latent,
+        "Coil:Heating:WaterToAirHeatPump:EquationFit",
+        "heating",
+        1:14,
+        1:14,
+        1:15,
+        c(curve_name = 15L),
+        function(cur_args) 15L
+    )
+    dt36 <- latent_child(
+        trans_action(idf, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"),
+        latent,
+        "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit",
+        "cooling",
+        c(1:12, 13:144),
+        c(1:12, 16:147),
+        13:15,
+        c(max_cycling = 13L, heat_pump_time = 14L, delay = 15L),
+        function(cur_args) cur_args + 3L
+    )
+    # }}}
+
+    dt <- rbindlist(c(mget(paste0("dt", 1:36)), list(dt_curve)), use.names = TRUE)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
