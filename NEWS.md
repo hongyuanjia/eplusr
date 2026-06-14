@@ -2,7 +2,7 @@
 
 ## New features
 
-* Add support for EnergyPlus v24.2.0.
+* Add support for EnergyPlus v24.2.0 (#603).
 
 * Add support for EnergyPlus v24.1.0 (#582, #602).
 
