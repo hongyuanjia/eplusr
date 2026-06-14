@@ -4980,6 +4980,15 @@ trans_funs$f2410t2420 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# f2420t2510 {{{
+trans_funs$f2420t2510 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "24.2")
+
+    new_idf <- trans_preprocess(idf, "25.1")
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

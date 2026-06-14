@@ -2996,5 +2996,49 @@ test_that("Transition v24.1 --> v24.2", {
     )
 })
 # }}}
+# v24.2 --> v25.1 {{{
+test_that("Transition v24.2 --> v25.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "24.2"
+    to <- "25.1"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `RunPeriod` = list(
+                "Annual", 1, 1, 2024, 12, 31, 2024, "Monday",
+                "Yes", "Yes", "No", "Yes", "Yes"
+            ),
+            `Output:Variable` = list("*", "Infiltration Air Change Rate"),
+            `EnergyManagementSystem:Sensor` = list(
+                "InfACH", "*", "Zone Infiltration Air Change Rate"
+            ),
+            `Output:Table:Monthly` = list(
+                "MonthlyReport", 3, "Zone Ventilation Air Change Rate", "SumOrAverage"
+            ),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("25.1.0"))
+
+    expect_equal(
+        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Infiltration Current Density Air Change Rate"
+    )
+    expect_equal(
+        idfTR$`EnergyManagementSystem:Sensor`$InfACH$value(3)[[1L]],
+        "Zone Infiltration Current Density Air Change Rate"
+    )
+    expect_equal(
+        idfTR$`Output:Table:Monthly`$MonthlyReport$value(3)[[1L]],
+        "Zone Ventilation Current Density Air Change Rate"
+    )
+    expect_equal(idfTR$RunPeriod$Annual$value(1)[[1L]], "Annual")
+})
+# }}}
 
 # vim: set fdm=marker:
