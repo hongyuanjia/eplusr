@@ -130,7 +130,7 @@ update_internal_data <- function(eplus_src, force = FALSE) {
 
     if (save) {
         usethis::use_data(WEATHER_DB, REPORTVAR_RULES, OUTPUT_VARS,
-            internal = TRUE, overwrite = TRUE, compress = "xz")
+            internal = TRUE, overwrite = TRUE, compress = "xz", version = 2)
     } else {
         message("Nothing has been updated. Skip saving internal data.")
     }
