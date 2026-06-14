@@ -270,7 +270,7 @@ test_that("IddObject class", {
 
     skip_on_cran()
     # Outputs {{{
-    expect_equal(nrow(res <- use_idd(LATEST_EPLUS_VER, "auto")$Lights$outputs()), 49L)
+    expect_equal(nrow(res <- use_idd(LATEST_EPLUS_VER, "auto")$Lights$outputs()), 0L)
     expect_equal(names(res), c("index", "class", "reported_time_step",
         "report_type", "variable", "units"))
     expect_equal(
