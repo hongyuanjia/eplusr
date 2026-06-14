@@ -4767,6 +4767,219 @@ trans_funs$f2320t2410 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# f2410t2420 {{{
+trans_funs$f2410t2420 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "24.1")
+
+    target_cls <- c(
+        "HeatPump:PlantLoop:EIR:Cooling",
+        "HeatPump:PlantLoop:EIR:Heating",
+        "OutputControl:Files",
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"
+    )
+
+    new_idf <- trans_preprocess(idf, "24.2", target_cls)
+
+    value_at <- function(dt, field_index) {
+        value <- dt[list(as.integer(field_index)), on = "index", value]
+        if (!length(value)) NA_character_ else value[[1L]]
+    }
+
+    trim_value <- function(value) {
+        if (length(value) == 0L || is.na(value)) return("")
+        stri_trim_both(as.character(value))
+    }
+
+    same_string <- function(value, target) {
+        value <- stri_trans_tolower(trim_value(value))
+        target <- stri_trans_tolower(trim_value(target))
+        nzchar(value) && value == target
+    }
+
+    make_obj_dt <- function(id, name, class, value) {
+        data.table(
+            id = id,
+            name = name,
+            class = class,
+            index = seq_along(value),
+            field = NA_character_,
+            value = value
+        )
+    }
+
+    next_generated_id <- local({
+        i <- 0L
+        function() {
+            i <<- i + 1L
+            -i
+        }
+    })
+
+    duplicate_field <- function(dt, field_index) {
+        if (!nrow(dt)) return(dt)
+
+        out <- rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- copy(dt[list(obj_id), on = "id"])
+            cur_args <- max(obj$index)
+            if (cur_args < field_index) return(obj)
+
+            field <- obj[list(field_index), on = "index"][1L]
+            set(field, NULL, "field", NA_character_)
+
+            obj[index >= field_index, index := index + 1L]
+            rbindlist(list(obj, field), use.names = TRUE)
+        }), use.names = TRUE)
+
+        setorderv(out, c("id", "index"))
+        out
+    }
+
+    fixed_flow_fraction <- function(method, min_frac, min_flow, max_flow) {
+        if (!same_string(method, "FixedFlowRate")) return(min_frac)
+        if (same_string(max_flow, "autosize")) return("0.0")
+
+        min_flow <- suppressWarnings(as.numeric(min_flow))
+        max_flow <- suppressWarnings(as.numeric(max_flow))
+        if (is.na(min_flow) || is.na(max_flow) || max_flow == 0) return(NA_character_)
+
+        sprintf("%.5f", min_flow / max_flow)
+    }
+
+    fan_lookup <- function() {
+        fans <- trans_action(idf, "Fan:VariableVolume")
+        if (!nrow(fans)) return(list())
+
+        objs <- lapply(unique(fans$id), function(obj_id) fans[list(obj_id), on = "id"])
+        names(objs) <- stri_trans_tolower(vapply(objs, function(obj) trim_value(value_at(obj, 1L)), character(1L)))
+        objs
+    }
+
+    vrf_terminal_unit <- function(dt) {
+        if (!nrow(dt)) {
+            return(list(dt = dt, fan_del_ids = integer()))
+        }
+
+        fans <- fan_lookup()
+        out <- list()
+        fan_del_names <- character()
+
+        for (obj_id in unique(dt$id)) {
+            obj <- copy(dt[list(obj_id), on = "id"])
+            fan_type <- value_at(obj, 14L)
+            fan_name <- trim_value(value_at(obj, 15L))
+
+            if (!same_string(fan_type, "Fan:VariableVolume")) {
+                out[[length(out) + 1L]] <- obj
+                next
+            }
+
+            obj[list(14L), on = "index", value := "Fan:SystemModel"]
+            out[[length(out) + 1L]] <- obj
+
+            fan <- fans[[stri_trans_tolower(fan_name)]]
+            if (is.null(fan)) next
+
+            fan_del_names <- c(fan_del_names, fan_name)
+
+            fan_total_eff <- value_at(fan, 3L)
+            pressure_rise <- value_at(fan, 4L)
+            max_air_flow <- value_at(fan, 5L)
+            min_flow_method <- value_at(fan, 6L)
+            min_air_flow_frac <- value_at(fan, 7L)
+            fan_power_min_air_flow <- value_at(fan, 8L)
+            motor_eff <- value_at(fan, 9L)
+            motor_in_air_stream <- value_at(fan, 10L)
+            coeff <- vapply(11:15, function(i) as.character(value_at(fan, i)), character(1L))
+            inlet_node <- value_at(fan, 16L)
+            outlet_node <- value_at(fan, 17L)
+            end_use <- value_at(fan, 18L)
+
+            curve_name <- paste0(fan_name, "_curve")
+
+            out[[length(out) + 1L]] <- make_obj_dt(
+                next_generated_id(), fan_name, "Fan:SystemModel",
+                c(
+                    fan_name,
+                    value_at(fan, 2L),
+                    inlet_node,
+                    outlet_node,
+                    max_air_flow,
+                    "Continuous",
+                    fixed_flow_fraction(min_flow_method, min_air_flow_frac, fan_power_min_air_flow, max_air_flow),
+                    pressure_rise,
+                    motor_eff,
+                    motor_in_air_stream,
+                    "autosize",
+                    "TotalEfficiencyAndPressure",
+                    "",
+                    "",
+                    fan_total_eff,
+                    curve_name,
+                    "",
+                    "",
+                    "",
+                    "",
+                    end_use
+                )
+            )
+
+            out[[length(out) + 1L]] <- make_obj_dt(
+                next_generated_id(), curve_name, "Curve:Quartic",
+                c(
+                    curve_name,
+                    coeff,
+                    "0.0",
+                    "1.0",
+                    "0.0",
+                    "5.0",
+                    "Dimensionless",
+                    "Dimensionless"
+                )
+            )
+        }
+
+        res <- rbindlist(out, use.names = TRUE)
+        setorderv(res, c("id", "index"))
+
+        fan_del_ids <- integer()
+        if (length(fan_del_names)) {
+            old_fans <- trans_action(idf, "Fan:VariableVolume")
+            if (nrow(old_fans)) {
+                old_fans[, value_lower := stri_trans_tolower(stri_trim_both(as.character(value)))]
+                fan_del_ids <- old_fans[
+                    J(1L, stri_trans_tolower(fan_del_names)),
+                    on = c("index", "value_lower"),
+                    unique(id)
+                ]
+            }
+        }
+
+        list(dt = res, fan_del_ids = fan_del_ids)
+    }
+
+    dt1 <- trans_action(idf, "HeatPump:PlantLoop:EIR:Cooling",
+        insert = list(7:8),
+        insert = list(12L)
+    )
+    dt2 <- trans_action(idf, "HeatPump:PlantLoop:EIR:Heating",
+        insert = list(7:8),
+        insert = list(12L)
+    )
+    dt3 <- duplicate_field(trans_action(idf, "OutputControl:Files", min_fields = 9L), 9L)
+    vrf <- vrf_terminal_unit(trans_action(idf, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"))
+    dt4 <- vrf$dt
+
+    if (length(vrf$fan_del_ids)) {
+        with_silent(new_idf$del(vrf$fan_del_ids, .force = TRUE))
+    }
+
+    dt <- rbindlist(mget(paste0("dt", 1:4)), use.names = TRUE)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
