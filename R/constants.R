@@ -6,7 +6,8 @@ ALL_EPLUS_VER <- c(
     paste0("9.0.", 0:1), paste0("9.", 1:6, ".0"),
     paste0("22.", 1:2, ".0"),
     paste0("23.", 1:2, ".0"),
-    paste0("24.", 1:2, ".0")
+    paste0("24.", 1:2, ".0"),
+    "25.1.0"
 )
 
 LATEST_EPLUS_VER <- ALL_EPLUS_VER[length(ALL_EPLUS_VER)]
@@ -25,11 +26,13 @@ ALL_IDD_VER <- c(
     paste0("9.", 1:6, ".0"),
     paste0("22.", 1:2, ".0"),
     paste0("23.", 1:2, ".0"),
-    paste0("24.", 1:2, ".0")
+    paste0("24.", 1:2, ".0"),
+    "25.1.0"
 )
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
     "version , commit
+     25.1.0  , 68a4a7c774
      24.2.0  , e7ecb2d53b
      24.1.0  , 9d7789a3ac
      23.2.0  , 7636e6b3e9
@@ -56,6 +59,16 @@ ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
 
 # data for OS version specific EnergyPlus installers
 ALL_EPLUS_OSVER <- list(
+    "25.1.0" = list(
+        macos = list(
+            x86_64 = c("macOS12.1"),
+            arm64  = c("macOS13")
+        ),
+        linux = list(
+            x86_64 = c("Ubuntu22.04", "Ubuntu24.04"),
+            arm64  = c("Ubuntu22.04", "Ubuntu24.04")
+        )
+    ),
     "24.2.0" = list(
         macos = list(
             x86_64 = c("macOS12.1"),
