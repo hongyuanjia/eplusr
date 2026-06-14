@@ -2901,5 +2901,100 @@ test_that("Transition v23.2 --> v24.1", {
     expect_equal(idfTR$`ZoneHVAC:WaterToAirHeatPump`$WAHP$value(11)[[1L]], 0.2)
 })
 # }}}
+# v24.1 --> v24.2 {{{
+test_that("Transition v24.1 --> v24.2", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "24.1"
+    to <- "24.2"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `HeatPump:PlantLoop:EIR:Cooling` = list(
+                "CoolingHP", "Load In", "Load Out", "WaterSource",
+                "Source In", "Source Out", "HeatingHP", 0.1, 0.2,
+                10000, 3.0, 1.0, "CoolCapFT", "CoolEIRFT", "CoolEIRFPLR"
+            ),
+            `HeatPump:PlantLoop:EIR:Heating` = list(
+                "HeatingHP", "Load In", "Load Out", "WaterSource",
+                "Source In", "Source Out", "CoolingHP", 0.3, 0.4,
+                12000, 3.5, 1.1, "HeatCapFT", "HeatEIRFT", "HeatEIRFPLR"
+            ),
+            `OutputControl:Files` = list(
+                "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No",
+                "Yes", "No"
+            ),
+            `ZoneHVAC:TerminalUnit:VariableRefrigerantFlow` = list(
+                "VRFTU", "AvailSch", "TU In", "TU Out",
+                1.0, 0.2, 1.1, 0.3, 0.0, 0.0, 0.0,
+                "FanOpSch", "BlowThrough", "Fan:VariableVolume", "VAVFan"
+            ),
+            `Fan:VariableVolume` = list(
+                "VAVFan", "FanAvail", 0.7, 600, 2.0, "FixedFlowRate",
+                0.25, 0.4, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5,
+                "Fan In", "Fan Out", "VRFFans"
+            ),
+            `Fan:VariableVolume` = list(
+                "KeepFan", "FanAvail", 0.6, 500, 1.0, "Fraction",
+                0.3, 0.0, 0.85, 1.0, 0.2, 0.3, 0.4, 0.5, 0.6,
+                "Keep In", "Keep Out", "General"
+            ),
+            `Output:Variable` = list("*", "Zone Windows Total Transmitted Solar Radiation Rate"),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("24.2.0"))
+
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(7)[[1L]]))
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(8)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(9)[[1L]], "HeatingHP")
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(10)[[1L]], 0.1)
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(11)[[1L]], 0.2)
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(12)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(13)[[1L]], 10000)
+
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(7)[[1L]]))
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(8)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(9)[[1L]], "CoolingHP")
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(13)[[1L]], 12000)
+
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(9)[[1L]], "Yes")
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(10)[[1L]], "Yes")
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(11)[[1L]], "No")
+
+    expect_equal(idfTR$`ZoneHVAC:TerminalUnit:VariableRefrigerantFlow`$VRFTU$value(14)[[1L]], "Fan:SystemModel")
+    expect_equal(idfTR$`ZoneHVAC:TerminalUnit:VariableRefrigerantFlow`$VRFTU$value(15)[[1L]], "VAVFan")
+    expect_false("VAVFan" %in% idfTR$object_name("Fan:VariableVolume", simplify = TRUE))
+    expect_true("KeepFan" %in% idfTR$object_name("Fan:VariableVolume", simplify = TRUE))
+
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(1)[[1L]], "VAVFan")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(3)[[1L]], "Fan In")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(4)[[1L]], "Fan Out")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(6)[[1L]], "Continuous")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(7)[[1L]], 0.2)
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(12)[[1L]], "TotalEfficiencyAndPressure")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(16)[[1L]], "VAVFan_curve")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(21)[[1L]], "VRFFans")
+
+    expect_equal(idfTR$`Curve:Quartic`$VAVFan_curve$value(1)[[1L]], "VAVFan_curve")
+    expect_equal(
+        unname(unlist(idfTR$`Curve:Quartic`$VAVFan_curve$value(2:6))),
+        c(0.1, 0.2, 0.3, 0.4, 0.5)
+    )
+    expect_equal(
+        unname(unlist(idfTR$`Curve:Quartic`$VAVFan_curve$value(7:12))),
+        c(0.0, 1.0, 0.0, 5.0, "Dimensionless", "Dimensionless")
+    )
+
+    expect_equal(
+        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Enclosure Windows Total Transmitted Solar Radiation Rate"
+    )
+})
+# }}}
 
 # vim: set fdm=marker:
