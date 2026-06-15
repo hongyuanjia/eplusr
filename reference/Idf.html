@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9010</span>
       </span>
     </div>
 
@@ -1650,7 +1650,14 @@ set the field of all objects in specified class to specified value.</p></li>
 note the use of <code>.()</code> in the left hand side. You can put multiple
 object ID or names in <code>.()</code>. It will set the field of all specified
 objects to specified value.</p></li>
-</ul><p>You can delete a field by assigning <code>NULL</code> to it, e.g. <code>list(fld = NULL)</code> means to delete the value of field <code>fld</code>, in the condition
+</ul><p>Field values can be updated from their current values using a one-sided
+formula or a function. In <code>field = ~ . * 0.5</code>, <code>.</code> is the current field
+value. In <code>field = function(x) x * 0.5</code>, the first argument receives the
+current field value. eplusr only supplies that first argument; other
+function arguments must have defaults or be captured from the enclosing
+environment. Function updates must return a character, integer, or double
+vector of length <code>1</code> or the number of target objects.</p>
+<p>You can delete a field by assigning <code>NULL</code> to it, e.g. <code>list(fld = NULL)</code> means to delete the value of field <code>fld</code>, in the condition
 that <code>.default</code> is <code>FALSE</code>, <code>fld</code> is not a required field and the
 index of <code>fld</code> is larger than the number minimum fields required for
 that class. If those conditions are not required, <code>fld</code> will be left
@@ -1715,6 +1722,10 @@ idf$set(.("r13layer", "r31layer") := list(solar_absorptance = 0.8))
 idf$set(r13layer = list(solar_absorptance = 0.8),
         r31layer = list(solar_absorptance = 0.8)
 )
+
+# update values using the current field values
+idf$set(Material := list(conductivity = ~ . * 0.5))
+idf$set(Material := list(conductivity = function(x) x * 0.5))
 
 # use variable input
 sets &lt;- list(r13layer = list(roughness = "smooth"))
@@ -3994,6 +4005,10 @@ idf$print("field", order = FALSE)
 <span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>r13layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>solar_absorptance <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        r31layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>solar_absorptance <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># update values using the current field values</span></span></span>
+<span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>conductivity <span class="op">=</span> <span class="op">~</span> <span class="va">.</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">idf</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">Material</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>conductivity <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># use variable input</span></span></span>
 <span class="r-in"><span><span class="va">sets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>r13layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>roughness <span class="op">=</span> <span class="st">"smooth"</span><span class="op">)</span><span class="op">)</span></span></span>

@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9010</span>
       </span>
     </div>
 
@@ -111,7 +111,8 @@
 <span>  .ref_assign <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  .unique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  .empty <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  .env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  .env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  .fun_update <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -164,6 +165,11 @@ object with all default values. Default: <code>TRUE</code>.</p></dd>
 <dt id="arg--env">.env<a class="anchor" aria-label="anchor" href="#arg--env"></a></dt>
 <dd><p>An environment specifying the environment to evaluate the <code>...</code>.
 Default: <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame()</a></code>.</p></dd>
+
+
+<dt id="arg--fun-update">.fun_update<a class="anchor" aria-label="anchor" href="#arg--fun-update"></a></dt>
+<dd><p>If <code>TRUE</code>, allow one-sided formulas and functions as
+field values for paired object inputs. Default: <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div id="value">

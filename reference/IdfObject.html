@@ -26,7 +26,7 @@ parent Idf object, using $object(), $objects_in_class() and equivalent."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9010</span>
       </span>
     </div>
 
@@ -127,6 +127,11 @@ will be automatically added on the fly.</p></li>
 <li><p>Field name matching is <strong>case-insensitive</strong>. For convenience,
 underscore-style field names are also allowed, e.g. <code>eNd_MoNtH</code> is
 equivalent to <code>End Month</code>.</p></li>
+<li><p>Field values can be updated from their current values using a one-sided
+formula or a function, e.g. <code>field = ~ . * 0.5</code> or
+<code>field = function(x) x * 0.5</code>. In formulas, <code>.</code> is the current field
+value. In functions, the first argument receives the current field
+value.</p></li>
 <li><p>If not all field names are given, positions of those values without field
 names are determined after those values with names. E.g. in
 <code>model$set(Construction = list("out_layer", name = "name"))</code>, <code>"out_layer"</code>
@@ -632,6 +637,8 @@ object comments, please use <code>$comment()</code>.</p>
 # set field values
 mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
+mat$set(Conductivity = ~ . * 0.5)
+mat$set(Conductivity = function(x) x * 0.5)
 
 # When `default` argument is set to TRUE and input field values are empty, i.e.
 # NULL, the field values will be reset to defaults.
@@ -2091,6 +2098,8 @@ mat$print(auto_sep = TRUE)
 <span class="r-in"><span><span class="co"># set field values</span></span></span>
 <span class="r-in"><span><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"new_name"</span>, Thickness <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mat</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Name"</span>, <span class="st">"Thickness"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>Conductivity <span class="op">=</span> <span class="op">~</span> <span class="va">.</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>Conductivity <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># When `default` argument is set to TRUE and input field values are empty, i.e.</span></span></span>
 <span class="r-in"><span><span class="co"># NULL, the field values will be reset to defaults.</span></span></span>
