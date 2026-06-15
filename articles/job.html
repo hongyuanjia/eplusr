@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9000</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2025-04-23</h4>
+            <h4 data-toc-skip class="date">2026-06-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -174,7 +174,7 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
 <span><span class="co">#&gt; ExpandObjects Finished. Time:     0.020</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2025.04.23 10:41</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2026.06.15 01:43</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -187,11 +187,11 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/RtmpV4Vnfi/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpq61iVC/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2025-04-23 10:41:27.388631' and completed successfully after 0.7 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 01:43:07.887772' and completed successfully after 1.24 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -200,11 +200,11 @@ status.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/RtmpV4Vnfi/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpq61iVC/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2025-04-23 10:41:27.388631' and completed successfully after 0.7 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 01:43:07.887772' and completed successfully after 1.24 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -219,14 +219,14 @@ the <code>EplusJob</code> object or using the
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpV4Vnfi/5Zone_Transformer.idf.</span></span>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpq61iVC/5Zone_Transformer.idf.</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/RtmpV4Vnfi/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/Rtmpq61iVC/5Zone_Transformer.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '/usr/local/EnergyPlus-23-1-0/WeatherData/USA_CA_San.Francisco.Intl…</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2025-04-23 10:41:28.507385' and is still running...</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 01:43:09.553089' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -253,7 +253,7 @@ the <code>EplusJob</code> object or using the
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ══ EnergyPlus Error File ═══════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt;   * EnergyPlus version: 23.1.0 (87ed9199d4)</span></span>
-<span><span class="co">#&gt;   * Simulation started: 2025-04-23 10:41:00</span></span>
+<span><span class="co">#&gt;   * Simulation started: 2026-06-15 01:43:00</span></span>
 <span><span class="co">#&gt;   * Terminated: FALSE</span></span>
 <span><span class="co">#&gt;   * Successful: TRUE</span></span>
 <span><span class="co">#&gt;   * Warning[W]: 1</span></span>
@@ -313,7 +313,7 @@ components into four new variables, including <code>Month</code>,
 together, Table (b) forms a nine-variable tidy table and each variable
 matches the semantics of simulation output.</p>
 <div class="figure" style="text-align: center">
-<img src="tidy-format.png" alt="An example of tidy BES output data representation where Table (a) is the standard output format of EnergyPlus CSV table and Table (b) is the tidy representation of the same underlying data" width="60%"><p class="caption">
+<img src="tidy-format.png" class="r-plt" alt="An example of tidy BES output data representation where Table (a) is the standard output format of EnergyPlus CSV table and Table (b) is the tidy representation of the same underlying data" width="60%"><p class="caption">
 An example of tidy BES output data representation where Table (a) is the
 standard output format of EnergyPlus CSV table and Table (b) is the tidy
 representation of the same underlying data
@@ -367,6 +367,7 @@ values: <code>0</code> and <code>1</code>
 <span><span class="co">#&gt; 19:                         1216        1    Sum</span></span>
 <span><span class="co">#&gt; 20:                         1315        1    Sum</span></span>
 <span><span class="co">#&gt;     report_data_dictionary_index is_meter   type</span></span>
+<span><span class="co">#&gt;                            &lt;int&gt;    &lt;int&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt;                             index_group timestep_type     key_value</span></span>
 <span><span class="co">#&gt;                                  &lt;char&gt;        &lt;char&gt;        &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:                                Zone          Zone   Environment</span></span>
@@ -390,6 +391,7 @@ values: <code>0</code> and <code>1</code>
 <span><span class="co">#&gt; 19:           Facility:Electricity:Fans          Zone          &lt;NA&gt;</span></span>
 <span><span class="co">#&gt; 20:                   Plant:Electricity          Zone          &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;                             index_group timestep_type     key_value</span></span>
+<span><span class="co">#&gt;                                  &lt;char&gt;        &lt;char&gt;        &lt;char&gt;</span></span>
 <span><span class="co">#&gt;                                                 name reporting_frequency</span></span>
 <span><span class="co">#&gt;                                               &lt;char&gt;              &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:             Site Outdoor Air Drybulb Temperature       Zone Timestep</span></span>
@@ -413,6 +415,7 @@ values: <code>0</code> and <code>1</code>
 <span><span class="co">#&gt; 19:                                 Fans:Electricity       Zone Timestep</span></span>
 <span><span class="co">#&gt; 20:                                Electricity:Plant       Zone Timestep</span></span>
 <span><span class="co">#&gt;                                                 name reporting_frequency</span></span>
+<span><span class="co">#&gt;                                               &lt;char&gt;              &lt;char&gt;</span></span>
 <span><span class="co">#&gt;     schedule_name  units</span></span>
 <span><span class="co">#&gt;            &lt;char&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:          &lt;NA&gt;      C</span></span>
@@ -435,7 +438,8 @@ values: <code>0</code> and <code>1</code>
 <span><span class="co">#&gt; 18:          &lt;NA&gt;      J</span></span>
 <span><span class="co">#&gt; 19:          &lt;NA&gt;      J</span></span>
 <span><span class="co">#&gt; 20:          &lt;NA&gt;      J</span></span>
-<span><span class="co">#&gt;     schedule_name  units</span></span></code></pre></div>
+<span><span class="co">#&gt;     schedule_name  units</span></span>
+<span><span class="co">#&gt;            &lt;char&gt; &lt;char&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="retrieve-report-data">Retrieve report data<a class="anchor" aria-label="anchor" href="#retrieve-report-data"></a>
@@ -971,18 +975,15 @@ using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class=
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>category <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s [%.2f%%]"</span>, <span class="va">category</span>, <span class="va">proportion</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="st">""</span>, <span class="va">proportion</span>, fill <span class="op">=</span> <span class="va">category</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, width <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_radial.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="st">"y"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: There was 1 warning in `mutate()`.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `category = as.factor(sprintf("%s [%.2f%%]", category,</span></span>
 <span><span class="co">#&gt;   proportion, "%"))`.</span></span>
 <span><span class="co">#&gt; Caused by warning in `sprintf()`:</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> one argument not used by format '%s [%.2f%%]'</span></span>
-<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
-<p><img src="job_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
+<span><span class="co">#&gt; Warning in geom_bar(stat = "identity", width = 1, color = "black", size = 0.2):</span></span>
+<span><span class="co">#&gt; Ignoring unknown parameters: `size`</span></span></code></pre></div>
+<p><img src="job_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="get-heating-and-cooling-demand-profile">Get heating and cooling demand profile<a class="anchor" aria-label="anchor" href="#get-heating-and-cooling-demand-profile"></a>
@@ -1007,7 +1008,7 @@ using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class=
 <span>    <span class="co"># only consider weekdays</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">day_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Holiday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="co"># add an identifier column to indicate cooling and heating condition</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Heating"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Heating"</span>,</span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Cooling"</span>, <span class="va">name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Cooling"</span></span>
 <span>    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1017,13 +1018,17 @@ using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class=
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">type</span>, air_system <span class="op">=</span> <span class="va">key_value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span> <span class="op">/</span> <span class="va">floor_area</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'month', 'type'. You can override using the</span></span>
-<span><span class="co">#&gt; `.groups` argument.</span></span>
+<span><span class="co">#&gt; `summarise()` has regrouped the output.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Summaries were computed grouped by <span style="color: #0000BB;">month</span>, <span style="color: #0000BB;">type</span>, and <span style="color: #0000BB;">air_system</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Output is grouped by <span style="color: #0000BB;">month</span> and <span style="color: #0000BB;">type</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.groups = "drop_last")` to silence this message.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.by = c(month, type, air_system))` for per-operation grouping</span></span>
+<span><span class="co">#&gt;   (`?dplyr::dplyr_by`) instead.</span></span>
 <span></span>
 <span><span class="co"># plot a column chart to show the heating and cooling demand profile</span></span>
 <span><span class="va">aircon_out_mon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>system_output <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>        <span class="va">type</span> <span class="op">==</span> <span class="st">"Heating"</span> <span class="op">~</span> <span class="op">-</span><span class="va">system_output</span>,</span>
 <span>        <span class="va">type</span> <span class="op">==</span> <span class="st">"Cooling"</span> <span class="op">~</span> <span class="va">system_output</span></span>
 <span>    <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1031,7 +1036,7 @@ using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class=
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">system_output</span>, group <span class="op">=</span> <span class="va">type</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">air_system</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">""</span>, y <span class="op">=</span> <span class="st">"Heating and cooling demands / MJ m-2"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="job_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="job_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>
@@ -1061,7 +1066,7 @@ the <code>ParametricJob</code> class to run parametric simulations.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

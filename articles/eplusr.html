@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9000</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2025-04-23</h4>
+            <h4 data-toc-skip class="date">2026-06-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -142,7 +142,7 @@ useful, but not essential to follow this vignette.</p>
 <h2 id="class-structure">Class structure<a class="anchor" aria-label="anchor" href="#class-structure"></a>
 </h2>
 <p>Below shows the class structure in eplusr.</p>
-<p><img src="class_structure.png" style="display: block; margin: auto;"></p>
+<p><img src="class_structure.png" class="r-plt" alt="" style="display: block; margin: auto;"></p>
 <p>Basically, eplusr uses <code>Idf</code> class to present the whole
 IDF file and <code>IdfObject</code> class to present a single object in
 an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain
@@ -1032,7 +1032,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2025-04-23</span></span>
+<span><span class="co">#&gt; !2026-06-15</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1087,7 +1087,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2025-04-23</span></span>
+<span><span class="co">#&gt; !2026-06-15</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1437,7 +1437,8 @@ construction named <code>"CLNG-1"</code>.</p>
 <code>MAT-CLNG-1</code>.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: Cannot delete object(s) that are referred by others:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Cannot delete object(s) that are referred by others:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Class: &lt;Material:NoMass&gt;</span></span>
 <span><span class="co">#&gt;   └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
@@ -1522,7 +1523,8 @@ can be useful when doing model cleaning.</p>
 <span><span class="co">#&gt; 25:   Schedule:Compact    40     OA Cooling Supply Air Temp Sch        NA</span></span>
 <span><span class="co">#&gt; 26:   Schedule:Compact    41     OA Heating Supply Air Temp Sch        NA</span></span>
 <span><span class="co">#&gt; 27:   Schedule:Compact    42                          Always On        34</span></span>
-<span><span class="co">#&gt;                  class    id                               name duplicate</span></span></code></pre></div>
+<span><span class="co">#&gt;                  class    id                               name duplicate</span></span>
+<span><span class="co">#&gt;                 &lt;char&gt; &lt;int&gt;                             &lt;char&gt;     &lt;int&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">unique</span><span class="op">(</span>group <span class="op">=</span> <span class="st">"Schedules"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Duplications for object ID [32] (name 'FanAvailSched') in class 'Schedule:Compact' have been removed:</span></span>
@@ -1637,10 +1639,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpgi5xfH/file239f58209ab6.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpLz7sRq/file266c7c6212b9.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/Rtmpgi5xfH/file239f58209ab6.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpLz7sRq/file266c7c6212b9.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -1667,7 +1669,7 @@ vignette <em>“Run simulation and data exploration”</em>.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

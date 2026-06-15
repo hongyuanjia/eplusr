@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9000</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2025-04-23</h4>
+            <h4 data-toc-skip class="date">2026-06-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -215,7 +215,8 @@ arbitrary strings.</p>
 schedule values.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: Failed to set object(s).</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Failed to set object(s).</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
 <span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span></span>
@@ -432,7 +433,8 @@ to <code>TRUE</code> to validate schedule values during
 modification.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>allday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: Invalid schedule value found ('2'). Should be in range [0, 1] as defined in ScheduleTypeLimits 'Fraction'.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Invalid schedule value found ('2'). Should be in range [0, 1] as defined in ScheduleTypeLimits 'Fraction'.</span></span></code></pre></div>
 <p>You can also use <code>$validate()</code> and
 <code>$is_valid()</code> method to check existing schedule values.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -532,7 +534,7 @@ e.g. <code>as.difftime(1:24, units = "hours")</code>
 </li>
 <li>
 <code>ITime</code>: <code>ITime</code> objects constructed using
-<code><a href="https://rdatatable.gitlab.io/data.table/reference/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>,
+<code><a href="https://rdrr.io/pkg/data.table/man/IDateTime.html" class="external-link">data.table::as.ITime()</a></code>,
 e.g. <code>as.ITime("01:30:00")</code>
 </li>
 </ul>
@@ -542,13 +544,13 @@ e.g. <code>as.ITime("01:30:00")</code>
 values</li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
+<code class="sourceCode R"><span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>,</span>
 <span>    daytype <span class="op">=</span> <span class="st">"weekday, summerdesignday"</span>,</span>
 <span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"6:00"</span>, <span class="st">"7:00"</span>, <span class="st">"8:00"</span>, <span class="st">"12:00"</span>, <span class="st">"13:30"</span>, <span class="st">"14:00"</span>, <span class="st">"18:00"</span>, <span class="st">"19:00"</span>, <span class="st">"24:00"</span><span class="op">)</span>,</span>
 <span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,    <span class="fl">0.5</span>,    <span class="fl">0.5</span>,    <span class="fl">0.95</span>,    <span class="fl">0.6</span>,     <span class="fl">0.8</span>,     <span class="fl">0.95</span>,    <span class="fl">0.2</span>,     <span class="fl">0.0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span>
-<span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>year_day <span class="op">=</span> <span class="st">"12/31"</span>, daytype <span class="op">=</span> <span class="st">"allotherday"</span>, time <span class="op">=</span> <span class="st">"24:00"</span>, value <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span>
+<span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">val1</span>, <span class="va">val2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">val</span></span>
 <span><span class="co">#&gt;     year_day                  daytype   time value</span></span>
 <span><span class="co">#&gt;       &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;num&gt;</span></span>
@@ -731,6 +733,7 @@ i.e. <code>Weekend</code>, <code>WinterDesignDay</code> and
 <span><span class="co">#&gt; 20:    12/31     2 WinterDesignDay 24:00:00  0.00</span></span>
 <span><span class="co">#&gt; 21:    12/31     2     AllOtherDay 24:00:00  0.00</span></span>
 <span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;          &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span>
 <span><span class="co"># OR sch$extract(daytype = "compact")</span></span></code></pre></div>
 <p>If you want to specify your own grouped day types, you can directly
 pass a character vector to <code>daytype</code>. All other days except
@@ -763,7 +766,8 @@ separately. We can achieve it by:</p>
 <span><span class="co">#&gt; 19:    12/31     2        Saturday 24:00:00  0.00</span></span>
 <span><span class="co">#&gt; 20:    12/31     2          Sunday 24:00:00  0.00</span></span>
 <span><span class="co">#&gt; 21:    12/31     2     AllOtherDay 24:00:00  0.00</span></span>
-<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span></code></pre></div>
+<span><span class="co">#&gt;     year_day    id         daytype     time value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;int&gt;          &lt;char&gt;    &lt;hms&gt; &lt;num&gt;</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="compact-or-expand-schedule-times">Compact or expand schedule times<a class="anchor" aria-label="anchor" href="#compact-or-expand-schedule-times"></a>
@@ -847,7 +851,7 @@ package.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="fu">extract</span><span class="op">(</span><span class="cn">FALSE</span>, <span class="st">"1 hour"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">value</span>, fill <span class="op">=</span> <span class="va">daytype</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">daytype</span><span class="op">)</span></span></code></pre></div>
-<p><img src="schedule_files/figure-html/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="schedule_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>If your schedule contains multiple time periods that have the same
 schedule value, you can compact the schedule times and values by setting
 <code>timestep</code> to <code>"auto"</code>.</p>
@@ -887,7 +891,7 @@ time periods together into one (06:00 – 08:00).</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
