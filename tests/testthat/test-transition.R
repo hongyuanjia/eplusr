@@ -3124,5 +3124,57 @@ test_that("Transition v25.1 --> v25.2", {
     )
 })
 # }}}
+# v25.2 --> v26.1 {{{
+test_that("Transition v25.2 --> v26.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "25.2"
+    to <- "26.1"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `AirTerminal:SingleDuct:ParallelPIU:Reheat` = list(
+                "ParallelPIU", "Always On", "Autosize", "Autosize",
+                0.2, 0.4, "Primary Inlet", "Secondary Inlet", "Outlet",
+                "Deleted Reheat Coil Inlet", "Mixer", "Fan",
+                "Coil:Heating:Water", "Reheat Coil", "Autosize", 0.0,
+                0.001, "VariableSpeed", 0.3
+            ),
+            `AirTerminal:SingleDuct:SeriesPIU:Reheat` = list(
+                "SeriesPIU", "Always On", "Autosize", "Autosize",
+                0.3, "Primary Inlet", "Secondary Inlet", "Outlet",
+                "Deleted Reheat Coil Inlet", "Mixer", "Fan",
+                "Coil:Heating:Electric", "Reheat Coil", "Autosize", 0.0,
+                0.001, "ConstantSpeed", 0.4, "Modulated"
+            ),
+            `Output:Variable` = list("*", "Zone Air Temperature"),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("26.1.0"))
+
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(9)[[1L]], "Outlet")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(10)[[1L]], "Mixer")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(11)[[1L]], "Fan")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(12)[[1L]], "Coil:Heating:Water")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(13)[[1L]], "Reheat Coil")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value(18)[[1L]], 0.3)
+    expect_false("Deleted Reheat Coil Inlet" %in% unlist(idfTR$`AirTerminal:SingleDuct:ParallelPIU:Reheat`$ParallelPIU$value()))
+
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(8)[[1L]], "Outlet")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(9)[[1L]], "Mixer")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(10)[[1L]], "Fan")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(11)[[1L]], "Coil:Heating:Electric")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(12)[[1L]], "Reheat Coil")
+    expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(18)[[1L]], "Modulated")
+    expect_false("Deleted Reheat Coil Inlet" %in% unlist(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value()))
+
+    expect_equal(idfTR$`Output:Variable`[[1]]$value(2)[[1L]], "Zone Air Temperature")
+})
+# }}}
 
 # vim: set fdm=marker:
