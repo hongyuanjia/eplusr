@@ -208,9 +208,9 @@ Functions except for \code{energyplus()} return a list of two elements:
 \itemize{
 \item \code{ver}: EnergyPlus \link[=numeric_version]{version} used
 \item \code{energyplus}: EnergyPlus installation directory
-\item \code{start_time}: a \code{\link[=POSIXct]{POSIXct()}} giving the local time when the simulation
+\item \code{start_time}: a \code{\link[lubridate:posix_utils]{lubridate::POSIXct()}} giving the local time when the simulation
 starts
-\item \code{end_time}: a \code{\link[=POSIXct]{POSIXct()}} giving the local time when the simulation ends
+\item \code{end_time}: a \code{\link[lubridate:posix_utils]{lubridate::POSIXct()}} giving the local time when the simulation ends
 \item \code{output_dir}: full path of output directory of simulation outputs
 \item \code{file}: a named list of relative paths of output files under \code{output_dir}
 \item \code{run}: a \link[data.table:data.table]{data.table} of each outputs from the

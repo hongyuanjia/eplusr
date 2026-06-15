@@ -358,6 +358,11 @@ eplus_exe <- function(eplus) {
         return(normalizePath(eplus, mustWork = TRUE))
     }
 
+    if (is_eplus_path(eplus)) {
+        config <- suppressMessages(use_eplus(eplus))
+        return(normalizePath(file.path(config$dir, config$exe), mustWork = TRUE))
+    }
+
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
     config <- tryCatch(eplus_config(eplus),
         eplusr_warning_miss_eplus_config = function(w) abort(conditionMessage(w), "miss_eplus_config")
@@ -2388,6 +2393,8 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
     assert_flag(wait)
 
     if (is.null(weather)) design_day <- TRUE
+
+    eplus <- get_eplus_loc_from_input(model, eplus)
 
     start_time <- current()
 

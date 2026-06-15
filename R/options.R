@@ -7,6 +7,7 @@ NULL
 
 # for storing internal data
 .globals$eplus <- list()
+.globals$eplus_scanned <- FALSE
 .globals$idd <- list()
 .globals$epw <- list()
 .globals$color <- has_color()
