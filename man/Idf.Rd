@@ -1249,8 +1249,9 @@ contains valid class names in the context of current \code{Idf} (when
 \code{all} is \code{FALSE}) or current underlying \link{Idd} (when \code{all} is \code{TRUE}),
 and \code{FALSE}s otherwise.
 
-Note that case-sensitive matching is performed, which means that
-\code{"Version"} is a valid class name but \code{"version"} is not.
+Class name matching is \strong{case-insensitive}. For convenience,
+underscore-style class names are also allowed, e.g. \code{Site_Location}
+is equivalent to \code{Site:Location}.
 }
 
 \subsection{Returns}{
@@ -2250,6 +2251,10 @@ Note that \code{.()} can be used as an alias as \code{list()}, e.g.
 \code{idf$add(Building = .())} is equivalent to
 \code{idf$add(Building = list())}.
 
+Class name matching is \strong{case-insensitive}. For convenience,
+underscore-style class names are also allowed, e.g. \code{runperiod} is
+equivalent to \code{RunPeriod}.
+
 Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
 equivalent to \verb{End Month}. This behavior is consistent among all
@@ -2382,6 +2387,10 @@ empty fields by setting \code{.empty} to \code{TRUE}.
 
 New fields that currently do not exist in that object can also be
 set. They will be automatically added on the fly.
+
+Class name matching in \verb{:=} is \strong{case-insensitive}. For convenience,
+underscore-style class names are also allowed, e.g. \code{material_nomass}
+is equivalent to \code{Material:NoMass}.
 
 Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is

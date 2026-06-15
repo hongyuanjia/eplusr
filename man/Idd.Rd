@@ -808,8 +808,9 @@ Check if elements in input character vector are valid class names.
 contains valid class names in the context of current \code{Idd}, and
 \code{FALSE}s otherwise.
 
-Note that case-sensitive matching is performed, which means that
-\code{"Version"} is a valid class name but \code{"version"} is not.
+Class name matching is \strong{case-insensitive}. For convenience,
+underscore-style class names are also allowed, e.g. \code{Site_Location}
+is equivalent to \code{Site:Location}.
 }
 
 \subsection{Returns}{
@@ -849,10 +850,8 @@ string specifying the class name.}
 \verb{$object()} returns an \link{IddObject} object specified by a class ID
 or name.
 
-Note that case-sensitive matching is performed, which means that
-\code{"Version"} is a valid class name but \code{"version"} is not.
-
-For convenience, underscore-style names are allowed, e.g.
+Class name matching is \strong{case-insensitive}. For convenience,
+underscore-style names are allowed, e.g.
 \code{Site_Location} is equivalent to \code{Site:Location}.
 }
 
@@ -894,10 +893,8 @@ vector specifying class names.}
 \verb{$objects()} returns a named list of \link{IddObject} objects using class
 indices or names. The returned list is named using class names.
 
-Note that case-sensitive matching is performed, which means that
-\code{"Version"} is a valid class name but \code{"version"} is not.
-
-For convenience, underscore-style names are allowed, e.g.
+Class name matching is \strong{case-insensitive}. For convenience,
+underscore-style names are allowed, e.g.
 \code{Site_Location} is equivalent to \code{Site:Location}.
 }
 
