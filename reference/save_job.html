@@ -26,7 +26,7 @@ simulation outputs can be collected."><meta property="og:image" content="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9008</span>
       </span>
     </div>
 
@@ -169,16 +169,14 @@ and a checksum when available. These file metadata are informational and do
 not prevent <code>read_job()</code> from restoring the job object if files have been
 removed.</p>
     </div>
-    <div id="parametric-jobs">
-    <h2>Parametric jobs</h2>
+    <div id="model-snapshots">
+    <h2>Model snapshots</h2>
 
 
-<p>For <a href="ParametricJob.html">ParametricJob</a>, the manifest stores the seed model, weather file,
-generated model files, case data, and available run results. If generated
-models only exist in memory, <code>save_job()</code> snapshots them into a
-<code>&lt;manifest&gt;_files</code> directory next to the JSON file. Arbitrary R measure
-functions passed to <code>$apply_measure()</code> are not serialized; the restored job
-uses the generated model snapshots and stored case data.</p>
+<p>The manifest stores a prepared model snapshot store for <a href="EplusJob.html">EplusJob</a>,
+<a href="EplusGroupJob.html">EplusGroupJob</a>, and <a href="ParametricJob.html">ParametricJob</a>. For <a href="ParametricJob.html">ParametricJob</a>, arbitrary R
+measure functions passed to <code>$apply_measure()</code> are not serialized; the
+restored job uses the generated model snapshots and stored case data.</p>
     </div>
 
     <div id="ref-examples">

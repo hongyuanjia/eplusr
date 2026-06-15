@@ -26,7 +26,7 @@ For details on ParametricJob, please see ParametricJob class."><meta property="o
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9008</span>
       </span>
     </div>
 
@@ -134,11 +134,11 @@ one <code>Sizing:DesignDay</code> object exists in the <a href="Idf.html">Idf</a
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Basically, it is a collection of multiple <code>EplusJob</code> objects. However, the
-model is first parsed and the <a href="Idf.html">Idf</a> object is stored internally, instead of
-storing only the path of Idf like in <a href="EplusJob.html">EplusJob</a> class. Also, an object in
-<code>Output:SQLite</code> with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be
-automatically created if it does not exists, like <a href="Idf.html">Idf</a> class does.</p>
+    <p>Basically, it is a collection of multiple <code>EplusJob</code> objects. The seed model
+and generated models are stored internally as prepared model snapshots and
+parsed as <a href="Idf.html">Idf</a> objects only when needed. Also, an object in <code>Output:SQLite</code>
+with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be automatically created
+if it does not exists, like <a href="Idf.html">Idf</a> class does.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -256,14 +256,27 @@ param$version()
 
 </div><p></p><hr><a id="method-ParametricJob-seed"></a><div class="section">
 <h3 id="method-seed-">Method <code>seed()</code><a class="anchor" aria-label="anchor" href="#method-seed-"></a></h3>
-<p>Get the seed <a href="Idf.html">Idf</a> object</p><div class="section">
+<p>Get or replace the seed <a href="Idf.html">Idf</a> object</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">seed</span><span class="op">(</span><span class="va">new</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>new</code></dt>
+<dd><p>A path to an EnergyPlus IDF file or an <a href="Idf.html">Idf</a> object used
+to replace the current seed. If missing, the current seed is
+returned.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
 <h4 id="details-1">Details<a class="anchor" aria-label="anchor" href="#details-1"></a></h4>
-<p><code>$seed()</code> returns the parsed input seed <a href="Idf.html">Idf</a> object.</p>
+<p><code>$seed()</code> returns the parsed input seed <a href="Idf.html">Idf</a> object. <code>$seed(new)</code>
+replaces the seed model. If parametric models have already been
+generated, they become stale and cannot be run or saved until
+<code>$param()</code> or <code>$apply_measure()</code> is called again.</p>
 </div>
 
 <div class="section">
@@ -307,7 +320,7 @@ param$weather()
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Lists of parameter definitions. Please see above on the
 syntax.</p></dd>
@@ -421,7 +434,7 @@ param$param(
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>measure</code></dt>
 <dd><p>A function that takes an <code>Idf</code> and other arguments as
 input and returns an <a href="Idf.html">Idf</a> object as output.</p></dd>
@@ -511,7 +524,7 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30),
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>names</code></dt>
 <dd><p>A character vector of new names for parametric models.
 If a single string, it will be used as a prefix and all models
@@ -530,13 +543,10 @@ returned. Default: <code>NULL</code>.</p></dd>
 method. Model names are assigned in the same way as the <code>.names</code>
 argument in
 <a href="../../eplusr/html/ParametricJob.html#method-apply_measure"><code>$apply_measure()</code></a>.
-If no measure has been applied, <code>NULL</code> is returned. Note that it is
-not recommended to conduct any extra modification on those models
-directly, after they were created using
-<a href="../../eplusr/html/ParametricJob.html#method-apply_measure"><code>$apply_measure()</code></a>,
-as this may lead to an un-reproducible process. A warning message
-will be issued if any of those models has been modified when running
-simulations.</p>
+If no measure has been applied, <code>NULL</code> is returned. Returned <a href="Idf.html">Idf</a>
+objects are detached copies of the internally stored prepared
+snapshots. Modifying them will not change the models that are used
+for <code>$run()</code> or <code>$save()</code>.</p>
 </div>
 
 <div class="section">
@@ -593,7 +603,7 @@ param$cases()
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir</code></dt>
 <dd><p>The parent output directory for models to be saved. If
 <code>NULL</code>, the directory of the seed model will be used. Default:
@@ -657,7 +667,7 @@ param$save(tempdir(), separate = FALSE)
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir</code></dt>
 <dd><p>The parent output directory for specified simulations.
 Outputs of each simulation are placed in a separate folder
