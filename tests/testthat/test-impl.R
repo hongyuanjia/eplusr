@@ -16,7 +16,7 @@ test_that("Basic Table Implementation", {
     expect_equal(
     ignore_attr = TRUE,
         recognize_input("Class:Name", type = "class", underscore = TRUE),
-        data.table(class_name_us = "Class_Name", rleid = 1L, original = "Class:Name")
+        data.table(class_name_us = "class_name", rleid = 1L, original = "Class:Name")
     )
 
     expect_equal(

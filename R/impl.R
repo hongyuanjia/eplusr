@@ -21,7 +21,10 @@ recognize_input <- function(input, type = "class", underscore = FALSE, lower = F
         col_on <- paste0(type, "_id")
         col_key <- paste0(type, " index")
     } else {
-        if (underscore) {
+        if (type == "class") {
+            input <- lower_name(input)
+            col_on <- "class_name_us"
+        } else if (underscore) {
             input <- underscore_name(input)
             col_on <- paste0(type, "_name_us")
             # always trans to lower case for field names

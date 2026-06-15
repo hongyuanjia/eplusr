@@ -141,6 +141,7 @@ test_that("Idd class", {
 
     # can get group name of one class
     expect_equal(idd$from_group("TestSimple"), "TestGroup1")
+    expect_equal(idd$from_group("testsimple"), "TestGroup1")
 
     # can return when multiple class names are given
     expect_equal(idd$from_group(c("TestSlash", "TestSimple")),
@@ -167,6 +168,7 @@ test_that("Idd class", {
 
     # can return an index of a single class
     expect_equal(idd$class_index("TestSlash"), 2L)
+    expect_equal(idd$class_index("testslash"), 2L)
 
     # can return multiple class indexes
     expect_equal(idd$class_index(c("TestSlash", "TestSimple", "TestSimple")),
@@ -193,6 +195,7 @@ test_that("Idd class", {
 
     # can return a single IddObject using class name
     expect_s3_class(idd$object("TestSimple"), "IddObject")
+    expect_s3_class(idd$object("testsimple"), "IddObject")
 
     # can stop when invalid class names are given
     expect_error(idd$object("WrongClass"), class = "eplusr_error_invalid_class_name")
@@ -226,6 +229,11 @@ test_that("Idd class", {
     # can check if input is a valid class
     expect_false(idd$is_valid_class("WrongClass"))
     expect_true(idd$is_valid_class("TestSlash"))
+    expect_true(idd$is_valid_class("testslash"))
+
+    # can access classes case-insensitively
+    expect_s3_class(idd$testslash, "IddObject")
+    expect_s3_class(idd[["testslash"]], "IddObject")
 
     # can export IDD data in data.table format
     expect_equal(idd$to_table("TestSlash", all = TRUE),

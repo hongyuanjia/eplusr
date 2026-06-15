@@ -808,8 +808,8 @@ parse_class_property <- function(dt, ref) {
         num_extensible_group = (num_fields - first_extensible + 1L) %/% num_extensible
     )]
 
-    # add underscore class names
-    set(dt, NULL, "class_name_us", underscore_name(dt$class_name))
+    # add normalized class names
+    set(dt, NULL, "class_name_us", lower_name(dt$class_name))
 
     # only keep useful columns
     ignore <- setdiff(names(dt), unlist(CLASS_COLS, use.names = FALSE))

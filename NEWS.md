@@ -4,6 +4,9 @@
 
 * Add support for EnergyPlus v26.1.0 (#607, #612).
 
+* Class name matching is now case-insensitive across `Idd` and `Idf` class
+  lookup, `$add()`, and class-wide `$set()` inputs (#152).
+
 * Add support for EnergyPlus v25.2.0 (#605, #606).
 
 * Add support for EnergyPlus v25.1.0 (#600, #604).

@@ -391,8 +391,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' contains valid class names in the context of current `Idd`, and
         #' `FALSE`s otherwise.
         #'
-        #' Note that case-sensitive matching is performed, which means that
-        #' `"Version"` is a valid class name but `"version"` is not.
+        #' Class name matching is **case-insensitive**. For convenience,
+        #' underscore-style class names are also allowed, e.g. `Site_Location`
+        #' is equivalent to `Site:Location`.
         #'
         #' @param class A character vector to check.
         #'
@@ -418,10 +419,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' `$object()` returns an [IddObject] object specified by a class ID
         #' or name.
         #'
-        #' Note that case-sensitive matching is performed, which means that
-        #' `"Version"` is a valid class name but `"version"` is not.
-        #'
-        #' For convenience, underscore-style names are allowed, e.g.
+        #' Class name matching is **case-insensitive**. For convenience,
+        #' underscore-style names are allowed, e.g.
         #' `Site_Location` is equivalent to `Site:Location`.
         #'
         #' @param class A single integer specifying the class index or a single
@@ -448,10 +447,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' `$objects()` returns a named list of [IddObject] objects using class
         #' indices or names. The returned list is named using class names.
         #'
-        #' Note that case-sensitive matching is performed, which means that
-        #' `"Version"` is a valid class name but `"version"` is not.
-        #'
-        #' For convenience, underscore-style names are allowed, e.g.
+        #' Class name matching is **case-insensitive**. For convenience,
+        #' underscore-style names are allowed, e.g.
         #' `Site_Location` is equivalent to `Site:Location`.
         #'
         #' @param class An integer vector specifying class indices or a character
@@ -798,7 +795,8 @@ idd_is_valid_group_name <- function(self, private, group) {
 # }}}
 # idd_is_valid_class_name {{{
 idd_is_valid_class_name <- function(self, private, class) {
-    class %chin% private$m_idd_env$class$class_name
+    normalize_idd_class_name_us(private$m_idd_env)
+    lower_name(class) %chin% private$m_idd_env$class$class_name_us
 }
 # }}}
 # idd_obj {{{
@@ -902,8 +900,9 @@ idd_print <- function(self, private) {
     if (i %chin% ls(x)) return(NextMethod())
 
     private <- get_priv_env(x)
+    normalize_idd_class_name_us(private$m_idd_env)
 
-    cls_id <- chmatch(i, private$m_idd_env$class$class_name)
+    cls_id <- chmatch(lower_name(i), private$m_idd_env$class$class_name_us)
 
     # skip if not a valid IDD class name
     if (is.na(cls_id)) return(NextMethod())
@@ -919,8 +918,9 @@ idd_print <- function(self, private) {
     if (i %chin% ls(x)) return(NextMethod())
 
     private <- get_priv_env(x)
+    normalize_idd_class_name_us(private$m_idd_env)
 
-    cls_id <- chmatch(underscore_name(i), private$m_idd_env$class$class_name_us)
+    cls_id <- chmatch(lower_name(i), private$m_idd_env$class$class_name_us)
 
     # skip if not a valid IDD class name
     if (is.na(cls_id)) return(NextMethod())

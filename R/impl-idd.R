@@ -33,6 +33,20 @@ get_idd_group_name <- function(idd_env, group = NULL) {
 # }}}
 
 # CLASS
+# normalize_idd_class_name_us {{{
+normalize_idd_class_name_us <- function(idd_env) {
+    if (!all(c("class_name", "class_name_us") %chin% names(idd_env$class))) {
+        return(invisible(idd_env))
+    }
+
+    key <- lower_name(idd_env$class$class_name)
+    if (!identical(idd_env$class$class_name_us, key)) {
+        set(idd_env$class, NULL, "class_name_us", key)
+    }
+
+    invisible(idd_env)
+}
+# }}}
 # get_idd_class {{{
 #' Get class data
 #'
@@ -50,6 +64,8 @@ get_idd_group_name <- function(idd_env, group = NULL) {
 #' @keywords internal
 #' @export
 get_idd_class <- function(idd_env, class = NULL, property = NULL, underscore = FALSE) {
+    normalize_idd_class_name_us(idd_env)
+
     cols <- setdiff(CLASS_COLS$index, "class_name_us")
 
     if (is.null(class)) {

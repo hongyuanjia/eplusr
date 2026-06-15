@@ -157,7 +157,10 @@ test_that("$is_valid_class()", {
 
     # can check invalid class name
     expect_true(idf$is_valid_class("Version"))
-    expect_false(idf$is_valid_class("version"))
+    expect_true(idf$is_valid_class("version"))
+    expect_true(idf$is_valid_class("simulationcontrol", all = TRUE))
+    expect_false(idf$is_valid_class("wrongclass"))
+    expect_s3_class(idf$definition("version"), "IddObject")
 })
 # }}}
 
@@ -299,7 +302,7 @@ test_that("$objects_in_class()", {
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get all objects in a class
-    expect_error(idf$objects_in_class("version"), class = "eplusr_error_invalid_class_name")
+    expect_type(idf$objects_in_class("version"), "list")
     expect_type(idf$objects_in_class("Version"), "list")
 })
 # }}}
@@ -493,6 +496,14 @@ test_that("$add()", {
     expect_equal(idf$objects("rp_test_3")[[1]]$value(simplify = TRUE),
         c("rp_test_3", "3", "1", NA, "4", "1", NA)
     )
+    expect_silent(idf$add(runperiod = list(
+        name = "rp_test_4",
+        begin_month = 5,
+        begin_day_of_month = 1,
+        end_month = 5,
+        end_day_of_month = 31
+    )))
+    expect_equal(idf$object("rp_test_4")$class_name(), "RunPeriod")
 
     # can stop adding objects if trying to add a object with same name
     expect_error(idf$add(RunPeriod = list("rp_test_1", 1, 1, 2, 1)), class = "eplusr_error_validity_check")
@@ -542,8 +553,8 @@ test_that("$set()", {
     # can set all values in a class
     expect_type(type = "list",
         idf$set(
-            RunPeriod := list(treat_weather_as_actual = NULL),
-            Material_NoMass := list(roughness = "Rough")
+            runperiod := list(treat_weather_as_actual = NULL),
+            material_nomass := list(roughness = "Rough")
         )
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Rough")
@@ -1286,6 +1297,8 @@ test_that("[[.Idf and $.Idf", {
 
     expect_equal(names(idf[["Material"]]), c("WD01", "WD02"))
     expect_equal(names(idf$Material), c("WD01", "WD02"))
+    expect_equal(names(idf[["material"]]), c("WD01", "WD02"))
+    expect_equal(names(idf$material), c("WD01", "WD02"))
 
     expect_null(idf$Wrong)
     expect_null(idf[["Wrong"]])
