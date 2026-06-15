@@ -9,6 +9,11 @@
 
 * Add support for EnergyPlus v25.2.0 (#605, #606).
 
+* `save_job()` and `read_job()` can now save and restore `EplusJob`,
+  `EplusGroupJob`, and `ParametricJob` objects using a JSON manifest validated
+  by the bundled schemate standalone schema validator. Saved manifests include
+  file metadata and checksums for EnergyPlus result files (#505).
+
 * Add support for EnergyPlus v25.1.0 (#600, #604).
 
 * Add support for EnergyPlus v24.2.0 (#603).
