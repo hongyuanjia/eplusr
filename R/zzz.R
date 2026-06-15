@@ -6,4 +6,5 @@
         data.table::setDTthreads(2)
     }
     reg_custom_units()
+    S7::methods_register()
 }
