@@ -112,7 +112,7 @@
 <span></span>
 <span><span class="fu">is_avail_eplus</span><span class="op">(</span><span class="va">ver</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">locate_eplus</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">locate_eplus</span><span class="op">(</span>dirs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -126,6 +126,13 @@ path.</p></dd>
 
 <dt id="arg-ver">ver<a class="anchor" aria-label="anchor" href="#arg-ver"></a></dt>
 <dd><p>An acceptable EnergyPlus version.</p></dd>
+
+
+<dt id="arg-dirs">dirs<a class="anchor" aria-label="anchor" href="#arg-dirs"></a></dt>
+<dd><p>A character vector of extra locations to search for EnergyPlus
+installations. Each entry can be either an EnergyPlus installation
+directory, or a parent directory that contains installations using
+standard EnergyPlus directory names. Default: <code>NULL</code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -144,12 +151,17 @@ available EnergyPlus is found;</p></li>
 eplusr. That cache will be used to get corresponding <a href="Idd.html">Idd</a> object when
 parsing IDF files and call corresponding EnergyPlus to run models.</p>
 <p><code>eplus_config()</code> returns the a list of configure data of specified version of
-EnergyPlus. If no data found, an empty list will be returned.</p>
-<p><code>avail_eplus()</code> returns all versions of available EnergyPlus.</p>
+EnergyPlus. If no data found, eplusr will try to locate that version in the
+default installation locations and extra locations set via the base R option
+<code>eplusr.eplus_dirs</code>. If still no data is found, an empty list will be
+returned.</p>
+<p><code>avail_eplus()</code> returns all versions of available EnergyPlus. The first call
+will locate EnergyPlus installations in default installation locations and
+extra locations set via <code>options(eplusr.eplus_dirs = ...)</code>.</p>
 <p><code>locate_eplus()</code> re-searches all EnergyPlus installations at the <strong>default</strong>
-locations and returns versions of EnergyPlus it finds. Please note that all
-configure data of EnergyPlus installed at custom locations will be
-<strong>removed</strong>.</p>
+locations and any extra <code>dirs</code>, and returns versions of EnergyPlus it finds.
+Extra search locations can also be configured for the session using
+<code>options(eplusr.eplus_dirs = ...)</code>.</p>
 <p><code>is_avail_eplus()</code> checks if the specified version of EnergyPlus is
 available or not.</p>
     </div>

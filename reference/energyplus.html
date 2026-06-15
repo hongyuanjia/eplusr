@@ -333,9 +333,9 @@ not <code>NULL</code>, files will be copied to the output directory. Default: <c
 <li><p><code>run</code>: a named list of outputs from the process.</p></li>
 </ul><p><code>energyplus()</code> returns a list of 7 elements:</p><ul><li><p><code>ver</code>: EnergyPlus <a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">version</a> used</p></li>
 <li><p><code>energyplus</code>: EnergyPlus installation directory</p></li>
-<li><p><code>start_time</code>: a <code><a href="https://rdrr.io/r/base/DateTimeClasses.html" class="external-link">POSIXct()</a></code> giving the local time when the simulation
+<li><p><code>start_time</code>: a <code><a href="https://lubridate.tidyverse.org/reference/posix_utils.html" class="external-link">lubridate::POSIXct()</a></code> giving the local time when the simulation
 starts</p></li>
-<li><p><code>end_time</code>: a <code><a href="https://rdrr.io/r/base/DateTimeClasses.html" class="external-link">POSIXct()</a></code> giving the local time when the simulation ends</p></li>
+<li><p><code>end_time</code>: a <code><a href="https://lubridate.tidyverse.org/reference/posix_utils.html" class="external-link">lubridate::POSIXct()</a></code> giving the local time when the simulation ends</p></li>
 <li><p><code>output_dir</code>: full path of output directory of simulation outputs</p></li>
 <li><p><code>file</code>: a named list of relative paths of output files under <code>output_dir</code></p></li>
 <li><p><code>run</code>: a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a> of each outputs from the

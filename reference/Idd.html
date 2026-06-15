@@ -121,8 +121,8 @@ intended to conform to a data schema written using similar syntax. For XML,
 the schema format is XSD; for IDF, the schema format is IDD. For each release
 of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 with the release.</p>
-<p>eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading, i.e. <code>C:\\EnergyPlusVX-X-0</code> on Windows,
+<p>eplusr tries to detect installed EnergyPlus lazily when that information is
+needed, using default installation locations, i.e. <code>C:\\EnergyPlusVX-X-0</code> on Windows,
 <code>/usr/local/EnergyPlus-X-Y-0</code> on Linux, and
 <code>/Applications/EnergyPlus-X-Y-0</code> on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
@@ -1132,8 +1132,8 @@ idd$print()
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Failed to locate 'Energy+.idd' because EnergyPlus v8.8.0 is not available.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Starting to download the IDD file from EnergyPlus GitHub repo...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/RtmplAdB3y.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> IDD file found: '/tmp/RtmplAdB3y/V8-8-0-Energy+.idd'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> EnergyPlus v8.8.0 IDD file 'V8-8-0-Energy+.idd' has been successfully downloaded into /tmp/RtmpWapu2f.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> IDD file found: '/tmp/RtmpWapu2f/V8-8-0-Energy+.idd'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Start parsing...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Parsing completed.</span>
 <span class="r-in"><span> <span class="co"># \dontrun{}</span></span></span>

@@ -174,9 +174,9 @@ useful in case where you only want to edit an EnergyPlus Input Data File
 <p><code>avail_idd()</code> returns versions of all cached <code>Idd</code> object.</p>
 <p><code>is_avail_idd()</code> returns <code>TRUE</code> if input version of IDD file has been parsed
 and cached.</p>
-<p>eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading. If argument <code>idd</code> is a version, eplusr will try the
-follow ways sequentially to find corresponding IDD:</p><ul><li><p>The cached <code>Idd</code> object of that version</p></li>
+<p>eplusr tries to detect installed EnergyPlus lazily when that information is
+needed. If argument <code>idd</code> is a version, eplusr will try the follow ways
+sequentially to find corresponding IDD:</p><ul><li><p>The cached <code>Idd</code> object of that version</p></li>
 <li><p><code>"Energy+.idd"</code> file distributed with EnergyPlus of that version (see
 <code><a href="use_eplus.html">avail_eplus()</a></code>).</p></li>
 <li><p>The <code>"VX-Y-Z-Energy+.idd"</code> file distributed along with IDFVersionUpdater
