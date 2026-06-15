@@ -4475,6 +4475,520 @@ trans_funs$f2310t2320 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# f2320t2410 {{{
+trans_funs$f2320t2410 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "23.2")
+
+    target_cls <- c(
+        "AirLoopHVAC:UnitarySystem",
+        "ComfortViewFactorAngles",
+        "HeatExchanger:AirToAir:SensibleAndLatent",
+        "People",
+        "ZoneHVAC:PackagedTerminalAirConditioner",
+        "ZoneHVAC:PackagedTerminalHeatPump",
+        "ZoneHVAC:WaterToAirHeatPump"
+    )
+
+    new_idf <- trans_preprocess(idf, "24.1", target_cls)
+
+    value_at <- function(dt, field_index) {
+        value <- dt[list(field_index), on = "index", value]
+        if (!length(value)) NA_character_ else value[[1L]]
+    }
+
+    value_lower <- function(value) {
+        stri_trans_tolower(stri_trim_both(as.character(value)))
+    }
+
+    same_string <- function(value, target) {
+        value <- value_lower(value)
+        target <- value_lower(target)
+        !is.na(value) && value == target
+    }
+
+    replace_value <- function(dt, field_index, old, new) {
+        if (!nrow(dt)) return(dt)
+        field_index <- field_index[field_index <= max(dt$index)]
+        if (!length(field_index)) return(dt)
+
+        set(dt, NULL, "value_lower", value_lower(dt$value))
+        dt[J(field_index, value_lower(old)), on = c("index", "value_lower"), value := new]
+        set(dt, NULL, "value_lower", NULL)
+        dt
+    }
+
+    remap_object <- function(obj, old_index, new_index, blank_index = integer(),
+                             blank_value = rep(NA_character_, length(blank_index)),
+                             max_index = NULL) {
+        rows <- list()
+
+        old_index <- as.integer(old_index)
+        new_index <- as.integer(new_index)
+        use <- old_index <= max(obj$index)
+        if (length(old_index) && any(use)) {
+            old_index_use <- old_index[use]
+            new_index_use <- new_index[use]
+            src <- obj[J(old_index_use), on = "index", nomatch = 0L]
+            if (nrow(src)) {
+                src[, old_index := index]
+                src[, index := new_index_use[match(old_index, old_index_use)]]
+                set(src, NULL, "old_index", NULL)
+                rows[[length(rows) + 1L]] <- src
+            }
+        }
+
+        if (length(blank_index)) {
+            blank <- obj[rep(1L, length(blank_index))]
+            set(blank, NULL, "index", as.integer(blank_index))
+            set(blank, NULL, "field", NA_character_)
+            set(blank, NULL, "value", rep(blank_value, length.out = length(blank_index)))
+            rows[[length(rows) + 1L]] <- blank
+        }
+
+        if (!length(rows)) return(obj)
+
+        out <- rbindlist(rows, use.names = TRUE)
+        if (!is.null(max_index)) out <- out[index <= max_index]
+        setorderv(out, c("id", "index"))
+        out <- out[!duplicated(out, by = c("id", "index"), fromLast = TRUE)]
+        out
+    }
+
+    insert_field_dt <- function(dt, insert_at, value, do_insert = function(obj, cur_args) TRUE) {
+        if (!nrow(dt)) return(dt)
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+            if (!do_insert(obj, cur_args)) return(obj)
+
+            old_index <- seq_len(cur_args)
+            new_index <- old_index + as.integer(old_index >= insert_at)
+            remap_object(obj, old_index, new_index,
+                blank_index = insert_at,
+                blank_value = value(obj),
+                max_index = cur_args + 1L
+            )
+        }), use.names = TRUE)
+    }
+
+    delete_field_dt <- function(dt, delete_at) {
+        if (!nrow(dt)) return(dt)
+
+        rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+            if (cur_args < delete_at) return(obj)
+
+            old_index <- setdiff(seq_len(cur_args), delete_at)
+            new_index <- old_index - as.integer(old_index > delete_at)
+            remap_object(obj, old_index, new_index, max_index = cur_args - 1L)
+        }), use.names = TRUE)
+    }
+
+    next_generated_id <- local({
+        i <- 0L
+        function() {
+            i <<- i + 1L
+            -i
+        }
+    })
+
+    old_field_default <- function(class, field_index) {
+        idd_env <- get_priv_env(idf)$idd_env()
+        class_id <- idd_env$class[J(class), on = "class_name", class_id]
+        default <- idd_env$field[J(class_id, as.integer(field_index)), on = c("class_id", "field_index")]
+
+        if (nrow(default) && !is.na(default$default_chr[[1L]])) {
+            default$default_chr[[1L]]
+        } else if (nrow(default) && !is.na(default$default_num[[1L]])) {
+            as.character(default$default_num[[1L]])
+        } else if (same_string(class, "HeatExchanger:AirToAir:SensibleAndLatent") && field_index %in% 4:11) {
+            "0.0"
+        } else {
+            NA_character_
+        }
+    }
+
+    field_or_default <- function(obj, class, field_index) {
+        value <- value_at(obj, field_index)
+        if (is.na(value) || !nzchar(stri_trim_both(as.character(value)))) {
+            old_field_default(class, field_index)
+        } else {
+            as.character(value)
+        }
+    }
+
+    no_load_control <- function(obj, heating_index = NULL, cooling_index = NULL) {
+        is_variable_speed <- FALSE
+        if (!is.null(heating_index)) {
+            is_variable_speed <- is_variable_speed ||
+                same_string(value_at(obj, heating_index), "Coil:Heating:DX:VariableSpeed")
+        }
+        if (!is.null(cooling_index)) {
+            is_variable_speed <- is_variable_speed ||
+                same_string(value_at(obj, cooling_index), "Coil:Cooling:DX:VariableSpeed")
+        }
+
+        if (is_variable_speed) "Yes" else "No"
+    }
+
+    hx_air_to_air <- function(dt) {
+        if (!nrow(dt)) return(dt)
+
+        class <- "HeatExchanger:AirToAir:SensibleAndLatent"
+        out <- list()
+        tables <- list()
+        table_lookup_list <- "effectiveness_IndependentVariableList"
+        table_variable <- "HxAirFlowRatio"
+
+        for (obj_id in unique(dt$id)) {
+            obj <- dt[list(obj_id), on = "id"]
+            cur_args <- max(obj$index)
+
+            effect_75 <- vapply(c(6L, 7L, 10L, 11L), function(field_index) {
+                field_or_default(obj, class, field_index)
+            }, character(1L))
+            effect_100 <- vapply(c(4L, 5L, 8L, 9L), function(field_index) {
+                field_or_default(obj, class, field_index)
+            }, character(1L))
+            effect_diff <- suppressWarnings(as.numeric(effect_75) != as.numeric(effect_100))
+            effect_diff[is.na(effect_diff)] <- FALSE
+
+            hx_name <- as.character(value_at(obj, 1L))
+            table_names <- rep("", 4L)
+            table_names[effect_diff] <- paste0(hx_name, "_", which(effect_diff))
+
+            old_cooling <- if (cur_args >= 8L) seq.int(8L, min(9L, cur_args)) else integer()
+            old_tail <- if (cur_args >= 12L) seq.int(12L, cur_args) else integer()
+            old_index <- c(seq_len(min(5L, cur_args)), old_cooling, old_tail)
+            new_index <- c(
+                seq_len(min(5L, cur_args)),
+                if (length(old_cooling)) seq.int(6L, 6L + length(old_cooling) - 1L) else integer(),
+                if (length(old_tail)) seq.int(8L, 8L + length(old_tail) - 1L) else integer()
+            )
+
+            table_index <- (20:23)[20:23 <= cur_args]
+            out[[length(out) + 1L]] <- remap_object(obj, old_index, new_index,
+                blank_index = table_index,
+                blank_value = table_names[table_index - 19L],
+                max_index = cur_args
+            )
+
+            for (i in which(effect_diff)) {
+                tables[[length(tables) + 1L]] <- data.table(
+                    id = next_generated_id(),
+                    name = table_names[[i]],
+                    class = "Table:Lookup",
+                    index = 1:12,
+                    field = NA_character_,
+                    value = c(
+                        table_names[[i]],
+                        table_lookup_list,
+                        "DivisorOnly",
+                        effect_100[[i]],
+                        "0.0",
+                        "10.0",
+                        "Dimensionless",
+                        "",
+                        "",
+                        "",
+                        effect_75[[i]],
+                        effect_100[[i]]
+                    )
+                )
+            }
+        }
+
+        if (length(tables)) {
+            tables[[length(tables) + 1L]] <- data.table(
+                id = next_generated_id(),
+                name = table_lookup_list,
+                class = "Table:IndependentVariableList",
+                index = 1:2,
+                field = NA_character_,
+                value = c(table_lookup_list, table_variable)
+            )
+            tables[[length(tables) + 1L]] <- data.table(
+                id = next_generated_id(),
+                name = table_variable,
+                class = "Table:IndependentVariable",
+                index = 1:12,
+                field = NA_character_,
+                value = c(
+                    table_variable,
+                    "Linear",
+                    "Linear",
+                    "0.0",
+                    "10.0",
+                    "",
+                    "Dimensionless",
+                    "",
+                    "",
+                    "",
+                    "0.75",
+                    "1.0"
+                )
+            )
+        }
+
+        rbindlist(c(out, tables), use.names = TRUE)
+    }
+
+    dt1 <- insert_field_dt(
+        trans_action(idf, "AirLoopHVAC:UnitarySystem"),
+        39L,
+        function(obj) no_load_control(obj, heating_index = 12L, cooling_index = 15L),
+        function(obj, cur_args) cur_args > 38L
+    )
+    dt2 <- delete_field_dt(trans_action(idf, "ComfortViewFactorAngles"), 2L)
+    dt3 <- hx_air_to_air(trans_action(idf, "HeatExchanger:AirToAir:SensibleAndLatent"))
+    dt4 <- replace_value(trans_action(idf, "People"), 13L, "ZoneAveraged", "EnclosureAveraged")
+    dt5 <- insert_field_dt(
+        trans_action(idf, "ZoneHVAC:PackagedTerminalAirConditioner"),
+        10L,
+        function(obj) no_load_control(obj, cooling_index = 17L)
+    )
+    dt6 <- insert_field_dt(
+        trans_action(idf, "ZoneHVAC:PackagedTerminalHeatPump"),
+        10L,
+        function(obj) no_load_control(obj, heating_index = 15L, cooling_index = 18L)
+    )
+    dt7 <- insert_field_dt(
+        trans_action(idf, "ZoneHVAC:WaterToAirHeatPump"),
+        10L,
+        function(obj) "No"
+    )
+
+    dt <- rbindlist(mget(paste0("dt", 1:7)), use.names = TRUE)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# f2410t2420 {{{
+trans_funs$f2410t2420 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "24.1")
+
+    target_cls <- c(
+        "HeatPump:PlantLoop:EIR:Cooling",
+        "HeatPump:PlantLoop:EIR:Heating",
+        "OutputControl:Files",
+        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"
+    )
+
+    new_idf <- trans_preprocess(idf, "24.2", target_cls)
+
+    value_at <- function(dt, field_index) {
+        value <- dt[list(as.integer(field_index)), on = "index", value]
+        if (!length(value)) NA_character_ else value[[1L]]
+    }
+
+    trim_value <- function(value) {
+        if (length(value) == 0L || is.na(value)) return("")
+        stri_trim_both(as.character(value))
+    }
+
+    same_string <- function(value, target) {
+        value <- stri_trans_tolower(trim_value(value))
+        target <- stri_trans_tolower(trim_value(target))
+        nzchar(value) && value == target
+    }
+
+    make_obj_dt <- function(id, name, class, value) {
+        data.table(
+            id = id,
+            name = name,
+            class = class,
+            index = seq_along(value),
+            field = NA_character_,
+            value = value
+        )
+    }
+
+    next_generated_id <- local({
+        i <- 0L
+        function() {
+            i <<- i + 1L
+            -i
+        }
+    })
+
+    duplicate_field <- function(dt, field_index) {
+        if (!nrow(dt)) return(dt)
+
+        out <- rbindlist(lapply(unique(dt$id), function(obj_id) {
+            obj <- copy(dt[list(obj_id), on = "id"])
+            cur_args <- max(obj$index)
+            if (cur_args < field_index) return(obj)
+
+            field <- obj[list(field_index), on = "index"][1L]
+            set(field, NULL, "field", NA_character_)
+
+            obj[index >= field_index, index := index + 1L]
+            rbindlist(list(obj, field), use.names = TRUE)
+        }), use.names = TRUE)
+
+        setorderv(out, c("id", "index"))
+        out
+    }
+
+    fixed_flow_fraction <- function(method, min_frac, min_flow, max_flow) {
+        if (!same_string(method, "FixedFlowRate")) return(min_frac)
+        if (same_string(max_flow, "autosize")) return("0.0")
+
+        min_flow <- suppressWarnings(as.numeric(min_flow))
+        max_flow <- suppressWarnings(as.numeric(max_flow))
+        if (is.na(min_flow) || is.na(max_flow) || max_flow == 0) return(NA_character_)
+
+        sprintf("%.5f", min_flow / max_flow)
+    }
+
+    fan_lookup <- function() {
+        fans <- trans_action(idf, "Fan:VariableVolume")
+        if (!nrow(fans)) return(list())
+
+        objs <- lapply(unique(fans$id), function(obj_id) fans[list(obj_id), on = "id"])
+        names(objs) <- stri_trans_tolower(vapply(objs, function(obj) trim_value(value_at(obj, 1L)), character(1L)))
+        objs
+    }
+
+    vrf_terminal_unit <- function(dt) {
+        if (!nrow(dt)) {
+            return(list(dt = dt, fan_del_ids = integer()))
+        }
+
+        fans <- fan_lookup()
+        out <- list()
+        fan_del_names <- character()
+
+        for (obj_id in unique(dt$id)) {
+            obj <- copy(dt[list(obj_id), on = "id"])
+            fan_type <- value_at(obj, 14L)
+            fan_name <- trim_value(value_at(obj, 15L))
+
+            if (!same_string(fan_type, "Fan:VariableVolume")) {
+                out[[length(out) + 1L]] <- obj
+                next
+            }
+
+            obj[list(14L), on = "index", value := "Fan:SystemModel"]
+            out[[length(out) + 1L]] <- obj
+
+            fan <- fans[[stri_trans_tolower(fan_name)]]
+            if (is.null(fan)) next
+
+            fan_del_names <- c(fan_del_names, fan_name)
+
+            fan_total_eff <- value_at(fan, 3L)
+            pressure_rise <- value_at(fan, 4L)
+            max_air_flow <- value_at(fan, 5L)
+            min_flow_method <- value_at(fan, 6L)
+            min_air_flow_frac <- value_at(fan, 7L)
+            fan_power_min_air_flow <- value_at(fan, 8L)
+            motor_eff <- value_at(fan, 9L)
+            motor_in_air_stream <- value_at(fan, 10L)
+            coeff <- vapply(11:15, function(i) as.character(value_at(fan, i)), character(1L))
+            inlet_node <- value_at(fan, 16L)
+            outlet_node <- value_at(fan, 17L)
+            end_use <- value_at(fan, 18L)
+
+            curve_name <- paste0(fan_name, "_curve")
+
+            out[[length(out) + 1L]] <- make_obj_dt(
+                next_generated_id(), fan_name, "Fan:SystemModel",
+                c(
+                    fan_name,
+                    value_at(fan, 2L),
+                    inlet_node,
+                    outlet_node,
+                    max_air_flow,
+                    "Continuous",
+                    fixed_flow_fraction(min_flow_method, min_air_flow_frac, fan_power_min_air_flow, max_air_flow),
+                    pressure_rise,
+                    motor_eff,
+                    motor_in_air_stream,
+                    "autosize",
+                    "TotalEfficiencyAndPressure",
+                    "",
+                    "",
+                    fan_total_eff,
+                    curve_name,
+                    "",
+                    "",
+                    "",
+                    "",
+                    end_use
+                )
+            )
+
+            out[[length(out) + 1L]] <- make_obj_dt(
+                next_generated_id(), curve_name, "Curve:Quartic",
+                c(
+                    curve_name,
+                    coeff,
+                    "0.0",
+                    "1.0",
+                    "0.0",
+                    "5.0",
+                    "Dimensionless",
+                    "Dimensionless"
+                )
+            )
+        }
+
+        res <- rbindlist(out, use.names = TRUE)
+        setorderv(res, c("id", "index"))
+
+        fan_del_ids <- integer()
+        if (length(fan_del_names)) {
+            old_fans <- trans_action(idf, "Fan:VariableVolume")
+            if (nrow(old_fans)) {
+                old_fans[, value_lower := stri_trans_tolower(stri_trim_both(as.character(value)))]
+                fan_del_ids <- old_fans[
+                    J(1L, stri_trans_tolower(fan_del_names)),
+                    on = c("index", "value_lower"),
+                    unique(id)
+                ]
+            }
+        }
+
+        list(dt = res, fan_del_ids = fan_del_ids)
+    }
+
+    dt1 <- trans_action(idf, "HeatPump:PlantLoop:EIR:Cooling",
+        insert = list(7:8),
+        insert = list(12L)
+    )
+    dt2 <- trans_action(idf, "HeatPump:PlantLoop:EIR:Heating",
+        insert = list(7:8),
+        insert = list(12L)
+    )
+    dt3 <- duplicate_field(trans_action(idf, "OutputControl:Files", min_fields = 9L), 9L)
+    vrf <- vrf_terminal_unit(trans_action(idf, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"))
+    dt4 <- vrf$dt
+
+    if (length(vrf$fan_del_ids)) {
+        with_silent(new_idf$del(vrf$fan_del_ids, .force = TRUE))
+    }
+
+    dt <- rbindlist(mget(paste0("dt", 1:4)), use.names = TRUE)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# f2420t2510 {{{
+trans_funs$f2420t2510 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "24.2")
+
+    new_idf <- trans_preprocess(idf, "25.1")
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

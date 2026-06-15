@@ -84,7 +84,21 @@ convert_to_md <- function(path, dir = tempdir(), ver = "9.4") {
 
 # read Markdown file as a data.table using {parsermd} package
 read_md_dt <- function(path) {
-    dt <- data.table::setDT(parsermd::as_tibble(parsermd::parse_rmd(path, parse_yaml = FALSE)))[]
+    lines <- readLines(path, warn = FALSE)
+    div <- grepl("^\\s*:::", lines)
+    if (any(div)) {
+        path <- tempfile(fileext = ".markdown")
+        writeLines(lines[!div], path)
+    }
+
+    parsed <- tryCatch(
+        parsermd::parse_rmd(path, parse_yaml = FALSE),
+        error = function(e) {
+            if (!grepl("unused argument", conditionMessage(e), fixed = TRUE)) stop(e)
+            parsermd::parse_rmd(path)
+        }
+    )
+    dt <- data.table::setDT(parsermd::as_tibble(parsed))[]
 
     # remove labels from headings
     cols <- grep("sec_h\\d+", names(dt))
@@ -95,9 +109,37 @@ read_md_dt <- function(path) {
     dt
 }
 
+node_prop <- function(x, prop) {
+    val <- tryCatch(x[[prop]], error = function(e) NULL)
+    if (!is.null(val)) return(val)
+
+    if (requireNamespace("S7", quietly = TRUE)) {
+        val <- tryCatch(S7::prop(x, prop), error = function(e) NULL)
+        if (!is.null(val)) return(val)
+    }
+
+    NULL
+}
+
+heading_level <- function(x) {
+    if (!inherits(x, "rmd_heading")) return(NULL)
+    node_prop(x, "level")
+}
+
+markdown_text <- function(x) {
+    if (is.character(x)) return(paste(x, collapse = "\n"))
+
+    lines <- node_prop(x, "lines")
+    if (is.null(lines)) {
+        as.character(x)
+    } else {
+        paste(lines, collapse = "\n")
+    }
+}
+
 # get the total heading levels
 get_md_h_levels <- function(doc) {
-    sort(unique(unlist(lapply(doc$ast, function(x) if (!inherits(x, "rmd_heading")) NULL else x$level))))
+    sort(unique(unlist(lapply(doc$ast, heading_level))))
 }
 
 # extract all output variables from Markdown file
@@ -193,7 +235,7 @@ extract_outputs_from_heading_level <- function(doc, level, pattern = "Output", p
             } else if (type[1L] != "rmd_heading" && which(type == "rmd_markdown")[1L] > which(type == "rmd_heading")[1L]) {
                 list(output = NA_character_, string = NA_character_)
             } else {
-                s <- ast[which(type == "rmd_markdown")[1L]][[1L]]
+                s <- markdown_text(ast[which(type == "rmd_markdown")[1L]][[1L]])
                 m <- stringi::stri_match_first_regex(s, "^(?:(?:\\s*-\\s{1,})|\\s{4}).+?,.+?,(.+)")
                 list(output = m[, 2L], string = m[, 1L])
             }
@@ -352,7 +394,7 @@ post_process_outputs <- function(file, doc, out, ver) {
         if (!nrow(d)) {
             post2 <- out[0]
         } else {
-            s <- d[max(grep("^Field:", sec_h4)), ast[[1]]]
+            s <- markdown_text(d[max(grep("^Field:", sec_h4)), ast[[1]]])
             output <- stringi::stri_match_first_regex(s, "^(?:(?:\\s*-\\s{1,})|\\s{4}).+?,.+?,(.+)")[, 2L]
             string <- output
             string[!is.na(output)] <- s[!is.na(output)]

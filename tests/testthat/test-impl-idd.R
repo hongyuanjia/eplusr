@@ -309,7 +309,7 @@ test_that("Idd implementation", {
     expect_error(get_idd_relation(idd_env, class_id = fld$class_id, field_id = fld$field_id), class = "eplusr_error_idd_relation")
 
     fld <- get_idd_field(idd_env, "Construction")
-    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 32880L)
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_by", keep_all = TRUE, depth = 2L)), 32901L)
 
     fld <- get_idd_field(idd_env, "Construction", 2L)
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to", depth = 0L)), 14L)

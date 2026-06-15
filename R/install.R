@@ -298,7 +298,12 @@ eplus_download_url <- function(ver, portable = FALSE) {
         if (arch == "i386" && os != "windows") {
             abort("EnergyPlus does not provide 32-bit version installer for macOS and Linux.")
         }
-        # NOTE: check Windows i386 support for EnergyPlus 24.1.0 and above
+        if (arch == "i386" && os == "windows" && cmt$version %in% "24.2.0") {
+            abort("EnergyPlus v24.2.0 does not provide a Windows i386 installer.")
+        }
+        if (arch == "i386" && os == "windows" && cmt$version %in% "25.1.0" && !portable) {
+            abort("EnergyPlus v25.1.0 does not provide a Windows i386 non-portable installer.")
+        }
     }
 
     # EnergyPlus v9.4 and above provide different installers for various

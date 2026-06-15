@@ -2808,5 +2808,237 @@ test_that("Transition v23.1 --> v23.2", {
     )
 })
 # }}}
+# v23.2 --> v24.1 {{{
+test_that("Transition v23.2 --> v24.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "23.2"
+    to <- "24.1"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `AirLoopHVAC:UnitarySystem` = list(
+                "UnitaryDX",
+                ..12 = "Coil:Heating:DX:VariableSpeed",
+                ..15 = "Coil:Cooling:DX:SingleSpeed",
+                ..39 = 12.3
+            ),
+            ComfortViewFactorAngles = list("ViewFactors", "Zone 1", "Surface 1", 0.6, "Surface 2", 0.4),
+            `HeatExchanger:AirToAir:SensibleAndLatent` = list(
+                "HX", "", 1.0, 0.8, 0.7, 0.6, 0.7, 0.9, 0.65, 0.9, 0.5,
+                "SupIn", "SupOut", "ExhIn", "ExhOut", 50, "Yes", "Rotary", "None", 1.7, 0.083, 0.012, "Yes"
+            ),
+            `HeatExchanger:AirToAir:SensibleAndLatent` = list(
+                "HXDefault", "", 1.0, "", "", 0.1, "", "", "", "", "",
+                "SupIn2", "SupOut2", "ExhIn2", "ExhOut2", 25, "No", "Plate", "None", 1.7, 0.083, 0.012, "No"
+            ),
+            People = list(
+                "People", "Zone 1", "PeopleSch", "People", 1, "", "", 0.3,
+                "", "ActivitySch", "", "", "ZoneAveraged"
+            ),
+            `ZoneHVAC:PackagedTerminalAirConditioner` = list(
+                "PTAC", "", "In", "Out", "", "", 1.0, 1.0, 0.1, 0.2, 0.3, 0.4,
+                "Fan:OnOff", "Fan", "Coil:Heating:Electric", "Heat",
+                "Coil:Cooling:DX:VariableSpeed", "Cool"
+            ),
+            `ZoneHVAC:PackagedTerminalHeatPump` = list(
+                "PTHP", "", "In", "Out", "", "", 1.0, 1.0, 0.1, 0.2, 0.3, 0.4,
+                "Fan:OnOff", "Fan", "Coil:Heating:DX:SingleSpeed", "Heat", 0.001,
+                "Coil:Cooling:DX:VariableSpeed", "Cool"
+            ),
+            `ZoneHVAC:WaterToAirHeatPump` = list("WAHP", "", "In", "Out", "", "", 1.0, 1.0, 0.1, 0.2),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("24.1.0"))
+
+    expect_equal(idfTR$`AirLoopHVAC:UnitarySystem`$UnitaryDX$value(39)[[1L]], "Yes")
+    expect_equal(idfTR$`AirLoopHVAC:UnitarySystem`$UnitaryDX$value(40)[[1L]], 12.3)
+
+    expect_equal(idfTR$ComfortViewFactorAngles$ViewFactors$value(2)[[1L]], "Surface 1")
+    expect_equal(idfTR$ComfortViewFactorAngles$ViewFactors$value(3)[[1L]], 0.6)
+
+    expect_equal(
+        unname(unlist(idfTR$`HeatExchanger:AirToAir:SensibleAndLatent`$HX$value(4:7))),
+        c(0.8, 0.7, 0.9, 0.65)
+    )
+    expect_equal(
+        unname(unlist(idfTR$`HeatExchanger:AirToAir:SensibleAndLatent`$HX$value(20:23))),
+        c("HX_1", NA_character_, NA_character_, "HX_4")
+    )
+    expect_equal(
+        unname(unlist(idfTR$`HeatExchanger:AirToAir:SensibleAndLatent`$HXDefault$value(20:23))),
+        c("HXDefault_1", NA_character_, NA_character_, NA_character_)
+    )
+    expect_setequal(
+        idfTR$object_name("Table:Lookup", simplify = TRUE),
+        c("HX_1", "HX_4", "HXDefault_1")
+    )
+    expect_equal(
+        unname(unlist(idfTR$`Table:Lookup`$HX_1$value(c(2:4, 11:12)))),
+        c("effectiveness_IndependentVariableList", "DivisorOnly", 0.8, 0.6, 0.8)
+    )
+    expect_equal(
+        unname(unlist(idfTR$`Table:Lookup`$HXDefault_1$value(c(4, 11:12)))),
+        c(0.0, 0.1, 0.0)
+    )
+    expect_equal(
+        idfTR$object_name("Table:IndependentVariableList", simplify = TRUE),
+        "effectiveness_IndependentVariableList"
+    )
+    expect_equal(idfTR$object_name("Table:IndependentVariable", simplify = TRUE), "HxAirFlowRatio")
+
+    expect_equal(idfTR$People$People$value(13)[[1L]], "EnclosureAveraged")
+    expect_equal(idfTR$`ZoneHVAC:PackagedTerminalAirConditioner`$PTAC$value(10)[[1L]], "Yes")
+    expect_equal(idfTR$`ZoneHVAC:PackagedTerminalAirConditioner`$PTAC$value(11)[[1L]], 0.2)
+    expect_equal(idfTR$`ZoneHVAC:PackagedTerminalHeatPump`$PTHP$value(10)[[1L]], "Yes")
+    expect_equal(idfTR$`ZoneHVAC:PackagedTerminalHeatPump`$PTHP$value(11)[[1L]], 0.2)
+    expect_equal(idfTR$`ZoneHVAC:WaterToAirHeatPump`$WAHP$value(10)[[1L]], "No")
+    expect_equal(idfTR$`ZoneHVAC:WaterToAirHeatPump`$WAHP$value(11)[[1L]], 0.2)
+})
+# }}}
+# v24.1 --> v24.2 {{{
+test_that("Transition v24.1 --> v24.2", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "24.1"
+    to <- "24.2"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `HeatPump:PlantLoop:EIR:Cooling` = list(
+                "CoolingHP", "Load In", "Load Out", "WaterSource",
+                "Source In", "Source Out", "HeatingHP", 0.1, 0.2,
+                10000, 3.0, 1.0, "CoolCapFT", "CoolEIRFT", "CoolEIRFPLR"
+            ),
+            `HeatPump:PlantLoop:EIR:Heating` = list(
+                "HeatingHP", "Load In", "Load Out", "WaterSource",
+                "Source In", "Source Out", "CoolingHP", 0.3, 0.4,
+                12000, 3.5, 1.1, "HeatCapFT", "HeatEIRFT", "HeatEIRFPLR"
+            ),
+            `OutputControl:Files` = list(
+                "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No",
+                "Yes", "No"
+            ),
+            `ZoneHVAC:TerminalUnit:VariableRefrigerantFlow` = list(
+                "VRFTU", "AvailSch", "TU In", "TU Out",
+                1.0, 0.2, 1.1, 0.3, 0.0, 0.0, 0.0,
+                "FanOpSch", "BlowThrough", "Fan:VariableVolume", "VAVFan"
+            ),
+            `Fan:VariableVolume` = list(
+                "VAVFan", "FanAvail", 0.7, 600, 2.0, "FixedFlowRate",
+                0.25, 0.4, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5,
+                "Fan In", "Fan Out", "VRFFans"
+            ),
+            `Fan:VariableVolume` = list(
+                "KeepFan", "FanAvail", 0.6, 500, 1.0, "Fraction",
+                0.3, 0.0, 0.85, 1.0, 0.2, 0.3, 0.4, 0.5, 0.6,
+                "Keep In", "Keep Out", "General"
+            ),
+            `Output:Variable` = list("*", "Zone Windows Total Transmitted Solar Radiation Rate"),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("24.2.0"))
+
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(7)[[1L]]))
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(8)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(9)[[1L]], "HeatingHP")
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(10)[[1L]], 0.1)
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(11)[[1L]], 0.2)
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(12)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Cooling`$CoolingHP$value(13)[[1L]], 10000)
+
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(7)[[1L]]))
+    expect_true(is.na(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(8)[[1L]]))
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(9)[[1L]], "CoolingHP")
+    expect_equal(idfTR$`HeatPump:PlantLoop:EIR:Heating`$HeatingHP$value(13)[[1L]], 12000)
+
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(9)[[1L]], "Yes")
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(10)[[1L]], "Yes")
+    expect_equal(idfTR$object_unique("OutputControl:Files")$value(11)[[1L]], "No")
+
+    expect_equal(idfTR$`ZoneHVAC:TerminalUnit:VariableRefrigerantFlow`$VRFTU$value(14)[[1L]], "Fan:SystemModel")
+    expect_equal(idfTR$`ZoneHVAC:TerminalUnit:VariableRefrigerantFlow`$VRFTU$value(15)[[1L]], "VAVFan")
+    expect_false("VAVFan" %in% idfTR$object_name("Fan:VariableVolume", simplify = TRUE))
+    expect_true("KeepFan" %in% idfTR$object_name("Fan:VariableVolume", simplify = TRUE))
+
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(1)[[1L]], "VAVFan")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(3)[[1L]], "Fan In")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(4)[[1L]], "Fan Out")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(6)[[1L]], "Continuous")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(7)[[1L]], 0.2)
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(12)[[1L]], "TotalEfficiencyAndPressure")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(16)[[1L]], "VAVFan_curve")
+    expect_equal(idfTR$`Fan:SystemModel`$VAVFan$value(21)[[1L]], "VRFFans")
+
+    expect_equal(idfTR$`Curve:Quartic`$VAVFan_curve$value(1)[[1L]], "VAVFan_curve")
+    expect_equal(
+        unname(unlist(idfTR$`Curve:Quartic`$VAVFan_curve$value(2:6))),
+        c(0.1, 0.2, 0.3, 0.4, 0.5)
+    )
+    expect_equal(
+        unname(unlist(idfTR$`Curve:Quartic`$VAVFan_curve$value(7:12))),
+        c(0.0, 1.0, 0.0, 5.0, "Dimensionless", "Dimensionless")
+    )
+
+    expect_equal(
+        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Enclosure Windows Total Transmitted Solar Radiation Rate"
+    )
+})
+# }}}
+# v24.2 --> v25.1 {{{
+test_that("Transition v24.2 --> v25.1", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "24.2"
+    to <- "25.1"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `RunPeriod` = list(
+                "Annual", 1, 1, 2024, 12, 31, 2024, "Monday",
+                "Yes", "Yes", "No", "Yes", "Yes"
+            ),
+            `Output:Variable` = list("*", "Infiltration Air Change Rate"),
+            `EnergyManagementSystem:Sensor` = list(
+                "InfACH", "*", "Zone Infiltration Air Change Rate"
+            ),
+            `Output:Table:Monthly` = list(
+                "MonthlyReport", 3, "Zone Ventilation Air Change Rate", "SumOrAverage"
+            ),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("25.1.0"))
+
+    expect_equal(
+        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Infiltration Current Density Air Change Rate"
+    )
+    expect_equal(
+        idfTR$`EnergyManagementSystem:Sensor`$InfACH$value(3)[[1L]],
+        "Zone Infiltration Current Density Air Change Rate"
+    )
+    expect_equal(
+        idfTR$`Output:Table:Monthly`$MonthlyReport$value(3)[[1L]],
+        "Zone Ventilation Current Density Air Change Rate"
+    )
+    expect_equal(idfTR$RunPeriod$Annual$value(1)[[1L]], "Annual")
+})
+# }}}
 
 # vim: set fdm=marker:
