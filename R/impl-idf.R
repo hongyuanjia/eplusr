@@ -37,6 +37,8 @@ NULL
 #' @export
 get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, property = NULL,
                             underscore = FALSE, ignore_case = FALSE) {
+    normalize_idd_class_name_us(idd_env)
+
     # if no object is specified
     if (is.null(object)) {
         # if no class is specified
@@ -61,7 +63,7 @@ get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, proper
                     idd_env$class[, .SD, .SDcols = c("group_id", "class_id", unique(c("class_name", col_on)))],
                     cls_in, "group_id"
                 )
-                set(cls_in, NULL, "group_id", NULL)
+                set(cls_in, NULL, intersect(names(cls_in), c("group_id", "class_name_us")), NULL)
                 col_on <- "class_id"
             }
 
@@ -98,7 +100,7 @@ get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, proper
                     idd_env$class[, .SD, .SDcols = c("group_id", "class_id", unique(c("class_name", names(cls_in)[[1L]])))],
                     cls_in, "group_id"
                 )
-                set(cls_in, NULL, "group_id", NULL)
+                set(cls_in, NULL, intersect(names(cls_in), c("group_id", "class_name_us")), NULL)
             }
 
             # add property if necessary
@@ -194,14 +196,7 @@ get_idf_object_name <- function(idd_env, idf_env, class = NULL, simplify = FALSE
 get_idf_object_num <- function(idd_env, idf_env, class = NULL) {
     if (is.null(class)) return(nrow(idf_env$object))
 
-    cls_in <- recognize_input(class, "class")
-    col_on <- names(cls_in)[[1L]]
-    if (any(!cls_in[[col_on]] %in% idd_env$class[[col_on]])) {
-        col_key <- if (col_on == "class_id") "class index" else "class name"
-        abort_bad_key(col_key, idd_env$class[cls_in, on = col_on][is.na(group_id), .SD, .SDcols = col_on][[col_on]])
-    }
-
-    if (col_on == "class_name") cls_in <- add_class_id(idd_env, cls_in)
+    cls_in <- fast_subset(get_idd_class(idd_env, class), c("rleid", "class_id"))
 
     idf_env$object[cls_in, on = "class_id", allow.cartesian = TRUE][
         , .N, by = list(rleid, found = !is.na(object_id))][found == FALSE, N := 0L]$N
@@ -1571,7 +1566,7 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
             add_rleid(cls_in, "class")
             cls_obj <- get_idf_object(idd_env, idf_env, cls_in$class_name, underscore = TRUE)
             add_joined_cols(cls_in, cls_obj, c("rleid" = "class_rleid"), "rleid")
-            set(cls_obj, NULL, "class_name_us", NULL)
+            if ("class_name_us" %chin% names(cls_obj)) set(cls_obj, NULL, "class_name_us", NULL)
 
             # update class id and class name
             add_joined_cols(
