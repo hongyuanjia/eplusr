@@ -19,6 +19,22 @@ test_that("Parametric methods", {
     # $weather()
     expect_s3_class(param$weather(), "Epw")
     expect_null(param_job(path_idf, NULL)$weather())
+
+    # $weathers()
+    path_epws <- path_eplus_weather(LATEST_EPLUS_VER,
+        c("USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw",
+          "USA_CO_Golden-NREL.724666_TMY3.epw")
+    )
+    param <- param_job(path_idf, NULL)
+    expect_s3_class(param$weathers(path_epws, names = c("sf", "golden")), "ParametricJob")
+    expect_equal(
+        ignore_attr = TRUE,
+        param$weathers(),
+        data.table(weather_index = 1:2, weather_case = c("sf", "golden"),
+            epw = normalizePath(path_epws)
+        )
+    )
+    expect_type(param$weather(), "list")
 })
 
 test_that("$apply_measure()", {
@@ -150,6 +166,43 @@ test_that("$cases()", {
             eff = c(0.1, 0.2), sch = c("FanAvailSched", "Always On")
         )
     )
+
+    path_epws <- path_eplus_weather(LATEST_EPLUS_VER,
+        c("USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw",
+          "USA_CO_Golden-NREL.724666_TMY3.epw")
+    )
+    param$weathers(path_epws, names = c("sf", "golden"))
+    expect_equal(
+        ignore_attr = TRUE,
+        param$cases("run"),
+        data.table(
+            index = 1:4,
+            case = c("case_1__sf", "case_1__golden", "case_2__sf", "case_2__golden"),
+            model_index = c(1L, 1L, 2L, 2L),
+            model_case = c("case_1", "case_1", "case_2", "case_2"),
+            weather_index = c(1L, 2L, 1L, 2L),
+            weather_case = c("sf", "golden", "sf", "golden"),
+            epw = normalizePath(path_epws[c(1L, 2L, 1L, 2L)]),
+            eff = c(0.1, 0.1, 0.2, 0.2),
+            sch = c("FanAvailSched", "FanAvailSched", "Always On", "Always On")
+        )
+    )
+
+    param <- param_job(path, path_epws)
+    expect_null(param$cases())
+    expect_equal(
+        ignore_attr = TRUE,
+        param$cases("run"),
+        data.table(
+            index = 1:2,
+            case = tools::file_path_sans_ext(basename(path_epws)),
+            model_index = c(1L, 1L),
+            model_case = c("seed", "seed"),
+            weather_index = 1:2,
+            weather_case = tools::file_path_sans_ext(basename(path_epws)),
+            epw = normalizePath(path_epws)
+        )
+    )
 })
 
 test_that("$run()", {
@@ -212,6 +265,26 @@ test_that("$save()", {
         data.table(
             model = normalizePath(file.path(tempdir(), c("case_1.idf", "case_2.idf"))),
             weather = normalizePath(file.path(tempdir(), "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"))
+        )
+    )
+
+    path_epws <- path_eplus_weather(LATEST_EPLUS_VER,
+        c("USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw",
+          "USA_CO_Golden-NREL.724666_TMY3.epw")
+    )
+    param <- param_job(path, NULL)
+    param$weathers(path_epws, names = c("sf", "golden"))
+    param$apply_measure(function(idf, num) idf, num = 1:2)
+    expect_equal(
+        ignore_attr = TRUE,
+        param$save(separate = FALSE),
+        data.table(
+            model = normalizePath(file.path(tempdir(),
+                c("case_1__sf.idf", "case_1__golden.idf", "case_2__sf.idf", "case_2__golden.idf")
+            )),
+            weather = normalizePath(file.path(tempdir(),
+                basename(path_epws[c(1L, 2L, 1L, 2L)])
+            ))
         )
     )
 })

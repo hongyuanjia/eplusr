@@ -157,28 +157,51 @@ test_that("ParametricJob generated models are snapshotted and restored", {
     skip_if_not(is_avail_eplus(LATEST_EPLUS_VER))
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path_epws <- path_eplus_weather(LATEST_EPLUS_VER,
+        c("USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw",
+          "USA_CO_Golden-NREL.724666_TMY3.epw")
+    )
 
-    param <- param_job(path_idf, path_epw)
-    param$apply_measure(function(idf, num) idf, num = 1:2)
+    param <- param_job(path_idf, NULL)
+    param$weathers(path_epws, names = c("sf", "golden"))
+    param$apply_measure(function(idf, num) idf, num = 1:2, .names = "case")
 
     path <- tempfile(fileext = ".json")
     save_job(param, path)
+
+    manifest <- jsonlite::fromJSON(path,
+        simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
+    expect_length(manifest$inputs$weather_cases, 2L)
+    expect_length(manifest$parametric$model_cases, 2L)
+    expect_length(manifest$parametric$run_cases, 4L)
 
     snap_dir <- file.path(dirname(path),
         paste0(tools::file_path_sans_ext(basename(path)), "_files"), "model_store")
     expect_true(dir.exists(snap_dir))
     expect_length(list.files(snap_dir, "\\.idf$", full.names = TRUE, recursive = TRUE), 3L)
 
-    invalid_kind <- jsonlite::fromJSON(path,
-        simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
+    invalid_kind <- manifest
     invalid_kind$parametric <- NULL
     invalid <- tempfile(fileext = ".json")
     write_job_manifest(invalid_kind, invalid)
     expect_error(read_job(invalid), class = "eplusr_error_job_json_kind")
 
+    invalid_weather <- manifest
+    invalid_weather$inputs$weather_cases[[1L]]$weather_index <- NULL
+    invalid <- tempfile(fileext = ".json")
+    write_job_manifest(invalid_weather, invalid)
+    expect_error(read_job(invalid), class = "eplusr_error_job_json_kind")
+
+    invalid_run <- manifest
+    invalid_run$parametric$run_cases[[1L]]$weather_index <- "bad"
+    invalid <- tempfile(fileext = ".json")
+    write_job_manifest(invalid_run, invalid)
+    expect_error(read_job(invalid), class = "eplusr_error_job_json_kind")
+
     restored <- read_job(path)
     expect_s3_class(restored, "ParametricJob")
     expect_equal(names(restored$models()), names(param$models()))
+    expect_equal(restored$weathers(), param$weathers())
     expect_equal(restored$cases(), param$cases())
+    expect_equal(restored$cases("run"), param$cases("run"))
 })

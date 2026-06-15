@@ -139,177 +139,333 @@ read_job <- function(path, validate = TRUE, verify = c("warn", "error", "ignore"
 JOB_JSON_FORMAT <- "eplusr-job"
 JOB_JSON_MANIFEST_VERSION <- 2L
 
-SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
-  "version": "1.0.0",
-  "$defs": {
-    "nullable_string": {
-      "check": { "kind": "string", "min.chars": 1, "null.ok": true, "na.ok": true }
+job_json_schema <- function(root) {
+    schema_flatten(schema_read(paste0(
+        '{"version":"1.0.0","$defs":', JOB_JSON_SCHEMA_DEFS, ',', root, '}'
+    )))
+}
+
+JOB_JSON_SCHEMA_DEFS <- '{
+  "nullable_string": {
+    "check": { "kind": "string", "min.chars": 1, "null.ok": true, "na.ok": true }
+  },
+  "string_vector": {
+    "any": [
+      { "check": { "kind": "character", "any.missing": true, "null.ok": true } },
+      {
+        "check": { "kind": "list", "null.ok": true },
+        "keys": { "type": "unnamed" },
+        "rest": { "$ref": "#/$defs/nullable_string" }
+      }
+    ]
+  },
+  "flag_or_null": {
+    "check": { "kind": "flag", "null.ok": true }
+  },
+  "logical_vector": {
+    "any": [
+      { "check": { "kind": "logical", "null.ok": true } },
+      {
+        "check": { "kind": "list", "null.ok": true },
+        "keys": { "type": "unnamed" },
+        "rest": { "$ref": "#/$defs/flag_or_null" }
+      }
+    ]
+  },
+  "text_or_array": {
+    "any": [
+      { "check": { "kind": "character", "any.missing": true, "null.ok": true } },
+      { "check": { "kind": "list", "null.ok": true } }
+    ]
+  },
+  "generic_rows": {
+    "check": { "kind": "list", "null.ok": true }
+  },
+  "weather_case_row": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": ["weather_index", "weather_case", "epw"],
+      "subset.of": ["weather_index", "weather_case", "epw"]
     },
-    "string_vector": {
-      "any": [
-        { "check": { "kind": "character", "any.missing": true, "null.ok": true } },
-        {
-          "check": { "kind": "list", "null.ok": true },
-          "keys": { "type": "unnamed" },
-          "rest": { "$ref": "#/$defs/nullable_string" }
-        }
+    "fields": {
+      "weather_index": { "check": { "kind": "int", "lower": 1 } },
+      "weather_case": { "check": { "kind": "string", "min.chars": 1 } },
+      "epw": { "$ref": "#/$defs/nullable_string" }
+    }
+  },
+  "weather_cases": {
+    "check": { "kind": "list", "null.ok": true },
+    "keys": { "type": "unnamed" },
+    "rest": { "$ref": "#/$defs/weather_case_row" }
+  },
+  "parametric_model_case_row": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": ["model_index", "model_id", "model_case"],
+      "subset.of": ["model_index", "model_id", "model_case"]
+    },
+    "fields": {
+      "model_index": { "check": { "kind": "int", "lower": 1 } },
+      "model_id": { "check": { "kind": "int", "lower": 1 } },
+      "model_case": { "check": { "kind": "string", "min.chars": 1 } }
+    }
+  },
+  "parametric_model_cases": {
+    "check": { "kind": "list", "null.ok": true },
+    "keys": { "type": "unnamed" },
+    "rest": { "$ref": "#/$defs/parametric_model_case_row" }
+  },
+  "parametric_run_case_row": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "index", "case", "model_index", "model_case",
+        "weather_index", "weather_case", "epw"
       ]
     },
-    "flag_or_null": {
-      "check": { "kind": "flag", "null.ok": true }
-    },
-    "logical_vector": {
-      "any": [
-        { "check": { "kind": "logical", "null.ok": true } },
-        {
-          "check": { "kind": "list", "null.ok": true },
-          "keys": { "type": "unnamed" },
-          "rest": { "$ref": "#/$defs/flag_or_null" }
-        }
+    "fields": {
+      "index": { "check": { "kind": "int", "lower": 1 } },
+      "case": { "check": { "kind": "string", "min.chars": 1 } },
+      "model_index": { "check": { "kind": "int", "lower": 1 } },
+      "model_case": { "check": { "kind": "string", "min.chars": 1 } },
+      "weather_index": { "check": { "kind": "int", "lower": 1 } },
+      "weather_case": { "check": { "kind": "string", "min.chars": 1 } },
+      "epw": { "$ref": "#/$defs/nullable_string" }
+    }
+  },
+  "parametric_run_cases": {
+    "check": { "kind": "list", "null.ok": true },
+    "keys": { "type": "unnamed" },
+    "rest": { "$ref": "#/$defs/parametric_run_case_row" }
+  },
+  "result_file": {
+    "check": { "kind": "list", "null.ok": true },
+    "rest": { "$ref": "#/$defs/text_or_array" }
+  },
+  "model_store_model": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "model_id", "role", "name", "source_path", "prepared_path",
+        "version", "sql", "dict", "signature", "size", "mtime"
+      ],
+      "subset.of": [
+        "model_id", "role", "name", "source_path", "prepared_path",
+        "version", "sql", "dict", "signature", "size", "mtime"
       ]
     },
-    "text_or_array": {
-      "any": [
-        { "check": { "kind": "character", "any.missing": true, "null.ok": true } },
-        { "check": { "kind": "list", "null.ok": true } }
+    "fields": {
+      "model_id": { "check": { "kind": "int", "lower": 1 } },
+      "role": {
+        "check": {
+          "kind": "choice",
+          "choices": ["input", "seed", "case"]
+        }
+      },
+      "name": { "$ref": "#/$defs/nullable_string" },
+      "source_path": { "$ref": "#/$defs/nullable_string" },
+      "prepared_path": { "check": { "kind": "string", "min.chars": 1 } },
+      "version": { "check": { "kind": "string", "min.chars": 1 } },
+      "sql": { "check": { "kind": "flag" } },
+      "dict": { "check": { "kind": "flag" } },
+      "signature": { "check": { "kind": "string", "min.chars": 1 } },
+      "size": { "check": { "kind": "number", "lower": 0 } },
+      "mtime": { "$ref": "#/$defs/nullable_string" }
+    }
+  },
+  "model_store_case": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": ["case_index", "model_id", "name", "run_path"],
+      "subset.of": ["case_index", "model_id", "name", "run_path"]
+    },
+    "fields": {
+      "case_index": { "check": { "kind": "int", "lower": 1 } },
+      "model_id": { "check": { "kind": "int", "lower": 1 } },
+      "name": { "$ref": "#/$defs/nullable_string" },
+      "run_path": { "$ref": "#/$defs/nullable_string" }
+    }
+  },
+  "model_store": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "version", "seed_model_id", "cases_valid", "invalid_reason",
+        "models", "cases"
+      ],
+      "subset.of": [
+        "version", "seed_model_id", "cases_valid", "invalid_reason",
+        "models", "cases"
       ]
     },
-    "generic_rows": {
-      "check": { "kind": "list", "null.ok": true }
-    },
-    "result_file": {
-      "check": { "kind": "list", "null.ok": true },
-      "rest": { "$ref": "#/$defs/text_or_array" }
-    },
-    "model_store_model": {
-      "check": { "kind": "list" },
-      "keys": {
-        "type": "unique",
-        "must.include": [
-          "model_id", "role", "name", "source_path", "prepared_path",
-          "version", "sql", "dict", "signature", "size", "mtime"
-        ],
-        "subset.of": [
-          "model_id", "role", "name", "source_path", "prepared_path",
-          "version", "sql", "dict", "signature", "size", "mtime"
-        ]
+    "fields": {
+      "version": { "check": { "kind": "int", "lower": 1, "upper": 1 } },
+      "seed_model_id": { "check": { "kind": "int", "lower": 1, "null.ok": true } },
+      "cases_valid": { "check": { "kind": "flag" } },
+      "invalid_reason": { "$ref": "#/$defs/nullable_string" },
+      "models": {
+        "check": { "kind": "list", "min.len": 1 },
+        "keys": { "type": "unnamed" },
+        "rest": { "$ref": "#/$defs/model_store_model" }
       },
-      "fields": {
-        "model_id": { "check": { "kind": "int", "lower": 1 } },
-        "role": {
-          "check": {
-            "kind": "choice",
-            "choices": ["input", "seed", "case"]
-          }
-        },
-        "name": { "$ref": "#/$defs/nullable_string" },
-        "source_path": { "$ref": "#/$defs/nullable_string" },
-        "prepared_path": { "check": { "kind": "string", "min.chars": 1 } },
-        "version": { "check": { "kind": "string", "min.chars": 1 } },
-        "sql": { "check": { "kind": "flag" } },
-        "dict": { "check": { "kind": "flag" } },
-        "signature": { "check": { "kind": "string", "min.chars": 1 } },
-        "size": { "check": { "kind": "number", "lower": 0 } },
-        "mtime": { "$ref": "#/$defs/nullable_string" }
-      }
-    },
-    "model_store_case": {
-      "check": { "kind": "list" },
-      "keys": {
-        "type": "unique",
-        "must.include": ["case_index", "model_id", "name", "run_path"],
-        "subset.of": ["case_index", "model_id", "name", "run_path"]
-      },
-      "fields": {
-        "case_index": { "check": { "kind": "int", "lower": 1 } },
-        "model_id": { "check": { "kind": "int", "lower": 1 } },
-        "name": { "$ref": "#/$defs/nullable_string" },
-        "run_path": { "$ref": "#/$defs/nullable_string" }
-      }
-    },
-    "model_store": {
-      "check": { "kind": "list" },
-      "keys": {
-        "type": "unique",
-        "must.include": [
-          "version", "seed_model_id", "cases_valid", "invalid_reason",
-          "models", "cases"
-        ],
-        "subset.of": [
-          "version", "seed_model_id", "cases_valid", "invalid_reason",
-          "models", "cases"
-        ]
-      },
-      "fields": {
-        "version": { "check": { "kind": "int", "lower": 1, "upper": 1 } },
-        "seed_model_id": { "check": { "kind": "int", "lower": 1, "null.ok": true } },
-        "cases_valid": { "check": { "kind": "flag" } },
-        "invalid_reason": { "$ref": "#/$defs/nullable_string" },
-        "models": {
-          "check": { "kind": "list", "min.len": 1 },
-          "keys": { "type": "unnamed" },
-          "rest": { "$ref": "#/$defs/model_store_model" }
-        },
-        "cases": {
-          "check": { "kind": "list" },
-          "keys": { "type": "unnamed" },
-          "rest": { "$ref": "#/$defs/model_store_case" }
-        }
-      }
-    },
-    "result_file_record": {
-      "check": { "kind": "list" },
-      "fields": {
-        "type": { "$ref": "#/$defs/nullable_string" },
-        "index": { "check": { "kind": "int", "lower": 1, "null.ok": true } },
-        "path": { "$ref": "#/$defs/nullable_string" },
-        "exists": { "check": { "kind": "flag" } },
-        "size": { "check": { "kind": "number", "lower": 0, "null.ok": true } },
-        "mtime": { "$ref": "#/$defs/nullable_string" },
-        "hash_algorithm": { "$ref": "#/$defs/nullable_string" },
-        "hash": { "$ref": "#/$defs/nullable_string" }
-      }
-    },
-    "result_file_info": {
-      "check": { "kind": "list", "null.ok": true },
-      "keys": { "type": "unnamed" },
-      "rest": { "$ref": "#/$defs/result_file_record" }
-    },
-    "energyplus_result": {
-      "check": { "kind": "list", "null.ok": true },
-      "fields": {
-        "version": { "$ref": "#/$defs/nullable_string" },
-        "energyplus": { "$ref": "#/$defs/nullable_string" },
-        "start_time": { "$ref": "#/$defs/nullable_string" },
-        "end_time": { "$ref": "#/$defs/nullable_string" },
-        "exit_status": { "check": { "kind": "int", "null.ok": true } },
-        "output_dir": { "$ref": "#/$defs/nullable_string" },
-        "file": { "$ref": "#/$defs/result_file" },
-        "file_info": { "$ref": "#/$defs/result_file_info" },
-        "run": { "$ref": "#/$defs/generic_rows" }
-      }
-    },
-    "job_row": {
-      "check": { "kind": "list" },
-      "fields": {
-        "index": { "check": { "kind": "int", "lower": 1 } },
-        "status": { "$ref": "#/$defs/nullable_string" },
-        "model": { "$ref": "#/$defs/nullable_string" },
-        "weather": { "$ref": "#/$defs/nullable_string" },
-        "output_dir": { "$ref": "#/$defs/nullable_string" },
-        "energyplus_exe": { "$ref": "#/$defs/nullable_string" },
-        "annual": { "check": { "kind": "flag" } },
-        "design_day": { "check": { "kind": "flag" } },
-        "resources": { "$ref": "#/$defs/string_vector" },
-        "exit_status": { "check": { "kind": "int", "null.ok": true } },
-        "start_time": { "$ref": "#/$defs/nullable_string" },
-        "end_time": { "$ref": "#/$defs/nullable_string" },
-        "stdout": { "$ref": "#/$defs/text_or_array" },
-        "stderr": { "$ref": "#/$defs/text_or_array" },
-        "result": { "$ref": "#/$defs/energyplus_result" }
+      "cases": {
+        "check": { "kind": "list" },
+        "keys": { "type": "unnamed" },
+        "rest": { "$ref": "#/$defs/model_store_case" }
       }
     }
   },
+  "model_store_with_cases": {
+    "all": [
+      { "$ref": "#/$defs/model_store" },
+      {
+        "check": { "kind": "list" },
+        "fields": {
+          "cases": {
+            "check": { "kind": "list", "min.len": 1 },
+            "keys": { "type": "unnamed" },
+            "rest": { "$ref": "#/$defs/model_store_case" }
+          }
+        }
+      }
+    ]
+  },
+  "model_store_seeded": {
+    "all": [
+      { "$ref": "#/$defs/model_store" },
+      {
+        "check": { "kind": "list" },
+        "fields": {
+          "seed_model_id": { "check": { "kind": "int", "lower": 1 } }
+        }
+      }
+    ]
+  },
+  "result_file_record": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "type", "index", "path", "exists", "size", "mtime",
+        "hash_algorithm", "hash"
+      ],
+      "subset.of": [
+        "type", "index", "path", "exists", "size", "mtime",
+        "hash_algorithm", "hash"
+      ]
+    },
+    "fields": {
+      "type": { "$ref": "#/$defs/nullable_string" },
+      "index": { "check": { "kind": "int", "lower": 1, "null.ok": true } },
+      "path": { "$ref": "#/$defs/nullable_string" },
+      "exists": { "check": { "kind": "flag" } },
+      "size": { "check": { "kind": "number", "lower": 0, "null.ok": true } },
+      "mtime": { "$ref": "#/$defs/nullable_string" },
+      "hash_algorithm": { "$ref": "#/$defs/nullable_string" },
+      "hash": { "$ref": "#/$defs/nullable_string" }
+    }
+  },
+  "result_file_info": {
+    "check": { "kind": "list", "null.ok": true },
+    "keys": { "type": "unnamed" },
+    "rest": { "$ref": "#/$defs/result_file_record" }
+  },
+  "energyplus_result": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "version", "energyplus", "start_time", "end_time",
+        "exit_status", "output_dir", "file", "file_info", "run"
+      ],
+      "subset.of": [
+        "version", "energyplus", "start_time", "end_time",
+        "exit_status", "output_dir", "file", "file_info", "run"
+      ]
+    },
+    "fields": {
+      "version": { "$ref": "#/$defs/nullable_string" },
+      "energyplus": { "$ref": "#/$defs/nullable_string" },
+      "start_time": { "$ref": "#/$defs/nullable_string" },
+      "end_time": { "$ref": "#/$defs/nullable_string" },
+      "exit_status": { "check": { "kind": "int", "null.ok": true } },
+      "output_dir": { "$ref": "#/$defs/nullable_string" },
+      "file": { "$ref": "#/$defs/result_file" },
+      "file_info": { "$ref": "#/$defs/result_file_info" },
+      "run": { "$ref": "#/$defs/generic_rows" }
+    }
+  },
+  "energyplus_result_nullable": {
+    "any": [
+      { "check": { "kind": "null" } },
+      { "$ref": "#/$defs/energyplus_result" }
+    ]
+  },
+  "job_row": {
+    "check": { "kind": "list" },
+    "keys": {
+      "type": "unique",
+      "must.include": [
+        "index", "status", "model", "weather", "output_dir",
+        "energyplus_exe", "annual", "design_day", "resources",
+        "exit_status", "start_time", "end_time", "stdout", "stderr",
+        "result"
+      ],
+      "subset.of": [
+        "index", "status", "model", "weather", "output_dir",
+        "energyplus_exe", "annual", "design_day", "resources",
+        "exit_status", "start_time", "end_time", "stdout", "stderr",
+        "result"
+      ]
+    },
+    "fields": {
+      "index": { "check": { "kind": "int", "lower": 1 } },
+      "status": { "$ref": "#/$defs/nullable_string" },
+      "model": { "$ref": "#/$defs/nullable_string" },
+      "weather": { "$ref": "#/$defs/nullable_string" },
+      "output_dir": { "$ref": "#/$defs/nullable_string" },
+      "energyplus_exe": { "$ref": "#/$defs/nullable_string" },
+      "annual": { "check": { "kind": "flag" } },
+      "design_day": { "check": { "kind": "flag" } },
+      "resources": { "$ref": "#/$defs/string_vector" },
+      "exit_status": { "check": { "kind": "int", "null.ok": true } },
+      "start_time": { "$ref": "#/$defs/nullable_string" },
+      "end_time": { "$ref": "#/$defs/nullable_string" },
+      "stdout": { "$ref": "#/$defs/text_or_array" },
+      "stderr": { "$ref": "#/$defs/text_or_array" },
+      "result": { "$ref": "#/$defs/energyplus_result_nullable" }
+    }
+  },
+  "group_run": {
+    "any": [
+      { "check": { "kind": "null" } },
+      {
+        "check": { "kind": "list" },
+        "keys": {
+          "type": "unique",
+          "must.include": ["options", "jobs"],
+          "subset.of": ["options", "jobs"]
+        },
+        "fields": {
+          "options": { "check": { "kind": "list", "null.ok": true } },
+          "jobs": {
+            "check": { "kind": "list", "null.ok": true },
+            "keys": { "type": "unnamed" },
+            "rest": { "$ref": "#/$defs/job_row" }
+          }
+        }
+      }
+    ]
+  }
+}'
+
+SCHEMA_EPLUS_JOB_MANIFEST <- job_json_schema('
   "check": { "kind": "list" },
   "keys": {
     "type": "unique",
@@ -345,33 +501,109 @@ SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
     "paths_relative_to": {
       "check": { "kind": "string", "min.chars": 1, "null.ok": true }
     },
+    "inputs": { "check": { "kind": "list" } },
+    "log": { "check": { "kind": "list" } },
+    "run": {
+      "any": [
+        { "check": { "kind": "null" } },
+        { "check": { "kind": "list" } }
+      ]
+    },
+    "parametric": { "check": { "kind": "list", "null.ok": true } }
+  }
+')
+
+SCHEMA_EPLUS_JOB_MANIFEST_EPLUS <- job_json_schema('
+  "check": { "kind": "list" },
+  "keys": {
+    "type": "unique",
+    "must.include": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run"
+    ],
+    "subset.of": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run"
+    ]
+  },
+  "fields": {
+    "kind": { "check": { "kind": "choice", "choices": ["EplusJob"] } },
     "inputs": {
       "check": { "kind": "list" },
       "keys": {
         "type": "unique",
-        "subset.of": [
-          "model_store", "epw", "epws", "weather"
-        ]
+        "must.include": ["model_store", "epw"],
+        "subset.of": ["model_store", "epw"]
       },
       "fields": {
-        "model_store": { "$ref": "#/$defs/model_store" },
-        "epw": { "$ref": "#/$defs/nullable_string" },
-        "epws": { "$ref": "#/$defs/string_vector" },
-        "weather": { "$ref": "#/$defs/nullable_string" }
+        "model_store": { "$ref": "#/$defs/model_store_with_cases" },
+        "epw": { "$ref": "#/$defs/nullable_string" }
       }
     },
     "log": {
       "check": { "kind": "list" },
       "keys": {
         "type": "unique",
+        "must.include": [
+          "uuid", "seed_uuid", "unsaved", "start_time", "end_time", "killed"
+        ],
         "subset.of": [
-          "uuid", "seed_uuid", "idf_uuid", "unsaved", "start_time",
-          "end_time", "killed"
+          "uuid", "seed_uuid", "unsaved", "start_time", "end_time", "killed"
         ]
       },
       "fields": {
         "uuid": { "$ref": "#/$defs/nullable_string" },
         "seed_uuid": { "$ref": "#/$defs/nullable_string" },
+        "unsaved": { "$ref": "#/$defs/logical_vector" },
+        "start_time": { "$ref": "#/$defs/nullable_string" },
+        "end_time": { "$ref": "#/$defs/nullable_string" },
+        "killed": { "$ref": "#/$defs/flag_or_null" }
+      }
+    },
+    "run": { "$ref": "#/$defs/energyplus_result_nullable" }
+  }
+')
+
+SCHEMA_EPLUS_JOB_MANIFEST_GROUP <- job_json_schema('
+  "check": { "kind": "list" },
+  "keys": {
+    "type": "unique",
+    "must.include": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run"
+    ],
+    "subset.of": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run"
+    ]
+  },
+  "fields": {
+    "kind": { "check": { "kind": "choice", "choices": ["EplusGroupJob"] } },
+    "inputs": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": ["model_store", "epws"],
+        "subset.of": ["model_store", "epws"]
+      },
+      "fields": {
+        "model_store": { "$ref": "#/$defs/model_store_with_cases" },
+        "epws": { "$ref": "#/$defs/string_vector" }
+      }
+    },
+    "log": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": [
+          "uuid", "idf_uuid", "unsaved", "start_time", "end_time", "killed"
+        ],
+        "subset.of": [
+          "uuid", "idf_uuid", "unsaved", "start_time", "end_time", "killed"
+        ]
+      },
+      "fields": {
+        "uuid": { "$ref": "#/$defs/nullable_string" },
         "idf_uuid": { "$ref": "#/$defs/string_vector" },
         "unsaved": { "$ref": "#/$defs/logical_vector" },
         "start_time": { "$ref": "#/$defs/nullable_string" },
@@ -379,28 +611,77 @@ SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
         "killed": { "$ref": "#/$defs/flag_or_null" }
       }
     },
-    "run": {
-      "check": { "kind": "list", "null.ok": true },
+    "run": { "$ref": "#/$defs/group_run" }
+  }
+')
+
+SCHEMA_EPLUS_JOB_MANIFEST_PARAMETRIC <- job_json_schema('
+  "check": { "kind": "list" },
+  "keys": {
+    "type": "unique",
+    "must.include": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run",
+      "parametric"
+    ],
+    "subset.of": [
+      "format", "manifest_version", "kind", "package_version",
+      "created_at", "paths_relative_to", "inputs", "log", "run",
+      "parametric"
+    ]
+  },
+  "fields": {
+    "kind": { "check": { "kind": "choice", "choices": ["ParametricJob"] } },
+    "inputs": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": ["model_store", "weather"],
+        "subset.of": ["model_store", "weather", "weather_cases"]
+      },
       "fields": {
-        "version": { "$ref": "#/$defs/nullable_string" },
-        "energyplus": { "$ref": "#/$defs/nullable_string" },
-        "start_time": { "$ref": "#/$defs/nullable_string" },
-        "end_time": { "$ref": "#/$defs/nullable_string" },
-        "exit_status": { "check": { "kind": "int", "null.ok": true } },
-        "output_dir": { "$ref": "#/$defs/nullable_string" },
-        "file": { "$ref": "#/$defs/result_file" },
-        "file_info": { "$ref": "#/$defs/result_file_info" },
-        "run": { "$ref": "#/$defs/generic_rows" },
-        "options": { "check": { "kind": "list", "null.ok": true } },
-        "jobs": {
-          "check": { "kind": "list", "null.ok": true },
-          "keys": { "type": "unnamed" },
-          "rest": { "$ref": "#/$defs/job_row" }
-        }
+        "model_store": { "$ref": "#/$defs/model_store_seeded" },
+        "weather": { "$ref": "#/$defs/nullable_string" },
+        "weather_cases": { "$ref": "#/$defs/weather_cases" }
       }
     },
+    "log": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": [
+          "uuid", "idf_uuid", "seed_uuid", "unsaved", "start_time",
+          "end_time", "killed"
+        ],
+        "subset.of": [
+          "uuid", "idf_uuid", "seed_uuid", "unsaved", "start_time",
+          "end_time", "killed"
+        ]
+      },
+      "fields": {
+        "uuid": { "$ref": "#/$defs/nullable_string" },
+        "idf_uuid": { "$ref": "#/$defs/string_vector" },
+        "seed_uuid": { "$ref": "#/$defs/nullable_string" },
+        "unsaved": { "$ref": "#/$defs/logical_vector" },
+        "start_time": { "$ref": "#/$defs/nullable_string" },
+        "end_time": { "$ref": "#/$defs/nullable_string" },
+        "killed": { "$ref": "#/$defs/flag_or_null" }
+      }
+    },
+    "run": { "$ref": "#/$defs/group_run" },
     "parametric": {
-      "check": { "kind": "list", "null.ok": true },
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": [
+          "applied", "simple", "replayable", "measure_name",
+          "bare", "params", "cases"
+        ],
+        "subset.of": [
+          "applied", "simple", "replayable", "measure_name",
+          "bare", "params", "cases", "model_cases", "run_cases"
+        ]
+      },
       "fields": {
         "applied": { "check": { "kind": "flag" } },
         "simple": { "$ref": "#/$defs/flag_or_null" },
@@ -408,11 +689,13 @@ SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
         "measure_name": { "$ref": "#/$defs/nullable_string" },
         "bare": { "$ref": "#/$defs/flag_or_null" },
         "params": { "$ref": "#/$defs/generic_rows" },
-        "cases": { "$ref": "#/$defs/generic_rows" }
+        "cases": { "$ref": "#/$defs/generic_rows" },
+        "model_cases": { "$ref": "#/$defs/parametric_model_cases" },
+        "run_cases": { "$ref": "#/$defs/parametric_run_cases" }
       }
     }
   }
-}'))
+')
 
 job_json_validate_manifest <- function(x) {
     schema_validate(SCHEMA_EPLUS_JOB_MANIFEST, x, mode = "assert", name = "job manifest")
@@ -429,65 +712,26 @@ job_json_validate_manifest <- function(x) {
         ), "job_json_version")
     }
 
-    job_json_validate_manifest_kind(x)
+    job_json_validate_manifest_object(x)
     job_json_validate_manifest_model_store(x)
 
     invisible(x)
 }
 
-job_json_validate_manifest_kind <- function(x) {
+job_json_validate_manifest_object <- function(x) {
     kind <- job_json_scalar_character(x$kind)
-    specs <- switch(kind,
-        EplusJob = list(
-            inputs = c("model_store", "epw"),
-            log = c("uuid", "seed_uuid", "unsaved", "start_time", "end_time", "killed"),
-            run = c("version", "energyplus", "start_time", "end_time",
-                "exit_status", "output_dir", "file", "file_info", "run"),
-            parametric = NULL
-        ),
-        EplusGroupJob = list(
-            inputs = c("model_store", "epws"),
-            log = c("uuid", "idf_uuid", "unsaved", "start_time", "end_time", "killed"),
-            run = c("options", "jobs"),
-            parametric = NULL
-        ),
-        ParametricJob = list(
-            inputs = c("model_store", "weather"),
-            log = c("uuid", "idf_uuid", "seed_uuid", "unsaved", "start_time",
-                "end_time", "killed"),
-            run = c("options", "jobs"),
-            parametric = c("applied", "simple", "replayable", "measure_name",
-                "bare", "params", "cases")
-        ),
+    schema <- switch(kind,
+        EplusJob = SCHEMA_EPLUS_JOB_MANIFEST_EPLUS,
+        EplusGroupJob = SCHEMA_EPLUS_JOB_MANIFEST_GROUP,
+        ParametricJob = SCHEMA_EPLUS_JOB_MANIFEST_PARAMETRIC,
         abort(sprintf("Unsupported job manifest kind: %s", surround(kind)),
             "job_json_kind")
     )
 
-    job_json_assert_manifest_keys(x$inputs, specs$inputs, specs$inputs,
-        sprintf("%s inputs", kind))
-    job_json_assert_manifest_keys(x$log, specs$log, specs$log,
-        sprintf("%s log", kind))
-
-    if (is.null(x$run)) {
-        # Unrun jobs have no run state to validate.
-    } else {
-        job_json_assert_manifest_keys(x$run, specs$run, specs$run,
-            sprintf("%s run", kind))
-    }
-
-    if (is.null(specs$parametric)) {
-        if ("parametric" %in% names(x)) {
-            abort(sprintf("Field 'parametric' is only valid for ParametricJob manifests, not %s.",
-                surround(kind)), "job_json_kind")
-        }
-    } else {
-        if (!("parametric" %in% names(x)) || is.null(x$parametric)) {
-            abort("ParametricJob manifests must include field 'parametric'.",
-                "job_json_kind")
-        }
-        job_json_assert_manifest_keys(x$parametric, specs$parametric, specs$parametric,
-            sprintf("%s parametric", kind))
-    }
+    tryCatch(
+        schema_validate(schema, x, mode = "assert", name = "job manifest"),
+        error = function(e) abort(conditionMessage(e), "job_json_kind")
+    )
 
     invisible(x)
 }
@@ -540,23 +784,6 @@ job_json_validate_manifest_model_store <- function(x) {
     }
 
     invisible(x)
-}
-
-job_json_assert_manifest_keys <- function(x, required, allowed, context) {
-    keys <- names(x)
-    missing <- setdiff(required, keys)
-    extra <- setdiff(keys, allowed)
-    if (!length(missing) && !length(extra)) return(invisible(x))
-
-    msg <- sprintf("Job manifest fields are not valid for %s.", context)
-    if (length(missing)) {
-        msg <- paste0(msg, "\nMissing fields: ", collapse(surround(missing)), ".")
-    }
-    if (length(extra)) {
-        msg <- paste0(msg, "\nUnexpected fields: ", collapse(surround(extra)), ".")
-    }
-
-    abort(msg, "job_json_kind")
 }
 
 job_json_verify_files <- function(manifest, base, action) {
@@ -791,11 +1018,29 @@ job_json_group_inputs <- function(private, path, overwrite, relative) {
 }
 
 job_json_parametric_inputs <- function(private, path, overwrite, relative) {
+    base <- dirname(path)
+    weather_cases <- job_json_encode_weather_cases(private$m_weather_cases, base, relative)
+    legacy_weather <- NULL
+    if (!is.null(private$m_weather_cases) && nrow(private$m_weather_cases) == 1L &&
+        !is.na(private$m_weather_cases$epw[[1L]])) {
+        legacy_weather <- private$m_weather_cases$epw[[1L]]
+    }
+
     list(
-        model_store = job_json_encode_model_store(private$m_model_store, dirname(path), relative,
+        model_store = job_json_encode_model_store(private$m_model_store, base, relative,
             path = path, overwrite = overwrite),
-        weather = job_json_encode_path(private$m_epws_path, dirname(path), relative)
+        weather = job_json_encode_path(legacy_weather, base, relative),
+        weather_cases = weather_cases
     )
+}
+
+job_json_encode_weather_cases <- function(weather, base, relative) {
+    if (is.null(weather)) return(NULL)
+    weather <- data.table::copy(weather)
+    if (nrow(weather)) {
+        set(weather, NULL, "epw", job_json_encode_path(weather$epw, base, relative))
+    }
+    job_json_encode_table(weather)
 }
 
 job_json_encode_model_store <- function(store, base, relative, path, overwrite) {
@@ -874,8 +1119,10 @@ job_json_parametric_state <- function(private) {
         cases = if (is.null(params) || !private$m_model_store$cases_valid()) {
             NULL
         } else {
-            job_json_encode_table(param_cases(NULL, private))
-        }
+            job_json_encode_table(param_cases(NULL, private, "model"))
+        },
+        model_cases = job_json_encode_table(param_model_case_table(private)),
+        run_cases = job_json_encode_table(private$m_run_cases)
     )
 }
 
@@ -1104,6 +1351,42 @@ job_json_decode_model_store <- function(x, base) {
     )
 }
 
+job_json_decode_weather_cases <- function(rows, legacy_weather = NULL, base) {
+    if (is.null(rows)) {
+        return(param_weather_cases(job_json_decode_path_nullable(legacy_weather, base)))
+    }
+
+    weather <- job_json_decode_table(rows)
+    if (!nrow(weather)) return(param_weather_cases(NULL))
+
+    set(weather, NULL, "weather_index", as.integer(weather$weather_index))
+    set(weather, NULL, "epw", job_json_decode_path_vector(weather$epw, base))
+    weather[]
+}
+
+job_json_decode_model_cases <- function(rows) {
+    cases <- job_json_decode_table(rows)
+    if (!nrow(cases)) return(data.table(model_index = integer(), model_id = integer(), model_case = character()))
+
+    set(cases, NULL, "model_index", as.integer(cases$model_index))
+    set(cases, NULL, "model_id", as.integer(cases$model_id))
+    cases[]
+}
+
+job_json_decode_param_run_cases <- function(rows, base) {
+    cases <- job_json_decode_table(rows)
+    if (!nrow(cases)) return(data.table())
+
+    int_cols <- c("index", "model_index", "weather_index")
+    for (col in intersect(int_cols, names(cases))) {
+        set(cases, NULL, col, as.integer(cases[[col]]))
+    }
+    if ("epw" %in% names(cases)) {
+        set(cases, NULL, "epw", job_json_decode_path_vector(cases$epw, base))
+    }
+    cases[]
+}
+
 job_json_restore_eplus_job <- function(manifest, base) {
     inputs <- manifest$inputs
     store <- job_json_decode_model_store(inputs$model_store, base)
@@ -1146,16 +1429,32 @@ job_json_restore_group_job <- function(manifest, base) {
 job_json_restore_parametric_job <- function(manifest, base) {
     inputs <- manifest$inputs
     store <- job_json_decode_model_store(inputs$model_store, base)
-    weather <- job_json_decode_path_nullable(inputs$weather, base)
     job <- param_job(
         store$model_prepared_path(store$seed_model_id()),
-        weather
+        NULL
     )
 
     private <- get_priv_env(job)
     private$m_model_store <- store
-    private$m_epws_path <- weather
+    private$m_weather_cases <- job_json_decode_weather_cases(inputs$weather_cases,
+        inputs$weather, base)
 
+    model_cases <- job_json_decode_model_cases(manifest$parametric$model_cases)
+    if (!nrow(model_cases) && store$has_cases()) {
+        model_cases <- data.table(
+            model_index = seq_len(store$case_count()),
+            model_id = store$case_model_ids(),
+            model_case = store$case_names()
+        )
+    }
+    private$m_model_case_ids <- model_cases$model_id
+    private$m_model_case_names <- model_cases$model_case
+
+    if (private$m_model_store$cases_valid()) {
+        param_refresh_run_cases(private)
+    } else {
+        private$m_run_cases <- job_json_decode_param_run_cases(manifest$parametric$run_cases, base)
+    }
     job_json_restore_parametric_log(private, manifest$log, manifest$parametric)
     private$m_job <- job_json_decode_group_run(manifest$run, base)
 
