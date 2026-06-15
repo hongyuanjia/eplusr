@@ -40,7 +40,7 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus("23.1")) install_eplus("23.1")
+if (!is_avail_eplus("latest")) install_eplus("latest")
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
@@ -93,7 +93,7 @@ data of EnergyPlus configuration using `eplus_config()`.
 ```{r avail_eplus}
 avail_eplus()
 
-eplus_config("23.1")
+eplus_config("latest")
 ```
 
 If your EnergyPlus was not installed in standard location, you can add that
@@ -108,7 +108,7 @@ If the needed version of EnergyPlus was not installed, you can use
 `install_eplus()` to install it.
 
 ```{r install, eval = FALSE}
-install_eplus(ver = "23.1")
+install_eplus(ver = "latest")
 ```
 
 ## Download EnergyPlus IDD
@@ -116,15 +116,16 @@ install_eplus(ver = "23.1")
 Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
 `download_idd()` or set `download` to `TRUE` in `use_idd()`. The code below will
-download IDD file for EnergyPlus v23.1.0, parse it and create an `Idd` object
-that will be used whenever parsing all EnergyPlus models of version v23.1.
+download IDD file for the latest EnergyPlus release, parse it and create an
+`Idd` object that will be used whenever parsing all EnergyPlus models of that
+version.
 
 ```{r idd_dl, eval = FALSE}
-path_idd <- download_idd("23.1", dir = tempdir())
+path_idd <- download_idd("latest", dir = tempdir())
 use_idd(path_idd)
 
 # OR
-use_idd("23.1", download = TRUE)
+use_idd("latest", download = TRUE)
 ```
 
 # Read and parse IDF
@@ -135,8 +136,8 @@ with additional heading lines showing the `Path`, `Version` of the model. The
 classes of objects in the model are ordered by groups and the number of objects
 in classes are shown in square bracket.
 
-Now let's read an IDF file distributed with EnergyPlus 23.1. As we have already
-got the IDD, we can just ignore the `idd` argument.
+Now let's read an IDF file distributed with the latest EnergyPlus release. As we
+have already got the IDD, we can just ignore the `idd` argument.
 
 **Note**: Once an EnergyPlus version `X.Y` is successfully located, all IDFs
 with versions lower than `X.Y` can be parsed. For example, if you have
@@ -145,7 +146,7 @@ simply `read_idf(path)` without specifying `idd`. This is because eplusr will
 use IDD files distributed with EnergyPlus VersionUpdater program.
 
 ```{r read, out.lines = 10}
-path <- path_eplus_example("23.1", "5Zone_Transformer.idf")
+path <- path_eplus_example("latest", "5Zone_Transformer.idf")
 model <- read_idf(path)
 
 model
@@ -247,14 +248,14 @@ def_mat
 You can also achieve this using methods in `Idd` class.
 
 ```{r idd_obj, eval = FALSE}
-idd <- use_idd("23.1")
+idd <- use_idd("latest")
 idd$Material
 
 # OR
 # idd$object("Material")
 
 # OR
-# idd_object(23.1, "Material")
+# idd_object("latest", "Material")
 ```
 
 With the `IddObject`, you can easily get class and field properties using
@@ -523,7 +524,7 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 
 ```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-path_ddy <- path_eplus_weather("23.1", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+path_ddy <- path_eplus_weather("latest", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 ddy <- read_idf(path_ddy, idd = model$version(), encoding = "Latin-1")
 
 model$insert(ddy$SizingPeriod_DesignDay)
@@ -710,4 +711,3 @@ and save the results.
 
 Let's turn our attention to run EnergyPlus simulations in the next vignette
 *"Run simulation and data exploration"*.
-

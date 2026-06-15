@@ -38,6 +38,31 @@ jobs:
           extra-packages: any::pkgdown, any::dplyr, any::ggplot2, local::.
           needs: website
 
+      - name: Restore EnergyPlus cache
+        id: cache-eplus
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.local/EnergyPlus-*
+          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-22.2
+
+      - name: Prepare EnergyPlus
+        run: |
+          latest <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
+          versions <- c(latest, "22.2")
+          for (ver in versions) {
+            if (!eplusr::is_avail_eplus(ver)) eplusr::install_eplus(ver, local = TRUE)
+            stopifnot(eplusr::is_avail_eplus(ver))
+            message("EnergyPlus ", ver, ": ", eplusr::eplus_config(ver)$dir)
+          }
+        shell: Rscript {0}
+
+      - name: Save EnergyPlus cache
+        if: steps.cache-eplus.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.local/EnergyPlus-*
+          key: ${{ steps.cache-eplus.outputs.cache-primary-key }}
+
       - name: Deploy package
         if: github.event_name != 'pull_request'
         run: |

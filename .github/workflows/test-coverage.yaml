@@ -9,6 +9,7 @@ on:
     branches:
       - master
       - main
+  workflow_dispatch:
 
 name: test-coverage
 
@@ -37,10 +38,12 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: true
       NOT_CRAN: true
+      TESTTHAT_CPUS: 1
+      R_KEEP_PKG_SOURCE: true
       COVR_COVRIGNORE: ".github/workflows/.covrignore"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -50,9 +53,63 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
+          extra-packages: any::covr, any::pkgload, any::xml2, any::htmltools
           needs: coverage
 
-      - name: Test coverage
-        run: covr::codecov(quiet = FALSE)
+      - name: Restore EnergyPlus cache
+        id: cache-eplus
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.local/EnergyPlus-*
+          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-22.2-9.6
+
+      - name: Prepare EnergyPlus
+        run: |
+          pkgload::load_all(".", quiet = TRUE, export_all = FALSE)
+          latest <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
+          versions <- c(latest, "22.2", "9.6")
+          for (ver in versions) {
+            if (!eplusr::is_avail_eplus(ver)) eplusr::install_eplus(ver, local = TRUE)
+            stopifnot(eplusr::is_avail_eplus(ver))
+            message("EnergyPlus ", ver, ": ", eplusr::eplus_config(ver)$dir)
+          }
         shell: Rscript {0}
+
+      - name: Save EnergyPlus cache
+        if: steps.cache-eplus.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.local/EnergyPlus-*
+          key: ${{ steps.cache-eplus.outputs.cache-primary-key }}
+
+      - name: Test coverage
+        run: |
+          dir.create("coverage", showWarnings = FALSE)
+          cov <- covr::package_coverage(
+            path = ".",
+            type = "tests",
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = "coverage/covr-lib"
+          )
+          print(cov)
+          saveRDS(cov, "coverage/coverage.rds")
+          covr::to_cobertura(cov, "coverage/cobertura.xml")
+          covr::report(cov, file = "coverage/index.html", browse = FALSE)
+        shell: Rscript {0}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-artifacts
+          path: coverage/
+
+      - uses: codecov/codecov-action@v7
+        if: always() && hashFiles('coverage/cobertura.xml') != ''
+        with:
+          files: coverage/cobertura.xml
+          flags: full-tests
+          name: eplusr-full-tests
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
