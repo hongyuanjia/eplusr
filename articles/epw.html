@@ -209,7 +209,11 @@ data. For details on the data structure of EPW file, please see “Chapter
 2 - Weather Converter Program” in EnergyPlus “Auxiliary Programs”
 documentation. An online version can be found <a href="https://bigladdersoftware.com/epx/docs/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">eplus_ver</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">eplus_ver</span></span>
+<span><span class="co">#&gt; [1] '26.1.0'</span></span>
+<span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="va">eplus_ver</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_epw.html">read_epw</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Superclass Idd has cloneable=FALSE, but subclass EpwIdd has cloneable=TRUE. A subclass cannot be cloneable when its superclass is not cloneable, so cloning will be disabled for EpwIdd.</span></span>
@@ -343,7 +347,7 @@ restriction.</p>
 <span><span class="co">#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16</span></span>
 <span><span class="co">#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0</span></span>
 <span><span class="co">#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;pointer: 0x55de0dcd1f20&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;pointer: 0x55d70d816f20&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="abnormal-data">Abnormal data<a class="anchor" aria-label="anchor" href="#abnormal-data"></a>

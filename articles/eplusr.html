@@ -181,14 +181,18 @@ release to parse the input IDF.</p>
 using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '23.1.0'</span></span>
+<span><span class="co">#&gt; [1] '9.6.0'  '22.2.0' '26.1.0'</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="st">"23.1"</span><span class="op">)</span></span>
+<span><span class="va">eplus_ver</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">eplus_ver</span></span>
+<span><span class="co">#&gt; [1] '26.1.0'</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $version</span></span>
-<span><span class="co">#&gt; [1] '23.1.0'</span></span>
+<span><span class="co">#&gt; [1] '26.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dir</span></span>
-<span><span class="co">#&gt; [1] "/usr/local/EnergyPlus-23-1-0"</span></span>
+<span><span class="co">#&gt; [1] "/home/runner/.local/EnergyPlus-26-1-0"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $exe</span></span>
 <span><span class="co">#&gt; [1] "energyplus"</span></span></code></pre></div>
@@ -200,7 +204,7 @@ models of that version will use this path to call EnergyPlus.</p>
 <p>If the needed version of EnergyPlus was not installed, you can use
 <code><a href="../reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"23.1"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_eplus.html">install_eplus</a></span><span class="op">(</span>ver <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-energyplus-idd">Download EnergyPlus IDD<a class="anchor" aria-label="anchor" href="#download-energyplus-idd"></a>
@@ -209,15 +213,15 @@ models of that version will use this path to call EnergyPlus.</p>
 whole EnergyPlus software. You can just download the IDD file of that
 version using <code><a href="../reference/use_idd.html">download_idd()</a></code> or set <code>download</code>
 to <code>TRUE</code> in <code><a href="../reference/use_idd.html">use_idd()</a></code>. The code below will
-download IDD file for EnergyPlus v23.1.0, parse it and create an
-<code>Idd</code> object that will be used whenever parsing all
-EnergyPlus models of version v23.1.</p>
+download IDD file for the latest EnergyPlus release, parse it and create
+an <code>Idd</code> object that will be used whenever parsing all
+EnergyPlus models of that version.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="st">"23.1"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">download_idd</a></span><span class="op">(</span><span class="st">"latest"</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="va">path_idd</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"23.1"</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"latest"</span>, download <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -229,9 +233,9 @@ similar style you see in IDF Editor, with additional heading lines
 showing the <code>Path</code>, <code>Version</code> of the model. The
 classes of objects in the model are ordered by groups and the number of
 objects in classes are shown in square bracket.</p>
-<p>Now let’s read an IDF file distributed with EnergyPlus 23.1. As we
-have already got the IDD, we can just ignore the <code>idd</code>
-argument.</p>
+<p>Now let’s read an IDF file distributed with the latest EnergyPlus
+release. As we have already got the IDD, we can just ignore the
+<code>idd</code> argument.</p>
 <p><strong>Note</strong>: Once an EnergyPlus version <code>X.Y</code> is
 successfully located, all IDFs with versions lower than <code>X.Y</code>
 can be parsed. For example, if you have EnergyPlus v9.1 installed, all
@@ -240,18 +244,18 @@ IDFs from v7.2 to v9.1 can be parsed using simply
 because eplusr will use IDD files distributed with EnergyPlus
 VersionUpdater program.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="va">eplus_ver</span>, <span class="st">"5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span></span>
 <span><span class="va">model</span></span>
 <span><span class="co">#&gt; ── EnergPlus Input Data File ───────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt;  • Version: '23.1.0'</span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
+<span><span class="co">#&gt;  • Version: '26.1.0'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group: &lt;Simulation Parameters&gt;</span></span>
 <span><span class="co">#&gt; ├─ [01&lt;O&gt;] Class: &lt;Version&gt;</span></span>
@@ -591,14 +595,14 @@ marked with <code>*</code>. For example, you can get the
 <p>You can also achieve this using methods in <code>Idd</code>
 class.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"23.1"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">idd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/use_idd.html">use_idd</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span>
 <span><span class="va">idd</span><span class="op">$</span><span class="va">Material</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># idd$object("Material")</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
-<span><span class="co"># idd_object(23.1, "Material")</span></span></code></pre></div>
+<span><span class="co"># idd_object("latest", "Material")</span></span></code></pre></div>
 <p>With the <code>IddObject</code>, you can easily get class and field
 properties using methods it has.</p>
 <p>For example, you can get all default field values using
@@ -811,13 +815,13 @@ contains data presenting such relation above.</p>
 <span><span class="co">#&gt; $ref_by</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16525           2</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16878           2</span></span>
 <span><span class="co">#&gt;       field_name value_id  value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer      634 MAT-CLNG-1        NA         5           57</span></span>
 <span><span class="co">#&gt;     src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12600               1</span></span>
+<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12603               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          542    MAT-CLNG-1            NA             4</span></span>
@@ -1187,13 +1191,13 @@ objects, the corresponding fields will also be updated.</p>
 <span><span class="co">#&gt; $ref_by</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id  object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16525           2</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16878           2</span></span>
 <span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer      636      CC03        NA         5           56</span></span>
 <span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       Material            52            CC03        12591               1</span></span>
+<span><span class="co">#&gt; 1:       Material            52            CC03        12594               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          521          CC03            NA             4</span></span>
@@ -1227,13 +1231,13 @@ objects, the corresponding fields will also be updated.</p>
 <span><span class="co">#&gt; $ref_by</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id  object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16525           2</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16878           2</span></span>
 <span><span class="co">#&gt;       field_name value_id    value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;       &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer      636 CC03_renamed        NA         5           56</span></span>
 <span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       Material            52    CC03_renamed        12591               1</span></span>
+<span><span class="co">#&gt; 1:       Material            52    CC03_renamed        12594               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          521  CC03_renamed            NA             4</span></span>
@@ -1254,8 +1258,8 @@ class.</p>
 <code class="sourceCode R"><span><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    class_id class_name object_id  object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;     &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       56   Material        52 CC03_renamed    12592           2</span></span>
-<span><span class="co">#&gt; 2:       56   Material        52 CC03_renamed    12597           7</span></span>
+<span><span class="co">#&gt; 1:       56   Material        52 CC03_renamed    12595           2</span></span>
+<span><span class="co">#&gt; 2:       56   Material        52 CC03_renamed    12600           7</span></span>
 <span><span class="co">#&gt;             field_name value_id   value_chr value_num   auto default</span></span>
 <span><span class="co">#&gt;                 &lt;char&gt;    &lt;int&gt;      &lt;char&gt;     &lt;num&gt; &lt;char&gt;  &lt;list&gt;</span></span>
 <span><span class="co">#&gt; 1:           Roughness      522 MediumRough        NA   &lt;NA&gt;      NA</span></span>
@@ -1278,7 +1282,7 @@ data from a “.ddy” file. You can achieve that using
 <code>$insert()</code>.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read ddy file as normal IDF</span></span>
-<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="st">"23.1"</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
+<span><span class="va">path_ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="va">eplus_ver</span>, <span class="st">"USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"</span><span class="op">)</span></span>
 <span><span class="va">ddy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_ddy</span>, idd <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span>, encoding <span class="op">=</span> <span class="st">"Latin-1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">insert</span><span class="op">(</span><span class="va">ddy</span><span class="op">$</span><span class="va">SizingPeriod_DesignDay</span><span class="op">)</span></span>
@@ -1351,13 +1355,13 @@ or modified.</p>
 <span><span class="co">#&gt; $ref_to</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction       349  new_const1    16525           2</span></span>
+<span><span class="co">#&gt; 1:       92 Construction       349  new_const1    16878           2</span></span>
 <span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer     3808      WD10        NA         5           56</span></span>
 <span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       Material            43            WD10        12591               1</span></span>
+<span><span class="co">#&gt; 1:       Material            43            WD10        12594               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          440          WD10            NA             4</span></span>
@@ -1377,10 +1381,10 @@ or modified.</p>
 <span><span class="co">#&gt; $ref_to</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction       350  new_const2    16525           2</span></span>
-<span><span class="co">#&gt; 2:       92 Construction       350  new_const2    16526           3</span></span>
-<span><span class="co">#&gt; 3:       92 Construction       350  new_const2    16527           4</span></span>
-<span><span class="co">#&gt; 4:       92 Construction       350  new_const2    16528           5</span></span>
+<span><span class="co">#&gt; 1:       92 Construction       350  new_const2    16878           2</span></span>
+<span><span class="co">#&gt; 2:       92 Construction       350  new_const2    16879           3</span></span>
+<span><span class="co">#&gt; 3:       92 Construction       350  new_const2    16880           4</span></span>
+<span><span class="co">#&gt; 4:       92 Construction       350  new_const2    16881           5</span></span>
 <span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer     3810      RG01        NA         5           56</span></span>
@@ -1389,10 +1393,10 @@ or modified.</p>
 <span><span class="co">#&gt; 4:       Layer 4     3813      WD01        NA         5           56</span></span>
 <span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       Material            44            RG01        12591               1</span></span>
-<span><span class="co">#&gt; 2:       Material            45            BR01        12591               1</span></span>
-<span><span class="co">#&gt; 3:       Material            46            IN46        12591               1</span></span>
-<span><span class="co">#&gt; 4:       Material            47            WD01        12591               1</span></span>
+<span><span class="co">#&gt; 1:       Material            44            RG01        12594               1</span></span>
+<span><span class="co">#&gt; 2:       Material            45            BR01        12594               1</span></span>
+<span><span class="co">#&gt; 3:       Material            46            IN46        12594               1</span></span>
+<span><span class="co">#&gt; 4:       Material            47            WD01        12594               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          449          RG01            NA             4</span></span>
@@ -1468,13 +1472,13 @@ see if it has been referred by other objects.</p>
 <span><span class="co">#&gt; $ref_by</span></span>
 <span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16525           2</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16878           2</span></span>
 <span><span class="co">#&gt;       field_name value_id  value_chr value_num type_enum src_class_id</span></span>
 <span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer      634 MAT-CLNG-1        NA         5           57</span></span>
 <span><span class="co">#&gt;     src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12600               1</span></span>
+<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12603               1</span></span>
 <span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
 <span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:           Name          542    MAT-CLNG-1            NA             4</span></span>
@@ -1674,7 +1678,7 @@ on. We can just trigger invalid reference checking using
 <span><span class="co">#&gt; $invalid_reference</span></span>
 <span><span class="co">#&gt;    object_id object_name class_id   class_name field_id field_index</span></span>
 <span><span class="co">#&gt;        &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1:        68      CLNG-1       92 Construction    16525           2</span></span>
+<span><span class="co">#&gt; 1:        68      CLNG-1       92 Construction    16878           2</span></span>
 <span><span class="co">#&gt;       field_name  units ip_units type_enum value_id  value_chr value_num</span></span>
 <span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt;   &lt;char&gt;     &lt;int&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;</span></span>
 <span><span class="co">#&gt; 1: Outside Layer   &lt;NA&gt;     &lt;NA&gt;         5      634 MAT-CLNG-1        NA</span></span>
@@ -1731,10 +1735,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpeVVUm8/file24ab2054d680.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpVHKPtx/file25c415b4104a.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpeVVUm8/file24ab2054d680.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpVHKPtx/file25c415b4104a.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>

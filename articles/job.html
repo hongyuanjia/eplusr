@@ -152,13 +152,17 @@ weather used will be copied to the output directory. An
 information of the simulation and methods to collect simulation output.
 Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for details.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
-<span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">eplus_ver</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">eplus_ver</span></span>
+<span><span class="co">#&gt; [1] '26.1.0'</span></span>
+<span></span>
+<span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v23.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v23.1.0 installation folder '/usr/local/EnergyPlus-23-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/usr/local/EnergyPlus-23-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before.</span></span>
+<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span></code></pre></div>
 <div class="section level3">
@@ -172,9 +176,9 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.</span></span>
 <span><span class="co">#&gt; ExpandObjects Started.</span></span>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
-<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.016</span></span>
+<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.017</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2026.06.15 11:59</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.06.15 13:59</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -187,11 +191,11 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 11:59:12.943453' and completed successfully after 0.55 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 13:59:05.728642' and completed successfully after 0.69 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -200,11 +204,11 @@ status.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 11:59:12.943453' and completed successfully after 0.55 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 13:59:05.728642' and completed successfully after 0.69 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -220,11 +224,11 @@ the <code>EplusJob</code> object or using the
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/usr/local/EnergyPlus-23-1-0/ExampleFiles/5Zone_Transformer.idf'</span></span>
-<span><span class="co">#&gt;  • Version: '/usr/local/EnergyPlus-23-1-0/WeatherData/USA_CA_San.Francisco.Intl…</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '23.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/usr/local/EnergyPlus-23-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 11:59:13.660303' and is still running...</span></span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
+<span><span class="co">#&gt;  • Version: '/home/runner/.local/EnergyPlus-26-1-0/WeatherData/USA_CA_San.Franc…</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-15 13:59:06.643214' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -605,7 +609,7 @@ numbers. We need to convert it by setting <code>string_value</code> to
 <span><span class="co">#&gt; 1: Site and Source Energy Total Site Energy</span></span>
 <span><span class="co">#&gt;    Energy Per Total Building Area [MJ/m2]</span></span>
 <span><span class="co">#&gt;                                     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:                                   1.45</span></span></code></pre></div>
+<span><span class="co">#&gt; 1:                                   1.44</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -622,8 +626,8 @@ process of obtaining:</p>
 <h3 id="run-annual-simulation">Run annual simulation<a class="anchor" aria-label="anchor" href="#run-annual-simulation"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
-<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="fl">23.1</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">path_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf"</span><span class="op">)</span></span>
+<span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
 <span></span>
@@ -690,21 +694,21 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 15: MediumOffice AnnualBuildingUtilityPerformanceSummary Entire Facility</span></span>
 <span><span class="co">#&gt;     table_name           row_name Electricity [kWh] Natural Gas [kWh]</span></span>
 <span><span class="co">#&gt;         &lt;char&gt;             &lt;char&gt;             &lt;num&gt;             &lt;num&gt;</span></span>
-<span><span class="co">#&gt;  1:   End Uses            Heating         142077.59          50331.57</span></span>
-<span><span class="co">#&gt;  2:   End Uses            Cooling          76534.54              0.00</span></span>
+<span><span class="co">#&gt;  1:   End Uses            Heating         142077.61          50331.57</span></span>
+<span><span class="co">#&gt;  2:   End Uses            Cooling          76542.52              0.00</span></span>
 <span><span class="co">#&gt;  3:   End Uses  Interior Lighting         168399.82              0.00</span></span>
 <span><span class="co">#&gt;  4:   End Uses  Exterior Lighting          64602.19              0.00</span></span>
 <span><span class="co">#&gt;  5:   End Uses Interior Equipment         296261.61              0.00</span></span>
 <span><span class="co">#&gt;  6:   End Uses Exterior Equipment              0.00              0.00</span></span>
-<span><span class="co">#&gt;  7:   End Uses               Fans          20001.40              0.00</span></span>
+<span><span class="co">#&gt;  7:   End Uses               Fans          20001.42              0.00</span></span>
 <span><span class="co">#&gt;  8:   End Uses              Pumps             73.94              0.00</span></span>
 <span><span class="co">#&gt;  9:   End Uses     Heat Rejection              0.00              0.00</span></span>
 <span><span class="co">#&gt; 10:   End Uses     Humidification              0.00              0.00</span></span>
 <span><span class="co">#&gt; 11:   End Uses      Heat Recovery              0.00              0.00</span></span>
-<span><span class="co">#&gt; 12:   End Uses      Water Systems              0.00          10030.80</span></span>
+<span><span class="co">#&gt; 12:   End Uses      Water Systems              0.00          10029.69</span></span>
 <span><span class="co">#&gt; 13:   End Uses      Refrigeration              0.00              0.00</span></span>
 <span><span class="co">#&gt; 14:   End Uses         Generators              0.00              0.00</span></span>
-<span><span class="co">#&gt; 15:   End Uses     Total End Uses         767951.09          60362.37</span></span>
+<span><span class="co">#&gt; 15:   End Uses     Total End Uses         767959.11          60361.26</span></span>
 <span><span class="co">#&gt;     Gasoline [kWh] Diesel [kWh] Coal [kWh] Fuel Oil No 1 [kWh]</span></span>
 <span><span class="co">#&gt;              &lt;num&gt;        &lt;num&gt;      &lt;num&gt;               &lt;num&gt;</span></span>
 <span><span class="co">#&gt;  1:              0            0          0                   0</span></span>
@@ -739,23 +743,40 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 13:                   0             0                  0                  0</span></span>
 <span><span class="co">#&gt; 14:                   0             0                  0                  0</span></span>
 <span><span class="co">#&gt; 15:                   0             0                  0                  0</span></span>
-<span><span class="co">#&gt;     District Cooling [kWh] District Heating [kWh] Water [m3]</span></span>
-<span><span class="co">#&gt;                      &lt;num&gt;                  &lt;num&gt;      &lt;num&gt;</span></span>
-<span><span class="co">#&gt;  1:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  2:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  3:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  4:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  5:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  6:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  7:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  8:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt;  9:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt; 10:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt; 11:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt; 12:                      0                      0     174.59</span></span>
-<span><span class="co">#&gt; 13:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt; 14:                      0                      0       0.00</span></span>
-<span><span class="co">#&gt; 15:                      0                      0     174.59</span></span>
+<span><span class="co">#&gt;     District Cooling [kWh] District Heating Water [kWh]</span></span>
+<span><span class="co">#&gt;                      &lt;num&gt;                        &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:                      0                            0</span></span>
+<span><span class="co">#&gt;  2:                      0                            0</span></span>
+<span><span class="co">#&gt;  3:                      0                            0</span></span>
+<span><span class="co">#&gt;  4:                      0                            0</span></span>
+<span><span class="co">#&gt;  5:                      0                            0</span></span>
+<span><span class="co">#&gt;  6:                      0                            0</span></span>
+<span><span class="co">#&gt;  7:                      0                            0</span></span>
+<span><span class="co">#&gt;  8:                      0                            0</span></span>
+<span><span class="co">#&gt;  9:                      0                            0</span></span>
+<span><span class="co">#&gt; 10:                      0                            0</span></span>
+<span><span class="co">#&gt; 11:                      0                            0</span></span>
+<span><span class="co">#&gt; 12:                      0                            0</span></span>
+<span><span class="co">#&gt; 13:                      0                            0</span></span>
+<span><span class="co">#&gt; 14:                      0                            0</span></span>
+<span><span class="co">#&gt; 15:                      0                            0</span></span>
+<span><span class="co">#&gt;     District Heating Steam [kWh] Water [m3]</span></span>
+<span><span class="co">#&gt;                            &lt;num&gt;      &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:                            0       0.00</span></span>
+<span><span class="co">#&gt;  2:                            0       0.00</span></span>
+<span><span class="co">#&gt;  3:                            0       0.00</span></span>
+<span><span class="co">#&gt;  4:                            0       0.00</span></span>
+<span><span class="co">#&gt;  5:                            0       0.00</span></span>
+<span><span class="co">#&gt;  6:                            0       0.00</span></span>
+<span><span class="co">#&gt;  7:                            0       0.00</span></span>
+<span><span class="co">#&gt;  8:                            0       0.00</span></span>
+<span><span class="co">#&gt;  9:                            0       0.00</span></span>
+<span><span class="co">#&gt; 10:                            0       0.00</span></span>
+<span><span class="co">#&gt; 11:                            0       0.00</span></span>
+<span><span class="co">#&gt; 12:                            0     174.59</span></span>
+<span><span class="co">#&gt; 13:                            0       0.00</span></span>
+<span><span class="co">#&gt; 14:                            0       0.00</span></span>
+<span><span class="co">#&gt; 15:                            0     174.59</span></span>
 <span></span>
 <span><span class="co"># read zone metadata from Standard Input and Output</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">zones</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span><span class="op">)</span></span>
@@ -895,17 +916,17 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 52560:             365   Sunday           ANNUAL                        3</span></span>
 <span><span class="co">#&gt;        is_meter   type index_group timestep_type key_value</span></span>
 <span><span class="co">#&gt;           &lt;int&gt; &lt;char&gt;      &lt;char&gt;        &lt;char&gt;    &lt;char&gt;</span></span>
-<span><span class="co">#&gt;     1:        0    Sum        HVAC   HVAC System     VAV_1</span></span>
-<span><span class="co">#&gt;     2:        0    Sum        HVAC   HVAC System     VAV_1</span></span>
-<span><span class="co">#&gt;     3:        0    Sum        HVAC   HVAC System     VAV_1</span></span>
-<span><span class="co">#&gt;     4:        0    Sum        HVAC   HVAC System     VAV_1</span></span>
-<span><span class="co">#&gt;     5:        0    Sum        HVAC   HVAC System     VAV_1</span></span>
+<span><span class="co">#&gt;     1:        0    Sum      System   HVAC System     VAV_1</span></span>
+<span><span class="co">#&gt;     2:        0    Sum      System   HVAC System     VAV_1</span></span>
+<span><span class="co">#&gt;     3:        0    Sum      System   HVAC System     VAV_1</span></span>
+<span><span class="co">#&gt;     4:        0    Sum      System   HVAC System     VAV_1</span></span>
+<span><span class="co">#&gt;     5:        0    Sum      System   HVAC System     VAV_1</span></span>
 <span><span class="co">#&gt;    ---                                                    </span></span>
-<span><span class="co">#&gt; 52556:        0    Sum        HVAC   HVAC System     VAV_3</span></span>
-<span><span class="co">#&gt; 52557:        0    Sum        HVAC   HVAC System     VAV_3</span></span>
-<span><span class="co">#&gt; 52558:        0    Sum        HVAC   HVAC System     VAV_3</span></span>
-<span><span class="co">#&gt; 52559:        0    Sum        HVAC   HVAC System     VAV_3</span></span>
-<span><span class="co">#&gt; 52560:        0    Sum        HVAC   HVAC System     VAV_3</span></span>
+<span><span class="co">#&gt; 52556:        0    Sum      System   HVAC System     VAV_3</span></span>
+<span><span class="co">#&gt; 52557:        0    Sum      System   HVAC System     VAV_3</span></span>
+<span><span class="co">#&gt; 52558:        0    Sum      System   HVAC System     VAV_3</span></span>
+<span><span class="co">#&gt; 52559:        0    Sum      System   HVAC System     VAV_3</span></span>
+<span><span class="co">#&gt; 52560:        0    Sum      System   HVAC System     VAV_3</span></span>
 <span><span class="co">#&gt;                                   name reporting_frequency schedule_name  units</span></span>
 <span><span class="co">#&gt;                                 &lt;char&gt;              &lt;char&gt;        &lt;char&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt;     1: Air System Total Heating Energy              Hourly          &lt;NA&gt;      J</span></span>
@@ -921,11 +942,11 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 52560: Air System Total Cooling Energy              Hourly          &lt;NA&gt;      J</span></span>
 <span><span class="co">#&gt;           value</span></span>
 <span><span class="co">#&gt;           &lt;num&gt;</span></span>
-<span><span class="co">#&gt;     1: 34083017</span></span>
+<span><span class="co">#&gt;     1: 34083018</span></span>
 <span><span class="co">#&gt;     2: 36303710</span></span>
 <span><span class="co">#&gt;     3: 48153527</span></span>
 <span><span class="co">#&gt;     4: 37244335</span></span>
-<span><span class="co">#&gt;     5: 49652701</span></span>
+<span><span class="co">#&gt;     5: 49652702</span></span>
 <span><span class="co">#&gt;    ---         </span></span>
 <span><span class="co">#&gt; 52556:        0</span></span>
 <span><span class="co">#&gt; 52557:        0</span></span>
