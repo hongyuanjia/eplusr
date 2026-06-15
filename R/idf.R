@@ -1136,6 +1136,14 @@ Idf <- R6::R6Class(classname = "Idf",
         #'   object ID or names in `.()`. It will set the field of all specified
         #'   objects to specified value.
         #'
+        #' Field values can be updated from their current values using a one-sided
+        #' formula or a function. In `field = ~ . * 0.5`, `.` is the current field
+        #' value. In `field = function(x) x * 0.5`, the first argument receives the
+        #' current field value. eplusr only supplies that first argument; other
+        #' function arguments must have defaults or be captured from the enclosing
+        #' environment. Function updates must return a character, integer, or double
+        #' vector of length `1` or the number of target objects.
+        #'
         #' You can delete a field by assigning `NULL` to it, e.g. `list(fld =
         #' NULL)` means to delete the value of field `fld`, in the condition
         #' that `.default` is `FALSE`, `fld` is not a required field and the
@@ -1214,6 +1222,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' idf$set(r13layer = list(solar_absorptance = 0.8),
         #'         r31layer = list(solar_absorptance = 0.8)
         #' )
+        #'
+        #' # update values using the current field values
+        #' idf$set(Material := list(conductivity = ~ . * 0.5))
+        #' idf$set(Material := list(conductivity = function(x) x * 0.5))
         #'
         #' # use variable input
         #' sets <- list(r13layer = list(roughness = "smooth"))

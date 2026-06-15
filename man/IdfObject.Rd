@@ -26,6 +26,11 @@ will be automatically added on the fly.
 \item Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
 equivalent to \verb{End Month}.
+\item Field values can be updated from their current values using a one-sided
+formula or a function, e.g. \code{field = ~ . * 0.5} or
+\code{field = function(x) x * 0.5}. In formulas, \code{.} is the current field
+value. In functions, the first argument receives the current field
+value.
 \item If not all field names are given, positions of those values without field
 names are determined after those values with names. E.g. in
 \code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
@@ -193,6 +198,8 @@ mat[c("Name", "Density")]
 # set field values
 mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
+mat$set(Conductivity = ~ . * 0.5)
+mat$set(Conductivity = function(x) x * 0.5)
 
 # When `default` argument is set to TRUE and input field values are empty, i.e.
 # NULL, the field values will be reset to defaults.
@@ -907,6 +914,8 @@ object comments, please use \verb{$comment()}.
 # set field values
 mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
+mat$set(Conductivity = ~ . * 0.5)
+mat$set(Conductivity = function(x) x * 0.5)
 
 # When `default` argument is set to TRUE and input field values are empty, i.e.
 # NULL, the field values will be reset to defaults.

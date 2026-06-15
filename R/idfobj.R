@@ -370,6 +370,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' * Field name matching is **case-insensitive**. For convenience,
         #'   underscore-style field names are also allowed, e.g. `eNd_MoNtH` is
         #'   equivalent to `End Month`.
+        #' * Field values can be updated from their current values using a one-sided
+        #'   formula or a function, e.g. `field = ~ . * 0.5` or
+        #'   `field = function(x) x * 0.5`. In formulas, `.` is the current field
+        #'   value. In functions, the first argument receives the current field
+        #'   value.
         #' * If not all field names are given, positions of those values without field
         #'   names are determined after those values with names. E.g. in
         #'   `model$set(Construction = list("out_layer", name = "name"))`, `"out_layer"`
@@ -398,6 +403,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' # set field values
         #' mat$set(name = "new_name", Thickness = 0.02)
         #' mat[c("Name", "Thickness")]
+        #' mat$set(Conductivity = ~ . * 0.5)
+        #' mat$set(Conductivity = function(x) x * 0.5)
         #'
         #' # When `default` argument is set to TRUE and input field values are empty, i.e.
         #' # NULL, the field values will be reset to defaults.
