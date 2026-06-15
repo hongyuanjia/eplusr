@@ -41,8 +41,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
@@ -66,6 +64,9 @@ related objects, including:
   `Daylighting` group
 
 ```{r}
+eplus_ver <- max(avail_eplus())
+eplus_ver
+
 path_idf <- file.path(eplus_config(eplus_ver)$dir, "ExampleFiles/HospitalLowEnergy.idf")
 idf <- read_idf(path_idf)
 geom <- idf$geometry()

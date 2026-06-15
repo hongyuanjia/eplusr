@@ -42,8 +42,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 
 library(dplyr)
 library(ggplot2)
@@ -68,6 +66,9 @@ provides detailed information of the simulation and methods to collect
 simulation output. Please see `?EplusJob` for details.
 
 ```{r}
+eplus_ver <- max(avail_eplus())
+eplus_ver
+
 path_idf <- file.path(eplus_config(eplus_ver)$dir, "ExampleFiles/5Zone_Transformer.idf")
 path_epw <- file.path(eplus_config(eplus_ver)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 

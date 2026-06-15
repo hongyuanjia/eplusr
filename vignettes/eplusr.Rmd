@@ -40,8 +40,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
@@ -93,6 +91,9 @@ data of EnergyPlus configuration using `eplus_config()`.
 
 ```{r avail_eplus}
 avail_eplus()
+
+eplus_ver <- max(avail_eplus())
+eplus_ver
 
 eplus_config(eplus_ver)
 ```

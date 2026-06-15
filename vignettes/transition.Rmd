@@ -40,8 +40,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 ```
 
 # Motivation
@@ -89,6 +87,9 @@ Unfortunately, even though the transition programs are written in Fortran, it
 could still take several minutes to complete the update process
 
 ```{r}
+eplus_ver <- max(avail_eplus())
+eplus_ver
+
 path <- "RefBldgLargeOfficeNew2004_Chicago.idf"
 read_idf(path)$version()
 

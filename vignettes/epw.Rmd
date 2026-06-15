@@ -40,8 +40,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 ```
 
 This vignette introduces the `Epw` class which is designed to read and modify
@@ -121,6 +119,9 @@ Program" in EnergyPlus "Auxiliary Programs" documentation. An online version
 can be found [here](https://bigladdersoftware.com/epx/docs/).
 
 ```{r}
+eplus_ver <- max(avail_eplus())
+eplus_ver
+
 path <- path_eplus_weather(eplus_ver, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
 epw <- read_epw(path)

@@ -42,8 +42,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 
 library(dplyr)
 ```
@@ -74,6 +72,9 @@ and a weather file.
 ```{r}
 library(eplusr)
 library(dplyr)
+
+eplus_ver <- max(avail_eplus())
+eplus_ver
 
 path_model <- path_eplus_example(eplus_ver, "RefBldgMediumOfficeNew2004_Chicago.idf")
 path_weather <- path_eplus_weather(eplus_ver, "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")

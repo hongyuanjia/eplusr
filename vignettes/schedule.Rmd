@@ -41,8 +41,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- max(avail_eplus())
-eplus_ver
 ```
 
 # The `Schedule:Compact` class
@@ -54,6 +52,9 @@ number of fields and positions are not set, and cannot really be described in
 the usual `Field #` manner.
 
 ```{r}
+eplus_ver <- max(avail_eplus())
+eplus_ver
+
 path_idf <- path_eplus_example(eplus_ver, "1ZoneUncontrolled.idf")
 idf <- read_idf(path_idf)
 idf$definition("Schedule:Compact")
