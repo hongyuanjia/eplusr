@@ -19,8 +19,8 @@ NULL
 #' of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 #' with the release.
 #'
-#' eplusr tries to detect all installed EnergyPlus in default installation
-#' locations when loading, i.e. `C:\\EnergyPlusVX-X-0` on Windows,
+#' eplusr tries to detect installed EnergyPlus lazily when that information is
+#' needed, using default installation locations, i.e. `C:\\EnergyPlusVX-X-0` on Windows,
 #' `/usr/local/EnergyPlus-X-Y-0` on Linux, and
 #' `/Applications/EnergyPlus-X-Y-0` on macOS and stores all found locations
 #' internally. This data is used to locate the distributed "Energy+.idd" file of
@@ -1033,9 +1033,9 @@ read_idd <- function(path, encoding = "unknown") {
 #' `is_avail_idd()` returns `TRUE` if input version of IDD file has been parsed
 #' and cached.
 #'
-#' eplusr tries to detect all installed EnergyPlus in default installation
-#' locations when loading. If argument `idd` is a version, eplusr will try the
-#' follow ways sequentially to find corresponding IDD:
+#' eplusr tries to detect installed EnergyPlus lazily when that information is
+#' needed. If argument `idd` is a version, eplusr will try the follow ways
+#' sequentially to find corresponding IDD:
 #'
 #' * The cached `Idd` object of that version
 #' * `"Energy+.idd"` file distributed with EnergyPlus of that version (see

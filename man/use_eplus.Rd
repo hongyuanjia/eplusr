@@ -16,13 +16,18 @@ avail_eplus()
 
 is_avail_eplus(ver)
 
-locate_eplus()
+locate_eplus(dirs = NULL)
 }
 \arguments{
 \item{eplus}{An acceptable EnergyPlus version or an EnergyPlus installation
 path.}
 
 \item{ver}{An acceptable EnergyPlus version.}
+
+\item{dirs}{A character vector of extra locations to search for EnergyPlus
+installations. Each entry can be either an EnergyPlus installation
+directory, or a parent directory that contains installations using
+standard EnergyPlus directory names. Default: \code{NULL}.}
 }
 \value{
 \itemize{
@@ -43,14 +48,19 @@ eplusr. That cache will be used to get corresponding \link{Idd} object when
 parsing IDF files and call corresponding EnergyPlus to run models.
 
 \code{eplus_config()} returns the a list of configure data of specified version of
-EnergyPlus. If no data found, an empty list will be returned.
+EnergyPlus. If no data found, eplusr will try to locate that version in the
+default installation locations and extra locations set via the base R option
+\code{eplusr.eplus_dirs}. If still no data is found, an empty list will be
+returned.
 
-\code{avail_eplus()} returns all versions of available EnergyPlus.
+\code{avail_eplus()} returns all versions of available EnergyPlus. The first call
+will locate EnergyPlus installations in default installation locations and
+extra locations set via \code{options(eplusr.eplus_dirs = ...)}.
 
 \code{locate_eplus()} re-searches all EnergyPlus installations at the \strong{default}
-locations and returns versions of EnergyPlus it finds. Please note that all
-configure data of EnergyPlus installed at custom locations will be
-\strong{removed}.
+locations and any extra \code{dirs}, and returns versions of EnergyPlus it finds.
+Extra search locations can also be configured for the session using
+\code{options(eplusr.eplus_dirs = ...)}.
 
 \code{is_avail_eplus()} checks if the specified version of EnergyPlus is
 available or not.

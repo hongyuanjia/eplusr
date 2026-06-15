@@ -9,6 +9,10 @@
 * Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball
   installation (#601).
 
+* Delay EnergyPlus installation discovery until needed and allow extra search
+  roots via `locate_eplus(dirs = ...)` and `options(eplusr.eplus_dirs = ...)`
+  (#609).
+
 # eplusr 0.16.3
 
 ## New features

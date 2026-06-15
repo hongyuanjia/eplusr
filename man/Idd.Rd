@@ -20,8 +20,8 @@ the schema format is XSD; for IDF, the schema format is IDD. For each release
 of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 with the release.
 
-eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading, i.e. \verb{C:\\\\EnergyPlusVX-X-0} on Windows,
+eplusr tries to detect installed EnergyPlus lazily when that information is
+needed, using default installation locations, i.e. \verb{C:\\\\EnergyPlusVX-X-0} on Windows,
 \verb{/usr/local/EnergyPlus-X-Y-0} on Linux, and
 \verb{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of

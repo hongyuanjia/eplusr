@@ -40,10 +40,23 @@ test_that("can read IDD", {
     # EnergyPlus is EnergyPlus v9.0
     expect_s3_class(use_idd("9.0"), "Idd")
 
-    # can stop if that EnergyPlus is not available and IDD if not found in any
+    # can lazily discover EnergyPlus and use corresponding IDD
+    rm_global_cache("eplus", avail_eplus())
+    rm_global_cache("idd")
+    expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
+    expect_true(is_avail_eplus(LATEST_EPLUS_VER))
+
+    # can stop if that EnergyPlus is not available and IDD is not found in any
     # existing VersionUpdater folder
     rm_global_cache("eplus", avail_eplus())
-    expect_error(use_idd(LATEST_EPLUS_VER), class = "eplusr_error_locate_idd")
+    rm_global_cache("idd")
+    local({
+        local_mocked_bindings(
+            is_avail_eplus = function(ver) FALSE,
+            find_idd_from_updater = function(ver) NULL
+        )
+        expect_error(use_idd(LATEST_EPLUS_VER), class = "eplusr_error_locate_idd")
+    })
 
     # can direct read if corresponding EnergyPlus is found
     use_eplus(LATEST_EPLUS_VER)

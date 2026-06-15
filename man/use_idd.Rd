@@ -69,9 +69,9 @@ useful in case where you only want to edit an EnergyPlus Input Data File
 \code{is_avail_idd()} returns \code{TRUE} if input version of IDD file has been parsed
 and cached.
 
-eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading. If argument \code{idd} is a version, eplusr will try the
-follow ways sequentially to find corresponding IDD:
+eplusr tries to detect installed EnergyPlus lazily when that information is
+needed. If argument \code{idd} is a version, eplusr will try the follow ways
+sequentially to find corresponding IDD:
 \itemize{
 \item The cached \code{Idd} object of that version
 \item \code{"Energy+.idd"} file distributed with EnergyPlus of that version (see
