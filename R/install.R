@@ -301,6 +301,9 @@ eplus_download_url <- function(ver, portable = FALSE) {
         if (arch == "i386" && os == "windows" && cmt$version %in% "24.2.0") {
             abort("EnergyPlus v24.2.0 does not provide a Windows i386 installer.")
         }
+        if (arch == "i386" && os == "windows" && cmt$version %in% "26.1.0") {
+            abort("EnergyPlus v26.1.0 does not provide a Windows i386 installer.")
+        }
         if (arch == "i386" && os == "windows" && cmt$version %in% c("25.1.0", "25.2.0") && !portable) {
             abort("EnergyPlus v", cmt$version, " does not provide a Windows i386 non-portable installer.")
         }
