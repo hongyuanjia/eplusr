@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9005</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9006</span>
       </span>
     </div>
 
@@ -529,8 +529,9 @@ valid class names for underlying <a href="Idd.html">Idd</a>. Default: FALSE</p><
 contains valid class names in the context of current <code>Idf</code> (when
 <code>all</code> is <code>FALSE</code>) or current underlying <a href="Idd.html">Idd</a> (when <code>all</code> is <code>TRUE</code>),
 and <code>FALSE</code>s otherwise.</p>
-<p>Note that case-sensitive matching is performed, which means that
-<code>"Version"</code> is a valid class name but <code>"version"</code> is not.</p>
+<p>Class name matching is <strong>case-insensitive</strong>. For convenience,
+underscore-style class names are also allowed, e.g. <code>Site_Location</code>
+is equivalent to <code>Site:Location</code>.</p>
 </div>
 
 <div class="section">
@@ -1537,6 +1538,9 @@ components will be performed during adding new objects, please see
 <p>Note that <code>.()</code> can be used as an alias as <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>, e.g.
 <code>idf$add(Building = .())</code> is equivalent to
 <code>idf$add(Building = list())</code>.</p>
+<p>Class name matching is <strong>case-insensitive</strong>. For convenience,
+underscore-style class names are also allowed, e.g. <code>runperiod</code> is
+equivalent to <code>RunPeriod</code>.</p>
 <p>Field name matching is <strong>case-insensitive</strong>. For convenience,
 underscore-style field names are also allowed, e.g. <code>eNd_MoNtH</code> is
 equivalent to <code>End Month</code>. This behavior is consistent among all
@@ -1660,6 +1664,9 @@ since they are all non-required fields. You can keep the trailing
 empty fields by setting <code>.empty</code> to <code>TRUE</code>.</p>
 <p>New fields that currently do not exist in that object can also be
 set. They will be automatically added on the fly.</p>
+<p>Class name matching in <code>:=</code> is <strong>case-insensitive</strong>. For convenience,
+underscore-style class names are also allowed, e.g. <code>material_nomass</code>
+is equivalent to <code>Material:NoMass</code>.</p>
 <p>Field name matching is <strong>case-insensitive</strong>. For convenience,
 underscore-style field names are also allowed, e.g. <code>eNd_MoNtH</code> is
 equivalent to <code>End Month</code>.</p>
