@@ -3040,5 +3040,89 @@ test_that("Transition v24.2 --> v25.1", {
     expect_equal(idfTR$RunPeriod$Annual$value(1)[[1L]], "Annual")
 })
 # }}}
+# v25.1 --> v25.2 {{{
+test_that("Transition v25.1 --> v25.2", {
+    skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
+    from <- "25.1"
+    to <- "25.2"
+
+    expect_s3_class(
+        class = "Idf",
+        idfOri <- temp_idf(from,
+            `Coil:Cooling:WaterToAirHeatPump:EquationFit` = list(
+                "CWAHP", "WaterIn", "WaterOut", "AirIn", "AirOut",
+                "Autosize", "Autosize", "Autosize", "Autosize", 5.0,
+                30, 27, 19, "TotCap", "SensCap", "Power", "PLF"
+            ),
+            `Coil:Heating:DX:VariableSpeed` = list(
+                "HDXVS", "In", "Out", 2, 2, 10000, 1.0, "HPLF",
+                "DefEIR", -20, -5, 5, 0, "CrankCurve", 10, "ReverseCycle", "Timed",
+                0.1, 500,
+                1000, 3.0, 0.5, 773.3, 934.4, "H1-CapFT", "H1-CapFF", "H1-EIRFT",
+                "H1-EIRFF",
+                2000, 3.1, 0.6, 773.3, 934.4, "H2-CapFT", "H2-CapFF", "H2-EIRFT",
+                "H2-EIRFF"
+            ),
+            `AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed` = list(
+                "MSHP", "Sched", "In", "Out", "Zone",
+                "Fan:OnOff", "Fan", "BlowThrough", "FanSch",
+                "Coil:Heating:DX:MultiSpeed", "HCoil", -8.0,
+                "Coil:Cooling:DX:MultiSpeed", "CCoil"
+            ),
+            `GroundHeatExchanger:System` = list(
+                "GHES1", "Inlet", "Outlet", 0.0003,
+                "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                "Vertical Ground Heat Exchanger Ground Temps",
+                0.7, 2347000,
+                "Vertical Ground Heat Exchanger g-functions"
+            ),
+            `GroundHeatExchanger:System` = list(
+                "GHES2", "Inlet", "Outlet", 0.0003,
+                "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                "Vertical Ground Heat Exchanger Ground Temps",
+                0.7, 2347000, NULL,
+                "UHFcalc", "Array1", "Single1"
+            ),
+            `Output:Variable` = list(
+                "*", "Hot Water Thermal Storage Final Tank Temperature"
+            ),
+            .all = FALSE
+        )
+    )
+
+    expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
+    expect_equal(idfTR$version(), numeric_version("25.2.0"))
+
+    expect_true(is.na(idfTR$`Coil:Cooling:WaterToAirHeatPump:EquationFit`$CWAHP$value(2)[[1L]]))
+    expect_equal(idfTR$`Coil:Cooling:WaterToAirHeatPump:EquationFit`$CWAHP$value(3)[[1L]], "WaterIn")
+    expect_equal(idfTR$`Coil:Cooling:WaterToAirHeatPump:EquationFit`$CWAHP$value(18)[[1L]], "PLF")
+
+    expect_true(is.na(idfTR$`Coil:Heating:DX:VariableSpeed`$HDXVS$value(2)[[1L]]))
+    expect_equal(idfTR$`Coil:Heating:DX:VariableSpeed`$HDXVS$value(3)[[1L]], "In")
+    expect_equal(
+        unname(unlist(idfTR$`Coil:Heating:DX:VariableSpeed`$HDXVS$value(c(28:29, 37:38)))),
+        c("H1-EIRFT", "H1-EIRFF", "H2-EIRFT", "H2-EIRFF")
+    )
+
+    expect_true(is.na(idfTR$`AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed`$MSHP$value(12)[[1L]]))
+    expect_equal(
+        idfTR$`AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed`$MSHP$value(13)[[1L]],
+        "Coil:Cooling:DX:MultiSpeed"
+    )
+
+    expect_length(idfTR$`GroundHeatExchanger:System`$GHES1$value(), 9L)
+    expect_true(is.na(idfTR$`GroundHeatExchanger:System`$GHES2$value(11)[[1L]]))
+    expect_true(is.na(idfTR$`GroundHeatExchanger:System`$GHES2$value(12)[[1L]]))
+    expect_equal(idfTR$`GroundHeatExchanger:System`$GHES2$value(13)[[1L]], "Array1")
+    expect_equal(idfTR$`GroundHeatExchanger:System`$GHES2$value(14)[[1L]], "Single1")
+
+    expect_equal(
+        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Hot Water Thermal Storage Tank Final Tank Temperature"
+    )
+})
+# }}}
 
 # vim: set fdm=marker:

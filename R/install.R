@@ -301,16 +301,17 @@ eplus_download_url <- function(ver, portable = FALSE) {
         if (arch == "i386" && os == "windows" && cmt$version %in% "24.2.0") {
             abort("EnergyPlus v24.2.0 does not provide a Windows i386 installer.")
         }
-        if (arch == "i386" && os == "windows" && cmt$version %in% "25.1.0" && !portable) {
-            abort("EnergyPlus v25.1.0 does not provide a Windows i386 non-portable installer.")
+        if (arch == "i386" && os == "windows" && cmt$version %in% c("25.1.0", "25.2.0") && !portable) {
+            abort("EnergyPlus v", cmt$version, " does not provide a Windows i386 non-portable installer.")
         }
     }
 
     # EnergyPlus v9.4 and above provide different installers for various
     # Ubuntu distribution and macOS versions and should be handled differently
     if (os == "windows" || !cmt$version %in% names(ALL_EPLUS_OSVER)) {
-        # no macOS arm64 installer provided for ENergyPlus v9.4 and below
-        if (arch == "arm64") {
+        # no macOS arm64 installer provided for EnergyPlus v9.4 and below.
+        # Windows arm64 installers are available starting from v25.2.0.
+        if (arch == "arm64" && !(os == "windows" && numeric_version(cmt$version) >= "25.2.0")) {
             verbose_info(
                 "EnergyPlus does not provide v", cmt$version, " installer for ",
                 if (ostype == "Darwin") "macOS" else ostype, " arm64 platform. ",

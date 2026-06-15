@@ -4989,6 +4989,51 @@ trans_funs$f2420t2510 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# f2510t2520 {{{
+trans_funs$f2510t2520 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "25.1")
+
+    coil <- c(
+        "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit",
+        "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit",
+        "Coil:Cooling:DX:VariableSpeed",
+        "Coil:Heating:DX:VariableSpeed",
+        "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+        "Coil:Heating:WaterToAirHeatPump:EquationFit",
+        "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+        "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+        "Coil:WaterHeating:AirToWaterHeatPump:Pumped",
+        "Coil:WaterHeating:AirToWaterHeatPump:Wrapped"
+    )
+    target_cls <- c(
+        coil,
+        "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed",
+        "GroundHeatExchanger:System"
+    )
+
+    new_idf <- trans_preprocess(idf, "25.2", target_cls)
+
+    dt1 <- rbindlist(lapply(coil, function(cls) {
+        trans_action(idf, cls, min_fields = 2L, insert = list(2L))
+    }), use.names = TRUE)
+
+    dt2 <- trans_action(idf,
+        "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed",
+        min_fields = 12L,
+        reset = list(12L, NA_character_)
+    )
+
+    dt3 <- trans_action(idf, "GroundHeatExchanger:System", insert = list(11:12))
+
+    dt <- rbindlist(mget(paste0("dt", 1:3)), use.names = TRUE)
+    set(dt, NULL, "field", NA_character_)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class

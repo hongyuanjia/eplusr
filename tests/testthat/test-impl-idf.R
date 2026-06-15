@@ -1027,6 +1027,8 @@ test_that("VALUE DOTS", {
     fld_id <- function(ind) get_idd_field(idd_env, class_name, ind)$field_id
     output_var_ids <- get_idf_object(idd_env, idf_env, "Output:Variable")$object_id
     n_output_var <- length(output_var_ids)
+    first_output_var_id <- output_var_ids[[1L]]
+    output_var_pair_ids <- output_var_ids[1:2]
     output_var_values <- get_idf_value(idd_env, idf_env, "Output:Variable")
 
     # can stop if duplicated class names are given
@@ -1277,127 +1279,127 @@ test_that("VALUE DOTS", {
     ## Obj = list()
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(),
+            .(first_output_var_id) := list(),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27)
+    expect_equal(res$object$object_id, first_output_var_id)
     expect_equal(res$value$field_index, 1:3)
     ## Obj = list(), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(), ..27 = list(),
+            .(first_output_var_id) := list(), .(first_output_var_id) := list(),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27, 2))
+    expect_equal(res$object$object_id, rep(first_output_var_id, 2))
     expect_equal(res$value$field_index, rep(1:3, 2))
 
     ## Obj = list(Fld = Val)
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(key_value = "*"),
+            .(first_output_var_id) := list(key_value = "*"),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27)
+    expect_equal(res$object$object_id, first_output_var_id)
     expect_equal(res$value$field_index, 1)
     ## Obj = list(Fld = Val), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(key_value = "*"), ..27 = list(key_value = "*"),
+            .(first_output_var_id) := list(key_value = "*"), .(first_output_var_id) := list(key_value = "*"),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27, 2))
+    expect_equal(res$object$object_id, rep(first_output_var_id, 2))
     expect_equal(res$value$field_index, rep(1, 2))
 
     ## Obj = list(Fld1 = Val1, Fld2 = Val2)
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(key_value = "*", variable_name = NULL),
+            .(first_output_var_id) := list(key_value = "*", variable_name = NULL),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27)
+    expect_equal(res$object$object_id, first_output_var_id)
     expect_equal(res$value$field_index, 1:2)
     ## Obj = list(Fld1 = Val1, Fld2 = Val2), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            ..27 = list(key_value = "*", variable_name = NULL),
-            ..27 = list(key_value = "*", variable_name = NULL),
+            .(first_output_var_id) := list(key_value = "*", variable_name = NULL),
+            .(first_output_var_id) := list(key_value = "*", variable_name = NULL),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27, 2))
+    expect_equal(res$object$object_id, rep(first_output_var_id, 2))
     expect_equal(res$value$field_index, rep(1:2, 2))
 
     ## c(Obj1, Obj2) := list(Fld = Val)
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = "*"),
+            .(output_var_pair_ids) := list(key_value = "*"),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27:28)
+    expect_equal(res$object$object_id, output_var_pair_ids)
     expect_equal(res$value$field_index, rep(1, 2))
     ## c(Obj1, Obj2) := list(Fld = Val), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = "*"), c(27, 28) := list(key_value = "*"),
+            .(output_var_pair_ids) := list(key_value = "*"), .(output_var_pair_ids) := list(key_value = "*"),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27:28, 2))
+    expect_equal(res$object$object_id, rep(output_var_pair_ids, 2))
     expect_equal(res$value$field_index, rep(1, 2 * 2))
 
     ## c(Obj1, Obj2) := list(Fld1 = Val1, Fld2 = Val2)
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = "*", variable_name = NULL),
+            .(output_var_pair_ids) := list(key_value = "*", variable_name = NULL),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27:28)
+    expect_equal(res$object$object_id, output_var_pair_ids)
     expect_equal(res$value$field_index, rep(1:2, 2))
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = rep("*", 3), variable_name = NULL),
+            .(output_var_pair_ids) := list(key_value = rep("*", 3), variable_name = NULL),
             .scalar = FALSE, .pair = FALSE
         )
     )
-    expect_equal(res$object$object_id, 27:28)
+    expect_equal(res$object$object_id, output_var_pair_ids)
     expect_equal(res$value$field_index, rep(1:2, 2))
     expect_equal(res$value$value_chr, list(rep("*", 3), NA_character_, rep("*", 3), NA_character_))
     ## c(Obj1, Obj2) := list(Fld1 = Val1, Fld2 = Val2), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = "*", variable_name = NULL),
-            c(27, 28) := list(key_value = "*", variable_name = NULL),
+            .(output_var_pair_ids) := list(key_value = "*", variable_name = NULL),
+            .(output_var_pair_ids) := list(key_value = "*", variable_name = NULL),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27:28, 2))
+    expect_equal(res$object$object_id, rep(output_var_pair_ids, 2))
     expect_equal(res$value$field_index, rep(1:2, 2 * 2))
 
     ## c(Obj1, Obj2) := list(Fld1 = c(Val1, Val2), Fld2 = c(Val3, Val4))
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = c("*", "*"), variable_name = c("", "")),
+            .(output_var_pair_ids) := list(key_value = c("*", "*"), variable_name = c("", "")),
             .scalar = FALSE, .pair = TRUE
         )
     )
-    expect_equal(res$object$object_id, 27:28)
+    expect_equal(res$object$object_id, output_var_pair_ids)
     expect_equal(res$value$field_index, rep(1:2, 2))
     ## c(Obj1, Obj2) := list(Fld1 = c(Val1, Val2), Fld2 = c(Val3, Val4)), dup
     expect_type(type = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
-            c(27, 28) := list(key_value = c("*", "*"), variable_name = c("", ""), "hourly"),
-            c(27, 28) := list(key_value = c("*", "*"), variable_name = c("", "")),
+            .(output_var_pair_ids) := list(key_value = c("*", "*"), variable_name = c("", ""), "hourly"),
+            .(output_var_pair_ids) := list(key_value = c("*", "*"), variable_name = c("", "")),
             .scalar = FALSE, .pair = TRUE, .unique = FALSE
         )
     )
-    expect_equal(res$object$object_id, rep(27:28, 2))
+    expect_equal(res$object$object_id, rep(output_var_pair_ids, 2))
     expect_equal(res$value$field_index, c(rep(1:3, 2), rep(1:2, 2)))
 
     # whole game
@@ -2556,11 +2558,11 @@ test_that("to_string", {
     idf_env <- parse_idf_file(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"), LATEST_EPLUS_VER)
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 
-    expect_equal(length(get_idf_string(idd_env, idf_env)), 664)
-    expect_equal(length(get_idf_string(idd_env, idf_env, comment = FALSE)), 571)
+    expect_equal(length(get_idf_string(idd_env, idf_env)), 820)
+    expect_equal(length(get_idf_string(idd_env, idf_env, comment = FALSE)), 727)
 
-    expect_equal(length(get_idf_string(idd_env, idf_env, idf_env$object[0, list(object_id, object_order = integer())], format = "new_top")), 583)
-    expect_equal(length(get_idf_string(idd_env, idf_env, idf_env$object[0, list(object_id, object_order = integer())], format = "new_top", comment = FALSE)), 490)
+    expect_equal(length(get_idf_string(idd_env, idf_env, idf_env$object[0, list(object_id, object_order = integer())], format = "new_top")), 736)
+    expect_equal(length(get_idf_string(idd_env, idf_env, idf_env$object[0, list(object_id, object_order = integer())], format = "new_top", comment = FALSE)), 643)
 
     expect_equal(length(get_idf_string(idd_env, idf_env, class = "Version")), 97)
     expect_equal(length(get_idf_string(idd_env, idf_env, class = "Version", comment = FALSE)), 12)
