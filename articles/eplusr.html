@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9007</span>
       </span>
     </div>
 
@@ -805,21 +805,31 @@ contains data presenting such relation above.</p>
 <span><span class="co">#&gt; $`Material:NoMass`</span></span>
 <span><span class="co">#&gt; [1] "CP01"        "MAT-SB-U"    "MAT-CLNG-1"  "MAT-FLOOR-1"</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"mat-clng-1"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
-<span><span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span></span>
-<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
-<span><span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
-<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16525           2</span></span>
+<span><span class="co">#&gt;       field_name value_id  value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer      634 MAT-CLNG-1        NA         5           57</span></span>
+<span><span class="co">#&gt;     src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;             &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12600               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          542    MAT-CLNG-1            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span></code></pre></div>
 <p>Above shows that no-mass material <code>MAT-CLNG-1</code> is used at
 the outside layer of a construction named <code>CLNG-1</code>. You can
 extract both of them using <code>$objects_in_relation()</code>.</p>
@@ -1171,21 +1181,31 @@ objects, the corresponding fields will also be updated.</p>
 <code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">Material</span><span class="op">$</span><span class="va">CC03</span></span>
 <span></span>
 <span><span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:52] &lt;CC03&gt;</span></span>
-<span><span class="co">#&gt;      └─ 1: "CC03";        !- Name</span></span>
-<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span></span>
-<span><span class="co">#&gt;               └─ 2: "CC03";        !- Outside Layer</span></span>
-<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id  object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16525           2</span></span>
+<span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer      636      CC03        NA         5           56</span></span>
+<span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       Material            52            CC03        12591               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          521          CC03            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span>
 <span></span>
 <span><span class="va">mat</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"CC03_renamed"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'Material'&gt; [ID:52] `CC03_renamed`</span></span>
@@ -1201,44 +1221,53 @@ objects, the corresponding fields will also be updated.</p>
 <span><span class="co">#&gt; └─ 9 : 0.65;           !- Visible Absorptance</span></span>
 <span></span>
 <span><span class="va">mat</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="st">"Name"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:52] &lt;CC03_renamed&gt;</span></span>
-<span><span class="co">#&gt;      └─ 1: "CC03_renamed";!- Name</span></span>
-<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;            └─ Object [ID:69] &lt;FLOOR-SLAB-1&gt;</span></span>
-<span><span class="co">#&gt;               └─ 2: "CC03_renamed";!- Outside Layer</span></span>
-<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id  object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        69 FLOOR-SLAB-1    16525           2</span></span>
+<span><span class="co">#&gt;       field_name value_id    value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;       &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer      636 CC03_renamed        NA         5           56</span></span>
+<span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       Material            52    CC03_renamed        12591               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          521  CC03_renamed            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span></code></pre></div>
 <p>Sometimes, you may want to get all possible values of fields before
 you change them. You can achieve that by using
 <code>$value_possible()</code> method in <code>IdfObject</code>
 class.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── 2: Roughness ────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; * Auto value: &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; * Default: &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; * Choice:</span></span>
-<span><span class="co">#&gt;   - "VeryRough"</span></span>
-<span><span class="co">#&gt;   - "Rough"</span></span>
-<span><span class="co">#&gt;   - "MediumRough"</span></span>
-<span><span class="co">#&gt;   - "MediumSmooth"</span></span>
-<span><span class="co">#&gt;   - "Smooth"</span></span>
-<span><span class="co">#&gt;   - "......"</span></span>
-<span><span class="co">#&gt; * Source: &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── 7: Thermal Absorptance ──────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; * Auto value: &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; * Default: 0.9</span></span>
-<span><span class="co">#&gt; * Choice: &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; * Source: &lt;NA&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;    class_id class_name object_id  object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;     &lt;char&gt;     &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       56   Material        52 CC03_renamed    12592           2</span></span>
+<span><span class="co">#&gt; 2:       56   Material        52 CC03_renamed    12597           7</span></span>
+<span><span class="co">#&gt;             field_name value_id   value_chr value_num   auto default</span></span>
+<span><span class="co">#&gt;                 &lt;char&gt;    &lt;int&gt;      &lt;char&gt;     &lt;num&gt; &lt;char&gt;  &lt;list&gt;</span></span>
+<span><span class="co">#&gt; 1:           Roughness      522 MediumRough        NA   &lt;NA&gt;      NA</span></span>
+<span><span class="co">#&gt; 2: Thermal Absorptance      527         0.9       0.9   &lt;NA&gt;     0.9</span></span>
+<span><span class="co">#&gt;                                                        choice            range</span></span>
+<span><span class="co">#&gt;                                                        &lt;list&gt;           &lt;list&gt;</span></span>
+<span><span class="co">#&gt; 1: VeryRough,Rough,MediumRough,MediumSmooth,Smooth,VerySmooth &lt;Not Applicable&gt;</span></span>
+<span><span class="co">#&gt; 2:                                                     [NULL]     (0, 0.99999]</span></span>
+<span><span class="co">#&gt;    source</span></span>
+<span><span class="co">#&gt;    &lt;list&gt;</span></span>
+<span><span class="co">#&gt; 1: [NULL]</span></span>
+<span><span class="co">#&gt; 2: [NULL]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="insert-objects-from-another-idf-idfinsert">Insert objects from another IDF (<code>Idf$insert()</code>)<a class="anchor" aria-label="anchor" href="#insert-objects-from-another-idf-idfinsert"></a>
@@ -1319,55 +1348,72 @@ character vectors or data.frames to load new objects.</p>
 or modified.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const1"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:349] &lt;new_const1&gt;</span></span>
-<span><span class="co">#&gt;      └─ 2: "WD10";        !- Outside Layer</span></span>
-<span><span class="co">#&gt;         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;         └─ Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;            └─ Object [ID:43] &lt;WD10&gt;</span></span>
-<span><span class="co">#&gt;               └─ 1: "WD10";        !- Name</span></span>
-<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction       349  new_const1    16525           2</span></span>
+<span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer     3808      WD10        NA         5           56</span></span>
+<span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       Material            43            WD10        12591               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          440          WD10            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) is not referred by any other field.</span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">object_relation</span><span class="op">(</span><span class="st">"new_const2"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:350] &lt;new_const2&gt;</span></span>
-<span><span class="co">#&gt;     ├─ 2: "RG01",        !- Outside Layer</span></span>
-<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;     │     └─ Object [ID:44] &lt;RG01&gt;</span></span>
-<span><span class="co">#&gt;     │        └─ 1: "RG01";        !- Name</span></span>
-<span><span class="co">#&gt;     │  </span></span>
-<span><span class="co">#&gt;     ├─ 3: "BR01",        !- Layer 2</span></span>
-<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;     │     └─ Object [ID:45] &lt;BR01&gt;</span></span>
-<span><span class="co">#&gt;     │        └─ 1: "BR01";        !- Name</span></span>
-<span><span class="co">#&gt;     │  </span></span>
-<span><span class="co">#&gt;     ├─ 4: "IN46",        !- Layer 3</span></span>
-<span><span class="co">#&gt;     │  v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;     │  └─ Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;     │     └─ Object [ID:46] &lt;IN46&gt;</span></span>
-<span><span class="co">#&gt;     │        └─ 1: "IN46";        !- Name</span></span>
-<span><span class="co">#&gt;     │  </span></span>
-<span><span class="co">#&gt;     └─ 5: "WD01";        !- Layer 4</span></span>
-<span><span class="co">#&gt;        v~~~~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;        └─ Class: &lt;Material&gt;</span></span>
-<span><span class="co">#&gt;           └─ Object [ID:47] &lt;WD01&gt;</span></span>
-<span><span class="co">#&gt;              └─ 1: "WD01";        !- Name</span></span>
-<span><span class="co">#&gt;        </span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction       350  new_const2    16525           2</span></span>
+<span><span class="co">#&gt; 2:       92 Construction       350  new_const2    16526           3</span></span>
+<span><span class="co">#&gt; 3:       92 Construction       350  new_const2    16527           4</span></span>
+<span><span class="co">#&gt; 4:       92 Construction       350  new_const2    16528           5</span></span>
+<span><span class="co">#&gt;       field_name value_id value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;    &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer     3810      RG01        NA         5           56</span></span>
+<span><span class="co">#&gt; 2:       Layer 2     3811      BR01        NA         5           56</span></span>
+<span><span class="co">#&gt; 3:       Layer 3     3812      IN46        NA         5           56</span></span>
+<span><span class="co">#&gt; 4:       Layer 4     3813      WD01        NA         5           56</span></span>
+<span><span class="co">#&gt;    src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       Material            44            RG01        12591               1</span></span>
+<span><span class="co">#&gt; 2:       Material            45            BR01        12591               1</span></span>
+<span><span class="co">#&gt; 3:       Material            46            IN46        12591               1</span></span>
+<span><span class="co">#&gt; 4:       Material            47            WD01        12591               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          449          RG01            NA             4</span></span>
+<span><span class="co">#&gt; 2:           Name          458          BR01            NA             4</span></span>
+<span><span class="co">#&gt; 3:           Name          467          IN46            NA             4</span></span>
+<span><span class="co">#&gt; 4:           Name          476          WD01            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
+<span><span class="co">#&gt; 2:        2     0</span></span>
+<span><span class="co">#&gt; 3:        2     0</span></span>
+<span><span class="co">#&gt; 4:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) is not referred by any other field.</span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="update-objects-using-characters-or-data-frames-idfupdate">Update objects using characters or data.frames
@@ -1416,21 +1462,31 @@ names. For example, in current model, there is a material named
 see if it has been referred by other objects.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="va">Material_NoMass</span><span class="op">$</span><span class="va">`MAT-CLNG-1`</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Refer to Others ─────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) does not refer to any other field.</span></span>
+<span><span class="co">#&gt; $ref_to</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Referred by Others ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;  Class: &lt;Material:NoMass&gt;</span></span>
-<span><span class="co">#&gt;  └─ Object [ID:55] &lt;MAT-CLNG-1&gt;</span></span>
-<span><span class="co">#&gt;      └─ 1: "MAT-CLNG-1";  !- Name</span></span>
-<span><span class="co">#&gt;         ^~~~~~~~~~~~~~~~~~~~~~~~~</span></span>
-<span><span class="co">#&gt;         └─ Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;            └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
-<span><span class="co">#&gt;               └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
-<span><span class="co">#&gt;     </span></span>
+<span><span class="co">#&gt; $ref_by</span></span>
+<span><span class="co">#&gt;    class_id   class_name object_id object_name field_id field_index</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;       &lt;char&gt;     &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:       92 Construction        68      CLNG-1    16525           2</span></span>
+<span><span class="co">#&gt;       field_name value_id  value_chr value_num type_enum src_class_id</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;     &lt;int&gt;        &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer      634 MAT-CLNG-1        NA         5           57</span></span>
+<span><span class="co">#&gt;     src_class_name src_object_id src_object_name src_field_id src_field_index</span></span>
+<span><span class="co">#&gt;             &lt;char&gt;         &lt;int&gt;          &lt;char&gt;        &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: Material:NoMass            55      MAT-CLNG-1        12600               1</span></span>
+<span><span class="co">#&gt;    src_field_name src_value_id src_value_chr src_value_num src_type_enum</span></span>
+<span><span class="co">#&gt;            &lt;char&gt;        &lt;int&gt;        &lt;char&gt;         &lt;num&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:           Name          542    MAT-CLNG-1            NA             4</span></span>
+<span><span class="co">#&gt;    src_enum   dep</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        2     0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Node Relation ───────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Target(s) has no node or their nodes have no reference to other object.</span></span></code></pre></div>
+<span><span class="co">#&gt; $node</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 24 cols): class_id,class_name,object_id,object_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfRelation" "list"</span></span></code></pre></div>
 <p>As we can see, <code>MAT-CLNG-1</code> has been referred by a
 construction named <code>"CLNG-1"</code>.</p>
 <p>First, let’s try to direct delete Material
@@ -1579,16 +1635,52 @@ on. We can just trigger invalid reference checking using
 <code><a href="../reference/custom_validate.html">custom_validate()</a></code> function.</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu"><a href="../reference/custom_validate.html">custom_validate</a></span><span class="op">(</span>reference <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
-<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; $missing_object</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── [1] Invalid Reference ─────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;    Fields below are not one of valid references:</span></span>
+<span><span class="co">#&gt; $duplicate_object</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     Class: &lt;Construction&gt;</span></span>
-<span><span class="co">#&gt;     └─ Object [ID:68] &lt;CLNG-1&gt;</span></span>
-<span><span class="co">#&gt;        └─ 2: "MAT-CLNG-1";  !- Outside Layer</span></span>
-<span><span class="co">#&gt; </span></span></code></pre></div>
+<span><span class="co">#&gt; $conflict_name</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $incomplete_extensible</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $missing_value</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_autosize</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_autocalculate</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_character</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_numeric</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_integer</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_choice</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_range</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 13 cols): object_id,object_name,class_id,class_name,field_id,field_index...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $invalid_reference</span></span>
+<span><span class="co">#&gt;    object_id object_name class_id   class_name field_id field_index</span></span>
+<span><span class="co">#&gt;        &lt;int&gt;      &lt;char&gt;    &lt;int&gt;       &lt;char&gt;    &lt;int&gt;       &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:        68      CLNG-1       92 Construction    16525           2</span></span>
+<span><span class="co">#&gt;       field_name  units ip_units type_enum value_id  value_chr value_num</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt;   &lt;char&gt;     &lt;int&gt;    &lt;int&gt;     &lt;char&gt;     &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: Outside Layer   &lt;NA&gt;     &lt;NA&gt;         5      634 MAT-CLNG-1        NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "IdfValidity" "list"</span></span></code></pre></div>
 <p>As we can see, the invalid reference in construction
 <code>CLNG-1</code> is successfully detected.</p>
 <p>In this example, we already knows that <code>CLNG-1</code> is the
@@ -1639,10 +1731,10 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpnfKOhH/file25c65f8167d8.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpPtvD0z/file25b07f3a63a1.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpnfKOhH/file25c65f8167d8.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; Replace the existing IDF located at /tmp/RtmpPtvD0z/file25b07f3a63a1.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
