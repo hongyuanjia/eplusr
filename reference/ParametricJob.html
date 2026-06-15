@@ -26,7 +26,7 @@ For details on ParametricJob, please see ParametricJob class."><meta property="o
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9008</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9009</span>
       </span>
     </div>
 
@@ -162,6 +162,7 @@ if it does not exists, like <a href="Idf.html">Idf</a> class does.</p>
 <li><p><a href="#method-ParametricJob-version"><code>ParametricJob$version()</code></a></p></li>
 <li><p><a href="#method-ParametricJob-seed"><code>ParametricJob$seed()</code></a></p></li>
 <li><p><a href="#method-ParametricJob-weather"><code>ParametricJob$weather()</code></a></p></li>
+<li><p><a href="#method-ParametricJob-weathers"><code>ParametricJob$weathers()</code></a></p></li>
 <li><p><a href="#method-ParametricJob-param"><code>ParametricJob$param()</code></a></p></li>
 <li><p><a href="#method-ParametricJob-apply_measure"><code>ParametricJob$apply_measure()</code></a></p></li>
 <li><p><a href="#method-ParametricJob-models"><code>ParametricJob$models()</code></a></p></li>
@@ -312,15 +313,62 @@ param$weather()
 </div>
 
 
-</div><p></p><hr><a id="method-ParametricJob-param"></a><div class="section">
-<h3 id="method-param-">Method <code>param()</code><a class="anchor" aria-label="anchor" href="#method-param-"></a></h3>
-<p>Set parameters for parametric simulations</p><div class="section">
+</div><p></p><hr><a id="method-ParametricJob-weathers"></a><div class="section">
+<h3 id="method-weathers-">Method <code>weathers()</code><a class="anchor" aria-label="anchor" href="#method-weathers-"></a></h3>
+<p>Get or set weather cases</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span><span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span>, .cross <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">weathers</span><span class="op">(</span><span class="va">epws</span>, names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>epws</code></dt>
+<dd><p>A path, a character vector of paths, an <a href="Epw.html">Epw</a> object, or a
+list of paths and <a href="Epw.html">Epw</a> objects. <code>NULL</code> or <code>NA</code> entries indicate
+design-day-only weather cases. If missing, the current weather case
+table is returned.</p></dd>
+
+
+<dt><code>names</code></dt>
+<dd><p>Optional weather case names. If <code>NULL</code>, names are taken
+from <code>epws</code>, file names, or <code>"design_day"</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details-3">Details<a class="anchor" aria-label="anchor" href="#details-3"></a></h4>
+<p><code>$weathers()</code> returns the current weather case table. <code>$weathers(epws)</code>
+replaces the weather cases and rebuilds the actual run cases used by
+<code>$run()</code>, <code>$save()</code> and <code>$cases(type = "run")</code>. Existing generated
+parametric models are kept.</p>
+</div>
+
+<div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p>If <code>epws</code> is missing, a <code><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table()</a></code>. Otherwise,
+the modified <code>ParametricJob</code> object invisibly.</p>
+</div>
+<div class="section">
+<h4 id="examples-4">Examples<a class="anchor" aria-label="anchor" href="#examples-4"></a></h4>
+<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
+param$weathers()
+param$weathers(c(sf = "USA_CA_San.Francisco.epw", golden = "USA_CO_Golden.epw"))
+}
+
+</code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-ParametricJob-param"></a><div class="section">
+<h3 id="method-param-">Method <code>param()</code><a class="anchor" aria-label="anchor" href="#method-param-"></a></h3>
+<p>Set parameters for parametric simulations</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">param</span><span class="op">(</span><span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span>, .cross <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Lists of parameter definitions. Please see above on the
 syntax.</p></dd>
@@ -341,7 +389,7 @@ the same length of values. Default: <code>FALSE</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-3">Details<a class="anchor" aria-label="anchor" href="#details-3"></a></h4>
+<h4 id="details-4">Details<a class="anchor" aria-label="anchor" href="#details-4"></a></h4>
 <p><code>$param()</code> takes parameter definitions in list format, which is
 similar to <a href="Idf.html">Idf$set()</a> except that each field is not assigned
 with a single value, but a vector of any length, indicating the
@@ -378,11 +426,11 @@ levels being 0.1 to 1.0 W/m-K with a 0.1 W/m-K step.</p></li>
 </div>
 
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>The modified <code>ParametricJob</code> object invisibly.</p>
 </div>
 <div class="section">
-<h4 id="examples-4">Examples<a class="anchor" aria-label="anchor" href="#examples-4"></a></h4>
+<h4 id="examples-5">Examples<a class="anchor" aria-label="anchor" href="#examples-5"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 
 param$param(
@@ -429,12 +477,12 @@ param$param(
 </div><p></p><hr><a id="method-ParametricJob-apply_measure"></a><div class="section">
 <h3 id="method-apply-measure-">Method <code>apply_measure()</code><a class="anchor" aria-label="anchor" href="#method-apply-measure-"></a></h3>
 <p>Create parametric models</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">apply_measure</span><span class="op">(</span><span class="va">measure</span>, <span class="va">...</span>, .names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>measure</code></dt>
 <dd><p>A function that takes an <code>Idf</code> and other arguments as
 input and returns an <a href="Idf.html">Idf</a> object as output.</p></dd>
@@ -454,7 +502,7 @@ If <code>NULL</code>, the new <code>Idf</code>s will be named in format
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-4">Details<a class="anchor" aria-label="anchor" href="#details-4"></a></h4>
+<h4 id="details-5">Details<a class="anchor" aria-label="anchor" href="#details-5"></a></h4>
 <p><code>$apply_measure()</code> allows to apply a measure to an <a href="Idf.html">Idf</a> and creates
 parametric models for analysis. Basically, a measure is just a
 function that takes an <a href="Idf.html">Idf</a> object and other argument input, argument
@@ -465,11 +513,11 @@ measure. Under the hook, <code><a href="https://rdrr.io/r/base/mapply.html" clas
 </div>
 
 <div class="section">
-<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p>The modified <code>ParametricJob</code> object itself, invisibly.</p>
 </div>
 <div class="section">
-<h4 id="examples-5">Examples<a class="anchor" aria-label="anchor" href="#examples-5"></a></h4>
+<h4 id="examples-6">Examples<a class="anchor" aria-label="anchor" href="#examples-6"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # create a measure to change the orientation of the building
 rotate_building &lt;- function(idf, degree = 0L) {
@@ -519,12 +567,12 @@ param$apply_measure(rotate_building, degree = seq(30, 360, 30),
 </div><p></p><hr><a id="method-ParametricJob-models"></a><div class="section">
 <h3 id="method-models-">Method <code>models()</code><a class="anchor" aria-label="anchor" href="#method-models-"></a></h3>
 <p>Get created parametric <a href="Idf.html">Idf</a> objects</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">models</span><span class="op">(</span>names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>names</code></dt>
 <dd><p>A character vector of new names for parametric models.
 If a single string, it will be used as a prefix and all models
@@ -536,7 +584,7 @@ returned. Default: <code>NULL</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-5">Details<a class="anchor" aria-label="anchor" href="#details-5"></a></h4>
+<h4 id="details-6">Details<a class="anchor" aria-label="anchor" href="#details-6"></a></h4>
 <p><code>$models()</code> returns a list of parametric models generated using input
 <a href="Idf.html">Idf</a> object and
 <a href="../../eplusr/html/ParametricJob.html#method-apply_measure"><code>$apply_measure()</code></a>
@@ -550,7 +598,7 @@ for <code>$run()</code> or <code>$save()</code>.</p>
 </div>
 
 <div class="section">
-<h4 id="examples-6">Examples<a class="anchor" aria-label="anchor" href="#examples-6"></a></h4>
+<h4 id="examples-7">Examples<a class="anchor" aria-label="anchor" href="#examples-7"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 param$models()
 }
@@ -561,16 +609,28 @@ param$models()
 
 </div><p></p><hr><a id="method-ParametricJob-cases"></a><div class="section">
 <h3 id="method-cases-">Method <code>cases()</code><a class="anchor" aria-label="anchor" href="#method-cases-"></a></h3>
-<p>Get a summary of parametric models and parameters</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p>Get a summary of parametric or run cases</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">cases</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"run"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="details-6">Details<a class="anchor" aria-label="anchor" href="#details-6"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>type</code></dt>
+<dd><p><code>"model"</code> returns parameter model cases and preserves the
+historical <code>$cases()</code> behavior. <code>"run"</code> returns the actual simulation
+cases. Default: <code>"model"</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details-7">Details<a class="anchor" aria-label="anchor" href="#details-7"></a></h4>
 <p><code>$cases()</code> returns a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a> giving a
-summary of parametric models and parameter values.</p>
-<p>The returned <code>data.table</code> has the following columns:</p><ul><li><p><code>index</code>: Integer type. The indices of parameter models</p></li>
+summary of parametric models and parameter values. With
+<code>type = "run"</code>, it returns the actual simulation case table created
+from parametric model cases and weather cases.</p>
+<p>The model case <code>data.table</code> has the following columns:</p><ul><li><p><code>index</code>: Integer type. The indices of parameter models</p></li>
 <li><p><code>case</code>: Character type. The names of parameter models</p></li>
 <li><p>Parameters: Type depends on the parameter values. Each parameter
 stands in a separate column. For parametric models created using
@@ -578,15 +638,23 @@ stands in a separate column. For parametric models created using
 you specified in <code>.names</code>. For the case of
 <code>ParametricJob$apply_measure()</code>, this will be the argument names of
 the measure functions.</p></li>
+</ul><p>The run case <code>data.table</code> has the following columns:</p><ul><li><p><code>index</code>: Integer type. The indices of actual simulations</p></li>
+<li><p><code>case</code>: Character type. The names of actual simulations</p></li>
+<li><p><code>model_index</code>: Integer type. The indices of parameter models</p></li>
+<li><p><code>model_case</code>: Character type. The names of parameter models</p></li>
+<li><p><code>weather_index</code>: Integer type. The indices of weather cases</p></li>
+<li><p><code>weather_case</code>: Character type. The names of weather cases</p></li>
+<li><p><code>epw</code>: Character type. The paths of weather files. <code>NA</code> means
+design-day-only simulation.</p></li>
 </ul></div>
 
 <div class="section">
-<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
-<p>If no parametric models have been created, <code>NULL</code> is
-returned. Otherwise, a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a>.</p>
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<p>If no corresponding cases exist, <code>NULL</code> is returned.
+Otherwise, a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a>.</p>
 </div>
 <div class="section">
-<h4 id="examples-7">Examples<a class="anchor" aria-label="anchor" href="#examples-7"></a></h4>
+<h4 id="examples-8">Examples<a class="anchor" aria-label="anchor" href="#examples-8"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 param$cases()
 }
@@ -598,12 +666,12 @@ param$cases()
 </div><p></p><hr><a id="method-ParametricJob-save"></a><div class="section">
 <h3 id="method-save-">Method <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code><a class="anchor" aria-label="anchor" href="#method-save-"></a></h3>
 <p>Save parametric models</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>dir <span class="op">=</span> <span class="cn">NULL</span>, separate <span class="op">=</span> <span class="cn">TRUE</span>, copy_external <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir</code></dt>
 <dd><p>The parent output directory for models to be saved. If
 <code>NULL</code>, the directory of the seed model will be used. Default:
@@ -627,18 +695,18 @@ file paths in the Idf will be changed automatically.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-7">Details<a class="anchor" aria-label="anchor" href="#details-7"></a></h4>
+<h4 id="details-8">Details<a class="anchor" aria-label="anchor" href="#details-8"></a></h4>
 <p><code>$save()</code> saves all parametric models in specified folder. An error
 will be issued if no measure has been applied.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>A <code><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table()</a></code> with two columns:</p><ul><li><p>model: The path of saved parametric model files.</p></li>
 <li><p>weather: The path of saved weather files.</p></li>
 </ul></div>
 <div class="section">
-<h4 id="examples-8">Examples<a class="anchor" aria-label="anchor" href="#examples-8"></a></h4>
+<h4 id="examples-9">Examples<a class="anchor" aria-label="anchor" href="#examples-9"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # save all parametric models with each model in a separate folder
 param$save(tempdir())
@@ -654,7 +722,7 @@ param$save(tempdir(), separate = FALSE)
 </div><p></p><hr><a id="method-ParametricJob-run"></a><div class="section">
 <h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
 <p>Run parametric simulations</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span></span>
 <span>  dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -667,7 +735,7 @@ param$save(tempdir(), separate = FALSE)
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir</code></dt>
 <dd><p>The parent output directory for specified simulations.
 Outputs of each simulation are placed in a separate folder
@@ -721,7 +789,7 @@ hundreds of output variables or meters. Default: <code>TRUE</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-8">Details<a class="anchor" aria-label="anchor" href="#details-8"></a></h4>
+<h4 id="details-9">Details<a class="anchor" aria-label="anchor" href="#details-9"></a></h4>
 <p><code>$run()</code> runs all parametric simulations in parallel. The number of
 parallel EnergyPlus process can be controlled by
 <code>eplusr_option("num_parallel")</code>. If <code>wait</code> is FALSE, then the job
@@ -730,11 +798,11 @@ printing the <code>ParametricJob</code> object.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
+<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
 <p>The <code>ParametricJob</code> object itself, invisibly.</p>
 </div>
 <div class="section">
-<h4 id="examples-9">Examples<a class="anchor" aria-label="anchor" href="#examples-9"></a></h4>
+<h4 id="examples-10">Examples<a class="anchor" aria-label="anchor" href="#examples-10"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # run parametric simulations
 param$run(wait = TRUE, echo = FALSE)
@@ -752,12 +820,12 @@ print(param)
 </div><p></p><hr><a id="method-ParametricJob-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print <code>ParametricJob</code> object</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ParametricJob</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="details-9">Details<a class="anchor" aria-label="anchor" href="#details-9"></a></h4>
+<h4 id="details-10">Details<a class="anchor" aria-label="anchor" href="#details-10"></a></h4>
 <p><code>$print()</code> shows the core information of this <code>ParametricJob</code>,
 including the path of IDFs and EPWs and also the simulation job
 status.</p>
@@ -767,11 +835,11 @@ and printed whenever <code>$print()</code> is called.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
+<h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
 <p>The <code>ParametricJob</code> object itself, invisibly.</p>
 </div>
 <div class="section">
-<h4 id="examples-10">Examples<a class="anchor" aria-label="anchor" href="#examples-10"></a></h4>
+<h4 id="examples-11">Examples<a class="anchor" aria-label="anchor" href="#examples-11"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 param$print()
 
@@ -833,6 +901,16 @@ param$print()
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">weather</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `ParametricJob$weathers`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">weathers</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">param</span><span class="op">$</span><span class="fu">weathers</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sf <span class="op">=</span> <span class="st">"USA_CA_San.Francisco.epw"</span>, golden <span class="op">=</span> <span class="st">"USA_CO_Golden.epw"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
