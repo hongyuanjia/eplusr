@@ -5034,6 +5034,36 @@ trans_funs$f2510t2520 <- function(idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# f2520t2610 {{{
+trans_funs$f2520t2610 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "25.2")
+
+    target_cls <- c(
+        "AirTerminal:SingleDuct:ParallelPIU:Reheat",
+        "AirTerminal:SingleDuct:SeriesPIU:Reheat"
+    )
+
+    new_idf <- trans_preprocess(idf, "26.1", target_cls)
+
+    delete_shift <- function(dt, drop_index) {
+        if (!nrow(dt)) return(dt)
+
+        dt <- dt[!J(drop_index), on = "index"]
+        dt[index > drop_index, index := index - 1L]
+        dt
+    }
+
+    dt1 <- delete_shift(trans_action(idf, "AirTerminal:SingleDuct:ParallelPIU:Reheat"), 10L)
+    dt2 <- delete_shift(trans_action(idf, "AirTerminal:SingleDuct:SeriesPIU:Reheat"), 9L)
+
+    dt <- rbindlist(mget(paste0("dt", 1:2)), use.names = TRUE)
+    set(dt, NULL, "field", NA_character_)
+
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
