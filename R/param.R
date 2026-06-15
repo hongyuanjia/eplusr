@@ -61,7 +61,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$unsaved <- logical()
 
-            if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
+            private$m_weather_cases <- param_weather_cases(epw)
+            param_refresh_run_cases(private)
 
             # save uuid
             private$log_seed_uuid()
@@ -126,6 +127,36 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         weather = function()
             param_weather(self, private),
+        # }}}
+
+        # weathers {{{
+        #' @description
+        #' Get or set weather cases
+        #'
+        #' @details
+        #' `$weathers()` returns the current weather case table. `$weathers(epws)`
+        #' replaces the weather cases and rebuilds the actual run cases used by
+        #' `$run()`, `$save()` and `$cases(type = "run")`. Existing generated
+        #' parametric models are kept.
+        #'
+        #' @param epws A path, a character vector of paths, an [Epw] object, or a
+        #'   list of paths and [Epw] objects. `NULL` or `NA` entries indicate
+        #'   design-day-only weather cases. If missing, the current weather case
+        #'   table is returned.
+        #' @param names Optional weather case names. If `NULL`, names are taken
+        #'   from `epws`, file names, or `"design_day"`.
+        #'
+        #' @return If `epws` is missing, a [data.table::data.table()]. Otherwise,
+        #'   the modified `ParametricJob` object invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' param$weathers()
+        #' param$weathers(c(sf = "USA_CA_San.Francisco.epw", golden = "USA_CO_Golden.epw"))
+        #' }
+        #'
+        weathers = function(epws, names = NULL)
+            param_weathers(self, private, epws, names),
         # }}}
 
         # param {{{
@@ -335,13 +366,15 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
         # cases {{{
         #' @description
-        #' Get a summary of parametric models and parameters
+        #' Get a summary of parametric or run cases
         #'
         #' @details
         #' `$cases()` returns a [data.table][data.table::data.table()] giving a
-        #' summary of parametric models and parameter values.
+        #' summary of parametric models and parameter values. With
+        #' `type = "run"`, it returns the actual simulation case table created
+        #' from parametric model cases and weather cases.
         #'
-        #' The returned `data.table` has the following columns:
+        #' The model case `data.table` has the following columns:
         #'
         #' * `index`: Integer type. The indices of parameter models
         #' * `case`: Character type. The names of parameter models
@@ -352,16 +385,31 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'   `ParametricJob$apply_measure()`, this will be the argument names of
         #'   the measure functions.
         #'
-        #' @return If no parametric models have been created, `NULL` is
-        #' returned. Otherwise, a [data.table][data.table::data.table()].
+        #' The run case `data.table` has the following columns:
+        #'
+        #' * `index`: Integer type. The indices of actual simulations
+        #' * `case`: Character type. The names of actual simulations
+        #' * `model_index`: Integer type. The indices of parameter models
+        #' * `model_case`: Character type. The names of parameter models
+        #' * `weather_index`: Integer type. The indices of weather cases
+        #' * `weather_case`: Character type. The names of weather cases
+        #' * `epw`: Character type. The paths of weather files. `NA` means
+        #'   design-day-only simulation.
+        #'
+        #' @param type `"model"` returns parameter model cases and preserves the
+        #'   historical `$cases()` behavior. `"run"` returns the actual simulation
+        #'   cases. Default: `"model"`.
+        #'
+        #' @return If no corresponding cases exist, `NULL` is returned.
+        #'   Otherwise, a [data.table][data.table::data.table()].
         #'
         #' @examples
         #' \dontrun{
         #' param$cases()
         #' }
         #'
-        cases = function()
-            param_cases(self, private),
+        cases = function(type = c("model", "run"))
+            param_cases(self, private, type),
         # }}}
 
         # save {{{
@@ -492,6 +540,13 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
     ),
 
     private = list(
+        # PRIVATE FIELDS {{{
+        m_model_case_ids = integer(),
+        m_model_case_names = character(),
+        m_weather_cases = NULL,
+        m_run_cases = NULL,
+        # }}}
+
         # PRIVATE FUNCTIONS {{{
         seed_uuid = function() private$m_model_store$model_signature(private$m_model_store$seed_model_id()),
         log_seed_uuid = function() private$m_log$seed_uuid <- private$seed_uuid(),
@@ -532,8 +587,14 @@ param_seed <- function(self, private, new) {
         return(private$m_model_store$load_seed())
     }
 
+    param_assert_not_running(private)
     private$m_model_store$set_seed(new)
-    private$m_log$unsaved <- rep(FALSE, private$m_model_store$case_count())
+    if (!length(private$m_model_case_ids)) {
+        param_refresh_run_cases(private)
+    } else {
+        private$m_run_cases <- NULL
+    }
+    param_clear_run_state(private, new_uuid = FALSE)
     private$log_seed_uuid()
     private$log_new_uuid()
     invisible(self)
@@ -542,7 +603,7 @@ param_seed <- function(self, private, new) {
 # param_models {{{
 param_models <- function(self, private, names = NULL) {
     assert_character(names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
-    if (!private$m_model_store$has_cases()) {
+    if (!length(private$m_model_case_ids)) {
         verbose_info("No parametric models have been created.")
         if (!is.null(names)) {
             verbose_info("Nothing to rename.")
@@ -553,20 +614,63 @@ param_models <- function(self, private, names = NULL) {
     private$m_model_store$assert_cases_valid()
 
     if (length(names)) {
-        private$m_model_store$rename_cases(names)
+        private$m_model_case_names <- param_normalize_case_names(
+            names, length(private$m_model_case_ids), "parametric model"
+        )
+        param_refresh_run_cases(private)
+        param_clear_run_state(private)
     }
 
-    private$m_model_store$load_cases()
+    out <- lapply(private$m_model_case_ids, private$m_model_store$load_model)
+    names(out) <- private$m_model_case_names
+    out
 }
 # }}}
 # param_weather {{{
 param_weather <- function(self, private) {
-    if (is.null(private$m_epws_path)) NULL else read_epw(private$m_epws_path)
+    weather <- private$m_weather_cases
+    if (is.null(weather) || !nrow(weather)) return(NULL)
+    has_epw <- !is.na(weather$epw)
+    if (!any(has_epw)) return(NULL)
+
+    paths <- weather$epw[has_epw]
+    if (length(paths) == 1L && nrow(weather) == 1L) return(read_epw(paths[[1L]]))
+
+    out <- lapply(weather$epw, function(path) {
+        if (is.na(path)) NULL else read_epw(path)
+    })
+    names(out) <- weather$weather_case
+    out
+}
+# }}}
+# param_weathers {{{
+param_weathers <- function(self, private, epws, names = NULL) {
+    if (missing(epws)) {
+        return(data.table::copy(private$m_weather_cases))
+    }
+
+    param_assert_not_running(private)
+    private$m_weather_cases <- param_weather_cases(epws, names)
+    param_refresh_run_cases(private)
+    param_clear_run_state(private)
+
+    invisible(self)
 }
 # }}}
 # param_cases {{{
-param_cases <- function(self, private, param = NULL) {
-    if (!private$m_model_store$has_cases()) {
+param_cases <- function(self, private, type = c("model", "run")) {
+    type <- match.arg(type)
+
+    if (identical(type, "run")) {
+        return(param_run_cases(self, private))
+    }
+
+    param_model_cases(self, private)
+}
+# }}}
+# param_model_cases {{{
+param_model_cases <- function(self, private) {
+    if (!length(private$m_model_case_ids)) {
         verbose_info("No parametric models have been created.")
         return(NULL)
     }
@@ -576,7 +680,7 @@ param_cases <- function(self, private, param = NULL) {
 
     if (!private$m_log$simple) {
         if ("case" %in% names(cases)) {
-            set(cases, NULL, "case", private$m_model_store$case_names())
+            set(cases, NULL, "case", private$m_model_case_names)
         }
         return(cases)
     }
@@ -594,10 +698,44 @@ param_cases <- function(self, private, param = NULL) {
         set(cases, NULL, col, unlist(cases[[col]], FALSE, FALSE))
     }
     setnames(cases, "case_index", "index")
-    set(cases, NULL, "case", private$m_model_store$case_names())
+    set(cases, NULL, "case", private$m_model_case_names)
     setcolorder(cases, c("index", "case"))
 
     cases[]
+}
+# }}}
+# param_run_cases {{{
+param_run_cases <- function(self, private) {
+    run <- private$m_run_cases
+    if (is.null(run) || !nrow(run)) {
+        verbose_info("No run cases have been created.")
+        return(NULL)
+    }
+    private$m_model_store$assert_cases_valid()
+
+    out <- data.table::copy(run)
+    model <- suppressMessages(param_model_cases(self, private))
+    if (!is.null(model)) {
+        setnames(model, c("index", "case"), c("model_index", "model_case"))
+        out <- model[out, on = c("model_index", "model_case")]
+        setcolorder(out, c("index", "case", "model_index", "model_case",
+            "weather_index", "weather_case", "epw"))
+    }
+
+    out[]
+}
+# }}}
+# param_model_case_table {{{
+param_model_case_table <- function(private) {
+    if (!length(private$m_model_case_ids)) {
+        return(data.table(model_index = integer(), model_id = integer(), model_case = character()))
+    }
+
+    data.table(
+        model_index = seq_along(private$m_model_case_ids),
+        model_id = private$m_model_case_ids,
+        model_case = private$m_model_case_names
+    )
 }
 # }}}
 # param_param {{{
@@ -790,12 +928,15 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
         private$m_model_store$add_model(out[[i]], role = "case",
             name = nms[[i]], source_path = NULL, sql = TRUE, dict = TRUE)
     })
-    private$m_model_store$set_cases(model_ids, nms)
+    private$m_model_store$set_cases(integer())
+    private$m_model_case_ids <- model_ids
+    private$m_model_case_names <- nms
+    param_refresh_run_cases(private)
 
     # log unique ids
     private$log_idf_uuid()
     private$log_new_uuid()
-    private$m_log$unsaved <- rep(FALSE, length(out))
+    private$m_log$unsaved <- rep(FALSE, private$m_model_store$case_count())
 
     if (bare) {
         mea_nm <- "function"
@@ -858,16 +999,7 @@ param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external
     # save model
     path_param <- private$m_model_store$materialize_cases(path_param,
         copy_external = copy_external)$paths
-    # copy weather
-    path_epw <- private$m_epws_path
-    if (!is.null(path_epw)) {
-        path_epw <- file_copy(
-            rep(path_epw, length(path_param)),
-            file.path(dirname(path_param), basename(path_epw))
-        )
-    } else {
-        path_epw <- NA_character_
-    }
+    path_epw <- param_copy_weather_files(private$m_epws_path, dirname(path_param))
 
     data.table(model = path_param, weather = path_epw)
 }
@@ -878,12 +1010,7 @@ param_print <- function(self, private) {
     if (is.na(path_idf)) {
         path_idf <- private$m_model_store$model_prepared_path(private$m_model_store$seed_model_id())
     }
-    print_job_header(title = "EnergPlus Parametric Simulation Job",
-        path_idf = path_idf,
-        path_epw = private$m_epws_path,
-        eplus_ver = param_version(self, private),
-        name_idf = "Seed", name_epw = "Weather"
-    )
+    param_print_header(private, path_idf)
 
     if (!private$m_model_store$has_cases()) {
         cli::cat_line("<< No measure has been applied >>",
@@ -901,9 +1028,184 @@ param_print <- function(self, private) {
         cli::cat_line(paste0("Applied Measure: ", surround(private$m_log$measure_name)))
     }
 
-    cli::cat_line(paste0("Parametric Models [", private$m_model_store$case_count(), "]: "))
+    cli::cat_line(paste0("Parametric Models [", length(private$m_model_case_ids), "]: "))
+    if (nrow(private$m_weather_cases) > 1L) {
+        cli::cat_line(paste0("Weather Cases [", nrow(private$m_weather_cases), "]: "))
+    }
 
-    epgroup_print_status(self, private, epw = FALSE)
+    epgroup_print_status(self, private, epw = nrow(private$m_weather_cases) > 1L)
+}
+# }}}
+
+# param_weather_cases {{{
+param_weather_cases <- function(epws = NULL, names = NULL) {
+    assert_character(names, null.ok = TRUE, any.missing = FALSE)
+
+    if (is.null(epws)) {
+        epws <- list(NULL)
+    } else if (is_epw(epws) || checkmate::test_string(epws)) {
+        epws <- list(epws)
+    } else {
+        epws <- as.list(epws)
+    }
+
+    if (!length(epws)) epws <- list(NULL)
+
+    paths <- vcapply(epws, function(epw) {
+        if (is.null(epw)) return(NA_character_)
+        if (length(epw) == 1L && is.na(epw)) return(NA_character_)
+        get_init_epw(epw)
+    })
+
+    if (!is.null(names)) {
+        assert_same_len(paths, names)
+        weather_names <- names
+    } else if (checkmate::test_names(names(epws))) {
+        weather_names <- names(epws)
+    } else {
+        weather_names <- tools::file_path_sans_ext(basename(paths))
+        weather_names[is.na(paths)] <- "design_day"
+    }
+
+    weather_names <- make.unique(as.character(weather_names), sep = "_")
+
+    data.table(
+        weather_index = seq_along(paths),
+        weather_case = weather_names,
+        epw = paths
+    )
+}
+# }}}
+# param_refresh_run_cases {{{
+param_refresh_run_cases <- function(private) {
+    weather <- private$m_weather_cases
+    if (is.null(weather) || !nrow(weather)) {
+        weather <- param_weather_cases(NULL)
+        private$m_weather_cases <- weather
+    }
+
+    has_model_cases <- length(private$m_model_case_ids) > 0L
+    if (has_model_cases && !private$m_model_store$cases_valid()) {
+        private$m_run_cases <- NULL
+        return(invisible(FALSE))
+    }
+
+    if (has_model_cases) {
+        model_ids <- private$m_model_case_ids
+        model_names <- private$m_model_case_names
+    } else if (nrow(weather) > 1L) {
+        model_ids <- private$m_model_store$seed_model_id()
+        model_names <- "seed"
+    } else {
+        private$m_model_store$set_cases(integer())
+        private$m_run_cases <- NULL
+        private$m_epws_path <- if (is.na(weather$epw[[1L]])) NULL else weather$epw[[1L]]
+        private$m_log$unsaved <- logical()
+        return(invisible(FALSE))
+    }
+
+    run <- data.table(
+        model_index = rep(seq_along(model_ids), each = nrow(weather)),
+        model_case = rep(model_names, each = nrow(weather)),
+        model_id = rep(model_ids, each = nrow(weather)),
+        weather_index = rep(weather$weather_index, times = length(model_ids)),
+        weather_case = rep(weather$weather_case, times = length(model_ids)),
+        epw = rep(weather$epw, times = length(model_ids))
+    )
+
+    if (nrow(weather) == 1L && has_model_cases) {
+        case <- model_names
+    } else if (!has_model_cases) {
+        case <- weather$weather_case
+    } else {
+        case <- paste(run$model_case, run$weather_case, sep = "__")
+    }
+    set(run, NULL, "index", seq_len(nrow(run)))
+    set(run, NULL, "case", make.unique(case, sep = "_"))
+    setcolorder(run, c("index", "case", "model_index", "model_case",
+        "model_id", "weather_index", "weather_case", "epw"))
+
+    private$m_run_cases <- data.table::copy(run[, setdiff(names(run), "model_id"), with = FALSE])
+    private$m_model_store$set_cases(run$model_id, run$case)
+    private$m_epws_path <- if (all(is.na(run$epw))) NULL else run$epw
+    private$m_log$unsaved <- rep(FALSE, nrow(run))
+
+    invisible(TRUE)
+}
+# }}}
+# param_normalize_case_names {{{
+param_normalize_case_names <- function(names, n, type) {
+    if (length(names) == 1L && n > 1L) {
+        names <- paste(names, lpad(seq_len(n), "0"), sep = "_")
+    } else if (length(names) != n) {
+        abort(paste(
+            "Invalid", type, "names found.",
+            n, "cases exist but", length(names), "names given"
+        ), "param_names")
+    }
+
+    make.unique(names, sep = "_")
+}
+# }}}
+# param_assert_not_running {{{
+param_assert_not_running <- function(private) {
+    proc <- private$m_job
+    if ((inherits(proc, "process") || inherits(proc, "r_process")) && proc$is_alive()) {
+        abort(paste0(
+            "Cannot change ParametricJob inputs while simulations are still running. ",
+            "Please call `$kill()` first."
+        ), "param_running")
+    }
+    invisible(TRUE)
+}
+# }}}
+# param_clear_run_state {{{
+param_clear_run_state <- function(private, new_uuid = TRUE) {
+    private$m_job <- NULL
+    private$m_log$start_time <- NULL
+    private$m_log$end_time <- NULL
+    private$m_log$killed <- NULL
+    private$m_log$stdout <- NULL
+    private$m_log$stderr <- NULL
+    if (isTRUE(new_uuid)) private$log_new_uuid()
+    invisible(TRUE)
+}
+# }}}
+# param_copy_weather_files {{{
+param_copy_weather_files <- function(epws, dirs) {
+    out <- rep(NA_character_, length(dirs))
+    if (is.null(epws)) return(out)
+
+    if (length(epws) == 1L) epws <- rep(epws, length(dirs))
+    assert_same_len(epws, dirs)
+
+    has_epw <- !is.na(epws)
+    if (any(has_epw)) {
+        out[has_epw] <- file_copy(
+            epws[has_epw],
+            file.path(dirs[has_epw], basename(epws[has_epw]))
+        )
+    }
+    out
+}
+# }}}
+# param_print_header {{{
+param_print_header <- function(private, path_idf) {
+    weather <- private$m_weather_cases
+    if (is.null(weather) || !nrow(weather) || all(is.na(weather$epw))) {
+        path_epw <- NULL
+    } else if (nrow(weather) == 1L) {
+        path_epw <- weather$epw[[1L]]
+    } else {
+        path_epw <- NULL
+    }
+
+    print_job_header(title = "EnergPlus Parametric Simulation Job",
+        path_idf = path_idf,
+        path_epw = path_epw,
+        eplus_ver = private$m_model_store$model_version(private$m_model_store$seed_model_id()),
+        name_idf = "Seed", name_epw = "Weather"
+    )
 }
 # }}}
 

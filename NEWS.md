@@ -2,6 +2,10 @@
 
 ## New features
 
+* `ParametricJob` can now combine one seed IDF with multiple EPW weather cases
+  using `$weathers()`. `$cases(type = "run")` reports the actual simulation
+  cases while `$cases()` keeps the existing parameter-case behavior (#617).
+
 * Store prepared job model snapshots instead of keeping `Idf` objects alive
   inside `EplusJob`, `EplusGroupJob`, and `ParametricJob`, reducing memory use
   for large simulation sets. `ParametricJob$seed(new = ...)` can replace the

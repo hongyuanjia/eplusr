@@ -82,6 +82,16 @@ param$weather()
 
 
 ## ------------------------------------------------
+## Method `ParametricJob$weathers`
+## ------------------------------------------------
+
+\dontrun{
+param$weathers()
+param$weathers(c(sf = "USA_CA_San.Francisco.epw", golden = "USA_CO_Golden.epw"))
+}
+
+
+## ------------------------------------------------
 ## Method `ParametricJob$param`
 ## ------------------------------------------------
 
@@ -246,6 +256,7 @@ Hongyuan Jia
 \item \href{#method-ParametricJob-version}{\code{ParametricJob$version()}}
 \item \href{#method-ParametricJob-seed}{\code{ParametricJob$seed()}}
 \item \href{#method-ParametricJob-weather}{\code{ParametricJob$weather()}}
+\item \href{#method-ParametricJob-weathers}{\code{ParametricJob$weathers()}}
 \item \href{#method-ParametricJob-param}{\code{ParametricJob$param()}}
 \item \href{#method-ParametricJob-apply_measure}{\code{ParametricJob$apply_measure()}}
 \item \href{#method-ParametricJob-models}{\code{ParametricJob$models()}}
@@ -403,6 +414,52 @@ when creating the \code{ParametricJob} object, \code{NULL} is returned.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 param$weather()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ParametricJob-weathers"></a>}}
+\if{latex}{\out{\hypertarget{method-ParametricJob-weathers}{}}}
+\subsection{Method \code{weathers()}}{
+Get or set weather cases
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$weathers(epws, names = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{epws}}{A path, a character vector of paths, an \link{Epw} object, or a
+list of paths and \link{Epw} objects. \code{NULL} or \code{NA} entries indicate
+design-day-only weather cases. If missing, the current weather case
+table is returned.}
+
+\item{\code{names}}{Optional weather case names. If \code{NULL}, names are taken
+from \code{epws}, file names, or \code{"design_day"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$weathers()} returns the current weather case table. \verb{$weathers(epws)}
+replaces the weather cases and rebuilds the actual run cases used by
+\verb{$run()}, \verb{$save()} and \verb{$cases(type = "run")}. Existing generated
+parametric models are kept.
+}
+
+\subsection{Returns}{
+If \code{epws} is missing, a \code{\link[data.table:data.table]{data.table::data.table()}}. Otherwise,
+the modified \code{ParametricJob} object invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$weathers()
+param$weathers(c(sf = "USA_CA_San.Francisco.epw", golden = "USA_CO_Golden.epw"))
 }
 
 }
@@ -668,16 +725,27 @@ param$models()
 \if{html}{\out{<a id="method-ParametricJob-cases"></a>}}
 \if{latex}{\out{\hypertarget{method-ParametricJob-cases}{}}}
 \subsection{Method \code{cases()}}{
-Get a summary of parametric models and parameters
+Get a summary of parametric or run cases
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$cases()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$cases(type = c("model", "run"))}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{\code{"model"} returns parameter model cases and preserves the
+historical \verb{$cases()} behavior. \code{"run"} returns the actual simulation
+cases. Default: \code{"model"}.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
 \verb{$cases()} returns a \link[data.table:data.table]{data.table} giving a
-summary of parametric models and parameter values.
+summary of parametric models and parameter values. With
+\code{type = "run"}, it returns the actual simulation case table created
+from parametric model cases and weather cases.
 
-The returned \code{data.table} has the following columns:
+The model case \code{data.table} has the following columns:
 \itemize{
 \item \code{index}: Integer type. The indices of parameter models
 \item \code{case}: Character type. The names of parameter models
@@ -688,11 +756,23 @@ you specified in \code{.names}. For the case of
 \code{ParametricJob$apply_measure()}, this will be the argument names of
 the measure functions.
 }
+
+The run case \code{data.table} has the following columns:
+\itemize{
+\item \code{index}: Integer type. The indices of actual simulations
+\item \code{case}: Character type. The names of actual simulations
+\item \code{model_index}: Integer type. The indices of parameter models
+\item \code{model_case}: Character type. The names of parameter models
+\item \code{weather_index}: Integer type. The indices of weather cases
+\item \code{weather_case}: Character type. The names of weather cases
+\item \code{epw}: Character type. The paths of weather files. \code{NA} means
+design-day-only simulation.
+}
 }
 
 \subsection{Returns}{
-If no parametric models have been created, \code{NULL} is
-returned. Otherwise, a \link[data.table:data.table]{data.table}.
+If no corresponding cases exist, \code{NULL} is returned.
+Otherwise, a \link[data.table:data.table]{data.table}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
