@@ -1,6 +1,8 @@
 # HELPER {{{
 test_that("Transition Helper", {
     skip_on_cran()
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+
     idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
     # transition action {{{

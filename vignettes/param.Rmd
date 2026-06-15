@@ -42,7 +42,6 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-
 library(dplyr)
 ```
 
@@ -109,10 +108,12 @@ value.
 # create a measure for modifying LPD
 set_lpd <- function(idf, lpd = NA) {
     # keep the original if applicable
-    if (is.na(lpd)) return(idf)
+    if (is.na(lpd)) {
+        return(idf)
+    }
 
     # set 'Watts per Zone Floor Area' in all 'Lights' objects as input LPD
-    idf$set(Lights := list(watts_per_zone_floor_area = lpd))
+    idf$set(Lights := list(watts_per_floor_area = lpd))
 
     # return the modified model
     idf
@@ -121,17 +122,21 @@ set_lpd <- function(idf, lpd = NA) {
 # create a measure for reducing plug loads during off-work time
 set_nightplug <- function(idf, frac = NA) {
     # keep the original if applicable
-    if (is.na(frac)) return(idf)
+    if (is.na(frac)) {
+        return(idf)
+    }
 
     # extract the plug load schedule into a tidy table
     sch <- idf$to_table("bldg_equip_sch")
 
     # modify certain schedule value specified using field names
     sch <- sch %>%
-        mutate(value = case_when(
-            field %in% paste("Field", c(4,14,16,18)) ~ sprintf("%.2f", as.numeric(value) * frac),
-            TRUE ~ value
-        ))
+        mutate(
+            value = case_when(
+                field %in% paste("Field", c(4, 14, 16, 18)) ~ sprintf("%.2f", as.numeric(value) * frac),
+                TRUE ~ value
+            )
+        )
 
     # update schedule object using the tidy table
     idf$update(sch)
@@ -139,7 +144,6 @@ set_nightplug <- function(idf, frac = NA) {
     # return the modified model
     idf
 }
-
 ```
 
 # Create parametric models
@@ -157,11 +161,12 @@ ecm <- function(idf, lpd, nightplug_frac) {
 }
 
 # apply measures and create parametric models
-param$apply_measure(ecm,
-                  lpd = c(   NA,  7.0,   5.0,        NA,        NA,           5.0),
-       nightplug_frac = c(   NA,   NA,    NA,       0.6,       0.2,           0.2),
-               # name of each case
-               .names = c("Ori", "T5", "LED", "0.6Frac", "0.2Frac", "LED+0.2Frac")
+param$apply_measure(
+    ecm,
+    lpd = c(NA, 7.0, 5.0, NA, NA, 5.0),
+    nightplug_frac = c(NA, NA, NA, 0.6, 0.2, 0.2),
+    # name of each case
+    .names = c("Ori", "T5", "LED", "0.6Frac", "0.2Frac", "LED+0.2Frac")
 )
 ```
 
@@ -249,8 +254,7 @@ library(ggplot2)
 param_savings %>%
     mutate(case = factor(case, names(param$models()))) %>%
     ggplot(aes(case, savings, fill = category)) +
-    geom_bar(position = "dodge", stat = "identity", width = 0.6, color = "black",
-        show.legend = FALSE) +
+    geom_bar(position = "dodge", stat = "identity", width = 0.6, color = "black", show.legend = FALSE) +
     facet_wrap(vars(category), nrow = 2) +
     labs(x = NULL, y = "Energy savings / %") +
     coord_flip()

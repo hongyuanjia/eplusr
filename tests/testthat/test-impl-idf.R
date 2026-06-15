@@ -1506,10 +1506,16 @@ test_that("OBJECT DOTS", {
     # can stop if version is not the same
     skip_on_cran()
 
-    expect_error(expand_idf_dots_object(idd_env, idf_env, empty_idf(8.7)), class = "eplusr_error_dots_format")
+    other_ver <- as.integer(strsplit(as.character(idf$version()), ".", fixed = TRUE)[[1L]][1:2])
+    other_ver[[2L]] <- if (other_ver[[2L]] > 0L) other_ver[[2L]] - 1L else other_ver[[2L]] + 1L
+    other_idf <- empty_idf(LATEST_EPLUS_VER)
+    other_priv <- get_priv_env(other_idf)
+    other_priv$m_version <- numeric_version(paste(other_ver, collapse = "."))
+
+    expect_error(expand_idf_dots_object(idd_env, idf_env, other_idf), class = "eplusr_error_dots_format")
 
     # can proceed if version is not the same
-    expect_type(expand_idf_dots_object(idd_env, idf_env, empty_idf(8.7), .strict = FALSE), "list")
+    expect_type(expand_idf_dots_object(idd_env, idf_env, other_idf, .strict = FALSE), "list")
 
     expect_silent(expand_idf_dots_value(idd_env, idf_env, ..53 = list("sch"), .type = "object", .empty = FALSE))
 })
