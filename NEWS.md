@@ -2,7 +2,7 @@
 
 ## New features
 
-* Add support for EnergyPlus v25.2.0 (#605).
+* Add support for EnergyPlus v25.2.0 (#605, #606).
 
 * Add support for EnergyPlus v25.1.0 (#600, #604).
 
