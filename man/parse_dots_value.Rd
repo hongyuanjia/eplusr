@@ -11,7 +11,8 @@ parse_dots_value(
   .ref_assign = TRUE,
   .unique = FALSE,
   .empty = FALSE,
-  .env = parent.frame()
+  .env = parent.frame(),
+  .fun_update = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,9 @@ object with all default values. Default: \code{TRUE}.}
 
 \item{.env}{An environment specifying the environment to evaluate the \code{...}.
 Default: \code{\link[=parent.frame]{parent.frame()}}.}
+
+\item{.fun_update}{If \code{TRUE}, allow one-sided formulas and functions as
+field values for paired object inputs. Default: \code{FALSE}.}
 }
 \value{
 A named list of 2 element \code{object} and \code{value} which is a

@@ -970,12 +970,191 @@ expand_idf_dots_name <- function(idd_env, idf_env, ..., .keep_name = TRUE, .prop
 }
 # }}}
 # parse_dots_value {{{
+is_idf_value_updater <- function(x) {
+    inherits(x, "formula") || is.function(x)
+}
+
+get_idf_value_updater <- function(x) {
+    if (!inherits(x, "formula") && !is.function(x) && is.list(x) && length(x) == 1L) {
+        x[[1L]]
+    } else {
+        x
+    }
+}
+
+flatten_idf_value_updaters <- function(x) {
+    out <- list()
+    add <- function(x) {
+        if (is.null(x) || is_idf_value_updater(x)) {
+            out[[length(out) + 1L]] <<- x
+        } else if (is.list(x)) {
+            lapply(x, add)
+        } else {
+            out[[length(out) + 1L]] <<- x
+        }
+        invisible(NULL)
+    }
+
+    add(x)
+    out
+}
+
+assert_idf_value_update_function <- function(fun) {
+    fml <- formals(fun)
+    if (is.null(fml)) return(invisible())
+
+    nm <- names(fml)
+    if (!length(fml) || nm[[1L]] == "...") {
+        abort("Function field updates must have a first argument for the current field value.",
+            "dots_update"
+        )
+    }
+
+    extra <- seq_along(fml)[-1L]
+    extra <- extra[nm[extra] != "..."]
+    if (!length(extra)) return(invisible())
+
+    required <- nm[extra][vlapply(fml[extra], identical, quote(expr = ))]
+    if (length(required)) {
+        abort(paste0(
+            "Only the first argument is supplied to function field updates. ",
+            "Arguments without defaults are not allowed: ",
+            paste0(surround(required), collapse = ", "), "."
+        ), "dots_update")
+    }
+
+    invisible()
+}
+
+context_idf_value_update <- function(dt_value) {
+    paste0("object ID ", dt_value$object_id[[1L]],
+        ", field '", dt_value$field_name[[1L]], "'")
+}
+
+eval_idf_value_update <- function(updater, old, dt_value) {
+    ctx <- context_idf_value_update(dt_value)
+
+    if (inherits(updater, "formula")) {
+        if (length(updater) != 2L) {
+            abort(paste0("Formula field updates must be one-sided formulas. Invalid update for ", ctx, "."),
+                "dots_update"
+            )
+        }
+
+        env <- environment(updater)
+        mask <- new.env(parent = env)
+        assign(".", old, envir = mask)
+        return(tryCatch(eval(updater[[2L]], mask),
+            error = function(e) abort(paste0(
+                "Failed to evaluate formula field update for ", ctx, ": ",
+                conditionMessage(e)
+            ), "dots_update")
+        ))
+    }
+
+    assert_idf_value_update_function(updater)
+    tryCatch(updater(old),
+        error = function(e) abort(paste0(
+            "Failed to evaluate function field update for ", ctx, ": ",
+            conditionMessage(e)
+        ), "dots_update")
+    )
+}
+
+as_idf_value_update <- function(value, n, dt_value) {
+    ctx <- context_idf_value_update(dt_value)
+
+    if (is.null(value)) {
+        abort(paste0("Function field updates cannot return NULL. Invalid update for ", ctx, "."),
+            "dots_update"
+        )
+    }
+
+    if (!is.null(dim(value)) || is.object(value) ||
+        !(is.character(value) || is.integer(value) || is.double(value))) {
+        abort(paste0(
+            "Function field updates must return a character, integer, or double vector. ",
+            "Invalid update for ", ctx, "."
+        ), "dots_update")
+    }
+
+    if (!length(value)) {
+        abort(paste0("Function field updates must return a non-empty vector. Invalid update for ", ctx, "."),
+            "dots_update"
+        )
+    }
+
+    if (length(value) == 1L) {
+        value <- rep(value, n)
+    } else if (length(value) != n) {
+        abort(paste0(
+            "Function field update result length must be 1 or ", n,
+            ". Invalid update for ", ctx, " returned length ", length(value), "."
+        ), "dots_pair_length")
+    }
+
+    value_chr <- stri_trim_both(as.character(value))
+    value_chr[stri_isempty(value_chr)] <- NA_character_
+
+    value_num <- rep(NA_real_, length(value))
+    if (is.integer(value) || is.double(value)) {
+        value_num <- as.double(value)
+    }
+
+    list(value_chr = value_chr, value_num = value_num)
+}
+
+apply_idf_value_updates <- function(idd_env, idf_env, dt_value, default = FALSE) {
+    if (!has_names(dt_value, "value_update")) return(dt_value)
+
+    updates <- lapply(dt_value$value_update, get_idf_value_updater)
+    is_update <- vlapply(updates, is_idf_value_updater)
+    if (!any(is_update)) {
+        set(dt_value, NULL, "value_update", NULL)
+        return(dt_value)
+    }
+
+    has_type <- has_names(dt_value, "type_enum")
+    if (!has_type) add_field_property(idd_env, dt_value, "type_enum")
+
+    old <- idf_env$value[match(dt_value$value_id, idf_env$value$value_id)]
+    old_chr <- old$value_chr
+    old_num <- old$value_num
+
+    rows <- which(is_update)
+    groups <- split(rows, paste(dt_value$rleid[rows], dt_value$field_id[rows], sep = "\r"))
+    for (i in groups) {
+        updater <- updates[[i[[1L]]]]
+        old_value <- if (dt_value$type_enum[[i[[1L]]]] <= IDDFIELD_TYPE$real) {
+            old_num[i]
+        } else {
+            old_chr[i]
+        }
+
+        value <- eval_idf_value_update(updater, old_value, dt_value[i[[1L]]])
+        value <- as_idf_value_update(value, length(i), dt_value[i[[1L]]])
+
+        set(dt_value, i, "value_chr", value$value_chr)
+        set(dt_value, i, "value_num", value$value_num)
+    }
+
+    set(dt_value, NULL, "value_update", NULL)
+    if (!has_type) set(dt_value, NULL, "type_enum", NULL)
+
+    if (default) dt_value <- assign_idf_value_default(idd_env, idf_env, dt_value)
+
+    dt_value
+}
+
 #' @inherit expand_idf_dots_value
+#' @param .fun_update If `TRUE`, allow one-sided formulas and functions as
+#'        field values for paired object inputs. Default: `FALSE`.
 #' @keywords internal
 #' @export
 parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
                               .ref_assign = TRUE, .unique = FALSE,
-                              .empty = FALSE, .env = parent.frame()) {
+                              .empty = FALSE, .env = parent.frame(),
+                              .fun_update = FALSE) {
     l <- eval(substitute(alist(...)))
     rules <- if (.scalar) "V1" else "V"
 
@@ -1123,7 +1302,9 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
         }
 
         if (!evaluated) val <- eval(li, .env)
-        assert_list(val, c("character", "integer", "double", "null"), .var.name = "Input",
+        type <- c("character", "integer", "double", "null")
+        if (.fun_update) type <- c(type, "formula", "function")
+        assert_list(val, type, .var.name = "Input",
             all.missing = .empty
         )
 
@@ -1168,9 +1349,21 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
 
         # check if NULL
         isnull <- vlapply(val, is.null)
+        isupdate <- vlapply(val, is_idf_value_updater)
+
+        if (any(isupdate)) {
+            if (.scalar || !.pair) {
+                abort("Functional field updates are only supported for paired field value inputs.",
+                    "dots_update"
+                )
+            }
+            if (!has_names(dt_in, "value_update")) {
+                set(dt_in, NULL, "value_update", rep(list(list(NULL)), nrow(dt_in)))
+            }
+        }
 
         # make sure no NA and scalar if necessary
-        qassertr(val[!isnull], rules, .var.name = "Field Value")
+        qassertr(val[!isnull & !isupdate], rules, .var.name = "Field Value")
 
         # separate character and numeric value
         if (.scalar) {
@@ -1205,6 +1398,7 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
         } else {
             len_obj <- length(.subset2(dt_in$name, i))
             len_val <- each_length(val)
+            len_val[isupdate] <- 1L
             len <- max(len_obj, len_val)
 
             # indicate if vector value input
@@ -1232,8 +1426,13 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
             }
 
             # check the length of values
-            val_lst <- apply2(val, len_val, function(v, l) {
-                if (is.null(v)) {
+            val_lst <- lapply(seq_along(val), function(k) {
+                v <- val[[k]]
+                l <- len_val[[k]]
+                if (isupdate[[k]]) {
+                    chr <- rep(NA_character_, len)
+                    num <- rep(NA_real_, len)
+                } else if (is.null(v)) {
                     chr <- rep(NA_character_, len)
                     num <- rep(NA_real_, len)
                 } else if (l == 1L) {
@@ -1267,13 +1466,25 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
                 list(chr = chr, num = num)
             })
 
+            if (has_names(dt_in, "value_update")) {
+                upd_lst <- lapply(seq_along(val), function(k) {
+                    if (isupdate[[k]]) rep(list(val[[k]]), len) else rep(list(NULL), len)
+                })
+            }
+
             # only one field
             if (length(len_val) == 1L) {
                 set(dt_in, i, "value_chr", list(list(as.list(val_lst[[1L]]$chr))))
                 set(dt_in, i, "value_num", list(list(as.list(val_lst[[1L]]$num))))
+                if (has_names(dt_in, "value_update")) {
+                    set(dt_in, i, "value_update", list(list(upd_lst[[1L]])))
+                }
             } else {
                 set(dt_in, i, "value_chr", list(list(transpose(lapply(val_lst, .subset2, "chr")))))
                 set(dt_in, i, "value_num", list(list(transpose(lapply(val_lst, .subset2, "num")))))
+                if (has_names(dt_in, "value_update")) {
+                    set(dt_in, i, "value_update", list(list(transpose(upd_lst))))
+                }
             }
         }
     }
@@ -1354,6 +1565,26 @@ parse_dots_value <- function(..., .scalar = TRUE, .pair = FALSE,
         )]
     }
 
+    if (has_names(dt_in, "value_update")) {
+        value_update <- unlist(lapply(seq_len(nrow(dt_in)), function(i) {
+            upd <- dt_in$value_update[[i]]
+            flat <- flatten_idf_value_updaters(upd)
+            if (is.null(upd) || !any(vlapply(flat, is_idf_value_updater))) {
+                rep(list(NULL), len_obj[[i]] * len_fld[[i]])
+            } else {
+                flat
+            }
+        }), recursive = FALSE, use.names = FALSE)
+
+        if (length(value_update) != nrow(val)) {
+            abort("Internal error when parsing functional field updates.",
+                "dots_update"
+            )
+        }
+
+        set(val, NULL, "value_update", lapply(value_update, list))
+    }
+
     list(object = obj, value = val)
 }
 # }}}
@@ -1423,11 +1654,13 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
                                    .scalar = TRUE, .pair = FALSE, .ref_assign = TRUE,
                                    .unique = TRUE, .empty = TRUE, .default = TRUE,
                                    .env = parent.frame()) {
+    .type <- match.arg(.type, c("class", "object"))
+
     l <- parse_dots_value(...,
         .scalar = .scalar, .pair = .pair, .ref_assign = .ref_assign,
-        .unique = .unique, .empty = .empty, .env = .env)
+        .unique = .unique, .empty = .empty, .env = .env,
+        .fun_update = .type == "object")
 
-    .type <- match.arg(.type, c("class", "object"))
     # indicate if single field value
     .sgl <- .scalar || (!.scalar && .pair)
 
@@ -1705,8 +1938,14 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
                     }
 
                     # assign input value
-                    cls_val_out[cls_val, on = c("rleid", "object_id", "field_index"),
-                        `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+                    if (has_names(cls_val, "value_update")) {
+                        cls_val_out[cls_val, on = c("rleid", "object_id", "field_index"),
+                            `:=`(value_chr = i.value_chr, value_num = i.value_num,
+                                value_update = i.value_update)]
+                    } else {
+                        cls_val_out[cls_val, on = c("rleid", "object_id", "field_index"),
+                            `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+                    }
                     cls_val <- cls_val_out
                 } else {
                     setnames(cls_val, "name", "object_name")
@@ -1719,7 +1958,7 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
 
             # combine empty
             cls_obj <- rbindlist(list(cls_obj_emp, cls_obj), use.names = TRUE)
-            cls_val <- rbindlist(list(cls_val_emp, cls_val), use.names = TRUE)
+            cls_val <- rbindlist(list(cls_val_emp, cls_val), use.names = TRUE, fill = TRUE)
         }
         # }}}
 
@@ -1856,8 +2095,14 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
                     }
 
                     # assign input value
-                    obj_val_out[obj_val, on = c("each_rleid", "object_id", "field_id"),
-                        `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+                    if (has_names(obj_val, "value_update")) {
+                        obj_val_out[obj_val, on = c("each_rleid", "object_id", "field_id"),
+                            `:=`(value_chr = i.value_chr, value_num = i.value_num,
+                                value_update = i.value_update)]
+                    } else {
+                        obj_val_out[obj_val, on = c("each_rleid", "object_id", "field_id"),
+                            `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+                    }
                     obj_val <- obj_val_out
                 } else {
                     # add object name
@@ -1870,13 +2115,14 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
 
             # combine empty
             obj <- rbindlist(list(obj_emp, obj), use.names = TRUE)
-            obj_val <- rbindlist(list(val_emp, obj_val), use.names = TRUE)
+            obj_val <- rbindlist(list(val_emp, obj_val), use.names = TRUE, fill = TRUE)
         }
         # }}}
 
         # combine all
         obj <- rbindlist(list(cls_obj, obj), use.names = TRUE)
-        val <- rbindlist(list(cls_val, obj_val), use.names = TRUE)
+        val <- rbindlist(list(cls_val, obj_val), use.names = TRUE, fill = TRUE)
+        val <- apply_idf_value_updates(idd_env, idf_env, val, default = .default && .sgl)
         setorderv(obj, "rleid")
         setorderv(val, "rleid")
 

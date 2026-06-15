@@ -222,6 +222,11 @@ test_that("$set()", {
     expect_equal(surf$value()[24:26],
         list(`Vertex 5 X-coordinate` = 1, `Vertex 5 Y-coordinate` = 2, `Vertex 5 Z-coordinate` = 3)
     )
+    # can update fields using formulas and functions
+    cond <- mat$Conductivity
+    expect_equal(mat$set(Conductivity = ~ . * 0.5)$Conductivity, cond * 0.5)
+    expect_equal(mat$set(Conductivity = function(x) x * 2)$Conductivity, cond)
+
     # can change referenced values accordingly
     expect_equal(mat$set(name = "NewMaterialName")$value("Name")[[1]], "NewMaterialName")
     expect_equal(con$value("Outside Layer")[[1]], "NewMaterialName")

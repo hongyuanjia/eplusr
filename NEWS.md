@@ -2,6 +2,9 @@
 
 ## New features
 
+* `Idf$set()` and `IdfObject$set()` can now update field values from their
+  current values using one-sided formulas or functions (#518).
+
 * `ParametricJob` can now combine one seed IDF with multiple EPW weather cases
   using `$weathers()`. `$cases(type = "run")` reports the actual simulation
   cases while `$cases()` keeps the existing parameter-case behavior (#617).

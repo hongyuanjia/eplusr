@@ -430,6 +430,10 @@ idf$set(r13layer = list(solar_absorptance = 0.8),
         r31layer = list(solar_absorptance = 0.8)
 )
 
+# update values using the current field values
+idf$set(Material := list(conductivity = ~ . * 0.5))
+idf$set(Material := list(conductivity = function(x) x * 0.5))
+
 # use variable input
 sets <- list(r13layer = list(roughness = "smooth"))
 idf$set(sets)
@@ -2371,6 +2375,14 @@ object ID or names in \code{.()}. It will set the field of all specified
 objects to specified value.
 }
 
+Field values can be updated from their current values using a one-sided
+formula or a function. In \code{field = ~ . * 0.5}, \code{.} is the current field
+value. In \code{field = function(x) x * 0.5}, the first argument receives the
+current field value. eplusr only supplies that first argument; other
+function arguments must have defaults or be captured from the enclosing
+environment. Function updates must return a character, integer, or double
+vector of length \code{1} or the number of target objects.
+
 You can delete a field by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to delete the value of field \code{fld}, in the condition
 that \code{.default} is \code{FALSE}, \code{fld} is not a required field and the
 index of \code{fld} is larger than the number minimum fields required for
@@ -2440,6 +2452,10 @@ idf$set(.("r13layer", "r31layer") := list(solar_absorptance = 0.8))
 idf$set(r13layer = list(solar_absorptance = 0.8),
         r31layer = list(solar_absorptance = 0.8)
 )
+
+# update values using the current field values
+idf$set(Material := list(conductivity = ~ . * 0.5))
+idf$set(Material := list(conductivity = function(x) x * 0.5))
 
 # use variable input
 sets <- list(r13layer = list(roughness = "smooth"))

@@ -567,6 +567,48 @@ test_that("$set()", {
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "VeryRough")
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
 
+    # can update fields using a formula
+    res <- c(
+        idf$Material_NoMass$R13LAYER$Thermal_Resistance,
+        idf$Material_NoMass$R31LAYER$Thermal_Resistance
+    )
+    expect_type(idf$set(Material_NoMass := list(thermal_resistance = ~ . * c(0.5, 2))), "list")
+    expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Resistance, res[[1L]] * 0.5)
+    expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Resistance, res[[2L]] * 2)
+
+    # can update fields using a function
+    half <- function(x, frac = 0.5) x * frac
+    expect_type(idf$set(Material_NoMass := list(thermal_resistance = half)), "list")
+    expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Resistance, res[[1L]] * 0.25)
+    expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Resistance, res[[2L]])
+
+    expect_error(
+        idf$set(Material_NoMass := list(thermal_resistance = ~ . > 0)),
+        class = "eplusr_error_dots_update"
+    )
+    expect_error(
+        idf$set(Material_NoMass := list(thermal_resistance = function(x) NULL)),
+        class = "eplusr_error_dots_update"
+    )
+    expect_error(
+        idf$set(Material_NoMass := list(thermal_resistance = function(x, frac) x * frac)),
+        class = "eplusr_error_dots_update"
+    )
+    expect_error(
+        idf$set(Material_NoMass := list(thermal_resistance = function(x) c(1, 2, 3))),
+        class = "eplusr_error_dots_pair_length"
+    )
+    expect_type(
+        idf$set(Material_NoMass := list(visible_absorptance = ~ NA_real_), .default = FALSE, .empty = TRUE),
+        "list"
+    )
+    expect_true(is.na(idf$Material_NoMass$R13LAYER$Visible_Absorptance))
+    expect_true(is.na(idf$Material_NoMass$R31LAYER$Visible_Absorptance))
+    expect_error(
+        idf$set(Material_NoMass := list(visible_absorptance = ~ NA)),
+        class = "eplusr_error_dots_update"
+    )
+
     # can handle references
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")), "Idf")
     expect_type(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
