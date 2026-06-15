@@ -67,7 +67,9 @@ get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, proper
 
             col_add <- setdiff(names(idf_env$object), names(cls_in))
 
-            obj <- idf_env$object[, .SD, .SDcols = c(col_on, col_add)][, check := .I][cls_in, on = col_on]
+            obj <- idf_env$object[, .SD, .SDcols = c(col_on, col_add)][, check := .I][
+                cls_in, on = col_on, allow.cartesian = TRUE
+            ]
             check_bad_key(obj, "check", col_key)
             set(obj, NULL, "check", NULL)
 
