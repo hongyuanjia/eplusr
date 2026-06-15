@@ -16,13 +16,11 @@ NULL
 #' not prevent `read_job()` from restoring the job object if files have been
 #' removed.
 #'
-#' @section Parametric jobs:
-#' For [ParametricJob], the manifest stores the seed model, weather file,
-#' generated model files, case data, and available run results. If generated
-#' models only exist in memory, `save_job()` snapshots them into a
-#' `<manifest>_files` directory next to the JSON file. Arbitrary R measure
-#' functions passed to `$apply_measure()` are not serialized; the restored job
-#' uses the generated model snapshots and stored case data.
+#' @section Model snapshots:
+#' The manifest stores a prepared model snapshot store for [EplusJob],
+#' [EplusGroupJob], and [ParametricJob]. For [ParametricJob], arbitrary R
+#' measure functions passed to `$apply_measure()` are not serialized; the
+#' restored job uses the generated model snapshots and stored case data.
 #'
 #' @param x An [EplusJob], [EplusGroupJob], or [ParametricJob].
 #' @param path A JSON file path. If `NULL`, a default file name is used in the
@@ -139,13 +137,13 @@ read_job <- function(path, validate = TRUE, verify = c("warn", "error", "ignore"
 }
 
 JOB_JSON_FORMAT <- "eplusr-job"
-JOB_JSON_MANIFEST_VERSION <- 1L
+JOB_JSON_MANIFEST_VERSION <- 2L
 
 SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
   "version": "1.0.0",
   "$defs": {
     "nullable_string": {
-      "check": { "kind": "string", "min.chars": 1, "null.ok": true }
+      "check": { "kind": "string", "min.chars": 1, "null.ok": true, "na.ok": true }
     },
     "string_vector": {
       "any": [
@@ -182,6 +180,82 @@ SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
     "result_file": {
       "check": { "kind": "list", "null.ok": true },
       "rest": { "$ref": "#/$defs/text_or_array" }
+    },
+    "model_store_model": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": [
+          "model_id", "role", "name", "source_path", "prepared_path",
+          "version", "sql", "dict", "signature", "size", "mtime"
+        ],
+        "subset.of": [
+          "model_id", "role", "name", "source_path", "prepared_path",
+          "version", "sql", "dict", "signature", "size", "mtime"
+        ]
+      },
+      "fields": {
+        "model_id": { "check": { "kind": "int", "lower": 1 } },
+        "role": {
+          "check": {
+            "kind": "choice",
+            "choices": ["input", "seed", "case"]
+          }
+        },
+        "name": { "$ref": "#/$defs/nullable_string" },
+        "source_path": { "$ref": "#/$defs/nullable_string" },
+        "prepared_path": { "check": { "kind": "string", "min.chars": 1 } },
+        "version": { "check": { "kind": "string", "min.chars": 1 } },
+        "sql": { "check": { "kind": "flag" } },
+        "dict": { "check": { "kind": "flag" } },
+        "signature": { "check": { "kind": "string", "min.chars": 1 } },
+        "size": { "check": { "kind": "number", "lower": 0 } },
+        "mtime": { "$ref": "#/$defs/nullable_string" }
+      }
+    },
+    "model_store_case": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": ["case_index", "model_id", "name", "run_path"],
+        "subset.of": ["case_index", "model_id", "name", "run_path"]
+      },
+      "fields": {
+        "case_index": { "check": { "kind": "int", "lower": 1 } },
+        "model_id": { "check": { "kind": "int", "lower": 1 } },
+        "name": { "$ref": "#/$defs/nullable_string" },
+        "run_path": { "$ref": "#/$defs/nullable_string" }
+      }
+    },
+    "model_store": {
+      "check": { "kind": "list" },
+      "keys": {
+        "type": "unique",
+        "must.include": [
+          "version", "seed_model_id", "cases_valid", "invalid_reason",
+          "models", "cases"
+        ],
+        "subset.of": [
+          "version", "seed_model_id", "cases_valid", "invalid_reason",
+          "models", "cases"
+        ]
+      },
+      "fields": {
+        "version": { "check": { "kind": "int", "lower": 1, "upper": 1 } },
+        "seed_model_id": { "check": { "kind": "int", "lower": 1, "null.ok": true } },
+        "cases_valid": { "check": { "kind": "flag" } },
+        "invalid_reason": { "$ref": "#/$defs/nullable_string" },
+        "models": {
+          "check": { "kind": "list", "min.len": 1 },
+          "keys": { "type": "unnamed" },
+          "rest": { "$ref": "#/$defs/model_store_model" }
+        },
+        "cases": {
+          "check": { "kind": "list" },
+          "keys": { "type": "unnamed" },
+          "rest": { "$ref": "#/$defs/model_store_case" }
+        }
+      }
     },
     "result_file_record": {
       "check": { "kind": "list" },
@@ -276,20 +350,14 @@ SCHEMA_EPLUS_JOB_MANIFEST <- schema_flatten(schema_read('{
       "keys": {
         "type": "unique",
         "subset.of": [
-          "idf", "epw", "idfs", "idf_names", "epws",
-          "seed", "weather", "models", "model_names"
+          "model_store", "epw", "epws", "weather"
         ]
       },
       "fields": {
-        "idf": { "$ref": "#/$defs/nullable_string" },
+        "model_store": { "$ref": "#/$defs/model_store" },
         "epw": { "$ref": "#/$defs/nullable_string" },
-        "idfs": { "$ref": "#/$defs/string_vector" },
-        "idf_names": { "$ref": "#/$defs/string_vector" },
         "epws": { "$ref": "#/$defs/string_vector" },
-        "seed": { "$ref": "#/$defs/nullable_string" },
-        "weather": { "$ref": "#/$defs/nullable_string" },
-        "models": { "$ref": "#/$defs/string_vector" },
-        "model_names": { "$ref": "#/$defs/string_vector" }
+        "weather": { "$ref": "#/$defs/nullable_string" }
       }
     },
     "log": {
@@ -362,6 +430,7 @@ job_json_validate_manifest <- function(x) {
     }
 
     job_json_validate_manifest_kind(x)
+    job_json_validate_manifest_model_store(x)
 
     invisible(x)
 }
@@ -370,20 +439,20 @@ job_json_validate_manifest_kind <- function(x) {
     kind <- job_json_scalar_character(x$kind)
     specs <- switch(kind,
         EplusJob = list(
-            inputs = c("idf", "epw"),
+            inputs = c("model_store", "epw"),
             log = c("uuid", "seed_uuid", "unsaved", "start_time", "end_time", "killed"),
             run = c("version", "energyplus", "start_time", "end_time",
                 "exit_status", "output_dir", "file", "file_info", "run"),
             parametric = NULL
         ),
         EplusGroupJob = list(
-            inputs = c("idfs", "idf_names", "epws"),
+            inputs = c("model_store", "epws"),
             log = c("uuid", "idf_uuid", "unsaved", "start_time", "end_time", "killed"),
             run = c("options", "jobs"),
             parametric = NULL
         ),
         ParametricJob = list(
-            inputs = c("seed", "weather", "models", "model_names"),
+            inputs = c("model_store", "weather"),
             log = c("uuid", "idf_uuid", "seed_uuid", "unsaved", "start_time",
                 "end_time", "killed"),
             run = c("options", "jobs"),
@@ -418,6 +487,56 @@ job_json_validate_manifest_kind <- function(x) {
         }
         job_json_assert_manifest_keys(x$parametric, specs$parametric, specs$parametric,
             sprintf("%s parametric", kind))
+    }
+
+    invisible(x)
+}
+
+job_json_validate_manifest_model_store <- function(x) {
+    kind <- job_json_scalar_character(x$kind)
+    store <- x$inputs$model_store
+    models <- store$models
+
+    if (is.null(models) || !length(models)) {
+        abort("Job manifest model store must contain at least one model.",
+            "job_json_model_store")
+    }
+
+    model_ids <- viapply(models, function(row) job_json_scalar_integer(row$model_id))
+    if (anyDuplicated(model_ids)) {
+        abort("Job manifest model store contains duplicate model ids.",
+            "job_json_model_store")
+    }
+
+    seed_id <- job_json_scalar_integer(store$seed_model_id, default = NULL)
+    if (identical(kind, "ParametricJob") && is.null(seed_id)) {
+        abort("ParametricJob manifest model store must include a seed model id.",
+            "job_json_model_store")
+    }
+    if (!is.null(seed_id) && !(seed_id %in% model_ids)) {
+        abort("Job manifest model store seed model id does not match any stored model.",
+            "job_json_model_store")
+    }
+
+    cases <- store$cases
+    if (kind %in% c("EplusJob", "EplusGroupJob") && (is.null(cases) || !length(cases))) {
+        abort(sprintf("%s manifest model store must contain at least one case.", kind),
+            "job_json_model_store")
+    }
+
+    if (is.null(cases) || !length(cases)) return(invisible(x))
+
+    case_indices <- viapply(cases, function(row) job_json_scalar_integer(row$case_index))
+    if (anyDuplicated(case_indices)) {
+        abort("Job manifest model store contains duplicate case indices.",
+            "job_json_model_store")
+    }
+
+    case_model_ids <- viapply(cases, function(row) job_json_scalar_integer(row$model_id))
+    missing <- setdiff(case_model_ids, model_ids)
+    if (length(missing)) {
+        abort("Job manifest model store cases reference unknown model ids.",
+            "job_json_model_store")
     }
 
     invisible(x)
@@ -603,9 +722,9 @@ job_json_default_path <- function(x) {
     kind <- job_json_kind(x)
 
     dir <- switch(kind,
-        EplusJob = dirname(priv$m_idf$path()),
-        EplusGroupJob = dirname(priv$m_idfs[[1L]]$path()),
-        ParametricJob = dirname(priv$m_seed$path())
+        EplusJob = priv$m_model_store$default_dir(),
+        EplusGroupJob = priv$m_model_store$default_dir(),
+        ParametricJob = priv$m_model_store$default_dir(seed = TRUE)
     )
 
     file <- switch(kind,
@@ -630,8 +749,8 @@ job_json_manifest <- function(x, path, overwrite, relative, hash) {
         created_at = job_json_format_time(current()),
         paths_relative_to = if (relative) "." else NULL,
         inputs = switch(kind,
-            EplusJob = job_json_eplus_inputs(priv, base, relative),
-            EplusGroupJob = job_json_group_inputs(priv, base, relative),
+            EplusJob = job_json_eplus_inputs(priv, path, overwrite, relative),
+            EplusGroupJob = job_json_group_inputs(priv, path, overwrite, relative),
             ParametricJob = job_json_parametric_inputs(priv, path, overwrite, relative)
         ),
         log = switch(kind,
@@ -653,64 +772,61 @@ job_json_manifest <- function(x, path, overwrite, relative, hash) {
     out
 }
 
-job_json_eplus_inputs <- function(private, base, relative) {
+job_json_eplus_inputs <- function(private, path, overwrite, relative) {
+    base <- dirname(path)
     list(
-        idf = job_json_encode_path(private$m_idf$path(), base, relative),
+        model_store = job_json_encode_model_store(private$m_model_store, base, relative,
+            path = path, overwrite = overwrite),
         epw = job_json_encode_path(private$m_epw_path, base, relative)
     )
 }
 
-job_json_group_inputs <- function(private, base, relative) {
+job_json_group_inputs <- function(private, path, overwrite, relative) {
+    base <- dirname(path)
     list(
-        idfs = job_json_encode_path(vcapply(private$m_idfs, function(idf) idf$path()), base, relative),
-        idf_names = names(private$m_idfs),
+        model_store = job_json_encode_model_store(private$m_model_store, base, relative,
+            path = path, overwrite = overwrite),
         epws = job_json_encode_path(private$m_epws_path, base, relative)
     )
 }
 
 job_json_parametric_inputs <- function(private, path, overwrite, relative) {
-    base <- dirname(path)
-
-    models <- NULL
-    model_names <- NULL
-    if (!is.null(private$m_idfs)) {
-        models <- job_json_snapshot_parametric_models(private, path, overwrite, relative)
-        model_names <- names(private$m_idfs)
-    }
-
     list(
-        seed = job_json_encode_path(private$m_seed$path(), base, relative),
-        weather = job_json_encode_path(private$m_epws_path, base, relative),
-        models = models,
-        model_names = model_names
+        model_store = job_json_encode_model_store(private$m_model_store, dirname(path), relative,
+            path = path, overwrite = overwrite),
+        weather = job_json_encode_path(private$m_epws_path, dirname(path), relative)
     )
 }
 
-job_json_snapshot_parametric_models <- function(private, path, overwrite, relative) {
-    base <- dirname(path)
+job_json_encode_model_store <- function(store, base, relative, path, overwrite) {
     stem <- tools::file_path_sans_ext(basename(path))
-    dir <- normalizePath(file.path(base, paste0(stem, "_files")), mustWork = FALSE)
+    dir <- normalizePath(file.path(base, paste0(stem, "_files"), "model_store"),
+        mustWork = FALSE)
+    snapshot <- store$snapshot(dir, overwrite = overwrite)
 
-    if (dir.exists(dir) && length(list.files(dir, all.files = TRUE, no.. = TRUE)) && !overwrite) {
-        abort(sprintf("Parametric job snapshot directory already exists: %s", surround(dir)),
-            "job_json_file_exists")
-    }
-    if (!dir.exists(dir) && !dir.create(dir, recursive = TRUE, showWarnings = FALSE)) {
-        abort(sprintf("Failed to create parametric job snapshot directory: %s", surround(dir)),
-            "job_json_dir")
-    }
-
-    nms <- names(private$m_idfs)
-    if (is.null(nms)) nms <- paste0("model_", seq_along(private$m_idfs))
-    nms <- make.unique(make_filename(nms), sep = "_")
-
-    paths <- normalizePath(file.path(dir, paste0(nms, ".idf")), mustWork = FALSE)
-    for (i in seq_along(private$m_idfs)) {
-        idf <- private$m_idfs[[i]]$clone(deep = TRUE)
-        idf$save(paths[[i]], overwrite = TRUE)
+    models <- snapshot$models
+    if (nrow(models)) {
+        set(models, NULL, "source_path",
+            job_json_encode_path(models$source_path, base, relative))
+        set(models, NULL, "prepared_path",
+            job_json_encode_path(models$prepared_path, base, relative))
+        set(models, NULL, "mtime", job_json_format_time(models$mtime))
     }
 
-    job_json_encode_path(paths, base, relative)
+    cases <- snapshot$cases
+    if (nrow(cases)) {
+        set(cases, NULL, "run_path",
+            job_json_encode_path(cases$run_path, base, relative))
+    }
+
+    list(
+        version = 1L,
+        seed_model_id = job_json_scalar_or_null(snapshot$seed_model_id),
+        cases_valid = isTRUE(snapshot$cases_valid),
+        invalid_reason = snapshot$invalid_reason,
+        models = job_json_encode_table(models),
+        cases = job_json_encode_table(cases)
+    )
 }
 
 job_json_eplus_log <- function(private) {
@@ -749,13 +865,17 @@ job_json_parametric_state <- function(private) {
     params <- job_json_env_get(log, "params")
 
     list(
-        applied = !is.null(private$m_idfs),
+        applied = private$m_model_store$has_cases(),
         simple = job_json_env_get(log, "simple"),
         replayable = isTRUE(job_json_env_get(log, "simple")),
         measure_name = job_json_env_get(log, "measure_name"),
         bare = job_json_env_get(log, "bare"),
         params = job_json_encode_table(params),
-        cases = if (is.null(params)) NULL else job_json_encode_table(param_cases(NULL, private))
+        cases = if (is.null(params) || !private$m_model_store$cases_valid()) {
+            NULL
+        } else {
+            job_json_encode_table(param_cases(NULL, private))
+        }
     )
 }
 
@@ -953,14 +1073,49 @@ job_json_encode_value <- function(x) {
     x
 }
 
+job_json_decode_model_store <- function(x, base) {
+    models <- job_json_decode_table(x$models)
+    if (nrow(models)) {
+        set(models, NULL, "model_id", as.integer(models$model_id))
+        set(models, NULL, "source_path",
+            job_json_decode_path_vector(models$source_path, base))
+        set(models, NULL, "prepared_path",
+            job_json_decode_path_vector(models$prepared_path, base))
+        set(models, NULL, "sql", as.logical(models$sql))
+        set(models, NULL, "dict", as.logical(models$dict))
+        set(models, NULL, "size", as.numeric(models$size))
+        set(models, NULL, "mtime", job_json_parse_time(models$mtime))
+    }
+
+    cases <- job_json_decode_table(x$cases)
+    if (nrow(cases)) {
+        set(cases, NULL, "case_index", as.integer(cases$case_index))
+        set(cases, NULL, "model_id", as.integer(cases$model_id))
+        set(cases, NULL, "run_path",
+            job_json_decode_path_vector(cases$run_path, base))
+    }
+
+    JobModelStore$new(
+        models = models,
+        cases = cases,
+        seed_model_id = job_json_scalar_integer(x$seed_model_id, default = NULL),
+        cases_valid = job_json_scalar_logical(x$cases_valid, default = TRUE),
+        invalid_reason = job_json_scalar_character(x$invalid_reason)
+    )
+}
+
 job_json_restore_eplus_job <- function(manifest, base) {
     inputs <- manifest$inputs
+    store <- job_json_decode_model_store(inputs$model_store, base)
+    epw <- job_json_decode_path_nullable(inputs$epw, base)
     job <- eplus_job(
-        job_json_decode_path(inputs$idf, base),
-        job_json_decode_path_nullable(inputs$epw, base)
+        store$first_prepared_path(),
+        epw
     )
 
     private <- get_priv_env(job)
+    private$m_model_store <- store
+    private$m_epw_path <- epw
     job_json_restore_eplus_log(private, manifest$log)
     private$m_job <- job_json_decode_energyplus_result(manifest$run, base)
 
@@ -969,14 +1124,18 @@ job_json_restore_eplus_job <- function(manifest, base) {
 
 job_json_restore_group_job <- function(manifest, base) {
     inputs <- manifest$inputs
-    idfs <- job_json_decode_path_vector(inputs$idfs, base)
     epws <- job_json_decode_epws(inputs$epws, base)
+    store <- job_json_decode_model_store(inputs$model_store, base)
 
-    job <- group_job(idfs, epws)
+    first_epw <- if (length(epws)) epws[[1L]] else NULL
+    job <- group_job(store$first_prepared_path(), first_epw)
     private <- get_priv_env(job)
-
-    nms <- job_json_decode_optional_character(inputs$idf_names)
-    if (!is.null(nms)) names(private$m_idfs) <- nms
+    private$m_model_store <- store
+    private$m_epws_path <- if (length(epws)) {
+        vcapply(epws, function(epw) epw %||% NA_character_)
+    } else {
+        NULL
+    }
 
     job_json_restore_group_log(private, manifest$log)
     private$m_job <- job_json_decode_group_run(manifest$run, base)
@@ -986,20 +1145,16 @@ job_json_restore_group_job <- function(manifest, base) {
 
 job_json_restore_parametric_job <- function(manifest, base) {
     inputs <- manifest$inputs
+    store <- job_json_decode_model_store(inputs$model_store, base)
+    weather <- job_json_decode_path_nullable(inputs$weather, base)
     job <- param_job(
-        job_json_decode_path(inputs$seed, base),
-        job_json_decode_path_nullable(inputs$weather, base)
+        store$model_prepared_path(store$seed_model_id()),
+        weather
     )
 
     private <- get_priv_env(job)
-
-    models <- job_json_decode_path_vector(inputs$models, base, null.ok = TRUE)
-    if (!is.null(models)) {
-        private$m_idfs <- lapply(models, get_init_idf, sql = TRUE, dict = TRUE)
-        nms <- job_json_decode_optional_character(inputs$model_names)
-        if (!is.null(nms)) names(private$m_idfs) <- nms
-        private$log_idf_uuid()
-    }
+    private$m_model_store <- store
+    private$m_epws_path <- weather
 
     job_json_restore_parametric_log(private, manifest$log, manifest$parametric)
     private$m_job <- job_json_decode_group_run(manifest$run, base)
@@ -1019,7 +1174,7 @@ job_json_restore_group_log <- function(private, log) {
 
 job_json_restore_parametric_log <- function(private, log, parametric) {
     private$log_seed_uuid()
-    if (!is.null(private$m_idfs)) private$log_idf_uuid()
+    if (private$m_model_store$has_cases()) private$log_idf_uuid()
     job_json_restore_common_log(private$m_log, log)
 
     if (!is.null(parametric)) {
@@ -1032,6 +1187,8 @@ job_json_restore_parametric_log <- function(private, log, parametric) {
 
 job_json_restore_common_log <- function(log_env, log) {
     if (!is.null(log$uuid)) log_env$uuid <- job_json_scalar_character(log$uuid)
+    if (!is.null(log$seed_uuid)) log_env$seed_uuid <- job_json_scalar_character(log$seed_uuid)
+    if (!is.null(log$idf_uuid)) log_env$idf_uuid <- job_json_decode_character_vector(log$idf_uuid)
     if (!is.null(log$unsaved)) log_env$unsaved <- job_json_decode_value(log$unsaved)
 
     start <- job_json_parse_time(log$start_time)

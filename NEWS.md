@@ -2,6 +2,12 @@
 
 ## New features
 
+* Store prepared job model snapshots instead of keeping `Idf` objects alive
+  inside `EplusJob`, `EplusGroupJob`, and `ParametricJob`, reducing memory use
+  for large simulation sets. `ParametricJob$seed(new = ...)` can replace the
+  seed model and invalidates existing generated models until they are
+  regenerated (#615).
+
 * Add support for EnergyPlus v26.1.0 (#607, #612).
 
 * Class name matching is now case-insensitive across `Idd` and `Idf` class

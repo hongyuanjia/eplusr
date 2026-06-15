@@ -50,14 +50,12 @@ and a checksum when available. These file metadata are informational and do
 not prevent \code{read_job()} from restoring the job object if files have been
 removed.
 }
-\section{Parametric jobs}{
+\section{Model snapshots}{
 
-For \link{ParametricJob}, the manifest stores the seed model, weather file,
-generated model files, case data, and available run results. If generated
-models only exist in memory, \code{save_job()} snapshots them into a
-\verb{<manifest>_files} directory next to the JSON file. Arbitrary R measure
-functions passed to \verb{$apply_measure()} are not serialized; the restored job
-uses the generated model snapshots and stored case data.
+The manifest stores a prepared model snapshot store for \link{EplusJob},
+\link{EplusGroupJob}, and \link{ParametricJob}. For \link{ParametricJob}, arbitrary R
+measure functions passed to \verb{$apply_measure()} are not serialized; the
+restored job uses the generated model snapshots and stored case data.
 }
 
 \examples{
