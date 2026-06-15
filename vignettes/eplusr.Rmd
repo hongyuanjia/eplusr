@@ -40,8 +40,8 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-eplus_ver <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
-if (!is_avail_eplus(eplus_ver)) install_eplus(eplus_ver)
+eplus_ver <- max(avail_eplus())
+eplus_ver
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
