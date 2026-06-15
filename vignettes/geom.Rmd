@@ -41,7 +41,8 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus("latest")) install_eplus("latest")
+eplus_ver <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
+if (!is_avail_eplus(eplus_ver)) install_eplus(eplus_ver)
 ```
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
@@ -65,7 +66,7 @@ related objects, including:
   `Daylighting` group
 
 ```{r}
-path_idf <- file.path(eplus_config("latest")$dir, "ExampleFiles/HospitalLowEnergy.idf")
+path_idf <- file.path(eplus_config(eplus_ver)$dir, "ExampleFiles/HospitalLowEnergy.idf")
 idf <- read_idf(path_idf)
 geom <- idf$geometry()
 geom
@@ -121,7 +122,7 @@ detailed class, including:
 * `Shading:Zone:Detailed`
 
 ```{r}
-path_simple <- path_eplus_example("latest", "4ZoneWithShading_Simple_1.idf")
+path_simple <- path_eplus_example(eplus_ver, "4ZoneWithShading_Simple_1.idf")
 simple <- read_idf(path_simple)
 
 simple$class_name(by_group = TRUE)["Thermal Zones and Surfaces"]
@@ -369,4 +370,3 @@ methods will be added to perform geometric transformations in the near future.
 
 Also, new methods will be added in `IdfViewer` to allow visualize simulation
 results dynamically.
-

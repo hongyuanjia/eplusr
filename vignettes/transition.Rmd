@@ -40,7 +40,8 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus("latest")) install_eplus("latest")
+eplus_ver <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
+if (!is_avail_eplus(eplus_ver)) install_eplus(eplus_ver)
 if (!is_avail_eplus("22.2")) install_eplus("22.2")
 ```
 

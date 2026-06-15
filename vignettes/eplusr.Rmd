@@ -40,7 +40,8 @@ options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
 
 library(eplusr)
-if (!is_avail_eplus("latest")) install_eplus("latest")
+eplus_ver <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
+if (!is_avail_eplus(eplus_ver)) install_eplus(eplus_ver)
 ```
 
 This vignette introduces eplusr class structure, how to read EnergyPlus IDFs
@@ -93,7 +94,7 @@ data of EnergyPlus configuration using `eplus_config()`.
 ```{r avail_eplus}
 avail_eplus()
 
-eplus_config("latest")
+eplus_config(eplus_ver)
 ```
 
 If your EnergyPlus was not installed in standard location, you can add that
@@ -146,7 +147,7 @@ simply `read_idf(path)` without specifying `idd`. This is because eplusr will
 use IDD files distributed with EnergyPlus VersionUpdater program.
 
 ```{r read, out.lines = 10}
-path <- path_eplus_example("latest", "5Zone_Transformer.idf")
+path <- path_eplus_example(eplus_ver, "5Zone_Transformer.idf")
 model <- read_idf(path)
 
 model
@@ -524,7 +525,7 @@ from a ".ddy" file. You can achieve that using `$insert()`.
 
 ```{r ddy, out.lines = 20}
 # read ddy file as normal IDF
-path_ddy <- path_eplus_weather("latest", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
+path_ddy <- path_eplus_weather(eplus_ver, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")
 ddy <- read_idf(path_ddy, idd = model$version(), encoding = "Latin-1")
 
 model$insert(ddy$SizingPeriod_DesignDay)
