@@ -1,3 +1,14 @@
+# eplusr (development version)
+
+## New features
+
+* Add support for EnergyPlus v23.2.0 (#578, #601).
+
+## Bug fixes
+
+* Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball
+  installation (#601).
+
 # eplusr 0.16.3
 
 ## New features

@@ -2444,9 +2444,9 @@ test_that("to_table", {
             value = list(
                 "C5 - 4 IN HW CONCRETE", "MediumRough",
                 units::set_units(0.1014984, "m"),
-                units::set_units(1.729577, "W/K/m"),
+                units::set_units(1.729577, "W/m/K"),
                 units::set_units(2242.585, "kg/m^3"),
-                units::set_units(836.8, "J/K/kg"),
+                units::set_units(836.8, "J/kg/K"),
                 0.9, 0.65, 0.65
             )
         ), tolerance = 1e-5
@@ -2456,9 +2456,9 @@ test_that("to_table", {
             "Name" = "C5 - 4 IN HW CONCRETE",
             "Roughness" = "MediumRough",
             "Thickness" = units::set_units(0.1014984, "m"),
-            "Conductivity" = units::set_units(1.729577, "W/K/m"),
+            "Conductivity" = units::set_units(1.729577, "W/m/K"),
             "Density" = units::set_units(2242.585, "kg/m^3"),
-            "Specific Heat" = units::set_units(836.8, "J/K/kg"),
+            "Specific Heat" = units::set_units(836.8, "J/kg/K"),
             "Thermal Absorptance" = 0.9,
             "Solar Absorptance" = 0.65,
             "Visible Absorptance" = 0.65
@@ -2469,9 +2469,9 @@ test_that("to_table", {
             "Name" = "C5 - 4 IN HW CONCRETE",
             "Roughness" = "MediumRough",
             "Thickness" = units::set_units(0.1014984, "m"),
-            "Conductivity" = units::set_units(1.729577, "W/K/m"),
+            "Conductivity" = units::set_units(1.729577, "W/m/K"),
             "Density" = units::set_units(2242.585, "kg/m^3"),
-            "Specific Heat" = units::set_units(836.8, "J/K/kg"),
+            "Specific Heat" = units::set_units(836.8, "J/kg/K"),
             "Thermal Absorptance" = 0.9,
             "Solar Absorptance" = 0.65,
             "Visible Absorptance" = 0.65
