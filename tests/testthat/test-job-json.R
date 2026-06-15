@@ -37,6 +37,9 @@ test_that("save_job() and read_job() round-trip job manifests", {
 
     expect_equal(save_job(job, path), path)
     expect_true(jsonlite::validate(paste(readLines(path), collapse = "\n")))
+    manifest <- jsonlite::fromJSON(path,
+        simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
+    expect_named(manifest$inputs, c("model_store", "epw"))
 
     restored <- read_job(path)
     expect_s3_class(restored, "EplusJob")
@@ -49,10 +52,22 @@ test_that("save_job() and read_job() round-trip job manifests", {
 
     invalid_kind <- jsonlite::fromJSON(path,
         simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
-    invalid_kind$inputs$idfs <- invalid_kind$inputs$idf
+    invalid_kind$inputs$idfs <- "unexpected.idf"
     invalid <- tempfile(fileext = ".json")
     write_job_manifest(invalid_kind, invalid)
-    expect_error(read_job(invalid), class = "eplusr_error_job_json_kind")
+    expect_error(read_job(invalid), "job manifest\\$inputs")
+
+    invalid_store <- manifest
+    invalid_store$inputs$model_store$models[[1L]]$prepared_path <- NULL
+    invalid <- tempfile(fileext = ".json")
+    write_job_manifest(invalid_store, invalid)
+    expect_error(read_job(invalid), "job manifest\\$inputs\\$model_store")
+
+    invalid_ref <- manifest
+    invalid_ref$inputs$model_store$cases[[1L]]$model_id <- 999L
+    invalid <- tempfile(fileext = ".json")
+    write_job_manifest(invalid_ref, invalid)
+    expect_error(read_job(invalid), class = "eplusr_error_job_json_model_store")
 })
 
 test_that("completed EplusJob results can be restored from JSON", {
@@ -151,9 +166,9 @@ test_that("ParametricJob generated models are snapshotted and restored", {
     save_job(param, path)
 
     snap_dir <- file.path(dirname(path),
-        paste0(tools::file_path_sans_ext(basename(path)), "_files"))
+        paste0(tools::file_path_sans_ext(basename(path)), "_files"), "model_store")
     expect_true(dir.exists(snap_dir))
-    expect_length(list.files(snap_dir, "\\.idf$", full.names = TRUE), 2L)
+    expect_length(list.files(snap_dir, "\\.idf$", full.names = TRUE, recursive = TRUE), 3L)
 
     invalid_kind <- jsonlite::fromJSON(path,
         simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)

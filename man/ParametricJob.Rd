@@ -27,11 +27,11 @@ of EnergyPlus simulations.
 For details on \code{ParametricJob}, please see \link{ParametricJob} class.
 }
 \details{
-Basically, it is a collection of multiple \code{EplusJob} objects. However, the
-model is first parsed and the \link{Idf} object is stored internally, instead of
-storing only the path of Idf like in \link{EplusJob} class. Also, an object in
-\code{Output:SQLite} with \verb{Option Type} value of \code{SimpleAndTabular} will be
-automatically created if it does not exists, like \link{Idf} class does.
+Basically, it is a collection of multiple \code{EplusJob} objects. The seed model
+and generated models are stored internally as prepared model snapshots and
+parsed as \link{Idf} objects only when needed. Also, an object in \code{Output:SQLite}
+with \verb{Option Type} value of \code{SimpleAndTabular} will be automatically created
+if it does not exists, like \link{Idf} class does.
 }
 \examples{
 
@@ -352,13 +352,25 @@ param$version()
 \if{html}{\out{<a id="method-ParametricJob-seed"></a>}}
 \if{latex}{\out{\hypertarget{method-ParametricJob-seed}{}}}
 \subsection{Method \code{seed()}}{
-Get the seed \link{Idf} object
+Get or replace the seed \link{Idf} object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$seed()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$seed(new)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new}}{A path to an EnergyPlus IDF file or an \link{Idf} object used
+to replace the current seed. If missing, the current seed is
+returned.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
-\verb{$seed()} returns the parsed input seed \link{Idf} object.
+\verb{$seed()} returns the parsed input seed \link{Idf} object. \verb{$seed(new)}
+replaces the seed model. If parametric models have already been
+generated, they become stale and cannot be run or saved until
+\verb{$param()} or \verb{$apply_measure()} is called again.
 }
 
 \subsection{Examples}{
@@ -634,13 +646,10 @@ returned. Default: \code{NULL}.}
 method. Model names are assigned in the same way as the \code{.names}
 argument in
 \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
-If no measure has been applied, \code{NULL} is returned. Note that it is
-not recommended to conduct any extra modification on those models
-directly, after they were created using
-\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
-as this may lead to an un-reproducible process. A warning message
-will be issued if any of those models has been modified when running
-simulations.
+If no measure has been applied, \code{NULL} is returned. Returned \link{Idf}
+objects are detached copies of the internally stored prepared
+snapshots. Modifying them will not change the models that are used
+for \verb{$run()} or \verb{$save()}.
 }
 
 \subsection{Examples}{

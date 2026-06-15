@@ -78,10 +78,10 @@ test_that("Reload", {
 
     expect_idf_reloaded(idf)
     expect_idf_reloaded(epw)
-    expect_idf_reloaded(get_priv_env(job)$m_idf)
-    expect_idf_reloaded(get_priv_env(par)$m_seed)
-    lapply(get_priv_env(grp)$m_idfs, expect_idf_reloaded)
-    lapply(get_priv_env(par)$m_idfs, expect_idf_reloaded)
+    expect_idf_reloaded(get_priv_env(job)$m_model_store$load_cases()[[1L]])
+    expect_idf_reloaded(get_priv_env(par)$m_model_store$load_seed())
+    lapply(get_priv_env(grp)$m_model_store$load_cases(), expect_idf_reloaded)
+    lapply(get_priv_env(par)$m_model_store$load_cases(), expect_idf_reloaded)
     expect_true(data.table::truelength(get_priv_env(grp)$m_job$jobs) > 0L)
     expect_true(data.table::truelength(get_priv_env(par)$m_job$jobs) > 0L)
 

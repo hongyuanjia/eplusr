@@ -14,6 +14,7 @@ test_that("Parametric methods", {
 
     # $seed()
     expect_s3_class(param$seed(), "Idf")
+    expect_s3_class(param$seed(new = path_idf), "ParametricJob")
 
     # $weather()
     expect_s3_class(param$weather(), "Epw")
@@ -101,6 +102,10 @@ test_that("$models()", {
 
     expect_equal(names(param$models(names = "model")), c("model_1", "model_2"))
     expect_error(names(param$models(names = c("a", "b", "c"))), "names")
+
+    models <- param$models()
+    models[[1L]]$set(Material := list(thickness = 0.05))
+    expect_false(param$models()[[1L]]$is_unsaved())
 })
 
 test_that("$cases()", {
@@ -157,12 +162,29 @@ test_that("$run()", {
 
     param$apply_measure(function(idf, num) idf, num = 1:2)
     param$models()[[1L]]$set(Material := list(thickness = 0.05))
-    expect_warning(param$run())
+    expect_s3_class(param$run(), "ParametricJob")
 
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     param <- param_job(path, path_epw)
     param$apply_measure(function(idf, num) idf, num = 1:2)
     expect_s3_class(param$run(), "ParametricJob")
+})
+
+test_that("$seed(new=) invalidates generated parametric models", {
+    skip_on_cran()
+
+    path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
+    param <- param_job(path, NULL)
+    param$apply_measure(function(idf, num) idf, num = 1:2)
+
+    expect_s3_class(param$seed(new = path), "ParametricJob")
+    expect_error(param$models(), class = "eplusr_error_param_models_stale")
+    expect_error(param$cases(), class = "eplusr_error_param_models_stale")
+    expect_error(param$save(), class = "eplusr_error_param_models_stale")
+    expect_error(param$run(), class = "eplusr_error_param_models_stale")
+
+    expect_s3_class(param$apply_measure(function(idf, num) idf, num = 1:2), "ParametricJob")
+    expect_equal(names(param$models()), c("case_1", "case_2"))
 })
 
 test_that("$save()", {

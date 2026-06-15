@@ -839,7 +839,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_idf = NULL,
+        m_model_store = NULL,
         m_epw_path = NULL,
         m_job = NULL,
         m_log = NULL,
@@ -849,8 +849,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         uuid = function() private$m_log$uuid,
         log_new_uuid = function() log_new_uuid(private$m_log),
 
-        seed_uuid = function() get_priv_env(private$m_idf)$m_log$uuid,
-        log_seed_uuid = function() private$m_log$seed_uuid <- get_priv_env(private$m_idf)$m_log$uuid,
+        seed_uuid = function() private$m_model_store$case_signatures()[[1L]],
+        log_seed_uuid = function() private$m_log$seed_uuid <- private$seed_uuid(),
         cached_seed_uuid = function() private$m_log$seed_uuid,
 
         is_unsaved = function() private$m_log$unsaved,
@@ -883,22 +883,25 @@ eplus_job <- function(idf, epw) {
 
 # job_initialize {{{
 job_initialize <- function(self, private, idf, epw) {
-    # add Output:SQLite and Output:VariableDictionary if necessary
-    private$m_idf <- get_init_idf(idf)
+    store <- JobModelStore$new()
+    model_id <- store$add_input_model(idf, role = "input")
+    store$set_cases(model_id)
+    private$m_model_store <- store
+
     if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
 
     # log if the input idf has been changed
     private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-    private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
+    private$m_log$unsaved <- FALSE
 
     # save uuid
-    private$log_seed_uuid()
+    private$m_log$seed_uuid <- if (is_idf(idf)) get_priv_env(idf)$uuid() else private$seed_uuid()
     private$log_new_uuid()
 }
 # }}}
 # job_version {{{
 job_version <- function(self, private) {
-    private$m_idf$version()
+    private$m_model_store$model_version(private$m_model_store$case_model_ids()[[1L]])
 }
 # }}}
 # job_path {{{
@@ -906,23 +909,17 @@ job_path <- function(self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)
 
     path_epw <- if (is.null(private$m_epw_path)) NA_character_ else private$m_epw_path
+    path_idf <- private$m_model_store$case_source_paths()[[1L]]
+    if (is.na(path_idf)) path_idf <- private$m_model_store$case_model_paths()[[1L]]
     switch(type,
-        all = c(idf = private$m_idf$path(), epw = path_epw),
-        idf = private$m_idf$path(), epw = path_epw
+        all = c(idf = path_idf, epw = path_epw),
+        idf = path_idf, epw = path_epw
     )
 }
 # }}}
 # job_run {{{
 job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE, readvars = TRUE) {
-    # stop if idf object has been changed accidentally
-    if (!identical(private$seed_uuid(), private$cached_seed_uuid())) {
-        abort(paste0("The Idf has been modified after job was created. ",
-            "Running this Idf will result in simulation outputs that may be not reproducible.",
-            "Please recreate the job using new Idf and then run it."
-        ))
-    }
-
     if (missing(epw)) epw <- private$m_epw_path
 
     if (is.null(epw)) {
@@ -933,24 +930,24 @@ job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
         path_epw <- private$m_epw_path
     }
 
-    path_idf <- private$m_idf$path()
+    model_id <- private$m_model_store$case_model_ids()[[1L]]
+    path_idf <- private$m_model_store$case_source_paths()[[1L]]
+    if (is.na(path_idf)) path_idf <- private$m_model_store$case_model_paths()[[1L]]
     if (is.null(dir)) {
         run_dir <- dirname(path_idf)
     } else {
         run_dir <- dir
-        path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = FALSE)
     }
+    path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = FALSE)
 
-    # if necessary, resave the model
-    if (private$is_unsaved() || !is.null(dir)) {
-        path_idf <- private$m_idf$save(path_idf, overwrite = TRUE, copy_external = copy_external)
-        private$log_seed_uuid()
-        private$log_saved()
-    }
+    materialized <- private$m_model_store$materialize_cases(path_idf,
+        copy_external = copy_external)
+    path_idf <- materialized$paths[[1L]]
+    private$log_saved()
 
     # when no epw is given, at least one design day object should exists
     if (is.null(private$m_epw_path)) {
-        if (!private$m_idf$is_valid_class("SizingPeriod:DesignDay")) {
+        if (!private$m_model_store$model_has_design_day(model_id)) {
             abort(paste0("When no weather file is given, input IDF should contain ",
                 "at least one 'SizingPeriod:DesignDay' object to enable ",
                 "Design-Day-only simulation."
@@ -980,17 +977,13 @@ job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     private$m_log$start_time <- current()
     private$m_log$killed <- NULL
 
-    resrc <- NULL
-    if (copy_external) {
-        # check if external file dependencies are found
-        resrc <- private$m_idf$external_deps()
-        if (!length(resrc)) resrc <- NULL
-    }
+    resrc <- if (copy_external) materialized$resources[[1L]] else NULL
 
     private$m_job <- energyplus(
         model = path_idf, weather = path_epw, design_day = is.null(private$m_epw_path),
-        eso_to_ip = FALSE, readvars = readvars, echo = echo, wait = wait,
-        eplus = private$m_idf$version(), resources = resrc
+        output_dir = run_dir, eso_to_ip = FALSE, readvars = readvars, echo = echo,
+        wait = wait, eplus = private$m_model_store$model_version(model_id),
+        resources = resrc
     )
 
     private$log_new_uuid()
@@ -1040,8 +1033,9 @@ job_status <- function(self, private) {
 
     # if the model has not been run before
     if (is.null(proc)) {
-        if (!file.exists(private$m_idf$path())) {
-            warn(sprintf("Could not find local idf file '%s'.", surround(private$m_idf$path())))
+        path_idf <- private$m_model_store$case_source_paths()[[1L]]
+        if (!is.na(path_idf) && !file.exists(path_idf)) {
+            warn(sprintf("Could not find local idf file '%s'.", surround(path_idf)))
         }
         return(status)
     }
@@ -1078,16 +1072,18 @@ job_status <- function(self, private) {
     }
 
     status$changed_after <- FALSE
-    if (!identical(private$cached_seed_uuid(), private$seed_uuid())) {
-        status$changed_after <- TRUE
-    }
 
     status
 }
 # }}}
 # job_output_dir {{{
 job_output_dir <- function(self, private, open = FALSE) {
-    dir <- normalizePath(dirname(private$m_idf$path()), mustWork = FALSE)
+    if (!is.null(private$m_job) && !inherits(private$m_job, "process")) {
+        dir <- normalizePath(private$m_job$output_dir, mustWork = FALSE)
+    } else {
+        dir <- private$m_model_store$default_dir()
+        dir <- normalizePath(dir, mustWork = FALSE)
+    }
     if (!open) return(dir)
     if (open) {
         if (is.null(dir)) {
@@ -1155,7 +1151,12 @@ job_list_files <- function(self, private, simplify = FALSE, full = FALSE) {
 # }}}
 # job_locate_output {{{
 job_locate_output <- function(self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
-    out <- paste0(tools::file_path_sans_ext(private$m_idf$path()), suffix)
+    path_idf <- private$m_model_store$case_run_paths()[[1L]]
+    if (is.na(path_idf)) {
+        path_idf <- private$m_model_store$case_source_paths()[[1L]]
+        if (is.na(path_idf)) path_idf <- private$m_model_store$case_model_paths()[[1L]]
+    }
+    out <- paste0(tools::file_path_sans_ext(path_idf), suffix)
 
     if (strict) {
         status <- job_status(self, private)
@@ -1273,10 +1274,12 @@ job_tabular_data <- function(self, private, report_name = NULL, report_for = NUL
 # job_print {{{
 job_print <- function(self, private) {
     path_epw <- if (is.null(private$m_epw_path)) NULL else private$m_epw_path
+    path_idf <- private$m_model_store$case_source_paths()[[1L]]
+    if (is.na(path_idf)) path_idf <- private$m_model_store$case_model_paths()[[1L]]
     print_job_header(title = "EnergPlus Simulation Job",
-        path_idf = private$m_idf$path(),
+        path_idf = path_idf,
         path_epw = path_epw,
-        eplus_ver = private$m_idf$version(),
+        eplus_ver = job_version(self, private),
         name_idf = "Model", name_epw = "Weather"
     )
     status <- job_status(self, private)

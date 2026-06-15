@@ -26,6 +26,7 @@ test_that("can read IDD", {
     expect_error(use_idd(""), class = "eplusr_error_read_lines")
 
     # can directly download from EnergyPlus GitHub repo
+    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
     expect_s3_class(idd <- use_idd("8.4", download = TRUE), "Idd")
 
     # can directly return if input is an Idd

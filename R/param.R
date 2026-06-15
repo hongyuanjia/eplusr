@@ -9,11 +9,11 @@ NULL
 #' `ParametricJob` class provides a prototype of conducting parametric analysis
 #' of EnergyPlus simulations.
 #'
-#' Basically, it is a collection of multiple `EplusJob` objects. However, the
-#' model is first parsed and the [Idf] object is stored internally, instead of
-#' storing only the path of Idf like in [EplusJob] class. Also, an object in
-#' `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
-#' automatically created if it does not exists, like [Idf] class does.
+#' Basically, it is a collection of multiple `EplusJob` objects. The seed model
+#' and generated models are stored internally as prepared model snapshots and
+#' parsed as [Idf] objects only when needed. Also, an object in `Output:SQLite`
+#' with `Option Type` value of `SimpleAndTabular` will be automatically created
+#' if it does not exists, like [Idf] class does.
 #'
 #' @docType class
 #' @name ParametricJob
@@ -54,14 +54,12 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' }
         #'
         initialize = function(idf, epw) {
-            # add Output:SQLite and Output:VariableDictionary if necessary
-            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE)
-
-            private$m_seed <- idf
+            private$m_model_store <- JobModelStore$new()
+            private$m_model_store$set_seed(idf)
 
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
+            private$m_log$unsaved <- logical()
 
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 
@@ -92,18 +90,25 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
         # seed {{{
         #' @description
-        #' Get the seed [Idf] object
+        #' Get or replace the seed [Idf] object
         #'
         #' @details
-        #' `$seed()` returns the parsed input seed [Idf] object.
+        #' `$seed()` returns the parsed input seed [Idf] object. `$seed(new)`
+        #' replaces the seed model. If parametric models have already been
+        #' generated, they become stale and cannot be run or saved until
+        #' `$param()` or `$apply_measure()` is called again.
+        #'
+        #' @param new A path to an EnergyPlus IDF file or an [Idf] object used
+        #'   to replace the current seed. If missing, the current seed is
+        #'   returned.
         #'
         #' @examples
         #' \dontrun{
         #' param$seed()
         #' }
         #'
-        seed = function()
-            param_seed(self, private),
+        seed = function(new)
+            param_seed(self, private, new),
         # }}}
 
         # weather {{{
@@ -308,13 +313,10 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' method. Model names are assigned in the same way as the `.names`
         #' argument in
         #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
-        #' If no measure has been applied, `NULL` is returned. Note that it is
-        #' not recommended to conduct any extra modification on those models
-        #' directly, after they were created using
-        #' \href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
-        #' as this may lead to an un-reproducible process. A warning message
-        #' will be issued if any of those models has been modified when running
-        #' simulations.
+        #' If no measure has been applied, `NULL` is returned. Returned [Idf]
+        #' objects are detached copies of the internally stored prepared
+        #' snapshots. Modifying them will not change the models that are used
+        #' for `$run()` or `$save()`.
         #'
         #' @param names A character vector of new names for parametric models.
         #'        If a single string, it will be used as a prefix and all models
@@ -490,11 +492,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
     ),
 
     private = list(
-        # PRIVATE FIELDS {{{
-        m_seed = NULL,
-        # }}}
         # PRIVATE FUNCTIONS {{{
-        seed_uuid = function() get_priv_env(private$m_seed)$m_log$uuid,
+        seed_uuid = function() private$m_model_store$model_signature(private$m_model_store$seed_model_id()),
         log_seed_uuid = function() private$m_log$seed_uuid <- private$seed_uuid(),
         cached_seed_uuid = function() private$m_log$seed_uuid
         # }}}
@@ -524,18 +523,26 @@ param_job <- function(idf, epw) {
 
 # param_version {{{
 param_version <- function(self, private) {
-    private$m_seed$version()
+    private$m_model_store$model_version(private$m_model_store$seed_model_id())
 }
 # }}}
 # param_seed {{{
-param_seed <- function(self, private) {
-    private$m_seed
+param_seed <- function(self, private, new) {
+    if (missing(new)) {
+        return(private$m_model_store$load_seed())
+    }
+
+    private$m_model_store$set_seed(new)
+    private$m_log$unsaved <- rep(FALSE, private$m_model_store$case_count())
+    private$log_seed_uuid()
+    private$log_new_uuid()
+    invisible(self)
 }
 # }}}
 # param_models {{{
 param_models <- function(self, private, names = NULL) {
     assert_character(names, any.missing = FALSE, null.ok = TRUE, min.len = 1L)
-    if (!length(private$m_idfs)) {
+    if (!private$m_model_store$has_cases()) {
         verbose_info("No parametric models have been created.")
         if (!is.null(names)) {
             verbose_info("Nothing to rename.")
@@ -543,20 +550,13 @@ param_models <- function(self, private, names = NULL) {
         return(NULL)
     }
 
-    if (!length(names)) return(private$m_idfs)
+    private$m_model_store$assert_cases_valid()
 
-    if (length(names) == 1L && length(private$m_idfs) > 1L) {
-        names <- paste0(names, sep = "_", lpad(seq_along(private$m_idfs), "0"))
-    } else if (length(names) != length(private$m_idfs)) {
-        abort(paste(
-            "Invalid parametric model names found.",
-            length(private$m_idfs), "models created but", length(names), "new names given"
-        ), "param_names")
+    if (length(names)) {
+        private$m_model_store$rename_cases(names)
     }
 
-    setattr(private$m_idfs, "names", names)
-
-    private$m_idfs
+    private$m_model_store$load_cases()
 }
 # }}}
 # param_weather {{{
@@ -566,19 +566,26 @@ param_weather <- function(self, private) {
 # }}}
 # param_cases {{{
 param_cases <- function(self, private, param = NULL) {
-    if (is.null(private$m_idfs)) {
+    if (!private$m_model_store$has_cases()) {
         verbose_info("No parametric models have been created.")
         return(NULL)
     }
+    private$m_model_store$assert_cases_valid()
 
     cases <- copy(private$m_log$params)
 
-    if (!private$m_log$simple) return(cases)
+    if (!private$m_log$simple) {
+        if ("case" %in% names(cases)) {
+            set(cases, NULL, "case", private$m_model_store$case_names())
+        }
+        return(cases)
+    }
 
     # remove duplicates
     cases <- unique(cases, by = c("case_index", "param_index"))
     # add field type
-    add_field_property(get_priv_env(private$m_seed)$idd_env(), cases, "type_enum")
+    seed <- private$m_model_store$load_seed()
+    add_field_property(get_priv_env(seed)$idd_env(), cases, "type_enum")
     # get value list
     set(cases, NULL, "value", get_value_list(cases))
     # change to wide
@@ -587,7 +594,7 @@ param_cases <- function(self, private, param = NULL) {
         set(cases, NULL, col, unlist(cases[[col]], FALSE, FALSE))
     }
     setnames(cases, "case_index", "index")
-    set(cases, NULL, "case", names(private$m_idfs))
+    set(cases, NULL, "case", private$m_model_store$case_names())
     setcolorder(cases, c("index", "case"))
 
     cases[]
@@ -598,8 +605,9 @@ param_param <- function(self, private, ..., .names = NULL, .cross = FALSE, .env 
     assert_flag(.cross)
     assert_character(.names, null.ok = TRUE, any.missing = FALSE)
 
+    seed <- private$m_model_store$load_seed()
     l <- expand_idf_dots_value(
-        get_priv_env(private$m_seed)$idd_env(), get_priv_env(private$m_seed)$idf_env(),
+        get_priv_env(seed)$idd_env(), get_priv_env(seed)$idf_env(),
         ..., .type = "object", .complete = FALSE, .unique = TRUE, .empty = FALSE,
         .default = FALSE, .scalar = FALSE, .pair = FALSE, .env = .env)
 
@@ -732,6 +740,8 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
     private$m_log$measure_name <- mea_nm
     private$m_log$bare <- bare
 
+    seed <- private$m_model_store$load_seed()
+
     # progress bar
     progress_bar <- cli::cli_progress_bar(
         total = max(viapply(list(...), length)), clear = TRUE,
@@ -741,7 +751,7 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
     # create models
     out <- mapply(measure_wrapper, ...,
         MoreArgs = list(
-            idf = private$m_seed,
+            idf = seed,
             .__PROGRESS_BAR__ = list(id = progress_bar, env = environment())
         ),
         SIMPLIFY = FALSE, USE.NAMES = FALSE
@@ -776,12 +786,16 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
     private$m_log$params <- cases
     private$m_log$simple <- FALSE
 
-    private$m_idfs <- out
+    model_ids <- viapply(seq_along(out), function(i) {
+        private$m_model_store$add_model(out[[i]], role = "case",
+            name = nms[[i]], source_path = NULL, sql = TRUE, dict = TRUE)
+    })
+    private$m_model_store$set_cases(model_ids, nms)
 
     # log unique ids
     private$log_idf_uuid()
     private$log_new_uuid()
-    private$m_log$unsaved <- rep(TRUE, length(out))
+    private$m_log$unsaved <- rep(FALSE, length(out))
 
     if (bare) {
         mea_nm <- "function"
@@ -800,27 +814,13 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
 param_run <- function(self, private, output_dir = NULL, wait = TRUE,
                        force = FALSE, copy_external = FALSE, echo = wait,
                        separate = TRUE, readvars = TRUE) {
-    if (is.null(private$m_idfs)) {
+    if (!private$m_model_store$has_cases()) {
         abort("No measure has been applied.")
     }
-
-    # check if generated models have been modified outside
-    uuid <- private$idf_uuid()
-    if (any(i <- uuid != private$cached_idf_uuid())) {
-        warn(paste0(
-                "Some of the parametric models have been modified after created using `$apply_measure()`. ",
-                "Running these models will result in simulation outputs that may be not reproducible. ",
-                "It is recommended to re-apply your original measure using `$apply_measure()` and call `$run()` again. ",
-                "Models that have been modified are listed below:\n",
-                paste0(" #", lpad(seq_along(uuid)[i], "0"), " | ", names(uuid)[i], collapse = "\n")
-            ),
-            "param_model_modified"
-        )
-        private$log_unsaved(which(i))
-    }
+    private$m_model_store$assert_cases_valid()
 
     private$log_new_uuid()
-    if (is.null(output_dir)) output_dir <- dirname(private$m_seed$path())
+    if (is.null(output_dir)) output_dir <- private$m_model_store$default_dir(seed = TRUE)
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
 }
 # }}}
@@ -828,16 +828,12 @@ param_run <- function(self, private, output_dir = NULL, wait = TRUE,
 #' @importFrom checkmate assert_string
 param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
     assert_string(dir, null.ok = TRUE)
-    if (is.null(private$m_idfs)) {
+    if (!private$m_model_store$has_cases()) {
         abort("No parametric models found since no measure has been applied.")
     }
+    private$m_model_store$assert_cases_valid()
 
-    # restore uuid
-    uuid <- private$idf_uuid()
-
-    path_idf <- normalizePath(private$m_seed$path(), mustWork = TRUE)
-
-    if (is.null(dir)) dir <- dirname(path_idf)
+    if (is.null(dir)) dir <- private$m_model_store$default_dir(seed = TRUE)
 
     if (!dir.exists(dir)) {
         # nocov start
@@ -850,7 +846,7 @@ param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external
         # nocov end
     }
 
-    filename <- make_filename(names(private$m_idfs))
+    filename <- make_filename(private$m_model_store$case_names())
 
     if (separate) {
         path_param <- file.path(dir, filename, paste0(filename, ".idf"))
@@ -860,9 +856,8 @@ param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external
     }
 
     # save model
-    path_param <- apply2_chr(private$m_idfs, path_param,
-        function(x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
-    )
+    path_param <- private$m_model_store$materialize_cases(path_param,
+        copy_external = copy_external)$paths
     # copy weather
     path_epw <- private$m_epws_path
     if (!is.null(path_epw)) {
@@ -874,29 +869,31 @@ param_save <- function(self, private, dir = NULL, separate = TRUE, copy_external
         path_epw <- NA_character_
     }
 
-    # assign original uuid in case it is updated when saving
-    # if not assign original here, the model modification checkings in `$run()`
-    # may be incorrect.
-    for (i in seq_along(uuid)) {
-        log <- get_priv_env(private$m_idfs[[i]])$m_log
-        log$uuid <- uuid[[i]]
-    }
-
     data.table(model = path_param, weather = path_epw)
 }
 # }}}
 # param_print {{{
 param_print <- function(self, private) {
+    path_idf <- private$m_model_store$model_source_path(private$m_model_store$seed_model_id())
+    if (is.na(path_idf)) {
+        path_idf <- private$m_model_store$model_prepared_path(private$m_model_store$seed_model_id())
+    }
     print_job_header(title = "EnergPlus Parametric Simulation Job",
-        path_idf = private$m_seed$path(),
+        path_idf = path_idf,
         path_epw = private$m_epws_path,
-        eplus_ver = private$m_seed$version(),
+        eplus_ver = param_version(self, private),
         name_idf = "Seed", name_epw = "Weather"
     )
 
-    if (is.null(private$m_idfs)) {
+    if (!private$m_model_store$has_cases()) {
         cli::cat_line("<< No measure has been applied >>",
             col = "white", background_col = "blue")
+        return(invisible(self))
+    }
+
+    if (!private$m_model_store$cases_valid()) {
+        cli::cat_line("<< Parametric models are stale. Regenerate them before running or saving. >>",
+            col = "white", background_col = "red")
         return(invisible(self))
     }
 
@@ -904,7 +901,7 @@ param_print <- function(self, private) {
         cli::cat_line(paste0("Applied Measure: ", surround(private$m_log$measure_name)))
     }
 
-    cli::cat_line(paste0("Parametric Models [", length(private$m_idfs), "]: "))
+    cli::cat_line(paste0("Parametric Models [", private$m_model_store$case_count(), "]: "))
 
     epgroup_print_status(self, private, epw = FALSE)
 }

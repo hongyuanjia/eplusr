@@ -58,11 +58,11 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             # add Output:SQLite and Output:VariableDictionary if necessary
             input <- get_epgroup_input(idfs, epws, sql = TRUE, dict = TRUE)
 
-            private$m_idfs <- input$idfs
+            private$m_model_store <- input$store
             private$m_epws_path <- input$epws
             # log if the input idf has been changed
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
-            private$m_log$unsaved <- input$sql | input$dict
+            private$m_log$unsaved <- rep(FALSE, private$m_model_store$case_count())
 
             # save uuid
             private$log_idf_uuid()
@@ -877,7 +877,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_idfs = NULL,
+        m_model_store = NULL,
         m_epws_path = NULL,
         m_job = NULL,
         m_log = NULL,
@@ -887,11 +887,11 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         log_new_uuid = function() log_new_uuid(private$m_log),
 
         idf_uuid = function(which = NULL) {
-            idfs <- if (is.null(which)) private$m_idfs else private$m_idfs[which]
-            vcapply(idfs, function(idf) get_priv_env(idf)$uuid())
+            sig <- private$m_model_store$case_signatures()
+            if (is.null(which)) sig else sig[which]
         },
         log_idf_uuid = function(which = NULL) {
-            if (is.null(which)) which <- seq_along(private$m_idfs)
+            if (is.null(which)) which <- seq_len(private$m_model_store$case_count())
             private$m_log$idf_uuid[which] <- private$idf_uuid(which)
         },
         cached_idf_uuid = function(which = NULL) {
@@ -933,17 +933,7 @@ group_job <- function(idfs, epws) {
 epgroup_run <- function(self, private, output_dir = NULL, wait = TRUE,
                          force = FALSE, copy_external = FALSE, echo = wait,
                          separate = TRUE, readvars = TRUE) {
-    # check if generated models have been modified outside
-    uuid <- private$idf_uuid()
-    if (any(i <- uuid != private$cached_idf_uuid())) {
-        warn(paste0(
-            "Some of the grouped models have been modified. ",
-            "Running these models will result in simulation outputs that may be not reproducible. ",
-            paste0(" # ", seq_along(uuid)[i], " | ", names(uuid)[i], collapse = "\n")
-        ), "group_model_modified")
-        private$log_unsaved(which(i))
-    }
-
+    private$m_model_store$assert_cases_valid()
     private$log_new_uuid()
 
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
@@ -959,11 +949,15 @@ epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
     assert_flag(separate)
     assert_flag(readvars)
 
-    path_idf <- vcapply(private$m_idfs, function(idf) idf$path())
+    store <- private$m_model_store
+    store$assert_cases_valid()
 
-    if (checkmate::test_names(names(private$m_idfs))) {
+    path_idf <- store$case_source_paths()
+    path_idf[is.na(path_idf)] <- store$case_model_paths()[is.na(path_idf)]
+
+    if (store$case_has_names()) {
         # for parametric job
-        nms <- paste0(make_filename(names(private$m_idfs)), ".idf")
+        nms <- paste0(make_filename(store$case_names()), ".idf")
     } else {
         nms <- basename(path_idf)
     }
@@ -1022,22 +1016,17 @@ epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
         path_group <- normalizePath(file.path(output_dir, nms), mustWork = FALSE)
     }
 
-    if (any(to_save <- path_group != path_idf | private$is_unsaved())) {
-        # remove duplications
-        dup <- duplicated(path_group)
-        apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
-            function(x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
-        )
-        private$log_idf_uuid(which(to_save))
-        private$log_saved(which(to_save))
-    }
+    materialized <- store$materialize_cases(path_group, copy_external = copy_external)
+    path_group <- materialized$paths
+    private$log_idf_uuid()
+    private$log_saved()
 
     # reset status
     private$m_log$start_time <- current()
     private$m_log$killed <- NULL
     private$m_job <- NULL
 
-    ver <- vcapply(private$m_idfs, function(idf) as.character(idf$version()))
+    ver <- store$case_versions()
 
     # init job table
     jobs <- pre_job_inputs(path_group, path_epw, NULL, design_day, FALSE, ver)
@@ -1045,12 +1034,7 @@ epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
         set(jobs, NULL, "resources", list())
     } else {
         # check if external file dependencies are found
-        resrc <- lapply(private$m_idfs, function(idf) {
-            deps <- idf$external_deps()
-            if (!length(deps)) deps <- NULL
-            deps
-        })
-        set(jobs, NULL, "resources", resrc)
+        set(jobs, NULL, "resources", materialized$resources)
     }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo,
@@ -1119,11 +1103,15 @@ epgroup_status <- function(self, private) {
     proc <- private$m_job
 
     if (is.null(private$m_job)) {
-        if (!is.null(private$m_idfs)) {
+        if (!is.null(private$m_model_store) && private$m_model_store$case_count()) {
             status$job_status <- data.table(
-                index = seq_along(private$m_idfs),
+                index = seq_len(private$m_model_store$case_count()),
                 status = "idle",
-                idf = vcapply(private$m_idfs, function(idf) idf$path())
+                idf = {
+                    paths <- private$m_model_store$case_source_paths()
+                    paths[is.na(paths)] <- private$m_model_store$case_model_paths()[is.na(paths)]
+                    paths
+                }
             )
             if (is.null(private$m_epws_path)) {
                 epw <- NA_character_
@@ -1144,16 +1132,7 @@ epgroup_status <- function(self, private) {
         status$terminated <- FALSE
     }
 
-    status$changed_after <- FALSE
-    uuid <- private$idf_uuid()
-    if (any(private$cached_idf_uuid() != uuid)) {
-        status$changed_after <- TRUE
-    }
-
-    # for parametric job
-    if (is_idf(private$m_seed) && !identical(private$seed_uuid(), get_priv_env(private$m_seed)$uuid())) {
-        status$changed_after <- TRUE
-    }
+    status$changed_after <- !private$m_model_store$cases_valid()
 
     if (inherits(proc, "r_process")) {
         if (proc$is_alive()) {
@@ -1352,7 +1331,7 @@ epgroup_tabular_data <- function(self, private, which = NULL, report_name = NULL
 # epgroup_print {{{
 epgroup_print <- function(self, private) {
     cli::cat_rule("EnergPlus Group Simulation Job", col = "green")
-    cli::cat_line(paste0("Grouped Jobs [", length(private$m_idfs), "]: "))
+    cli::cat_line(paste0("Grouped Jobs [", private$m_model_store$case_count(), "]: "))
 
     epgroup_print_status(self, private)
 }
@@ -1362,30 +1341,34 @@ epgroup_print <- function(self, private) {
 # get_epgroup_input {{{
 get_epgroup_input <- function(idfs, epws, sql = TRUE, dict = TRUE) {
     # check idf {{{
+    store <- JobModelStore$new()
     if (is_idf(idfs)) {
-        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict))
+        idfs <- list(idfs)
     } else {
-        init_idf <- function(...) {
-            tryCatch(get_init_idf(...),
-                eplusr_error_idf_not_local = function(e) e,
-                eplusr_error_idf_path_not_exist = function(e) e,
-                eplusr_error_idf_not_saved = function(e) e
-            )
-        }
-        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
+        idfs <- as.list(idfs)
     }
 
+    init_idf <- function(idf) {
+        tryCatch(store$add_input_model(idf, role = "input", sql = sql, dict = dict),
+            eplusr_error_idf_not_local = function(e) e,
+            eplusr_error_idf_path_not_exist = function(e) e,
+            eplusr_error_idf_not_saved = function(e) e
+        )
+    }
+    model_ids <- lapply(idfs, init_idf)
+
     err <- c("eplusr_error_idf_not_local", "eplusr_error_idf_path_not_exist", "eplusr_error_idf_not_saved")
-    if (any(invld <- vlapply(idfs, inherits, err))) {
+    if (any(invld <- vlapply(model_ids, inherits, err))) {
         abort(paste0("Invalid IDF input found:\n",
-            paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(idfs[invld], conditionMessage),
+            paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(model_ids[invld], conditionMessage),
                 collapse = "\n"
             )
         ))
     }
 
-    sql <- vlapply(idfs, attr, "sql")
-    dict <- vlapply(idfs, attr, "sql")
+    model_ids <- as.integer(unlist(model_ids, use.names = FALSE))
+    case_names <- names(idfs)
+    if (!checkmate::test_names(case_names)) case_names <- NULL
     # }}}
 
     # check epw paths {{{
@@ -1416,14 +1399,15 @@ get_epgroup_input <- function(idfs, epws, sql = TRUE, dict = TRUE) {
         epws <- vcapply(epws, `%||%`, NA_character_)
         if (length(epws) == 1L) epws <- replicate(length(idfs), epws)
         if (length(idfs) == 1L) {
-            idfs <- replicate(length(epws), idfs[[1L]]$clone())
-            sql <- rep(sql, length(epws))
-            dict <- rep(dict, length(epws))
+            model_ids <- rep(model_ids, length(epws))
+            case_names <- NULL
         }
-        assert_same_len(idfs, epws)
+        assert_same_len(model_ids, epws)
     }
 
-    list(idfs = idfs, epws = epws, sql = sql, dict = dict)
+    store$set_cases(model_ids, case_names)
+
+    list(store = store, epws = epws)
 }
 # }}}
 # epgroup_retrieve_data {{{
@@ -1508,11 +1492,7 @@ epgroup_job_from_which <- function(self, private, which, keep_unsucess = FALSE) 
 # epgroup_case_from_which {{{
 #' @importFrom checkmate test_names
 epgroup_case_from_which <- function(self, private, which = NULL, name = FALSE) {
-    if (checkmate::test_named(private$m_idfs)) {
-        nms <- names(private$m_idfs)
-    } else {
-        nms <- vcapply(private$m_idfs, function(idf) tools::file_path_sans_ext(basename(idf$path())))
-    }
+    nms <- private$m_model_store$case_names()
 
     if (is.null(which)) {
         if (name) return(nms) else return(seq_along(nms))
@@ -1570,18 +1550,21 @@ epgroup_print_status <- function(self, private, epw = TRUE) {
     status <- epgroup_status(self, private)
     epgroup_retrieve_data(self, private, status)
 
-    if (!is.null(names(private$m_idfs))) {
-        nm_idf <- paste0(names(private$m_idfs), ".idf")
+    n_case <- private$m_model_store$case_count()
+    if (private$m_model_store$case_has_names()) {
+        nm_idf <- paste0(private$m_model_store$case_names(), ".idf")
     } else {
-        nm_idf <- vcapply(private$m_idfs, function(x) basename(x$path()))
+        paths <- private$m_model_store$case_source_paths()
+        paths[is.na(paths)] <- private$m_model_store$case_model_paths()[is.na(paths)]
+        nm_idf <- basename(paths)
     }
     if (!epw) {
         nm <- cli::ansi_strtrim(paste0(
-            "[", lpad(seq_along(private$m_idfs), 0), "]: ", surround(nm_idf)
+            "[", lpad(seq_len(n_case), 0), "]: ", surround(nm_idf)
         ))
     } else {
         nm_idf <- cli::ansi_strtrim(paste0(
-            "[", lpad(seq_along(private$m_idfs), 0), "]: ",
+            "[", lpad(seq_len(n_case), 0), "]: ",
             paste0("[IDF] ", surround(nm_idf))
         ))
 
@@ -1619,7 +1602,7 @@ epgroup_print_status <- function(self, private, epw = TRUE) {
             job_status <- job_status[J(seq_along(nm)), on = "index"]
             # for models that are idle
             job_status[J(NA_character_), on = "V2", V2 := paste0(
-                "IDLE       --> [IDF]", surround(names(private$m_idfs)[index]))]
+                "IDLE       --> [IDF]", surround(private$m_model_store$case_names()[index]))]
             stderr <- paste0(lpad(job_status$index, "0"), "|" ,job_status$V2)
             safe_width <- getOption("width") - 2L
             stderr_trunc <- vcapply(stderr, function(l) {
