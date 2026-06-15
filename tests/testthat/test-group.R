@@ -114,7 +114,7 @@ test_that("Group methods", {
     # }}}
 
     # Tabular Data {{{
-    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5))), 23576L)
+    expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5))), 24131L)
     expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5),
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
@@ -125,7 +125,7 @@ test_that("Group methods", {
     expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), table_name = "Site and Source Energy")), 12 * 4)
     expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), column_name = "Total Energy")), 4 * 4)
     expect_equal(nrow(grp$tabular_data(c(1, 2, 4, 5), row_name = "Total Site Energy")), 3 * 4)
-    expect_equal(nrow(grp$tabular_data(2)), 4390)
+    expect_equal(nrow(grp$tabular_data(2)), 4584)
     expect_equal(nrow(grp$tabular_data(2,
         report_name = c(
             "AnnualBuildingUtilityPerformanceSummary",
