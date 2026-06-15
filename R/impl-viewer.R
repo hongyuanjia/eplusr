@@ -70,6 +70,7 @@ rgl_view_surface <- function(dev, geoms, type = "surface_type", x_ray = FALSE, w
     assert_flag(x_ray)
     # should contain vertices after triangulation
     assert_names(names(geoms), must.include = "vertices2")
+    if (!nrow(geoms$vertices2)) return(integer())
 
     # make sure all vertices are in the OpenGL coordinate system
     if (!isTRUE(geoms$in_opengl)) {
