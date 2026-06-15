@@ -17,6 +17,7 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CI_SKIP_SUFFIX: ${{ contains(github.event.comment.body, '[ci skip]') && ' [ci skip]' || '' }}
 
     steps:
       - uses: actions/checkout@v2
@@ -42,7 +43,7 @@ jobs:
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add man/\* NAMESPACE
-          git commit -m 'Document'
+          git commit -m "Document${CI_SKIP_SUFFIX}"
 
       - uses: r-lib/actions/pr-push@v2
         with:
@@ -57,6 +58,7 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CI_SKIP_SUFFIX: ${{ contains(github.event.comment.body, '[ci skip]') && ' [ci skip]' || '' }}
 
     steps:
       - uses: actions/checkout@v3
@@ -78,7 +80,7 @@ jobs:
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add \*.R
-          git commit -m 'Style'
+          git commit -m "Style${CI_SKIP_SUFFIX}"
 
       - uses: r-lib/actions/pr-push@v2
         with:

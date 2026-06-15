@@ -80,10 +80,10 @@ download and install it automatically on major operating systems
 (Windows, macOS and Linux):
 
 ``` r
-# install the latest version (currently v23.1.0)
+# install the latest version (currently v26.1.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v23.1.0) and run the installer
+# OR download the latest version (currently v26.1.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -119,17 +119,17 @@ in interactive mode.
   faster than VersionUpdater distributed with EnergyPlus
 - Fast 3D geometry visualization
 
-**View IDF geometry in 3D**  
+**View IDF geometry in 3D**\
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true" width="60%" />
 
-**Turn RStudio into a model editor via autocompletion**  
+**Turn RStudio into a model editor via autocompletion**\
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true" width="60%" />
 
-**Query and modify weather file**  
+**Query and modify weather file**\
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true" width="60%" />
 
 **Query output via SQL in Tidy format which is much better for data
-analysis**  
+analysis**\
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true" width="60%" />
 
 ## Resources
