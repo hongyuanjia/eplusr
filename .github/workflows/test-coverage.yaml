@@ -89,10 +89,13 @@ jobs:
             path = ".",
             type = "tests",
             quiet = FALSE,
-            clean = FALSE,
-            install_path = "coverage/covr-lib"
+            clean = FALSE
           )
           print(cov)
+          vals <- vapply(cov, function(x) x$value, numeric(1))
+          if (!any(vals > 0)) {
+            stop("covr returned all-zero coverage; tests likely did not run")
+          }
           saveRDS(cov, "coverage/coverage.rds")
           covr::to_cobertura(cov, "coverage/cobertura.xml")
           covr::report(cov, file = "coverage/index.html", browse = FALSE)
