@@ -547,6 +547,18 @@ test_that("$add()", {
     )))
     expect_equal(idf$object("rp_test_4")$class_name(), "RunPeriod")
 
+    expect_silent(idf$add(runperiod = list(
+        name = "rp_test_5",
+        begin_month = 6,
+        begin_day_of_month = 1,
+        end_month = 6,
+        end_day_of_month = 30,
+        use_weather_file_rain_indicators = TRUE,
+        use_weather_file_snow_indicators = FALSE
+    )))
+    expect_equal(idf$object("rp_test_5")$Use_Weather_File_Rain_Indicators, "Yes")
+    expect_equal(idf$object("rp_test_5")$Use_Weather_File_Snow_Indicators, "No")
+
     # can stop adding objects if trying to add a object with same name
     expect_error(idf$add(RunPeriod = list("rp_test_1", 1, 1, 2, 1)), class = "eplusr_error_validity_check")
 })
@@ -579,6 +591,34 @@ test_that("$set()", {
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 13)
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
+
+    expect_type(type = "list",
+        idf$set(rp_test = list(
+            use_weather_file_rain_indicators = TRUE,
+            use_weather_file_snow_indicators = FALSE
+        ))
+    )
+    expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
+    expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Snow_Indicators, "No")
+    expect_error(idf$set(R13LAYER = list(roughness = TRUE)), class = "eplusr_error_dots_logical_choice")
+    expect_error(idf$set(rp_test = list(begin_month = TRUE)), class = "eplusr_error_dots_logical_choice")
+
+    expect_silent(idf$add(runperiod = list(
+        name = "rp_test_vec",
+        begin_month = 7,
+        begin_day_of_month = 1,
+        end_month = 7,
+        end_day_of_month = 31
+    )))
+    expect_type(idf$set(RunPeriod := list(use_weather_file_rain_indicators = c(TRUE, FALSE))), "list")
+    expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
+    expect_equal(idf$RunPeriod$rp_test_vec$Use_Weather_File_Rain_Indicators, "No")
+
+    expect_type(idf$set(c("rp_test", "rp_test_vec") := list(
+        use_weather_file_rain_indicators = c(FALSE, TRUE)
+    )), "list")
+    expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "No")
+    expect_equal(idf$RunPeriod$rp_test_vec$Use_Weather_File_Rain_Indicators, "Yes")
 
     # can remove trailing empty fields
     expect_type(type = "list",
@@ -620,6 +660,23 @@ test_that("$set()", {
     expect_type(idf$set(Material_NoMass := list(thermal_resistance = ~ . * c(0.5, 2))), "list")
     expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Resistance, res[[1L]] * 0.5)
     expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Resistance, res[[2L]] * 2)
+
+    therm_abs <- c(
+        idf$Material_NoMass$R13LAYER$Thermal_Absorptance,
+        idf$Material_NoMass$R31LAYER$Thermal_Absorptance
+    )
+    solar_abs <- c(
+        idf$Material_NoMass$R13LAYER$Solar_Absorptance,
+        idf$Material_NoMass$R31LAYER$Solar_Absorptance
+    )
+    expect_type(idf$set(Material_NoMass := list(
+        thermal_absorptance = ~ . * c(0.5, 1),
+        solar_absorptance = ~ . * c(1, 0.5)
+    )), "list")
+    expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Absorptance, therm_abs[[1L]] * 0.5)
+    expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Absorptance, therm_abs[[2L]])
+    expect_equal(idf$Material_NoMass$R13LAYER$Solar_Absorptance, solar_abs[[1L]])
+    expect_equal(idf$Material_NoMass$R31LAYER$Solar_Absorptance, solar_abs[[2L]] * 0.5)
 
     # can update fields using a function
     half <- function(x, frac = 0.5) x * frac
@@ -1000,6 +1057,11 @@ test_that("$update()", {
         }
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Rough")
+
+    tbl <- idf$SimulationControl$to_table(string_value = FALSE)
+    tbl[index == 5L, value := TRUE]
+    expect_type(idf$update(tbl[index == 5L]), "list")
+    expect_equal(idf$SimulationControl$Run_Simulation_for_Weather_File_Run_Periods, "Yes")
 })
 # }}}
 
@@ -1552,9 +1614,9 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Absorptance, 0.5)
     expect_silent(idf$Material_NoMass$R13LAYER[["Thermal Absorptance"]] <- 0.6)
     expect_equal(idf$Material_NoMass$R13LAYER[["Thermal Absorptance"]], 0.6)
-    expect_silent(idf$SimulationControl$Do_Zone_Sizing_Calculation <- "Yes")
+    expect_silent(idf$SimulationControl$Do_Zone_Sizing_Calculation <- TRUE)
     expect_equal(idf$SimulationControl$Do_Zone_Sizing_Calculation, "Yes")
-    expect_silent(idf$SimulationControl[["Do Zone Sizing Calculation"]] <- "No")
+    expect_silent(idf$SimulationControl[["Do Zone Sizing Calculation"]] <- FALSE)
     expect_equal(idf$SimulationControl[["Do Zone Sizing Calculation"]], "No")
 
     # get data.frame input

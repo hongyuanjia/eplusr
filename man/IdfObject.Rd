@@ -977,6 +977,11 @@ or in a single list format, sets new values for fields specified, and
 returns the modified \code{IdfObject}. Unlike \verb{$set()} method in \link{Idf}
 class, the special element \code{.comment} is \strong{not allowed}. To modify
 object comments, please use \verb{$comment()}.
+
+
+For choice fields whose valid choices include \code{"Yes"} and \code{"No"},
+logical values are accepted and converted to those choices, i.e.
+\code{TRUE} is treated as \code{"Yes"} and \code{FALSE} as \code{"No"}.
 }
 
 \subsection{Examples}{

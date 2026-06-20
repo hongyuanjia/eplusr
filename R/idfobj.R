@@ -428,6 +428,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
         #'
+        #' @details
+        #' For choice fields whose valid choices include `"Yes"` and `"No"`,
+        #' logical values are accepted and converted to those choices, i.e.
+        #' `TRUE` is treated as `"Yes"` and `FALSE` as `"No"`.
+        #'
         #' @examples
         #' \dontrun{
         #' # set field values
