@@ -153,6 +153,7 @@ Hongyuan Jia
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_node"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_node'><code>eplusr::IdfObject$has_ref_node()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_to"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_to'><code>eplusr::IdfObject$has_ref_to()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="id"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-id'><code>eplusr::IdfObject$id()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="is_valid_field"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-is_valid_field'><code>eplusr::IdfObject$is_valid_field()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-name'><code>eplusr::IdfObject$name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="parent"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-parent'><code>eplusr::IdfObject$parent()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="print"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-print'><code>eplusr::IdfObject$print()</code></a></span></li>

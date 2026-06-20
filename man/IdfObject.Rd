@@ -191,6 +191,16 @@ mat[c("Name", "Density")]
 
 
 ## ------------------------------------------------
+## Method `IdfObject$is_valid_field`
+## ------------------------------------------------
+
+\dontrun{
+con <- idf$Construction[[1L]]
+con$is_valid_field(c("Name", "Layer 5"))
+}
+
+
+## ------------------------------------------------
 ## Method `IdfObject$set`
 ## ------------------------------------------------
 
@@ -434,6 +444,7 @@ Hongyuan Jia
 \item \href{#method-IdfObject-definition}{\code{IdfObject$definition()}}
 \item \href{#method-IdfObject-comment}{\code{IdfObject$comment()}}
 \item \href{#method-IdfObject-value}{\code{IdfObject$value()}}
+\item \href{#method-IdfObject-is_valid_field}{\code{IdfObject$is_valid_field()}}
 \item \href{#method-IdfObject-set}{\code{IdfObject$set()}}
 \item \href{#method-IdfObject-value_possible}{\code{IdfObject$value_possible()}}
 \item \href{#method-IdfObject-validate}{\code{IdfObject$validate()}}
@@ -867,6 +878,49 @@ mat$Roughness
 mat[["Specific_Heat"]]
 mat[c(1,2)]
 mat[c("Name", "Density")]
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-IdfObject-is_valid_field"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfObject-is_valid_field}{}}}
+\subsection{Method \code{is_valid_field()}}{
+Check if fields exist in current object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$is_valid_field(which)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_field()} returns \code{TRUE} if the specified fields are present
+in the current \code{IdfObject}. It checks fields that the object actually
+contains, not all possible fields defined in the underlying \link{Idd}.
+Fields with blank values are still treated as existing.
+
+Field names can be given in underscore style, e.g. \code{"outside_layer"}
+is equivalent to \code{"Outside Layer"}.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as \code{which}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+con <- idf$Construction[[1L]]
+con$is_valid_field(c("Name", "Layer 5"))
 }
 
 }

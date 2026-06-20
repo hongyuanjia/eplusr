@@ -181,6 +181,27 @@ test_that("$value()", {
 })
 # }}}
 
+# IS_VALID_FIELD {{{
+test_that("$is_valid_field()", {
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf")), "Idf")
+    expect_s3_class(con <- IdfObject$new(2, parent = idf), "IdfObject")
+
+    expect_equal(
+        con$is_valid_field(c("Name", "Layer 4", "Layer 5", "Wrong")),
+        c(TRUE, TRUE, FALSE, FALSE)
+    )
+    expect_equal(con$is_valid_field(c(1L, 5L, 6L)), c(TRUE, TRUE, FALSE))
+
+    expect_true(con$is_valid_field("layer_4"))
+    expect_true(con$is_valid_field("layer 4"))
+    expect_false(con$is_valid_field("layer_5"))
+
+    expect_silent(without_checking(con$set(`Layer 5` = "", .empty = TRUE)))
+    expect_true(con$is_valid_field("Layer 5"))
+})
+# }}}
+
 # SET {{{
 test_that("$set()", {
     skip_on_cran()
