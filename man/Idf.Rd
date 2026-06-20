@@ -3425,7 +3425,8 @@ represents the results from a single validation checking component.
 \item \code{invalid_autocalculate}: Result of \code{auto_field} checking for
 invalid \code{Autocalculate} field values.
 \item \code{invalid_character}: Result of \code{type} checking for invalid
-character field values.
+character field values, including character values that contain
+IDF delimiters \verb{,} or \verb{;}.
 \item \code{invalid_numeric}: Result of \code{type} checking for invalid
 numeric field values.
 \item \code{invalid_integer}: Result of \code{type} checking for invalid

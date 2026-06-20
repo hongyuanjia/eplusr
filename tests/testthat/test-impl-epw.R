@@ -35,14 +35,14 @@ test_that("Epw Header", {
             TYPICAL/EXTREME PERIODS
             GROUND TEMPERATURES
             HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0
-            COMMENTS 1
+            COMMENTS 1,Allowed; comment
             COMMENTS 2
             DATA PERIODS,1,1, Data, Friday, 2016/01/01, 2016/12/31
             "
         )
     )
     expect_equal(h$value[object_id %in% c(2, 3, 4), value_num], rep(0, 3))
-    expect_equal(h$value[object_id %in% c(6, 7), value_chr], rep(NA_character_, 2))
+    expect_equal(h$value[object_id %in% c(6, 7), value_chr], c("Allowed; comment", NA_character_))
 
     # can fix mismatched extensible group and value of number field
     suppressWarnings(expect_warning(

@@ -95,9 +95,10 @@ exclude_invalid <- function(env_in, invalid, on) {
 #' `FALSE`.
 #' @param auto_field Check if all fields with value `"Autosize"` and
 #' `"Autocalculate"` are valid or not. Default: `FALSE`.
-#' @param type Check if all fields have values with valid types, i.e. 
+#' @param type Check if all fields have values with valid types, i.e.
 #' character, numeric and integer fields should be filled with corresponding
-#' type of values. Default: `FALSE`.
+#' type of values, and character fields should not contain IDF delimiters `,` or
+#' `;`. Default: `FALSE`.
 #' @param choice Check if all choice fields have valid choice values. Default:
 #' `FALSE`.
 #' @param range Check if all numeric fields have values within defined ranges.
@@ -503,9 +504,15 @@ check_invalid_autocalculate <- function(idd_env, idf_env, env_in) {
     env_in
 }
 # }}}
-# check_invalid_character: invalid numeric fields {{{
+# check_invalid_character: invalid character fields {{{
 check_invalid_character <- function(idd_env, idf_env, env_in) {
-    invalid_character <- env_in$value[type_enum > IDDFIELD_TYPE$real & !is.na(value_num)]
+    check_idf_delimiter <- !"WEATHER DATA" %chin% idd_env$class$class_name
+    invalid_character <- env_in$value[
+        type_enum > IDDFIELD_TYPE$real &
+            (!is.na(value_num) |
+                (check_idf_delimiter & !is.na(value_chr) &
+                    (stri_detect_fixed(value_chr, ",") | stri_detect_fixed(value_chr, ";"))))
+    ]
 
     if (!nrow(invalid_character)) return(env_in)
 
@@ -713,7 +720,7 @@ format_single_validity <- function(single_validity, type, epw = FALSE) {
         invalid_autosize = "Fields below cannot be `autosize`:",
         invalid_autocalculate = "Fields below cannot be `autocalculate`:",
         invalid_numeric = "Fields below should be numbers but are not:",
-        invalid_character = "Fields below should be characters but are not:",
+        invalid_character = "Character fields below should not be numeric inputs or contain IDF delimiters `,` or `;`:",
         invalid_integer = "Fields below are not or cannot be coerced into integers:",
         invalid_choice = "Fields below are not one of prescribed choices:",
         invalid_range = "Fields below exceed prescribed ranges:",

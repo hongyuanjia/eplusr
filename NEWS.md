@@ -11,6 +11,9 @@
 
 ## Bug fixes
 
+* Reject character field values that contain IDF delimiters, preventing comma or
+  semicolon inputs from corrupting generated IDF syntax (#67).
+
 * Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during
   IDD relation tests.
 
