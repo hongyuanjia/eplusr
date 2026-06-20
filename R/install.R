@@ -506,6 +506,49 @@ sudo_on_mac <- function(cmd) {
     }
 }
 # }}}
+# macos_mount_dmg {{{
+macos_mount_dmg <- function(exec, no_ext) {
+    res <- system(sprintf("hdiutil mount %s", shQuote(exec)))
+    attr(res, "mount_dir") <- file.path("/Volumes", no_ext)
+    res
+}
+# }}}
+# macos_unmount_dmg {{{
+macos_unmount_dmg <- function(mount_dir) {
+    system(sprintf("hdiutil unmount %s", shQuote(mount_dir)))
+}
+# }}}
+# macos_qt_installer_exec {{{
+macos_qt_installer_exec <- function(mount_dir, no_ext) {
+    mount_dir <- normalizePath(mount_dir, mustWork = TRUE)
+
+    app_dirs <- list.files(mount_dir, pattern = "\\.app$", full.names = TRUE)
+    app_dirs <- unique(c(file.path(mount_dir, paste0(no_ext, ".app")), app_dirs))
+    app_dirs <- app_dirs[dir.exists(app_dirs)]
+
+    for (app_dir in app_dirs) {
+        exec_dir <- file.path(app_dir, "Contents", "MacOS")
+        if (!dir.exists(exec_dir)) next
+
+        app_exec <- file.path(exec_dir, tools::file_path_sans_ext(basename(app_dir)))
+        execs <- unique(c(app_exec, list.files(exec_dir, full.names = TRUE)))
+        execs <- execs[file.exists(execs)]
+        info <- file.info(execs)
+        execs <- execs[!is.na(info$isdir) & !info$isdir & file.access(execs, 1L) == 0L]
+
+        if (length(execs)) return(normalizePath(execs[[1L]], mustWork = TRUE))
+    }
+
+    root_exec <- unique(c(file.path(mount_dir, no_ext), list.files(mount_dir, full.names = TRUE)))
+    root_exec <- root_exec[file.exists(root_exec)]
+    info <- file.info(root_exec)
+    root_exec <- root_exec[!is.na(info$isdir) & !info$isdir & file.access(root_exec, 1L) == 0L]
+
+    if (length(root_exec)) return(normalizePath(root_exec[[1L]], mustWork = TRUE))
+
+    abort("Failed to locate the EnergyPlus QtIFW installer executable in mounted disk image '", mount_dir, "'.")
+}
+# }}}
 # install_eplus_macos {{{
 install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable = FALSE) {
     ver <- standardize_ver(ver)
@@ -528,19 +571,25 @@ install_eplus_macos <- function(ver, exec, local = FALSE, dir = NULL, portable =
         res <- install_eplus_portable(ver, exec, dir)
     } else {
         # mount
-        system(sprintf("hdiutil mount %s", exec))
+        res <- macos_mount_dmg(exec, no_ext)
+        if (res != 0L) return(res)
+
+        mount_dir <- attr(res, "mount_dir")
+        on.exit(macos_unmount_dmg(mount_dir), add = TRUE)
+
         if (ver < "9.1") {
+            pkg <- file.path(mount_dir, paste0(no_ext, ".pkg"))
             if (local) {
-                res <- system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
+                res <- system(sprintf("installer -pkg %s -target CurrentUserHomeDirectory", shQuote(pkg)))
             } else {
-                res <- sudo_on_mac(sprintf("installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+                res <- sudo_on_mac(sprintf("installer -pkg %s -target LocalSystem", shQuote(pkg)))
             }
             attr(res, "path") <- eplus_default_path(ver, local = local)
         } else {
-            res <- install_eplus_qt(ver, exec, dir, local = local)
+            qt_exec <- macos_qt_installer_exec(mount_dir, no_ext)
+            res <- install_eplus_qt(ver, qt_exec, dir, local = local)
             attr(res, "path") <- dir
         }
-        system(sprintf("hdiutil unmount /Volumes/%s/", no_ext))
     }
     res
 }
@@ -715,7 +764,7 @@ install_eplus_qt <- function(ver, exec, dir, local = FALSE, verbose = FALSE) {
             gui.clickButton(buttons.FinishButton);
         };
     ", collapse = "\n"))
-    res <- system(sprintf("%s %s --script %s", exec, if (verbose) "--verbose " else "", ctrl))
+    res <- system(paste(shQuote(exec), if (verbose) "--verbose" else NULL, "--script", shQuote(ctrl)))
     # sometimes QtIFW returns 1 if success for EnergyPlus v9.5 installer
     if (res == 1L) res <- res - 1L
     res

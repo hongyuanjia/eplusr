@@ -92,6 +92,71 @@ test_that("invalid extra EnergyPlus dirs are ignored quietly", {
     })
 })
 
+test_that("macOS Qt installer executable is found inside a mounted app bundle", {
+    skip_on_os("windows")
+
+    no_ext <- "EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64"
+    mount_dir <- tempfile()
+    exec_dir <- file.path(mount_dir, paste0(no_ext, ".app"), "Contents", "MacOS")
+    dir.create(exec_dir, recursive = TRUE)
+
+    exec <- file.path(exec_dir, no_ext)
+    file.create(exec)
+    Sys.chmod(exec, "755")
+
+    expect_identical(macos_qt_installer_exec(mount_dir, no_ext), normalizePath(exec))
+})
+
+test_that("macOS Qt installer executable can be found at mounted volume root", {
+    skip_on_os("windows")
+
+    no_ext <- "EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64"
+    mount_dir <- tempfile()
+    dir.create(mount_dir)
+
+    exec <- file.path(mount_dir, no_ext)
+    file.create(exec)
+    Sys.chmod(exec, "755")
+
+    expect_identical(macos_qt_installer_exec(mount_dir, no_ext), normalizePath(exec))
+})
+
+test_that("macOS Qt installer uses executable from mounted DMG", {
+    skip_on_os("windows")
+
+    no_ext <- "EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64"
+    inst <- file.path(tempdir(), paste0(no_ext, ".dmg"))
+    mount_dir <- tempfile()
+    qt_exec <- file.path(mount_dir, paste0(no_ext, ".app"), "Contents", "MacOS", no_ext)
+    used_exec <- NULL
+    unmounted <- FALSE
+
+    local_mocked_bindings(
+        macos_mount_dmg = function(exec, no_ext) {
+            res <- 0L
+            attr(res, "mount_dir") <- mount_dir
+            res
+        },
+        macos_unmount_dmg = function(mount_dir) {
+            unmounted <<- TRUE
+            0L
+        },
+        macos_qt_installer_exec = function(mount_dir, no_ext) qt_exec,
+        install_eplus_qt = function(ver, exec, dir, local = FALSE) {
+            used_exec <<- exec
+            0L
+        }
+    )
+
+    res <- install_eplus_macos("9.4", inst, local = TRUE)
+
+    expect_identical(used_exec, qt_exec)
+    expect_true(unmounted)
+    expect_identical(attr(res, "path"),
+        normalizePath("~/Applications/EnergyPlus-9-4-0", mustWork = FALSE)
+    )
+})
+
 test_that("Install EnergyPlus v9.0 and below", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_INSTALL_OLD_") != "")

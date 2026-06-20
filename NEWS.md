@@ -37,6 +37,9 @@
 
 ## Bug fixes
 
+* Fix macOS installation from mounted EnergyPlus DMG installers that provide a
+  QtIFW `.app` bundle instead of a `.pkg` file (#620).
+
 * Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball
   installation (#601).
 
