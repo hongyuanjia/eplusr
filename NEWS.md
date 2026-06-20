@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during
+  IDD relation tests.
+
 # eplusr 0.17.0
 
 ## New features
