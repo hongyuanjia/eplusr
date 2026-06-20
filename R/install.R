@@ -188,33 +188,14 @@ uninstall_eplus <- function(ver) {
 
     verbose_info(sprintf("Start uninstalling EnergyPlus v%s...", ver))
 
-    # detect if it is a portable EnergyPlus installation
-    is_portable <- switch(
-        os_type(),
-        windows = if (ver >= "9.2") {
-            file.exists(file.path(dir, "maintenancetool.exe"))
-        } else {
-            file.exists(file.path(dir, "Uninstall.exe"))
-        },
-        linux = file.exists(file.path(dir, "uninstall.sh")),
-        macos = if (ver >= "9.2") {
-            file.exists(file.path(dir, "maintenancetool.app/Contents/MacOS/maintenancetool"))
-        } else {
-            TRUE
-        }
-    )
     verbose_info("NOTE: Administrative privileges may be required during uninstallation. ",
         "Please make sure R is running with an administrator acount or equivalent.")
 
-    if (is_portable) {
-        res <- uninstall_eplus_portable(ver, dir)
-    } else {
-        res <- switch(os_type(),
-            windows = uninstall_eplus_win(ver, dir),
-            linux   = uninstall_eplus_linux(ver, dir),
-            macos   = uninstall_eplus_macos(ver, dir)
-        )
-    }
+    res <- switch(os_type(),
+        windows = uninstall_eplus_win(ver, dir),
+        linux   = uninstall_eplus_linux(ver, dir),
+        macos   = uninstall_eplus_macos(ver, dir)
+    )
 
     if (res != 0L) abort(paste0("Failed to uninstall EnergyPlus v", ver, "."))
 
@@ -826,51 +807,50 @@ uninstall_eplus_win <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
     if (ver >= "9.2") {
-        uninstall_eplus_qt(ver, dir)
+        if (file.exists(uninstall_eplus_qt_path(dir))) {
+            return(uninstall_eplus_qt(ver, dir))
+        }
     } else {
         uninstaller <- normalizePath(file.path(dir, "Uninstall.exe"), mustWork = FALSE)
-        if (!file.exists(uninstaller)) {
-            abort(sprintf(paste0(
-                "Failed to locate 'Uninstall.exe' under EnergyPlus installation directory '%s'.",
-            ), dir))
+        if (file.exists(uninstaller)) {
+            message(paste("The uninstaller will pop up a message box asking",
+                "whether to remove files copied to the system directory during installation.",
+                "Please make your choice."
+            ))
+            return(system(paste(shQuote(uninstaller), "/S")))
         }
-
-        message(paste("The uninstaller will pop up a message box asking",
-            "whether to remove files copied to the system directory during installation.",
-            "Please make your choice."
-        ))
-        system(sprintf("%s /S", uninstaller))
     }
+
+    uninstall_eplus_portable(ver, dir)
 }
 # }}}
 # uninstall_eplus_macos {{{
 uninstall_eplus_macos <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
-    if (ver >= "9.2") {
-        uninstall_eplus_qt(ver, dir)
-    } else {
-        # test if EnergyPlus directory is accessible for current user
-        if (identical(unname(try(file.access(dir, 2L), silent = TRUE)), 0L)) {
-            system(sprintf("rm -rf %s", dir))
-        } else {
-            sudo_on_mac(sprintf("rm -rf %s", dir))
-        }
+    if (ver >= "9.1" && file.exists(uninstall_eplus_qt_path(dir))) {
+        return(uninstall_eplus_qt(ver, dir))
     }
+
+    uninstall_eplus_portable(ver, dir)
+}
+# }}}
+# uninstall_eplus_qt_path {{{
+uninstall_eplus_qt_path <- function(dir) {
+    exe <- switch(os_type(),
+        windows = "maintenancetool.exe",
+        macos   = "maintenancetool.app/Contents/MacOS/maintenancetool",
+        linux   = "maintenancetool"
+    )
+
+    normalizePath(file.path(dir, exe), mustWork = FALSE)
 }
 # }}}
 # uninstall_eplus_qt {{{
 uninstall_eplus_qt <- function(ver, dir) {
     ver <- standardize_ver(ver)
 
-    ext <- if (is_windows()) ".exe" else ""
-    if (!is_macos()) {
-        exe <- sprintf("maintenancetool%s", ext)
-    } else {
-        exe <- "maintenancetool.app/Contents/MacOS/maintenancetool"
-    }
-
-    uninstaller <- normalizePath(file.path(dir, exe), mustWork = FALSE)
+    uninstaller <- uninstall_eplus_qt_path(dir)
     if (!file.exists(uninstaller)) {
         abort(sprintf(
             "Failed to locate '%s' under EnergyPlus installation directory '%s'.",
@@ -885,27 +865,26 @@ uninstall_eplus_linux <- function(ver, dir, force = FALSE) {
     ver <- standardize_ver(ver)
     uninstaller <- normalizePath(file.path(dir, "uninstall.sh"), mustWork = FALSE)
     if (!file.exists(uninstaller)) {
-        if (!force) {
-            abort(sprintf(paste0(
-                "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
-                "Unable to remove symbolic links."
-            ), dir))
-        } else {
+        if (force) {
             warn(sprintf(paste0(
                 "Failed to locate 'uninstall.sh' under EnergyPlus installation directory '%s'. ",
                 "Symbolic links will NOT be removed"
             ), dir))
         }
+        return(uninstall_eplus_portable(ver, dir))
     }
 
     if (!utils::file_test("-x", uninstaller)) {
-        system(sprintf("sudo chmod +x %s", uninstaller))
+        res <- system(sprintf("sudo chmod +x %s", shQuote(uninstaller)))
+        if (res != 0L) return(res)
     }
 
     verbose_info(sprintf("Removing symbolic links for EnergyPlus v%s.", ver))
-    system(sprintf("sudo bash %s", uninstaller))
+    res <- system(sprintf("sudo bash %s", shQuote(uninstaller)))
+    if (res != 0L) return(res)
+
     verbose_info(sprintf("Removing installation directory of EnergyPlus v%s.", ver))
-    system(sprintf("sudo rm -rf %s", dir))
+    system(sprintf("sudo rm -rf %s", shQuote(dir)))
 }
 # }}}
 # uninstall_eplus_portable {{{
@@ -918,9 +897,9 @@ uninstall_eplus_portable <- function(ver, dir) {
             unlink(dir, recursive = TRUE, force = TRUE)
         } else {
             if (is_macos()) {
-                sudo_on_mac(sprintf("rm -rf %s", dir))
+                sudo_on_mac(sprintf("rm -rf %s", shQuote(dir)))
             } else {
-                system(sprintf("sudo rm -rf %s", dir))
+                system(sprintf("sudo rm -rf %s", shQuote(dir)))
             }
         }
     }
