@@ -1,6 +1,7 @@
 # VALUE {{{
 test_that("get_idfobj_value()", {
     skip_on_cran()
+
     idf_env <- parse_idf_file(idftext("idf", LATEST_EPLUS_VER))
     idd_env <- get_priv_env(use_idd(LATEST_EPLUS_VER))$idd_env()
 

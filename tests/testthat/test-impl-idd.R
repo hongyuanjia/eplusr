@@ -355,7 +355,7 @@ test_that("Idd implementation", {
     # UNIT CONVERSION {{{
     fld <- get_idd_field(idd_env, "WindowMaterial:Glazing:RefractionExtinctionMethod", 9, property = c("units", "ip_units"))
     expect_equal(field_default_to_unit(idd_env, fld, "si", "ip")$default_num,
-        drop_units(set_units(set_units(0.9, "W/m/K"), "Btu*in/h/ft^2/degF"))
+        units::drop_units(units::set_units(units::set_units(0.9, "W/m/K"), "Btu*in/h/ft^2/degF"))
     )
 
     # can keep input value_id

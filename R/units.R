@@ -1,9 +1,31 @@
 #' @importFrom data.table fread
 NULL
 
+# has_units {{{
+has_units <- function() {
+    requireNamespace("units", quietly = TRUE)
+}
+# }}}
+
+# check_units {{{
+check_units <- function(action = "use unit-aware features") {
+    if (has_units()) {
+        reg_custom_units()
+        return(invisible(TRUE))
+    }
+
+    abort(paste0(
+        "The 'units' package is required to ", action, ". ",
+        "Please install it with install.packages(\"units\") and try again."
+    ), "missing_units")
+}
+# }}}
+
 # reg_custom_units {{{
 # nocov start
 reg_custom_units <- function() {
+    if (!has_units()) return(FALSE)
+
     tryCatch(
         {
             if (utils::packageVersion("units") < "0.7-0") {

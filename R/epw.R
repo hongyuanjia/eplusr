@@ -995,7 +995,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$add_unit()` assigns units to numeric weather data using
-        #' [units::set_units()] if applicable.
+        #' [units::set_units()] if applicable. This requires the suggested
+        #' package `units`.
         #'
         #' `$add_unit()`
         #' and

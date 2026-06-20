@@ -4268,7 +4268,8 @@ read_idfeditor_copy <- function(idd_env, idf_env, version = NULL, in_ip = FALSE)
 #'        type being a string instead of a number. Default: `TRUE`.
 #' @param unit Only applicable when `string_value` is `FALSE`. If
 #'        `TRUE`, values of numeric fields are assigned with units using
-#'        [units::set_units()] if applicable. Default: `FALSE`.
+#'        [units::set_units()] if applicable. This requires the suggested package
+#'        `units`. Default: `FALSE`.
 #' @param wide Only applicable if target objects belong to a same class.
 #'        If `TRUE`, a wide table will be returned, i.e. first three
 #'        columns are always `id`, `name` and `class`, and then every
