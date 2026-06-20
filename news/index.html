@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0</span>
       </span>
     </div>
 
@@ -95,13 +95,13 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/hongyuanjia/eplusr/blob/v0.17.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.17.1" id="eplusr-0171">eplusr 0.17.1<a class="anchor" aria-label="anchor" href="#eplusr-0171"></a></h2>
+<h2 class="page-header" data-toc-text="0.17.0" id="eplusr-0170">eplusr 0.17.0<a class="anchor" aria-label="anchor" href="#eplusr-0170"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-17-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-17-1"></a></h3>
+<h3 id="new-features-0-17-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-17-0"></a></h3>
 <ul><li><p><code>Idf$set()</code> and <code>IdfObject$set()</code> can now update field values from their current values using one-sided formulas or functions (<a href="https://github.com/hongyuanjia/eplusr/issues/518" class="external-link">#518</a>).</p></li>
 <li><p><code>ParametricJob</code> can now combine one seed IDF with multiple EPW weather cases using <code>$weathers()</code>. <code>$cases(type = "run")</code> reports the actual simulation cases while <code>$cases()</code> keeps the existing parameter-case behavior (<a href="https://github.com/hongyuanjia/eplusr/issues/617" class="external-link">#617</a>).</p></li>
 <li><p>Store prepared job model snapshots instead of keeping <code>Idf</code> objects alive inside <code>EplusJob</code>, <code>EplusGroupJob</code>, and <code>ParametricJob</code>, reducing memory use for large simulation sets. <code>ParametricJob$seed(new = ...)</code> can replace the seed model and invalidates existing generated models until they are regenerated (<a href="https://github.com/hongyuanjia/eplusr/issues/615" class="external-link">#615</a>).</p></li>
@@ -115,15 +115,14 @@
 <li><p>Add support for EnergyPlus v23.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/578" class="external-link">#578</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/601" class="external-link">#601</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-17-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-17-1"></a></h3>
-<ul><li><p>Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during IDD relation tests.</p></li>
-<li><p>Fix macOS installation from mounted EnergyPlus DMG installers that provide a QtIFW <code>.app</code> bundle instead of a <code>.pkg</code> file (<a href="https://github.com/hongyuanjia/eplusr/issues/620" class="external-link">#620</a>).</p></li>
+<h3 id="bug-fixes-0-17-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-17-0"></a></h3>
+<ul><li><p>Fix macOS installation from mounted EnergyPlus DMG installers that provide a QtIFW <code>.app</code> bundle instead of a <code>.pkg</code> file (<a href="https://github.com/hongyuanjia/eplusr/issues/620" class="external-link">#620</a>).</p></li>
 <li><p>Fix <code><a href="../reference/install_eplus.html">uninstall_eplus()</a></code> dispatch so native uninstallers are used when available and portable or manual installs fall back to direct directory removal (<a href="https://github.com/hongyuanjia/eplusr/issues/622" class="external-link">#622</a>).</p></li>
 <li><p>Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball installation (<a href="https://github.com/hongyuanjia/eplusr/issues/601" class="external-link">#601</a>).</p></li>
 <li><p>Delay EnergyPlus installation discovery until needed and allow extra search roots via <code>locate_eplus(dirs = ...)</code> and <code>options(eplusr.eplus_dirs = ...)</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/609" class="external-link">#609</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="internal-refactor-0-17-1">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-0-17-1"></a></h3>
+<h3 id="internal-refactor-0-17-0">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-0-17-0"></a></h3>
 <ul><li>Move the <code>units</code> package from Imports to Suggests and load it only when unit-aware features are used (<a href="https://github.com/hongyuanjia/eplusr/issues/466" class="external-link">#466</a>).</li>
 </ul></div>
 </div>
