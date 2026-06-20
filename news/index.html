@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9013</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0</span>
       </span>
     </div>
 
@@ -99,9 +99,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<h2 class="page-header" data-toc-text="0.17.0" id="eplusr-0170">eplusr 0.17.0<a class="anchor" aria-label="anchor" href="#eplusr-0170"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-17-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-17-0"></a></h3>
 <ul><li><p><code>Idf$set()</code> and <code>IdfObject$set()</code> can now update field values from their current values using one-sided formulas or functions (<a href="https://github.com/hongyuanjia/eplusr/issues/518" class="external-link">#518</a>).</p></li>
 <li><p><code>ParametricJob</code> can now combine one seed IDF with multiple EPW weather cases using <code>$weathers()</code>. <code>$cases(type = "run")</code> reports the actual simulation cases while <code>$cases()</code> keeps the existing parameter-case behavior (<a href="https://github.com/hongyuanjia/eplusr/issues/617" class="external-link">#617</a>).</p></li>
 <li><p>Store prepared job model snapshots instead of keeping <code>Idf</code> objects alive inside <code>EplusJob</code>, <code>EplusGroupJob</code>, and <code>ParametricJob</code>, reducing memory use for large simulation sets. <code>ParametricJob$seed(new = ...)</code> can replace the seed model and invalidates existing generated models until they are regenerated (<a href="https://github.com/hongyuanjia/eplusr/issues/615" class="external-link">#615</a>).</p></li>
@@ -115,14 +115,14 @@
 <li><p>Add support for EnergyPlus v23.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/578" class="external-link">#578</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/601" class="external-link">#601</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-17-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-17-0"></a></h3>
 <ul><li><p>Fix macOS installation from mounted EnergyPlus DMG installers that provide a QtIFW <code>.app</code> bundle instead of a <code>.pkg</code> file (<a href="https://github.com/hongyuanjia/eplusr/issues/620" class="external-link">#620</a>).</p></li>
 <li><p>Fix <code><a href="../reference/install_eplus.html">uninstall_eplus()</a></code> dispatch so native uninstallers are used when available and portable or manual installs fall back to direct directory removal (<a href="https://github.com/hongyuanjia/eplusr/issues/622" class="external-link">#622</a>).</p></li>
 <li><p>Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball installation (<a href="https://github.com/hongyuanjia/eplusr/issues/601" class="external-link">#601</a>).</p></li>
 <li><p>Delay EnergyPlus installation discovery until needed and allow extra search roots via <code>locate_eplus(dirs = ...)</code> and <code>options(eplusr.eplus_dirs = ...)</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/609" class="external-link">#609</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
+<h3 id="internal-refactor-0-17-0">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-0-17-0"></a></h3>
 <ul><li>Move the <code>units</code> package from Imports to Suggests and load it only when unit-aware features are used (<a href="https://github.com/hongyuanjia/eplusr/issues/466" class="external-link">#466</a>).</li>
 </ul></div>
 </div>
@@ -348,7 +348,7 @@
 <h3 id="minor-changes-0-14-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-0-14-0"></a></h3>
 <ul><li>Now rgl and decido package has been moved from <em>Imports</em> to <em>Suggests</em>, since they are only used in the <code>IdfViewer</code> class for 3D visualization which is not the main focus of this package (368).</li>
 <li>
-<code><a href="../reference/run_model.html">run_multi()</a></code> now gets a new argument <code>expand_obj</code> to control whether <code>ExpandObjects</code> should be called before simulation or not. Because there is a known issue of <code>ExpandObjects</code> on Linux system (<a href="https://github.com/NREL/EnergyPlus/issues/8376" class="external-link uri">https://github.com/NREL/EnergyPlus/issues/8376</a>), here we want to avoid unnecessary calls of <code>ExpandObjects</code> as possible. Also, <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code> now will detect if there are any <code>HVACTemplate:*</code> objects and set the <code>expand_obj</code> flag properly (<a href="https://github.com/hongyuanjia/eplusr/issues/377" class="external-link">#377</a>).</li>
+<code><a href="../reference/run_model.html">run_multi()</a></code> now gets a new argument <code>expand_obj</code> to control whether <code>ExpandObjects</code> should be called before simulation or not. Because there is a known issue of <code>ExpandObjects</code> on Linux system (<a href="https://github.com/NatLabRockies/EnergyPlus/issues/8376" class="external-link uri">https://github.com/NatLabRockies/EnergyPlus/issues/8376</a>), here we want to avoid unnecessary calls of <code>ExpandObjects</code> as possible. Also, <code>EplusJob$run()</code> and <code>EplusGroupJob$run()</code> now will detect if there are any <code>HVACTemplate:*</code> objects and set the <code>expand_obj</code> flag properly (<a href="https://github.com/hongyuanjia/eplusr/issues/377" class="external-link">#377</a>).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-14-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-14-0"></a></h3>
@@ -497,7 +497,7 @@
 <h3 id="new-features-0-12-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-12-0"></a></h3>
 <ul><li>Now <code><a href="../reference/EplusGroupJob.html">group_job()</a></code> supports single IDF input with multiple EPW inputs (<a href="https://github.com/hongyuanjia/eplusr/issues/185" class="external-link">#185</a>).</li>
 <li>A new method <code>Idf$last_job()</code> has been added to enable getting the last simulation job created using <code>Idf$run()</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/187" class="external-link">#187</a>).</li>
-<li>Provide a workaround to fix the issue of EnergyPlus v9.1 and above installation which fails to extract files into correct directory <code>/usr/local/EnergyPlus-X-Y-0</code>, but instead extracting all files directly into <code>/usr/local</code> (<a href="https://github.com/NREL/EnergyPlus/issues/7256" class="external-link">NREL/EnergyPlus#7256</a>) (<a href="https://github.com/hongyuanjia/eplusr/issues/193" class="external-link">#193</a>).</li>
+<li>Provide a workaround to fix the issue of EnergyPlus v9.1 and above installation which fails to extract files into correct directory <code>/usr/local/EnergyPlus-X-Y-0</code>, but instead extracting all files directly into <code>/usr/local</code> (<a href="https://github.com/NatLabRockies/EnergyPlus/issues/7256" class="external-link">NatLabRockies/EnergyPlus#7256</a>) (<a href="https://github.com/hongyuanjia/eplusr/issues/193" class="external-link">#193</a>).</li>
 <li>A new parameter <code>group_ext</code> has been added in <code>Idf$to_table()</code> and <code>IdfObject$to_table()</code>, with default value being <code>"none"</code>. If <code>"group"</code>, values from extensible fields will be grouped by the extensible group they belong to. For example, coordinate values of each vertex in class <code>BuildingSurface:Detailed</code> will be put into a list. If <code>"index"</code>, values from extensible fields will be grouped by the extensible field indices they belong to. For example, coordinate values of all x coordinates will be put into a list (<a href="https://github.com/hongyuanjia/eplusr/issues/74" class="external-link">#74</a>).</li>
 </ul></div>
 <div class="section level3">
