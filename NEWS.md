@@ -11,6 +11,10 @@
 * Add `Idf$reorder()` to reorder objects within a class without changing object
   IDs (#66).
 
+* `Idf$drop()` and `IdfObject$drop()` can now remove field slots from
+  extensible groups or numbered repeated field sequences and shift following
+  values forward (#217).
+
 ## Internal refactor
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and

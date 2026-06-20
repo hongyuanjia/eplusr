@@ -147,6 +147,7 @@ Hongyuan Jia
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="class_name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-class_name'><code>eplusr::IdfObject$class_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="comment"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-comment'><code>eplusr::IdfObject$comment()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="definition"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-definition'><code>eplusr::IdfObject$definition()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="drop"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-drop'><code>eplusr::IdfObject$drop()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="group_name"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-group_name'><code>eplusr::IdfObject$group_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref'><code>eplusr::IdfObject$has_ref()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="eplusr" data-topic="IdfObject" data-id="has_ref_by"><a href='../../eplusr/html/IdfObject.html#method-IdfObject-has_ref_by'><code>eplusr::IdfObject$has_ref_by()</code></a></span></li>
