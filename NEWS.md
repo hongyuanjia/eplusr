@@ -51,6 +51,11 @@
   roots via `locate_eplus(dirs = ...)` and `options(eplusr.eplus_dirs = ...)`
   (#609).
 
+## Internal refactor
+
+* Move the `units` package from Imports to Suggests and load it only when
+  unit-aware features are used (#466).
+
 # eplusr 0.16.3
 
 ## New features

@@ -309,8 +309,8 @@ test_that("Data Tagger", {
             rad <- epw$data()$direct_normal_radiation
         }
     )
-    expect_true(all(units(rad)$numerator %in% c("W", "h")))
-    expect_equal(units(rad)$denominator, c("m", "m"))
+    expect_true(all(attr(rad, "units")$numerator %in% c("W", "h")))
+    expect_equal(attr(rad, "units")$denominator, c("m", "m"))
     expect_message(with_verbose(epw$add_unit()), "already")
 
     expect_type(epw$drop_unit()$data()$dry_bulb_temperature, "double")
@@ -409,7 +409,7 @@ test_that("Data Setter", {
     expect_s3_class(d <- epw$data(start_year = 2017), "data.table")
     expect_s3_class(epw$add_unit(), "Epw")
     expect_s3_class(epw$add(d, realyear = TRUE), "Epw")
-    expect_warning(u <- units(epw$data()$liquid_precip_rate)$numerator)
+    expect_warning(u <- attr(epw$data()$liquid_precip_rate, "units")$numerator)
     expect_equal(u, "h")
 
     # unit + unit
@@ -417,7 +417,7 @@ test_that("Data Setter", {
     expect_s3_class(epw$add_unit(), "Epw")
     expect_s3_class(d <- epw$data(start_year = 2017), "data.table")
     expect_s3_class(epw$add(d, realyear = TRUE), "Epw")
-    expect_warning(u <- units(epw$data()$liquid_precip_rate)$numerator)
+    expect_warning(u <- attr(epw$data()$liquid_precip_rate, "units")$numerator)
     expect_equal(u, "h")
 
     # no unit + unit

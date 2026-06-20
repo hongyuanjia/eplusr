@@ -55,6 +55,8 @@ get_value_list <- function(dt_value, unit = FALSE) {
         u <- !is.na(dt_value[[input]]) & num
 
         if (any(u)) {
+            check_units("return values with units")
+
             col <- paste0(prefix, "_standard_name")
 
             unit <- FIELD_UNIT_TABLE[J(dt_value[[input]][u]), on = c(paste0(prefix, "_name")),

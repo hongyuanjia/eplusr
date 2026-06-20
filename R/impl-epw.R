@@ -7,7 +7,6 @@
 #' @importFrom data.table "%chin%" chmatch copy fread fwrite as.data.table
 #' @importFrom data.table data.table melt.data.table set setattr setcolorder
 #' @importFrom data.table setnames setorderv
-#' @importFrom units set_units drop_units
 #' @importFrom cli cat_rule cat_line
 #' @importFrom utils combn
 #' @importFrom stats na.omit
@@ -2078,6 +2077,8 @@ fill_epw_data_abnormal_special <- function(epw_data, loc, action, init_value, co
 # }}}
 # add_epw_data_unit {{{
 add_epw_data_unit <- function(idd_env, epw_data) {
+    check_units("add units to EPW data")
+
     unit <- get_epw_data_unit(idd_env)
 
     # change to standard SI units
@@ -2093,6 +2094,8 @@ add_epw_data_unit <- function(idd_env, epw_data) {
 # }}}
 # drop_epw_data_unit {{{
 drop_epw_data_unit <- function(idd_env, epw_data) {
+    check_units("drop units from EPW data")
+
     unit <- get_epw_data_unit(idd_env)
     for (nm in names(unit)) {
         if (inherits(epw_data[[nm]], "units")) {

@@ -956,6 +956,8 @@ test_that("$to_table()", {
             value = as.list(c("WALL-1", "WD01", "PW03", "IN02", "GP01"))
         )
     )
+    set_units <- units::set_units
+
     expect_equal(
         ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(1, unit = TRUE, string_value = FALSE),

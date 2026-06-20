@@ -1448,6 +1448,8 @@ convert_value_unit <- function(idd_env, dt_value, from, to, type = "value") {
 
     if (!nrow(val)) return(dt_value)
 
+    check_units("convert values between SI and IP units")
+
     val <- FIELD_UNIT_TABLE[val, on = c(si_name = "units", ip_name = "ip_units")]
     set(val, NULL, c("si_name", "ip_name"), NULL)
     setnames(val, c("si_standard_name", "ip_standard_name"), c("si", "ip"))

@@ -3700,7 +3700,8 @@ type being a string instead of a number. Default: \code{TRUE}.}
 
 \item{\code{unit}}{Only applicable when \code{string_value} is \code{FALSE}. If
 \code{TRUE}, values of numeric fields are assigned with units using
-\code{\link[units:units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
+\code{\link[units:units]{units::set_units()}} if applicable. This requires the suggested
+package \code{units}. Default: \code{FALSE}.}
 
 \item{\code{wide}}{Only applicable if target objects belong to a same class.
 If \code{TRUE}, a wide table will be returned, i.e. first three

@@ -1616,7 +1616,8 @@ Add units to weather data variables
 
 \subsection{Details}{
 \verb{$add_unit()} assigns units to numeric weather data using
-\code{\link[units:units]{units::set_units()}} if applicable.
+\code{\link[units:units]{units::set_units()}} if applicable. This requires the suggested
+package \code{units}.
 
 \verb{$add_unit()}
 and

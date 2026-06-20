@@ -5,6 +5,5 @@
     if (any(grepl("_R_CHECK", names(Sys.getenv()), fixed = TRUE))) {
         data.table::setDTthreads(2)
     }
-    reg_custom_units()
     S7::methods_register()
 }
