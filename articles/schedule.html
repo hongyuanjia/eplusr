@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
       </span>
     </div>
 
@@ -150,8 +150,8 @@ the usual <code>Field #</code> manner.</p>
 <span></span>
 <span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_example</a></span><span class="op">(</span><span class="va">eplus_ver</span>, <span class="st">"1ZoneUncontrolled.idf"</span><span class="op">)</span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
+<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before. Try to locate 'Energy+.idd' in</span></span>
+<span><span class="co">#&gt; EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
 <span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
@@ -300,18 +300,12 @@ schedule values.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>..3 <span class="op">=</span> <span class="st">"Through: 12/31"</span>, ..4 <span class="op">=</span> <span class="st">"For: AllDays"</span>, ..5 <span class="op">=</span> <span class="st">"Until: 24:00"</span>, ..6 <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Failed to set object(s).</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  ✖ [1] Errors found during validation.</span></span>
-<span><span class="co">#&gt; ══════════════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── [1] Invalid Character ─────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt;    Fields below should be characters but are not:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     Class: &lt;Schedule:Compact&gt;</span></span>
-<span><span class="co">#&gt;     └─ Object [ID:89] &lt;sch&gt;</span></span>
-<span><span class="co">#&gt;        └─ 6: "1";           !- Field 4</span></span>
-<span><span class="co">#&gt; </span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Failed to set object(s).  ✖ [1] Errors found during validation.</span></span>
+<span><span class="co">#&gt;   ══════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt;   ── [1] Invalid Character</span></span>
+<span><span class="co">#&gt;   ───────────────────────────────────────────────────── Fields below should be</span></span>
+<span><span class="co">#&gt;   characters but are not: Class: &lt;Schedule:Compact&gt; └─ Object [ID:89] &lt;sch&gt; └─</span></span>
+<span><span class="co">#&gt;   6: "1"; !- Field 4</span></span></code></pre></div>
 <p>As a result, the output from <code>$value()</code> and
 <code>$to_table()</code> method is not very useful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -531,7 +525,8 @@ modification.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sch</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>allday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>..24 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, .check_range <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Invalid schedule value found ('2'). Should be in range [0, 1] as defined in ScheduleTypeLimits 'Fraction'.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Invalid schedule value found ('2'). Should be in range [0, 1] as</span></span>
+<span><span class="co">#&gt;   defined in ScheduleTypeLimits 'Fraction'.</span></span></code></pre></div>
 <p>You can also use <code>$validate()</code> and
 <code>$is_valid()</code> method to check existing schedule values.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">

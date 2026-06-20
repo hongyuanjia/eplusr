@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
       </span>
     </div>
 
@@ -166,8 +166,8 @@ giving a seed model and a weather file.</p>
 <span><span class="va">path_weather</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/path_eplus.html">path_eplus_weather</a></span><span class="op">(</span><span class="va">eplus_ver</span>, <span class="st">"USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before.</span></span>
-<span><span class="co">#&gt; Try to locate 'Energy+.idd' in EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
+<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before. Try to locate 'Energy+.idd' in</span></span>
+<span><span class="co">#&gt; EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
 <span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-1-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
@@ -269,13 +269,8 @@ Different measures can be chained together.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `value = case_when(...)`.</span></span>
 <span><span class="co">#&gt; Caused by warning in `sprintf()`:</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> NAs introduced by coercion</span></span>
-<span><span class="co">#&gt; Measure 'ecm' has been applied with 6 new models created:</span></span>
-<span><span class="co">#&gt; [1]: Ori</span></span>
-<span><span class="co">#&gt; [2]: T5</span></span>
-<span><span class="co">#&gt; [3]: LED</span></span>
-<span><span class="co">#&gt; [4]: 0.6Frac</span></span>
-<span><span class="co">#&gt; [5]: 0.2Frac</span></span>
-<span><span class="co">#&gt; [6]: LED+0.2Frac</span></span></code></pre></div>
+<span><span class="co">#&gt; Measure 'ecm' has been applied with 6 new models created: [1]: Ori [2]: T5 [3]:</span></span>
+<span><span class="co">#&gt; LED [4]: 0.6Frac [5]: 0.2Frac [6]: LED+0.2Frac</span></span></code></pre></div>
 <p>After parametric models have been created, you can retrieve the
 summary of the parameter values and model names using
 <code>$cases()</code>.</p>
@@ -308,28 +303,29 @@ investigations.</p>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
 <span><span class="co">#&gt; 4|RUNNING --&gt; [IDF]'0.6Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; 4|COMPLETED --&gt; [IDF]'0.6Frac.idf' +</span></span>
+<span><span class="co">#&gt; 2|COMPLETED --&gt; [IDF]'T5.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 47.5s]</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 44.4s]</span></span>
 <span><span class="co">#&gt; 5|RUNNING --&gt; [IDF]'0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 47.5s]1|COMPLETED --&gt; [IDF]'Ori.idf' +</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 44.4s]3|COMPLETED --&gt; [IDF]'LED.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 47.5s][2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.6s]</span></span>
+<span><span class="co">#&gt; [1/6] |  17% <span style="color: #00BB00;">■■■■■■                          </span> [Elapsed: 44.4s][2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.2s]</span></span>
 <span><span class="co">#&gt; 6|RUNNING --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.6s]2|COMPLETED --&gt; [IDF]'T5.idf' +</span></span>
+<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.2s]1|COMPLETED --&gt; [IDF]'Ori.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.6s]3|COMPLETED --&gt; [IDF]'LED.idf' +</span></span>
+<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.2s]4|COMPLETED --&gt; [IDF]'0.6Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.6s]5|COMPLETED --&gt; [IDF]'0.2Frac.idf' +</span></span>
+<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.2s][4/6] |  67% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span> [Elapsed: 51.5s]</span></span>
+<span><span class="co">#&gt; 5|COMPLETED --&gt; [IDF]'0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [2/6] |  33% <span style="color: #00BB00;">■■■■■■■■■■■                     </span> [Elapsed: 49.6s][5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 13.7s]</span></span>
+<span><span class="co">#&gt; [4/6] |  67% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span> [Elapsed: 51.5s][5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 10.6s]</span></span>
 <span><span class="co">#&gt; 6|COMPLETED --&gt; [IDF]'LED+0.2Frac.idf' +</span></span>
 <span><span class="co">#&gt; [EPW]'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'</span></span>
-<span><span class="co">#&gt; [5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 13.7s][6/6] | 100% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> [Elapsed: 1m 20.3s]</span></span>
+<span><span class="co">#&gt; [5/6] |  83% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■      </span> [Elapsed: 1m 10.6s][6/6] | 100% <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> [Elapsed: 1m 20.6s]</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Parametric Simulation Job</span> <span style="color: #00BB00;">─────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/tmp/RtmpXxgVJ2/MediumOffice.idf'</span></span>
+<span><span class="co">#&gt;  • Path: '/tmp/RtmpjtEhMp/MediumOffice.idf'</span></span>
 <span><span class="co">#&gt;  • Version: '/home/runner/.local/EnergyPlus-26-1-0/WeatherData/USA_IL_Chicago-O…</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
@@ -341,7 +337,7 @@ investigations.</p>
 <span><span class="co">#&gt; [4]: '0.6Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [5]: '0.2Frac.idf'     &lt;-- SUCCEEDED</span></span>
 <span><span class="co">#&gt; [6]: 'LED+0.2Frac.idf' &lt;-- SUCCEEDED</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-20 15:32:55.559361' and completed successfully after 1.34 mins.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-20 17:14:32.628781' and completed successfully after 1.34 mins.</span></span></span>
 <span></span>
 <span><span class="va">param</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -362,12 +358,12 @@ investigations.</p>
 <span><span class="co">#&gt; $job_status</span></span>
 <span><span class="co">#&gt;    index    status                                         idf</span></span>
 <span><span class="co">#&gt;    &lt;int&gt;    &lt;char&gt;                                      &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpXxgVJ2/Ori/Ori.idf</span></span>
-<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpXxgVJ2/T5/T5.idf</span></span>
-<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpXxgVJ2/LED/LED.idf</span></span>
-<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpXxgVJ2/0.6Frac/0.6Frac.idf</span></span>
-<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpXxgVJ2/0.2Frac/0.2Frac.idf</span></span>
-<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpXxgVJ2/LED+0.2Frac/LED+0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 1:     1 completed                 /tmp/RtmpjtEhMp/Ori/Ori.idf</span></span>
+<span><span class="co">#&gt; 2:     2 completed                   /tmp/RtmpjtEhMp/T5/T5.idf</span></span>
+<span><span class="co">#&gt; 3:     3 completed                 /tmp/RtmpjtEhMp/LED/LED.idf</span></span>
+<span><span class="co">#&gt; 4:     4 completed         /tmp/RtmpjtEhMp/0.6Frac/0.6Frac.idf</span></span>
+<span><span class="co">#&gt; 5:     5 completed         /tmp/RtmpjtEhMp/0.2Frac/0.2Frac.idf</span></span>
+<span><span class="co">#&gt; 6:     6 completed /tmp/RtmpjtEhMp/LED+0.2Frac/LED+0.2Frac.idf</span></span>
 <span><span class="co">#&gt;                                                                                               epw</span></span>
 <span><span class="co">#&gt;                                                                                            &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: /home/runner/.local/EnergyPlus-26-1-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</span></span>

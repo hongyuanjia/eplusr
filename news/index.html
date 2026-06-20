@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
       </span>
     </div>
 
@@ -101,12 +101,17 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
+<ul><li><p>Use cli conditions for eplusr verbose logging, package warnings, errors, and narrow user-facing console messages while preserving eplusr condition classes (<a href="https://github.com/hongyuanjia/eplusr/issues/551" class="external-link">#551</a>).</p></li>
+<li><p>Truncate large parametric verbose messages and print summarized status output for large parametric jobs (<a href="https://github.com/hongyuanjia/eplusr/issues/569" class="external-link">#569</a>).</p></li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during IDD relation tests.</li>
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.17.0" id="eplusr-0170">eplusr 0.17.0<a class="anchor" aria-label="anchor" href="#eplusr-0170"></a></h2>
+<h2 class="page-header" data-toc-text="0.17.0" id="eplusr-0170">eplusr 0.17.0<small>2026-06-20</small><a class="anchor" aria-label="anchor" href="#eplusr-0170"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-17-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-17-0"></a></h3>
 <ul><li><p><code>Idf$set()</code> and <code>IdfObject$set()</code> can now update field values from their current values using one-sided formulas or functions (<a href="https://github.com/hongyuanjia/eplusr/issues/518" class="external-link">#518</a>).</p></li>

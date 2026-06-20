@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
       </span>
     </div>
 
@@ -347,7 +347,7 @@ restriction.</p>
 <span><span class="co">#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16</span></span>
 <span><span class="co">#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0</span></span>
 <span><span class="co">#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;pointer: 0x55d18ea09f20&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;pointer: 0x55cca74d0f20&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="abnormal-data">Abnormal data<a class="anchor" aria-label="anchor" href="#abnormal-data"></a>
@@ -444,29 +444,21 @@ data.</p>
 <span><span class="co">#&gt; 8760: 2024-01-01 00:00:00</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">d</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Data period #1 has been replaced with input data.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;      Name StartDayOfWeek   StartDay     EndDay</span></span>
-<span><span class="co">#&gt;  1:  Data         Sunday 2023/ 1/ 1 2023/12/31</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
+<span><span class="co">#&gt; Data period #1 has been replaced with input data.  Name StartDayOfWeek StartDay</span></span>
+<span><span class="co">#&gt; EndDay 1: Data Sunday 2023/ 1/ 1 2023/12/31</span></span></code></pre></div>
 <p><code>Epw</code> class supports multiple data periods in a single EPW
 file:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">epw</span><span class="op">$</span><span class="fu">data</span><span class="op">(</span>start_year <span class="op">=</span> <span class="fl">2014</span>, align_wday <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Invalid 'start_year' found for Data period #1 'Data' starting from</span></span>
-<span><span class="co">#&gt; 2023/ 1/ 1 to 2023/12/31. The original starting date falls in a leap year,</span></span>
-<span><span class="co">#&gt; however input 'start_year' is not a leap year. Invalid date time may occur.</span></span>
-<span><span class="co">#&gt; Warning: Data period #1 'Data' seems like a real-year data starting from 2023/</span></span>
-<span><span class="co">#&gt; 1/ 1 to 2023/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span></span>
+<span><span class="co">#&gt; Warning: Invalid 'start_year' found for Data period #1 'Data' starting from 2023/ 1/ 1</span></span>
+<span><span class="co">#&gt; to 2023/12/31. The original starting date falls in a leap year, however input</span></span>
+<span><span class="co">#&gt; 'start_year' is not a leap year. Invalid date time may occur.</span></span>
+<span><span class="co">#&gt; Warning: Data period #1 'Data' seems like a real-year data starting from 2023/ 1/ 1 to</span></span>
+<span><span class="co">#&gt; 2023/12/31. The starting date will be overwriten as 2014/ 1/ 1.</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">add</span><span class="op">(</span><span class="va">d</span>, after <span class="op">=</span> <span class="fl">0L</span>, realyear <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">Info</span> <span style="color: #00BB00;">────────────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; New data period has been added successfully:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;       Name StartDayOfWeek   StartDay     EndDay</span></span>
-<span><span class="co">#&gt;  1:  Data1      Wednesday 2014/ 1/ 1 2014/12/31</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; New data period has been added successfully: Name StartDayOfWeek StartDay</span></span>
+<span><span class="co">#&gt; EndDay 1: Data1 Wednesday 2014/ 1/ 1 2014/12/31</span></span>
 <span></span>
 <span><span class="va">epw</span><span class="op">$</span><span class="fu">period</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    index   name start_day_of_week  start_day    end_day</span></span>
