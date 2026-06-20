@@ -157,6 +157,119 @@ test_that("macOS Qt installer uses executable from mounted DMG", {
     )
 })
 
+test_that("uninstall_eplus() delegates to platform uninstallers", {
+    with_clean_eplus_cache({
+        root <- tempfile()
+        fake <- fake_eplus_install(root, ver = "23.1")
+        dir.create(file.path(fake, "maintenancetool.app", "Contents", "MacOS"), recursive = TRUE)
+        file.create(file.path(fake, "maintenancetool.app", "Contents", "MacOS", "maintenancetool"))
+        suppressMessages(use_eplus(fake))
+
+        called <- NULL
+        local_mocked_bindings(
+            os_type = function() "macos",
+            uninstall_eplus_macos = function(ver, dir) {
+                called <<- "macos"
+                0L
+            },
+            uninstall_eplus_portable = function(ver, dir) {
+                called <<- "portable"
+                0L
+            }
+        )
+
+        expect_equal(ignore_attr = TRUE, uninstall_eplus("23.1"), 0L)
+        expect_identical(called, "macos")
+    })
+})
+
+test_that("macOS Qt installations use the maintenance tool", {
+    dir <- tempfile()
+    mt <- file.path(dir, "maintenancetool.app", "Contents", "MacOS", "maintenancetool")
+    dir.create(dirname(mt), recursive = TRUE)
+    file.create(mt)
+
+    called <- NULL
+    local_mocked_bindings(
+        os_type = function() "macos",
+        uninstall_eplus_qt = function(ver, dir) {
+            called <<- list(ver = as.character(ver), dir = dir)
+            0L
+        }
+    )
+
+    expect_identical(uninstall_eplus_macos("9.4", dir), 0L)
+    expect_identical(called, list(ver = "9.4.0", dir = dir))
+})
+
+test_that("macOS installs without maintenance tools are removed directly", {
+    dir <- fake_eplus_install(tempfile(), ver = "9.4")
+
+    local_mocked_bindings(
+        os_type = function() "macos",
+        uninstall_eplus_qt = function(ver, dir) {
+            abort("Qt uninstaller should not be used.")
+        }
+    )
+
+    expect_identical(uninstall_eplus_macos("9.4", dir), 0L)
+    expect_false(dir.exists(dir))
+})
+
+test_that("Windows Qt installations use the maintenance tool", {
+    dir <- tempfile()
+    dir.create(dir)
+    file.create(file.path(dir, "maintenancetool.exe"))
+
+    called <- NULL
+    local_mocked_bindings(
+        os_type = function() "windows",
+        uninstall_eplus_qt = function(ver, dir) {
+            called <<- list(ver = as.character(ver), dir = dir)
+            0L
+        },
+        uninstall_eplus_portable = function(ver, dir) {
+            abort("Portable uninstaller should not be used.")
+        }
+    )
+
+    expect_identical(uninstall_eplus_win("23.1", dir), 0L)
+    expect_identical(called, list(ver = "23.1.0", dir = dir))
+})
+
+test_that("Windows installs without uninstallers are removed directly", {
+    dir <- tempfile()
+    dir.create(dir)
+
+    called <- NULL
+    local_mocked_bindings(
+        os_type = function() "windows",
+        uninstall_eplus_portable = function(ver, dir) {
+            called <<- list(ver = as.character(ver), dir = dir)
+            0L
+        }
+    )
+
+    expect_identical(uninstall_eplus_win("23.1", dir), 0L)
+    expect_identical(called, list(ver = "23.1.0", dir = dir))
+})
+
+test_that("Linux installs without uninstall.sh are removed directly", {
+    dir <- tempfile()
+    dir.create(dir)
+
+    called <- NULL
+    local_mocked_bindings(
+        uninstall_eplus_portable = function(ver, dir) {
+            called <<- list(ver = as.character(ver), dir = dir)
+            0L
+        }
+    )
+
+    expect_identical(uninstall_eplus_linux("23.1", dir), 0L)
+    expect_identical(called, list(ver = "23.1.0", dir = dir))
+})
+
 test_that("Install EnergyPlus v9.0 and below", {
     skip_on_cran()
     skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_INSTALL_OLD_") != "")
