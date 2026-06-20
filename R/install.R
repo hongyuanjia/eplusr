@@ -619,14 +619,15 @@ install_eplus_linux <- function(ver, exec, local = FALSE, dir = NULL, dir_bin = 
                 patch_eplus_linux_sh(ver, temp_exec)
                 exec <- temp_exec
             } else {
-                message("There is a known issue in EnergyPlus installation for v9.1.0 which ",
+                inform("There is a known issue in EnergyPlus installation for v9.1.0 which ",
                     "fails to extract files into correct directory ('", dir_eplus, "'). ",
                     "eplusr uses 'sed' to fix the issue before running the installation, ",
                     "but 'sed' is not found on current system. ",
                     "Please remember to manually move corresponding files ",
                     "from '", dir, "' to '", dir_eplus, "' in order to make sure ",
                     "eplusr can locate EnergyPlus v", ver, "correctly.",
-                    "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
+                    "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256",
+                    class = "install_known_issue"
                 )
             }
         }
@@ -813,10 +814,10 @@ uninstall_eplus_win <- function(ver, dir) {
     } else {
         uninstaller <- normalizePath(file.path(dir, "Uninstall.exe"), mustWork = FALSE)
         if (file.exists(uninstaller)) {
-            message(paste("The uninstaller will pop up a message box asking",
+            inform(paste("The uninstaller will pop up a message box asking",
                 "whether to remove files copied to the system directory during installation.",
                 "Please make your choice."
-            ))
+            ), class = "uninstall_note")
             return(system(paste(shQuote(uninstaller), "/S")))
         }
     }

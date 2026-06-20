@@ -46,6 +46,30 @@ collapse <- function(x, out = "'", or = FALSE, max_num = 5L) {
 }
 # }}}
 
+# format_truncated_lines {{{
+format_truncated_lines <- function(x, max = 20L, more = NULL) {
+    x <- as.character(x)
+    assert_count(max)
+
+    if (length(x) <= max) return(x)
+
+    more <- more %||% paste0("... and ", length(x) - max, " more.")
+    c(x[seq_len(max)], more)
+}
+# }}}
+
+# format_indexed_lines {{{
+format_indexed_lines <- function(x, max = 20L, more = NULL) {
+    x <- as.character(x)
+    if (!length(x)) return(x)
+
+    format_truncated_lines(
+        paste0("[", lpad(seq_along(x), "0"), "]: ", x),
+        max = max, more = more
+    )
+}
+# }}}
+
 # surround {{{
 surround <- function(x, out = "'") {
     if (is.null(out)) return(as.character(x))
@@ -382,17 +406,40 @@ make_filename <- function(x, len = 100, unique = TRUE) {
 }
 # }}}
 
+# condition_classes {{{
+condition_classes <- function(type, class = NULL, extra = NULL) {
+    class <- if (is.null(class)) {
+        character(0L)
+    } else {
+        paste0("eplusr_", type, "_", class)
+    }
+    unique(c(class, extra, paste0("eplusr_", type)))
+}
+# }}}
+
+# inform {{{
+inform <- function(..., class = NULL) {
+    msg <- paste0(..., collapse = "")
+    cli::cli_inform("{msg}",
+        class = condition_classes("message", class),
+        .envir = environment()
+    )
+}
+# }}}
+
 # abort {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
 abort <- function(message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
-    if (is.null(class)) {
-        stop(errorCondition(message, ..., class = "eplusr_error", call = call))
-    } else {
-        stop(errorCondition(message, ..., class = unique(c(paste0("eplusr_error_", class), "eplusr_error")), call = call))
-    }
+    msg <- paste0(message, collapse = "")
+    cli::cli_abort("{msg}",
+        ...,
+        class = condition_classes("error", class),
+        call = call,
+        .envir = environment()
+    )
 }
 # }}}
 
@@ -402,11 +449,13 @@ warn <- function(message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
-    if (is.null(class)) {
-        warning(warningCondition(message, ..., class = "eplusr_warning", call = call))
-    } else {
-        warning(warningCondition(message, ..., class = unique(c(paste0("eplusr_warning_", class), "eplusr_warning")), call = call))
-    }
+    msg <- paste0(message, collapse = "")
+    cli::cli_warn("{msg}",
+        ...,
+        class = condition_classes("warning", class),
+        call = call,
+        .envir = environment()
+    )
 }
 # }}}
 

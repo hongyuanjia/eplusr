@@ -944,8 +944,15 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
         mea_nm <- surround(mea_nm)
     }
     verbose_info("Measure ", mea_nm, " has been applied with ", length(out),
-        " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
-        nms, collapse = "\n")
+        " new models created:\n",
+        paste0(
+            format_indexed_lines(nms,
+                more = paste0("... and ", max(length(nms) - 20L, 0L),
+                    " more. Use $cases() to inspect all cases.")
+            ),
+            collapse = "\n"
+        ),
+        class = "param_measure"
     )
 
     invisible(self)

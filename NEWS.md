@@ -1,5 +1,14 @@
 # eplusr (development version)
 
+## Internal refactor
+
+* Use cli conditions for eplusr verbose logging, package warnings, errors, and
+  narrow user-facing console messages while preserving eplusr condition classes
+  (#551).
+
+* Truncate large parametric verbose messages and print summarized status output
+  for large parametric jobs (#569).
+
 ## Bug fixes
 
 * Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during

@@ -1181,7 +1181,7 @@ format.Range <- function(x, ...) {
 #' @export
 # print.Range {{{
 print.Range <- function(x, ...) {
-    cat(format.Range(x, ...), "\n")
+    cli::cat_line(format.Range(x, ...))
     invisible(x)
 }
 # }}}

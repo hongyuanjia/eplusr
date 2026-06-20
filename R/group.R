@@ -1545,12 +1545,53 @@ epgroup_combine_data <- function(self, private, which, data, fill = TRUE) {
     rbindlist(data, fill = fill)
 }
 # }}}
+
+# epgroup_print helpers {{{
+epgroup_print_max_cases <- function() 20L
+
+epgroup_more_cases <- function(n, max = epgroup_print_max_cases(),
+                               inspect = "$cases()") {
+    paste0("... and ", n - max, " more. Use ", inspect,
+        " to inspect all cases.")
+}
+
+epgroup_status_summary <- function(status) {
+    status <- tolower(as.character(status))
+    status[is.na(status) | !nzchar(status)] <- "unknown"
+
+    order <- unique(c(
+        "failed", "completed", "succeeded", "running", "idle",
+        "terminated", "cancelled", "unknown", sort(unique(status))
+    ))
+    count <- table(factor(status, levels = order))
+    count <- count[count > 0L]
+
+    c(
+        "Simulation Status Summary:",
+        paste0("  * ", names(count), ": ", as.integer(count))
+    )
+}
+
+epgroup_status_from_line <- function(x) {
+    status <- tolower(trimws(sub("\\s*-->.*$", "", x)))
+    status[is.na(status) | !nzchar(status)] <- "unknown"
+    status
+}
+
+epgroup_print_case_lines <- function(lines, max = epgroup_print_max_cases(),
+                                     more = NULL, ...) {
+    lines <- format_truncated_lines(cli::ansi_strtrim(lines), max = max, more = more)
+    cli::cat_line(paste0(lines, collapse = "\n"), ...)
+}
+# }}}
+
 # epgroup_print_status {{{
 epgroup_print_status <- function(self, private, epw = TRUE) {
     status <- epgroup_status(self, private)
     epgroup_retrieve_data(self, private, status)
 
     n_case <- private$m_model_store$case_count()
+    max_print <- epgroup_print_max_cases()
     if (private$m_model_store$case_has_names()) {
         nm_idf <- paste0(private$m_model_store$case_names(), ".idf")
     } else {
@@ -1581,7 +1622,12 @@ epgroup_print_status <- function(self, private, epw = TRUE) {
     }
 
     if (!status$run_before) {
-        cli::cat_line(paste0(cli::ansi_strtrim(nm), collapse = "\n"))
+        if (n_case > max_print) {
+            cli::cat_line(epgroup_status_summary(rep("idle", n_case)))
+        }
+        epgroup_print_case_lines(nm, max = max_print,
+            more = epgroup_more_cases(n_case, max_print)
+        )
         cli::cat_line("<< Job has not been run before >>",
             col = "white", background_col = "blue")
         return(invisible())
@@ -1603,6 +1649,9 @@ epgroup_print_status <- function(self, private, epw = TRUE) {
             # for models that are idle
             job_status[J(NA_character_), on = "V2", V2 := paste0(
                 "IDLE       --> [IDF]", surround(private$m_model_store$case_names()[index]))]
+            if (n_case > max_print) {
+                cli::cat_line(epgroup_status_summary(epgroup_status_from_line(job_status$V2)))
+            }
             stderr <- paste0(lpad(job_status$index, "0"), "|" ,job_status$V2)
             safe_width <- getOption("width") - 2L
             stderr_trunc <- vcapply(stderr, function(l) {
@@ -1612,22 +1661,50 @@ epgroup_print_status <- function(self, private, epw = TRUE) {
                     l
                 }
             })
+            if (n_case > max_print) {
+                stderr_trunc <- format_truncated_lines(stderr_trunc, max_print,
+                    epgroup_more_cases(n_case, max_print, "$status()$job_status"))
+            }
 
             cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
                 padding = 0)
         }
     } else {
         if (isTRUE(status$terminated)) {
-            cli::cat_line(paste0(cli::ansi_strtrim(rpad(nm), width = cli::console_width() - 15L),
-                " <-- TERMINATED", collapse = "\n"))
+            if (n_case > max_print) {
+                cli::cat_line(epgroup_status_summary(rep("terminated", n_case)))
+            }
+            epgroup_print_case_lines(
+                paste0(cli::ansi_strtrim(rpad(nm), width = cli::console_width() - 15L),
+                    " <-- TERMINATED"),
+                max = max_print,
+                more = epgroup_more_cases(n_case, max_print, "$status()$job_status")
+            )
         } else {
+            job_status <- ifelse(private$m_job$jobs$exit_status == 0L, "completed", "failed")
             nm <- private$m_job$jobs[, paste0(
                 ifelse(exit_status == 0L,
                     cli::ansi_strtrim(paste0(rpad(nm), " <-- SUCCEEDED")),
                     cli::ansi_strtrim(paste0(rpad(nm), " <-- FAILED"))
                 )
             )]
-            cli::cat_line(paste0(nm, collapse = "\n"))
+            if (n_case > max_print) {
+                cli::cat_line(epgroup_status_summary(job_status))
+                if (any(job_status == "failed")) {
+                    failed <- nm[job_status == "failed"]
+                    epgroup_print_case_lines(failed, max = max_print,
+                        more = paste0("... and ", max(length(failed) - max_print, 0L),
+                            " more failed cases. Use $status()$job_status ",
+                            "to inspect all cases.")
+                    )
+                } else {
+                    epgroup_print_case_lines(nm, max = max_print,
+                        more = epgroup_more_cases(n_case, max_print, "$status()$job_status")
+                    )
+                }
+            } else {
+                cli::cat_line(paste0(nm, collapse = "\n"))
+            }
         }
     }
     # }}}

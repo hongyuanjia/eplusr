@@ -56,6 +56,13 @@ test_that("$apply_measure()", {
     eplusr_option(verbose_info = TRUE)
     expect_message(param$apply_measure(function(idf, num) idf, num = 1:2), "function")
     expect_message(param$apply_measure(mea, num = 1:2), "mea")
+
+    param <- param_job(path_idf, NULL)
+    msg <- catch_cnd(param$apply_measure(mea, num = 1:27))
+    expect_s3_class(msg, "eplusr_message_param_measure")
+    expect_match(conditionMessage(msg), "... and 7 more", fixed = TRUE)
+    expect_match(conditionMessage(msg), "[20]: mea_20", fixed = TRUE)
+    expect_no_match(conditionMessage(msg), "[21]: mea_21", fixed = TRUE)
 })
 
 test_that("$param()", {
@@ -299,6 +306,15 @@ test_that("$print()", {
     mea <- function(idf, num) idf
     param$apply_measure(mea, num = 1:2)
     expect_output(param$print())
+
+    param <- param_job(path, NULL)
+    suppressMessages(param$apply_measure(mea, num = 1:27))
+    out <- paste0(utils::capture.output(param$print()), collapse = "\n")
+    expect_match(out, "Simulation Status Summary")
+    expect_match(out, "idle: 27")
+    expect_match(out, "... and 7 more", fixed = TRUE)
+    expect_match(out, "Use $cases() to inspect all cases", fixed = TRUE)
+    expect_no_match(out, "mea_21", fixed = TRUE)
 })
 
 test_that("==.ParametricJob and !=.ParametricJob", {

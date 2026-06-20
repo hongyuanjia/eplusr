@@ -176,8 +176,14 @@ in_verbose <- function() {
 }
 # }}}
 # verbose_info {{{
-verbose_info <- function(...) {
-    if (eplusr_option("verbose_info")) message(...)
+verbose_info <- function(..., class = NULL) {
+    if (!eplusr_option("verbose_info")) return(invisible(NULL))
+
+    msg <- paste0(..., collapse = "")
+    cli::cli_inform("{msg}",
+        class = condition_classes("message", class, "eplusr_message_verbose"),
+        .envir = environment()
+    )
 }
 # }}}
 # fast_subset {{{

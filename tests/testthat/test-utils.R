@@ -19,6 +19,14 @@ test_that("Utility functions", {
     expect_equal(lpad(c(1, 10)), c(" 1", "10"))
     expect_equal(lpad(c(1, 10), width = 3), c("  1", " 10"))
 
+    expect_equal(format_truncated_lines(letters[1:3], max = 3L), letters[1:3])
+    expect_equal(format_truncated_lines(letters[1:4], max = 3L),
+        c("a", "b", "c", "... and 1 more."))
+    expect_equal(format_truncated_lines(letters[1:4], max = 2L, more = "etc"),
+        c("a", "b", "etc"))
+    expect_equal(format_indexed_lines(c("case_a", "case_b"), max = 1L),
+        c("[1]: case_a", "... and 1 more."))
+
     expect_error(read_lines(NULL), "Failed to read input file", "eplusr_error_read_lines")
     expect_equal(read_lines("a\n b \n c \n"), data.table(line = 1:3, string = c("a", "b", "c")))
 
@@ -86,6 +94,13 @@ test_that("Utility functions", {
     expect_equal(names2(1:3), rep(NA_character_, 3))
     expect_equal(names2(c(a = 1, 2)), c("a", NA_character_))
 
+    expect_message(inform("a"), "a")
+    msg <- catch_cnd(inform("a", "b", class = "notice"))
+    expect_equal(conditionMessage(msg), "ab")
+    expect_s3_class(msg, "eplusr_message")
+    expect_s3_class(msg, "eplusr_message_notice")
+    expect_s3_class(msg, "message")
+
     expect_equal(each_length(list(1, 2:3)), c(1L, 2L))
 
     expect_equal(ranger()[], list(minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE))
@@ -106,8 +121,28 @@ test_that("Utility functions", {
     expect_equal(match_in_vec("a", LETTERS, "aa", label = TRUE), "A")
     expect_equal(match_in_vec("aa", LETTERS, "aa", label = TRUE), "A")
 
-    expect_s3_class(catch_cnd(warn("")), "eplusr_warning")
-    expect_s3_class(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
+    expect_warning(warn("a"), "a", class = "eplusr_warning")
+
+    cnd <- catch_cnd(warn("a {b}", class = "empty", value = 1L))
+    expect_equal(conditionMessage(cnd), "a {b}")
+    expect_equal(cnd$value, 1L)
+    expect_s3_class(cnd, "eplusr_warning")
+    expect_s3_class(cnd, "eplusr_warning_empty")
+    expect_s3_class(cnd, "warning")
+
+    expect_silent(
+        withCallingHandlers(
+            warn("a"),
+            warning = function(w) invokeRestart("muffleWarning")
+        )
+    )
+
+    cnd <- catch_cnd(abort("a {b}", class = "empty", value = 1L, call = NULL))
+    expect_equal(conditionMessage(cnd), "a {b}")
+    expect_equal(cnd$value, 1L)
+    expect_s3_class(cnd, "eplusr_error")
+    expect_s3_class(cnd, "eplusr_error_empty")
+    expect_s3_class(cnd, "error")
 })
 
 # vim: set fdm=marker:
