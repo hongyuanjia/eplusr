@@ -1906,6 +1906,22 @@ epw_align_data_status <- function(self, private, data, period = NULL) {
     data
 }
 # }}}
+# format_epw_period_info {{{
+format_epw_period_info <- function(period) {
+    fmt <- format(period)
+    header <- names(period)
+    width <- pmax(nchar(header, type = "width"), apply(fmt, 2L, function(x) max(nchar(x, type = "width"))))
+
+    lines <- c(
+        paste0(rpad(header, width = width), collapse = " "),
+        vapply(seq_len(nrow(fmt)), function(i) {
+            paste0(rpad(fmt[i, ], width = width), collapse = " ")
+        }, character(1L), USE.NAMES = FALSE)
+    )
+
+    paste0(lines, collapse = "\n")
+}
+# }}}
 # epw_add {{{
 epw_add <- function(self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, after = 0L) {
@@ -1918,19 +1934,18 @@ epw_add <- function(self, private, data, realyear = FALSE, name = NULL,
     private$update_idf_env(lst$header)
 
     if (in_verbose()) {
-        cli::cat_rule("Info", col = "green")
-        cat("New data period has been added successfully:\n\n")
+        period_dt <- self$period()[lst$period][,
+            list(
+                " " = paste0(index, ": "),
+                Name = name,
+                `StartDayOfWeek` = start_day_of_week,
+                `StartDay` = start_day, `EndDay` = end_day)
+        ]
 
-        print(self$period()[lst$period][,
-           list(
-            " " = paste0(index, ": "),
-            Name = name,
-            `StartDayOfWeek` = start_day_of_week,
-            `StartDay` = start_day, `EndDay` = end_day)],
-            class = FALSE, row.names = FALSE
+        verbose_info("New data period has been added successfully:\n\n",
+            format_epw_period_info(period_dt),
+            class = "epw_period"
         )
-
-        cli::cat_rule()
     }
 
     private$log_unsaved()
@@ -1953,19 +1968,19 @@ epw_set <- function(self, private, data, realyear = FALSE, name = NULL,
     private$update_idf_env(lst$header)
 
     if (in_verbose()) {
-        cli::cat_rule("Info", col = "green")
-        cat("Data period", paste0("#", lst$period), "has been replaced with input data.\n\n")
+        period_dt <- self$period()[lst$period][,
+            list(
+                " " = paste0(index, ": "),
+                Name = name,
+                `StartDayOfWeek` = start_day_of_week,
+                `StartDay` = start_day, `EndDay` = end_day)
+        ]
 
-        print(self$period()[lst$period][,
-           list(
-            " " = paste0(index, ": "),
-            Name = name,
-            `StartDayOfWeek` = start_day_of_week,
-            `StartDay` = start_day, `EndDay` = end_day)],
-            class = FALSE, row.names = FALSE
+        verbose_info("Data period ", paste0("#", lst$period),
+            " has been replaced with input data.\n\n",
+            format_epw_period_info(period_dt),
+            class = "epw_period"
         )
-
-        cli::cat_rule()
     }
 
     private$log_unsaved()
@@ -1984,19 +1999,19 @@ epw_del <- function(self, private, period) {
     private$update_idf_env(lst$header)
 
     if (in_verbose()) {
-        cli::cat_rule("Info", col = "green")
-        cat("Data period", paste0("#", lst$period), "has been successfully deleted:\n\n")
+        period_dt <- p[lst$period][,
+            list(
+                " " = paste0(index, ": "),
+                Name = name,
+                `StartDayOfWeek` = start_day_of_week,
+                `StartDay` = start_day, `EndDay` = end_day)
+        ]
 
-        print(p[lst$period][,
-           list(
-            " " = paste0(index, ": "),
-            Name = name,
-            `StartDayOfWeek` = start_day_of_week,
-            `StartDay` = start_day, `EndDay` = end_day)],
-            class = FALSE, row.names = FALSE
+        verbose_info("Data period ", paste0("#", lst$period),
+            " has been successfully deleted:\n\n",
+            format_epw_period_info(period_dt),
+            class = "epw_period"
         )
-
-        cli::cat_rule()
     }
 
     private$log_unsaved()

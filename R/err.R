@@ -321,7 +321,8 @@ print.ErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
     }
 
     if (!nrow(dt)) {
-        cat("\n  [EnergyPlus did not generate any message...]\n", sep = "")
+        cli::cat_line()
+        cli::cat_line("  [EnergyPlus did not generate any message...]")
         return(invisible(x))
     }
 
@@ -371,7 +372,8 @@ print.TransitionErrFile <- function(x, brief = FALSE, info = TRUE, ...) {
     }
 
     if (!nrow(dt)) {
-        cat("\n  [IDFVersionUpdater did not generate any message...]\n", sep = "")
+        cli::cat_line()
+        cli::cat_line("  [IDFVersionUpdater did not generate any message...]")
         return(invisible(x))
     }
 
