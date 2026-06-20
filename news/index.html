@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9012</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9013</span>
       </span>
     </div>
 
@@ -120,6 +120,10 @@
 <li><p>Fix <code><a href="../reference/install_eplus.html">uninstall_eplus()</a></code> dispatch so native uninstallers are used when available and portable or manual installs fall back to direct directory removal (<a href="https://github.com/hongyuanjia/eplusr/issues/622" class="external-link">#622</a>).</p></li>
 <li><p>Fix EnergyPlus IDD downloads from v23.2.0 and portable macOS tarball installation (<a href="https://github.com/hongyuanjia/eplusr/issues/601" class="external-link">#601</a>).</p></li>
 <li><p>Delay EnergyPlus installation discovery until needed and allow extra search roots via <code>locate_eplus(dirs = ...)</code> and <code>options(eplusr.eplus_dirs = ...)</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/609" class="external-link">#609</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
+<ul><li>Move the <code>units</code> package from Imports to Suggests and load it only when unit-aware features are used (<a href="https://github.com/hongyuanjia/eplusr/issues/466" class="external-link">#466</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">

@@ -26,7 +26,7 @@ parent Idf object, using $object(), $objects_in_class() and equivalent."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9012</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.16.3.9013</span>
       </span>
     </div>
 
@@ -546,8 +546,8 @@ characters and the converted character vector is returned.</p></dd>
 
 <dt><code>unit</code></dt>
 <dd><p>If <code>TRUE</code>, values of numeric fields are assigned with
-units using <code><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">units::set_units()</a></code> if applicable. Default:
-<code>FALSE</code>.</p></dd>
+units using <code><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">units::set_units()</a></code> if applicable. This requires
+the suggested package <code>units</code>. Default: <code>FALSE</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -1705,7 +1705,8 @@ type being a string instead of a number. Default: <code>TRUE</code>.</p></dd>
 <dt><code>unit</code></dt>
 <dd><p>Only applicable when <code>string_value</code> is <code>FALSE</code>. If
 <code>TRUE</code>, values of numeric fields are assigned with units using
-<code><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">units::set_units()</a></code> if applicable. Default: <code>FALSE</code>.</p></dd>
+<code><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">units::set_units()</a></code> if applicable. This requires the suggested
+package <code>units</code>. Default: <code>FALSE</code>.</p></dd>
 
 
 <dt><code>wide</code></dt>
