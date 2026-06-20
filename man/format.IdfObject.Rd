@@ -4,7 +4,15 @@
 \alias{format.IdfObject}
 \title{Format an IdfObject}
 \usage{
-\method{format}{IdfObject}(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...)
+\method{format}{IdfObject}(
+  x,
+  comment = TRUE,
+  leading = 4L,
+  sep_at = 29L,
+  all = FALSE,
+  field = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{An \link{IdfObject} object.}
@@ -18,6 +26,9 @@ Default: \code{29L} which is the same as IDF Editor.}
 
 \item{all}{If \code{TRUE}, values of all possible fields in current class the
 \link{IdfObject} belongs to are returned. Default: \code{FALSE}}
+
+\item{field}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

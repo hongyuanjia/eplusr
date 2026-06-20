@@ -667,6 +667,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #'        between different classes. Default: `0`.
         #' @param all If `TRUE`, all available fields defined in IDD for
         #'        specified class will be returned. Default: `FALSE`.
+        #' @param field If `FALSE`, field names will not be included as comments.
+        #'        Default: `TRUE`.
         #'
         #' @return A character vector.
         #'
@@ -682,8 +684,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         #' idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
         #' }
         #'
-        to_string = function(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
-            idd_to_string(self, private, class, leading, sep_at, sep_each, all),
+        to_string = function(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE, field = TRUE)
+            idd_to_string(self, private, class = class, leading = leading,
+                sep_at = sep_at, sep_each = sep_each, all = all, field = field),
         # }}}
         # }}}
 
@@ -879,8 +882,9 @@ idd_to_table <- function(self, private, class, all) {
 }
 # }}}
 # idd_to_string {{{
-idd_to_string <- function(self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
-    get_idd_string(private$m_idd_env, class, leading, sep_at, sep_each, all)
+idd_to_string <- function(self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE, field = TRUE) {
+    get_idd_string(private$m_idd_env, class = class, leading = leading,
+        sep_at = sep_at, sep_each = sep_each, all = all, field = field)
 }
 # }}}
 # idd_print {{{

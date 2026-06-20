@@ -556,6 +556,14 @@ test_that("$to_string()", {
           "IN02,     !- Layer 3",
           "GP01;     !- Layer 4")
     )
+    expect_equal(con$to_string(leading = 0, sep_at = 10, field = FALSE),
+        c("Construction,",
+          "WALL-1,",
+          "WD01,",
+          "PW03,",
+          "IN02,",
+          "GP01;")
+    )
     expect_equal(con$to_string(leading = 0, sep_at = 10, all = TRUE),
         c("Construction,",
           "WALL-1,   !- Name",
@@ -603,6 +611,10 @@ test_that("format.IdfObject, as.character.IdfObject, etc", {
 
     expect_type(format(con), "character")
     expect_equal(as.character(con), con$to_string())
+    expect_equal(format(con, field = FALSE),
+        paste0(con$to_string(field = FALSE), collapse = "\n")
+    )
+    expect_equal(as.character(con, field = FALSE), con$to_string(field = FALSE))
     expect_output(str(con))
     expect_output(print(con))
 })

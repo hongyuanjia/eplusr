@@ -5,6 +5,9 @@
 * `IdfObject$is_valid_field()` can now check whether fields are present in the
   current object instead of only being defined in the IDD (#391).
 
+* Add a `field` argument to `$to_string()` methods to optionally omit field
+  name comments from generated IDF strings (#77).
+
 ## Internal refactor
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and

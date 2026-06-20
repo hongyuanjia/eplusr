@@ -263,6 +263,15 @@ test_that("Idd class", {
         )
 
     )
+    expect_equal(idd$to_string("TestSlash", all = TRUE, field = FALSE),
+        c(
+        "TestSlash,",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ;"
+        )
+    )
 
     # can print without error
     expect_output(idd$print())

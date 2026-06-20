@@ -249,6 +249,14 @@ test_that("IddObject class", {
         )
     )
     expect_equal(
+        slash$to_string(field = FALSE),
+        c("TestSlash,",
+          "    ,",
+          "    ,",
+          "    ;"
+        )
+    )
+    expect_equal(
         slash$to_string(c("comment1", "comment2"), leading = 0L, sep_at = 0L),
         c("!comment1",
           "!comment2",
@@ -266,6 +274,7 @@ test_that("IddObject class", {
     expect_equal(format(slash, ver = FALSE), "<IddObject: 'TestSlash'>")
     expect_output(str(slash))
     expect_equal(as.character(slash), slash$to_string())
+    expect_equal(as.character(slash, field = FALSE), slash$to_string(field = FALSE))
     # }}}
 
     skip_on_cran()

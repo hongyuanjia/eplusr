@@ -94,12 +94,12 @@ get_iddobj_table <- function(idd_env, class_id = NULL, all = FALSE) {
 }
 # }}}
 # get_iddobj_string {{{
-get_iddobj_string <- function(idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
+get_iddobj_string <- function(idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE) {
     fld <- get_idd_field(idd_env, class_id, property = c("units", "ip_units"), all = all)
     # add fake value in order to correctly format
     set(fld, NULL, "value_chr", NA_character_)
 
-    str_fld <- format_field(fld, leading = leading, sep_at = sep_at)
+    str_fld <- format_field(fld, leading = leading, sep_at = sep_at, field = field)
     str_cls <- paste0(fld$class_name[[1L]], ",")
     str_cmt <- NULL
 

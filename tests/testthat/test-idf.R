@@ -937,6 +937,24 @@ test_that("$to_string()", {
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
     expect_equal(idf_1$to_string(format = "new_top"), idf_string)
+    expect_equal(
+        idf_1$to_string(format = "new_top", field = FALSE),
+        c(
+            "!-Generator eplusr",
+            "!-Option OriginalOrderTop",
+            "",
+            "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
+            "!-      Use '!' comments if they need to be retained when using the IDFEditor.",
+            "",
+            "Construction,",
+            "    WALL-1,",
+            "    WD01;",
+            "",
+            "Version,",
+            sprintf("    %s;", LATEST_EPLUS_VER),
+            ""
+        )
+    )
 
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_equal(idf$to_string()[2], "!-Option OriginalOrderTop")

@@ -1366,6 +1366,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'        class that objects belong to will be returned. Default:
         #'        `FALSE`.
         #'
+        #' @param field If `FALSE`, field names will not be included as comments.
+        #'        Default: `TRUE`.
+        #'
         #' @return A character vector.
         #'
         #' @examples
@@ -1381,8 +1384,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' mat$to_string(leading = 0)
         #' }
         #'
-        to_string = function(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
-            idfobj_to_string(self, private, comment, leading, sep_at, all),
+        to_string = function(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE)
+            idfobj_to_string(self, private, comment = comment, leading = leading,
+                sep_at = sep_at, all = all, field = field),
         # }}}
 
         # print {{{
@@ -1832,9 +1836,10 @@ idfobj_to_table <- function(self, private, all = FALSE, string_value = TRUE,
 }
 # }}}
 # idfobj_to_string {{{
-idfobj_to_string <- function(self, private, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+idfobj_to_string <- function(self, private, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE) {
     get_idfobj_string(private$idd_env(), private$idf_env(), private$m_object_id,
-        comment = comment, leading = leading, sep_at = sep_at, all = all
+        comment = comment, leading = leading, sep_at = sep_at, all = all,
+        field = field
     )
 }
 # }}}
@@ -1890,6 +1895,8 @@ idfobj_print <- function(self, private, comment = TRUE, auto_sep = FALSE, brief 
 #' Default: `29L` which is the same as IDF Editor.
 #' @param all If `TRUE`, values of all possible fields in current class the
 #'   [IdfObject] belongs to are returned. Default: `FALSE`
+#' @param field If `FALSE`, field names will not be included as comments.
+#' Default: `TRUE`.
 #' @param ... Further arguments passed to or from other methods.
 #' @return A character vector.
 #' @examples
@@ -1905,8 +1912,9 @@ idfobj_print <- function(self, private, comment = TRUE, auto_sep = FALSE, brief 
 #'
 #' @export
 # format.IdfObject {{{
-format.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all), collapse = "\n")
+format.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE, ...) {
+    paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at,
+        all = all, field = field), collapse = "\n")
 }
 # }}}
 
@@ -1929,8 +1937,9 @@ format.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all 
 #'
 #' @export
 # as.character.IdfObject {{{
-as.character.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+as.character.IdfObject <- function(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE, ...) {
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at,
+        all = all, field = field)
 }
 # }}}
 
