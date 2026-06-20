@@ -22,7 +22,7 @@ file, usually named as \code{Energy+.idd}, or a valid version of IDD, e.g.
 \code{"8.9"}, \code{"8.9.0"}.}
 
 \item{download}{If \code{TRUE} and argument \code{idd}, the IDD file will be
-downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
+downloaded from \href{https://github.com/NatLabRockies/EnergyPlus}{EnergyPlus GitHub Repository},
 and saved to \code{\link[=tempdir]{tempdir()}}. It will be parsed after it is downloaded
 successfully. A special value of \code{"auto"} can be given, which will
 automatically download corresponding IDD file if the Idd object is
@@ -60,7 +60,7 @@ Dictionary (IDD) file, usually named "Energy+.idd" and return an \code{Idd}
 object. For details on \code{Idd} class, please see \link{Idd}.
 
 \code{download_idd()} downloads specified version of EnergyPlus IDD file from
-\href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
+\href{https://github.com/NatLabRockies/EnergyPlus}{EnergyPlus GitHub Repository}. It is
 useful in case where you only want to edit an EnergyPlus Input Data File
 (IDF) directly but do not want to install whole EnergyPlus software.
 

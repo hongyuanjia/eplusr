@@ -2357,7 +2357,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #' paths or copy them into the output directory, based on your choice.
 #'
 #' @references
-#' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
+#' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NatLabRockies/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
 #'
 #' @examples
 #' \dontrun{

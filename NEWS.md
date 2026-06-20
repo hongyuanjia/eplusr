@@ -372,7 +372,7 @@
 * `run_multi()` now gets a new argument `expand_obj` to control whether
   `ExpandObjects` should be called before simulation or not. Because there is a
   known issue of `ExpandObjects` on Linux system
-  (https://github.com/NREL/EnergyPlus/issues/8376), here we want to avoid
+  (https://github.com/NatLabRockies/EnergyPlus/issues/8376), here we want to avoid
   unnecessary calls of `ExpandObjects` as possible. Also, `EplusJob$run()` and
   `EplusGroupJob$run()` now will detect if there are any `HVACTemplate:*`
   objects and set the `expand_obj` flag properly (#377).
@@ -617,7 +617,7 @@
 * Provide a workaround to fix the issue of EnergyPlus v9.1 and above
   installation which fails to extract files into correct directory
   `/usr/local/EnergyPlus-X-Y-0`, but instead extracting all files directly into
-  `/usr/local` ([NREL/EnergyPlus#7256](https://github.com/NREL/EnergyPlus/issues/7256))
+  `/usr/local` ([NatLabRockies/EnergyPlus#7256](https://github.com/NatLabRockies/EnergyPlus/issues/7256))
   (#193).
 * A new parameter `group_ext` has been added in `Idf$to_table()` and
   `IdfObject$to_table()`, with default value being `"none"`.

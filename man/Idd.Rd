@@ -287,7 +287,7 @@ idd$print()
 
 }
 \references{
-\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor},
+\href{https://github.com/NatLabRockies/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor},
 \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library}
 }
 \seealso{

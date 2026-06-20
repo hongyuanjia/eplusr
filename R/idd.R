@@ -52,7 +52,7 @@ NULL
 #' curtain class
 #' @author Hongyuan Jia
 #' @references
-#' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor),
+#' [IDFEditor](https://github.com/NatLabRockies/EnergyPlus/tree/develop/src/IDF_Editor),
 #' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
 NULL
 
@@ -1002,7 +1002,7 @@ read_idd <- function(path, encoding = "unknown") {
 #'     file, usually named as `Energy+.idd`, or a valid version of IDD, e.g.
 #'     `"8.9"`, `"8.9.0"`.
 #' @param download If `TRUE` and argument `idd`, the IDD file will be
-#'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
+#'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NatLabRockies/EnergyPlus),
 #'     and saved to [tempdir()]. It will be parsed after it is downloaded
 #'     successfully. A special value of `"auto"` can be given, which will
 #'     automatically download corresponding IDD file if the Idd object is
@@ -1024,7 +1024,7 @@ read_idd <- function(path, encoding = "unknown") {
 #'  object. For details on `Idd` class, please see [Idd].
 #'
 #' `download_idd()` downloads specified version of EnergyPlus IDD file from
-#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
+#' [EnergyPlus GitHub Repository](https://github.com/NatLabRockies/EnergyPlus). It is
 #' useful in case where you only want to edit an EnergyPlus Input Data File
 #' (IDF) directly but do not want to install whole EnergyPlus software.
 #'

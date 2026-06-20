@@ -179,7 +179,7 @@ if (is_avail_eplus("8.8")) {
 }
 }
 \references{
-\href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
+\href{https://github.com/NatLabRockies/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
 }
 \seealso{
 \link{EplusJob} class and \link{ParametricJob} class which provide a more friendly

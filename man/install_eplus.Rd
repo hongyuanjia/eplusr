@@ -84,7 +84,7 @@ install it.
 }
 \details{
 \code{download_eplus()} downloads specified version of EnergyPlus from
-\href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
+\href{https://github.com/NatLabRockies/EnergyPlus}{EnergyPlus GitHub Repository}.
 
 \code{install_eplus()} tries to install EnergyPlus into the default location,
 e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, \verb{/usr/local/EnergyPlus-X-Y-0} on
