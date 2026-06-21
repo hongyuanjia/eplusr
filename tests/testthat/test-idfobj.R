@@ -204,6 +204,10 @@ test_that("$set()", {
     # can stop when invalid names are given for a non-extensible class
     expect_error(mat$set(wrong = "something"), class = "eplusr_error_invalid_field_name")
 
+    # can stop when character fields contain IDF delimiters
+    expect_s3_class(err <- catch_cnd(mat$set(name = "Bad;Name")), "eplusr_error_validity_check")
+    expect_equal(err$data$invalid_character$value_chr, "Bad;Name")
+
     # can stop when invalid names are given for an extensible class
     expect_error(con$set(name = "first", wrong = "second"), class = "eplusr_error_invalid_field_name")
 

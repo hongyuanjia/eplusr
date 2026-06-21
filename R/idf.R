@@ -1975,7 +1975,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' * `invalid_autocalculate`: Result of `auto_field` checking for
         #'   invalid `Autocalculate` field values.
         #' * `invalid_character`: Result of `type` checking for invalid
-        #'   character field values.
+        #'   character field values, including character values that contain
+        #'   IDF delimiters `,` or `;`.
         #' * `invalid_numeric`: Result of `type` checking for invalid
         #'   numeric field values.
         #' * `invalid_integer`: Result of `type` checking for invalid

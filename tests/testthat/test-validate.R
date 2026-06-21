@@ -185,6 +185,19 @@ test_that("Validate method", {
     expect_equal(chr$object_id, 1:4)
     expect_equal(chr$field_index, rep(1L, 4L))
     expect_equal(chr$value_id, c(1L, 10L, 15L, 41L))
+
+    env_in <- list2env(parse_idf_file(idftext("idf")))
+    env_in$validity <- empty_validity()
+    add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
+    add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
+    add_field_property(idd_env, env_in$value, c("field_index", "field_name", "units", "ip_units", "type_enum"))
+    invisible(env_in$value[value_id %in% c(1L, 10L), value_chr := c("Building,One", "Construction;One")])
+
+    expect_silent({chr <- check_invalid_character(idd_env, idf_env, env_in)$validity$invalid_character})
+    expect_equal(chr$object_id, 1:2)
+    expect_equal(chr$field_index, rep(1L, 2L))
+    expect_equal(chr$value_id, c(1L, 10L))
+    expect_equal(chr$value_chr, c("Building,One", "Construction;One"))
     # }}}
 
     # INVALID NUMERIC {{{

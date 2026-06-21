@@ -38,7 +38,8 @@ Default: \code{FALSE}.}
 
 \item{type}{Check if all fields have values with valid types, i.e.
 character, numeric and integer fields should be filled with corresponding
-type of values. Default: \code{FALSE}.}
+type of values, and character fields should not contain IDF delimiters \verb{,} or
+\verb{;}. Default: \code{FALSE}.}
 
 \item{choice}{Check if all choice fields have valid choice values. Default:
 \code{FALSE}.}

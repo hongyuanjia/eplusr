@@ -438,6 +438,11 @@ test_that("$add()", {
     expect_silent(idf_full <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
     expect_error(idf_full$add("Building" = list()))
 
+    expect_s3_class(err <- catch_cnd(idf$add("Building" = list("Bad,Name"))), "eplusr_error_validity_check")
+    expect_equal(err$data$invalid_character$value_chr, "Bad,Name")
+    expect_s3_class(err <- catch_cnd(idf$add("Building" = list("Bad;Name"))), "eplusr_error_validity_check")
+    expect_equal(err$data$invalid_character$value_chr, "Bad;Name")
+
     # adding empty object
     expect_s3_class(idf$add("Building" = list())[[1L]], "IdfObject")
 
@@ -514,6 +519,9 @@ test_that("$add()", {
 test_that("$set()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+
+    expect_s3_class(err <- catch_cnd(idf$set(..8 = list(name = "rp,test"))), "eplusr_error_validity_check")
+    expect_equal(err$data$invalid_character$value_chr, "rp,test")
 
     # set new values and comments
     expect_type(type = "list",
