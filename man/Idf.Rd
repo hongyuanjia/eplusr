@@ -451,6 +451,19 @@ idf$set(sets)
 
 
 ## ------------------------------------------------
+## Method `Idf$drop`
+## ------------------------------------------------
+
+\dontrun{
+# remove Layer 2 and shift later layers forward
+idf$drop(r13wall = "Layer 2")
+
+# drop the same fields in multiple objects
+idf$drop(.("r13wall", "roof31") := "Layer 2")
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$del`
 ## ------------------------------------------------
 
@@ -907,6 +920,7 @@ Hongyuan Jia
 \item \href{#method-Idf-dup}{\code{Idf$dup()}}
 \item \href{#method-Idf-add}{\code{Idf$add()}}
 \item \href{#method-Idf-set}{\code{Idf$set()}}
+\item \href{#method-Idf-drop}{\code{Idf$drop()}}
 \item \href{#method-Idf-del}{\code{Idf$del()}}
 \item \href{#method-Idf-purge}{\code{Idf$purge()}}
 \item \href{#method-Idf-duplicated}{\code{Idf$duplicated()}}
@@ -2443,12 +2457,13 @@ function arguments must have defaults or be captured from the enclosing
 environment. Function updates must return a character, integer, or double
 vector of length \code{1} or the number of target objects.
 
-You can delete a field by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to delete the value of field \code{fld}, in the condition
-that \code{.default} is \code{FALSE}, \code{fld} is not a required field and the
-index of \code{fld} is larger than the number minimum fields required for
-that class. If those conditions are not required, \code{fld} will be left
-as blank if \code{.default} is \code{FALSE} or filled with default value if
-\code{.default} is \code{TRUE}.
+You can clear a field value by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to clear the value of field \code{fld}. If \code{.default} is
+\code{FALSE}, \code{fld} is not a required field and the index of \code{fld} is
+larger than the number minimum fields required for that class, trailing
+empty fields will be deleted. Otherwise \code{fld} will be left as blank if
+\code{.default} is \code{FALSE} or filled with default value if \code{.default} is
+\code{TRUE}. To structurally remove field slots and shift following values
+forward, use \verb{$drop()}.
 
 By default, trailing empty fields that are not required will be
 removed and only minimum required fields are kept. For example, if
@@ -2520,6 +2535,71 @@ idf$set(Material := list(conductivity = function(x) x * 0.5))
 # use variable input
 sets <- list(r13layer = list(roughness = "smooth"))
 idf$set(sets)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Idf-drop"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-drop}{}}}
+\subsection{Method \code{drop()}}{
+Drop existing fields.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$drop(..., .empty = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Field drop definitions. Each value should be a character
+vector of field names or an integer vector of field indexes.}
+
+\item{\code{.empty}}{If \code{TRUE}, trailing empty fields are kept after field
+values are shifted. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$drop()} removes field slots from existing objects and shifts the
+following values in the same field sequence forward. This is useful
+for objects such as \code{Construction}, where dropping \verb{Layer 2} should
+move \verb{Layer 3} into \verb{Layer 2}.
+
+Unlike \verb{$set(field = NULL)}, \verb{$drop()} changes the object field
+structure instead of only clearing field values. Only fields in IDD
+extensible groups or numbered repeated field sequences, such as
+\verb{Layer 2}, \verb{Layer 3}, and so on, can be dropped. For classes whose
+extensible group contains multiple fields, all fields in the group
+must be dropped together.
+
+The input format follows \verb{$set()} object selection rules:
+\itemize{
+\item \code{object = field}: Drop one or more fields in the named object.
+\item \code{..ID = field}: Drop one or more fields in the object with ID \code{ID}.
+\item \code{class := field}: Drop one or more fields from all objects in a class.
+\item \code{.(object, object) := field}: Drop one or more fields from multiple
+objects.
+}
+
+Field names are matched case-insensitively and underscore-style field
+names are allowed.
+}
+
+\subsection{Returns}{
+A named list of modified \link{IdfObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# remove Layer 2 and shift later layers forward
+idf$drop(r13wall = "Layer 2")
+
+# drop the same fields in multiple objects
+idf$drop(.("r13wall", "roof31") := "Layer 2")
 }
 
 }

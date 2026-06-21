@@ -384,12 +384,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'
         #' * Only one single list is allowed, e.g. `idfobj$set(lst1)` where `lst1 <-
         #'   list(field1 = value1)` is allowed, but `idfobj$set(lst1, lst2)` is not.
-        #' * You can delete a field by assigning `NULL` to it, e.g. `iddobj$set(fld =
-        #'   NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
-        #'   also `fld` is not a required field and the index of `fld` is larger than
-        #'   the number minimum fields required for that class, it will be deleted.
-        #'   Otherwise it will be left as blank. If `.default` is `TRUE`, that field
-        #'   will be filled with default value if applicable and left as blank if not.
+        #' * You can clear a field value by assigning `NULL` to it, e.g.
+        #'   `idfobj$set(fld = NULL)` means to clear the value of field `fld`. If
+        #'   `.default` is FALSE, also `fld` is not a required field and the index of
+        #'   `fld` is larger than the number minimum fields required for that class,
+        #'   trailing empty fields will be deleted. Otherwise it will be left as
+        #'   blank. If `.default` is `TRUE`, that field will be filled with default
+        #'   value if applicable and left as blank if not. To structurally remove
+        #'   field slots and shift following values forward, use `$drop()`.
         #' * By default, trailing empty fields that are not required will be removed and
         #'   only minimum required fields are kept. You can keep the trailing empty
         #'   fields by setting `.empty` to `TRUE`.
@@ -450,6 +452,45 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'
         set = function(..., .default = TRUE, .empty = FALSE)
             idfobj_set(self, private, ..., .default = .default, .empty = .empty),
+        # }}}
+
+        # drop {{{
+        #' @description
+        #' Drop existing fields.
+        #'
+        #' @details
+        #' `$drop()` removes field slots from the current object and shifts the
+        #' following values in the same field sequence forward. This is useful
+        #' for objects such as `Construction`, where dropping `Layer 2` should
+        #' move `Layer 3` into `Layer 2`.
+        #'
+        #' Unlike `$set(field = NULL)`, `$drop()` changes the object field
+        #' structure instead of only clearing field values. Only fields in IDD
+        #' extensible groups or numbered repeated field sequences, such as
+        #' `Layer 2`, `Layer 3`, and so on, can be dropped. For classes whose
+        #' extensible group contains multiple fields, all fields in the group
+        #' must be dropped together.
+        #'
+        #' Field names are matched case-insensitively and underscore-style field
+        #' names are allowed.
+        #'
+        #' @param ... Field names or indexes to drop.
+        #' @param .empty If `TRUE`, trailing empty fields are kept after field
+        #'        values are shifted. Default: `FALSE`.
+        #'
+        #' @return The modified `IdfObject` itself.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # remove Layer 2 and shift later layers forward
+        #' construction$drop("Layer 2")
+        #'
+        #' # drop fields by index
+        #' construction$drop(3)
+        #' }
+        #'
+        drop = function(..., .empty = FALSE)
+            idfobj_drop(self, private, ..., .empty = .empty),
         # }}}
 
         # value_possible {{{
@@ -1624,6 +1665,27 @@ idfobj_set <- function(self, private, ..., .default = TRUE, .empty = FALSE) {
     names(lst) <- paste0("..", private$m_object_id)
     idf_set(get_self_env(private$m_parent), get_priv_env(private$m_parent),
         lst, .default = .default, .empty = .empty
+    )
+
+    self
+}
+# }}}
+# idfobj_drop {{{
+idfobj_drop <- function(self, private, ..., .empty = FALSE) {
+    field <- list(...)
+    if (!length(field)) {
+        abort("No fields to drop are specified.", "drop_no_field")
+    }
+
+    if (length(field) == 1L && is.list(field[[1L]]) && !is.data.frame(field[[1L]])) {
+        field <- field[[1L]]
+    }
+    field <- unlist(field, use.names = FALSE)
+
+    lst <- list(field)
+    names(lst) <- paste0("..", private$m_object_id)
+    idf_drop(get_self_env(private$m_parent), get_priv_env(private$m_parent),
+        lst, .empty = .empty
     )
 
     self

@@ -2175,6 +2175,172 @@ expand_idf_dots_value <- function(idd_env, idf_env, ...,
     list(object = obj, value = val)
 }
 # }}}
+# expand_idf_dots_drop {{{
+parse_dots_drop_field <- function(x, .env = parent.frame()) {
+    if (is.symbol(x) || is.call(x)) x <- eval(x, .env)
+    if (is.list(x) && !is.data.frame(x)) x <- unlist(x, use.names = FALSE)
+    assert_valid_type(x, "Field Index|Name")
+}
+
+parse_dots_drop_selector <- function(name) {
+    if (stri_detect_regex(name, "^\\.\\.\\d+$")) {
+        id <- stri_sub(name, 3L)
+        storage.mode(id) <- "integer"
+        id
+    } else {
+        name
+    }
+}
+
+parse_dots_drop <- function(..., .env = parent.frame()) {
+    l <- eval(substitute(alist(...)))
+    assert_list(l, any.missing = FALSE, all.missing = FALSE, .var.name = "Input", min.len = 1L)
+
+    specs <- list()
+    add_spec <- function(scope, selector, field) {
+        specs[[length(specs) + 1L]] <<- data.table(
+            scope = scope,
+            selector = list(selector),
+            field = list(field)
+        )
+    }
+    add_named_list <- function(x) {
+        nm <- names2(x, default = "")
+        assert_character(nm[!stri_isempty(nm)], any.missing = FALSE,
+            unique = TRUE, .var.name = "Object Name"
+        )
+        if (any(stri_isempty(nm))) {
+            abort("Assertion on 'Input' failed: All field drop list elements must be named.",
+                "drop_no_name"
+            )
+        }
+        for (i in seq_along(x)) {
+            add_spec("object", parse_dots_drop_selector(nm[[i]]),
+                parse_dots_drop_field(x[[i]], .env)
+            )
+        }
+    }
+
+    nm <- names2(l)
+    for (i in seq_along(l)) {
+        li <- l[[i]]
+
+        if (is.symbol(li) && is.na(nm[[i]])) {
+            add_named_list(eval(li, .env))
+            next
+        }
+
+        if (!is.symbol(li) && is.call(li) && li[[1L]] == ":=") {
+            lhs <- li[[2L]]
+            rhs <- parse_dots_drop_field(li[[3L]], .env)
+
+            if (length(lhs) == 1L) {
+                add_spec("class", assert_valid_type(as.character(lhs), "Class Name", type = "name"), rhs)
+            } else if (is.call(lhs) && as.character(lhs[[1L]]) %chin% c("c", ".")) {
+                lhs[[1L]] <- as.name("c")
+                add_spec("object", assert_valid_type(eval(lhs, .env), "Object ID|Name"), rhs)
+            } else if (is.call(lhs) && as.character(lhs[[1L]]) == "..") {
+                lhs[[1L]] <- as.name("c")
+                add_spec("class", assert_valid_type(eval(lhs, .env), "Class Name", type = "name"), rhs)
+            } else {
+                abort("Assertion on 'Input' failed: LHS of ':=' must start with '.()', 'c()', or '..()'",
+                    "drop_ref_lhs"
+                )
+            }
+            next
+        }
+
+        if (is.na(nm[[i]])) {
+            add_named_list(eval(li, .env))
+        } else {
+            add_spec("object", parse_dots_drop_selector(nm[[i]]),
+                parse_dots_drop_field(li, .env)
+            )
+        }
+    }
+
+    rbindlist(specs, use.names = TRUE)[, rleid := .I][]
+}
+
+expand_idf_dots_drop <- function(idd_env, idf_env, ..., .env = parent.frame()) {
+    spec <- parse_dots_drop(..., .env = .env)
+
+    objects <- vector("list", nrow(spec))
+    fields <- vector("list", nrow(spec))
+    for (i in seq_len(nrow(spec))) {
+        selector <- spec$selector[[i]]
+        field <- spec$field[[i]]
+
+        if (spec$scope[[i]] == "class") {
+            obj <- get_idf_object(idd_env, idf_env, class = selector, underscore = TRUE)
+        } else {
+            obj <- get_idf_object(idd_env, idf_env, object = selector, ignore_case = TRUE)
+        }
+        objects[[i]] <- obj
+        field_len <- length(field)
+        if (is.numeric(field)) {
+            fields[[i]] <- data.table(
+                object_id = rep(obj$object_id, each = field_len),
+                field_index = rep(as.integer(field), times = nrow(obj)),
+                field_name = NA_character_
+            )
+        } else {
+            fields[[i]] <- data.table(
+                object_id = rep(obj$object_id, each = field_len),
+                field_index = NA_integer_,
+                field_name = rep(field, times = nrow(obj))
+            )
+        }
+    }
+
+    obj <- rbindlist(objects, use.names = TRUE)
+    obj <- obj[!duplicated(object_id)]
+    set(obj, NULL, "rleid", seq_len(nrow(obj)))
+
+    field <- unique(rbindlist(fields, use.names = TRUE),
+        by = c("object_id", "field_index", "field_name")
+    )
+    field <- obj[, .SD, .SDcols = c("rleid", "class_id", "class_name", "object_id")][
+        field, on = "object_id"
+    ]
+    set(field, NULL, "drop_id", seq_len(nrow(field)))
+
+    resolve_field <- function(dt, by_index = TRUE) {
+        if (!nrow(dt)) return(data.table())
+
+        fld <- get_idd_field(idd_env, dt$class_id,
+            if (by_index) dt$field_index else dt$field_name,
+            property = "extensible_group", no_ext = TRUE
+        )
+        input_rleid <- fld$rleid
+        set(fld, NULL, "drop_id", dt$drop_id[input_rleid])
+        set(fld, NULL, "rleid", dt$rleid[input_rleid])
+        set(fld, NULL, "object_id", dt$object_id[input_rleid])
+        fld
+    }
+
+    field <- rbindlist(list(
+        resolve_field(field[!is.na(field_index)], TRUE),
+        resolve_field(field[!is.na(field_name)], FALSE)
+    ), use.names = TRUE)
+    setorderv(field, "drop_id")
+    field <- idf_env$value[field, on = c("object_id", "field_id")]
+
+    if (nrow(missing <- field[J(NA_integer_), on = "value_id", nomatch = 0L])) {
+        abort(paste0("Cannot drop fields that are not present in target objects:\n",
+            paste0(" #", rpad(missing$rleid), "| Object ID ", missing$object_id,
+                ", Field ", surround(missing$field_name), collapse = "\n")),
+            "drop_missing_field"
+        )
+    }
+
+    setcolorder(field, c("rleid", "class_id", "class_name", "object_id",
+        "field_id", "field_index", "field_name", "value_id", "value_chr",
+        "value_num", "extensible_group"))
+
+    list(object = obj, field = field)
+}
+# }}}
 # match_idd_field {{{
 match_idd_field <- function(idd_env, dt_field) {
     # need to verify field name
@@ -3245,6 +3411,107 @@ set_idf_object <- function(idd_env, idf_env, dt_object, dt_value, empty = FALSE,
         changed = c(dt_object$object_id),
         updated = setdiff(ref$object_id, dt_object$object_id)
     ))
+}
+# }}}
+# drop_idf_fields {{{
+numbered_field_prefix <- function(field_name) {
+    prefix <- stri_match_first_regex(field_name, "^(.*?)[[:space:]]+\\d+$")[, 2L]
+    prefix[stri_isempty(prefix)] <- NA_character_
+    prefix
+}
+
+drop_idf_fields <- function(idd_env, idf_env, dt_object, dt_field,
+                            empty = FALSE, level = eplusr_option("validate_level")) {
+    if (!nrow(dt_field)) {
+        abort("No fields to drop are specified.", "drop_no_field")
+    }
+
+    dt_field <- unique(dt_field, by = c("object_id", "field_id"))
+
+    if (!has_names(dt_field, "extensible_group")) {
+        add_field_property(idd_env, dt_field, "extensible_group")
+    }
+    if (!has_names(dt_field, "num_extensible")) {
+        add_class_property(idd_env, dt_field, "num_extensible")
+    }
+
+    set(dt_field, NULL, "fixed_prefix", NA_character_)
+    dt_field[J(0L), on = "extensible_group", fixed_prefix := numbered_field_prefix(field_name)]
+
+    if (nrow(invld <- dt_field[extensible_group == 0L & is.na(fixed_prefix)])) {
+        abort(paste0("Only extensible fields or numbered repeated fields can be dropped. Invalid input:\n",
+            paste0(" #", rpad(invld$rleid), "| Object ID ", invld$object_id,
+                ", Field ", surround(invld$field_name), collapse = "\n")),
+            "drop_non_extensible"
+        )
+    }
+
+    invld <- dt_field[extensible_group > 0L,
+        .N, by = c("rleid", "object_id", "extensible_group", "num_extensible")][
+        N != num_extensible
+    ]
+    if (nrow(invld)) {
+        invld <- dt_field[invld, on = c("rleid", "object_id", "extensible_group", "num_extensible")]
+        abort(paste0("Fields in an extensible group must be dropped together. Invalid input:\n",
+            paste0(" #", rpad(invld$rleid), "| Object ID ", invld$object_id,
+                ", Field ", surround(invld$field_name), collapse = "\n")),
+            "drop_incomplete_extensible"
+        )
+    }
+
+    val <- get_idf_value(idd_env, idf_env, object = dt_object$object_id)
+    add_field_property(idd_env, val, "extensible_group")
+    set(val, NULL, "fixed_prefix", numbered_field_prefix(val$field_name))
+    set(val, NULL, "field_drop", FALSE)
+    val[dt_field, on = c("object_id", "field_id"),
+        `:=`(field_drop = TRUE, fixed_prefix = i.fixed_prefix)]
+
+    shift_one <- function(x) {
+        x <- copy(x)
+        setorderv(x, "field_index")
+
+        ext <- which(x$extensible_group > 0L)
+        if (length(ext)) {
+            keep <- ext[!x$field_drop[ext]]
+            value_chr <- x$value_chr[keep]
+            value_num <- x$value_num[keep]
+
+            set(x, ext, "value_chr", NA_character_)
+            set(x, ext, "value_num", NA_real_)
+
+            if (length(keep)) {
+                i <- ext[seq_along(keep)]
+                set(x, i, "value_chr", value_chr)
+                set(x, i, "value_num", value_num)
+            }
+        }
+
+        for (prefix in unique(x$fixed_prefix[x$field_drop & x$extensible_group == 0L])) {
+            group <- which(x$fixed_prefix == prefix)
+            keep <- group[!x$field_drop[group]]
+            value_chr <- x$value_chr[keep]
+            value_num <- x$value_num[keep]
+
+            set(x, group, "value_chr", NA_character_)
+            set(x, group, "value_num", NA_real_)
+
+            if (length(keep)) {
+                i <- group[seq_along(keep)]
+                set(x, i, "value_chr", value_chr)
+                set(x, i, "value_num", value_num)
+            }
+        }
+
+        x
+    }
+
+    val <- rbindlist(lapply(split(val, by = "object_id"), shift_one), use.names = TRUE)
+    set(val, NULL, c("field_drop", "extensible_group", "fixed_prefix"), NULL)
+    setorderv(val, c("rleid", "field_index"))
+
+    set_idf_object(idd_env, idf_env, dt_object, val,
+        empty = empty, level = level, replace = TRUE
+    )
 }
 # }}}
 # del_idf_object {{{

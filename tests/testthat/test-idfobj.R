@@ -269,6 +269,34 @@ test_that("$set()", {
 })
 # }}}
 
+# DROP {{{
+test_that("$drop()", {
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+
+    con <- idf$Construction$R13WALL
+    expect_error(con$drop(), class = "eplusr_error_drop_no_field")
+
+    con$set(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER")
+    expect_s3_class(con$drop("Layer 2"), "IdfObject")
+    expect_equal(con$value(),
+        list(Name = "R13WALL", `Outside Layer` = "R13LAYER", `Layer 2` = "R31LAYER")
+    )
+
+    con$set(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER")
+    expect_s3_class(con$drop(list("Layer 2")), "IdfObject")
+    expect_equal(con$value(),
+        list(Name = "R13WALL", `Outside Layer` = "R13LAYER", `Layer 2` = "R31LAYER")
+    )
+
+    surf <- idf$BuildingSurface_Detailed[[1L]]
+    expect_silent(surf$set(vertex_5_x_coordinate = 1, vertex_5_y_coordinate = 2, vertex_5_z_coordinate = 3))
+    expect_error(surf$drop("Vertex 5 X-coordinate"), class = "eplusr_error_drop_incomplete_extensible")
+    expect_s3_class(surf$drop(c("Vertex 5 X-coordinate", "Vertex 5 Y-coordinate", "Vertex 5 Z-coordinate")), "IdfObject")
+    expect_equal(length(surf$value()), 23L)
+})
+# }}}
+
 # VALUE_POSSIBLE {{{
 test_that("$value_possible()", {
     skip_on_cran()

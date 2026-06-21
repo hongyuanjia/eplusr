@@ -661,6 +661,113 @@ test_that("$set()", {
 })
 # }}}
 
+# DROP {{{
+test_that("$drop()", {
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(R13WALL = "Layer 2"), "list")
+    expect_equal(idf$Construction$R13WALL$value(),
+        list(Name = "R13WALL", `Outside Layer` = "R13LAYER", `Layer 2` = "R31LAYER")
+    )
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(R13WALL = 3L), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    field <- "Layer 2"
+    expect_type(idf$drop(R13WALL = field), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(R13WALL = paste("Layer", 2L)), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(R13WALL = list("Layer 2")), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(R13WALL = "Layer 2", .empty = TRUE), "list")
+    expect_equal(length(idf$Construction$R13WALL$value()), 4L)
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+    expect_true(is.na(idf$Construction$R13WALL$Layer_3))
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    fields <- list(R13WALL = "Layer 2")
+    expect_type(idf$drop(fields), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    oid <- idf$Construction$R13WALL$id()
+    expect_type(do.call(idf$drop, setNames(list("Layer 2"), paste0("..", oid))), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(
+        R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"),
+        ROOF31 = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R13LAYER")
+    )
+    expect_type(idf$drop(.("R13WALL", "ROOF31") := "Layer 2"), "list")
+    expect_equal(idf$Construction$R13WALL$Layer_2, "R31LAYER")
+    expect_equal(idf$Construction$ROOF31$Layer_2, "R13LAYER")
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(Construction := list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(Construction := "Layer 2"), "list")
+    expect_equal(
+        unname(vapply(idf$Construction, function(x) x$Layer_2, character(1L))),
+        rep("R31LAYER", 3L)
+    )
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    idf$set(Construction := list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    expect_type(idf$drop(..("Construction") := "Layer 2"), "list")
+    expect_equal(
+        unname(vapply(idf$Construction, function(x) x$Layer_2, character(1L))),
+        rep("R31LAYER", 3L)
+    )
+
+    expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
+    fields <- list(R13WALL = "Layer 2", "Layer 3")
+    expect_error(idf$drop(fields), class = "eplusr_error_drop_no_name")
+    expect_error(idf$drop(MISSING = "Layer 2"), class = "eplusr_error_invalid_object_name")
+    expect_error(idf$drop((1 + 1) := "Layer 2"), class = "eplusr_error_drop_ref_lhs")
+    expect_error(idf$drop(R13WALL = "Layer 2"), class = "eplusr_error_drop_missing_field")
+    expect_error(idf$drop(R13WALL = "Name"), class = "eplusr_error_drop_non_extensible")
+
+    idf$set(R13WALL = list(layer_2 = "C5 - 4 IN HW CONCRETE", layer_3 = "R31LAYER"))
+    idd_env <- get_priv_env(idf$definition())$idd_env()
+    idf_env <- get_priv_env(idf)$idf_env()
+    obj <- get_idf_object(idd_env, idf_env, object = "R13WALL", ignore_case = TRUE)
+    empty_field <- data.table(
+        rleid = integer(), class_id = integer(), class_name = character(),
+        object_id = integer(), field_id = integer(), field_index = integer(),
+        field_name = character()
+    )
+    expect_error(drop_idf_fields(idd_env, idf_env, obj, empty_field),
+        class = "eplusr_error_drop_no_field"
+    )
+
+    field <- get_idf_value(idd_env, idf_env, object = obj$object_id, field = 3L)
+    if (has_names(field, "extensible_group")) field[, extensible_group := NULL]
+    drop <- drop_idf_fields(idd_env, idf_env, obj, field)
+    expect_equal(
+        drop$value[object_id == obj$object_id, value_chr],
+        c("R13WALL", "R13LAYER", "R31LAYER")
+    )
+})
+# }}}
+
 # DEL {{{
 test_that("$del()", {
     skip_on_cran()
