@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9002</span>
       </span>
     </div>
 
@@ -2662,7 +2662,8 @@ represents the results from a single validation checking component.</p><ul><li><
 <li><p><code>invalid_autocalculate</code>: Result of <code>auto_field</code> checking for
 invalid <code>Autocalculate</code> field values.</p></li>
 <li><p><code>invalid_character</code>: Result of <code>type</code> checking for invalid
-character field values.</p></li>
+character field values, including character values that contain
+IDF delimiters <code>,</code> or <code>;</code>.</p></li>
 <li><p><code>invalid_numeric</code>: Result of <code>type</code> checking for invalid
 numeric field values.</p></li>
 <li><p><code>invalid_integer</code>: Result of <code>type</code> checking for invalid

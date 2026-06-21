@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9002</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2026-06-20</h4>
+            <h4 data-toc-skip class="date">2026-06-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/schedule.Rmd" class="external-link"><code>vignettes/schedule.Rmd</code></a></small>
       <div class="hidden name"><code>schedule.Rmd</code></div>
@@ -303,9 +303,9 @@ schedule values.</p>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Failed to set object(s).  ✖ [1] Errors found during validation.</span></span>
 <span><span class="co">#&gt;   ══════════════════════════════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt;   ── [1] Invalid Character</span></span>
-<span><span class="co">#&gt;   ───────────────────────────────────────────────────── Fields below should be</span></span>
-<span><span class="co">#&gt;   characters but are not: Class: &lt;Schedule:Compact&gt; └─ Object [ID:89] &lt;sch&gt; └─</span></span>
-<span><span class="co">#&gt;   6: "1"; !- Field 4</span></span></code></pre></div>
+<span><span class="co">#&gt;   ───────────────────────────────────────────────────── Character fields below</span></span>
+<span><span class="co">#&gt;   should not be numeric inputs or contain IDF delimiters `,` or `;`: Class:</span></span>
+<span><span class="co">#&gt;   &lt;Schedule:Compact&gt; └─ Object [ID:89] &lt;sch&gt; └─ 6: "1"; !- Field 4</span></span></code></pre></div>
 <p>As a result, the output from <code>$value()</code> and
 <code>$to_table()</code> method is not very useful.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
