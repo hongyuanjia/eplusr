@@ -26,7 +26,7 @@ but with total different data structure under the hook."><meta property="og:imag
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9011</span>
       </span>
     </div>
 
@@ -1596,6 +1596,9 @@ equivalent to <code>RunPeriod</code>.</p>
 underscore-style field names are also allowed, e.g. <code>eNd_MoNtH</code> is
 equivalent to <code>End Month</code>. This behavior is consistent among all
 methods that take field names as input.</p>
+<p>For choice fields whose valid choices include <code>"Yes"</code> and <code>"No"</code>,
+logical values are accepted and converted to those choices, i.e.
+<code>TRUE</code> is treated as <code>"Yes"</code> and <code>FALSE</code> as <code>"No"</code>.</p>
 <p>There is no need to give all field values if only specific fields are
 interested, as long as other fields are not required. For example, to
 define a new object in <code>RunPeriod</code> class, the following is enough (at
@@ -1708,6 +1711,9 @@ current field value. eplusr only supplies that first argument; other
 function arguments must have defaults or be captured from the enclosing
 environment. Function updates must return a character, integer, or double
 vector of length <code>1</code> or the number of target objects.</p>
+<p>For choice fields whose valid choices include <code>"Yes"</code> and <code>"No"</code>,
+logical values are accepted and converted to those choices, i.e.
+<code>TRUE</code> is treated as <code>"Yes"</code> and <code>FALSE</code> as <code>"No"</code>.</p>
 <p>You can clear a field value by assigning <code>NULL</code> to it, e.g. <code>list(fld = NULL)</code> means to clear the value of field <code>fld</code>. If <code>.default</code> is
 <code>FALSE</code>, <code>fld</code> is not a required field and the index of <code>fld</code> is
 larger than the number minimum fields required for that class, trailing
@@ -2346,7 +2352,9 @@ and
 class.
 Each value should have the right type as the corresponding field
 definition.  Otherwise, errors will be issued if current
-<a href="level_checks.html">validation level</a> includes invalid-type checking.</p></li>
+<a href="level_checks.html">validation level</a> includes invalid-type checking.
+Logical values are accepted for choice fields whose valid choices
+include <code>"Yes"</code> and <code>"No"</code>.</p></li>
 </ul></li>
 <li><p><code>id</code>: <strong>Optional</strong>. Integer type. If input data.frame includes
 multiple object definitions in a same class, values in <code>id</code> column
@@ -2485,7 +2493,9 @@ and
 class.
 Each value should have the right type as the corresponding field
 definition.  Otherwise, errors will be issued if current
-<a href="level_checks.html">validation level</a> includes invalid-type checking.</p></li>
+<a href="level_checks.html">validation level</a> includes invalid-type checking.
+Logical values are accepted for choice fields whose valid choices
+include <code>"Yes"</code> and <code>"No"</code>.</p></li>
 </ul></li>
 </ul><p>Note that <code>$update()</code> assumes all definitions are from the same version
 as current <code>Idf</code> object. If input definition is from different

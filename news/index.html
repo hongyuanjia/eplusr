@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9011</span>
       </span>
     </div>
 
@@ -106,6 +106,7 @@
 <li><p>Add a <code>field</code> argument to <code>$to_string()</code> methods to optionally omit field name comments from generated IDF strings (<a href="https://github.com/hongyuanjia/eplusr/issues/77" class="external-link">#77</a>).</p></li>
 <li><p>Add <code>Idf$reorder()</code> to reorder objects within a class without changing object IDs (<a href="https://github.com/hongyuanjia/eplusr/issues/66" class="external-link">#66</a>).</p></li>
 <li><p><code>Idf$drop()</code> and <code>IdfObject$drop()</code> can now remove field slots from extensible groups or numbered repeated field sequences and shift following values forward (<a href="https://github.com/hongyuanjia/eplusr/issues/217" class="external-link">#217</a>).</p></li>
+<li><p>Yes/No choice fields in <code>Idf$add()</code>, <code>Idf$set()</code>, <code>Idf$load()</code>, <code>Idf$update()</code>, and <code>IdfObject$set()</code> now accept logical <code>TRUE</code> and <code>FALSE</code> inputs as aliases for <code>"Yes"</code> and <code>"No"</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/257" class="external-link">#257</a>).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
