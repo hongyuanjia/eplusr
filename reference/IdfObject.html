@@ -26,7 +26,7 @@ parent Idf object, using $object(), $objects_in_class() and equivalent."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9009</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9010</span>
       </span>
     </div>
 
@@ -114,11 +114,14 @@ parent <a href="Idf.html">Idf</a> object, using <code>$object()</code>, <code>$o
     <h2>Note</h2>
 
 <ul><li><p>Only one single list is allowed, e.g. <code>idfobj$set(lst1)</code> where <code>lst1 &lt;- list(field1 = value1)</code> is allowed, but <code>idfobj$set(lst1, lst2)</code> is not.</p></li>
-<li><p>You can delete a field by assigning <code>NULL</code> to it, e.g. <code>iddobj$set(fld = NULL)</code> means to delete the value of field <code>fld</code>. If <code>.default</code> is FALSE,
-also <code>fld</code> is not a required field and the index of <code>fld</code> is larger than
-the number minimum fields required for that class, it will be deleted.
-Otherwise it will be left as blank. If <code>.default</code> is <code>TRUE</code>, that field
-will be filled with default value if applicable and left as blank if not.</p></li>
+<li><p>You can clear a field value by assigning <code>NULL</code> to it, e.g.
+<code>idfobj$set(fld = NULL)</code> means to clear the value of field <code>fld</code>. If
+<code>.default</code> is FALSE, also <code>fld</code> is not a required field and the index of
+<code>fld</code> is larger than the number minimum fields required for that class,
+trailing empty fields will be deleted. Otherwise it will be left as
+blank. If <code>.default</code> is <code>TRUE</code>, that field will be filled with default
+value if applicable and left as blank if not. To structurally remove
+field slots and shift following values forward, use <code>$drop()</code>.</p></li>
 <li><p>By default, trailing empty fields that are not required will be removed and
 only minimum required fields are kept. You can keep the trailing empty
 fields by setting <code>.empty</code> to <code>TRUE</code>.</p></li>
@@ -169,6 +172,7 @@ value of field <code>Name</code> has been given as <code>"name"</code>.</p></li>
 <li><p><a href="#method-IdfObject-value"><code>IdfObject$value()</code></a></p></li>
 <li><p><a href="#method-IdfObject-is_valid_field"><code>IdfObject$is_valid_field()</code></a></p></li>
 <li><p><a href="#method-IdfObject-set"><code>IdfObject$set()</code></a></p></li>
+<li><p><a href="#method-IdfObject-drop"><code>IdfObject$drop()</code></a></p></li>
 <li><p><a href="#method-IdfObject-value_possible"><code>IdfObject$value_possible()</code></a></p></li>
 <li><p><a href="#method-IdfObject-validate"><code>IdfObject$validate()</code></a></p></li>
 <li><p><a href="#method-IdfObject-is_valid"><code>IdfObject$is_valid()</code></a></p></li>
@@ -700,10 +704,64 @@ mat$Thickness
 </div>
 
 
+</div><p></p><hr><a id="method-IdfObject-drop"></a><div class="section">
+<h3 id="method-drop-">Method <code><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop()</a></code><a class="anchor" aria-label="anchor" href="#method-drop-"></a></h3>
+<p>Drop existing fields.</p><div class="section">
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">drop</span><span class="op">(</span><span class="va">...</span>, .empty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<dd><p>Field names or indexes to drop.</p></dd>
+
+
+<dt><code>.empty</code></dt>
+<dd><p>If <code>TRUE</code>, trailing empty fields are kept after field
+values are shifted. Default: <code>FALSE</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details-12">Details<a class="anchor" aria-label="anchor" href="#details-12"></a></h4>
+<p><code>$drop()</code> removes field slots from the current object and shifts the
+following values in the same field sequence forward. This is useful
+for objects such as <code>Construction</code>, where dropping <code>Layer 2</code> should
+move <code>Layer 3</code> into <code>Layer 2</code>.</p>
+<p>Unlike <code>$set(field = NULL)</code>, <code>$drop()</code> changes the object field
+structure instead of only clearing field values. Only fields in IDD
+extensible groups or numbered repeated field sequences, such as
+<code>Layer 2</code>, <code>Layer 3</code>, and so on, can be dropped. For classes whose
+extensible group contains multiple fields, all fields in the group
+must be dropped together.</p>
+<p>Field names are matched case-insensitively and underscore-style field
+names are allowed.</p>
+</div>
+
+<div class="section">
+<h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
+<p>The modified <code>IdfObject</code> itself.</p>
+</div>
+<div class="section">
+<h4 id="examples-12">Examples<a class="anchor" aria-label="anchor" href="#examples-12"></a></h4>
+<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
+# remove Layer 2 and shift later layers forward
+construction$drop("Layer 2")
+
+# drop fields by index
+construction$drop(3)
+}
+
+</code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-IdfObject-value_possible"></a><div class="section">
 <h3 id="method-value-possible-">Method <code>value_possible()</code><a class="anchor" aria-label="anchor" href="#method-value-possible-"></a></h3>
 <p>Get possible object field values.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">value_possible</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"default"</span>, <span class="st">"choice"</span>, <span class="st">"range"</span>, <span class="st">"source"</span><span class="op">)</span></span>
@@ -711,7 +769,7 @@ mat$Thickness
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>which</code></dt>
 <dd><p>An integer vector of field indexes or a character vector
 of field names.</p></dd>
@@ -727,7 +785,7 @@ All of those.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-12">Details<a class="anchor" aria-label="anchor" href="#details-12"></a></h4>
+<h4 id="details-13">Details<a class="anchor" aria-label="anchor" href="#details-13"></a></h4>
 <p><code>$value_possible()</code> takes an integer vector of valid field indexes or a character
 vector of valid field names, and returns all possible values for specified
 fields. For a specific field, there are 5 types of possible values:</p><ul><li><p><code>auto</code>: Whether the field can be filled with <code>Autosize</code> and
@@ -744,7 +802,7 @@ also be retrieved using <code>idfobj$definition()$field_range()</code>.</p></li>
 </ul></div>
 
 <div class="section">
-<h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
+<h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
 <p><code>$value_possible()</code> returns an <code>IdfValuePossible</code> object
 which is a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a> with at most 15
 columns:</p><ul><li><p><code>class_id</code>: index of class that current <code>IdfObject</code> belongs to</p></li>
@@ -781,7 +839,7 @@ element is a character vector which includes all values from other objects
 that current field can use as sources and refers to.</p></li>
 </ul></div>
 <div class="section">
-<h4 id="examples-12">Examples<a class="anchor" aria-label="anchor" href="#examples-12"></a></h4>
+<h4 id="examples-13">Examples<a class="anchor" aria-label="anchor" href="#examples-13"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 mat$value_possible()
 }
@@ -793,12 +851,12 @@ mat$value_possible()
 </div><p></p><hr><a id="method-IdfObject-validate"></a><div class="section">
 <h3 id="method-validate-">Method <code>validate()</code><a class="anchor" aria-label="anchor" href="#method-validate-"></a></h3>
 <p>Check possible object field value errors</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>level</code></dt>
 <dd><p>One of <code>"none"</code>, <code>"draft"</code>, <code>"final"</code> or a list of 10
 elements with same format as <code><a href="custom_validate.html">custom_validate()</a></code> output.</p></dd>
@@ -807,7 +865,7 @@ elements with same format as <code><a href="custom_validate.html">custom_validat
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-13">Details<a class="anchor" aria-label="anchor" href="#details-13"></a></h4>
+<h4 id="details-14">Details<a class="anchor" aria-label="anchor" href="#details-14"></a></h4>
 <p><code>$validate()</code> checks if there are errors in current <code>IdfObject</code> object
 under specified validation level and returns an <code>IdfValidity</code> object.</p>
 <p><code>$validate()</code> is useful to help avoid some common errors before
@@ -928,11 +986,11 @@ error is to correct those two fields by doing:</p>
 </ul></div>
 
 <div class="section">
-<h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
+<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
 <p>An <code>IdfValidity</code> object.</p>
 </div>
 <div class="section">
-<h4 id="examples-13">Examples<a class="anchor" aria-label="anchor" href="#examples-13"></a></h4>
+<h4 id="examples-14">Examples<a class="anchor" aria-label="anchor" href="#examples-14"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 mat$validate()
 
@@ -952,12 +1010,12 @@ mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 </div><p></p><hr><a id="method-IdfObject-is_valid"></a><div class="section">
 <h3 id="method-is-valid-">Method <code>is_valid()</code><a class="anchor" aria-label="anchor" href="#method-is-valid-"></a></h3>
 <p>Check if there is any error in current object</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">is_valid</span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="../reference/eplusr_option.html">eplusr_option</a></span><span class="op">(</span><span class="st">"validate_level"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>level</code></dt>
 <dd><p>One of <code>"none"</code>, <code>"draft"</code>, <code>"final"</code> or a list of 10
 elements with same format as <code><a href="custom_validate.html">custom_validate()</a></code> output.</p></dd>
@@ -966,7 +1024,7 @@ elements with same format as <code><a href="custom_validate.html">custom_validat
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-14">Details<a class="anchor" aria-label="anchor" href="#details-14"></a></h4>
+<h4 id="details-15">Details<a class="anchor" aria-label="anchor" href="#details-15"></a></h4>
 <p><code>$is_valid()</code> returns <code>TRUE</code> if there is no error in current <code>IdfObject</code>
 object under specified validation level and <code>FALSE</code> otherwise.</p>
 <p><code>$is_valid()</code> checks if there are errors in current <code>IdfObject</code> object
@@ -977,11 +1035,11 @@ documentation above.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
+<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
 <p>A single logical value of <code>TRUE</code> or <code>FALSE</code>.</p>
 </div>
 <div class="section">
-<h4 id="examples-14">Examples<a class="anchor" aria-label="anchor" href="#examples-14"></a></h4>
+<h4 id="examples-15">Examples<a class="anchor" aria-label="anchor" href="#examples-15"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 mat$is_valid()
 
@@ -1007,7 +1065,7 @@ mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 </div><p></p><hr><a id="method-IdfObject-value_relation"></a><div class="section">
 <h3 id="method-value-relation-">Method <code>value_relation()</code><a class="anchor" aria-label="anchor" href="#method-value-relation-"></a></h3>
 <p>Get value relations</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">value_relation</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"ref_to"</span>, <span class="st">"ref_by"</span>, <span class="st">"node"</span><span class="op">)</span>,</span>
@@ -1021,7 +1079,7 @@ mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>which</code></dt>
 <dd><p>An integer vector of field indexes or a character vector
 of field names.</p></dd>
@@ -1089,7 +1147,7 @@ aggressive option.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-15">Details<a class="anchor" aria-label="anchor" href="#details-15"></a></h4>
+<h4 id="details-16">Details<a class="anchor" aria-label="anchor" href="#details-16"></a></h4>
 <p>Many fields in <a href="Idd.html">Idd</a> can be referred by others. For example, the
 <code>Outside Layer</code> and other fields in <code>Construction</code> class refer to the
 <code>Name</code> field in <code>Material</code> class and other material related classes.
@@ -1120,13 +1178,13 @@ may do not have relation.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
+<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
 <p>An <code>IdfRelation</code> object, which is a list of 3
 <code><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table()</a></code>s named <code>ref_to</code>, <code>ref_by</code> and <code>node</code>.
 Each <code><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table()</a></code> contains 24 columns.</p>
 </div>
 <div class="section">
-<h4 id="examples-15">Examples<a class="anchor" aria-label="anchor" href="#examples-15"></a></h4>
+<h4 id="examples-16">Examples<a class="anchor" aria-label="anchor" href="#examples-16"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # check each layer's reference of a construction named FLOOR
 roof$value_relation("zone name", "ref_to")
@@ -1142,102 +1200,8 @@ roof$value_relation("name", direction = "ref_by")
 </div><p></p><hr><a id="method-IdfObject-ref_to_object"></a><div class="section">
 <h3 id="method-ref-to-object-">Method <code>ref_to_object()</code><a class="anchor" aria-label="anchor" href="#method-ref-to-object-"></a></h3>
 <p>Extract multiple <code>IdfObject</code> objects referred by specified field values</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_to_object</span><span class="op">(</span></span>
-<span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  depth <span class="op">=</span> <span class="fl">0L</span>,</span>
-<span>  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>which</code></dt>
-<dd><p>An integer vector of field indexes or a character vector
-of field names.</p></dd>
-
-
-<dt><code>object</code></dt>
-<dd><p>A character vector of object names or an integer vector
-of object IDs used for searching relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>class</code></dt>
-<dd><p>A character vector of class names used for searching
-relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>group</code></dt>
-<dd><p>A character vector of group names used for searching
-relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>depth</code></dt>
-<dd><p>If &gt; 0, the relation is searched recursively. A
-simple example of recursive reference: one material named
-<code>mat</code> is referred by a construction named <code>const</code>, and <code>const</code>
-is also referred by a surface named <code>surf</code>. If <code>NULL</code>,
-all possible recursive relations are returned. Default: <code>0</code>.</p></dd>
-
-
-<dt><code>class_ref</code></dt>
-<dd><p>Specify how to handle class-name-references. Class
-name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other
-many class names of objects, instaed of referring to specific
-field values. There are 3 options in total, i.e. <code>"none"</code>,
-<code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.
-* <code>"none"</code>: just ignore class-name-references. It is a reasonable
-option, as for most cases, class-name-references always come
-along with field value references. Ignoring
-class-name-references will not impact the most part of the
-relation structure.
-* <code>"both"</code>: only include class-name-references if this object
-also reference field values of the same one. For example, if the
-value of field <code>Component 1 Object Type</code> is
-<code>Coil:Heating:Water</code>, only the object that is referenced in the
-next field <code>Component 1 Name</code> is treated as referenced by
-<code>Component 1 Object Type</code>. This is the default option.
-* <code>"all"</code>: include all class-name-references. For example, if the
-value of field <code>Component 1 Object Type</code> is
-<code>Coil:Heating:Water</code>, all objects in <code>Coil:Heating:Water</code> will
-be treated as referenced by that field. This is the most
-aggressive option.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="details-16">Details<a class="anchor" aria-label="anchor" href="#details-16"></a></h4>
-<p>For details on field value relations, see
-<a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$ref_to_object()</code> takes an integer vector of field indexes or a
-character vector of field names, and returns a list of <code>IdfObject</code>s
-that specified fields refer to.</p>
-</div>
-
-<div class="section">
-<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
-<p>A named list of <code>IdfObject</code> objects.</p>
-</div>
-<div class="section">
-<h4 id="examples-16">Examples<a class="anchor" aria-label="anchor" href="#examples-16"></a></h4>
-<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-# get other objects that this object refereces
-mat$ref_to_object() # not referencing other objects
-}
-
-</code></pre></div><p></p></div>
-</div>
-
-
-</div><p></p><hr><a id="method-IdfObject-ref_by_object"></a><div class="section">
-<h3 id="method-ref-by-object-">Method <code>ref_by_object()</code><a class="anchor" aria-label="anchor" href="#method-ref-by-object-"></a></h3>
-<p>Extract multiple <code>IdfObject</code> objects referring to specified field values</p><div class="section">
 <h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_by_object</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_to_object</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -1307,9 +1271,9 @@ aggressive option.</p></dd>
 <h4 id="details-17">Details<a class="anchor" aria-label="anchor" href="#details-17"></a></h4>
 <p>For details on field value relations, see
 <a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$ref_by_object()</code> takes an integer vector of field indexes or a
+<p><code>$ref_to_object()</code> takes an integer vector of field indexes or a
 character vector of field names, and returns a list of <code>IdfObject</code>s
-that refer to specified fields.</p>
+that specified fields refer to.</p>
 </div>
 
 <div class="section">
@@ -1319,24 +1283,25 @@ that refer to specified fields.</p>
 <div class="section">
 <h4 id="examples-17">Examples<a class="anchor" aria-label="anchor" href="#examples-17"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-# get other objects that reference this object
-mat$ref_by_object() # referenced by construction "FLOOR"
+# get other objects that this object refereces
+mat$ref_to_object() # not referencing other objects
 }
 
 </code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-IdfObject-ref_to_node"></a><div class="section">
-<h3 id="method-ref-to-node-">Method <code>ref_to_node()</code><a class="anchor" aria-label="anchor" href="#method-ref-to-node-"></a></h3>
-<p>Extract multiple <code>IdfObject</code> objects referring to same nodes</p><div class="section">
+</div><p></p><hr><a id="method-IdfObject-ref_by_object"></a><div class="section">
+<h3 id="method-ref-by-object-">Method <code>ref_by_object()</code><a class="anchor" aria-label="anchor" href="#method-ref-by-object-"></a></h3>
+<p>Extract multiple <code>IdfObject</code> objects referring to specified field values</p><div class="section">
 <h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_to_node</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_by_object</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  depth <span class="op">=</span> <span class="fl">0L</span></span>
+<span>  depth <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -1370,78 +1335,6 @@ is also referred by a surface named <code>surf</code>. If <code>NULL</code>,
 all possible recursive relations are returned. Default: <code>0</code>.</p></dd>
 
 
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="details-18">Details<a class="anchor" aria-label="anchor" href="#details-18"></a></h4>
-<p>For details on field value relations, see
-<a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$ref_to_node()</code> takes an integer vector of field indexes or a
-character vector of field names, and returns a list of <code>IdfObject</code>s
-whose nodes are referred by specified fields.</p>
-</div>
-
-<div class="section">
-<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
-<p>A named list of <code>IdfObject</code> objects.</p>
-</div>
-<div class="section">
-<h4 id="examples-18">Examples<a class="anchor" aria-label="anchor" href="#examples-18"></a></h4>
-<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-if (is_avail_eplus(8.8)) {
-    path &lt;- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
-    idf_5z &lt;- read_idf(path)
-    idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
-}
-}
-
-</code></pre></div><p></p></div>
-</div>
-
-
-</div><p></p><hr><a id="method-IdfObject-has_ref_to"></a><div class="section">
-<h3 id="method-has-ref-to-">Method <code>has_ref_to()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-to-"></a></h3>
-<p>Check if object field values refer to others</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_to</span><span class="op">(</span></span>
-<span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  recursive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>which</code></dt>
-<dd><p>An integer vector of field indexes or a character vector
-of field names.</p></dd>
-
-
-<dt><code>object</code></dt>
-<dd><p>A character vector of object names or an integer vector
-of object IDs used for searching relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>class</code></dt>
-<dd><p>A character vector of class names used for searching
-relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>group</code></dt>
-<dd><p>A character vector of group names used for searching
-relations. Default: <code>NULL</code>.</p></dd>
-
-
-<dt><code>recursive</code></dt>
-<dd><p>If <code>TRUE</code>, the relation is searched recursively. A
-simple example of recursive reference: one material named
-<code>mat</code> is referred by a construction named <code>const</code>, and <code>const</code>
-is also referred by a surface named <code>surf</code>. Default: <code>FALSE</code>.</p></dd>
-
-
 <dt><code>class_ref</code></dt>
 <dd><p>Specify how to handle class-name-references. Class
 name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other
@@ -1469,33 +1362,106 @@ aggressive option.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-19">Details<a class="anchor" aria-label="anchor" href="#details-19"></a></h4>
+<h4 id="details-18">Details<a class="anchor" aria-label="anchor" href="#details-18"></a></h4>
 <p>For details on field value relations, see
 <a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$has_ref_to()</code> takes an integer vector of field indexes or a
-character vector of field names, and returns a logical vector showing
-whether specified fields refer to other object values or not.</p>
+<p><code>$ref_by_object()</code> takes an integer vector of field indexes or a
+character vector of field names, and returns a list of <code>IdfObject</code>s
+that refer to specified fields.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
-<p>A logical vector with the same length as specified field.</p>
+<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
+<p>A named list of <code>IdfObject</code> objects.</p>
 </div>
 <div class="section">
-<h4 id="examples-19">Examples<a class="anchor" aria-label="anchor" href="#examples-19"></a></h4>
+<h4 id="examples-18">Examples<a class="anchor" aria-label="anchor" href="#examples-18"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-mat$has_ref_to()
+# get other objects that reference this object
+mat$ref_by_object() # referenced by construction "FLOOR"
 }
 
 </code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-IdfObject-has_ref_by"></a><div class="section">
-<h3 id="method-has-ref-by-">Method <code>has_ref_by()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-by-"></a></h3>
-<p>Check if object field values are referred by others</p><div class="section">
+</div><p></p><hr><a id="method-IdfObject-ref_to_node"></a><div class="section">
+<h3 id="method-ref-to-node-">Method <code>ref_to_node()</code><a class="anchor" aria-label="anchor" href="#method-ref-to-node-"></a></h3>
+<p>Extract multiple <code>IdfObject</code> objects referring to same nodes</p><div class="section">
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">ref_to_node</span><span class="op">(</span></span>
+<span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  depth <span class="op">=</span> <span class="fl">0L</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>which</code></dt>
+<dd><p>An integer vector of field indexes or a character vector
+of field names.</p></dd>
+
+
+<dt><code>object</code></dt>
+<dd><p>A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>class</code></dt>
+<dd><p>A character vector of class names used for searching
+relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>group</code></dt>
+<dd><p>A character vector of group names used for searching
+relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>depth</code></dt>
+<dd><p>If &gt; 0, the relation is searched recursively. A
+simple example of recursive reference: one material named
+<code>mat</code> is referred by a construction named <code>const</code>, and <code>const</code>
+is also referred by a surface named <code>surf</code>. If <code>NULL</code>,
+all possible recursive relations are returned. Default: <code>0</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details-19">Details<a class="anchor" aria-label="anchor" href="#details-19"></a></h4>
+<p>For details on field value relations, see
+<a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
+<p><code>$ref_to_node()</code> takes an integer vector of field indexes or a
+character vector of field names, and returns a list of <code>IdfObject</code>s
+whose nodes are referred by specified fields.</p>
+</div>
+
+<div class="section">
+<h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
+<p>A named list of <code>IdfObject</code> objects.</p>
+</div>
+<div class="section">
+<h4 id="examples-19">Examples<a class="anchor" aria-label="anchor" href="#examples-19"></a></h4>
+<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
+if (is_avail_eplus(8.8)) {
+    path &lt;- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+    idf_5z &lt;- read_idf(path)
+    idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
+}
+}
+
+</code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-IdfObject-has_ref_to"></a><div class="section">
+<h3 id="method-has-ref-to-">Method <code>has_ref_to()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-to-"></a></h3>
+<p>Check if object field values refer to others</p><div class="section">
 <h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_by</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_to</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -1564,9 +1530,9 @@ aggressive option.</p></dd>
 <h4 id="details-20">Details<a class="anchor" aria-label="anchor" href="#details-20"></a></h4>
 <p>For details on field value relations, see
 <a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$has_ref_by()</code> takes an integer vector of field indexes or a
+<p><code>$has_ref_to()</code> takes an integer vector of field indexes or a
 character vector of field names, and returns a logical vector showing
-whether there are other object values ref to specified fields.</p>
+whether specified fields refer to other object values or not.</p>
 </div>
 
 <div class="section">
@@ -1576,23 +1542,24 @@ whether there are other object values ref to specified fields.</p>
 <div class="section">
 <h4 id="examples-20">Examples<a class="anchor" aria-label="anchor" href="#examples-20"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-mat$has_ref_by()
+mat$has_ref_to()
 }
 
 </code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-IdfObject-has_ref_node"></a><div class="section">
-<h3 id="method-has-ref-node-">Method <code>has_ref_node()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-node-"></a></h3>
-<p>Check if object field values refer to other nodes</p><div class="section">
+</div><p></p><hr><a id="method-IdfObject-has_ref_by"></a><div class="section">
+<h3 id="method-has-ref-by-">Method <code>has_ref_by()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-by-"></a></h3>
+<p>Check if object field values are referred by others</p><div class="section">
 <h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_node</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_by</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  recursive <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  recursive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  class_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"both"</span>, <span class="st">"none"</span>, <span class="st">"all"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -1625,15 +1592,39 @@ simple example of recursive reference: one material named
 is also referred by a surface named <code>surf</code>. Default: <code>FALSE</code>.</p></dd>
 
 
+<dt><code>class_ref</code></dt>
+<dd><p>Specify how to handle class-name-references. Class
+name references refer to references in like field <code>Component 1 Object Type</code> in <code>Branch</code> objects. Their value refers to other
+many class names of objects, instaed of referring to specific
+field values. There are 3 options in total, i.e. <code>"none"</code>,
+<code>"both"</code> and <code>"all"</code>, with <code>"both"</code> being the default.
+* <code>"none"</code>: just ignore class-name-references. It is a reasonable
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* <code>"both"</code>: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field <code>Component 1 Object Type</code> is
+<code>Coil:Heating:Water</code>, only the object that is referenced in the
+next field <code>Component 1 Name</code> is treated as referenced by
+<code>Component 1 Object Type</code>. This is the default option.
+* <code>"all"</code>: include all class-name-references. For example, if the
+value of field <code>Component 1 Object Type</code> is
+<code>Coil:Heating:Water</code>, all objects in <code>Coil:Heating:Water</code> will
+be treated as referenced by that field. This is the most
+aggressive option.</p></dd>
+
+
 </dl><p></p></div>
 </div>
 <div class="section">
 <h4 id="details-21">Details<a class="anchor" aria-label="anchor" href="#details-21"></a></h4>
 <p>For details on field value relations, see
 <a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$has_ref_node()</code> takes an integer vector of field indexes or a
+<p><code>$has_ref_by()</code> takes an integer vector of field indexes or a
 character vector of field names, and returns a logical vector showing
-whether specified fields refer to other objects' nodes.</p>
+whether there are other object values ref to specified fields.</p>
 </div>
 
 <div class="section">
@@ -1643,18 +1634,18 @@ whether specified fields refer to other objects' nodes.</p>
 <div class="section">
 <h4 id="examples-21">Examples<a class="anchor" aria-label="anchor" href="#examples-21"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
-mat$has_ref_node()
+mat$has_ref_by()
 }
 
 </code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-IdfObject-has_ref"></a><div class="section">
-<h3 id="method-has-ref-">Method <code>has_ref()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-"></a></h3>
-<p>Check if object field values refer to or are referred by others</p><div class="section">
+</div><p></p><hr><a id="method-IdfObject-has_ref_node"></a><div class="section">
+<h3 id="method-has-ref-node-">Method <code>has_ref_node()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-node-"></a></h3>
+<p>Check if object field values refer to other nodes</p><div class="section">
 <h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref_node</span><span class="op">(</span></span>
 <span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -1698,11 +1689,9 @@ is also referred by a surface named <code>surf</code>. Default: <code>FALSE</cod
 <h4 id="details-22">Details<a class="anchor" aria-label="anchor" href="#details-22"></a></h4>
 <p>For details on field value relations, see
 <a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
-<p><code>$has_ref()</code> takes an integer vector of field indexes or a character
-vector of field names, and returns a logical vector showing whether
-there are other object values ref to specified field values or
-specified field values refer to other object values or specified
-field values refer to other objects' nodes.</p>
+<p><code>$has_ref_node()</code> takes an integer vector of field indexes or a
+character vector of field names, and returns a logical vector showing
+whether specified fields refer to other objects' nodes.</p>
 </div>
 
 <div class="section">
@@ -1711,6 +1700,75 @@ field values refer to other objects' nodes.</p>
 </div>
 <div class="section">
 <h4 id="examples-22">Examples<a class="anchor" aria-label="anchor" href="#examples-22"></a></h4>
+<p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
+mat$has_ref_node()
+}
+
+</code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-IdfObject-has_ref"></a><div class="section">
+<h3 id="method-has-ref-">Method <code>has_ref()</code><a class="anchor" aria-label="anchor" href="#method-has-ref-"></a></h3>
+<p>Check if object field values refer to or are referred by others</p><div class="section">
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">has_ref</span><span class="op">(</span></span>
+<span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  object <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  recursive <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>which</code></dt>
+<dd><p>An integer vector of field indexes or a character vector
+of field names.</p></dd>
+
+
+<dt><code>object</code></dt>
+<dd><p>A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>class</code></dt>
+<dd><p>A character vector of class names used for searching
+relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>group</code></dt>
+<dd><p>A character vector of group names used for searching
+relations. Default: <code>NULL</code>.</p></dd>
+
+
+<dt><code>recursive</code></dt>
+<dd><p>If <code>TRUE</code>, the relation is searched recursively. A
+simple example of recursive reference: one material named
+<code>mat</code> is referred by a construction named <code>const</code>, and <code>const</code>
+is also referred by a surface named <code>surf</code>. Default: <code>FALSE</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details-23">Details<a class="anchor" aria-label="anchor" href="#details-23"></a></h4>
+<p>For details on field value relations, see
+<a href="../../eplusr/html/IdfObject.html#method-value_relation"><code>$value_relation()</code></a>.</p>
+<p><code>$has_ref()</code> takes an integer vector of field indexes or a character
+vector of field names, and returns a logical vector showing whether
+there are other object values ref to specified field values or
+specified field values refer to other object values or specified
+field values refer to other objects' nodes.</p>
+</div>
+
+<div class="section">
+<h4 id="returns-22">Returns<a class="anchor" aria-label="anchor" href="#returns-22"></a></h4>
+<p>A logical vector with the same length as specified field.</p>
+</div>
+<div class="section">
+<h4 id="examples-23">Examples<a class="anchor" aria-label="anchor" href="#examples-23"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # check if having any referenced objects or is referenced by other objects
 mat$has_ref()
@@ -1723,7 +1781,7 @@ mat$has_ref()
 </div><p></p><hr><a id="method-IdfObject-to_table"></a><div class="section">
 <h3 id="method-to-table-">Method <code>to_table()</code><a class="anchor" aria-label="anchor" href="#method-to-table-"></a></h3>
 <p>Format <code>IdfObject</code> as a data.frame</p><div class="section">
-<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
+<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">to_table</span><span class="op">(</span></span>
 <span>  string_value <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -1734,7 +1792,7 @@ mat$has_ref()
 </div>
 
 <div class="section">
-<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>string_value</code></dt>
 <dd><p>If <code>TRUE</code>, all field values are returned as
 character. If <code>FALSE</code>, <code>value</code> column in returned
@@ -1784,7 +1842,7 @@ Default: <code>"none"</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-23">Details<a class="anchor" aria-label="anchor" href="#details-23"></a></h4>
+<h4 id="details-24">Details<a class="anchor" aria-label="anchor" href="#details-24"></a></h4>
 <p><code>$to_table()</code> returns a <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a> that
 contains core data of current <code>IdfObject</code>. It has 6 columns:</p><ul><li><p><code>id</code>: Integer type. Object IDs.</p></li>
 <li><p><code>name</code>: Character type. Object names.</p></li>
@@ -1808,12 +1866,12 @@ resulting field names will be <code>Vertex X-coordinate</code>, <code>Vertex Y-c
 </ul></div>
 
 <div class="section">
-<h4 id="returns-22">Returns<a class="anchor" aria-label="anchor" href="#returns-22"></a></h4>
+<h4 id="returns-23">Returns<a class="anchor" aria-label="anchor" href="#returns-23"></a></h4>
 <p>A <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a> with 6 columns (if
 <code>wide</code> is <code>FALSE</code>) or at least 6 columns (if <code>wide</code> is <code>TRUE</code>).</p>
 </div>
 <div class="section">
-<h4 id="examples-23">Examples<a class="anchor" aria-label="anchor" href="#examples-23"></a></h4>
+<h4 id="examples-24">Examples<a class="anchor" aria-label="anchor" href="#examples-24"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))
@@ -1852,7 +1910,7 @@ surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRU
 </div><p></p><hr><a id="method-IdfObject-to_string"></a><div class="section">
 <h3 id="method-to-string-">Method <code>to_string()</code><a class="anchor" aria-label="anchor" href="#method-to-string-"></a></h3>
 <p>Format current object as a character vector</p><div class="section">
-<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
+<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">to_string</span><span class="op">(</span></span>
 <span>  comment <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  leading <span class="op">=</span> <span class="fl">4L</span>,</span>
@@ -1863,7 +1921,7 @@ surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRU
 </div>
 
 <div class="section">
-<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
+<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>comment</code></dt>
 <dd><p>If <code>FALSE</code>, all comments will not be included.
 Default: <code>TRUE</code>.</p></dd>
@@ -1892,16 +1950,16 @@ Default: <code>TRUE</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-24">Details<a class="anchor" aria-label="anchor" href="#details-24"></a></h4>
+<h4 id="details-25">Details<a class="anchor" aria-label="anchor" href="#details-25"></a></h4>
 <p><code>$to_string()</code> returns the text format of current object.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-23">Returns<a class="anchor" aria-label="anchor" href="#returns-23"></a></h4>
+<h4 id="returns-24">Returns<a class="anchor" aria-label="anchor" href="#returns-24"></a></h4>
 <p>A character vector.</p>
 </div>
 <div class="section">
-<h4 id="examples-24">Examples<a class="anchor" aria-label="anchor" href="#examples-24"></a></h4>
+<h4 id="examples-25">Examples<a class="anchor" aria-label="anchor" href="#examples-25"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # get string format object
 mat$to_string()
@@ -1921,12 +1979,12 @@ mat$to_string(leading = 0)
 </div><p></p><hr><a id="method-IdfObject-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print <code>IdfObject</code> object</p><div class="section">
-<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
+<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span>comment <span class="op">=</span> <span class="cn">TRUE</span>, auto_sep <span class="op">=</span> <span class="cn">TRUE</span>, brief <span class="op">=</span> <span class="cn">FALSE</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
+<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>comment</code></dt>
 <dd><p>If <code>FALSE</code>, all comments are not included.</p></dd>
 
@@ -1949,7 +2007,7 @@ they do not exist in current object. Default: <code>FALSE</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="details-25">Details<a class="anchor" aria-label="anchor" href="#details-25"></a></h4>
+<h4 id="details-26">Details<a class="anchor" aria-label="anchor" href="#details-26"></a></h4>
 <p><code>$print()</code> prints the <code>IdfObject</code>. Basically, the print output can be
 divided into 3 parts:</p><ul><li><p>OBJECT: Class name, object id and name (if applicable).</p></li>
 <li><p>COMMENTS: Object comments if exist.</p></li>
@@ -1960,11 +2018,11 @@ values are printed as <code>&lt;Blank&gt;</code>.</p></li>
 </ul></div>
 
 <div class="section">
-<h4 id="returns-24">Returns<a class="anchor" aria-label="anchor" href="#returns-24"></a></h4>
+<h4 id="returns-25">Returns<a class="anchor" aria-label="anchor" href="#returns-25"></a></h4>
 <p>The <code>IdfObject</code> itself, invisibly.</p>
 </div>
 <div class="section">
-<h4 id="examples-25">Examples<a class="anchor" aria-label="anchor" href="#examples-25"></a></h4>
+<h4 id="examples-26">Examples<a class="anchor" aria-label="anchor" href="#examples-26"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code>\dontrun{
 # print the object without comment
 mat$print(comment = FALSE)
@@ -1981,12 +2039,12 @@ mat$print(auto_sep = TRUE)
 </div><p></p><hr><a id="method-IdfObject-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
+<h4 id="usage-27">Usage<a class="anchor" aria-label="anchor" href="#usage-27"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IdfObject</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
+<h4 id="arguments-20">Arguments<a class="anchor" aria-label="anchor" href="#arguments-20"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -2178,6 +2236,19 @@ mat$print(auto_sep = TRUE)
 <span class="r-in"><span><span class="va">mat</span><span class="op">$</span><span class="va">Name</span></span></span>
 <span class="r-in"><span><span class="va">mat</span><span class="op">[[</span><span class="st">"Thickness"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.019</span></span></span>
 <span class="r-in"><span><span class="va">mat</span><span class="op">$</span><span class="va">Thickness</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Method `IdfObject$drop`</span></span></span>
+<span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># remove Layer 2 and shift later layers forward</span></span></span>
+<span class="r-in"><span><span class="va">construction</span><span class="op">$</span><span class="fu">drop</span><span class="op">(</span><span class="st">"Layer 2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># drop fields by index</span></span></span>
+<span class="r-in"><span><span class="va">construction</span><span class="op">$</span><span class="fu">drop</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
