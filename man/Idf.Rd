@@ -2338,6 +2338,10 @@ underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
 equivalent to \verb{End Month}. This behavior is consistent among all
 methods that take field names as input.
 
+For choice fields whose valid choices include \code{"Yes"} and \code{"No"},
+logical values are accepted and converted to those choices, i.e.
+\code{TRUE} is treated as \code{"Yes"} and \code{FALSE} as \code{"No"}.
+
 There is no need to give all field values if only specific fields are
 interested, as long as other fields are not required. For example, to
 define a new object in \code{RunPeriod} class, the following is enough (at
@@ -2456,6 +2460,10 @@ current field value. eplusr only supplies that first argument; other
 function arguments must have defaults or be captured from the enclosing
 environment. Function updates must return a character, integer, or double
 vector of length \code{1} or the number of target objects.
+
+For choice fields whose valid choices include \code{"Yes"} and \code{"No"},
+logical values are accepted and converted to those choices, i.e.
+\code{TRUE} is treated as \code{"Yes"} and \code{FALSE} as \code{"No"}.
 
 You can clear a field value by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to clear the value of field \code{fld}. If \code{.default} is
 \code{FALSE}, \code{fld} is not a required field and the index of \code{fld} is
@@ -3114,6 +3122,8 @@ class.
 Each value should have the right type as the corresponding field
 definition.  Otherwise, errors will be issued if current
 \link[=level_checks]{validation level} includes invalid-type checking.
+Logical values are accepted for choice fields whose valid choices
+include \code{"Yes"} and \code{"No"}.
 }
 \item \code{id}: \strong{Optional}. Integer type. If input data.frame includes
 multiple object definitions in a same class, values in \code{id} column
@@ -3268,6 +3278,8 @@ class.
 Each value should have the right type as the corresponding field
 definition.  Otherwise, errors will be issued if current
 \link[=level_checks]{validation level} includes invalid-type checking.
+Logical values are accepted for choice fields whose valid choices
+include \code{"Yes"} and \code{"No"}.
 }
 }
 

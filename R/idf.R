@@ -1076,6 +1076,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' equivalent to `End Month`. This behavior is consistent among all
         #' methods that take field names as input.
         #'
+        #' For choice fields whose valid choices include `"Yes"` and `"No"`,
+        #' logical values are accepted and converted to those choices, i.e.
+        #' `TRUE` is treated as `"Yes"` and `FALSE` as `"No"`.
+        #'
         #' There is no need to give all field values if only specific fields are
         #' interested, as long as other fields are not required. For example, to
         #' define a new object in `RunPeriod` class, the following is enough (at
@@ -1176,6 +1180,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' function arguments must have defaults or be captured from the enclosing
         #' environment. Function updates must return a character, integer, or double
         #' vector of length `1` or the number of target objects.
+        #'
+        #' For choice fields whose valid choices include `"Yes"` and `"No"`,
+        #' logical values are accepted and converted to those choices, i.e.
+        #' `TRUE` is treated as `"Yes"` and `FALSE` as `"No"`.
         #'
         #' You can clear a field value by assigning `NULL` to it, e.g. `list(fld =
         #' NULL)` means to clear the value of field `fld`. If `.default` is
@@ -1692,6 +1700,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'     Each value should have the right type as the corresponding field
         #'     definition.  Otherwise, errors will be issued if current
         #'     [validation level][level_checks()] includes invalid-type checking.
+        #'     Logical values are accepted for choice fields whose valid choices
+        #'     include `"Yes"` and `"No"`.
         #' * `id`: **Optional**. Integer type. If input data.frame includes
         #'   multiple object definitions in a same class, values in `id` column
         #'   will be used to distinguish each definition. If `id` column does
@@ -1828,6 +1838,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'     Each value should have the right type as the corresponding field
         #'     definition.  Otherwise, errors will be issued if current
         #'     [validation level][level_checks()] includes invalid-type checking.
+        #'     Logical values are accepted for choice fields whose valid choices
+        #'     include `"Yes"` and `"No"`.
         #'
         #' Note that `$update()` assumes all definitions are from the same version
         #' as current `Idf` object. If input definition is from different

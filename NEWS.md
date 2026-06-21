@@ -15,6 +15,10 @@
   extensible groups or numbered repeated field sequences and shift following
   values forward (#217).
 
+* Yes/No choice fields in `Idf$add()`, `Idf$set()`, `Idf$load()`,
+  `Idf$update()`, and `IdfObject$set()` now accept logical `TRUE` and `FALSE`
+  inputs as aliases for `"Yes"` and `"No"` (#257).
+
 ## Internal refactor
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and
