@@ -836,8 +836,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
         #'
         #' `$ref_to_object()` takes an integer vector of field indexes or a
-        #' character vector of field names, and returns a list of `IdfObject`s
-        #' that specified fields refer to.
+        #' character vector of field names, and returns an [IdfObjects]
+        #' collection that specified fields refer to.
         #'
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
@@ -880,7 +880,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'       be treated as referenced by that field. This is the most
         #'       aggressive option.
         #'
-        #' @return A named list of `IdfObject` objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -901,8 +901,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
         #'
         #' `$ref_by_object()` takes an integer vector of field indexes or a
-        #' character vector of field names, and returns a list of `IdfObject`s
-        #' that refer to specified fields.
+        #' character vector of field names, and returns an [IdfObjects]
+        #' collection that refer to specified fields.
         #'
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
@@ -945,7 +945,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'       be treated as referenced by that field. This is the most
         #'       aggressive option.
         #'
-        #' @return A named list of `IdfObject` objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -966,8 +966,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #' \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
         #'
         #' `$ref_to_node()` takes an integer vector of field indexes or a
-        #' character vector of field names, and returns a list of `IdfObject`s
-        #' whose nodes are referred by specified fields.
+        #' character vector of field names, and returns an [IdfObjects]
+        #' collection whose nodes are referred by specified fields.
         #'
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
@@ -987,7 +987,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         #'        is also referred by a surface named `surf`. If `NULL`,
         #'        all possible recursive relations are returned. Default: `0`.
         #'
-        #' @return A named list of `IdfObject` objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -1484,7 +1484,7 @@ idf_object <- function(parent, object = NULL, class = NULL) {
 
         lst <- list(list())
         names(lst) <- class
-        obj <- parent$add(lst)[[1L]]
+        obj <- parent$add(lst)$object(1L)
 
         verbose_info(
             paste0("New empty object [ID:", obj$id(), "] in class ",
@@ -1640,16 +1640,11 @@ idfobj_ref_to_object <- function(self, private, which = NULL, object = NULL,
                 verbose_info(msg, " specifed.")
             }
         }
-        return(invisible())
+        return(IdfObjects$new(integer(), integer(), private$m_parent))
     } else {
         rel <- rel[, list(src_object_id = unique(src_object_id)), by = "object_id"]
-        res <- apply2(
-            rel$src_object_id,
-            private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id],
-            IdfObject$new, list(parent = private$m_parent)
-        )
-        setattr(res, "names", private$idf_env()$object[J(rel$src_object_id), on = "object_id", object_name])
-        res
+        cls <- private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id]
+        IdfObjects$new(rel$src_object_id, cls, private$m_parent)
     }
 }
 # }}}
@@ -1677,16 +1672,11 @@ idfobj_ref_by_object <- function(self, private, which = NULL, object = NULL,
                 verbose_info(msg, " specifed.")
             }
         }
-        return(invisible())
+        return(IdfObjects$new(integer(), integer(), private$m_parent))
     } else {
         rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
-        res <- apply2(
-            rel$object_id,
-            private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
-            IdfObject$new, list(parent = private$m_parent)
-        )
-        setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
-        res
+        cls <- private$idf_env()$object[J(rel$object_id), on = "object_id", class_id]
+        IdfObjects$new(rel$object_id, cls, private$m_parent)
     }
 }
 # }}}
@@ -1711,16 +1701,11 @@ idfobj_ref_to_node <- function(self, private, which = NULL, object = NULL, class
                 verbose_info(msg, "specifed.")
             }
         }
-        return(invisible())
+        return(IdfObjects$new(integer(), integer(), private$m_parent))
     } else {
         rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
-        res <- apply2(
-            rel$object_id,
-            private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
-            IdfObject$new, list(parent = private$m_parent)
-        )
-        setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
-        res
+        cls <- private$idf_env()$object[J(rel$object_id), on = "object_id", class_id]
+        IdfObjects$new(rel$object_id, cls, private$m_parent)
     }
 }
 # }}}

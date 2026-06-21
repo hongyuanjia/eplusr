@@ -2199,7 +2199,7 @@ match_idd_field <- function(idd_env, dt_field) {
 }
 # }}}
 # expand_idf_dots_object {{{
-#' Parse object values given in a list of Idf or IdfObject format
+#' Parse object values given in a list of Idf, IdfObject, or IdfObjects format
 #'
 #' @param idd_env An environment or list contains IDD tables including class,
 #'        field, and reference.
@@ -2207,7 +2207,7 @@ match_idd_field <- function(idd_env, dt_field) {
 #' @param idf_env An environment or list contains IDF tables including object,
 #'        value, and reference.
 #'
-#' @param ... Lists of [Idf]s or [IdfObject]s.
+#' @param ... Lists of [Idf]s, [IdfObject]s, or [IdfObjects].
 #'
 #' @param .unique If `TRUE`, make sure there are no duplicated objects in the
 #'        input. If `FALSE`, duplicates are kept. If `NULL`, duplicates are
@@ -2251,8 +2251,27 @@ expand_idf_dots_object <- function(idd_env, idf_env, ..., .unique = TRUE, .stric
              idf_env = list(get_priv_env(x)$idf_env())
         )
     }
+    # extract IdfObjects meta
+    extract_idfobjects <- function(x) {
+        private <- get_priv_env(x)
+        parent <- get_priv_env(private$m_parent)
+        lapply(private$m_object_id, function(id) {
+            list(version = parent$m_version,
+                 uuid = parent$uuid(),
+                 object_id = id,
+                 idd_env = list(private$idd_env()),
+                 idf_env = list(private$idf_env())
+            )
+        })
+    }
     extract_data <- function(x) {
-        if (is_idf(x)) extract_idf(x) else if (is_idfobject(x)) extract_idfobj(x)
+        if (is_idf(x)) {
+            list(extract_idf(x))
+        } else if (is_idfobject(x)) {
+            list(extract_idfobj(x))
+        } else if (is_idfobjects(x)) {
+            extract_idfobjects(x)
+        }
     }
 
     len <- rep(1L, length(l))
@@ -2263,12 +2282,17 @@ expand_idf_dots_object <- function(idd_env, idf_env, ..., .unique = TRUE, .stric
             extract_idf(ll)
         } else if (is_idfobject(ll)) {
             extract_idfobj(ll)
+        } else if (is_idfobjects(ll)) {
+            d <- extract_idfobjects(ll)
+            len[[i]] <<- length(d)
+            is_nest[[i]] <<- TRUE
+            d
         } else {
-            if (!test_list(ll, c("Idf", "IdfObject"), any.missing = FALSE, all.missing = FALSE)) {
+            if (!test_list(ll, c("Idf", "IdfObject", "IdfObjects"), any.missing = FALSE, all.missing = FALSE)) {
                 abort(paste0("Assertion on 'Input' failed, element ", i, ": ",
-                    "Must be an 'Idf' or 'IdfObject', or a list of them."), "dots_format")
+                    "Must be an 'Idf', 'IdfObject', or 'IdfObjects', or a list of them."), "dots_format")
             }
-            d <- lapply(ll, extract_data)
+            d <- unlist(lapply(ll, extract_data), recursive = FALSE)
             # update actual object number
             len[[i]] <<- length(d)
             is_nest[[i]] <<- TRUE

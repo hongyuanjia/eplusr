@@ -74,6 +74,7 @@ reference:
     contents:
       - Idf
       - IdfObject
+      - IdfObjects
       - idf_object
       - read_idf
       - empty_idf
@@ -81,8 +82,10 @@ reference:
       - version_updater
       - as.character.Idf
       - as.character.IdfObject
+      - as.character.IdfObjects
       - format.Idf
       - format.IdfObject
+      - format.IdfObjects
 
   - title: IDF schedules
     desc: Class for IDF `Schedule:Compact` objects
@@ -158,6 +161,7 @@ reference:
       - is_idf
       - is_iddobject
       - is_idfobject
+      - is_idfobjects
       - is_epw
       - is_idd_ver
       - is_eplus_ver

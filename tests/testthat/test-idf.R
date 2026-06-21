@@ -285,14 +285,42 @@ test_that("$objects()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_equal(names(idf$objects("WD01")), "WD01")
+    expect_equal(idf$objects("WD01")$object_name(), "WD01")
 
     # can ignore cases
-    expect_equal(names(idf$objects("wall-1")), "WALL-1")
+    expect_equal(idf$objects("wall-1")$object_name(), "WALL-1")
 
-    expect_type(idf$objects(1:2), "list")
+    expect_s3_class(idf$objects(1:2), "IdfObjects")
     expect_error(idf$objects("a"), class = "eplusr_error_invalid_object_name")
     expect_error(idf$objects(1:6), class = "eplusr_error_invalid_object_id")
+})
+# }}}
+
+# IDFOBJECTS {{{
+test_that("IdfObjects", {
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+
+    expect_s3_class(objs <- idf$objects(c("WD01", "WD02")), "IdfObjects")
+    expect_equal(objs$length(), 2L)
+    expect_equal(objs$object_name(), c("WD01", "WD02"))
+    expect_equal(objs$class_name(), c("Material", "Material"))
+    expect_equal(objs$group_name(), c("Surface Construction Elements", "Surface Construction Elements"))
+
+    expect_s3_class(objs$object(1L), "IdfObject")
+    expect_s3_class(objs$object("WD01"), "IdfObject")
+    expect_s3_class(objs$WD01, "IdfObject")
+
+    expect_s3_class(one <- objs$slice(1L), "IdfObjects")
+    expect_equal(one$length(), 1L)
+    expect_equal(one$object_name(), "WD01")
+
+    expect_type(lst <- objs$objects(), "list")
+    expect_equal(names(lst), c("WD01", "WD02"))
+    expect_true(all(vlapply(lst, is_idfobject)))
+
+    expect_s3_class(objs$to_table(), "data.table")
+    expect_type(objs$to_string(), "character")
 })
 # }}}
 
@@ -302,8 +330,8 @@ test_that("$objects_in_class()", {
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can get all objects in a class
-    expect_type(idf$objects_in_class("version"), "list")
-    expect_type(idf$objects_in_class("Version"), "list")
+    expect_s3_class(idf$objects_in_class("version"), "IdfObjects")
+    expect_s3_class(idf$objects_in_class("Version"), "IdfObjects")
 })
 # }}}
 
@@ -314,7 +342,7 @@ test_that("$objects_in_group()", {
 
     # can get all objects in a group
     expect_error(idf$objects_in_group("Schedules"), class = "eplusr_error_invalid_group_name")
-    expect_type(idf$objects_in_group("Simulation Parameters"), "list")
+    expect_s3_class(idf$objects_in_group("Simulation Parameters"), "IdfObjects")
 })
 # }}}
 
@@ -328,21 +356,21 @@ test_that("$object_relation()", {
 
     # default only include both objects that are both referenced by their field
     # value and class names
-    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to")
+    ref <- idf_1$object_relation(idf_1$Branch$object(1L)$id(), direction = "ref_to")
     expect_equal(nrow(ref$ref_to), 8L)
     expect_equal(unique(ref$ref_to$src_object_name),
         c("OA Sys 1", "Main Cooling Coil 1", "Main Heating Coil 1", "Supply Fan 1")
     )
 
     # can exclude all class-name-reference
-    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to", class_ref = "none")
+    ref <- idf_1$object_relation(idf_1$Branch$object(1L)$id(), direction = "ref_to", class_ref = "none")
     expect_equal(nrow(ref$ref_to), 4L)
     expect_equal(unique(ref$ref_to$src_object_name),
         c("OA Sys 1", "Main Cooling Coil 1", "Main Heating Coil 1", "Supply Fan 1")
     )
 
     # can include all possible objects that are class-name-referenced
-    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to", class_ref = "all")
+    ref <- idf_1$object_relation(idf_1$Branch$object(1L)$id(), direction = "ref_to", class_ref = "all")
     expect_equal(nrow(ref$ref_to), 15L)
     expect_equal(unique(ref$ref_to$src_object_name),
         c(
@@ -367,17 +395,17 @@ test_that("$objects_in_relation()", {
     skip_on_cran()
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
-    expect_type(obj <- idf$objects_in_relation(2), "list")
-    expect_equal(length(obj), 2L)
-    expect_equal(names(obj), c("WALL-1", "WD01"))
+    expect_s3_class(obj <- idf$objects_in_relation(2), "IdfObjects")
+    expect_equal(obj$length(), 2L)
+    expect_equal(obj$object_name(), c("WALL-1", "WD01"))
 
     expect_message(with_verbose(obj <- idf$objects_in_relation(1)), "does not refer to")
     expect_message(with_verbose(obj <- idf$objects_in_relation(1, class = "Material")), "does not refer to")
-    expect_equal(length(obj), 1L)
-    expect_equal(names(obj), "WD01")
+    expect_equal(obj$length(), 1L)
+    expect_equal(obj$object_name(), "WD01")
 
-    expect_type(obj <- idf$objects_in_relation("WALL-1", "ref_by"), "list")
-    expect_equal(names(obj), c("WALL-1", "WALL-1PF"))
+    expect_s3_class(obj <- idf$objects_in_relation("WALL-1", "ref_by"), "IdfObjects")
+    expect_equal(obj$object_name(), c("WALL-1", "WALL-1PF"))
 })
 # }}}
 
@@ -388,10 +416,10 @@ test_that("$search_object()", {
 
     expect_error(idf$search_object("W", class = rep("Version", 2)))
 
-    expect_type(obj <- idf$search_object("W"), "list")
-    expect_equal(names(obj), c("WD01", "WALL-1", "WALL-1PF", "WD02"))
+    expect_s3_class(obj <- idf$search_object("W"), "IdfObjects")
+    expect_equal(obj$object_name(), c("WD01", "WALL-1", "WALL-1PF", "WD02"))
 
-    expect_equal(names(idf$search_object("W", class = "Material")), c("WD01", "WD02"))
+    expect_equal(idf$search_object("W", class = "Material")$object_name(), c("WD01", "WD02"))
 
     expect_equal(idf$search_object("AAA"), NULL)
 })
@@ -403,12 +431,12 @@ test_that("$dup()", {
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     # can duplicate objects and assign new names
-    expect_equal(names(idf$dup("WD01-DUP" = "WD01")), "WD01-DUP")
+    expect_equal(idf$dup("WD01-DUP" = "WD01")$object_name(), "WD01-DUP")
     expect_equal(idf$object(6)$name(), "WD01-DUP")
     expect_equal(idf$object("WD01-DUP")$value(2:5), idf$object("WD01")$value(2:5))
-    expect_equal(idf$dup("WD01")[[1L]]$name(), "WD01 1")
+    expect_equal(idf$dup("WD01")$object(1L)$name(), "WD01 1")
     expect_error(idf$dup("WD01" = "WD01-DUP"), class = "eplusr_error_conflict_name")
-    expect_equal(names(idf$dup(rep("WD01", times = 10L))), paste0("WD01 ", 2:11))
+    expect_equal(idf$dup(rep("WD01", times = 10L))$object_name(), paste0("WD01 ", 2:11))
 })
 # }}}
 
@@ -444,7 +472,7 @@ test_that("$add()", {
     expect_equal(err$data$invalid_character$value_chr, "Bad;Name")
 
     # adding empty object
-    expect_s3_class(idf$add("Building" = list())[[1L]], "IdfObject")
+    expect_s3_class(idf$add("Building" = list())$object(1L), "IdfObject")
 
     # invalid field number
     expect_error(idf$add("Output:Variable" = list("a", "b", "c", "d", "e")), class = "eplusr_error_invalid_field_index")
@@ -498,7 +526,7 @@ test_that("$add()", {
     expect_equal(idf$object("rp_test_2")$value(simplify = TRUE),
         c("rp_test_2", "1", "1", NA, "2", "1", NA)
     )
-    expect_equal(idf$objects("rp_test_3")[[1]]$value(simplify = TRUE),
+    expect_equal(idf$objects("rp_test_3")$object(1L)$value(simplify = TRUE),
         c("rp_test_3", "3", "1", NA, "4", "1", NA)
     )
     expect_silent(idf$add(runperiod = list(
@@ -524,53 +552,59 @@ test_that("$set()", {
     expect_equal(err$data$invalid_character$value_chr, "rp,test")
 
     # set new values and comments
-    expect_type(type = "list",
+    expect_s3_class(
         idf$set(..8 = list(name = "rp_test", begin_day_of_month = 2,
                 use_weather_file_rain_indicators = "no",
                 .comment = c("begin day has been changed."))
-        )
+        ),
+        "IdfObjects"
     )
     expect_equal(idf$RunPeriod$rp_test$Begin_Day_of_Month, 2L)
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "no")
     expect_equal(idf$RunPeriod$rp_test$comment(), "begin day has been changed.")
 
     # can set default values
-    expect_type(type = "list",
+    expect_s3_class(
         idf$set(rp_test = list(
             use_weather_file_rain_indicators = NULL, use_weather_file_snow_indicators = NULL
-        ))
+        )),
+        "IdfObjects"
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 13)
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
 
     # can remove trailing empty fields
-    expect_type(type = "list",
+    expect_s3_class(
         idf$set(rp_test = list(
             use_weather_file_rain_indicators = NULL,
             use_weather_file_snow_indicators = NULL
-        ), .default = FALSE)
+        ), .default = FALSE),
+        "IdfObjects"
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 11)
 
     # can keep trailing empty fields
-    expect_type(type = "list",
-        idf$set(rp_test = list(treat_weather_as_actual = NULL), .default = FALSE, .empty = TRUE)
+    expect_s3_class(
+        idf$set(rp_test = list(treat_weather_as_actual = NULL), .default = FALSE, .empty = TRUE),
+        "IdfObjects"
     )
     expect_equal(length(idf$RunPeriod$rp_test$value()), 14)
 
     # can set all values in a class
-    expect_type(type = "list",
+    expect_s3_class(
         idf$set(
             runperiod := list(treat_weather_as_actual = NULL),
             material_nomass := list(roughness = "Rough")
-        )
+        ),
+        "IdfObjects"
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Rough")
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Rough")
 
     # can set multiple objects
-    expect_type(type = "list",
-        idf$set(c(12, 13) := list(roughness = c("VeryRough", "Smooth")))
+    expect_s3_class(
+        idf$set(c(12, 13) := list(roughness = c("VeryRough", "Smooth"))),
+        "IdfObjects"
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "VeryRough")
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
@@ -580,13 +614,13 @@ test_that("$set()", {
         idf$Material_NoMass$R13LAYER$Thermal_Resistance,
         idf$Material_NoMass$R31LAYER$Thermal_Resistance
     )
-    expect_type(idf$set(Material_NoMass := list(thermal_resistance = ~ . * c(0.5, 2))), "list")
+    expect_s3_class(idf$set(Material_NoMass := list(thermal_resistance = ~ . * c(0.5, 2))), "IdfObjects")
     expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Resistance, res[[1L]] * 0.5)
     expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Resistance, res[[2L]] * 2)
 
     # can update fields using a function
     half <- function(x, frac = 0.5) x * frac
-    expect_type(idf$set(Material_NoMass := list(thermal_resistance = half)), "list")
+    expect_s3_class(idf$set(Material_NoMass := list(thermal_resistance = half)), "IdfObjects")
     expect_equal(idf$Material_NoMass$R13LAYER$Thermal_Resistance, res[[1L]] * 0.25)
     expect_equal(idf$Material_NoMass$R31LAYER$Thermal_Resistance, res[[2L]])
 
@@ -606,9 +640,9 @@ test_that("$set()", {
         idf$set(Material_NoMass := list(thermal_resistance = function(x) c(1, 2, 3))),
         class = "eplusr_error_dots_pair_length"
     )
-    expect_type(
+    expect_s3_class(
         idf$set(Material_NoMass := list(visible_absorptance = ~ NA_real_), .default = FALSE, .empty = TRUE),
-        "list"
+        "IdfObjects"
     )
     expect_true(is.na(idf$Material_NoMass$R13LAYER$Visible_Absorptance))
     expect_true(is.na(idf$Material_NoMass$R31LAYER$Visible_Absorptance))
@@ -619,8 +653,8 @@ test_that("$set()", {
 
     # can handle references
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")), "Idf")
-    expect_type(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
-    expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
+    expect_s3_class(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "IdfObjects")
+    expect_equal(idf$"Pump:VariableSpeed"$object(1L)$ref_by_object(class = "Branch")$object(1L)$Component_1_Object_Type, "Pump:VariableSpeed")
 })
 # }}}
 
@@ -633,7 +667,7 @@ test_that("$del()", {
     expect_error(idf$del(c(1, 2, 1)), class = "eplusr_error_del_same")
 
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
-    expect_error(idf$del(idf$Material_NoMass[[1]]$id()), class = "eplusr_error_del_referenced")
+    expect_error(idf$del(idf$Material_NoMass$object(1L)$id()), class = "eplusr_error_del_referenced")
     expect_error(idf$del(idf$Building$id()), class = "eplusr_error_del_required")
 
     expect_s3_class(without_checking(idf$del(12, .ref_by = TRUE)), "Idf")
@@ -718,7 +752,7 @@ test_that("$unique()", {
 test_that("$rename()", {
     skip_on_cran()
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
-    expect_type(idf$rename(test = "C5 - 4 IN HW CONCRETE"), "list")
+    expect_s3_class(idf$rename(test = "C5 - 4 IN HW CONCRETE"), "IdfObjects")
     expect_equal(idf$object_name("Material"), list(Material = "test"))
     expect_equal(idf$Construction$FLOOR$Outside_Layer, "test")
 })
@@ -732,7 +766,7 @@ test_that("$insert()", {
 
     expect_error(idf$insert(list()), class = "eplusr_error_dots_format")
 
-    expect_type(idf$insert(idf_full$Material_NoMass$R13LAYER), "list")
+    expect_s3_class(idf$insert(idf_full$Material_NoMass$R13LAYER), "IdfObjects")
     expect_equal(idf$object_name("Material:NoMass", simplify = TRUE), "R13LAYER")
     expect_equal(idf_full$Material_NoMass$R13LAYER$value(simplify = TRUE),
         c("R13LAYER", "Rough", "2.290965", "0.9", "0.75", "0.75")
@@ -748,8 +782,8 @@ test_that("$insert()", {
 
     idf1 <- empty_idf(LATEST_EPLUS_VER)
     idf2 <- empty_idf(LATEST_EPLUS_VER)
-    expect_type(idf1$add(ScheduleTypeLimits = list("Fraction", 0, 1, "continuous")), "list")
-    expect_type(idf2$add(ScheduleTypeLimits = list("Fraction", 0, 1, "Continuous")), "list")
+    expect_s3_class(idf1$add(ScheduleTypeLimits = list("Fraction", 0, 1, "continuous")), "IdfObjects")
+    expect_s3_class(idf2$add(ScheduleTypeLimits = list("Fraction", 0, 1, "Continuous")), "IdfObjects")
     expect_null(idf1$insert(idf2$ScheduleTypeLimits$Fraction))
     expect_equal(idf1$object_id()$ScheduleTypeLimits, 2L)
     # can directly insert an Idf
@@ -766,7 +800,7 @@ test_that("$search_value()", {
 
     expect_null(idf$search_value("AAA"))
     expect_equal(
-        vapply(idf$search_value("WALL"), function (x) x$id(), integer(1)),
+        vapply(idf$search_value("WALL")$objects(), function (x) x$id(), integer(1)),
         c(`WALL-1` = 2L, `WALL-1PF` = 3L)
     )
 })
@@ -778,7 +812,7 @@ test_that("$replace_value()", {
     expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
 
     expect_equal(
-        without_checking(vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1))),
+        without_checking(vapply(idf$replace_value("WALL-1", "WALL-2")$objects(), function (x) x$id(), integer(1))),
         c(`WALL-2` = 2L, `WALL-2PF` = 3L)
     )
 })
@@ -793,7 +827,7 @@ test_that("$paste()", {
     skip_if_not(is_windows())
     text <- "IDF,BuildingSurface:Detailed,Surface,Wall,R13WALL,ZONE ONE,,Outdoors,,SunExposed,WindExposed,0.5000000,4,0,0,4.572000,0,0,0,15.24000,0,0,15.24000,0,4.572000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;"
     writeClipboard(text)
-    expect_s3_class(idf$paste()[[1L]], "IdfObject")
+    expect_s3_class(idf$paste()$object(1L), "IdfObject")
     writeClipboard(text)
     expect_null(idf$paste())
 })
@@ -807,10 +841,10 @@ test_that("$load()", {
     # can error if trying to add Version
     expect_error(idf$load("Version,8.7;\n"))
 
-    expect_type(idf$load("SimulationControl,no;\n"), "list")
+    expect_s3_class(idf$load("SimulationControl,no;\n"), "IdfObjects")
     expect_s3_class(idf$SimulationControl, "IdfObject")
 
-    expect_type(type = "list",
+    expect_s3_class(
         idf$load(
             c("! some comments;",
               "Material,",
@@ -822,17 +856,19 @@ test_that("$load()", {
               "    300;",
               "Construction, const, mat;"
             )
-        )
+        ),
+        "IdfObjects"
     )
     expect_s3_class(idf$Material$mat, "IdfObject")
 
-    expect_type(type = "list",
+    expect_s3_class(
         {
             dt <- idf$to_table(class = rep("Material:NoMass", 2), init = TRUE)[
                 ,by = "id", value := c("mat", "Smooth", "0.5")
             ][index == 1L, value := paste(value, 1:2, sep = "_")]
             obj <- idf$load(dt)
-        }
+        },
+        "IdfObjects"
     )
     expect_equal(idf$Material_NoMass$mat_1$Roughness, "Smooth")
     expect_equal(idf$Material_NoMass$mat_2$Roughness, "Smooth")
@@ -847,13 +883,14 @@ test_that("$update()", {
     # can stop if trying to update non-named objects using string
     expect_error(idf$update("SimulationControl, no;\n"))
 
-    expect_type(idf$update("Material:NoMass, R13LAYER, Smooth, 2;\n"), "list")
+    expect_s3_class(idf$update("Material:NoMass, R13LAYER, Smooth, 2;\n"), "IdfObjects")
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Smooth")
 
-    expect_type(type = "list",
+    expect_s3_class(
         {
             idf$update(idf$to_table("r13layer")[2][, value := "Rough"])
-        }
+        },
+        "IdfObjects"
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Rough")
 })
@@ -1247,9 +1284,9 @@ test_that("$clone()", {
     skip_on_cran()
     idf1 <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf"))
     idf2 <- idf1$clone()
-    idf1$set(c(idf1$Zone[[1]]$name()) := list(name = "zone"))
-    expect_equal(idf1$Zone[[1]]$Name, "zone")
-    expect_equal(idf2$Zone[[1]]$Name, "ZONE ONE")
+    idf1$set(c(idf1$Zone$object(1L)$name()) := list(name = "zone"))
+    expect_equal(idf1$Zone$object(1L)$Name, "zone")
+    expect_equal(idf2$Zone$object(1L)$Name, "ZONE ONE")
 })
 # }}}
 
@@ -1281,18 +1318,19 @@ test_that("idf_add_output_*", {
 
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_true(idf_add_output_sqlite(idf))
-    expect_type(idf$set(`Output:SQLite` := list("Simple")), "list")
+    expect_s3_class(idf$set(`Output:SQLite` := list("Simple")), "IdfObjects")
     expect_true(idf_add_output_sqlite(idf))
 
     idf1 <- idf$clone()
-    idf$set(c(idf$Zone[[1]]$name()) := list(name = "zone"))
-    expect_equal(idf$Zone[[1]]$Name, "zone")
-    expect_equal(idf1$Zone[[1]]$Name, "ZONE ONE")
+    idf$set(c(idf$Zone$object(1L)$name()) := list(name = "zone"))
+    expect_equal(idf$Zone$object(1L)$Name, "zone")
+    expect_equal(idf1$Zone$object(1L)$Name, "ZONE ONE")
 
     expect_false(idf_add_output_vardict(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
 
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
-    expect_silent(without_checking(idf$Output_VariableDictionary[[1L]]$Key_Field <- "wrong"))
+    dict <- idf$Output_VariableDictionary$object(1L)
+    expect_silent(without_checking(dict$Key_Field <- "wrong"))
     expect_true(idf_add_output_vardict(idf))
     expect_null(idf$Output_VariableDictionary <- NULL)
     expect_true(idf_add_output_vardict(idf))
@@ -1347,10 +1385,10 @@ test_that("[[.Idf and $.Idf", {
 
     expect_s3_class(idf$Version, "IdfObject")
 
-    expect_equal(names(idf[["Material"]]), c("WD01", "WD02"))
-    expect_equal(names(idf$Material), c("WD01", "WD02"))
-    expect_equal(names(idf[["material"]]), c("WD01", "WD02"))
-    expect_equal(names(idf$material), c("WD01", "WD02"))
+    expect_equal(idf[["Material"]]$object_name(), c("WD01", "WD02"))
+    expect_equal(idf$Material$object_name(), c("WD01", "WD02"))
+    expect_equal(idf[["material"]]$object_name(), c("WD01", "WD02"))
+    expect_equal(idf$material$object_name(), c("WD01", "WD02"))
 
     expect_null(idf$Wrong)
     expect_null(idf[["Wrong"]])

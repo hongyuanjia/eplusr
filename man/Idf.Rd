@@ -864,7 +864,8 @@ idf$print("field", order = FALSE)
 
 }
 \seealso{
-\link{IdfObject} class for a single object in an IDF.
+\link{IdfObject} class for a single object in an IDF and \link{IdfObjects}
+class for a collection of IDF objects.
 }
 \author{
 Hongyuan Jia
@@ -1654,8 +1655,8 @@ vector specifying object names.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$objects()} returns a named list of \link{IdfObject} objects using object
-IDS or names. The returned list is named using object names.
+\verb{$objects()} returns an \link{IdfObjects} collection using object IDs or
+names. The returned collection is named using object names.
 
 Note that unlike object ID, which is always unique across the whole
 \code{Idf} object, different objects can have the same name. If the name
@@ -1671,7 +1672,7 @@ input.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1771,8 +1772,9 @@ object.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$objects_in_class()} returns a named list of all \link{IdfObject} objects
-in specified class. The returned list is named using object names.
+\verb{$objects_in_class()} returns an \link{IdfObjects} collection of all
+\link{IdfObject} objects in specified class. The returned collection is
+named using object names.
 
 \code{Idf} class also provides custom S3 method of \code{$} and \code{[[} to
 make it more convenient to get all \link{IdfObject} objects in one class.
@@ -1793,7 +1795,7 @@ check if \code{ClassName} is a valid class or not.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1830,12 +1832,13 @@ object.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$objects_in_group()} returns a named list of all \link{IdfObject} objects
-in specified group. The returned list is named using object names.
+\verb{$objects_in_group()} returns an \link{IdfObjects} collection of all
+\link{IdfObject} objects in specified group. The returned collection is
+named using object names.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2048,22 +2051,23 @@ aggressive option.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$objects_in_relation()} returns a named list of \link{IdfObject} objects
-that have specified relationship with given object. The first element of
-returned list is always the specified object itself. If that
-object does not have specified relationship with other objects in
-specified \code{class}, a list that only contains specified object itself
-is returned.
+\verb{$objects_in_relation()} returns an \link{IdfObjects} collection of
+\link{IdfObject} objects that have specified relationship with given
+object. The first element of returned collection is always the
+specified object itself. If that object does not have specified
+relationship with other objects in specified \code{class}, a collection
+that only contains specified object itself is returned.
 
 For instance, assuming that \code{const} is a valid object name in
 \code{Construction} class, \code{idf$objects_in_relation("const", "ref_by", "BuildingSurface:Detailed")}
-will return a named list of an \link{IdfObject} object named \code{const} and
-also all other \link{IdfObject} objects in \code{BuildingSurface:Detailed}
+will return an \link{IdfObjects} collection containing an \link{IdfObject}
+object named \code{const} and all other \link{IdfObject} objects in
+\code{BuildingSurface:Detailed}
 class that refer to field values in \code{const}. Similarly,
 \code{idf$objects_in_relation("const", "ref_to", "Material")}
-will return a named list of an \link{IdfObject} object named \code{const} and
-also all other \link{IdfObject} objects in \code{Material} class that \code{const}
-refers to. This makes it easy to directly extract groups of related
+will return an \link{IdfObjects} collection containing an \link{IdfObject}
+object named \code{const} and all other \link{IdfObject} objects in \code{Material}
+class that \code{const} refers to. This makes it easy to directly extract groups of related
 objects and then use \verb{$insert()} method or other methods
 described below to insert them or extract data.
 
@@ -2075,7 +2079,7 @@ recursively can be extracted by setting \code{recursive} to \code{TRUE}.
 }
 
 \subsection{Returns}{
-An named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2125,12 +2129,12 @@ corresponding \link{IdfObject} objects are returned if
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$search_object()} returns a named list of \link{IdfObject} objects whose
+\verb{$search_object()} returns an \link{IdfObjects} collection whose object
 names meet the given regular expression in specified classes.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2165,8 +2169,8 @@ name of newly created objects.}
 }
 \subsection{Details}{
 \verb{$dup()} takes integer vectors of object IDs and character vectors of
-object names, duplicates objects specified, and returns a list of
-newly created \link{IdfObject} objects. The names of input are used as new
+object names, duplicates objects specified, and returns an
+\link{IdfObjects} collection of newly created \link{IdfObject} objects. The names of input are used as new
 names for created \link{IdfObject}s. If input is not named, new names are
 the names of duplicated objects with a suffix \code{"_1"}, \code{"_2"} and etc,
 depending on how many times that object has been duplicated. Note an
@@ -2179,7 +2183,7 @@ conflicting checking. For details, please see \code{level_checks()}.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2233,8 +2237,8 @@ required fields are added. Default: \code{FALSE}.}
 }
 \subsection{Details}{
 \verb{$add()} takes new object definitions in list format, adds
-corresponding objects in specified classes, returns a list of newly
-added \link{IdfObject} objects. The returned list will be named using
+corresponding objects in specified classes, returns an \link{IdfObjects}
+collection of newly added \link{IdfObject} objects. The returned collection will be named using
 newly added object names. Every list should be named using a valid
 class name.  Underscore-style class name is allowed for class name.
 Names in each list element are treated as field names. Values without
@@ -2288,7 +2292,7 @@ specified using explicit field name.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2347,8 +2351,8 @@ Default: \code{TRUE}.}
 }
 \subsection{Details}{
 \verb{$set()} takes new field value definitions in list format, sets new
-values for fields in objects specified, and returns a list of
-modified \link{IdfObject}s. The returned list will be named using names of
+values for fields in objects specified, and returns an \link{IdfObjects}
+collection of modified \link{IdfObject}s. The returned collection will be named using names of
 modified objects. Every list in \verb{$set()} should be named with a
 valid object name. Object ID can also be used but have to be combined
 with prevailing two periods \code{..}, e.g. \code{..10} indicates the object
@@ -2417,7 +2421,7 @@ using explicit field name.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2786,8 +2790,8 @@ object names}
 \subsection{Details}{
 \verb{$rename()} takes named character vectors of object names and named
 integer vectors of object IDs, renames specified objects to names of
-input vectors and returns a list of renamed \link{IdfObject}s. The
-returned list will be named using names of modified objects. An error
+input vectors and returns an \link{IdfObjects} collection of renamed
+\link{IdfObject}s. The returned collection will be named using names of modified objects. An error
 will be issued if trying to "rename" an object which does not have
 name attribute. When renaming an object that is referred by other
 objects, corresponding fields that refer to that object's name will
@@ -2795,7 +2799,7 @@ also be changed accordingly.
 }
 
 \subsection{Returns}{
-A named list of renamed \link{IdfObject} objects.
+An \link{IdfObjects} collection of renamed objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2836,8 +2840,8 @@ input are removed. Default: \code{TRUE}.}
 }
 \subsection{Details}{
 \verb{$insert()} takes \link{IdfObject}s or lists of \link{IdfObject}s as input,
-inserts them into current \code{Idf} objects, and returns a list of
-inserted \link{IdfObject}s. The returned list will be named using names of
+inserts them into current \code{Idf} objects, and returns an \link{IdfObjects}
+collection of inserted \link{IdfObject}s. The returned collection will be named using names of
 inserted objects.
 
 \verb{$insert()} is quite useful to insert objects from other \code{Idf}
@@ -2856,7 +2860,7 @@ trailing empty fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \subsection{Returns}{
-A named list of inserted \link{IdfObject} objects.
+An \link{IdfObjects} collection of inserted objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -2907,8 +2911,8 @@ fields if possible. Default: \code{TRUE}.}
 \href{../../eplusr/html/Idf.html#method-insert}{\code{$insert()}},
 except it takes directly character vectors or data.frames as
 \link{IdfObject} definitions, insert corresponding objects into current
-\code{Idf} object and returns a named list of newly added \link{IdfObject}s.
-The returned list will be named using names of added objects. This
+\code{Idf} object and returns an \link{IdfObjects} collection of newly added
+\link{IdfObject}s. The returned collection will be named using names of added objects. This
 makes it easy to create objects using the output from\verb{$to_string()}
 and \verb{$to_table()} method from
 \href{../../eplusr/html/Idd.html#method-to_string}{\code{Idd}},
@@ -2993,7 +2997,7 @@ trailing empty fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \subsection{Returns}{
-A named list of loaded \link{IdfObject} objects.
+An \link{IdfObjects} collection of loaded objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -3062,8 +3066,8 @@ fields if possible. Default: \code{TRUE}.}
 \href{../../eplusr/html/Idf.html#method-set}{\code{$set()}}, except
 it takes directly character vectors or data.frames as \link{IdfObject}
 definitions, updates new values for fields in objects specified, and
-returns a named list of modified \link{IdfObject}s. The returned list will
-be named using names of modified objects. This makes it easy to
+returns an \link{IdfObjects} collection of modified \link{IdfObject}s. The
+returned collection will be named using names of modified objects. This makes it easy to
 update object values using the output from \verb{$to_string()} and
 \verb{$to_table} method from
 \href{../../eplusr/html/Idf.html#method-to_string}{\code{Idf}},
@@ -3141,7 +3145,7 @@ trailing empty fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \subsection{Returns}{
-A named list of updated \link{IdfObject} objects.
+An \link{IdfObjects} collection of updated objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -3195,8 +3199,8 @@ duplications in input are removed. Default: \code{TRUE}.}
 \subsection{Details}{
 \verb{$paste()} reads the contents (from clipboard) of copied objects from IDF
 Editor (after hitting \verb{Copy Obj} button), inserts corresponding
-objects into current \code{Idf} object and returns a named list of newly
-added \link{IdfObject}s. The returned list will be named using names of
+objects into current \code{Idf} object and returns an \link{IdfObjects}
+collection of newly added \link{IdfObject}s. The returned collection will be named using names of
 added objects. As IDF Editor is only available on Windows platform,
 \verb{$paste()} only works on Windows too.
 
@@ -3213,7 +3217,7 @@ trailing empty fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \subsection{Returns}{
-A named list of loaded \link{IdfObject} objects.
+An \link{IdfObjects} collection of loaded objects.
 }
 }
 \if{html}{\out{<hr>}}
@@ -3246,17 +3250,17 @@ used. Default: \code{NULL}.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$search_value()} returns a list of \link{IdfObject}s that contain values
-which match the given pattern. If no matched found, \code{NULL} is
-returned invisibly. The returned list will be named using names of
-matched objects.
+\verb{$search_value()} returns an \link{IdfObjects} collection of objects that
+contain values which match the given pattern. If no matched found,
+\code{NULL} is returned invisibly. The returned collection will be named
+using names of matched objects.
 
 Note that during matching, all values are treated as characters,
 including numeric values.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -3305,10 +3309,10 @@ used. Default: \code{NULL}.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$replace_value()} returns a list of \link{IdfObject}s whose values have
-been replaced using given pattern. If no matched found, \code{NULL} is
-returned invisibly. The returned list will be named using names of
-matched objects.
+\verb{$replace_value()} returns an \link{IdfObjects} collection whose values
+have been replaced using given pattern. If no matched found, \code{NULL}
+is returned invisibly. The returned collection will be named using
+names of matched objects.
 
 Note that during matching, all values are treated as characters,
 including numeric values.
@@ -3323,7 +3327,7 @@ if possible.
 }
 
 \subsection{Returns}{
-A named list of \link{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}

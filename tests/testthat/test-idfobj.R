@@ -429,11 +429,11 @@ test_that("$ref_to_object()", {
 
     expect_message(with_verbose(ver$ref_to_object()), "does not refer")
     expect_message(with_verbose(ver$ref_to_object(class = "Material")), "does not refer")
-    expect_equal(names(con$ref_to_object()), "WD01")
+    expect_equal(con$ref_to_object()$object_name(), "WD01")
 
     expect_message(with_verbose(ver$ref_by_object()), "is not referred")
     expect_message(with_verbose(ver$ref_by_object(class = "Material")), "is not referred")
-    expect_equal(names(con$ref_by_object()), "WALL-1PF")
+    expect_equal(con$ref_by_object()$object_name(), "WALL-1PF")
 
     expect_message(with_verbose(ver$ref_to_node()), "has no node")
     expect_message(with_verbose(ver$ref_to_node(class = "Material")), "has no node")
@@ -442,7 +442,7 @@ test_that("$ref_to_object()", {
 
     idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf"))
     expect_s3_class(loop <- IdfObject$new(278, parent = idf), "IdfObject")
-    expect_equal(length(loop$ref_to_node()), 9)
+    expect_equal(loop$ref_to_node()$length(), 9)
 
     expect_equal(con$has_ref(), c(TRUE, TRUE, FALSE, FALSE, FALSE))
     expect_true(con$has_ref(1))

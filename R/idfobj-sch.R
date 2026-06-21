@@ -360,7 +360,7 @@ idfsch_cmpt_init <- function (super, self, private, object, parent, new = FALSE)
         private$m_data <- parse_sch_cmpt(get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id))
     } else {
         assert_string(object, .var.name = "Name of Schedule:Compact")
-        obj <- private$m_parent$add(Schedule_Compact = list(object))[[1L]]
+        obj <- private$m_parent$add(Schedule_Compact = list(object))$object(1L)
 
         private$m_object_id <- obj$id()
         private$m_class_id <- obj$definition()$class_index()

@@ -37,6 +37,8 @@ convert_to_idd_ver <- function(ver, strict = FALSE, all_ver = c(ALL_IDD_VER, nam
 #'
 #' `is_idfobject()` returns `TRUE` if input is an IdfObject object.
 #'
+#' `is_idfobjects()` returns `TRUE` if input is an IdfObjects object.
+#'
 #' `is_epw()` returns `TRUE` if input is an Epw object.
 #'
 #' @param ver A character or numeric vector with suitable numeric version
@@ -67,6 +69,8 @@ convert_to_idd_ver <- function(ver, strict = FALSE, all_ver = c(ALL_IDD_VER, nam
 #' is_iddobject(idd_object("8.8", "Version"))
 #'
 #' is_idfobject(idf_object(idf, 1))
+#'
+#' is_idfobjects(idf$objects(1:2))
 #'
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 #' }
@@ -122,6 +126,12 @@ is_iddobject <- function(x) test_r6(x, "IddObject")
 #' @export
 # is_idfobject {{{
 is_idfobject <- function(x) test_r6(x, "IdfObject")
+# }}}
+
+#' @rdname assertion
+#' @export
+# is_idfobjects {{{
+is_idfobjects <- function(x) test_r6(x, "IdfObjects")
 # }}}
 
 #' @rdname assertion

@@ -504,9 +504,9 @@ idfgeom_coord_system <- function(self, private, detailed = NULL, simple = NULL, 
 
     # update the global geometry rules if exists, otherwise add one
     if (!private$m_parent$is_valid_class("GlobalGeometryRules")) {
-        ggr <- private$m_parent$add(GlobalGeometryRules = private$m_geoms$rules)[[1L]]
+        ggr <- private$m_parent$add(GlobalGeometryRules = private$m_geoms$rules)$object(1L)
     } else {
-        ggr <- private$m_parent$set(GlobalGeometryRules := private$m_geoms$rules)[[1L]]
+        ggr <- private$m_parent$set(GlobalGeometryRules := private$m_geoms$rules)$object(1L)
     }
     val <- standardize_idf_value(
         get_priv_env(private$m_parent)$idd_env(),

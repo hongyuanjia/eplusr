@@ -37,7 +37,8 @@ NULL
 #' * `value`: contains field values
 #' * `reference`: contains cross-reference data of field values.
 #'
-#' @seealso [IdfObject] class for a single object in an IDF.
+#' @seealso [IdfObject] class for a single object in an IDF and [IdfObjects]
+#' class for a collection of IDF objects.
 #' @author Hongyuan Jia
 #' @name Idf
 #'
@@ -587,8 +588,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Extract multiple [IdfObject] objects using object IDs or names.
         #'
         #' @details
-        #' `$objects()` returns a named list of [IdfObject] objects using object
-        #' IDS or names. The returned list is named using object names.
+        #' `$objects()` returns an [IdfObjects] collection using object IDs or
+        #' names. The returned collection is named using object names.
         #'
         #' Note that unlike object ID, which is always unique across the whole
         #' `Idf` object, different objects can have the same name. If the name
@@ -605,7 +606,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param which An integer vector specifying object IDs or a character
         #'        vector specifying object names.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -674,8 +675,9 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Extract all [IdfObject] objects in one class.
         #'
         #' @details
-        #' `$objects_in_class()` returns a named list of all [IdfObject] objects
-        #' in specified class. The returned list is named using object names.
+        #' `$objects_in_class()` returns an [IdfObjects] collection of all
+        #' [IdfObject] objects in specified class. The returned collection is
+        #' named using object names.
         #'
         #' `Idf` class also provides custom S3 method of `$` and \code{[[} to
         #' make it more convenient to get all [IdfObject] objects in one class.
@@ -697,7 +699,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param class A single string of valid class name for current `Idf`
         #'        object.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -718,13 +720,14 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Extract all [IdfObject] objects in one group.
         #'
         #' @details
-        #' `$objects_in_group()` returns a named list of all [IdfObject] objects
-        #' in specified group. The returned list is named using object names.
+        #' `$objects_in_group()` returns an [IdfObjects] collection of all
+        #' [IdfObject] objects in specified group. The returned collection is
+        #' named using object names.
         #'
         #' @param group A single string of valid group name for current `Idf`
         #'        object.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -841,23 +844,24 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Extract multiple [IdfObject] objects referencing each others.
         #'
         #' @details
-        #' `$objects_in_relation()` returns a named list of [IdfObject] objects
-        #' that have specified relationship with given object. The first element of
-        #' returned list is always the specified object itself. If that
-        #' object does not have specified relationship with other objects in
-        #' specified `class`, a list that only contains specified object itself
-        #' is returned.
+        #' `$objects_in_relation()` returns an [IdfObjects] collection of
+        #' [IdfObject] objects that have specified relationship with given
+        #' object. The first element of returned collection is always the
+        #' specified object itself. If that object does not have specified
+        #' relationship with other objects in specified `class`, a collection
+        #' that only contains specified object itself is returned.
         #'
         #' For instance, assuming that `const` is a valid object name in
         #' `Construction` class, `idf$objects_in_relation("const", "ref_by",
         #' "BuildingSurface:Detailed")`
-        #' will return a named list of an [IdfObject] object named `const` and
-        #' also all other [IdfObject] objects in `BuildingSurface:Detailed`
+        #' will return an [IdfObjects] collection containing an [IdfObject]
+        #' object named `const` and all other [IdfObject] objects in
+        #' `BuildingSurface:Detailed`
         #' class that refer to field values in `const`. Similarly,
         #' `idf$objects_in_relation("const", "ref_to", "Material")`
-        #' will return a named list of an [IdfObject] object named `const` and
-        #' also all other [IdfObject] objects in `Material` class that `const`
-        #' refers to. This makes it easy to directly extract groups of related
+        #' will return an [IdfObjects] collection containing an [IdfObject]
+        #' object named `const` and all other [IdfObject] objects in `Material`
+        #' class that `const` refers to. This makes it easy to directly extract groups of related
         #' objects and then use `$insert()` method or other methods
         #' described below to insert them or extract data.
         #'
@@ -911,7 +915,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'       be treated as referenced by that field. This is the most
         #'       aggressive option.
         #'
-        #' @return An named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -935,7 +939,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' names.
         #'
         #' @details
-        #' `$search_object()` returns a named list of [IdfObject] objects whose
+        #' `$search_object()` returns an [IdfObjects] collection whose object
         #' names meet the given regular expression in specified classes.
         #'
         #' @param pattern,ignore.case,perl,fixed,useBytes All are directly
@@ -946,7 +950,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        corresponding [IdfObject] objects are returned if
         #'        `pattern` is met Default: `NULL`.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -967,8 +971,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         #' @details
         #' `$dup()` takes integer vectors of object IDs and character vectors of
-        #' object names, duplicates objects specified, and returns a list of
-        #' newly created [IdfObject] objects. The names of input are used as new
+        #' object names, duplicates objects specified, and returns an
+        #' [IdfObjects] collection of newly created [IdfObject] objects. The names of input are used as new
         #' names for created [IdfObject]s. If input is not named, new names are
         #' the names of duplicated objects with a suffix `"_1"`, `"_2"` and etc,
         #' depending on how many times that object has been duplicated. Note an
@@ -983,7 +987,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        object names. If input is named, its name will be used as the
         #'        name of newly created objects.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -1012,8 +1016,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         #' @details
         #' `$add()` takes new object definitions in list format, adds
-        #' corresponding objects in specified classes, returns a list of newly
-        #' added [IdfObject] objects. The returned list will be named using
+        #' corresponding objects in specified classes, returns an [IdfObjects]
+        #' collection of newly added [IdfObject] objects. The returned collection will be named using
         #' newly added object names. Every list should be named using a valid
         #' class name.  Underscore-style class name is allowed for class name.
         #' Names in each list element are treated as field names. Values without
@@ -1076,7 +1080,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param .all If `TRUE`, all fields are added. If `FALSE`, only minimum
         #'        required fields are added. Default: `FALSE`.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -1109,8 +1113,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         #' @details
         #' `$set()` takes new field value definitions in list format, sets new
-        #' values for fields in objects specified, and returns a list of
-        #' modified [IdfObject]s. The returned list will be named using names of
+        #' values for fields in objects specified, and returns an [IdfObjects]
+        #' collection of modified [IdfObject]s. The returned collection will be named using names of
         #' modified objects. Every list in `$set()` should be named with a
         #' valid object name. Object ID can also be used but have to be combined
         #' with prevailing two periods `..`, e.g. `..10` indicates the object
@@ -1188,7 +1192,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default:
         #'        `FALSE`.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -1463,8 +1467,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @details
         #' `$rename()` takes named character vectors of object names and named
         #' integer vectors of object IDs, renames specified objects to names of
-        #' input vectors and returns a list of renamed [IdfObject]s. The
-        #' returned list will be named using names of modified objects. An error
+        #' input vectors and returns an [IdfObjects] collection of renamed
+        #' [IdfObject]s. The returned collection will be named using names of modified objects. An error
         #' will be issued if trying to "rename" an object which does not have
         #' name attribute. When renaming an object that is referred by other
         #' objects, corresponding fields that refer to that object's name will
@@ -1475,7 +1479,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        should be named. Names of input vectors are used as the new
         #'        object names
         #'
-        #' @return A named list of renamed [IdfObject] objects.
+        #' @return An [IdfObjects] collection of renamed objects.
         #'
         #' @examples
         #' \dontrun{
@@ -1493,8 +1497,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         #' @details
         #' `$insert()` takes [IdfObject]s or lists of [IdfObject]s as input,
-        #' inserts them into current `Idf` objects, and returns a list of
-        #' inserted [IdfObject]s. The returned list will be named using names of
+        #' inserts them into current `Idf` objects, and returns an [IdfObjects]
+        #' collection of inserted [IdfObject]s. The returned collection will be named using names of
         #' inserted objects.
         #'
         #' `$insert()` is quite useful to insert objects from other `Idf`
@@ -1519,7 +1523,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default:
         #'        `FALSE`.
         #'
-        #' @return A named list of inserted [IdfObject] objects.
+        #' @return An [IdfObjects] collection of inserted objects.
         #'
         #' @examples
         #' \dontrun{
@@ -1545,8 +1549,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' \href{../../eplusr/html/Idf.html#method-insert}{\code{$insert()}},
         #' except it takes directly character vectors or data.frames as
         #' [IdfObject] definitions, insert corresponding objects into current
-        #' `Idf` object and returns a named list of newly added [IdfObject]s.
-        #' The returned list will be named using names of added objects. This
+        #' `Idf` object and returns an [IdfObjects] collection of newly added
+        #' [IdfObject]s. The returned collection will be named using names of added objects. This
         #' makes it easy to create objects using the output from`$to_string()`
         #' and `$to_table()` method from
         #' \href{../../eplusr/html/Idd.html#method-to_string}{\code{Idd}},
@@ -1634,7 +1638,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default:
         #'        `FALSE`.
         #'
-        #' @return A named list of loaded [IdfObject] objects.
+        #' @return An [IdfObjects] collection of loaded objects.
         #'
         #' @examples
         #' \dontrun{
@@ -1682,8 +1686,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' \href{../../eplusr/html/Idf.html#method-set}{\code{$set()}}, except
         #' it takes directly character vectors or data.frames as [IdfObject]
         #' definitions, updates new values for fields in objects specified, and
-        #' returns a named list of modified [IdfObject]s. The returned list will
-        #' be named using names of modified objects. This makes it easy to
+        #' returns an [IdfObjects] collection of modified [IdfObject]s. The
+        #' returned collection will be named using names of modified objects. This makes it easy to
         #' update object values using the output from `$to_string()` and
         #' `$to_table` method from
         #' \href{../../eplusr/html/Idf.html#method-to_string}{\code{Idf}},
@@ -1761,7 +1765,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default:
         #'        `FALSE`.
         #'
-        #' @return A named list of updated [IdfObject] objects.
+        #' @return An [IdfObjects] collection of updated objects.
         #'
         #' @examples
         #' \dontrun{
@@ -1787,8 +1791,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @details
         #' `$paste()` reads the contents (from clipboard) of copied objects from IDF
         #' Editor (after hitting `Copy Obj` button), inserts corresponding
-        #' objects into current `Idf` object and returns a named list of newly
-        #' added [IdfObject]s. The returned list will be named using names of
+        #' objects into current `Idf` object and returns an [IdfObjects]
+        #' collection of newly added [IdfObject]s. The returned collection will be named using names of
         #' added objects. As IDF Editor is only available on Windows platform,
         #' `$paste()` only works on Windows too.
         #'
@@ -1815,7 +1819,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param empty If `TRUE`, trailing empty fields are kept. Default:
         #'        `FALSE`.
         #'
-        #' @return A named list of loaded [IdfObject] objects.
+        #' @return An [IdfObjects] collection of loaded objects.
         #'
         paste = function(in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
             idf_paste(self, private, in_ip = in_ip, ver = ver, unique = unique, empty = empty),
@@ -1826,10 +1830,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Search objects by field values using regular expression
         #'
         #' @details
-        #' `$search_value()` returns a list of [IdfObject]s that contain values
-        #' which match the given pattern. If no matched found, `NULL` is
-        #' returned invisibly. The returned list will be named using names of
-        #' matched objects.
+        #' `$search_value()` returns an [IdfObjects] collection of objects that
+        #' contain values which match the given pattern. If no matched found,
+        #' `NULL` is returned invisibly. The returned collection will be named
+        #' using names of matched objects.
         #'
         #' Note that during matching, all values are treated as characters,
         #' including numeric values.
@@ -1841,7 +1845,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        `Idf` object to search for values. If `NULL`, all classes are
         #'        used. Default: `NULL`.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -1864,10 +1868,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #' Replace object field values using regular expression
         #'
         #' @details
-        #' `$replace_value()` returns a list of [IdfObject]s whose values have
-        #' been replaced using given pattern. If no matched found, `NULL` is
-        #' returned invisibly. The returned list will be named using names of
-        #' matched objects.
+        #' `$replace_value()` returns an [IdfObjects] collection whose values
+        #' have been replaced using given pattern. If no matched found, `NULL`
+        #' is returned invisibly. The returned collection will be named using
+        #' names of matched objects.
         #'
         #' Note that during matching, all values are treated as characters,
         #' including numeric values.
@@ -1887,7 +1891,7 @@ Idf <- R6::R6Class(classname = "Idf",
         #'        `Idf` object to search for values. If `NULL`, all classes are
         #'        used. Default: `NULL`.
         #'
-        #' @return A named list of [IdfObject] objects.
+        #' @return An [IdfObjects] collection.
         #'
         #' @examples
         #' \dontrun{
@@ -2891,7 +2895,7 @@ idf_obj <- function(self, private, which, class = NULL) {
         class = class, object = which, ignore_case = TRUE
     )
 
-    idf_return_matched(self, private, obj)[[1L]]
+    idf_return_matched(self, private, obj)$object(1L)
 }
 # }}}
 # idf_object_unique {{{
@@ -2910,7 +2914,7 @@ idf_object_unique <- function(self, private, class) {
         ))
     }
 
-    idf_return_matched(self, private, obj)[[1L]]
+    idf_return_matched(self, private, obj)$object(1L)
 }
 # }}}
 # idf_objects {{{
@@ -2988,9 +2992,6 @@ idf_objects_in_relation <- function(self, private, which, direction = c("ref_to"
         id_ref <- unique(rel[[direction]]$object_id[!is.na(rel[[direction]]$object_id)])
     }
 
-    obj_self <- list(IdfObject$new(id_self, obj$class_id, self))
-    setattr(obj_self, "names", obj$object_name)
-
     if (!length(id_ref)) {
         if (in_verbose()) {
             dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
@@ -3005,16 +3006,12 @@ idf_objects_in_relation <- function(self, private, which, direction = c("ref_to"
                 verbose_info(msg, " specified.")
             }
         }
-        return(obj_self)
+        return(IdfObjects$new(id_self, obj$class_id, self))
     }
 
-    res <- c(obj_self, lapply(id_ref, IdfObject$new, parent = self))
-
-    ref_nm <- private$idf_env()$object[J(id_ref), on = "object_id", object_name]
-
-    setattr(res, "names", c(obj$object_name, ref_nm))
-
-    res
+    id <- c(id_self, id_ref)
+    cls <- private$idf_env()$object[J(id), on = "object_id", class_id]
+    IdfObjects$new(id, cls, self)
 }
 # }}}
 # idf_search_object {{{
@@ -3042,6 +3039,10 @@ idf_search_object <- function(self, private, pattern, class = NULL, ignore.case 
 idf_return_matched <- function(self, private, matched, object_id) {
     if (is.numeric(matched)) {
         matched <- private$idf_env()$object[J(matched), on = "object_id", nomatch = NULL]
+    }
+
+    if (is_idf(self)) {
+        return(IdfObjects$new(matched$object_id, matched$class_id, self))
     }
 
     res <- apply2(matched$object_id, matched$class_id, IdfObject$new, list(parent = self))
@@ -3495,7 +3496,7 @@ idf_add_output_sqlite <- function(idf) {
     if (!is_idf(idf)) idf <- read_idf(idf)
     added <- FALSE
     if (idf$is_valid_class("Output:SQLite")) {
-        sql <- idf$objects_in_class("Output:SQLite")[[1L]]
+        sql <- idf$objects_in_class("Output:SQLite")$object(1L)
         type <- toupper(sql$value()[[1]])
         if (type != "SIMPLEANDTABULAR") {
             sql$set("SimpleAndTabular")
@@ -3517,7 +3518,7 @@ idf_add_output_vardict <- function(idf) {
     if (!is_idf(idf)) idf <- read_idf(idf)
     added <- FALSE
     if (idf$is_valid_class("Output:VariableDictionary")) {
-        dict <- idf$objects_in_class("Output:VariableDictionary")[[1L]]
+        dict <- idf$objects_in_class("Output:VariableDictionary")$object(1L)
         key <- toupper(dict$value()[[1]])
         if (!key %chin% c("IDF", "REGULAR")) {
             dict$set("IDF")
@@ -3732,8 +3733,10 @@ replace_objects_in_class <- function(self, private, class, value, unique_object 
             with_silent(self$del(obj_main$object_id, .force = TRUE))
         }
 
-    # if a list of IdfObjects, use `$insert()`
-    } else if (checkmate::test_list(value, "IdfObject", any.missing = FALSE)) {
+    # if an IdfObjects collection or list of IdfObjects, use `$insert()`
+    } else if (is_idfobjects(value) || checkmate::test_list(value, "IdfObject", any.missing = FALSE)) {
+        if (is_idfobjects(value)) value <- value$objects()
+
         # check if input is from the same model
         # get uuid if idf
         uuid_main <- private$uuid()

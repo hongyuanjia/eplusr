@@ -239,8 +239,8 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     expect_equal(
-        idfVU$"AirflowNetwork:Distribution:Component:Fan"[[1]]$value(),
-        idfTR$"AirflowNetwork:Distribution:Component:Fan"[[1]]$value()
+        idfVU$"AirflowNetwork:Distribution:Component:Fan"$object(1L)$value(),
+        idfTR$"AirflowNetwork:Distribution:Component:Fan"$object(1L)$value()
     )
 
     expect_equal(
@@ -254,8 +254,8 @@ test_that("Transition v7.2 --> v8.0", {
     )
 
     expect_equal(
-        idfVU$"AirConditioner:VariableRefrigerantFlow"[[1]]$value(),
-        idfTR$"AirConditioner:VariableRefrigerantFlow"[[1]]$value()
+        idfVU$"AirConditioner:VariableRefrigerantFlow"$object(1L)$value(),
+        idfTR$"AirConditioner:VariableRefrigerantFlow"$object(1L)$value()
     )
 
     expect_equal(
@@ -404,8 +404,8 @@ test_that("Transition v8.0 --> v8.1", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"People"[[1]]$value()[1:16],
-        idfTR$"People"[[1]]$value()
+        idfVU$"People"$object(1L)$value()[1:16],
+        idfTR$"People"$object(1L)$value()
     )
 
     # VersionUpdater gives "autocalculate" instead of "Autocalculate"
@@ -460,30 +460,30 @@ test_that("Transition v8.0 --> v8.1", {
     expect_equal(idfTR$"ScheduleTypeLimits"$"Any Number"$Name, "Any Number")
 
     expect_equal(
-        idfVU$"HVACTemplate:Zone:PTAC"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:PTAC"[[1]]$value()
+        idfVU$"HVACTemplate:Zone:PTAC"$object(1L)$value(),
+        idfTR$"HVACTemplate:Zone:PTAC"$object(1L)$value()
     )
     expect_equal(
-        idfVU$"HVACTemplate:Zone:PTAC"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:PTAC"[[2]]$value()
-    )
-
-    expect_equal(
-        idfVU$"HVACTemplate:Zone:PTHP"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:PTHP"[[1]]$value()
-    )
-    expect_equal(
-        idfVU$"HVACTemplate:Zone:PTHP"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:PTHP"[[2]]$value()
+        idfVU$"HVACTemplate:Zone:PTAC"$object(2L)$value(),
+        idfTR$"HVACTemplate:Zone:PTAC"$object(2L)$value()
     )
 
     expect_equal(
-        idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[1]]$value()
+        idfVU$"HVACTemplate:Zone:PTHP"$object(1L)$value(),
+        idfTR$"HVACTemplate:Zone:PTHP"$object(1L)$value()
     )
     expect_equal(
-        idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[2]]$value()
+        idfVU$"HVACTemplate:Zone:PTHP"$object(2L)$value(),
+        idfTR$"HVACTemplate:Zone:PTHP"$object(2L)$value()
+    )
+
+    expect_equal(
+        idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"$object(1L)$value(),
+        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"$object(1L)$value()
+    )
+    expect_equal(
+        idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"$object(2L)$value(),
+        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"$object(2L)$value()
     )
 
     expect_equal(
@@ -589,48 +589,48 @@ test_that("Transition v8.1 --> v8.2", {
     )
 
     expect_equal(
-        idfVU$"Sizing:System"[[1]]$value(),
-        idfTR$"Sizing:System"[[1]]$value()
+        idfVU$"Sizing:System"$object(1L)$value(),
+        idfTR$"Sizing:System"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Water"[[1]]$value(1:14),
-        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Water"[[1]]$value()
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Water"$object(1L)$value(1:14),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Water"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:HighTemperatureRadiant"[[1]]$value(1:14),
-        idfTR$"ZoneHVAC:HighTemperatureRadiant"[[1]]$value()
+        idfVU$"ZoneHVAC:HighTemperatureRadiant"$object(1L)$value(1:14),
+        idfTR$"ZoneHVAC:HighTemperatureRadiant"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Steam"[[1]]$value(1:13),
-        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Steam"[[1]]$value()
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$object(1L)$value(1:13),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Steam"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Electric"[[1]]$value(1:9),
-        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Electric"[[1]]$value()
+        idfVU$"ZoneHVAC:Baseboard:RadiantConvective:Electric"$object(1L)$value(1:9),
+        idfTR$"ZoneHVAC:Baseboard:RadiantConvective:Electric"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:Baseboard:Convective:Water"[[1]]$value(),
-        idfTR$"ZoneHVAC:Baseboard:Convective:Water"[[1]]$value()
+        idfVU$"ZoneHVAC:Baseboard:Convective:Water"$object(1L)$value(),
+        idfTR$"ZoneHVAC:Baseboard:Convective:Water"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:Baseboard:Convective:Electric"[[1]]$value(),
-        idfTR$"ZoneHVAC:Baseboard:Convective:Electric"[[1]]$value()
+        idfVU$"ZoneHVAC:Baseboard:Convective:Electric"$object(1L)$value(),
+        idfTR$"ZoneHVAC:Baseboard:Convective:Electric"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"[[1]]$value(),
-        idfTR$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"[[1]]$value()
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$object(1L)$value(),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:VariableFlow"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:LowTemperatureRadiant:Electric"[[1]]$value(1:10),
-        idfTR$"ZoneHVAC:LowTemperatureRadiant:Electric"[[1]]$value()
+        idfVU$"ZoneHVAC:LowTemperatureRadiant:Electric"$object(1L)$value(1:10),
+        idfTR$"ZoneHVAC:LowTemperatureRadiant:Electric"$object(1L)$value()
     )
 })
 # }}}
@@ -661,23 +661,23 @@ test_that("Transition v8.2 --> v8.3", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"Chiller:Electric:ReformulatedEIR"[[1]]$value(1:26),
-        idfTR$"Chiller:Electric:ReformulatedEIR"[[1]]$value()
+        idfVU$"Chiller:Electric:ReformulatedEIR"$object(1L)$value(1:26),
+        idfTR$"Chiller:Electric:ReformulatedEIR"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Site:GroundDomain:Slab"[[1]]$value(),
-        idfTR$"Site:GroundDomain:Slab"[[1]]$value()
+        idfVU$"Site:GroundDomain:Slab"$object(1L)$value(),
+        idfTR$"Site:GroundDomain:Slab"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"EvaporativeCooler:Indirect:ResearchSpecial"[[1]]$value(),
-        idfTR$"EvaporativeCooler:Indirect:ResearchSpecial"[[1]]$value()
+        idfVU$"EvaporativeCooler:Indirect:ResearchSpecial"$object(1L)$value(),
+        idfTR$"EvaporativeCooler:Indirect:ResearchSpecial"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"EvaporativeCooler:Direct:ResearchSpecial"[[1]]$value(),
-        idfTR$"EvaporativeCooler:Direct:ResearchSpecial"[[1]]$value()
+        idfVU$"EvaporativeCooler:Direct:ResearchSpecial"$object(1L)$value(),
+        idfTR$"EvaporativeCooler:Direct:ResearchSpecial"$object(1L)$value()
     )
 })
 # }}}
@@ -724,8 +724,8 @@ test_that("Transition v8.3 --> v8.4", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"Coil:WaterHeating:AirToWaterHeatPump:Pumped"[[1]]$value(1:21),
-        idfTR$"Coil:WaterHeating:AirToWaterHeatPump:Pumped"[[1]]$value()
+        idfVU$"Coil:WaterHeating:AirToWaterHeatPump:Pumped"$object(1L)$value(1:21),
+        idfTR$"Coil:WaterHeating:AirToWaterHeatPump:Pumped"$object(1L)$value()
     )
 
     expect_equal(
@@ -755,28 +755,28 @@ test_that("Transition v8.3 --> v8.4", {
     )
 
     expect_equal(
-        idfVU$"Branch"[[1]]$value(1:13),
-        idfTR$"Branch"[[1]]$value()
+        idfVU$"Branch"$object(1L)$value(1:13),
+        idfTR$"Branch"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:EquipmentList"[[1]]$value(1:9),
-        idfTR$"ZoneHVAC:EquipmentList"[[1]]$value()
+        idfVU$"ZoneHVAC:EquipmentList"$object(1L)$value(1:9),
+        idfTR$"ZoneHVAC:EquipmentList"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"PlantEquipmentList"[[1]]$value(1:4),
-        idfTR$"PlantEquipmentList"[[1]]$value()
+        idfVU$"PlantEquipmentList"$object(1L)$value(1:4),
+        idfTR$"PlantEquipmentList"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"EvaporativeCooler:Direct:ResearchSpecial"[[1]]$value(1:11),
-        idfTR$"EvaporativeCooler:Direct:ResearchSpecial"[[1]]$value()
+        idfVU$"EvaporativeCooler:Direct:ResearchSpecial"$object(1L)$value(1:11),
+        idfTR$"EvaporativeCooler:Direct:ResearchSpecial"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Controller:MechanicalVentilation"[[1]]$value(1:8),
-        idfTR$"Controller:MechanicalVentilation"[[1]]$value()
+        idfVU$"Controller:MechanicalVentilation"$object(1L)$value(1:8),
+        idfTR$"Controller:MechanicalVentilation"$object(1L)$value()
     )
 
     expect_equal(
@@ -883,12 +883,12 @@ test_that("Transition v8.4 --> v8.5", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"EnergyManagementSystem:Actuator"[[1]]$value(),
-        idfTR$"EnergyManagementSystem:Actuator"[[1]]$value()
+        idfVU$"EnergyManagementSystem:Actuator"$object(1L)$value(),
+        idfTR$"EnergyManagementSystem:Actuator"$object(1L)$value()
     )
     expect_equal(
-        idfVU$"EnergyManagementSystem:Actuator"[[2]]$value(),
-        idfTR$"EnergyManagementSystem:Actuator"[[2]]$value()
+        idfVU$"EnergyManagementSystem:Actuator"$object(2L)$value(),
+        idfTR$"EnergyManagementSystem:Actuator"$object(2L)$value()
     )
 })
 # }}}
@@ -965,43 +965,43 @@ test_that("Transition v8.5 --> v8.6", {
     )
 
     expect_equal(
-        idfVU$"Exterior:FuelEquipment"[[1]]$value(),
-        idfTR$"Exterior:FuelEquipment"[[1]]$value()
+        idfVU$"Exterior:FuelEquipment"$object(1L)$value(),
+        idfTR$"Exterior:FuelEquipment"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"HVACTemplate:System:UnitarySystem"[[1]]$value(),
-        idfTR$"HVACTemplate:System:UnitarySystem"[[1]]$value()
+        idfVU$"HVACTemplate:System:UnitarySystem"$object(1L)$value(),
+        idfTR$"HVACTemplate:System:UnitarySystem"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"HVACTemplate:System:Unitary"[[1]]$value(),
-        idfTR$"HVACTemplate:System:Unitary"[[1]]$value()
+        idfVU$"HVACTemplate:System:Unitary"$object(1L)$value(),
+        idfTR$"HVACTemplate:System:Unitary"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ChillerHeater:Absorption:DirectFired"[[1]]$value(),
-        idfTR$"ChillerHeater:Absorption:DirectFired"[[1]]$value()
+        idfVU$"ChillerHeater:Absorption:DirectFired"$object(1L)$value(),
+        idfTR$"ChillerHeater:Absorption:DirectFired"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"SetpointManager:SingleZone:Humidity:Minimum"[[1]]$value(),
-        idfTR$"SetpointManager:SingleZone:Humidity:Minimum"[[1]]$value()
+        idfVU$"SetpointManager:SingleZone:Humidity:Minimum"$object(1L)$value(),
+        idfTR$"SetpointManager:SingleZone:Humidity:Minimum"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"SetpointManager:SingleZone:Humidity:Maximum"[[1]]$value(),
-        idfTR$"SetpointManager:SingleZone:Humidity:Maximum"[[1]]$value()
+        idfVU$"SetpointManager:SingleZone:Humidity:Maximum"$object(1L)$value(),
+        idfTR$"SetpointManager:SingleZone:Humidity:Maximum"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"AirTerminal:SingleDuct:VAV:Reheat"[[1]]$value(1:18),
-        idfTR$"AirTerminal:SingleDuct:VAV:Reheat"[[1]]$value()
+        idfVU$"AirTerminal:SingleDuct:VAV:Reheat"$object(1L)$value(1:18),
+        idfTR$"AirTerminal:SingleDuct:VAV:Reheat"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Branch"[[1]]$value(1:6),
-        idfTR$"Branch"[[1]]$value()
+        idfVU$"Branch"$object(1L)$value(1:6),
+        idfTR$"Branch"$object(1L)$value()
     )
 
     expect_equal(
@@ -1015,13 +1015,13 @@ test_that("Transition v8.5 --> v8.6", {
     )
 
     expect_equal(
-        idfVU$"OtherEquipment"[[1]]$value(),
-        idfTR$"OtherEquipment"[[1]]$value()
+        idfVU$"OtherEquipment"$object(1L)$value(),
+        idfTR$"OtherEquipment"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Coil:Heating:Fuel"[[1]]$value(1:7),
-        idfTR$"Coil:Heating:Fuel"[[1]]$value()
+        idfVU$"Coil:Heating:Fuel"$object(1L)$value(1:7),
+        idfTR$"Coil:Heating:Fuel"$object(1L)$value()
     )
 
     expect_equal(
@@ -1091,14 +1091,14 @@ test_that("Transition v8.5 --> v8.6", {
     )
 
     expect_equal(
-        idfVU$"EnergyManagementSystem:Actuator"[[1]]$value(),
-        idfTR$"EnergyManagementSystem:Actuator"[[1]]$value()
+        idfVU$"EnergyManagementSystem:Actuator"$object(1L)$value(),
+        idfTR$"EnergyManagementSystem:Actuator"$object(1L)$value()
     )
 
     expect_equal(
         tolerance = 1e-4,
-        idfVU$"MaterialProperty:MoisturePenetrationDepth:Settings"[[1]]$value(),
-        idfTR$"MaterialProperty:MoisturePenetrationDepth:Settings"[[1]]$value()
+        idfVU$"MaterialProperty:MoisturePenetrationDepth:Settings"$object(1L)$value(),
+        idfTR$"MaterialProperty:MoisturePenetrationDepth:Settings"$object(1L)$value()
     )
 
     # NOTE: VersionUpdater will crash if no matched material found for
@@ -1182,13 +1182,13 @@ test_that("Transition v8.6 --> v8.7", {
     )
 
     expect_equal(
-        idfVU$"ZoneCapacitanceMultiplier:ResearchSpecial"[[1]]$value(),
-        idfTR$"ZoneCapacitanceMultiplier:ResearchSpecial"[[1]]$value()
+        idfVU$"ZoneCapacitanceMultiplier:ResearchSpecial"$object(1L)$value(),
+        idfTR$"ZoneCapacitanceMultiplier:ResearchSpecial"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"WaterHeater:HeatPump:WrappedCondenser"[[1]]$value(1:37),
-        idfTR$"WaterHeater:HeatPump:WrappedCondenser"[[1]]$value()
+        idfVU$"WaterHeater:HeatPump:WrappedCondenser"$object(1L)$value(1:37),
+        idfTR$"WaterHeater:HeatPump:WrappedCondenser"$object(1L)$value()
     )
 
     expect_equal(
@@ -1244,8 +1244,8 @@ test_that("Transition v8.7 --> v8.8", {
     expect_warning(expect_warning(idfTR <- transition(idfOri, to), "'SurfaceProperty:ExposedFoundationPerimeter'"))
 
     expect_equal(
-        idfVU$"Output:Surfaces:List"[[1]]$value(1),
-        idfTR$"Output:Surfaces:List"[[1]]$value()
+        idfVU$"Output:Surfaces:List"$object(1L)$value(1),
+        idfTR$"Output:Surfaces:List"$object(1L)$value()
     )
 
     expect_equal(
@@ -1266,12 +1266,12 @@ test_that("Transition v8.7 --> v8.8", {
     # )
 
     expect_equal(
-        idfVU$"SurfaceProperty:ExposedFoundationPerimeter"[[1]]$value(1:14),
-        idfTR$"SurfaceProperty:ExposedFoundationPerimeter"[[1]]$value(1:14)
+        idfVU$"SurfaceProperty:ExposedFoundationPerimeter"$object(1L)$value(1:14),
+        idfTR$"SurfaceProperty:ExposedFoundationPerimeter"$object(1L)$value(1:14)
     )
     expect_equal(
-        idfVU$"SurfaceProperty:ExposedFoundationPerimeter"[[2]]$value(1:14),
-        idfTR$"SurfaceProperty:ExposedFoundationPerimeter"[[2]]$value(1:14)
+        idfVU$"SurfaceProperty:ExposedFoundationPerimeter"$object(2L)$value(1:14),
+        idfTR$"SurfaceProperty:ExposedFoundationPerimeter"$object(2L)$value(1:14)
     )
 
     expect_equal(
@@ -1356,54 +1356,54 @@ test_that("Transition v8.8 --> v8.9", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"ZoneHVAC:EquipmentList"[[1]]$value(1:6),
-        idfTR$"ZoneHVAC:EquipmentList"[[1]]$value()
+        idfVU$"ZoneHVAC:EquipmentList"$object(1L)$value(1:6),
+        idfTR$"ZoneHVAC:EquipmentList"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"GroundHeatExchanger:System"[[1]]$value(),
-        idfTR$"GroundHeatExchanger:System"[[1]]$value()
+        idfVU$"GroundHeatExchanger:System"$object(1L)$value(),
+        idfTR$"GroundHeatExchanger:System"$object(1L)$value()
     )
 
     expect_equal(
         tolerance = 1e-5,
-        idfVU$"GroundHeatExchanger:Vertical:Properties"[[1]]$value(),
-        idfTR$"GroundHeatExchanger:Vertical:Properties"[[1]]$value()
+        idfVU$"GroundHeatExchanger:Vertical:Properties"$object(1L)$value(),
+        idfTR$"GroundHeatExchanger:Vertical:Properties"$object(1L)$value()
     )
     expect_equal(
         tolerance = 1e-5,
-        idfVU$"GroundHeatExchanger:ResponseFactors"[[1]]$value(1:74),
-        idfTR$"GroundHeatExchanger:ResponseFactors"[[1]]$value(1:74)
+        idfVU$"GroundHeatExchanger:ResponseFactors"$object(1L)$value(1:74),
+        idfTR$"GroundHeatExchanger:ResponseFactors"$object(1L)$value(1:74)
     )
 
     expect_equal(
-        idfVU$"Branch"[[1]]$value(1:6),
-        idfTR$"Branch"[[1]]$value()
+        idfVU$"Branch"$object(1L)$value(1:6),
+        idfTR$"Branch"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"CondenserEquipmentList"[[1]]$value(1:3),
-        idfTR$"CondenserEquipmentList"[[1]]$value()
+        idfVU$"CondenserEquipmentList"$object(1L)$value(1:3),
+        idfTR$"CondenserEquipmentList"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ElectricEquipment:ITE:AirCooled"[[1]]$value(),
-        idfTR$"ElectricEquipment:ITE:AirCooled"[[1]]$value()
+        idfVU$"ElectricEquipment:ITE:AirCooled"$object(1L)$value(),
+        idfTR$"ElectricEquipment:ITE:AirCooled"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Schedule:Day:Interval"[[1]]$value(1:5),
-        idfTR$"Schedule:Day:Interval"[[1]]$value()
+        idfVU$"Schedule:Day:Interval"$object(1L)$value(1:5),
+        idfTR$"Schedule:Day:Interval"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Schedule:Day:List"[[1]]$value(1:5),
-        idfTR$"Schedule:Day:List"[[1]]$value()
+        idfVU$"Schedule:Day:List"$object(1L)$value(1:5),
+        idfTR$"Schedule:Day:List"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Schedule:Compact"[[1]]$value(1:5),
-        idfTR$"Schedule:Compact"[[1]]$value()
+        idfVU$"Schedule:Compact"$object(1L)$value(1:5),
+        idfTR$"Schedule:Compact"$object(1L)$value()
     )
 })
 # }}}
@@ -1443,28 +1443,28 @@ test_that("Transition v8.9 --> v9.0", {
     expect_warning(expect_warning(idfTR <- transition(idfOri, to), "UseWeatherFile"))
 
     expect_equal(
-        idfVU$"AirflowNetwork:Distribution:Component:OutdoorAirFlow"[[1]]$value(1:4),
-        idfTR$"AirflowNetwork:Distribution:Component:OutdoorAirFlow"[[1]]$value()
+        idfVU$"AirflowNetwork:Distribution:Component:OutdoorAirFlow"$object(1L)$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Component:OutdoorAirFlow"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"AirflowNetwork:Distribution:Component:ReliefAirFlow"[[1]]$value(1:4),
-        idfTR$"AirflowNetwork:Distribution:Component:ReliefAirFlow"[[1]]$value()
+        idfVU$"AirflowNetwork:Distribution:Component:ReliefAirFlow"$object(1L)$value(1:4),
+        idfTR$"AirflowNetwork:Distribution:Component:ReliefAirFlow"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Boiler:HotWater"[[1]]$value(),
-        idfTR$"Boiler:HotWater"[[1]]$value()
+        idfVU$"Boiler:HotWater"$object(1L)$value(),
+        idfTR$"Boiler:HotWater"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"FenestrationSurface:Detailed"[[1]]$value(1:18),
-        idfTR$"FenestrationSurface:Detailed"[[1]]$value()
+        idfVU$"FenestrationSurface:Detailed"$object(1L)$value(1:18),
+        idfTR$"FenestrationSurface:Detailed"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"GlazedDoor"[[1]]$value(1:5),
-        idfTR$"GlazedDoor"[[1]]$value()
+        idfVU$"GlazedDoor"$object(1L)$value(1:5),
+        idfTR$"GlazedDoor"$object(1L)$value()
     )
 
     expect_equal(
@@ -1485,23 +1485,23 @@ test_that("Transition v8.9 --> v9.0", {
     )
 
     expect_equal(
-        idfVU$"Table:OneIndependentVariable"[[1]]$value(1:14),
-        idfTR$"Table:OneIndependentVariable"[[1]]$value()
+        idfVU$"Table:OneIndependentVariable"$object(1L)$value(1:14),
+        idfTR$"Table:OneIndependentVariable"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"WindowMaterial:ComplexShade"[[1]]$value(),
-        idfTR$"WindowMaterial:ComplexShade"[[1]]$value()
+        idfVU$"WindowMaterial:ComplexShade"$object(1L)$value(),
+        idfTR$"WindowMaterial:ComplexShade"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Window"[[1]]$value(1:5),
-        idfTR$"Window"[[1]]$value()
+        idfVU$"Window"$object(1L)$value(1:5),
+        idfTR$"Window"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"WindowShadingControl"[[1]]$value(),
-        idfTR$"WindowShadingControl"[[1]]$value()
+        idfVU$"WindowShadingControl"$object(1L)$value(),
+        idfTR$"WindowShadingControl"$object(1L)$value()
     )
 })
 # }}}
@@ -1524,13 +1524,13 @@ test_that("Transition v9.0 --> v9.1", {
     expect_s3_class(idfTR <- transition(idfOri, to), "Idf")
 
     expect_equal(
-        idfVU$"HybridModel:Zone"[[1]]$value(),
-        idfTR$"HybridModel:Zone"[[1]]$value()
+        idfVU$"HybridModel:Zone"$object(1L)$value(),
+        idfTR$"HybridModel:Zone"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"ZoneHVAC:EquipmentList"[[1]]$value(1:8),
-        idfTR$"ZoneHVAC:EquipmentList"[[1]]$value()
+        idfVU$"ZoneHVAC:EquipmentList"$object(1L)$value(1:8),
+        idfTR$"ZoneHVAC:EquipmentList"$object(1L)$value()
     )
 })
 # }}}
@@ -1685,18 +1685,18 @@ test_that("Transition v9.1 --> v9.2", {
     suppressWarnings(expect_warning(idfTR <- transition(idfOri, to), "comments"))
 
     expect_equal(
-        idfVU$"Foundation:Kiva"[[1]]$value(1),
-        idfTR$"Foundation:Kiva"[[1]]$value()
+        idfVU$"Foundation:Kiva"$object(1L)$value(1),
+        idfTR$"Foundation:Kiva"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"RunPeriod"[[1]]$value(),
-        idfTR$"RunPeriod"[[1]]$value()
+        idfVU$"RunPeriod"$object(1L)$value(),
+        idfTR$"RunPeriod"$object(1L)$value()
     )
 
     expect_equal(
-        idfVU$"Schedule:File"[[1]]$value()[-3],
-        idfTR$"Schedule:File"[[1]]$value()[-3]
+        idfVU$"Schedule:File"$object(1L)$value()[-3],
+        idfTR$"Schedule:File"$object(1L)$value()[-3]
     )
 
     expect_equal(
@@ -1796,8 +1796,8 @@ test_that("Transition v9.1 --> v9.2", {
     )
 
     expect_equal(
-        idfVU$"ScheduleTypeLimits"[[1]]$value()[-1],
-        idfTR$"ScheduleTypeLimits"[[1]]$value()[-1]
+        idfVU$"ScheduleTypeLimits"$object(1L)$value()[-1],
+        idfTR$"ScheduleTypeLimits"$object(1L)$value()[-1]
     )
 
     expect_equal(
@@ -2442,8 +2442,8 @@ test_that("Transition v9.5 --> v9.6", {
     )
 
     expect_equal(
-        idfVU$"Sizing:System"[[1]]$value(),
-        idfTR$"Sizing:System"[[1]]$value()
+        idfVU$"Sizing:System"$object(1L)$value(),
+        idfTR$"Sizing:System"$object(1L)$value()
     )
 
     expect_equal(
@@ -2662,8 +2662,8 @@ test_that("Transition v22.1 --> v22.2", {
     )
 
     expect_equal(
-        idfVU$FuelFactors[[1]]$value(),
-        idfTR$FuelFactors[[1]]$value()
+        idfVU$FuelFactors$object(1L)$value(),
+        idfTR$FuelFactors$object(1L)$value()
     )
 
     expect_equal(
@@ -2789,8 +2789,8 @@ test_that("Transition v23.1 --> v23.2", {
     expect_equal(idfTR$`Coil:Cooling:DX:SingleSpeed`$CDXS$value(29)[[1L]], "SupplyTank")
 
     expect_equal(idfTR$object_name("Curve:Linear", simplify = TRUE), curve_name)
-    expect_equal(idfTR$`Curve:Linear`[[curve_name]]$value(1)[[1L]], curve_name)
-    expect_equal(unname(unlist(idfTR$`Curve:Linear`[[curve_name]]$value(2:3))), c(0.7396, 0.26039))
+    expect_equal(idfTR$`Curve:Linear`$object(curve_name)$value(1)[[1L]], curve_name)
+    expect_equal(unname(unlist(idfTR$`Curve:Linear`$object(curve_name)$value(2:3))), c(0.7396, 0.26039))
 
     expect_equal(idfTR$`Coil:Cooling:WaterToAirHeatPump:EquationFit`$CWAHP$value(17)[[1L]], curve_name)
     expect_equal(
@@ -2993,7 +2993,7 @@ test_that("Transition v24.1 --> v24.2", {
     )
 
     expect_equal(
-        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        idfTR$`Output:Variable`$object(1L)$value(2)[[1L]],
         "Enclosure Windows Total Transmitted Solar Radiation Rate"
     )
 })
@@ -3028,7 +3028,7 @@ test_that("Transition v24.2 --> v25.1", {
     expect_equal(idfTR$version(), numeric_version("25.1.0"))
 
     expect_equal(
-        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        idfTR$`Output:Variable`$object(1L)$value(2)[[1L]],
         "Infiltration Current Density Air Change Rate"
     )
     expect_equal(
@@ -3121,7 +3121,7 @@ test_that("Transition v25.1 --> v25.2", {
     expect_equal(idfTR$`GroundHeatExchanger:System`$GHES2$value(14)[[1L]], "Single1")
 
     expect_equal(
-        idfTR$`Output:Variable`[[1]]$value(2)[[1L]],
+        idfTR$`Output:Variable`$object(1L)$value(2)[[1L]],
         "Hot Water Thermal Storage Tank Final Tank Temperature"
     )
 })
@@ -3175,7 +3175,7 @@ test_that("Transition v25.2 --> v26.1", {
     expect_equal(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value(18)[[1L]], "Modulated")
     expect_false("Deleted Reheat Coil Inlet" %in% unlist(idfTR$`AirTerminal:SingleDuct:SeriesPIU:Reheat`$SeriesPIU$value()))
 
-    expect_equal(idfTR$`Output:Variable`[[1]]$value(2)[[1L]], "Zone Air Temperature")
+    expect_equal(idfTR$`Output:Variable`$object(1L)$value(2)[[1L]], "Zone Air Temperature")
 })
 # }}}
 

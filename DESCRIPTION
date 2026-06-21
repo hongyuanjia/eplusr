@@ -70,6 +70,7 @@ Collate:
     'idfobj-sch.R'
     'impl-idfobj.R'
     'idfobj.R'
+    'idfobjects.R'
     'impl-geom.R'
     'impl-iddobj.R'
     'impl-idfobj-sch.R'
