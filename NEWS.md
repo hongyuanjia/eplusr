@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## New features
+
+* Add a lazy `IdfObjects` collection for methods that return multiple
+  `IdfObject`s, with collection-level printing and extraction helpers (#627).
+
 ## Internal refactor
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and

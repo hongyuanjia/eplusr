@@ -2,7 +2,7 @@
 % Please edit documentation in R/impl-idf.R
 \name{expand_idf_dots_object}
 \alias{expand_idf_dots_object}
-\title{Parse object values given in a list of Idf or IdfObject format}
+\title{Parse object values given in a list of Idf, IdfObject, or IdfObjects format}
 \usage{
 expand_idf_dots_object(
   idd_env,
@@ -21,7 +21,7 @@ field, and reference.}
 \item{idf_env}{An environment or list contains IDF tables including object,
 value, and reference.}
 
-\item{...}{Lists of \link{Idf}s or \link{IdfObject}s.}
+\item{...}{Lists of \link{Idf}s, \link{IdfObject}s, or \link{IdfObjects}.}
 
 \item{.unique}{If \code{TRUE}, make sure there are no duplicated objects in the
 input. If \code{FALSE}, duplicates are kept. If \code{NULL}, duplicates are
@@ -41,6 +41,6 @@ A named list of 3 \code{\link[data.table:data.table]{data.table::data.table()}}:
 \code{value}.
 }
 \description{
-Parse object values given in a list of Idf or IdfObject format
+Parse object values given in a list of Idf, IdfObject, or IdfObjects format
 }
 \keyword{internal}

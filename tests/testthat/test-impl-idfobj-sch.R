@@ -295,22 +295,22 @@ test_that("get_sch_type_limits()", {
         list(name = "Fraction", range = ranger(0, TRUE, 1, TRUE))
     )
 
-    expect_s3_class(obj <- idf$add(ScheduleTypeLimits = list("lim"))[[1L]], "IdfObject")
+    expect_s3_class(obj <- idf$add(ScheduleTypeLimits = list("lim"))$object(1L), "IdfObject")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim"),
         list(name = "lim", range = ranger())
     )
 
     idf$definition("ScheduleTypeLimits")
-    expect_type(idf$add(ScheduleTypeLimits = list("lim1", ..4 = "discrete")), "list")
+    expect_s3_class(idf$add(ScheduleTypeLimits = list("lim1", ..4 = "discrete")), "IdfObjects")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim1"), list(name = "lim1", range = list()))
 
-    expect_type(idf$add(ScheduleTypeLimits = list("lim2", 1, 5, "discrete")), "list")
+    expect_s3_class(idf$add(ScheduleTypeLimits = list("lim2", 1, 5, "discrete")), "IdfObjects")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim2"), list(name = "lim2", range = 1:5))
 
-    expect_type(idf$add(ScheduleTypeLimits = list("lim3", 2, 1, "discrete")), "list")
+    expect_s3_class(idf$add(ScheduleTypeLimits = list("lim3", 2, 1, "discrete")), "IdfObjects")
     expect_error(get_sch_type_limits(idd_env, idf_env, "lim3"), class = "eplusr_error_idfschcmpt_typelimit")
 
-    expect_type(without_checking(idf$add(ScheduleTypeLimits = list("lim4", 1, 2, "integer"))), "list")
+    expect_s3_class(without_checking(idf$add(ScheduleTypeLimits = list("lim4", 1, 2, "integer"))), "IdfObjects")
     expect_equal(get_sch_type_limits(idd_env, idf_env, "lim4"), list(name = "lim4", range = list()))
 })
 # }}}

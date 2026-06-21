@@ -8,6 +8,7 @@
 \alias{is_idf}
 \alias{is_iddobject}
 \alias{is_idfobject}
+\alias{is_idfobjects}
 \alias{is_epw}
 \title{Check for Idd, Idf and Epw objects}
 \usage{
@@ -24,6 +25,8 @@ is_idf(x)
 is_iddobject(x)
 
 is_idfobject(x)
+
+is_idfobjects(x)
 
 is_epw(x)
 }
@@ -62,6 +65,8 @@ file.
 
 \code{is_idfobject()} returns \code{TRUE} if input is an IdfObject object.
 
+\code{is_idfobjects()} returns \code{TRUE} if input is an IdfObjects object.
+
 \code{is_epw()} returns \code{TRUE} if input is an Epw object.
 }
 \examples{
@@ -85,6 +90,8 @@ is_idf(idf)
 is_iddobject(idd_object("8.8", "Version"))
 
 is_idfobject(idf_object(idf, 1))
+
+is_idfobjects(idf$objects(1:2))
 
 is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 }

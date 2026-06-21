@@ -50,8 +50,8 @@ test_that("IdfViewer class", {
     expect_null(viewer$show(zone = "Zone 1"))
     expect_null(viewer$show(zone = "Zone 2"))
     expect_null(viewer$show(zone = "Zone"))
-    expect_null(viewer$show(zone = "Zone 1", surface = names(idf$Window)))
-    expect_null(viewer$show(surface = names(idf$Window)))
+    expect_null(viewer$show(zone = "Zone 1", surface = idf$Window$object_name()))
+    expect_null(viewer$show(surface = idf$Window$object_name()))
 
     expect_type(f <- viewer$snapshot(tempfile(fileext = ".pdf")), "character")
     expect_true(file.exists(f))

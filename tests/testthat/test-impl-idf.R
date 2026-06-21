@@ -1503,6 +1503,12 @@ test_that("OBJECT DOTS", {
     expect_equal(nrow(l$object), 2L)
     expect_equal(nrow(l$value), 2L)
 
+    # can extract IdfObjects without first materializing IdfObject lists
+    expect_s3_class(objs <- idf$objects_in_class("Material:NoMass"), "IdfObjects")
+    expect_type(l <- expand_idf_dots_object(idd_env, idf_env, objs), "list")
+    expect_equal(l$object$object_id, objs$id())
+    expect_equal(unique(l$value$object_id), objs$id())
+
     # can stop if version is not the same
     skip_on_cran()
 

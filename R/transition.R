@@ -873,8 +873,9 @@ trans_funs$f830t840 <- function(idf) {
             value[36L] <- NA_character_
 
             if (heater_num > 0L) {
-                tank <- with_silent(idf$object(.BY$id)$ref_to_object(18L)[[1L]])
-                if (length(tank)) {
+                tank <- with_silent(idf$object(.BY$id)$ref_to_object(18L))
+                if (tank$length()) {
+                    tank <- tank$object(1L)
                     if (stri_trans_tolower(tank$class_name()) == "waterheater:stratified") {
                         if (heater_num == 1L) {
                             value[37L] <- as.character(tank$Heater_1_Height)
@@ -984,8 +985,9 @@ trans_funs$f830t840 <- function(idf) {
         dt12_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
         dt12_2[J(c(2L:4L)), on = "index", value := {
             # get material properties
-            mat <- with_silent(idf$object(.BY$id)$ref_to_object(8L, "Material")[[1L]])
-            if (length(mat)) {
+            mat <- with_silent(idf$object(.BY$id)$ref_to_object(8L, "Material"))
+            if (mat$length()) {
+                mat <- mat$object(1L)
                 value <- mat$value(simplify = TRUE)[2L:4L]
             }
             value
@@ -1287,8 +1289,8 @@ trans_funs$f850t860 <- function(idf) {
         dt15 <- dt15[index <= 5L]
         nm_zone <- vcapply(unique(dt15$id),
             function(id) {
-                zone <- with_silent(idf$object(id)$ref_to_object(2L, class = "Zone", depth = NULL)[[1L]])
-                if (!length(zone)) NA_character_ else zone$value(2)[[1L]]
+                zone <- with_silent(idf$object(id)$ref_to_object(2L, class = "Zone", depth = NULL))
+                if (!zone$length()) NA_character_ else zone$object(1L)$value(2)[[1L]]
             }
         )
         dt15[J(2L), on = "index", value := nm_zone]
@@ -1327,10 +1329,10 @@ trans_funs$f850t860 <- function(idf) {
         dt16_2 <- lapply(unique(dt16_1$id),
             function(id) {
                 refp <- with_silent(idf$object(id)$ref_by_object(1L, class = "Daylighting:DELight:ReferencePoint"))
-                if (!length(refp)) {
+                if (!refp$length()) {
                     data.table()
                 } else {
-                    dt <- rbindlist(lapply(refp, function(x) x$to_table(all = TRUE)))[index %in% c(1L, 6L, 7L)]
+                    dt <- rbindlist(lapply(refp$objects(), function(x) x$to_table(all = TRUE)))[index %in% c(1L, 6L, 7L)]
                     # update object id
                     set(dt, NULL, "id", id)
                     set(dt, NULL, "class", "Daylighting:Controls")
@@ -1392,8 +1394,9 @@ trans_funs$f850t860 <- function(idf) {
                 value[7L] <- value[2L]
 
                 # get material density
-                mat <- with_silent(idf$object(.BY$id)$ref_to_object(1L, "Material")[[1L]])
-                if (length(mat)) {
+                mat <- with_silent(idf$object(.BY$id)$ref_to_object(1L, "Material"))
+                if (mat$length()) {
+                    mat <- mat$object(1L)
                     den <- mat$Density
                 } else {
                     warn(paste0(
@@ -1609,9 +1612,9 @@ trans_funs$f870t880 <- function(idf) {
             # if not, give a warning and add one
             dt3 <- rbindlist(lapply(obj_id,
                 function(i) {
-                    perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
+                    perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter"))
 
-                    if (length(perim)) return(data.table())
+                    if (perim$length()) return(data.table())
 
                     dt <- dt3[J(i), on = "id"]
                     n <- ceiling((nrow(dt) - 10L) / 3L)
@@ -1652,9 +1655,9 @@ trans_funs$f870t880 <- function(idf) {
             # if not, give a warning and add one
             dt4 <- rbindlist(lapply(obj_id,
                 function(i) {
-                    perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
+                    perim <- with_silent(idf$object(i)$ref_by_object(1L, class = "SurfaceProperty:ExposedFoundationPerimeter"))
 
-                    if (length(perim)) return(data.table())
+                    if (perim$length()) return(data.table())
                     dt <- dt4[J(i), on = "id"]
                     n <- ceiling((nrow(dt) - 9L) / 3L)
                     dt <- dt[index <= 4L + n]
@@ -2137,20 +2140,21 @@ trans_funs$f890t900 <- function(idf) {
         shadctrl <- idf$objects_in_class("WindowProperty:ShadingControl")
 
         # get zone that is being controled {{{
-        fene_daylight_zone <- lapply(shadctrl,
+        fene_daylight_zone <- lapply(shadctrl$objects(),
             function(ctrl) {
                 # get all fenestrations that uses this control
                 fene <- with_silent(ctrl$ref_by_object("Name",
                     class = c("FenestrationSurface:Detailed", "Window", "GlazedDoor")
                 ))
 
-                if (!length(fene)) {
+                if (!fene$length()) {
                     data.table(id_ctrl = ctrl$id(), name_ctrl = ctrl$name(),
                         id_fene = NA_integer_, name_fene = NA_character_,
                         id_zone = NA_integer_, name_zone = NA_character_,
                         id_daylgt = NA_integer_, name_daylgt = NA_character_
                     )
                 } else {
+                    fene <- fene$objects()
                     # use low-level API to speed up
                     fene <- data.table(id_fene = viapply(fene, function(f) f$id()), name_fene = names(fene))
 

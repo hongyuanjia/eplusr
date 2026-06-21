@@ -1471,12 +1471,12 @@ For details on field value relations, see
 \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
 
 \verb{$ref_to_object()} takes an integer vector of field indexes or a
-character vector of field names, and returns a list of \code{IdfObject}s
-that specified fields refer to.
+character vector of field names, and returns an \link{IdfObjects}
+collection that specified fields refer to.
 }
 
 \subsection{Returns}{
-A named list of \code{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1557,12 +1557,12 @@ For details on field value relations, see
 \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
 
 \verb{$ref_by_object()} takes an integer vector of field indexes or a
-character vector of field names, and returns a list of \code{IdfObject}s
-that refer to specified fields.
+character vector of field names, and returns an \link{IdfObjects}
+collection that refer to specified fields.
 }
 
 \subsection{Returns}{
-A named list of \code{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1620,12 +1620,12 @@ For details on field value relations, see
 \href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
 
 \verb{$ref_to_node()} takes an integer vector of field indexes or a
-character vector of field names, and returns a list of \code{IdfObject}s
-whose nodes are referred by specified fields.
+character vector of field names, and returns an \link{IdfObjects}
+collection whose nodes are referred by specified fields.
 }
 
 \subsection{Returns}{
-A named list of \code{IdfObject} objects.
+An \link{IdfObjects} collection.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
