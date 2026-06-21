@@ -222,7 +222,7 @@ Epw <- R6::R6Class(classname = "Epw",
             private$m_log$unsaved <- FALSE
             private$m_log$uuid <- unique_id()
             private$m_log$order <- private$m_idf_env$object[, list(object_id)][
-                , object_order := 0L]
+                , `:=`(object_order = 0L, object_rank = seq_len(.N))]
         },
         # }}}
 

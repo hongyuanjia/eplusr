@@ -118,6 +118,17 @@ keep_same_cols <- function(base, dt) {
 # }}}
 
 # LOG
+# log_ensure_order_rank {{{
+log_ensure_order_rank <- function(log) {
+    if (is.null(log$order)) return(invisible(log))
+
+    if (!has_names(log$order, "object_rank")) {
+        set(log$order, NULL, "object_rank", seq_len(nrow(log$order)))
+    }
+
+    invisible(log)
+}
+# }}}
 # log_new_uuid {{{
 log_new_uuid <- function(log) {
     log$uuid <- unique_id()
@@ -125,17 +136,33 @@ log_new_uuid <- function(log) {
 # }}}
 # log_new_order {{{
 log_new_order <- function(log, id) {
-    log$order <- append_dt(log$order, data.table(object_id = id, object_order = 1L, "object_id"))
+    log_ensure_order_rank(log)
+
+    rank <- if (nrow(log$order)) max(log$order$object_rank) else 0L
+    log$order <- append_dt(log$order, data.table(
+        object_id = id, object_order = 1L, object_rank = rank + seq_along(id)
+    ), "object_id")
 }
 # }}}
 # log_add_order {{{
 log_add_order <- function(log, id) {
+    log_ensure_order_rank(log)
     log$order[J(id), on = "object_id", object_order := object_order + 1L]
 }
 # }}}
 # log_del_order {{{
 log_del_order <- function(log, id) {
+    log_ensure_order_rank(log)
     log$order <- log$order[!J(id), on = "object_id"]
+}
+# }}}
+# log_reorder {{{
+log_reorder <- function(log, id) {
+    log_ensure_order_rank(log)
+
+    rank <- sort(log$order[J(id), on = "object_id", object_rank])
+    log$order[data.table(object_id = id, object_rank = rank),
+        on = "object_id", object_rank := i.object_rank]
 }
 # }}}
 # log_unsaved {{{

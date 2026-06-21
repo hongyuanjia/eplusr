@@ -84,15 +84,44 @@ test_that("Basic Table Implementation", {
     expect_silent(log_new_uuid(log))
     expect_equal(nchar(log$uuid), 2 + 1 + 10 + 1 + 10)
 
-    log$order <- data.table(object_id = 1:5, object_order = 0L)
+    log$order <- data.table(object_id = 1:5, object_order = 0L, object_rank = 1:5)
     expect_silent(log_new_order(log, 6L))
-    expect_equal(log$order, data.table(object_id = 1:6, object_order = c(rep(0L, 5), 1L)))
+    expect_equal(log$order, data.table(
+        object_id = 1:6,
+        object_order = c(rep(0L, 5), 1L),
+        object_rank = 1:6
+    ))
 
     expect_silent(log_add_order(log, 6L))
-    expect_equal(log$order[.N], data.table(object_id = 6L, object_order = 2L))
+    expect_equal(log$order[.N], data.table(object_id = 6L, object_order = 2L, object_rank = 6L))
+
+    expect_silent(log_reorder(log, c(4L, 1L)))
+    expect_equal(log$order[J(c(1L, 4L)), on = "object_id", object_rank], c(4L, 1L))
 
     expect_silent(log_del_order(log, 6L))
-    expect_equal(log$order, data.table(object_id = 1:5, object_order = 0L))
+    expect_equal(log$order, data.table(
+        object_id = 1:5,
+        object_order = 0L,
+        object_rank = c(4L, 2L, 3L, 1L, 5L)
+    ))
+
+    log <- new.env(parent = emptyenv())
+    expect_silent(log_ensure_order_rank(log))
+    expect_null(log$order)
+    log$unsaved <- NA
+
+    log$order <- data.table(object_id = 1:5, object_order = 0L)
+    expect_silent(log_ensure_order_rank(log))
+    expect_equal(log$order$object_rank, 1:5)
+
+    dt_object <- data.table(object_id = c(2L, 1L))
+    expect_silent(add_idf_object_rank(dt_object))
+    expect_equal(dt_object$object_rank, c(2L, 1L))
+
+    dt_object <- data.table(object_id = c(2L, 1L))
+    expect_silent(add_idf_object_rank(dt_object,
+        data.table(object_id = 1:2, object_order = 0L)))
+    expect_equal(dt_object$object_rank, c(2L, 1L))
 
     expect_silent(log_unsaved(log))
     expect_equal(log$unsaved, TRUE)

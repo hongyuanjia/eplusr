@@ -44,6 +44,7 @@ reload_idf_env <- function (idf_env) {
 }
 reload_log_env <- function (log_env) {
     log_env$order <- setDT(log_env$order)
+    log_ensure_order_rank(log_env)
     log_env
 }
 

@@ -307,6 +307,43 @@ test_that("$objects_in_class()", {
 })
 # }}}
 
+# REORDER {{{
+test_that("$reorder()", {
+    skip_on_cran()
+    expect_s3_class(idf <- read_idf(idftext("idf", LATEST_EPLUS_VER)), "Idf")
+
+    mat <- idf$object("WD01")
+    uuid <- get_priv_env(idf)$m_log$uuid
+    expect_false(idf$is_unsaved())
+
+    expect_silent(noop <- idf$reorder("Material", c("WD01", "WD02")))
+    expect_identical(noop, idf)
+    expect_false(idf$is_unsaved())
+    expect_equal(get_priv_env(idf)$m_log$uuid, uuid)
+
+    expect_silent(idf$reorder("Material", c("WD02", "WD01")))
+    expect_true(idf$is_unsaved())
+    expect_false(identical(get_priv_env(idf)$m_log$uuid, uuid))
+    expect_equal(idf$object_id("Material", simplify = TRUE), c(4L, 1L))
+    expect_equal(idf$object_name("Material", simplify = TRUE), c("WD02", "WD01"))
+    expect_equal(names(idf$objects_in_class("Material")), c("WD02", "WD01"))
+    expect_equal(unique(idf$to_table(class = "Material")$name), c("WD02", "WD01"))
+
+    str <- idf$to_string(class = "Material", comment = FALSE, header = FALSE)
+    expect_lt(grep("WD02", str, fixed = TRUE)[[1L]], grep("WD01", str, fixed = TRUE)[[1L]])
+
+    expect_equal(mat$id(), 1L)
+    expect_equal(mat$name(), "WD01")
+
+    expect_silent(idf$reorder("Material", c(1L, 4L)))
+    expect_equal(idf$object_name("Material", simplify = TRUE), c("WD01", "WD02"))
+
+    expect_error(idf$reorder("Material", "WD01"), "must include all objects")
+    expect_error(idf$reorder("Material", c("WD01", "WD01")), "duplicated objects")
+    expect_error(idf$reorder("Construction", c("WD02", "WD01")), class = "eplusr_error")
+})
+# }}}
+
 # OBJECTS_IN_GROUP {{{
 test_that("$objects_in_group()", {
     skip_on_cran()

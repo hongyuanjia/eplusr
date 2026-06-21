@@ -303,6 +303,16 @@ idf[["Zone"]]
 
 
 ## ------------------------------------------------
+## Method `Idf$reorder`
+## ------------------------------------------------
+
+\dontrun{
+# reverse material order
+idf$reorder("Material", rev(idf$object_id("Material", simplify = TRUE)))
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$objects_in_group`
 ## ------------------------------------------------
 
@@ -889,6 +899,7 @@ Hongyuan Jia
 \item \href{#method-Idf-objects}{\code{Idf$objects()}}
 \item \href{#method-Idf-object_unique}{\code{Idf$object_unique()}}
 \item \href{#method-Idf-objects_in_class}{\code{Idf$objects_in_class()}}
+\item \href{#method-Idf-reorder}{\code{Idf$reorder()}}
 \item \href{#method-Idf-objects_in_group}{\code{Idf$objects_in_group()}}
 \item \href{#method-Idf-object_relation}{\code{Idf$object_relation()}}
 \item \href{#method-Idf-objects_in_relation}{\code{Idf$objects_in_relation()}}
@@ -1804,6 +1815,55 @@ idf$objects_in_class("Zone")
 # S3 "[[" and "$" can also be used
 idf$Zone
 idf[["Zone"]]
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Idf-reorder"></a>}}
+\if{latex}{\out{\hypertarget{method-Idf-reorder}{}}}
+\subsection{Method \code{reorder()}}{
+Reorder objects in a class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$reorder(class, object)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single string of valid class name for current \code{Idf}
+object.}
+
+\item{\code{object}}{An integer vector of object IDs or a character vector
+of object names in the target class. It must include all
+objects in \code{class} exactly once.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$reorder()} updates the display and saving order of objects in one
+class without changing object IDs. The input \code{object} should contain
+every object in the target class exactly once, in the desired order.
+
+The new order is reflected in \verb{$object_id()}, \verb{$object_name()},
+\verb{$objects_in_class()}, \verb{$to_table()}, \verb{$to_string()}, and \verb{$save()}.
+The existing \code{"new_top"} and \code{"new_bot"} saving formats still use
+their original new-or-modified object ordering before applying the
+class order.
+}
+
+\subsection{Returns}{
+The modified \code{Idf} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# reverse material order
+idf$reorder("Material", rev(idf$object_id("Material", simplify = TRUE)))
 }
 
 }

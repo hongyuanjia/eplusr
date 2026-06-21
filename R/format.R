@@ -185,9 +185,30 @@ format_idf <- function(
         ]
     }
 
+    if (!is.null(dt_order)) {
+        assert_data_frame(dt_order, any.missing = FALSE, min.cols = 2)
+        assert_names(names(dt_order), must.include = c("object_id", "object_order"))
+
+        dt_order <- copy(dt_order)
+        if (!has_names(dt_order, "object_rank")) {
+            set(dt_order, NULL, "object_rank", seq_len(nrow(dt_order)))
+        }
+
+        out[dt_order, on = "object_id", `:=`(
+            object_order = i.object_order,
+            object_rank = i.object_rank
+        )]
+    } else {
+        set(out, NULL, "object_rank", out$object_id)
+    }
+
+    if (anyNA(out$object_rank)) {
+        out[is.na(object_rank), object_rank := object_id]
+    }
+
     # object order {{{
     if (save_format == "sorted") {
-        setorderv(out, c("class_id", "object_id"))
+        setorderv(out, c("class_id", "object_rank", "object_id"))
         # nest by class
         out <- out[, list(class_name = class_name[[1L]],
             fmt = list(c(format_class_header(class_name[[1L]]), fmt))),
@@ -195,16 +216,14 @@ format_idf <- function(
         ]
     } else {
         if (!is.null(dt_order)) {
-            assert_data_frame(dt_order, any.missing = FALSE, min.cols = 2)
-            assert_names(names(dt_order), must.include = c("object_id", "object_order"))
-
-            out[dt_order, on = "object_id", object_order := i.object_order]
             if (save_format == "new_top") {
-                setorderv(out, c("object_order", "object_id"), c(-1L, 1L))
+                setorderv(out, c("object_order", "object_rank", "object_id"), c(-1L, 1L, 1L))
             } else {
-                setorderv(out, c("object_order", "object_id"), c(1L, 1L))
+                setorderv(out, c("object_order", "object_rank", "object_id"), c(1L, 1L, 1L))
             }
-            set(out, NULL, "object_order", NULL)
+            set(out, NULL, c("object_order", "object_rank"), NULL)
+        } else {
+            set(out, NULL, "object_rank", NULL)
         }
     }
     # }}}

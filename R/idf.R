@@ -133,7 +133,7 @@ Idf <- R6::R6Class(classname = "Idf",
 
             private$m_log$unsaved <- FALSE
             private$m_log$order <- private$m_idf_env$object[, list(object_id)][
-                , object_order := 0L]
+                , `:=`(object_order = 0L, object_rank = seq_len(.N))]
 
             private$m_log$view_in_ip <- eplusr_option("view_in_ip")
             private$m_log$save_format <- idf_file$options$save_format
@@ -711,6 +711,39 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         objects_in_class = function(class)
             idf_objects_in_class(self, private, class),
+        # }}}
+
+        # reorder {{{
+        #' @description
+        #' Reorder objects in a class
+        #'
+        #' @details
+        #' `$reorder()` updates the display and saving order of objects in one
+        #' class without changing object IDs. The input `object` should contain
+        #' every object in the target class exactly once, in the desired order.
+        #'
+        #' The new order is reflected in `$object_id()`, `$object_name()`,
+        #' `$objects_in_class()`, `$to_table()`, `$to_string()`, and `$save()`.
+        #' The existing `"new_top"` and `"new_bot"` saving formats still use
+        #' their original new-or-modified object ordering before applying the
+        #' class order.
+        #'
+        #' @param class A single string of valid class name for current `Idf`
+        #'        object.
+        #' @param object An integer vector of object IDs or a character vector
+        #'        of object names in the target class. It must include all
+        #'        objects in `class` exactly once.
+        #'
+        #' @return The modified `Idf` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # reverse material order
+        #' idf$reorder("Material", rev(idf$object_id("Material", simplify = TRUE)))
+        #' }
+        #'
+        reorder = function(class, object)
+            idf_reorder(self, private, class, object),
         # }}}
 
         # objects_in_group {{{
@@ -2733,6 +2766,7 @@ Idf <- R6::R6Class(classname = "Idf",
         log_new_order = function(id) log_new_order(private$m_log, id),
         log_add_order = function(id) log_add_order(private$m_log, id),
         log_del_order = function(id) log_del_order(private$m_log, id),
+        log_reorder = function(id) log_reorder(private$m_log, id),
 
         idd_env = function() get_priv_env(private$m_idd)$m_idd_env,
         idf_env = function() private$m_idf_env,
@@ -2804,12 +2838,14 @@ idf_class_name <- function(self, private, all = FALSE, sorted = TRUE, by_group =
 # }}}
 # idf_object_id {{{
 idf_object_id <- function(self, private, class = NULL, simplify = TRUE) {
-    get_idf_object_id(private$idd_env(), private$idf_env(), class, simplify)
+    get_idf_object_id(private$idd_env(), private$idf_env(), class, simplify,
+        private$m_log$order)
 }
 # }}}
 # idf_object_name {{{
 idf_object_name <- function(self, private, class = NULL, simplify = FALSE) {
-    get_idf_object_name(private$idd_env(), private$idf_env(), class, simplify)
+    get_idf_object_name(private$idd_env(), private$idf_env(), class, simplify,
+        dt_order = private$m_log$order)
 }
 # }}}
 # idf_object_num {{{
@@ -2931,8 +2967,49 @@ idf_objects <- function(self, private, which, class = NULL) {
 idf_objects_in_class <- function(self, private, class) {
     assert_valid_type(class, "Class Name", type = "name")
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
+    add_idf_object_rank(obj, private$m_log$order)
+    setorderv(obj, c("rleid", "object_rank", "object_id"))
+    set(obj, NULL, "object_rank", NULL)
 
     idf_return_matched(self, private, obj)
+}
+# }}}
+# idf_reorder {{{
+idf_reorder <- function(self, private, class, object) {
+    assert_valid_type(class, "Class Name", len = 1L, type = "name")
+    assert_valid_type(object, "Object ID|Name")
+
+    cls_obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
+    obj <- get_idf_object(private$idd_env(), private$idf_env(),
+        class = class, object = object, ignore_case = TRUE)
+
+    if (anyDuplicated(obj$object_id)) {
+        dup <- obj[duplicated(object_id) | duplicated(object_id, fromLast = TRUE)]
+        abort(paste0(
+            "Input 'object' contains duplicated objects:\n",
+            get_object_info(dup, collapse = "\n")
+        ))
+    }
+
+    if (!setequal(cls_obj$object_id, obj$object_id)) {
+        mis <- cls_obj[!J(obj$object_id), on = "object_id"]
+        abort(paste0(
+            "Input 'object' must include all objects in class ",
+            surround(unique(cls_obj$class_name)), " exactly once. Missing objects:\n",
+            get_object_info(mis, collapse = "\n")
+        ))
+    }
+
+    add_idf_object_rank(cls_obj, private$m_log$order)
+    setorderv(cls_obj, c("object_rank", "object_id"))
+
+    if (identical(cls_obj$object_id, obj$object_id)) return(invisible(self))
+
+    private$log_reorder(obj$object_id)
+    private$log_unsaved()
+    private$log_new_uuid()
+
+    invisible(self)
 }
 # }}}
 # idf_objects_in_group {{{
@@ -3342,7 +3419,8 @@ idf_to_string <- function(self, private, which = NULL, class = NULL,
 idf_to_table <- function(self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"), force = FALSE, init = FALSE) {
     get_idf_table(private$idd_env(), private$idf_env(), class = class, object = which,
         string_value = string_value, unit = unit, wide = wide, align = align,
-        all = all, group_ext = group_ext, force = force, init = init)
+        all = all, group_ext = group_ext, force = force, init = init,
+        dt_order = private$m_log$order)
 }
 # }}}
 # idf_save {{{

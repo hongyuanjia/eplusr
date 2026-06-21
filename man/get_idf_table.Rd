@@ -16,7 +16,8 @@ get_idf_table(
   all = FALSE,
   group_ext = c("none", "group", "index"),
   force = FALSE,
-  init = FALSE
+  init = FALSE,
+  dt_order = NULL
 )
 }
 \arguments{
