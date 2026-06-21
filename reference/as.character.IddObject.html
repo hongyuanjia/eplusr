@@ -24,7 +24,7 @@ vector format. It is formatted exactly the same as in IDF Editor."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9008</span>
       </span>
     </div>
 
@@ -107,7 +107,15 @@ vector format. It is formatted exactly the same as in IDF Editor.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'IddObject'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span>, comment <span class="op">=</span> <span class="cn">NULL</span>, leading <span class="op">=</span> <span class="fl">4L</span>, sep_at <span class="op">=</span> <span class="fl">29L</span>, all <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  comment <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  leading <span class="op">=</span> <span class="fl">4L</span>,</span>
+<span>  sep_at <span class="op">=</span> <span class="fl">29L</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  field <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -135,6 +143,11 @@ Default: <code>29</code> which is the same as IDF Editor.'</p></dd>
 <dt id="arg-all">all<a class="anchor" aria-label="anchor" href="#arg-all"></a></dt>
 <dd><p>If <code>TRUE</code>, all fields in current class are returned, otherwise
 only minimum fields are returned.</p></dd>
+
+
+<dt id="arg-field">field<a class="anchor" aria-label="anchor" href="#arg-field"></a></dt>
+<dd><p>If <code>FALSE</code>, field names will not be included as comments.
+Default: <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
