@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## New features
+
+* `IdfObject$is_valid_field()` can now check whether fields are present in the
+  current object instead of only being defined in the IDD (#391).
+
 ## Internal refactor
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and

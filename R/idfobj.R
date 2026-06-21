@@ -341,6 +341,34 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             idfobj_value(self, private, which, all, simplify, unit),
         # }}}
 
+        # is_valid_field {{{
+        #' @description
+        #' Check if fields exist in current object.
+        #'
+        #' @details
+        #' `$is_valid_field()` returns `TRUE` if the specified fields are present
+        #' in the current `IdfObject`. It checks fields that the object actually
+        #' contains, not all possible fields defined in the underlying [Idd].
+        #' Fields with blank values are still treated as existing.
+        #'
+        #' Field names can be given in underscore style, e.g. `"outside_layer"`
+        #' is equivalent to `"Outside Layer"`.
+        #'
+        #' @param which An integer vector of field indexes or a character vector
+        #'        of field names.
+        #'
+        #' @return A logical vector with the same length as `which`.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' con <- idf$Construction[[1L]]
+        #' con$is_valid_field(c("Name", "Layer 5"))
+        #' }
+        #'
+        is_valid_field = function(which)
+            idfobj_is_valid_field(self, private, which),
+        # }}}
+
         # set {{{
         #' @description
         #' Modify object field values.
@@ -1567,6 +1595,21 @@ idfobj_comment <- function(self, private, comment, append = TRUE, width = 0L) {
 # idfobj_value {{{
 idfobj_value <- function(self, private, which = NULL, all = FALSE, simplify = FALSE, unit = FALSE) {
     get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which, all, simplify, unit)
+}
+# }}}
+# idfobj_is_valid_field {{{
+#' @importFrom checkmate assert_character test_integerish
+idfobj_is_valid_field <- function(self, private, which) {
+    val <- private$idf_env()$value[J(private$m_object_id), on = "object_id", nomatch = 0L]
+    fld <- private$idd_env()$field[J(val$field_id), on = "field_id", nomatch = 0L]
+
+    if (test_integerish(which, lower = 1L, any.missing = FALSE)) {
+        return(as.integer(which) %in% fld$field_index)
+    }
+
+    assert_character(which, any.missing = FALSE)
+
+    lower_name(which) %chin% lower_name(fld$field_name)
 }
 # }}}
 # idfobj_set {{{
