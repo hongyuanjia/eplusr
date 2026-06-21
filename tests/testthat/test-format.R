@@ -480,6 +480,16 @@ test_that("Formatting", {
     expect_null(format_idf(idf_parsed$value, idf_parsed$object, header = FALSE)$header)
     expect_null(format_idf(idf_parsed$value, idf_parsed$object, comment = FALSE)$format$fmt[[2L]][[2L]][[1L]])
     expect_silent({fmt <- format_idf(idf_parsed$value, idf_parsed$object,
+        dt_order = data.table(
+            object_id = 1:5,
+            object_order = 0L,
+            object_rank = c(4L, 2L, 3L, 1L, 5L)
+        ))})
+    mat <- fmt$format[class_name == "Material", fmt][[1L]]
+    expect_match(mat[[2L]][[2L]][2L], "WD02", fixed = TRUE)
+    expect_match(mat[[3L]][[2L]][2L], "WD01", fixed = TRUE)
+
+    expect_silent({fmt <- format_idf(idf_parsed$value, idf_parsed$object,
         dt_order = data.table(object_id = 1:5, object_order = 0L),
         save_format = "new_top")})
     expect_equal(fmt$format$object_id, 1:5)

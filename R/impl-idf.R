@@ -149,16 +149,44 @@ get_idf_object <- function(idd_env, idf_env, class = NULL, object = NULL, proper
     obj
 }
 # }}}
+# add_idf_object_rank {{{
+add_idf_object_rank <- function(dt_object, dt_order = NULL) {
+    if (is.null(dt_order)) {
+        set(dt_object, NULL, "object_rank", dt_object$object_id)
+        return(dt_object)
+    }
+
+    dt_order <- copy(dt_order)
+    if (!has_names(dt_order, "object_rank")) {
+        set(dt_order, NULL, "object_rank", seq_len(nrow(dt_order)))
+    }
+
+    dt_object[dt_order, on = "object_id", object_rank := i.object_rank]
+    dt_object[is.na(object_rank), object_rank := object_id]
+    dt_object
+}
+# }}}
 # get_idf_object_id {{{
-get_idf_object_id <- function(idd_env, idf_env, class = NULL, simplify = FALSE) {
+get_idf_object_id <- function(idd_env, idf_env, class = NULL, simplify = FALSE, dt_order = NULL) {
     obj <- get_idf_object(idd_env, idf_env, class)
+
+    add_idf_object_rank(obj, dt_order)
+    if (is.null(class)) {
+        if (simplify) {
+            setorderv(obj, c("object_rank", "object_id"))
+        } else {
+            setorderv(obj, c("class_id", "object_rank", "object_id"))
+        }
+    } else {
+        setorderv(obj, c("rleid", "object_rank", "object_id"))
+    }
+
     if (simplify) return(obj$object_id)
 
     obj <- add_class_name(idd_env, obj)
 
     if (is.null(class)) {
         col_by <- "class_id"
-        setorderv(obj, "class_id")
         nm <- unique(obj$class_name)
     } else {
         col_by <- "rleid"
@@ -171,16 +199,27 @@ get_idf_object_id <- function(idd_env, idf_env, class = NULL, simplify = FALSE) 
 }
 # }}}
 # get_idf_object_name {{{
-get_idf_object_name <- function(idd_env, idf_env, class = NULL, simplify = FALSE, lower = FALSE) {
+get_idf_object_name <- function(idd_env, idf_env, class = NULL, simplify = FALSE, lower = FALSE, dt_order = NULL) {
     obj <- get_idf_object(idd_env, idf_env, class)
     col <- if (lower) "object_name_lower" else "object_name"
+
+    add_idf_object_rank(obj, dt_order)
+    if (is.null(class)) {
+        if (simplify) {
+            setorderv(obj, c("object_rank", "object_id"))
+        } else {
+            setorderv(obj, c("class_id", "object_rank", "object_id"))
+        }
+    } else {
+        setorderv(obj, c("rleid", "object_rank", "object_id"))
+    }
+
     if (simplify) return(obj[[col]])
 
     obj <- add_class_name(idd_env, obj)
 
     if (is.null(class)) {
         col_by <- "class_id"
-        setorderv(obj, "class_id")
         nm <- unique(obj$class_name)
     } else {
         col_by <- "rleid"
@@ -4322,7 +4361,7 @@ read_idfeditor_copy <- function(idd_env, idf_env, version = NULL, in_ip = FALSE)
 get_idf_table <- function(idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
                            align = FALSE, all = FALSE, group_ext = c("none", "group", "index"),
-                           force = FALSE, init = FALSE) {
+                           force = FALSE, init = FALSE, dt_order = NULL) {
     group_ext <- match.arg(group_ext)
 
     cols <- c("object_id", "object_name", "class_name",
@@ -4344,6 +4383,17 @@ get_idf_table <- function(idd_env, idf_env, class = NULL, object = NULL,
             property = c("units", "ip_units", "type_enum", "extensible_group"),
             align = align, complete = TRUE, all = all, ignore_case = TRUE)[
             , .SD, .SDcols = c("rleid", cols)]
+
+        if (is.null(object) && !is.null(dt_order) && nrow(val)) {
+            add_idf_object_rank(val, dt_order)
+            if (is.null(class)) {
+                setorderv(val, c("object_rank", "object_id", "field_index"))
+            } else {
+                setorderv(val, c("rleid", "object_rank", "object_id", "field_index"))
+            }
+            val[, rleid := rleid(object_id)]
+            set(val, NULL, "object_rank", NULL)
+        }
     }
 
     if (wide && length(cls <- unique(val$class_name)) != 1L && !force) {
