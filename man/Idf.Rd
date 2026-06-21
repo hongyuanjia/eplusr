@@ -3589,7 +3589,8 @@ Format \code{Idf} as a character vector
   header = TRUE,
   format = eplusr_option("save_format"),
   leading = 4L,
-  sep_at = 29L
+  sep_at = 29L,
+  field = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -3625,6 +3626,9 @@ options \code{"Sorted"}, \code{"Original with New at Top"}, and \code{"Original 
 
 \item{\code{sep_at}}{The character width to separate value string and field
 string. Default: \code{29L} which is the same as IDF Editor.}
+
+\item{\code{field}}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

@@ -11,6 +11,7 @@
   format = eplusr_option("save_format"),
   leading = 4L,
   sep_at = 29L,
+  field = TRUE,
   ...
 )
 }
@@ -28,6 +29,9 @@
 
 \item{sep_at}{The character width to separate value string and field string.
 Default: \code{29L} which is the same as IDF Editor.}
+
+\item{field}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

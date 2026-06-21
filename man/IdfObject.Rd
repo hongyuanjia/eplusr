@@ -2126,7 +2126,13 @@ surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRU
 \subsection{Method \code{to_string()}}{
 Format current object as a character vector
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$to_string(
+  comment = TRUE,
+  leading = 4L,
+  sep_at = 29L,
+  all = FALSE,
+  field = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -2143,6 +2149,9 @@ string. Default: \code{29L} which is the same as IDF Editor.}
 \item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for the
 class that objects belong to will be returned. Default:
 \code{FALSE}.}
+
+\item{\code{field}}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

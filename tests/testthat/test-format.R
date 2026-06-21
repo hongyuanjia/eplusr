@@ -40,6 +40,14 @@ test_that("Formatting", {
           "  Test Character Field 2"
         )
     )
+
+    expect_equal(
+        format_field(
+            copy(idd_parsed$field[1:2])[, value_chr := c("Alpha", "Beta")],
+            leading = 2, sep_at = 10, field = FALSE
+        ),
+        c("  Alpha,", "  Beta;")
+    )
     expect_equal(format_objects(idd_parsed$group, component = "group")$out,
         c("Group: <TestGroup1>", "Group: <TestGroup2>")
     )

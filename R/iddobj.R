@@ -1389,6 +1389,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        string. Default: `29L` which is the same as IDF Editor.
         #' @param all If `TRUE`, all available fields defined in IDD for
         #'        specified class will be returned. Default: `FALSE`.
+        #' @param field If `FALSE`, field names will not be included as comments.
+        #'        Default: `TRUE`.
         #'
         #' @return A character vector.
         #'
@@ -1404,8 +1406,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$to_string(c("This", "will", "be", "comments"))
         #' }
         #'
-        to_string = function(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
-            iddobj_to_string(self, private, comment, leading, sep_at = sep_at, all = all),
+        to_string = function(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE)
+            iddobj_to_string(self, private, comment = comment, leading = leading,
+                sep_at = sep_at, all = all, field = field),
         # }}}
         # }}}
 
@@ -1827,9 +1830,9 @@ iddobj_to_table <- function(self, private, all = FALSE) {
 }
 # }}}
 # iddobj_to_string {{{
-iddobj_to_string <- function(self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
+iddobj_to_string <- function(self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE) {
     get_iddobj_string(private$idd_env(), private$m_class_id, comment = comment,
-        leading = leading, sep_at = sep_at, all = all
+        leading = leading, sep_at = sep_at, all = all, field = field
     )
 }
 # }}}
@@ -1931,6 +1934,8 @@ format.IddObject <- function(x, ver = TRUE, ...) {
 #' @param leading Leading spaces added to each field. Default: `4`.
 #' @param sep_at The character width to separate value string and field string.
 #'        Default: `29` which is the same as IDF Editor.'
+#' @param field If `FALSE`, field names will not be included as comments.
+#'        Default: `TRUE`.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A character vector.
@@ -1941,8 +1946,9 @@ format.IddObject <- function(x, ver = TRUE, ...) {
 #'
 #' @export
 # as.character.IddObject {{{
-as.character.IddObject <- function(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+as.character.IddObject <- function(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE, ...) {
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at,
+        all = all, field = field)
 }
 # }}}
 

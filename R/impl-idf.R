@@ -4521,7 +4521,7 @@ dt_to_load <- function(dt, string_value = TRUE) {
 get_idf_string <- function(idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
                             in_ip = FALSE, comment = TRUE, header = TRUE,
                             format = c("sorted", "new_top", "new_bot"),
-                            leading = 4L, sep_at = 29L, flat = TRUE) {
+                            leading = 4L, sep_at = 29L, flat = TRUE, field = TRUE) {
     format <- match.arg(format)
 
     # IP - SI conversion
@@ -4543,7 +4543,8 @@ get_idf_string <- function(idd_env, idf_env, dt_order = NULL, class = NULL, obje
                     idf_env$value[J(obj$object_id), on = "object_id"],
                     idf_env$object[J(obj$object_id), on = "object_id"],
                     dt_order, header = header, comment = comment,
-                    save_format = format, leading = leading, sep_at = sep_at
+                    save_format = format, leading = leading, sep_at = sep_at,
+                    field = field
                 )
             )
         ))
@@ -4552,7 +4553,7 @@ get_idf_string <- function(idd_env, idf_env, dt_order = NULL, class = NULL, obje
             with_option(list(view_in_ip = temp_ip),
                 format_idf(idf_env$value, idf_env$object, dt_order,
                     header = header, comment = comment, save_format = format,
-                    leading = leading, sep_at = sep_at
+                    leading = leading, sep_at = sep_at, field = field
                 )
             )
         ))

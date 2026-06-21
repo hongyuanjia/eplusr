@@ -2140,6 +2140,8 @@ Idf <- R6::R6Class(classname = "Idf",
         #' @param leading Leading spaces added to each field. Default: `4L`.
         #' @param sep_at The character width to separate value string and field
         #'        string. Default: `29L` which is the same as IDF Editor.
+        #' @param field If `FALSE`, field names will not be included as comments.
+        #'        Default: `TRUE`.
         #'
         #' @return A character vector.
         #'
@@ -2163,10 +2165,10 @@ Idf <- R6::R6Class(classname = "Idf",
         #'
         to_string = function(which = NULL, class = NULL, comment = TRUE,
                               header = TRUE, format = eplusr_option("save_format"),
-                              leading = 4L, sep_at = 29L)
+                              leading = 4L, sep_at = 29L, field = TRUE)
             idf_to_string(self, private, which, class, comment = comment,
                           header = header, format = format,
-                          leading = leading, sep_at = sep_at),
+                          leading = leading, sep_at = sep_at, field = field),
         # }}}
 
         # to_table {{{
@@ -3327,12 +3329,12 @@ idf_is_valid <- function(self, private, level = eplusr_option("validate_level"))
 # idf_to_string {{{
 idf_to_string <- function(self, private, which = NULL, class = NULL,
                            comment = TRUE, header = TRUE, format = eplusr_option("save_format"),
-                           leading = 4L, sep_at = 29L) {
+                           leading = 4L, sep_at = 29L, field = TRUE) {
     if (format == "asis") format <- private$m_log$save_format
 
     get_idf_string(private$idd_env(), private$idf_env(), private$m_log$order,
         class, which, comment = comment, header = header, format = format,
-        leading = leading, sep_at = sep_at
+        leading = leading, sep_at = sep_at, field = field
     )
 }
 # }}}
@@ -3948,6 +3950,8 @@ str.Idf <- function(object, zoom = "class", ...) {
 #' @param leading Leading spaces added to each field. Default: `4L`.
 #' @param sep_at The character width to separate value string and field string.
 #' Default: `29L` which is the same as IDF Editor.
+#' @param field If `FALSE`, field names will not be included as comments.
+#' Default: `TRUE`.
 #' @param ... Further arguments passed to or from other methods.
 #' @return A single length string.
 #' @examples
@@ -3960,10 +3964,10 @@ str.Idf <- function(object, zoom = "class", ...) {
 # format.idf {{{
 format.Idf <- function(x, comment = TRUE, header = TRUE,
                         format = eplusr_option("save_format"),
-                        leading = 4L, sep_at = 29L, ...) {
+                        leading = 4L, sep_at = 29L, field = TRUE, ...) {
     paste0(
         x$to_string(comment = comment, header = header, format = format,
-            leading = leading, sep_at = sep_at, ...
+            leading = leading, sep_at = sep_at, field = field, ...
         ),
         collapse = "\n"
     )
@@ -3986,9 +3990,9 @@ format.Idf <- function(x, comment = TRUE, header = TRUE,
 # as.character.Idf {{{
 as.character.Idf <- function(x, comment = TRUE, header = TRUE,
                         format = eplusr_option("save_format"),
-                        leading = 4L, sep_at = 29L, ...) {
+                        leading = 4L, sep_at = 29L, field = TRUE, ...) {
     x$to_string(comment = comment, header = header, format = format,
-        leading = leading, sep_at = sep_at, ...
+        leading = leading, sep_at = sep_at, field = field, ...
     )
 }
 # }}}

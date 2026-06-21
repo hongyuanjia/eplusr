@@ -196,14 +196,15 @@ get_idfobj_table <- function(idd_env, idf_env, object_id, all = FALSE,
 }
 # }}}
 # get_idfobj_string {{{
-get_idfobj_string <- function(idd_env, idf_env, object_id, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+get_idfobj_string <- function(idd_env, idf_env, object_id, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, field = TRUE) {
     val <- get_idf_value(idd_env, idf_env, object = object_id, property = c("units", "ip_units"), all = all)
 
     cls <- paste0(val$class_name[[1L]], ",")
 
     # get field value
     fld <- format_field(val, leading = leading, sep_at = sep_at,
-        index = FALSE, blank = FALSE, end = TRUE, required = FALSE)
+        index = FALSE, blank = FALSE, end = TRUE, required = FALSE,
+        field = field)
 
     if (comment) {
         id <- object_id

@@ -4,7 +4,15 @@
 \alias{as.character.IddObject}
 \title{Coerce an IddObject into a Character Vector}
 \usage{
-\method{as.character}{IddObject}(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...)
+\method{as.character}{IddObject}(
+  x,
+  comment = NULL,
+  leading = 4L,
+  sep_at = 29L,
+  all = FALSE,
+  field = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{An \link{IddObject} object.}
@@ -19,6 +27,9 @@ Default: \code{29} which is the same as IDF Editor.'}
 
 \item{all}{If \code{TRUE}, all fields in current class are returned, otherwise
 only minimum fields are returned.}
+
+\item{field}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

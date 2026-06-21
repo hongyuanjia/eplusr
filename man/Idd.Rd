@@ -1183,7 +1183,14 @@ idd$to_table(c("Construction", "Material"))
 \subsection{Method \code{to_string()}}{
 Format \code{Idf} classes as a character vector
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idd$to_string(
+  class,
+  leading = 4L,
+  sep_at = 29L,
+  sep_each = 0L,
+  all = FALSE,
+  field = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1201,6 +1208,9 @@ between different classes. Default: \code{0}.}
 
 \item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for
 specified class will be returned. Default: \code{FALSE}.}
+
+\item{\code{field}}{If \code{FALSE}, field names will not be included as comments.
+Default: \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
