@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9011</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9012</span>
       </span>
     </div>
 
@@ -110,7 +110,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
-<ul><li><p>Use cli conditions for eplusr verbose logging, package warnings, errors, and narrow user-facing console messages while preserving eplusr condition classes (<a href="https://github.com/hongyuanjia/eplusr/issues/551" class="external-link">#551</a>).</p></li>
+<ul><li><p>Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr’s recursive dependency chain and raising the minimum supported R version to 4.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/635" class="external-link">#635</a>).</p></li>
+<li><p>Use cli conditions for eplusr verbose logging, package warnings, errors, and narrow user-facing console messages while preserving eplusr condition classes (<a href="https://github.com/hongyuanjia/eplusr/issues/551" class="external-link">#551</a>).</p></li>
 <li><p>Truncate large parametric verbose messages and print summarized status output for large parametric jobs (<a href="https://github.com/hongyuanjia/eplusr/issues/569" class="external-link">#569</a>).</p></li>
 </ul></div>
 <div class="section level3">

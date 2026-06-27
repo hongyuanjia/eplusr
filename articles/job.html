@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9011</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9012</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2026-06-21</h4>
+            <h4 data-toc-skip class="date">2026-06-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -179,7 +179,7 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
 <span><span class="co">#&gt; ExpandObjects Finished. Time:     0.017</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.06.21 15:43</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.06.27 20:29</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -196,7 +196,7 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-21 15:43:44.398493' and completed successfully after 0.72 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-27 20:29:58.421043' and completed successfully after 0.67 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -209,7 +209,7 @@ status.</p>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-21 15:43:44.398493' and completed successfully after 0.72 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-27 20:29:58.421043' and completed successfully after 0.67 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -229,7 +229,7 @@ the <code>EplusJob</code> object or using the
 <span><span class="co">#&gt;  • Version: '/home/runner/.local/EnergyPlus-26-1-0/WeatherData/USA_CA_San.Franc…</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
 <span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-21 15:43:45.338909' and is still running...</span></span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-06-27 20:29:59.307556' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -346,7 +346,7 @@ values: <code>0</code> and <code>1</code>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">report_data_dict</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     report_data_dictionary_index is_meter   type</span></span>
-<span><span class="co">#&gt;                            &lt;int&gt;    &lt;int&gt; &lt;char&gt;</span></span>
+<span><span class="co">#&gt;                            &lt;num&gt;    &lt;num&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:                            7        0    Avg</span></span>
 <span><span class="co">#&gt;  2:                            9        1    Sum</span></span>
 <span><span class="co">#&gt;  3:                           21        1    Sum</span></span>
@@ -368,7 +368,7 @@ values: <code>0</code> and <code>1</code>
 <span><span class="co">#&gt; 19:                         1216        1    Sum</span></span>
 <span><span class="co">#&gt; 20:                         1315        1    Sum</span></span>
 <span><span class="co">#&gt;     report_data_dictionary_index is_meter   type</span></span>
-<span><span class="co">#&gt;                            &lt;int&gt;    &lt;int&gt; &lt;char&gt;</span></span>
+<span><span class="co">#&gt;                            &lt;num&gt;    &lt;num&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt;                             index_group timestep_type     key_value</span></span>
 <span><span class="co">#&gt;                                  &lt;char&gt;        &lt;char&gt;        &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:                                Zone          Zone   Environment</span></span>
@@ -782,7 +782,7 @@ to directly perform further data transformations.</p>
 <span><span class="co"># read zone metadata from Standard Input and Output</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">zones</span> <span class="op">&lt;-</span> <span class="va">job</span><span class="op">$</span><span class="fu">read_table</span><span class="op">(</span><span class="st">"Zones"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     zone_index          zone_name rel_north origin_x origin_y origin_z</span></span>
-<span><span class="co">#&gt;          &lt;int&gt;             &lt;char&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt;          &lt;num&gt;             &lt;char&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;    &lt;num&gt;</span></span>
 <span><span class="co">#&gt;  1:          1        CORE_BOTTOM         0        0        0        0</span></span>
 <span><span class="co">#&gt;  2:          2           CORE_MID         0        0        0        0</span></span>
 <span><span class="co">#&gt;  3:          3           CORE_TOP         0        0        0        0</span></span>
@@ -802,7 +802,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 17:         17 PERIMETER_TOP_ZN_4         0        0        0        0</span></span>
 <span><span class="co">#&gt; 18:         18    TOPFLOOR_PLENUM         0        0        0        0</span></span>
 <span><span class="co">#&gt;     centroid_x centroid_y centroid_z of_type multiplier list_multiplier</span></span>
-<span><span class="co">#&gt;          &lt;num&gt;      &lt;num&gt;      &lt;num&gt;   &lt;int&gt;      &lt;num&gt;           &lt;num&gt;</span></span>
+<span><span class="co">#&gt;          &lt;num&gt;      &lt;num&gt;      &lt;num&gt;   &lt;num&gt;      &lt;num&gt;           &lt;num&gt;</span></span>
 <span><span class="co">#&gt;  1:  24.955350  16.636900     1.3716       1          1               1</span></span>
 <span><span class="co">#&gt;  2:  24.955350  16.636900     5.3340       1          1               1</span></span>
 <span><span class="co">#&gt;  3:  24.955350  16.636900     9.2964       1          1               1</span></span>
@@ -842,7 +842,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 17:    0.0000    4.5732    0.0000   33.2738    7.9248   10.6680         2.7432</span></span>
 <span><span class="co">#&gt; 18:    0.0000   49.9110    0.0000   33.2738   10.6680   11.8872         1.2192</span></span>
 <span><span class="co">#&gt;        volume inside_convection_algo outside_convection_algo floor_area</span></span>
-<span><span class="co">#&gt;         &lt;num&gt;                  &lt;int&gt;                   &lt;int&gt;      &lt;num&gt;</span></span>
+<span><span class="co">#&gt;         &lt;num&gt;                  &lt;num&gt;                   &lt;num&gt;      &lt;num&gt;</span></span>
 <span><span class="co">#&gt;  1: 2698.0375                      2                       7   983.5366</span></span>
 <span><span class="co">#&gt;  2: 2698.0375                      2                       7   983.5366</span></span>
 <span><span class="co">#&gt;  3: 2698.0375                      2                       7   983.5366</span></span>
@@ -862,7 +862,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 17:  360.0548                      2                       7   131.2536</span></span>
 <span><span class="co">#&gt; 18: 2024.7603                      2                       7  1660.7286</span></span>
 <span><span class="co">#&gt;     ext_gross_wall_area ext_net_wall_area ext_window_area is_part_of_total_area</span></span>
-<span><span class="co">#&gt;                   &lt;num&gt;             &lt;num&gt;           &lt;num&gt;                 &lt;int&gt;</span></span>
+<span><span class="co">#&gt;                   &lt;num&gt;             &lt;num&gt;           &lt;num&gt;                 &lt;num&gt;</span></span>
 <span><span class="co">#&gt;  1:             0.00000           0.00000         0.00000                     1</span></span>
 <span><span class="co">#&gt;  2:             0.00000           0.00000         0.00000                     1</span></span>
 <span><span class="co">#&gt;  3:             0.00000           0.00000         0.00000                     1</span></span>
@@ -890,7 +890,7 @@ to directly perform further data transformations.</p>
 <span>    all <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                case            datetime month   day  hour minute   dst interval</span></span>
-<span><span class="co">#&gt;              &lt;char&gt;              &lt;POSc&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;    &lt;int&gt;</span></span>
+<span><span class="co">#&gt;              &lt;char&gt;              &lt;POSc&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;  &lt;num&gt; &lt;num&gt;    &lt;num&gt;</span></span>
 <span><span class="co">#&gt;     1: MediumOffice 2017-01-01 01:00:00     1     1     1      0     0       60</span></span>
 <span><span class="co">#&gt;     2: MediumOffice 2017-01-01 02:00:00     1     1     2      0     0       60</span></span>
 <span><span class="co">#&gt;     3: MediumOffice 2017-01-01 03:00:00     1     1     3      0     0       60</span></span>
@@ -903,7 +903,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 52559: MediumOffice 2017-12-31 23:00:00    12    31    23      0     0       60</span></span>
 <span><span class="co">#&gt; 52560: MediumOffice 2018-01-01 00:00:00    12    31    24      0     0       60</span></span>
 <span><span class="co">#&gt;        simulation_days day_type environment_name environment_period_index</span></span>
-<span><span class="co">#&gt;                  &lt;int&gt;   &lt;char&gt;           &lt;char&gt;                    &lt;int&gt;</span></span>
+<span><span class="co">#&gt;                  &lt;num&gt;   &lt;char&gt;           &lt;char&gt;                    &lt;num&gt;</span></span>
 <span><span class="co">#&gt;     1:               1  Holiday           ANNUAL                        3</span></span>
 <span><span class="co">#&gt;     2:               1  Holiday           ANNUAL                        3</span></span>
 <span><span class="co">#&gt;     3:               1  Holiday           ANNUAL                        3</span></span>
@@ -916,7 +916,7 @@ to directly perform further data transformations.</p>
 <span><span class="co">#&gt; 52559:             365   Sunday           ANNUAL                        3</span></span>
 <span><span class="co">#&gt; 52560:             365   Sunday           ANNUAL                        3</span></span>
 <span><span class="co">#&gt;        is_meter   type index_group timestep_type key_value</span></span>
-<span><span class="co">#&gt;           &lt;int&gt; &lt;char&gt;      &lt;char&gt;        &lt;char&gt;    &lt;char&gt;</span></span>
+<span><span class="co">#&gt;           &lt;num&gt; &lt;char&gt;      &lt;char&gt;        &lt;char&gt;    &lt;char&gt;</span></span>
 <span><span class="co">#&gt;     1:        0    Sum      System   HVAC System     VAV_1</span></span>
 <span><span class="co">#&gt;     2:        0    Sum      System   HVAC System     VAV_1</span></span>
 <span><span class="co">#&gt;     3:        0    Sum      System   HVAC System     VAV_1</span></span>
