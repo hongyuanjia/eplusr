@@ -21,6 +21,10 @@
 
 ## Internal refactor
 
+* Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr's
+  recursive dependency chain and raising the minimum supported R version to
+  4.2.0 (#635).
+
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and
   narrow user-facing console messages while preserving eplusr condition classes
   (#551).

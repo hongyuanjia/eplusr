@@ -80,6 +80,25 @@ jobs:
           extra-packages: any::rcmdcheck, any::pkgload
           needs: check
 
+      - name: Locate DuckDB extension cache
+        id: duckdb-ext-cache
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran }}
+        run: |
+          dir <- file.path(tools::R_user_dir("duckdb", "data"), "extensions")
+          dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+          out <- Sys.getenv("GITHUB_OUTPUT")
+          cat("path=", dir, "\n", file = out, append = TRUE, sep = "")
+          cat("version=", as.character(utils::packageVersion("duckdb")), "\n", file = out, append = TRUE, sep = "")
+        shell: Rscript {0}
+
+      - name: Restore DuckDB extension cache
+        id: cache-duckdb-ext
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran }}
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.duckdb-ext-cache.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-duckdb-ext-${{ steps.duckdb-ext-cache.outputs.version }}-sqlite-v1
+
       - name: Restore EnergyPlus cache
         id: cache-eplus
         if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran }}
@@ -97,6 +116,21 @@ jobs:
           stopifnot(eplusr::is_avail_eplus(latest))
           message("EnergyPlus ", latest, ": ", eplusr::eplus_config(latest)$dir)
         shell: Rscript {0}
+
+      - name: Install DuckDB SQLite extension
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran }}
+        run: |
+          pkgload::load_all(".", quiet = TRUE, export_all = FALSE)
+          eplusr::install_duckdb_sqlite()
+        shell: Rscript {0}
+
+      - name: Save DuckDB extension cache
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran && steps.cache-duckdb-ext.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.duckdb-ext-cache.outputs.path }}
+          key: ${{ steps.cache-duckdb-ext.outputs.cache-primary-key }}
 
       - name: Save EnergyPlus cache
         if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran && steps.cache-eplus.outputs.cache-hit != 'true' }}

@@ -1,4 +1,4 @@
-#' @importFrom RSQLite SQLite dbConnect dbDisconnect dbGetQuery dbListTables dbReadTable
+#' @importFrom duckdb duckdb sql_exec
 #' @importFrom data.table setDT setcolorder setorder
 #' @importFrom lubridate year force_tz
 NULL
@@ -16,26 +16,101 @@ RPFREQ <- c(
 # }}}
 # conn_sql {{{
 conn_sql <- function(sql) {
-    RSQLite::dbConnect(RSQLite::SQLite(), sql)
+    con <- duckdb::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+    ok <- FALSE
+    on.exit(if (!ok) duckdb::dbDisconnect(con), add = TRUE)
+
+    load_duckdb_sqlite(con)
+    attach_duckdb_sqlite(con, sql)
+
+    ok <- TRUE
+    con
 }
 # }}}
 # with_sql {{{
 with_sql <- function(sql, expr) {
-    on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
+    on.exit(duckdb::dbDisconnect(sql), add = TRUE)
     force(expr)
+}
+# }}}
+# install_sqlite_extension {{{
+install_sqlite_extension <- function() {
+    con <- duckdb::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+    on.exit(duckdb::dbDisconnect(con), add = TRUE)
+
+    tryCatch(
+        duckdb::sql_exec("INSTALL sqlite", conn = con),
+        error = function(e) {
+            abort(c(
+                "Failed to install DuckDB SQLite extension. ",
+                "Check your network, proxy, or offline extension configuration and try again. ",
+                "Original DuckDB error: ", conditionMessage(e)
+            ), "duckdb_sqlite_install", parent = e)
+        }
+    )
+
+    invisible(TRUE)
+}
+# }}}
+# load_duckdb_sqlite {{{
+load_duckdb_sqlite <- function(con) {
+    tryCatch(
+        duckdb::sql_exec("LOAD sqlite", conn = con),
+        error = function(e) {
+            abort(c(
+                "DuckDB SQLite extension is not installed or cannot be loaded. ",
+                "Run 'install_duckdb_sqlite()' once and retry. ",
+                "Original DuckDB error: ", conditionMessage(e)
+            ), "duckdb_sqlite_extension", parent = e)
+        }
+    )
+
+    invisible(TRUE)
+}
+# }}}
+# attach_duckdb_sqlite {{{
+attach_duckdb_sqlite <- function(con, sql) {
+    path <- duckdb::dbQuoteLiteral(con, normalizePath(sql, mustWork = TRUE))
+
+    tryCatch(
+        {
+            duckdb::sql_exec(paste0("ATTACH ", path, " AS eplus_sql (TYPE sqlite)"), conn = con)
+            duckdb::sql_exec("USE eplus_sql", conn = con)
+        },
+        error = function(e) {
+            abort(c(
+                "Failed to attach EnergyPlus SQLite output using DuckDB. ",
+                "Original DuckDB error: ", conditionMessage(e)
+            ), "duckdb_sqlite_attach", parent = e)
+        }
+    )
+
+    invisible(TRUE)
 }
 # }}}
 # read_sql_table {{{
 read_sql_table <- function(sql, table) {
     con <- conn_sql(sql)
-    with_sql(con, tidy_sql_name(setDT(RSQLite::dbReadTable(con, table)))[])
+    query <- paste0("SELECT * FROM ", duckdb::dbQuoteIdentifier(con, table))
+    with_sql(con, {
+        res <- tryCatch(
+            duckdb::sql_query(query, conn = con),
+            error = function(e) {
+                if (grepl("Table with name .* does not exist", conditionMessage(e))) {
+                    abort(paste0("no such table: ", table), "sql_table", parent = e)
+                }
+                stop(e)
+            }
+        )
+        tidy_sql_name(setDT(res))[]
+    })
 }
 # }}}
 # get_sql_query {{{
 get_sql_query <- function(sql, query) {
     con <- conn_sql(sql)
     with_sql(con, {
-        res <- RSQLite::dbGetQuery(con, query)
+        res <- duckdb::sql_query(query, conn = con)
         if (is.data.frame(res)) setDT(res)
         res
     })
@@ -100,7 +175,7 @@ get_sql_tabular_data_query <- function(report_name = NULL, report_for = NULL,
 # list_sql_table {{{
 list_sql_table <- function(sql) {
     con <- conn_sql(sql)
-    with_sql(con, RSQLite::dbListTables(con))
+    with_sql(con, duckdb::dbListTables(con))
 }
 # }}}
 # get_sql_report_data_dict {{{
@@ -718,11 +793,8 @@ add_csv_time <- function(time) {
 # helper {{{
 .sql_sep <- function(x, ignore_case = TRUE) {
     if (is.character(x)) {
-        if (ignore_case) {
-            stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
-        } else {
-            paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
-        }
+        if (ignore_case) x <- stri_trans_tolower(x)
+        paste(paste0("'", gsub("'", "''", x, fixed = TRUE), "'"), sep = ",", collapse = ",")
     } else {
         paste(x, sep = ",", collapse = ",")
     }
