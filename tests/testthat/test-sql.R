@@ -61,21 +61,8 @@ test_that("DuckDB SQLite connection attaches output database", {
     expect_equal(calls[[3L]], "USE eplus_sql")
 })
 
-skip_if_no_duckdb_sqlite <- function() {
-    con <- duckdb::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
-    on.exit(duckdb::dbDisconnect(con), add = TRUE)
-
-    ok <- tryCatch({
-        duckdb::sql_exec("LOAD sqlite", conn = con)
-        TRUE
-    }, error = function(e) FALSE)
-
-    if (!ok) skip("DuckDB SQLite extension is not installed.")
-}
-
 test_that("Sql methods", {
     skip_on_cran()
-    skip_if_no_duckdb_sqlite()
 
     example <- copy_example()
     idf <- read_idf(example$idf)
@@ -206,7 +193,6 @@ test_that("Sql methods", {
 
 test_that("Data extraction", {
     skip_on_cran()
-    skip_if_no_duckdb_sqlite()
 
     # can handle multiple time resolution
     example <- copy_example()
