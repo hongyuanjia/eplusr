@@ -20,6 +20,18 @@ test_that("DuckDB SQLite extension is explicit", {
     expect_equal(calls, "INSTALL sqlite")
 })
 
+test_that("DuckDB SQLite extension install failure includes guidance", {
+    expect_error(
+        with_mocked_bindings(
+            install_duckdb_sqlite(),
+            sql_exec = function(sql, conn) stop("offline install", call. = FALSE),
+            .package = "duckdb"
+        ),
+        "network, proxy, or offline",
+        class = "eplusr_error_duckdb_sqlite_install"
+    )
+})
+
 test_that("DuckDB SQLite load failure does not auto-install", {
     path <- tempfile(fileext = ".sql")
     file.create(path)
@@ -38,6 +50,30 @@ test_that("DuckDB SQLite load failure does not auto-install", {
         class = "eplusr_error_duckdb_sqlite_extension"
     )
     expect_equal(calls, "LOAD sqlite")
+})
+
+test_that("DuckDB SQLite attach failure reports attach context", {
+    path <- tempfile(fileext = ".sql")
+    file.create(path)
+    calls <- character()
+
+    expect_error(
+        with_mocked_bindings(
+            conn_sql(path),
+            sql_exec = function(sql, conn) {
+                sql <- as.character(sql)
+                calls <<- c(calls, sql)
+                if (grepl("^ATTACH ", sql)) stop("attach failed", call. = FALSE)
+                0
+            },
+            .package = "duckdb"
+        ),
+        "Failed to attach EnergyPlus SQLite output",
+        class = "eplusr_error_duckdb_sqlite_attach"
+    )
+    expect_equal(length(calls), 2L)
+    expect_equal(calls[[1L]], "LOAD sqlite")
+    expect_match(calls[[2L]], "^ATTACH '.+' AS eplus_sql \\(TYPE sqlite\\)$")
 })
 
 test_that("DuckDB SQLite connection attaches output database", {
@@ -59,6 +95,21 @@ test_that("DuckDB SQLite connection attaches output database", {
     expect_equal(calls[[1L]], "LOAD sqlite")
     expect_match(calls[[2L]], "^ATTACH '.+' AS eplus_sql \\(TYPE sqlite\\)$")
     expect_equal(calls[[3L]], "USE eplus_sql")
+})
+
+test_that("DuckDB SQL query failures are preserved", {
+    path <- tempfile(fileext = ".sql")
+    file.create(path)
+
+    expect_error(
+        with_mocked_bindings(
+            read_sql_table(path, "Zones"),
+            sql_exec = function(sql, conn) 0,
+            sql_query = function(sql, conn) stop("query failed", call. = FALSE),
+            .package = "duckdb"
+        ),
+        "query failed"
+    )
 })
 
 test_that("Sql methods", {
