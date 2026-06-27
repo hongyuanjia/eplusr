@@ -56,6 +56,11 @@ jobs:
           }
         shell: Rscript {0}
 
+      - name: Install DuckDB SQLite extension
+        run: |
+          eplusr::install_duckdb_sqlite()
+        shell: Rscript {0}
+
       - name: Save EnergyPlus cache
         if: steps.cache-eplus.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
