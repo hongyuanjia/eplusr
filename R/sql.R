@@ -563,6 +563,25 @@ eplus_sql <- function(sql) {
 }
 # }}}
 
+#' Install DuckDB SQLite Extension
+#'
+#' `install_duckdb_sqlite()` installs the DuckDB SQLite extension used by
+#' eplusr to read EnergyPlus SQLite output files. This helper uses DuckDB's
+#' official extension installation mechanism and may require network access.
+#'
+#' @return `TRUE`, invisibly, when the extension installation succeeds.
+#' @examples
+#' \dontrun{
+#' install_duckdb_sqlite()
+#' }
+#' @author Hongyuan Jia
+#' @export
+# install_duckdb_sqlite {{{
+install_duckdb_sqlite <- function() {
+    install_sqlite_extension()
+}
+# }}}
+
 # sql_path {{{
 sql_path <- function(self, private) private$m_path_sql
 # }}}

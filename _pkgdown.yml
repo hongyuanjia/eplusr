@@ -129,6 +129,7 @@ reference:
       - EplusGroupJob
       - ParametricJob
       - eplus_sql
+      - install_duckdb_sqlite
       - eplus_job
       - group_job
       - param_job

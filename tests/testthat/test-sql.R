@@ -1,5 +1,81 @@
+test_that("SQL literals are quoted for DuckDB", {
+    expect_equal(.sql_sep(c("Annual", "O'Brien")), "'annual','o''brien'")
+    expect_equal(.sql_sep(c("Annual", "O'Brien"), ignore_case = FALSE), "'Annual','O''Brien'")
+    expect_equal(.sql_make(c("Annual", "O'Brien"), sql_col = "report_name"),
+        "lower(report_name) IN ('annual','o''brien')"
+    )
+})
+
+test_that("DuckDB SQLite extension is explicit", {
+    calls <- character()
+
+    expect_true(with_mocked_bindings(
+        install_duckdb_sqlite(),
+        sql_exec = function(sql, conn) {
+            calls <<- c(calls, sql)
+            0
+        },
+        .package = "duckdb"
+    ))
+    expect_equal(calls, "INSTALL sqlite")
+})
+
+test_that("DuckDB SQLite load failure does not auto-install", {
+    path <- tempfile(fileext = ".sql")
+    file.create(path)
+    calls <- character()
+
+    expect_error(
+        with_mocked_bindings(
+            conn_sql(path),
+            sql_exec = function(sql, conn) {
+                calls <<- c(calls, sql)
+                stop("load failed", call. = FALSE)
+            },
+            .package = "duckdb"
+        ),
+        "install_duckdb_sqlite",
+        class = "eplusr_error_duckdb_sqlite_extension"
+    )
+    expect_equal(calls, "LOAD sqlite")
+})
+
+test_that("DuckDB SQLite connection attaches output database", {
+    path <- tempfile(fileext = ".sql")
+    file.create(path)
+    calls <- character()
+
+    con <- with_mocked_bindings(
+        conn_sql(path),
+        sql_exec = function(sql, conn) {
+            calls <<- c(calls, as.character(sql))
+            0
+        },
+        .package = "duckdb"
+    )
+    on.exit(duckdb::dbDisconnect(con), add = TRUE)
+
+    expect_true(duckdb::dbIsValid(con))
+    expect_equal(calls[[1L]], "LOAD sqlite")
+    expect_match(calls[[2L]], "^ATTACH '.+' AS eplus_sql \\(TYPE sqlite\\)$")
+    expect_equal(calls[[3L]], "USE eplus_sql")
+})
+
+skip_if_no_duckdb_sqlite <- function() {
+    con <- duckdb::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+    on.exit(duckdb::dbDisconnect(con), add = TRUE)
+
+    ok <- tryCatch({
+        duckdb::sql_exec("LOAD sqlite", conn = con)
+        TRUE
+    }, error = function(e) FALSE)
+
+    if (!ok) skip("DuckDB SQLite extension is not installed.")
+}
+
 test_that("Sql methods", {
     skip_on_cran()
+    skip_if_no_duckdb_sqlite()
 
     example <- copy_example()
     idf <- read_idf(example$idf)
@@ -130,6 +206,8 @@ test_that("Sql methods", {
 
 test_that("Data extraction", {
     skip_on_cran()
+    skip_if_no_duckdb_sqlite()
+
     # can handle multiple time resolution
     example <- copy_example()
     all_freq <- c("Detailed", "Timestep", "Hourly", "Daily", "Monthly",
