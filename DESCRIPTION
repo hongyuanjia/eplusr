@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.17.0.9012
+Version: 0.17.0.9013
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -92,4 +92,4 @@ Collate:
     'viewer.R'
     'zzz.R'
 Config/testthat/edition: 3
-Config/testthat/parallel: true
+Config/testthat/parallel: false

@@ -3,13 +3,24 @@ test_that("download_idd() can download IDD from EnergyPlus repo", {
     expect_error(download_idd(1, tempdir()), class = "eplusr_error_invalid_eplus_ver")
 
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
+    skip_if_not_integration()
 
     # should download IDD v9.0.1 if input is 9, 9.0, 9.0.1
     expect_equal(read_idd(attr(download_idd("9.0", tempdir()), "file"))$version(), numeric_version("9.0.1"))
     expect_equal(read_idd(attr(download_idd("9.0.1", tempdir()), "file"))$version(), numeric_version("9.0.1"))
 })
 # }}}
+
+# Network-backed IDD discovery is integration-only; local parsing remains in
+# the default suite below.
+test_that("use_idd() can download IDDs", {
+    skip_on_cran()
+    skip_if_not_integration()
+
+    rm_global_cache("idd")
+    expect_s3_class(use_idd("8.4", download = TRUE), "Idd")
+    expect_s3_class(use_idd("latest", download = TRUE), "Idd")
+})
 
 # use_idd() {{{
 test_that("can read IDD", {
@@ -25,17 +36,16 @@ test_that("can read IDD", {
     # can stop if failed to read input file
     expect_error(use_idd(""), class = "eplusr_error_read_lines")
 
-    # can directly download from EnergyPlus GitHub repo
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
-    expect_s3_class(idd <- use_idd("8.4", download = TRUE), "Idd")
+    # can use the IDD in EnergyPlus VersionUpdater folder
+    expect_s3_class(idd <- use_idd("9.0"), "Idd")
 
     # can directly return if input is an Idd
     expect_s3_class(use_idd(idd), "Idd")
 
     # can directly return if parsed previously
-    expect_s3_class(use_idd("8.4"), "Idd")
+    expect_s3_class(use_idd("9.0"), "Idd")
 
-    # can use the IDD in EnergyPlus VersionUpdater folder
+    # can rediscover an IDD in the EnergyPlus VersionUpdater folder
     rm_global_cache("idd")
     # NOTE: from EnergyPlus v23.1, the oldest IDD version shipped with
     # EnergyPlus is EnergyPlus v9.0
@@ -63,29 +73,8 @@ test_that("can read IDD", {
     use_eplus(LATEST_EPLUS_VER)
     expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
 
-    # can search in VersionUpdater folder if "Energy+.idd" is not found in
-    # EnergyPlus folder
-    use_eplus(LATEST_EPLUS_VER)
-    f1 <- path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
-    f1_bak <- paste0(f1, ".bak")
-    file.rename(f1, f1_bak)
-    expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
-    file.rename(f1_bak, f1)
-
-    # can stop if no available IDD found in any existing VersionUpdater folder
-    rm_global_cache("eplus")
-    use_eplus(LATEST_EPLUS_VER)
-    rm_global_cache("idd")
-    f2 <- find_idd_from_updater("9.0")
-    f2_bak <- paste0(f2, ".bak")
-    file.rename(f2, f2_bak)
-    expect_error(use_idd("9.0"), class = "eplusr_error_locate_idd")
-    # but "auto" still work in this case
-    expect_s3_class(use_idd("9.0", "auto"), "Idd")
-    file.rename(f2_bak, f2)
-
     # can use "latest" notation
-    expect_s3_class(use_idd("latest", download = TRUE), "Idd")
+    expect_s3_class(use_idd("latest"), "Idd")
 
     # helper functions
     expect_true(numeric_version(LATEST_EPLUS_VER) %in% avail_idd())
@@ -122,6 +111,32 @@ test_that("can read IDD", {
     expect_warning(get_idd_from_ver(NULL, NULL), "latest")
 })
 # }}}
+
+test_that("can fall back across installed IDD locations", {
+    skip_on_cran()
+    skip_if_not_integration()
+
+    # Verify VersionUpdater fallback using the real installed layout.
+    use_eplus(LATEST_EPLUS_VER)
+    f1 <- path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+    f1_bak <- paste0(f1, ".bak")
+    expect_true(file.rename(f1, f1_bak))
+    on.exit(if (file.exists(f1_bak)) file.rename(f1_bak, f1), add = TRUE)
+    expect_s3_class(use_idd(LATEST_EPLUS_VER), "Idd")
+    expect_true(file.rename(f1_bak, f1))
+
+    # Verify the error and auto-selection paths when an updater IDD is absent.
+    rm_global_cache("eplus")
+    use_eplus(LATEST_EPLUS_VER)
+    rm_global_cache("idd")
+    f2 <- find_idd_from_updater("9.0")
+    f2_bak <- paste0(f2, ".bak")
+    expect_true(file.rename(f2, f2_bak))
+    on.exit(if (file.exists(f2_bak)) file.rename(f2_bak, f2), add = TRUE)
+    expect_error(use_idd("9.0"), class = "eplusr_error_locate_idd")
+    expect_s3_class(use_idd("9.0", "auto"), "Idd")
+    expect_true(file.rename(f2_bak, f2))
+})
 
 # Idd class {{{
 test_that("Idd class", {

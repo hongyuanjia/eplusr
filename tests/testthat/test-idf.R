@@ -1424,6 +1424,7 @@ test_that("$save()", {
 # RUN {{{
 test_that("$run()", {
     skip_on_cran()
+    skip_if_not_integration()
     expect_error(read_idf(idftext("idf", LATEST_EPLUS_VER))$save(), class = "eplusr_error")
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_s3_class(job <- idf$run(NULL, tempdir(), echo = FALSE), "EplusJob")
@@ -1437,6 +1438,7 @@ test_that("$run()", {
 # LAST_JOB {{{
 test_that("$last_job()", {
     skip_on_cran()
+    skip_if_not_integration()
     expect_s3_class(idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")), "Idf")
     expect_null(idf$last_job())
     expect_s3_class({idf$run(NULL, tempdir(), echo = FALSE); idf$last_job()}, "EplusJob")

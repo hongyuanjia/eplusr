@@ -39,6 +39,7 @@ jobs:
       RGL_USE_NULL: true
       NOT_CRAN: true
       TESTTHAT_CPUS: 1
+      _EPLUSR_RUN_INTEGRATION_TESTS_: true
       R_KEEP_PKG_SOURCE: true
       COVR_COVRIGNORE: ".github/workflows/.covrignore"
 

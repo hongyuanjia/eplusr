@@ -214,6 +214,7 @@ test_that("$cases()", {
 
 test_that("$run()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     path <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     param <- param_job(path, NULL)
