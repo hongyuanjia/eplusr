@@ -65,6 +65,8 @@ jobs:
           out <- Sys.getenv("GITHUB_OUTPUT")
           cat("path=", dir, "\n", file = out, append = TRUE, sep = "")
           cat("version=", as.character(utils::packageVersion("duckdb")), "\n", file = out, append = TRUE, sep = "")
+          # DuckDB otherwise uses a per-session temp directory that covr cannot share.
+          cat("DUCKDB_EXTENSION_DIRECTORY=", dir, "\n", file = Sys.getenv("GITHUB_ENV"), append = TRUE, sep = "")
         shell: Rscript {0}
 
       - name: Restore DuckDB extension cache
