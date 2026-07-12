@@ -39,6 +39,9 @@
 
 ## Bug fixes
 
+* Validate active extensible groups using the first-group required-field
+  template, allowing optional fields without defaults to remain empty (#641).
+
 * Allow optional fields with default values to remain empty inside active
   extensible groups during validation (#640).
 
