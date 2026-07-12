@@ -39,6 +39,9 @@
 
 ## Bug fixes
 
+* Allow optional fields with default values to remain empty inside active
+  extensible groups during validation (#640).
+
 * Reject character field values that contain IDF delimiters, preventing comma or
   semicolon inputs from corrupting generated IDF syntax (#67).
 
