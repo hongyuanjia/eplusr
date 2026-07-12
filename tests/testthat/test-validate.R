@@ -121,11 +121,29 @@ test_that("Validate method", {
     env_in$validity <- empty_validity()
     add_joined_cols(env_in$object, env_in$value, "object_id", c("class_id", "object_name"))
     add_class_property(idd_env, env_in$value, c("class_id", "class_name"))
-    add_field_property(idd_env, env_in$value, c("extensible_group", "field_index", "field_name", "units", "ip_units", "type_enum"))
+    add_field_property(idd_env, env_in$value, c(
+        "extensible_group", "required_field", "default_chr", "field_index",
+        "field_name", "units", "ip_units", "type_enum"
+    ))
     expect_equal(nrow(check_incomplete_extensible(idd_env, idf_env, env_in)$validity$incomplete_extensible), 0L)
     invisible(env_in$value[extensible_group == 3L, value_chr := NA_character_])
     expect_silent({err <- check_incomplete_extensible(idd_env, idf_env, env_in)$validity$incomplete_extensible})
     expect_equal(err$object_id, rep(3L, 3))
+    expect_equal(err$field_index, 18:20)
+    expect_equal(err$value_id, 32:34)
+
+    # Optional fields with defaults can remain empty in an active group.
+    invisible(env_in$value[field_index == 18L, `:=`(
+        required_field = FALSE,
+        default_chr = "0.0"
+    )])
+    err <- check_incomplete_extensible(idd_env, idf_env, env_in)$validity$incomplete_extensible
+    expect_equal(err$field_index, 19:20)
+    expect_equal(err$value_id, 33:34)
+
+    # Required fields remain invalid even when a default is available.
+    invisible(env_in$value[field_index == 18L, required_field := TRUE])
+    err <- check_incomplete_extensible(idd_env, idf_env, env_in)$validity$incomplete_extensible
     expect_equal(err$field_index, 18:20)
     expect_equal(err$value_id, 32:34)
     # }}}

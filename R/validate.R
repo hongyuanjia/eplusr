@@ -301,7 +301,11 @@ validate_objects <- function
     # add field attributes used for validating {{{
     # add field index
     cols_add <- c("type_enum", "ip_units", "units")
-    if (isTRUE(extensible)) cols_add <- c(cols_add, "extensible_group")
+    if (isTRUE(extensible)) {
+        # Extensible validation distinguishes required fields and optional
+        # fields without defaults from optional fields that can be defaulted.
+        cols_add <- c(cols_add, "extensible_group", "required_field", "default_chr")
+    }
     if (isTRUE(required_field)) cols_add <- c(cols_add, "required_field")
     if (isTRUE(auto_field)) cols_add <- c(cols_add, "autosizable", "autocalculatable")
     if (isTRUE(choice)) cols_add <- c(cols_add, "choice")
@@ -446,7 +450,8 @@ check_conflict_name <- function(idd_env, idf_env, env_in) {
 check_incomplete_extensible <- function(idd_env, idf_env, env_in) {
     # extensible groups in input
     ext <- env_in$value[extensible_group > 0L,
-        list(object_id, field_index, field_id, extensible_group, value_chr)]
+        list(object_id, field_index, field_id, extensible_group, required_field,
+             default_chr, value_id, value_chr)]
 
     if (!nrow(ext)) return(env_in)
 
@@ -461,11 +466,22 @@ check_incomplete_extensible <- function(idd_env, idf_env, env_in) {
     empty_info[can_be_na == FALSE | is.na(can_be_na), can_be_na := can_be_na[1L],
         by = list(cumsum(!is.na(can_be_na)), object_id)]
     empty_info[is.na(can_be_na), can_be_na := TRUE]
-    incomplete <- empty_info[has_any_na == TRUE & can_be_na == FALSE, list(object_id, extensible_group)]
+    incomplete_group <- empty_info[
+        has_any_na == TRUE & can_be_na == FALSE,
+        list(object_id, extensible_group)
+    ]
+
+    # Within an active group, optional fields with defaults can stay empty.
+    # Report required fields and optional fields for which no default exists.
+    incomplete <- ext[incomplete_group, on = c("object_id", "extensible_group")][
+        is.na(value_chr) & (required_field == TRUE | is.na(default_chr)),
+        list(value_id)
+    ]
     setorderv(incomplete, names(incomplete))
 
     if (nrow(incomplete)) {
-        add_validity(idd_env, idf_env, env_in, incomplete, "incomplete_extensible", c("object_id", "extensible_group"))
+        add_validity(idd_env, idf_env, env_in, incomplete,
+            "incomplete_extensible", "value_id")
     }
 
     env_in

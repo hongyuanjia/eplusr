@@ -706,12 +706,19 @@ validate_epw_header_basic <- function(idd_env, header, class = NULL, field = NUL
     # TEMPERATURES'
     if (nrow(valid$incomplete_extensible) && EPW_CLASS$ground %chin% valid$incomplete_extensible$class_name) {
         add_field_property(idd_env, valid$incomplete_extensible, "extensible_group")
+        add_class_property(idd_env, valid$incomplete_extensible,
+            c("first_extensible", "num_extensible"))
+
+        # Validation now contains only invalid empty fields, so derive each
+        # field's position from the IDD instead of its row order in the result.
         valid$incomplete_extensible[extensible_group > 0,
-            extensible_field_index := seq_len(.N), by = c("object_id", "extensible_group")]
+            extensible_field_index :=
+                (field_index - first_extensible) %% num_extensible + 1L]
 
         ext_grp <- valid$incomplete_extensible[J(EPW_CLASS$ground), on = "class_name",
-            by = "extensible_group", list(incomplete = anyNA(value_chr[-(2:4)]))
-        ][J(FALSE), on = "incomplete", nomatch = NULL, extensible_group]
+            by = "extensible_group",
+            list(soil_properties_only = all(extensible_field_index %in% 2:4))
+        ][J(TRUE), on = "soil_properties_only", nomatch = NULL, extensible_group]
 
         if (length(ext_grp)) {
             valid$incomplete_extensible <- valid$incomplete_extensible[
@@ -719,7 +726,10 @@ validate_epw_header_basic <- function(idd_env, header, class = NULL, field = NUL
                 on = c("class_name", "extensible_group")]
         }
 
-        set(valid$incomplete_extensible, NULL, c("extensible_group", "extensible_field_index"), NULL)
+        set(valid$incomplete_extensible, NULL,
+            c("extensible_group", "first_extensible", "num_extensible",
+              "extensible_field_index"),
+            NULL)
     }
 
     setattr(valid, "class", c("EpwValidity", class(valid)))
