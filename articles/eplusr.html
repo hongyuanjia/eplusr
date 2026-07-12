@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9012</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9013</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2026-06-27</h4>
+            <h4 data-toc-skip class="date">2026-07-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/eplusr.Rmd" class="external-link"><code>vignettes/eplusr.Rmd</code></a></small>
       <div class="hidden name"><code>eplusr.Rmd</code></div>
@@ -181,7 +181,7 @@ release to parse the input IDF.</p>
 using <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '22.2.0' '26.1.0'</span></span>
+<span><span class="co">#&gt; [1] '9.6.0'  '22.2.0' '26.1.0'</span></span>
 <span></span>
 <span><span class="va">eplus_ver</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">eplus_ver</span></span>
@@ -1046,7 +1046,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2026-06-27</span></span>
+<span><span class="co">#&gt; !2026-07-12</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1101,7 +1101,7 @@ automatically recycled.</p>
 <span><span class="co">#&gt; $rp_test_3</span></span>
 <span><span class="co">#&gt; &lt;IdfObject: 'RunPeriod'&gt; [ID:326] `rp_test_3`</span></span>
 <span><span class="co">#&gt; ── COMMENTS ────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; !2026-06-27</span></span>
+<span><span class="co">#&gt; !2026-07-12</span></span>
 <span><span class="co">#&gt; !begin day has been changed.</span></span>
 <span><span class="co">#&gt; ── VALUES ──────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Class: &lt;RunPeriod&gt;</span></span>
@@ -1720,11 +1720,11 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpvz2KGP/file26075aa4ef18.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmprylTHn/file268645234ea9.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Replace the existing IDF located at</span></span>
-<span><span class="co">#&gt; /tmp/Rtmpvz2KGP/file26075aa4ef18.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; /tmp/RtmprylTHn/file268645234ea9.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -1751,7 +1751,7 @@ vignette <em>“Run simulation and data exploration”</em>.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer>
