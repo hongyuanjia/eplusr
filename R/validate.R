@@ -301,11 +301,7 @@ validate_objects <- function
     # add field attributes used for validating {{{
     # add field index
     cols_add <- c("type_enum", "ip_units", "units")
-    if (isTRUE(extensible)) {
-        # Extensible validation distinguishes required fields and optional
-        # fields without defaults from optional fields that can be defaulted.
-        cols_add <- c(cols_add, "extensible_group", "required_field", "default_chr")
-    }
+    if (isTRUE(extensible)) cols_add <- c(cols_add, "extensible_group")
     if (isTRUE(required_field)) cols_add <- c(cols_add, "required_field")
     if (isTRUE(auto_field)) cols_add <- c(cols_add, "autosizable", "autocalculatable")
     if (isTRUE(choice)) cols_add <- c(cols_add, "choice")
@@ -450,10 +446,25 @@ check_conflict_name <- function(idd_env, idf_env, env_in) {
 check_incomplete_extensible <- function(idd_env, idf_env, env_in) {
     # extensible groups in input
     ext <- env_in$value[extensible_group > 0L,
-        list(object_id, field_index, field_id, extensible_group, required_field,
-             default_chr, value_id, value_chr)]
+        list(object_id, class_id, field_index, field_id, extensible_group,
+             value_id, value_chr)]
 
     if (!nrow(ext)) return(env_in)
+
+    # Required flags are cleared from expanded fields after the class-level
+    # last required field. Map every slot back to the first extensible group so
+    # active groups retain the template's actual required-field pattern.
+    ext[idd_env$class, on = "class_id", `:=`(
+        first_extensible = i.first_extensible,
+        num_extensible = i.num_extensible
+    )]
+    ext[, template_field_index :=
+        first_extensible + (field_index - first_extensible) %% num_extensible]
+    template <- idd_env$field[extensible_group == 1L,
+        list(class_id, template_field_index = field_index,
+             template_required = required_field)]
+    ext[template, on = c("class_id", "template_field_index"),
+        template_required := i.template_required]
 
     # check incomplete extensible fields
     # check if fields in an extensible group have any NA or are all NAs
@@ -471,10 +482,9 @@ check_incomplete_extensible <- function(idd_env, idf_env, env_in) {
         list(object_id, extensible_group)
     ]
 
-    # Within an active group, optional fields with defaults can stay empty.
-    # Report required fields and optional fields for which no default exists.
+    # Optional template fields can stay empty regardless of their defaults.
     incomplete <- ext[incomplete_group, on = c("object_id", "extensible_group")][
-        is.na(value_chr) & (required_field == TRUE | is.na(default_chr)),
+        is.na(value_chr) & template_required == TRUE,
         list(value_id)
     ]
     setorderv(incomplete, names(incomplete))

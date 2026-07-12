@@ -89,12 +89,6 @@ test_that("can read IDD", {
     # recover EnergyPlus config
     locate_eplus()
 
-    # can parse old IDD
-    expect_s3_class(use_idd("7.2"), "Idd")
-    expect_s3_class(use_idd("8.0"), "Idd")
-    expect_s3_class(use_idd("8.1"), "Idd")
-    expect_s3_class(use_idd("8.2"), "Idd")
-
     # can auto find suitable IDD
     expect_s3_class(get_idd_from_ver("9.0", NULL), "Idd")
     # can give warning if hard-coded IDD is used
@@ -111,6 +105,19 @@ test_that("can read IDD", {
     expect_warning(get_idd_from_ver(NULL, NULL), "latest")
 })
 # }}}
+
+# Legacy IDDs come from the EnergyPlus 22.2 VersionUpdater bundle, which is
+# prepared only for integration jobs rather than the default R CMD check.
+test_that("can parse legacy IDDs", {
+    skip_on_cran()
+    skip_if_not_integration()
+
+    locate_eplus()
+    expect_s3_class(use_idd("7.2"), "Idd")
+    expect_s3_class(use_idd("8.0"), "Idd")
+    expect_s3_class(use_idd("8.1"), "Idd")
+    expect_s3_class(use_idd("8.2"), "Idd")
+})
 
 test_that("can fall back across installed IDD locations", {
     skip_on_cran()
