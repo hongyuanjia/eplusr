@@ -1,7 +1,11 @@
 # HELPER {{{
 test_that("Transition Helper", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
+
+    # EnergyPlus 23.1+ no longer ships pre-9.0 updater assets; register the
+    # integration prerequisite prepared by CI before exercising all versions.
+    use_eplus("22.2")
 
     idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
@@ -102,7 +106,7 @@ test_that("Transition Helper", {
 # v7.2 --> v8.0 {{{
 test_that("Transition v7.2 --> v8.0", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "7.2"
     to <- "8.0"
     expect_s3_class(
@@ -370,7 +374,7 @@ test_that("Transition v7.2 --> v8.0", {
 # v8.0 --> v8.1 {{{
 test_that("Transition v8.0 --> v8.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.0"
     to <- "8.1"
     expect_s3_class(
@@ -508,7 +512,7 @@ test_that("Transition v8.0 --> v8.1", {
 # v8.1 --> v8.2 {{{
 test_that("Transition v8.1 --> v8.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.1"
     to <- "8.2"
     expect_s3_class(
@@ -637,7 +641,7 @@ test_that("Transition v8.1 --> v8.2", {
 # v8.2 --> v8.3 {{{
 test_that("Transition v8.2 --> v8.3", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.2"
     to <- "8.3"
     expect_s3_class(
@@ -684,7 +688,7 @@ test_that("Transition v8.2 --> v8.3", {
 # v8.3 --> v8.4 {{{
 test_that("Transition v8.3 --> v8.4", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.3"
     to <- "8.4"
     expect_s3_class(
@@ -866,7 +870,7 @@ test_that("Transition v8.3 --> v8.4", {
 # v8.4 --> v8.5 {{{
 test_that("Transition v8.4 --> v8.5", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.4"
     to <- "8.5"
     expect_s3_class(
@@ -895,7 +899,7 @@ test_that("Transition v8.4 --> v8.5", {
 # v8.5 --> v8.6 {{{
 test_that("Transition v8.5 --> v8.6", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.5"
     to <- "8.6"
     expect_s3_class(
@@ -1119,7 +1123,7 @@ test_that("Transition v8.5 --> v8.6", {
 # v8.6 --> v8.7 {{{
 test_that("Transition v8.6 --> v8.7", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.6"
     to <- "8.7"
     expect_s3_class(
@@ -1200,7 +1204,7 @@ test_that("Transition v8.6 --> v8.7", {
 # v8.7 --> v8.8 {{{
 test_that("Transition v8.7 --> v8.8", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.7"
     to <- "8.8"
     expect_s3_class(
@@ -1328,7 +1332,7 @@ test_that("Transition v8.7 --> v8.8", {
 # v8.8 --> v8.9 {{{
 test_that("Transition v8.8 --> v8.9", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.8"
     to <- "8.9"
     expect_s3_class(
@@ -1410,7 +1414,7 @@ test_that("Transition v8.8 --> v8.9", {
 # v8.9 --> v9.0 {{{
 test_that("Transition v8.9 --> v9.0", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "8.9"
     to <- "9.0"
     expect_s3_class(
@@ -1508,7 +1512,7 @@ test_that("Transition v8.9 --> v9.0", {
 # v9.0 --> v9.1 {{{
 test_that("Transition v9.0 --> v9.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "9.0"
     to <- "9.1"
     expect_s3_class(
@@ -1537,7 +1541,7 @@ test_that("Transition v9.0 --> v9.1", {
 # v9.1 --> v9.2 {{{
 test_that("Transition v9.1 --> v9.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "9.1"
     to <- "9.2"
     unlink(file.path(tempdir(), "test.csv"))
@@ -1814,7 +1818,7 @@ test_that("Transition v9.1 --> v9.2", {
 # v9.2 --> v9.3 {{{
 test_that("Transition v9.2 --> v9.3", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "9.2"
     to <- "9.3"
     expect_s3_class(
@@ -2008,7 +2012,7 @@ test_that("Transition v9.2 --> v9.3", {
 # v9.3 --> v9.4 {{{
 test_that("Transition v9.3 --> v9.4", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "9.3"
     to <- "9.4"
     expect_s3_class(
@@ -2094,7 +2098,7 @@ test_that("Transition v9.3 --> v9.4", {
 # v9.4 --> v9.5 {{{
 test_that("Transition v9.4 --> v9.5", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
     from <- "9.4"
     to <- "9.5"
     expect_s3_class(
@@ -2276,7 +2280,7 @@ test_that("Transition v9.4 --> v9.5", {
 # v9.5 --> v9.6 {{{
 test_that("Transition v9.5 --> v9.6", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     # do not install EnergyPlus if not on CI
     skip_if_not(testthat:::on_ci())
@@ -2480,7 +2484,7 @@ test_that("Transition v9.5 --> v9.6", {
 # v9.6 --> v22.1 {{{
 test_that("Transition v9.6 --> v22.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "9.6"
     to <- "22.1"
@@ -2505,7 +2509,7 @@ test_that("Transition v9.6 --> v22.1", {
 # v22.1 --> v22.2 {{{
 test_that("Transition v22.1 --> v22.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "22.1"
     to <- "22.2"
@@ -2685,7 +2689,7 @@ test_that("Transition v22.1 --> v22.2", {
 # v22.2 --> v23.1 {{{
 test_that("Transition v22.2 --> v23.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "22.2"
     to <- "23.1"
@@ -2703,7 +2707,7 @@ test_that("Transition v22.2 --> v23.1", {
 # v23.1 --> v23.2 {{{
 test_that("Transition v23.1 --> v23.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "23.1"
     to <- "23.2"
@@ -2813,7 +2817,7 @@ test_that("Transition v23.1 --> v23.2", {
 # v23.2 --> v24.1 {{{
 test_that("Transition v23.2 --> v24.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "23.2"
     to <- "24.1"
@@ -2906,7 +2910,7 @@ test_that("Transition v23.2 --> v24.1", {
 # v24.1 --> v24.2 {{{
 test_that("Transition v24.1 --> v24.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "24.1"
     to <- "24.2"
@@ -3001,7 +3005,7 @@ test_that("Transition v24.1 --> v24.2", {
 # v24.2 --> v25.1 {{{
 test_that("Transition v24.2 --> v25.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "24.2"
     to <- "25.1"
@@ -3045,7 +3049,7 @@ test_that("Transition v24.2 --> v25.1", {
 # v25.1 --> v25.2 {{{
 test_that("Transition v25.1 --> v25.2", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "25.1"
     to <- "25.2"
@@ -3129,7 +3133,7 @@ test_that("Transition v25.1 --> v25.2", {
 # v25.2 --> v26.1 {{{
 test_that("Transition v25.2 --> v26.1", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_TRANSITION_") != "")
+    skip_if_not_integration()
 
     from <- "25.2"
     to <- "26.1"

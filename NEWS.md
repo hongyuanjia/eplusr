@@ -21,6 +21,11 @@
 
 ## Internal refactor
 
+* Run tests serially by default and reserve network, transition, preprocessor,
+  and other heavy external-program checks for an explicit integration mode,
+  while retaining latest-version SQLite output coverage in the default suite
+  (#637).
+
 * Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr's
   recursive dependency chain and raising the minimum supported R version to
   4.2.0 (#635).

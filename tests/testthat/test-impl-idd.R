@@ -299,7 +299,7 @@ test_that("Idd implementation", {
     )
 
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_DOWNLOAD_IDD_") != "")
+    skip_if_not_integration()
 
     idd <- use_idd(LATEST_EPLUS_VER, "auto")
     idd_env <- get_priv_env(idd)$idd_env()

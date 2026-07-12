@@ -72,13 +72,13 @@ test_that("save_job() and read_job() round-trip job manifests", {
 
 test_that("completed EplusJob results can be restored from JSON", {
     skip_on_cran()
+    skip_if_not_integration()
     skip_if_not(is_avail_eplus(LATEST_EPLUS_VER))
 
-    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
-
-    job <- eplus_job(path_idf, path_epw)
-    job$run(wait = TRUE, echo = FALSE)
+    # The hash-verification branch changes the ERR file, so work on a private
+    # copy of the session-level real output bundle.
+    bundle <- copy_latest_output_bundle()
+    job <- bundle$job
 
     path <- tempfile(fileext = ".json")
     save_job(job, path)
@@ -106,13 +106,13 @@ test_that("completed EplusJob results can be restored from JSON", {
 
 test_that("EplusGroupJob run state can be restored from JSON", {
     skip_on_cran()
+    skip_if_not_integration()
     skip_if_not(is_avail_eplus(LATEST_EPLUS_VER))
 
-    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
-
-    job <- eplus_job(path_idf, path_epw)
-    job$run(wait = TRUE, echo = FALSE)
+    bundle <- copy_latest_output_bundle()
+    path_idf <- bundle$idf_path
+    path_epw <- bundle$epw_path
+    job <- bundle$job
     result <- get_priv_env(job)$m_job
 
     group <- group_job(path_idf, path_epw)

@@ -1,5 +1,6 @@
 test_that("Job methods", {
     skip_on_cran()
+    skip_if_not_integration()
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "5Zone_Transformer.idf")
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")

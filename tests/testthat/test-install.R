@@ -272,7 +272,7 @@ test_that("Linux installs without uninstall.sh are removed directly", {
 
 test_that("Install EnergyPlus v9.0 and below", {
     skip_on_cran()
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_INSTALL_OLD_") != "")
+    skip_if_not_integration()
     skip_if_not(testthat:::on_ci())
 
     expect_equal(sort(as.character(avail_eplus())), sort(names(.globals$eplus)))

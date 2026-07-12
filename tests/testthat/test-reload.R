@@ -1,17 +1,18 @@
 # Reload {{{
 test_that("Reload", {
     skip_on_cran()
+    skip_if_not_integration()
     eplusr_option(verbose_info = FALSE)
 
     # default
     expect_equal(reload(1L), 1L)
 
-    example <- copy_example()
+    bundle <- latest_output_bundle()
 
     idd <- use_idd(LATEST_EPLUS_VER)
-    idf <- read_idf(example$idf)
-    epw <- read_epw(example$epw)
-    job <- idf$run(NULL, tempdir(), echo = FALSE)
+    idf <- bundle$idf
+    epw <- bundle$epw
+    job <- bundle$job
     grp <- group_job(idf, NULL)$run(tempdir())
     par <- param_job(idf, NULL)
     par$apply_measure(function(x, y) x, 1:2)

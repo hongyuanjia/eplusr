@@ -56,6 +56,7 @@ test_that("copy_energyplus_idd()", {
 
 test_that("EPMacro()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "EPMacro")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -117,6 +118,7 @@ test_that("EPMacro()", {
 
 test_that("ExpandObjects()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "ExpandObjects")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -186,8 +188,7 @@ test_that("ExpandObjects()", {
 
 test_that("Basement()", {
     skip_on_cran()
-
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") != "")
+    skip_if_not_integration()
     out_dir <- file.path(tempdir(), "Basement")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
@@ -298,8 +299,7 @@ test_that("Basement()", {
 
 test_that("Slab()", {
     skip_on_cran()
-
-    skip_if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") != "")
+    skip_if_not_integration()
     out_dir <- file.path(tempdir(), "Basement")
     if (!dir.exists(out_dir)) dir.create(out_dir)
 
@@ -389,6 +389,7 @@ test_that("Slab()", {
 
 test_that("EnergyPlus()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "Energyplus")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -436,6 +437,7 @@ test_that("EnergyPlus()", {
 
 test_that("convertESOMTR()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "convertESOMTR")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -482,6 +484,7 @@ test_that("convertESOMTR()", {
 
 test_that("ReadVarsESO()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "ReadVarsESO")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -527,6 +530,7 @@ test_that("ReadVarsESO()", {
 
 test_that("HVAC_Diagram()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "HVAC_Diagram")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -553,6 +557,7 @@ test_that("HVAC_Diagram()", {
 
 test_that("energyplus()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "run-energyplus")
     if (!dir.exists(out_dir)) dir.create(out_dir)
@@ -613,57 +618,55 @@ test_that("energyplus()", {
     expect_true(is.na(files["experr"]))
     unlink(c(path_exp, out_dir), recursive = TRUE)
 
-    if(Sys.getenv("_EPLUSR_SKIP_TESTS_BASEMENT_") == "") {
-        # NOTE: There is a bug in the basement preprocessor in EnergyPlus from v9.4 to v22.1
-        # Ref: https://github.com/NREL/EnergyPlus/pull/9356
-        if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
-            # can run Basement
-            path_base <- copy_eplus_example(LATEST_EPLUS_VER, "LgOffVAVusingBasement.idf")
-            expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
-            # modify the input in order to reduce the simulation time
-            l <- read_lines(path_base)
-            l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
-            l[grepl("NMAT: Number of materials in this domain", string), string := "1,"]
-            l[grepl("CLEARANCE: Distance from outside of wall", string), string := "1,"]
-            l[grepl("BaseDepth: Depth of the basement wall", string), string := "0.5;"]
-            write_lines(l, path_base)
-            res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
-            expect_equal(length(res_base$file), 57L)
-            # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-            # a SQLite output
-            expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 26L)
-            expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-            expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
-            expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
-            expect_true(file.exists(file.path(out_dir, files["expidf"])))
-            expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
-            expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
-            expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
-            expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
-            unlink(c(path_base, out_dir), recursive = TRUE)
-        }
-
-        # can run Slab
-        path_slab <- copy_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSlab.idf")
-        expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
+    # NOTE: There is a bug in the basement preprocessor in EnergyPlus from v9.4 to v22.1
+    # Ref: https://github.com/NREL/EnergyPlus/pull/9356
+    if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
+        # can run Basement
+        path_base <- copy_eplus_example(LATEST_EPLUS_VER, "LgOffVAVusingBasement.idf")
+        expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
         # modify the input in order to reduce the simulation time
-        l <- read_lines(path_slab)
-        l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
-        l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
-        write_lines(l, path_slab)
-        res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
-        expect_equal(length(res_slab$file), 57L)
+        l <- read_lines(path_base)
+        l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
+        l[grepl("NMAT: Number of materials in this domain", string), string := "1,"]
+        l[grepl("CLEARANCE: Distance from outside of wall", string), string := "1,"]
+        l[grepl("BaseDepth: Depth of the basement wall", string), string := "0.5;"]
+        write_lines(l, path_base)
+        res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
+        expect_equal(length(res_base$file), 57L)
         # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
         # a SQLite output
-        expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 25L)
+        expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 26L)
         expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-        expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
-        expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
-        expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
-        expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
-        expect_true(file.exists(file.path(out_dir, files["slab_out"])))
-        unlink(c(path_slab, out_dir), recursive = TRUE)
+        expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
+        expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
+        expect_true(file.exists(file.path(out_dir, files["expidf"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
+        expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
+        unlink(c(path_base, out_dir), recursive = TRUE)
     }
+
+    # can run Slab
+    path_slab <- copy_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSlab.idf")
+    expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
+    # modify the input in order to reduce the simulation time
+    l <- read_lines(path_slab)
+    l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
+    l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
+    write_lines(l, path_slab)
+    res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
+    expect_equal(length(res_slab$file), 57L)
+    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+    # a SQLite output
+    expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 25L)
+    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
+    expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
+    expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
+    expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
+    expect_true(file.exists(file.path(out_dir, files["slab_out"])))
+    unlink(c(path_slab, out_dir), recursive = TRUE)
 
     # can convert eso to IP
     path_ip <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
@@ -712,6 +715,7 @@ test_that("energyplus()", {
 
 test_that("run_idf()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
@@ -767,6 +771,7 @@ test_that("run_idf()", {
 
 test_that("run_multi()", {
     skip_on_cran()
+    skip_if_not_integration()
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, c("1ZoneUncontrolled.idf", "5Zone_Transformer.idf"))
     path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
