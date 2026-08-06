@@ -39,6 +39,9 @@
 
 ## Bug fixes
 
+* Keep `IdfViewer` triangulation compatible with decido 0.5.0 and infer
+  detailed fenestration vertices from populated XYZ coordinate fields (#643).
+
 * Validate active extensible groups using the first-group required-field
   template, allowing optional fields without defaults to remain empty (#641,
   #642).
