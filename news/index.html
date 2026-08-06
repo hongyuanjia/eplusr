@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9014</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9015</span>
       </span>
     </div>
 
@@ -117,7 +117,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p>Validate active extensible groups using the first-group required-field template, allowing optional fields without defaults to remain empty (<a href="https://github.com/hongyuanjia/eplusr/issues/641" class="external-link">#641</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/642" class="external-link">#642</a>).</p></li>
+<ul><li><p>Keep <code>IdfViewer</code> triangulation compatible with decido 0.5.0 and infer detailed fenestration vertices from populated XYZ coordinate fields (<a href="https://github.com/hongyuanjia/eplusr/issues/643" class="external-link">#643</a>).</p></li>
+<li><p>Validate active extensible groups using the first-group required-field template, allowing optional fields without defaults to remain empty (<a href="https://github.com/hongyuanjia/eplusr/issues/641" class="external-link">#641</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/642" class="external-link">#642</a>).</p></li>
 <li><p>Allow optional fields with default values to remain empty inside active extensible groups during validation (<a href="https://github.com/hongyuanjia/eplusr/issues/640" class="external-link">#640</a>).</p></li>
 <li><p>Reject character field values that contain IDF delimiters, preventing comma or semicolon inputs from corrupting generated IDF syntax (<a href="https://github.com/hongyuanjia/eplusr/issues/67" class="external-link">#67</a>).</p></li>
 <li><p>Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during IDD relation tests.</p></li>
