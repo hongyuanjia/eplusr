@@ -411,10 +411,20 @@ extract_geom_subsurface_detailed <- function(idf, geom_class = NULL, object = NU
 
     # vertices
     fldid_start <- get_first_vertex_field_index(idf$version())[["FenestrationSurface:Detailed"]]
-    # NOTE: currently fenestrations only support triangle and rectangles
+    # NOTE: currently fenestrations only support triangles and quadrilaterals
     vertices <- dt[J(fldid_start:(fldid_start + 11L)), on = "field_index"][, by = "object_id",
         list(index = rep(1:4, each = 3L), field = rep(c("x", "y", "z"), 4L), value_num)]
     vertices <- dcast.data.table(vertices, object_id + index ~ field, value.var = "value_num")
+
+    # A triangle has a fully blank fourth XYZ group, regardless of the value in
+    # Number of Vertices. Keep partially populated groups for validation below.
+    vertices <- vertices[!(index == 4L & is.na(x) & is.na(y) & is.na(z))]
+    if (any(!is.finite(vertices$x) | !is.finite(vertices$y) | !is.finite(vertices$z))) {
+        abort(
+            "'FenestrationSurface:Detailed' objects must contain three or four complete, finite XYZ vertex groups.",
+            "invalid_geom_vertices"
+        )
+    }
     setnames(vertices, "object_id", "id")
 
     list(meta = meta, vertices = vertices)

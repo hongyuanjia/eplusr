@@ -520,7 +520,8 @@ triangulate_surfaces <- function(vertices) {
     vert <- vertices[, by = "id", {
         hole <- which(index == -1L)
         if (!length(hole)) hole <- 0L
-        tri <- decido::earcut(list(inv_x, inv_y), hole)
+        # Preserve triangulation quality with the Earcut 3.x code in decido.
+        tri <- decido::earcut(list(inv_x, inv_y), hole, refine = TRUE)
         list(index = seq_along(tri), x = inv_x[tri], y = inv_y[tri], z = inv_z[tri])
     }]
 

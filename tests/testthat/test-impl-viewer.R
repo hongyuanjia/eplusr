@@ -1,4 +1,43 @@
 # IdfViewer Implemention {{{
+test_that("Geometry triangulation preserves polygon holes", {
+    skip_if_not_installed("decido")
+
+    geoms <- list(
+        surface = data.table(id = 1L, name = "wall"),
+        subsurface = data.table(
+            id = 2L, name = "window", building_surface_name = "wall"
+        ),
+        vertices = rbindlist(list(
+            data.table(
+                id = 1L, index = 1:4,
+                x = c(0, 4, 4, 0), y = c(0, 0, 4, 4), z = 0
+            ),
+            data.table(
+                id = 2L, index = 1:3,
+                x = c(1, 2, 1), y = c(1, 1, 2), z = 0
+            )
+        ))
+    )
+
+    triangulated <- triangulate_geoms(geoms)
+    expect_true(all(is.finite(triangulated$x)))
+    expect_true(all(is.finite(triangulated$y)))
+    expect_true(all(is.finite(triangulated$z)))
+    expect_equal(nrow(triangulated[id == 1L]), 21L)
+    expect_equal(nrow(triangulated[id == 2L]), 3L)
+
+    # Compare total triangle area instead of implementation-specific indices.
+    surface <- triangulated[id == 1L]
+    surface[, triangle := rep(seq_len(.N %/% 3L), each = 3L)]
+    area <- surface[, by = "triangle", .(
+        area = abs(
+            (x[2L] - x[1L]) * (y[3L] - y[1L]) -
+                (x[3L] - x[1L]) * (y[2L] - y[1L])
+        ) / 2
+    )][, sum(area)]
+    expect_equal(area, 15.5, tolerance = 1e-10)
+})
+
 test_that("IdfViewer Implemention", {
     skip_on_cran()
     skip_on_os("mac")

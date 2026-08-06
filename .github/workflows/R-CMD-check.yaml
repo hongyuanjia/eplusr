@@ -79,13 +79,14 @@ jobs:
         id: duckdb-ext-cache
         if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.not_cran }}
         run: |
-          dir <- file.path(tools::R_user_dir("duckdb", "data"), "extensions")
+          home <- tools::R_user_dir("duckdb", "data")
+          dir <- file.path(home, "extensions")
           dir.create(dir, recursive = TRUE, showWarnings = FALSE)
           out <- Sys.getenv("GITHUB_OUTPUT")
           cat("path=", dir, "\n", file = out, append = TRUE, sep = "")
           cat("version=", as.character(utils::packageVersion("duckdb")), "\n", file = out, append = TRUE, sep = "")
           # DuckDB otherwise uses a per-session temp directory that later checks cannot share.
-          cat("DUCKDB_EXTENSION_DIRECTORY=", dir, "\n", file = Sys.getenv("GITHUB_ENV"), append = TRUE, sep = "")
+          cat("DUCKDB_R_HOME=", home, "\n", file = Sys.getenv("GITHUB_ENV"), append = TRUE, sep = "")
         shell: Rscript {0}
 
       - name: Restore DuckDB extension cache

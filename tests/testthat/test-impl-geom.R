@@ -1,4 +1,51 @@
 # GEOMETRY EXTRACTION {{{
+test_that("Detailed fenestration vertices use populated XYZ fields", {
+    skip_on_cran()
+
+    idf <- read_idf(path_eplus_example(LATEST_EPLUS_VER, "AirflowNetwork3zVent.idf"))
+    fenestration <- idf[["FenestrationSurface:Detailed"]]
+
+    # A blank declared count must not add an empty fourth vertex to a triangle.
+    without_checking(fenestration$WINDOW11$set(
+        number_of_vertices = NULL, .default = FALSE, .empty = TRUE
+    ))
+    triangle <- extract_geom_subsurface_detailed(idf, object = fenestration$WINDOW11$id())
+    expect_equal(
+        triangle$vertices[, .(index, x, y, z)],
+        data.table(
+            index = 1:3,
+            x = c(1, 1, 5),
+            y = c(0, 0, 0),
+            z = c(2.5, 1, 1)
+        )
+    )
+    expect_false(anyNA(triangle$vertices))
+
+    # An inconsistent declared count is also ignored in favor of XYZ groups.
+    without_checking(fenestration$WINDOW11$set(number_of_vertices = 4L))
+    expect_equal(
+        extract_geom_subsurface_detailed(
+            idf, object = fenestration$WINDOW11$id()
+        )$vertices,
+        triangle$vertices
+    )
+
+    rectangle <- extract_geom_subsurface_detailed(
+        idf, object = fenestration$DoorInSurface_3$id()
+    )
+    expect_equal(nrow(rectangle$vertices), 4L)
+    expect_false(anyNA(rectangle$vertices))
+
+    # Partial coordinate groups are rejected before reaching the triangulator.
+    without_checking(fenestration$WINDOW11$set(
+        vertex_3_z_coordinate = NULL, .default = FALSE, .empty = TRUE
+    ))
+    expect_error(
+        extract_geom_subsurface_detailed(idf, object = fenestration$WINDOW11$id()),
+        class = "eplusr_error_invalid_geom_vertices"
+    )
+})
+
 test_that("Geometry Extraction", {
     skip_on_cran()
 
