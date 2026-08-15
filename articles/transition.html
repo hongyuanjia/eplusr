@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9016</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2026-08-06</h4>
+            <h4 data-toc-skip class="date">2026-08-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/transition.Rmd" class="external-link"><code>vignettes/transition.Rmd</code></a></small>
       <div class="hidden name"><code>transition.Rmd</code></div>
@@ -445,7 +445,12 @@ process</p>
 <span><span class="co">#&gt; [9.5.0 --&gt; 9.6.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt; IDD v9.6.0 has not been parsed before. Try to locate 'Energy+.idd' in</span></span>
 <span><span class="co">#&gt; EnergyPlus v9.6.0 installation folder '/usr/local/EnergyPlus-9-6-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-9-6-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; Failed to locate 'Energy+.idd' because EnergyPlus v9.6.0 is not available.</span></span>
+<span><span class="co">#&gt; Try to locate 'V9-6-0-Energy+.idd' in EnergyPlus v26.1.0 IDFVersionUpdater</span></span>
+<span><span class="co">#&gt; folder '/home/runner/.local/EnergyPlus-26-1-0/PreProcess/IDFVersionUpdater'.</span></span>
+<span><span class="co">#&gt; --&gt; Succeeded</span></span>
+<span><span class="co">#&gt; IDD file found:</span></span>
+<span><span class="co">#&gt; '/home/runner/.local/EnergyPlus-26-1-0/PreProcess/IDFVersionUpdater/V9-6-0-Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt; IDFVersionUpdater:</span></span>
@@ -492,7 +497,7 @@ process</p>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 183.083   3.692 176.417</span></span></code></pre></div>
+<span><span class="co">#&gt; 236.377   3.050 229.634</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="introduce-transition">Introduce <code>transition()</code><a class="anchor" aria-label="anchor" href="#introduce-transition"></a>
@@ -543,8 +548,8 @@ argument <code>save</code> to control whether to save the resultant
 <span><span class="co">#&gt; From Ver: 22.2.0 Toward Ver: 23.1.0</span></span>
 <span><span class="co">#&gt; [22.2.0 --&gt; 23.1.0] SUCCEEDED.</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  12.947   0.029   7.706</span></span></code></pre></div>
-<p>It is about 22.9 times faster.</p>
+<span><span class="co">#&gt;  12.689   0.029   7.818</span></span></code></pre></div>
+<p>It is about 29.4 times faster.</p>
 <p>Fast is always good. The most important thing is to ensure that
 <code><a href="../reference/transition.html">transition()</a></code> can provide reasonable results. Here we
 compare the results.</p>

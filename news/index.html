@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9016</span>
       </span>
     </div>
 
@@ -110,7 +110,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
-<ul><li><p>Run tests serially by default and reserve network, transition, preprocessor, and other heavy external-program checks for an explicit integration mode, while retaining latest-version SQLite output coverage in the default suite (<a href="https://github.com/hongyuanjia/eplusr/issues/637" class="external-link">#637</a>).</p></li>
+<ul><li><p>Remove redundant <code>field</code> resets from <code>trans_funs$f2510t2520()</code> and <code>trans_funs$f2520t2610()</code> because transition loading is driven by <code>class</code> and <code>index</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/646" class="external-link">#646</a>).</p></li>
+<li><p>Run tests serially by default and reserve network, transition, preprocessor, and other heavy external-program checks for an explicit integration mode, while retaining latest-version SQLite output coverage in the default suite (<a href="https://github.com/hongyuanjia/eplusr/issues/637" class="external-link">#637</a>).</p></li>
 <li><p>Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr’s recursive dependency chain and raising the minimum supported R version to 4.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/635" class="external-link">#635</a>).</p></li>
 <li><p>Use cli conditions for eplusr verbose logging, package warnings, errors, and narrow user-facing console messages while preserving eplusr condition classes (<a href="https://github.com/hongyuanjia/eplusr/issues/551" class="external-link">#551</a>).</p></li>
 <li><p>Truncate large parametric verbose messages and print summarized status output for large parametric jobs (<a href="https://github.com/hongyuanjia/eplusr/issues/569" class="external-link">#569</a>).</p></li>
