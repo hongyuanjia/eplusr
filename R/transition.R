@@ -5027,7 +5027,6 @@ trans_funs$f2510t2520 <- function(idf) {
     dt3 <- trans_action(idf, "GroundHeatExchanger:System", insert = list(11:12))
 
     dt <- rbindlist(mget(paste0("dt", 1:3)), use.names = TRUE)
-    set(dt, NULL, "field", NA_character_)
 
     trans_process(new_idf, idf, dt)
 
@@ -5057,7 +5056,6 @@ trans_funs$f2520t2610 <- function(idf) {
     dt2 <- delete_shift(trans_action(idf, "AirTerminal:SingleDuct:SeriesPIU:Reheat"), 9L)
 
     dt <- rbindlist(mget(paste0("dt", 1:2)), use.names = TRUE)
-    set(dt, NULL, "field", NA_character_)
 
     trans_process(new_idf, idf, dt)
 

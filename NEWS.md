@@ -21,6 +21,10 @@
 
 ## Internal refactor
 
+* Remove redundant `field` resets from `trans_funs$f2510t2520()` and
+  `trans_funs$f2520t2610()` because transition loading is driven by `class` and
+  `index` (#646).
+
 * Run tests serially by default and reserve network, transition, preprocessor,
   and other heavy external-program checks for an explicit integration mode,
   while retaining latest-version SQLite output coverage in the default suite
