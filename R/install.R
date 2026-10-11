@@ -279,22 +279,19 @@ eplus_download_url <- function(ver, portable = FALSE) {
         if (arch == "i386" && os != "windows") {
             abort("EnergyPlus does not provide 32-bit version installer for macOS and Linux.")
         }
-        if (arch == "i386" && os == "windows" && cmt$version %in% "24.2.0") {
-            abort("EnergyPlus v24.2.0 does not provide a Windows i386 installer.")
-        }
-        if (arch == "i386" && os == "windows" && cmt$version %in% "26.1.0") {
-            abort("EnergyPlus v26.1.0 does not provide a Windows i386 installer.")
-        }
+        # These releases lack i386 executables; v24.2 and v26.1 also lack ZIPs.
         if (
             arch == "i386" &&
                 os == "windows" &&
-                cmt$version %in% c("25.1.0", "25.2.0", "26.2.0") &&
-                !portable
+                cmt$version %in% c("24.2.0", "25.1.0", "25.2.0", "26.1.0", "26.2.0") &&
+                (!portable || cmt$version %in% c("24.2.0", "26.1.0"))
         ) {
             abort(paste0(
                 "EnergyPlus v",
                 cmt$version,
-                " does not provide a Windows i386 non-portable installer."
+                " does not provide a Windows i386 ",
+                if (portable) "portable" else "non-portable",
+                " installer."
             ))
         }
     }

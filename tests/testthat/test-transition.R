@@ -3261,5 +3261,110 @@ test_that("Transition v26.1 --> v26.2 preserves CurveFit speeds", {
         numeric_version("26.2.0")
     )
 })
+# Check every remaining class rule in the official v26.2 updater.
+test_that("Transition v26.1 --> v26.2 deletes obsolete fields and preserves Space tags", {
+    skip_on_cran()
+    skip_if_not_integration()
+
+    idf <- temp_idf(
+        "26.1",
+        CentralHeatPumpSystem = list(
+            "Plant",
+            "SmartMixing",
+            "Cool In",
+            "Cool Out",
+            "Source In",
+            "Source Out",
+            "Heat In",
+            "Heat Out",
+            25,
+            "Ancillary Schedule",
+            "ChillerHeaterPerformance:Electric:EIR",
+            "Performance",
+            "Module Schedule",
+            1,
+            "ChillerHeaterPerformance:Electric:EIR",
+            "Performance2",
+            "Module Schedule2",
+            2
+        ),
+        `ChillerHeaterPerformance:Electric:EIR` = list(
+            "Performance",
+            "autosize",
+            4,
+            6.67,
+            29.44,
+            35,
+            0.75,
+            1.38,
+            6.67,
+            49,
+            29.44,
+            12.22,
+            "ConstantFlow",
+            "autosize",
+            "autosize",
+            0,
+            0.95,
+            "WaterCooled",
+            "EnteringCondenser",
+            "CoolCapacity",
+            "CoolEIR",
+            "CoolPLR",
+            0.8,
+            "LeavingCondenser",
+            "HeatCapacity",
+            "HeatEIR",
+            "HeatPLR",
+            0.9,
+            1.3
+        ),
+        Space = list(
+            "Tagged",
+            "Zone",
+            3,
+            90,
+            30,
+            "Office",
+            "Tag1",
+            "Tag2",
+            "Tag3",
+            "Tag4",
+            "Tag5"
+        ),
+        Space = list("Untagged", "Zone", 3, 60, 20, "Storage"),
+        .all = FALSE
+    )
+    out <- transition(idf, "26.2")
+    expect_equal(out$object_num(), idf$object_num())
+
+    # Removing a field must shift every later value, including extensible modules.
+    expect_equal(
+        unname(out$CentralHeatPumpSystem$Plant$value()),
+        unname(idf$CentralHeatPumpSystem$Plant$value()[-2L])
+    )
+    expect_equal(
+        unname(out$`ChillerHeaterPerformance:Electric:EIR`$Performance$value()),
+        unname(idf$`ChillerHeaterPerformance:Electric:EIR`$Performance$value()[
+            -18L
+        ])
+    )
+
+    # Only tagged spaces gain the construction assignment slot before all tags.
+    expect_equal(
+        unname(out$Space$Tagged$value(1:6)),
+        unname(idf$Space$Tagged$value(1:6))
+    )
+    expect_true(is.na(out$Space$Tagged$value(7)[[1L]]))
+    expect_equal(
+        unname(out$Space$Tagged$value(8:12)),
+        unname(idf$Space$Tagged$value(7:11))
+    )
+    expect_equal(
+        unname(out$Space$Untagged$value()),
+        unname(idf$Space$Untagged$value())
+    )
+    expect_length(out$Space$Untagged$value(), 6L)
+})
 # }}}
 # vim: set fdm=marker:

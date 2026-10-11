@@ -361,4 +361,41 @@ test_that("EnergyPlus v26.2 download URLs match platform assets", {
     )
 })
 
+# Enforce the shared i386 guard while retaining releases with portable archives.
+test_that("Windows i386 installer availability follows release assets", {
+    download_url <- eplus_download_url
+    platform <- new.env(parent = environment(download_url))
+    environment(download_url) <- platform
+    platform$os_type <- function() "windows"
+    platform$Sys.info <- function() c(machine = "i386")
+
+    for (ver in c("24.2.0", "25.1.0", "25.2.0", "26.1.0", "26.2.0")) {
+        expect_error(
+            download_url(ver),
+            paste0(
+                "EnergyPlus v",
+                ver,
+                " does not provide a Windows i386 non-portable installer."
+            ),
+            fixed = TRUE
+        )
+        if (ver %in% c("24.2.0", "26.1.0")) {
+            expect_error(
+                download_url(ver, TRUE),
+                paste0(
+                    "EnergyPlus v",
+                    ver,
+                    " does not provide a Windows i386 portable installer."
+                ),
+                fixed = TRUE
+            )
+        } else {
+            expect_match(
+                basename(download_url(ver, TRUE)),
+                "Windows-i386.zip",
+                fixed = TRUE
+            )
+        }
+    }
+})
 # vim: set fdm=marker:
