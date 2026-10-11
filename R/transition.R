@@ -5063,6 +5063,21 @@ trans_funs$f2520t2610 <- function(idf) {
 }
 # }}}
 
+# f2610t2620 {{{
+# Insert the new CurveFit operating-mode option without losing speed references.
+trans_funs$f2610t2620 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "26.1")
+
+    target_cls <- "Coil:Cooling:DX:CurveFit:OperatingMode"
+    new_idf <- trans_preprocess(idf, "26.2", target_cls)
+
+    # The official updater leaves field 9 blank and shifts every speed name.
+    dt <- trans_action(idf, target_cls, min_fields = 8L, insert = list(9L))
+    trans_process(new_idf, idf, dt)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
 # 2. delete all old objects

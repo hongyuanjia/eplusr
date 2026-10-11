@@ -314,4 +314,51 @@ test_that("Install EnergyPlus v9.1 and above", {
     }
 })
 
+# Verify platform asset names against the official v26.2 release inventory.
+test_that("EnergyPlus v26.2 download URLs match platform assets", {
+    download_url <- eplus_download_url
+    platform <- new.env(parent = environment(download_url))
+    environment(download_url) <- platform
+    for (os in c("macos", "linux", "windows")) {
+        for (arch in c("x86_64", "arm64")) {
+            # Keep platform overrides local to this copy of the URL function.
+            platform$os_type <- function() os
+            platform$Sys.info <- function() c(machine = arch)
+            platform$os_version <- function() "99.0"
+            platform$linux_dist <- function() "ubuntu"
+            suffix <- switch(
+                os,
+                macos = paste0(
+                    "Darwin-",
+                    if (arch == "arm64") "macOS14.0" else "macOS13.3",
+                    "-",
+                    arch
+                ),
+                linux = paste0("Linux-Ubuntu24.04-", arch),
+                windows = paste0("Windows-", arch)
+            )
+            for (portable in c(FALSE, TRUE)) {
+                ext <- if (portable) {
+                    if (os == "windows") "zip" else "tar.gz"
+                } else {
+                    switch(os, macos = "dmg", linux = "sh", windows = "exe")
+                }
+                expect_equal(
+                    basename(download_url("26.2.0", portable)),
+                    paste0("EnergyPlus-26.2.0-4bd7a1f26f-", suffix, ".", ext)
+                )
+            }
+        }
+    }
+    platform$Sys.info <- function() c(machine = "i386")
+    expect_error(
+        download_url("26.2.0"),
+        "does not provide a Windows i386 non-portable installer"
+    )
+    expect_equal(
+        basename(download_url("26.2.0", TRUE)),
+        "EnergyPlus-26.2.0-4bd7a1f26f-Windows-i386.zip"
+    )
+})
+
 # vim: set fdm=marker:

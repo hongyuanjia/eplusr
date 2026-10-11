@@ -8,11 +8,11 @@ test_that("$new()", {
 
     expect_s3_class(mat <- IdfObject$new(1, parent = idf), "IdfObject")
     expect_equal(get_priv_env(mat)$m_object_id, 1L)
-    expect_equal(get_priv_env(mat)$m_class_id, 56L)
+    expect_equal(get_priv_env(mat)$m_class_id, 58L)
 
-    expect_s3_class(mat <- IdfObject$new(1, 56, parent = idf), "IdfObject")
+    expect_s3_class(mat <- IdfObject$new(1, 58, parent = idf), "IdfObject")
     expect_equal(get_priv_env(mat)$m_object_id, 1L)
-    expect_equal(get_priv_env(mat)$m_class_id, 56L)
+    expect_equal(get_priv_env(mat)$m_class_id, 58L)
 })
 # }}}
 
@@ -159,7 +159,10 @@ test_that("$value()", {
 
     # can detect invalid `index` values
     expect_error(mat$value("1"), class = "eplusr_error_invalid_field_name")
-    expect_error(mat$value(c(1, 10:11)), class = "eplusr_error_invalid_field_index")
+    expect_error(
+        mat$value(c(1, 13:14)),
+        class = "eplusr_error_invalid_field_index"
+    )
 
     # can return subset of values in a object using `index`
     expect_equal(
@@ -547,7 +550,7 @@ test_that("$to_table()", {
         ignore_attr = TRUE, tolerance = 1e-5,
         mat$to_table(string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
-            field = mat$definition()$field_name(),
+            field = mat$definition()$field_name()[1:9],
             value = list("WD01", "MediumSmooth", units::set_units(0.0191, m),
                 units::set_units(0.115, W/K/m), units::set_units(513, kg/m^3),
                 units::set_units(1381, J/K/kg), 0.9, 0.78, 0.78

@@ -3183,4 +3183,83 @@ test_that("Transition v25.2 --> v26.1", {
 })
 # }}}
 
+# v26.1 --> v26.2 {{{
+test_that("Transition v26.1 --> v26.2 preserves CurveFit speeds", {
+    skip_on_cran()
+    skip_if_not_integration()
+
+    # Exercise a complete speed list and a shorter list in the same transition.
+    idf <- temp_idf(
+        "26.1",
+        `Coil:Cooling:DX:CurveFit:OperatingMode` = list(
+            "Mode",
+            "autosize",
+            "autosize",
+            "autosize",
+            3,
+            1.5,
+            45,
+            1000,
+            "Yes",
+            "EvaporativelyCooled",
+            "autosize",
+            2,
+            "Speed1",
+            "Speed2",
+            "Speed3",
+            "Speed4",
+            "Speed5",
+            "Speed6",
+            "Speed7",
+            "Speed8",
+            "Speed9",
+            "Speed10"
+        ),
+        `Coil:Cooling:DX:CurveFit:OperatingMode` = list(
+            "Short",
+            "autosize",
+            "autosize",
+            "autosize",
+            3,
+            1.5,
+            45,
+            1000,
+            "Yes",
+            "EvaporativelyCooled",
+            "autosize",
+            1,
+            "Speed1"
+        ),
+        `Output:Variable` = list(
+            "*",
+            "Refrigeration Zone Air Chiller Sensible Heat Ratio"
+        ),
+        .all = FALSE
+    )
+
+    out <- transition(idf, "26.2")
+    expect_equal(out$version(), numeric_version("26.2.0"))
+    expect_equal(out$object_num(), idf$object_num())
+    for (name in c("Mode", "Short")) {
+        obj <- out$`Coil:Cooling:DX:CurveFit:OperatingMode`[[name]]
+        original <- idf$`Coil:Cooling:DX:CurveFit:OperatingMode`[[name]]
+        expect_true(is.na(obj$value(9)[[1L]]))
+        expect_equal(unname(obj$value(1:8)), unname(original$value(1:8)))
+        expect_equal(
+            unname(obj$value(10:length(obj$value()))),
+            unname(original$value(9:length(original$value())))
+        )
+    }
+    expect_equal(
+        out$`Output:Variable`[[1]]$value(2)[[1L]],
+        "Refrigeration Zone Air Chiller Coil Sensible Heat Ratio"
+    )
+
+    # Models without an operating mode must still upgrade successfully.
+    expect_equal(
+        transition(temp_idf("26.1"), "26.2")$version(),
+        numeric_version("26.2.0")
+    )
+})
+# }}}
 # vim: set fdm=marker:
