@@ -3184,7 +3184,7 @@ test_that("Transition v25.2 --> v26.1", {
 # }}}
 
 # v26.1 --> v26.2 {{{
-test_that("Transition v26.1 --> v26.2 preserves CurveFit speeds", {
+test_that("Transition v26.1 --> v26.2", {
     skip_on_cran()
     skip_if_not_integration()
 
@@ -3260,11 +3260,8 @@ test_that("Transition v26.1 --> v26.2 preserves CurveFit speeds", {
         transition(temp_idf("26.1"), "26.2")$version(),
         numeric_version("26.2.0")
     )
-})
-# Check every remaining class rule in the official v26.2 updater.
-test_that("Transition v26.1 --> v26.2 deletes obsolete fields and preserves Space tags", {
-    skip_on_cran()
-    skip_if_not_integration()
+
+    # Check the remaining class rules within the same version test.
 
     idf <- temp_idf(
         "26.1",
