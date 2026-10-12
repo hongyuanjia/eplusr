@@ -1194,7 +1194,7 @@ test_that("$to_table()", {
         ignore_attr = TRUE, tolerance = 1e-5,
         idf$to_table(1, unit = TRUE, string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
-            field = idf$definition("Material")$field_name(),
+            field = idf$definition("Material")$field_name()[1:9],
             value = list("WD01", "MediumSmooth", set_units(0.0191, m),
                 set_units(0.115, W/K/m), set_units(513, kg/m^3),
                 set_units(1381, J/K/kg), 0.9, 0.78, 0.78

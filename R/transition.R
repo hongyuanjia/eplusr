@@ -5063,6 +5063,48 @@ trans_funs$f2520t2610 <- function(idf) {
 }
 # }}}
 
+# f2610t2620 {{{
+# Apply all four class-specific rules from the official v26.2 updater.
+trans_funs$f2610t2620 <- function(idf) {
+    assert_true(idf$version()[, 1:2] == "26.1")
+
+    target_cls <- c(
+        "Coil:Cooling:DX:CurveFit:OperatingMode",
+        "CentralHeatPumpSystem",
+        "ChillerHeaterPerformance:Electric:EIR",
+        "Space"
+    )
+    new_idf <- trans_preprocess(idf, "26.2", target_cls)
+
+    # The official updater leaves field 9 blank and shifts every speed name.
+    dt1 <- trans_action(
+        idf,
+        target_cls[[1L]],
+        min_fields = 8L,
+        insert = list(9L)
+    )
+
+    # Delete Control Method and shift all remaining fields, including modules.
+    dt2 <- trans_action(idf, target_cls[[2L]], delete = list(2L))
+    if (nrow(dt2)) {
+        dt2[index > 2L, index := index - 1L]
+    }
+
+    # Delete Condenser Type while preserving every subsequent curve and ratio.
+    dt3 <- trans_action(idf, target_cls[[3L]], delete = list(18L))
+    if (nrow(dt3)) {
+        dt3[index > 18L, index := index - 1L]
+    }
+
+    # Insert field 7 only for tagged spaces; do not pad untagged spaces to match.
+    dt4 <- trans_action(idf, target_cls[[4L]], align = FALSE, insert = list(7L))
+    dt <- rbindlist(list(dt1, dt2, dt3, dt4), use.names = TRUE)
+    trans_process(new_idf, idf, dt)
+
+    # Apply the shared output-variable and meter rename rules.
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
 # 2. delete all old objects

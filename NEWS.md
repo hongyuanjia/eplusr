@@ -2,6 +2,8 @@
 
 ## New features
 
+* Add support for EnergyPlus v26.2.0 (#647, #648).
+
 * `IdfObject$is_valid_field()` can now check whether fields are present in the
   current object instead of only being defined in the IDD (#391).
 

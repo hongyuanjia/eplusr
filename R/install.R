@@ -279,14 +279,20 @@ eplus_download_url <- function(ver, portable = FALSE) {
         if (arch == "i386" && os != "windows") {
             abort("EnergyPlus does not provide 32-bit version installer for macOS and Linux.")
         }
-        if (arch == "i386" && os == "windows" && cmt$version %in% "24.2.0") {
-            abort("EnergyPlus v24.2.0 does not provide a Windows i386 installer.")
-        }
-        if (arch == "i386" && os == "windows" && cmt$version %in% "26.1.0") {
-            abort("EnergyPlus v26.1.0 does not provide a Windows i386 installer.")
-        }
-        if (arch == "i386" && os == "windows" && cmt$version %in% c("25.1.0", "25.2.0") && !portable) {
-            abort("EnergyPlus v", cmt$version, " does not provide a Windows i386 non-portable installer.")
+        # These releases lack i386 executables; v24.2 and v26.1 also lack ZIPs.
+        if (
+            arch == "i386" &&
+                os == "windows" &&
+                cmt$version %in% c("24.2.0", "25.1.0", "25.2.0", "26.1.0", "26.2.0") &&
+                (!portable || cmt$version %in% c("24.2.0", "26.1.0"))
+        ) {
+            abort(paste0(
+                "EnergyPlus v",
+                cmt$version,
+                " does not provide a Windows i386 ",
+                if (portable) "portable" else "non-portable",
+                " installer."
+            ))
         }
     }
 
@@ -321,7 +327,8 @@ eplus_download_url <- function(ver, portable = FALSE) {
     osver_cur <- os_version()
     osver_cur_num <- numeric_version(osver_cur, FALSE)
     osvers_nm <- ALL_EPLUS_OSVER[[cmt$version]][[os]][[arch]]
-    osvers <- gsub(os, "", osvers_nm, ignore.case = TRUE)
+    # Asset prefixes name the distribution, not the generic Linux platform.
+    osvers <- sub("^(macOS|Ubuntu)", "", osvers_nm, ignore.case = TRUE)
     dist <- linux_dist()
 
     # use the latest installer if not Ubuntu

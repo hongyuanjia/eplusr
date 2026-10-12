@@ -220,26 +220,51 @@ test_that("Formatting", {
         )
     )
 
-    expect_s3_class(pos <- format_possible(get_iddobj_possible(idd_latest, 4)), "IddFieldPossible")
-    expect_equal(pos$fmt_auto,
-        c("* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
-          "* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
-          "* Auto value: <NA>", "* Auto value: <NA>")
+    expect_s3_class(
+        pos <- format_possible(get_iddobj_possible(idd_latest, 4)),
+        "IddFieldPossible"
     )
-    expect_equal(pos$fmt_default,
-        c("* Default: \"NONE\"", "* Default: 0", "* Default: \"Suburbs\"",
-          "* Default: 0.04", "* Default: 0.4", "* Default: \"FullExterior\"",
-          "* Default: 25", "* Default: 1")
+    expect_equal(
+        pos$fmt_auto,
+        c(
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>",
+            "* Auto value: <NA>"
+        )
     )
-    expect_equal(pos$fmt_choice,
-        c("* Choice: <NA>",
-          "* Choice: <NA>",
-          "* Choice:\n  - \"Country\"\n  - \"Suburbs\"\n  - \"City\"\n  - \"Ocean\"\n  - \"Urban\"",
-          "* Choice: <NA>",
-          "* Choice: <NA>",
-          "* Choice:\n  - \"MinimalShadowing\"\n  - \"FullExterior\"\n  - \"FullInteriorAndExterior\"\n  - \"FullExteriorWithReflections\"\n  - \"FullInteriorAndExteriorWithReflections\"",
-          "* Choice: <NA>",
-          "* Choice: <NA>")
+    expect_equal(
+        pos$fmt_default,
+        c(
+            "* Default: \"NONE\"",
+            "* Default: 0",
+            "* Default: \"Suburbs\"",
+            "* Default: 0.04",
+            "* Default: 0.4",
+            "* Default: \"FullExterior\"",
+            "* Default: 25",
+            "* Default: 1",
+            "* Default: <NA>"
+        )
+    )
+    expect_equal(
+        pos$fmt_choice,
+        c(
+            "* Choice: <NA>",
+            "* Choice: <NA>",
+            "* Choice:\n  - \"Country\"\n  - \"Suburbs\"\n  - \"City\"\n  - \"Ocean\"\n  - \"Urban\"",
+            "* Choice: <NA>",
+            "* Choice: <NA>",
+            "* Choice:\n  - \"MinimalShadowing\"\n  - \"FullExterior\"\n  - \"FullInteriorAndExterior\"\n  - \"FullExteriorWithReflections\"\n  - \"FullInteriorAndExteriorWithReflections\"",
+            "* Choice: <NA>",
+            "* Choice: <NA>",
+            "* Choice: <NA>"
+        )
     )
     # }}}
     # IDF {{{
@@ -449,7 +474,7 @@ test_that("Formatting", {
           "!-      Use '!' comments if they need to be retained when using the IDFEditor."
         )
     )
-    expect_equal(fmt$format$class_id, c(1L, 56L, 92L, 109L))
+    expect_equal(fmt$format$class_id, c(1L, 58L, 94L, 114L))
     expect_equal(fmt$format$fmt[[2L]],
         list("!-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========",
              list(c("! this is a test comment for WD01"),

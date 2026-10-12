@@ -97,8 +97,21 @@ test_that("can read IDD", {
     # can stop if no available IDD parsed
     rm_global_cache("idd")
     rm_global_cache("eplus")
-    expect_error(get_idd_from_ver("9.0", NULL), class = "eplusr_error_locate_idd")
-    expect_error(get_idd_from_ver(NULL, NULL), class = "eplusr_error_no_avail_idd")
+    # Real installations must not supply an IDD during this missing-IDD check.
+    local({
+        local_mocked_bindings(
+            is_avail_eplus = function(ver) FALSE,
+            find_idd_from_updater = function(ver) NULL
+        )
+        expect_error(
+            get_idd_from_ver("9.0", NULL),
+            class = "eplusr_error_locate_idd"
+        )
+        expect_error(
+            get_idd_from_ver(NULL, NULL),
+            class = "eplusr_error_no_avail_idd"
+        )
+    })
 
     locate_eplus()
     use_idd(LATEST_EPLUS_VER)
@@ -140,6 +153,10 @@ test_that("can fall back across installed IDD locations", {
     f2_bak <- paste0(f2, ".bak")
     expect_true(file.rename(f2, f2_bak))
     on.exit(if (file.exists(f2_bak)) file.rename(f2_bak, f2), add = TRUE)
+    # Force the updater path even when this machine also has EnergyPlus 9.0.
+    local_mocked_bindings(
+        is_avail_eplus = function(ver) standardize_ver(ver)[, 1:2] != "9.0"
+    )
     expect_error(use_idd("9.0"), class = "eplusr_error_locate_idd")
     expect_s3_class(use_idd("9.0", "auto"), "Idd")
     expect_true(file.rename(f2_bak, f2))
