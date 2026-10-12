@@ -460,6 +460,11 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
         #' @details
         #' `$snapshot()` captures the current rgl view and saves it as an image
         #' file to disk using [rgl::snapshot3d()] and [rgl::rgl.postscript()].
+        #' Native image and vector exports require an OpenGL device. With a
+        #' NULL device, PNG exports require `webshot = TRUE`, the 'webshot2'
+        #' package, and a Chrome browser. Unavailable backends or failed
+        #' exports raise an error. An existing destination is replaced only
+        #' after a successful export.
         #'
         #' @param filename A single string specifying the file name. Current
         #'        supported formats are `png`, `pdf`, `svg`, `ps`, `eps`, `tex`

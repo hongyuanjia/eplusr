@@ -3,8 +3,6 @@ This is an update release of eplusr, from 0.17.0 to 0.18.0.
 ## Test environments
 
 * Local macOS 27.0.1, arm64, R 4.6.1.
-* The upstream package code at commit 1cc18666 also passed GitHub Actions
-  checks on Windows (R-release), macOS (R-release), and Linux (R-devel).
 
 ## R CMD check results
 

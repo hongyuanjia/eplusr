@@ -997,17 +997,29 @@ as_EpwDate.numeric <- function(x, leapyear = TRUE) {
 #' @keywords internal
 as_EpwDate.character <- function(x, leapyear = TRUE) {
     res <- init_epwdate_vctr(length(x))
-    if (length(x) == 0L) return(res)
+    if (length(x) == 0L) {
+        return(res)
+    }
 
     # coerce to double first
     is_dbl <- !is.na(suppressWarnings(as.double(x)))
     # check if ending with zero, e.g. "3.10"
-    is_tenth <- as.double(stri_split_fixed(x[is_dbl], ".", 2L, simplify = TRUE)[, 2L]) %% 10 == 0L
-    is_dbl[is_tenth] <- FALSE
+    is_tenth <- as.double(stri_split_fixed(
+        x[is_dbl],
+        ".",
+        2L,
+        simplify = TRUE
+    )[, 2L]) %%
+        10 ==
+        0L
+    # Map the filtered numeric positions back to the original date vector.
+    is_dbl[which(is_dbl)[which(is_tenth)]] <- FALSE
 
     res[is_dbl] <- as_EpwDate.numeric(as.double(x[is_dbl]))
 
-    if (sum(is_dbl) == length(x)) return(res)
+    if (sum(is_dbl) == length(x)) {
+        return(res)
+    }
 
     # init
     x <- x[!is_dbl]
@@ -1015,7 +1027,13 @@ as_EpwDate.character <- function(x, leapyear = TRUE) {
 
     # component separator, include "." to support "Month.Day" format
     sep <- "[/\\-\\.]"
-    s <- stri_split_charclass(x, sep, n = 5L, omit_empty = TRUE, simplify = TRUE)
+    s <- stri_split_charclass(
+        x,
+        sep,
+        n = 5L,
+        omit_empty = TRUE,
+        simplify = TRUE
+    )
 
     # month-day type
     is_md <- stri_isempty(s[, 3L]) & !stri_isempty(s[, 2L])
@@ -1025,7 +1043,12 @@ as_EpwDate.character <- function(x, leapyear = TRUE) {
     # only accept numeric values for each field
     is_ymd <- stri_isempty(s[, 4L]) & !stri_isempty(s[, 3L])
     s_ymd <- matrix(suppressWarnings(as.integer(s[is_ymd, ])), ncol = 5L)
-    d[is_ymd] <- parse_epwdate_ymd(s_ymd[, 1L], s_ymd[, 2L], s_ymd[, 3L], leapyear)
+    d[is_ymd] <- parse_epwdate_ymd(
+        s_ymd[, 1L],
+        s_ymd[, 2L],
+        s_ymd[, 3L],
+        leapyear
+    )
 
     # weekday type
     # split by space

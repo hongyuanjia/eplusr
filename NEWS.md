@@ -45,6 +45,17 @@
 
 ## Bug fixes
 
+* Preserve original positions when parsing mixed EPW date formats, including
+  decimal month/day strings ending in zero.
+
+* Report the correct integer fields in truncation warnings.
+
+* Reject unavailable or failed snapshot exports and preserve existing
+  destination files until an export succeeds.
+
+* Match weather dictionary cloneability to its parent IDD class, avoiding
+  R6 inheritance diagnostics when reading EPW files.
+
 * Keep `IdfViewer` triangulation compatible with decido 0.5.0 and infer
   detailed fenestration vertices from populated XYZ coordinate fields (#643, #644).
 
