@@ -1,25 +1,25 @@
-# eplusr (development version)
+# eplusr 0.18.0
 
 ## New features
 
 * Add support for EnergyPlus v26.2.0 (#647, #648).
 
 * `IdfObject$is_valid_field()` can now check whether fields are present in the
-  current object instead of only being defined in the IDD (#391).
+  current object instead of only being defined in the IDD (#391, #629).
 
 * Add a `field` argument to `$to_string()` methods to optionally omit field
-  name comments from generated IDF strings (#77).
+  name comments from generated IDF strings (#77, #631).
 
 * Add `Idf$reorder()` to reorder objects within a class without changing object
-  IDs (#66).
+  IDs (#66, #633).
 
 * `Idf$drop()` and `IdfObject$drop()` can now remove field slots from
   extensible groups or numbered repeated field sequences and shift following
-  values forward (#217).
+  values forward (#217, #632).
 
 * Yes/No choice fields in `Idf$add()`, `Idf$set()`, `Idf$load()`,
   `Idf$update()`, and `IdfObject$set()` now accept logical `TRUE` and `FALSE`
-  inputs as aliases for `"Yes"` and `"No"` (#257).
+  inputs as aliases for `"Yes"` and `"No"` (#257, #630).
 
 ## Internal refactor
 
@@ -30,23 +30,23 @@
 * Run tests serially by default and reserve network, transition, preprocessor,
   and other heavy external-program checks for an explicit integration mode,
   while retaining latest-version SQLite output coverage in the default suite
-  (#637).
+  (#637, #638).
 
 * Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr's
   recursive dependency chain and raising the minimum supported R version to
-  4.2.0 (#635).
+  4.2.0 (#635, #636).
 
 * Use cli conditions for eplusr verbose logging, package warnings, errors, and
   narrow user-facing console messages while preserving eplusr condition classes
-  (#551).
+  (#551, #626).
 
 * Truncate large parametric verbose messages and print summarized status output
-  for large parametric jobs (#569).
+  for large parametric jobs (#569, #626).
 
 ## Bug fixes
 
 * Keep `IdfViewer` triangulation compatible with decido 0.5.0 and infer
-  detailed fenestration vertices from populated XYZ coordinate fields (#643).
+  detailed fenestration vertices from populated XYZ coordinate fields (#643, #644).
 
 * Validate active extensible groups using the first-group required-field
   template, allowing optional fields without defaults to remain empty (#641,
@@ -56,7 +56,7 @@
   extensible groups during validation (#640).
 
 * Reject character field values that contain IDF delimiters, preventing comma or
-  semicolon inputs from corrupting generated IDF syntax (#67).
+  semicolon inputs from corrupting generated IDF syntax (#67, #628).
 
 * Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during
   IDD relation tests.
