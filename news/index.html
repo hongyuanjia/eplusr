@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9018</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.18.0</span>
       </span>
     </div>
 
@@ -99,10 +99,10 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
+<h2 class="page-header" data-toc-text="0.18.0" id="eplusr-0180">eplusr 0.18.0<a class="anchor" aria-label="anchor" href="#eplusr-0180"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p>Add support for EnergyPlus v26.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/647" class="external-link">#647</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/648" class="external-link">#648</a>).</p></li>
+<h3 id="new-features-0-18-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-18-0"></a></h3>
+<ul><li><p>Add support for EnergyPlus v26.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/647" class="external-link">#647</a>).</p></li>
 <li><p><code>IdfObject$is_valid_field()</code> can now check whether fields are present in the current object instead of only being defined in the IDD (<a href="https://github.com/hongyuanjia/eplusr/issues/391" class="external-link">#391</a>).</p></li>
 <li><p>Add a <code>field</code> argument to <code>$to_string()</code> methods to optionally omit field name comments from generated IDF strings (<a href="https://github.com/hongyuanjia/eplusr/issues/77" class="external-link">#77</a>).</p></li>
 <li><p>Add <code>Idf$reorder()</code> to reorder objects within a class without changing object IDs (<a href="https://github.com/hongyuanjia/eplusr/issues/66" class="external-link">#66</a>).</p></li>
@@ -110,7 +110,7 @@
 <li><p>Yes/No choice fields in <code>Idf$add()</code>, <code>Idf$set()</code>, <code>Idf$load()</code>, <code>Idf$update()</code>, and <code>IdfObject$set()</code> now accept logical <code>TRUE</code> and <code>FALSE</code> inputs as aliases for <code>"Yes"</code> and <code>"No"</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/257" class="external-link">#257</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="internal-refactor-development-version">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-development-version"></a></h3>
+<h3 id="internal-refactor-0-18-0">Internal refactor<a class="anchor" aria-label="anchor" href="#internal-refactor-0-18-0"></a></h3>
 <ul><li><p>Remove redundant <code>field</code> resets from <code>trans_funs$f2510t2520()</code> and <code>trans_funs$f2520t2610()</code> because transition loading is driven by <code>class</code> and <code>index</code> (<a href="https://github.com/hongyuanjia/eplusr/issues/646" class="external-link">#646</a>).</p></li>
 <li><p>Run tests serially by default and reserve network, transition, preprocessor, and other heavy external-program checks for an explicit integration mode, while retaining latest-version SQLite output coverage in the default suite (<a href="https://github.com/hongyuanjia/eplusr/issues/637" class="external-link">#637</a>).</p></li>
 <li><p>Use DuckDB to read EnergyPlus SQLite output files, reducing eplusr’s recursive dependency chain and raising the minimum supported R version to 4.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/635" class="external-link">#635</a>).</p></li>
@@ -118,9 +118,13 @@
 <li><p>Truncate large parametric verbose messages and print summarized status output for large parametric jobs (<a href="https://github.com/hongyuanjia/eplusr/issues/569" class="external-link">#569</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p>Keep <code>IdfViewer</code> triangulation compatible with decido 0.5.0 and infer detailed fenestration vertices from populated XYZ coordinate fields (<a href="https://github.com/hongyuanjia/eplusr/issues/643" class="external-link">#643</a>).</p></li>
-<li><p>Validate active extensible groups using the first-group required-field template, allowing optional fields without defaults to remain empty (<a href="https://github.com/hongyuanjia/eplusr/issues/641" class="external-link">#641</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/642" class="external-link">#642</a>).</p></li>
+<h3 id="bug-fixes-0-18-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-18-0"></a></h3>
+<ul><li><p>Preserve original positions when parsing mixed EPW date formats, including decimal month/day strings ending in zero (<a href="https://github.com/hongyuanjia/eplusr/issues/650" class="external-link">#650</a>).</p></li>
+<li><p>Report the correct integer fields in truncation warnings (<a href="https://github.com/hongyuanjia/eplusr/issues/650" class="external-link">#650</a>).</p></li>
+<li><p>Reject unavailable or failed snapshot exports and preserve existing destination files until an export succeeds (<a href="https://github.com/hongyuanjia/eplusr/issues/650" class="external-link">#650</a>).</p></li>
+<li><p>Match weather dictionary cloneability to its parent IDD class, avoiding R6 inheritance diagnostics when reading EPW files (<a href="https://github.com/hongyuanjia/eplusr/issues/650" class="external-link">#650</a>).</p></li>
+<li><p>Keep <code>IdfViewer</code> triangulation compatible with decido 0.5.0 and infer detailed fenestration vertices from populated XYZ coordinate fields (<a href="https://github.com/hongyuanjia/eplusr/issues/643" class="external-link">#643</a>).</p></li>
+<li><p>Validate active extensible groups using the first-group required-field template, allowing optional fields without defaults to remain empty (<a href="https://github.com/hongyuanjia/eplusr/issues/641" class="external-link">#641</a>).</p></li>
 <li><p>Allow optional fields with default values to remain empty inside active extensible groups during validation (<a href="https://github.com/hongyuanjia/eplusr/issues/640" class="external-link">#640</a>).</p></li>
 <li><p>Reject character field values that contain IDF delimiters, preventing comma or semicolon inputs from corrupting generated IDF syntax (<a href="https://github.com/hongyuanjia/eplusr/issues/67" class="external-link">#67</a>).</p></li>
 <li><p>Skip CRAN checks that would otherwise download the latest EnergyPlus IDD during IDD relation tests.</p></li>

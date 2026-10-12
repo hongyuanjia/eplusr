@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9018</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.18.0</span>
       </span>
     </div>
 
@@ -142,7 +142,7 @@ useful, but not essential to follow this vignette.</p>
 <h2 id="class-structure">Class structure<a class="anchor" aria-label="anchor" href="#class-structure"></a>
 </h2>
 <p>Below shows the class structure in eplusr.</p>
-<p><img src="class_structure.png" class="r-plt" alt="" style="display: block; margin: auto;"></p>
+<p><img src="class_structure.png" class="r-plt" alt="" width="236" style="display: block; margin: auto;"></p>
 <p>Basically, eplusr uses <code>Idf</code> class to present the whole
 IDF file and <code>IdfObject</code> class to present a single object in
 an IDF. Both <code>Idf</code> and <code>IdfObject</code> class contain
@@ -1726,11 +1726,11 @@ have to set <code>overwrite</code> to <code>TRUE</code> to confirm the
 process.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".idf"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpMA0gsL/file25a751f8acc9.idf"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpRRdlna/file2b595f81a9ff.idf"</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Replace the existing IDF located at</span></span>
-<span><span class="co">#&gt; /tmp/RtmpMA0gsL/file25a751f8acc9.idf.</span></span></code></pre></div>
+<span><span class="co">#&gt; /tmp/RtmpRRdlna/file2b595f81a9ff.idf.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
