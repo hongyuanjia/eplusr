@@ -54,7 +54,8 @@ error flag. \code{get_api_data(state)} copies a data frame and uses \code{freeAP
 \code{methods()} lists exact bindings, arguments, ownership, and unsupported methods.
 
 \code{rdyncall} is optional and is loaded only here. A build containing its native
-callback-boundary fix (PR 75) is required. A quarantined R process checks error,
+callback-boundary fix (PR 75), existing-handle dynport loading and signature
+metadata are required. A quarantined R process checks error,
 interrupt and return-conversion behavior; package version alone is insufficient
 until the fix has an official release. Start a fresh R process if rdyncall
 was already loaded by other code. EnergyPlus is loaded lazily and its

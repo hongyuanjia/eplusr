@@ -1,3 +1,30 @@
+# Read generated signatures for native stand-ins without loading an optional bridge.
+testapi__signatures <- function() {
+    functions <- read.dcf(system.file(
+        "dynports",
+        "EnergyPlus-26.1.dynport",
+        package = "eplusr"
+    ))[1L, "Function"]
+    lines <- trimws(strsplit(functions, "\n", fixed = TRUE)[[1L]])
+    names <- sub("\\(.*", "", lines)
+    signatures <- sub("^[^(]*\\(([^; ]+).*", "\\1", lines)
+    setNames(as.list(signatures), names)
+}
+
+# A stand-in typeinfo lets copied data exercise layout offsets rather than hard-coded strides.
+testapi__layout <- function() {
+    structure(
+        list(
+            size = 40L,
+            fields = data.frame(
+                name = c("what", "name", "key", "type", "unit"),
+                offset = seq.int(0L, 32L, 8L)
+            )
+        ),
+        class = "typeinfo"
+    )
+}
+
 # Build a native-call stand-in with real lifecycle records and callback execution.
 testapi__fake <- function() {
     ctx <- new.env(parent = emptyenv())
@@ -6,6 +33,8 @@ testapi__fake <- function() {
     ctx$version <- "26.1.0-fake"
     ctx$api_version <- "0.2"
     ctx$manifest <- api__manifest()
+    ctx$signatures <- testapi__signatures()
+    ctx$api_data <- testapi__layout()
     ctx$log <- list()
     ctx$deleted <- 0L
     ctx$unloaded <- 0L
@@ -94,15 +123,8 @@ testapi__fake <- function() {
         if (!is.null(ctx$hook)) {
             ctx$hook(symbol, arguments)
         }
-        descriptor <- Filter(
-            function(x) x$symbol == symbol,
-            ctx$manifest$native
-        )[[1L]]
-        type <- substr(
-            descriptor$signature,
-            nchar(descriptor$signature),
-            nchar(descriptor$signature)
-        )
+        signature <- ctx$signatures[[symbol]]
+        type <- substr(signature, nchar(signature), nchar(signature))
         switch(type, v = NULL, d = 0, i = 0L, I = 0L, Z = "", p = "pointer")
     }
     ctx$ffi <- list(
@@ -247,13 +269,29 @@ test_that("API data arrays are copied and freed on success and R conversion fail
     data <- api$exchange$get_api_data(state)
     expect_equal(names(data), c("what", "name", "key", "type", "unit"))
     expect_equal(data$name, "Temperature")
+    # Honor a generated padded layout for every row rather than assuming five packed pointers.
+    ctx$rows <- 2L
+    ctx$api_data$size <- 64L
+    ctx$api_data$fields$offset <- c(0L, 16L, 24L, 32L, 48L)
+    offsets <- integer()
+    ctx$ffi$unpack <- function(pointer, offset, type) {
+        offsets <<- c(offsets, offset)
+        c("OutputVariable", "Temperature", "ZONE ONE", "", "C")[
+            match(offset %% 64L, ctx$api_data$fields$offset)
+        ]
+    }
+    expect_equal(api$exchange$get_api_data(state)$name, rep("Temperature", 2L))
+    expect_equal(
+        offsets,
+        c(ctx$api_data$fields$offset, 64L + ctx$api_data$fields$offset)
+    )
     ctx$rows <- 0L
     expect_equal(nrow(api$exchange$get_api_data(state)), 0L)
     ctx$rows <- 1L
     ctx$ffi$string <- function(pointer) stop("decode failed")
     expect_error(api$exchange$get_api_data(state), "decode failed")
     freed <- Filter(function(x) x$symbol == "freeAPIData", ctx$log)
-    expect_equal(length(freed), 3L)
+    expect_equal(length(freed), 4L)
     entry$running <- FALSE
     api$close()
 })
@@ -507,6 +545,9 @@ testapi__loader <- function() {
     ctx$api_version <- "0.2"
     ctx$symbols <- TRUE
     ctx$load <- TRUE
+    ctx$layout <- TRUE
+    ctx$omit <- NULL
+    ctx$handle <- NULL
     ctx$null_state <- FALSE
     ctx$fail_identity <- FALSE
     ctx$deleted <- 0L
@@ -522,6 +563,7 @@ testapi__loader <- function() {
         file.create(file.path(ctx$directory, name))
     }
     ctx$call <- function(address, signature, ...) {
+        ctx$arguments <- list(...)
         switch(
             address,
             energyPlusVersion = ctx$version,
@@ -547,8 +589,29 @@ test_that("library loading audits identity and releases failed probe states", {
     ctx <- testapi__loader()
     local_mocked_bindings(
         dynload = function(...) if (ctx$load) ctx$pointer else NULL,
-        dynsym = function(library, name) if (ctx$symbols) name else NULL,
-        dyncall = ctx$call,
+        dynport_load_into = function(portfile, envir, libhandle = NULL) {
+            ctx$handle <- libhandle
+            if (ctx$symbols) {
+                for (symbol in setdiff(
+                    names(testapi__signatures()),
+                    ctx$omit
+                )) {
+                    # Capture each binding separately to preserve its own symbol and ABI.
+                    binding <- local({
+                        name <- symbol
+                        signature <- testapi__signatures()[[symbol]]
+                        f <- function(...) ctx$call(name, signature, ...)
+                        attr(f, "signature") <- signature
+                        f
+                    })
+                    envir[[symbol]] <- binding
+                }
+            }
+            if (ctx$layout) {
+                envir$APIDataEntry <- testapi__layout()
+            }
+            invisible(envir)
+        },
         dynunload = function(...) {
             ctx$unloaded <- ctx$unloaded + 1L
         },
@@ -562,6 +625,9 @@ test_that("library loading audits identity and releases failed probe states", {
     ctx$symbols <- FALSE
     expect_error(api__load(ctx$directory), "Missing required")
     ctx$symbols <- TRUE
+    ctx$layout <- FALSE
+    expect_error(api__load(ctx$directory), "APIDataEntry layout")
+    ctx$layout <- TRUE
     ctx$version <- "EnergyPlus, Version 26.2.0-test"
     expect_error(api__load(ctx$directory), "not EnergyPlus 26.1")
     ctx$version <- "EnergyPlus, Version 26.1.0-test"
@@ -576,15 +642,22 @@ test_that("library loading audits identity and releases failed probe states", {
     expect_error(api__load(ctx$directory), "API version")
     expect_equal(ctx$deleted, 2L)
     ctx$api_version <- "0.2"
+    # Unsupported methods remain inspectable when their optional native symbol is absent.
+    ctx$omit <- "inputFilePath"
     api <- api__load(ctx$directory)
     expect_match(api$info()$version, "26.1.0")
+    methods <- api$methods()
+    expect_equal(methods$signature[methods$symbol == ctx$omit], "")
     state <- api$state_manager$new_state()
+    api$runtime$issue_text(state, "positional arguments")
+    expect_null(names(ctx$arguments))
     # Create and diagnose the real guarded trampoline, while registration is mocked.
     api$runtime$callback_begin_new_environment(state, function(s) NULL)
     api$state_manager$delete_state(state)
     api$close()
     expect_equal(ctx$deleted, 4L)
-    expect_equal(ctx$unloaded, 6L)
+    expect_identical(ctx$handle, ctx$pointer)
+    expect_equal(ctx$unloaded, 7L)
 })
 
 test_that("constructor uses installation discovery and rejects non-26.1 versions", {
@@ -613,6 +686,15 @@ test_that("bridge safety gate handles missing, already loaded, failing and cache
     )
     expect_error(api__check_bridge(), "Install a rdyncall build")
     available <- TRUE
+    local_mocked_bindings(
+        dynport_load_into = function(portfile, envir) NULL,
+        .package = "rdyncall"
+    )
+    expect_error(api__check_bridge(), "existing-handle")
+    local_mocked_bindings(
+        dynport_load_into = function(portfile, envir, libhandle = NULL) NULL,
+        .package = "rdyncall"
+    )
     loaded <- TRUE
     saved <- as.list(api__bridge_cache)
     rm(list = ls(api__bridge_cache), envir = api__bridge_cache)
