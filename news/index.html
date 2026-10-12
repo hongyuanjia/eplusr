@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9018</span>
       </span>
     </div>
 
@@ -102,7 +102,8 @@
 <h2 class="page-header" data-toc-text="development version" id="eplusr-development-version">eplusr (development version)<a class="anchor" aria-label="anchor" href="#eplusr-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code>IdfObject$is_valid_field()</code> can now check whether fields are present in the current object instead of only being defined in the IDD (<a href="https://github.com/hongyuanjia/eplusr/issues/391" class="external-link">#391</a>).</p></li>
+<ul><li><p>Add support for EnergyPlus v26.2.0 (<a href="https://github.com/hongyuanjia/eplusr/issues/647" class="external-link">#647</a>, <a href="https://github.com/hongyuanjia/eplusr/issues/648" class="external-link">#648</a>).</p></li>
+<li><p><code>IdfObject$is_valid_field()</code> can now check whether fields are present in the current object instead of only being defined in the IDD (<a href="https://github.com/hongyuanjia/eplusr/issues/391" class="external-link">#391</a>).</p></li>
 <li><p>Add a <code>field</code> argument to <code>$to_string()</code> methods to optionally omit field name comments from generated IDF strings (<a href="https://github.com/hongyuanjia/eplusr/issues/77" class="external-link">#77</a>).</p></li>
 <li><p>Add <code>Idf$reorder()</code> to reorder objects within a class without changing object IDs (<a href="https://github.com/hongyuanjia/eplusr/issues/66" class="external-link">#66</a>).</p></li>
 <li><p><code>Idf$drop()</code> and <code>IdfObject$drop()</code> can now remove field slots from extensible groups or numbered repeated field sequences and shift following values forward (<a href="https://github.com/hongyuanjia/eplusr/issues/217" class="external-link">#217</a>).</p></li>

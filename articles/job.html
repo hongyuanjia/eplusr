@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.17.0.9018</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@
                         <h4 data-toc-skip class="author">Hongyuan
 Jia</h4>
             
-            <h4 data-toc-skip class="date">2026-08-15</h4>
+            <h4 data-toc-skip class="date">2026-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hongyuanjia/eplusr/blob/master/vignettes/job.Rmd" class="external-link"><code>vignettes/job.Rmd</code></a></small>
       <div class="hidden name"><code>job.Rmd</code></div>
@@ -154,15 +154,15 @@ Please see <code><a href="../reference/EplusJob.html">?EplusJob</a></code> for d
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eplus_ver</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">avail_eplus</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">eplus_ver</span></span>
-<span><span class="co">#&gt; [1] '26.1.0'</span></span>
+<span><span class="co">#&gt; [1] '26.2.0'</span></span>
 <span></span>
 <span><span class="va">path_idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"ExampleFiles/5Zone_Transformer.idf"</span><span class="op">)</span></span>
 <span><span class="va">path_epw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/use_eplus.html">eplus_config</a></span><span class="op">(</span><span class="va">eplus_ver</span><span class="op">)</span><span class="op">$</span><span class="va">dir</span>, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_idf.html">read_idf</a></span><span class="op">(</span><span class="va">path_idf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; IDD v26.1.0 has not been parsed before. Try to locate 'Energy+.idd' in</span></span>
-<span><span class="co">#&gt; EnergyPlus v26.1.0 installation folder '/usr/local/EnergyPlus-26-1-0'.</span></span>
-<span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-1-0/Energy+.idd'.</span></span>
+<span><span class="co">#&gt; IDD v26.2.0 has not been parsed before. Try to locate 'Energy+.idd' in</span></span>
+<span><span class="co">#&gt; EnergyPlus v26.2.0 installation folder '/usr/local/EnergyPlus-26-2-0'.</span></span>
+<span><span class="co">#&gt; IDD file found: '/home/runner/.local/EnergyPlus-26-2-0/Energy+.idd'.</span></span>
 <span><span class="co">#&gt; Start parsing...</span></span>
 <span><span class="co">#&gt; Parsing completed.</span></span></code></pre></div>
 <div class="section level3">
@@ -177,9 +177,9 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span><span class="co">#&gt; 'SimpleAndTabular' in order to create SQLite output file.</span></span>
 <span><span class="co">#&gt; ExpandObjects Started.</span></span>
 <span><span class="co">#&gt; No expanded file generated.</span></span>
-<span><span class="co">#&gt; ExpandObjects Finished. Time:     0.017</span></span>
+<span><span class="co">#&gt; ExpandObjects Completed Successfully-- 0 Warning; 0 Severe Errors; Time:     0.011</span></span>
 <span><span class="co">#&gt; EnergyPlus Starting</span></span>
-<span><span class="co">#&gt; EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.08.15 09:19</span></span>
+<span><span class="co">#&gt; EnergyPlus, Version 26.2.0-4bd7a1f26f, YMD=2026.10.12 06:57</span></span>
 <span><span class="co">#&gt; Initializing Response Factors</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "ROOF-1"</span></span>
 <span><span class="co">#&gt; Calculating CTFs for "WALL-1"</span></span>
@@ -192,11 +192,11 @@ the <code>weather</code> argument to <code>NULL</code>.</p>
 <span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-2-0/ExampleFiles/5Zone_Transformer.…</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-08-15 09:19:54.994712' and completed successfully after 0.69 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.2.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-2-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-10-12 06:57:27.600058' and completed successfully after 0.57 secs.</span></span></span></code></pre></div>
 <p><code>job</code> prints the path of model and weather, the version
 and path of EnergyPlus used to run simulations, and the simulation job
 status.</p>
@@ -205,11 +205,11 @@ status.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">last_job</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-2-0/ExampleFiles/5Zone_Transformer.…</span></span>
 <span><span class="co">#&gt;  • Version: '&lt;&lt; Not specified &gt;&gt;'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-08-15 09:19:54.994712' and completed successfully after 0.69 secs.</span></span></span></code></pre></div>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.2.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-2-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-10-12 06:57:27.600058' and completed successfully after 0.57 secs.</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-simulation-in-the-background">Run simulation in the background<a class="anchor" aria-label="anchor" href="#run-simulation-in-the-background"></a>
@@ -225,11 +225,11 @@ the <code>EplusJob</code> object or using the
 <code class="sourceCode R"><span><span class="va">job</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">path_epw</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">job</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">──</span> <span style="color: #00BB00;">EnergPlus Simulation Job</span> <span style="color: #00BB00;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-1-0/ExampleFiles/5Zone_Transformer.…</span></span>
-<span><span class="co">#&gt;  • Version: '/home/runner/.local/EnergyPlus-26-1-0/WeatherData/USA_CA_San.Franc…</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Version: '26.1.0'</span></span>
-<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-1-0'</span></span>
-<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-08-15 09:19:55.908729' and is still running...</span></span></span>
+<span><span class="co">#&gt;  • Path: '/home/runner/.local/EnergyPlus-26-2-0/ExampleFiles/5Zone_Transformer.…</span></span>
+<span><span class="co">#&gt;  • Version: '/home/runner/.local/EnergyPlus-26-2-0/WeatherData/USA_CA_San.Franc…</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Version: '26.2.0'</span></span>
+<span><span class="co">#&gt;  • EnergyPlus Path: '/home/runner/.local/EnergyPlus-26-2-0'</span></span>
+<span><span class="co">#&gt; <span style="color: #000000; background-color: #00BB00;"> Simulation started at '2026-10-12 06:57:28.29601' and is still running...</span></span></span>
 <span></span>
 <span><span class="va">job</span><span class="op">$</span><span class="fu">status</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $run_before</span></span>
@@ -254,20 +254,32 @@ the <code>EplusJob</code> object or using the
 <code>EplusJob$errors()</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job</span><span class="op">$</span><span class="fu">errors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    index envir_index                    envir level_index   level</span></span>
-<span><span class="co">#&gt;    &lt;int&gt;       &lt;int&gt;                   &lt;char&gt;       &lt;int&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:     1           1 Zone Sizing Calculations           1 Warning</span></span>
-<span><span class="co">#&gt; 2:     1           1 Zone Sizing Calculations           1 Warning</span></span>
-<span><span class="co">#&gt; 3:     1           1 Zone Sizing Calculations           1 Warning</span></span>
-<span><span class="co">#&gt; 4:     1           1 Zone Sizing Calculations           1 Warning</span></span>
-<span><span class="co">#&gt; 5:     1           1 Zone Sizing Calculations           1 Warning</span></span>
-<span><span class="co">#&gt;                                                                                                     message</span></span>
-<span><span class="co">#&gt;                                                                                                      &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:                            Weather file location will be used rather than entered (IDF) Location object.</span></span>
-<span><span class="co">#&gt; 2:                                                              ..Location object=CHICAGO_IL_USA TMY2-94846</span></span>
-<span><span class="co">#&gt; 3:                                    ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940</span></span>
-<span><span class="co">#&gt; 4: ..due to location differences, Latitude difference=[4.16] degrees, Longitude difference=[34.65] degrees.</span></span>
-<span><span class="co">#&gt; 5:             ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95] percent, [188.00] meters.</span></span></code></pre></div>
+<span><span class="co">#&gt;     index envir_index                     envir level_index   level</span></span>
+<span><span class="co">#&gt;     &lt;int&gt;       &lt;int&gt;                    &lt;char&gt;       &lt;int&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt;  1:     1           1  Zone Sizing Calculations           1 Warning</span></span>
+<span><span class="co">#&gt;  2:     1           1  Zone Sizing Calculations           1 Warning</span></span>
+<span><span class="co">#&gt;  3:     1           1  Zone Sizing Calculations           1 Warning</span></span>
+<span><span class="co">#&gt;  4:     1           1  Zone Sizing Calculations           1 Warning</span></span>
+<span><span class="co">#&gt;  5:     1           1  Zone Sizing Calculations           1 Warning</span></span>
+<span><span class="co">#&gt;  6:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt;  7:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt;  8:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt;  9:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt; 10:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt; 11:     2           3 Plant Sizing Calculations           2 Warning</span></span>
+<span><span class="co">#&gt;                                                                                                                         message</span></span>
+<span><span class="co">#&gt;                                                                                                                          &lt;char&gt;</span></span>
+<span><span class="co">#&gt;  1:                                               Weather file location will be used rather than entered (IDF) Location object.</span></span>
+<span><span class="co">#&gt;  2:                                                                                 ..Location object=CHICAGO_IL_USA TMY2-94846</span></span>
+<span><span class="co">#&gt;  3:                                                       ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940</span></span>
+<span><span class="co">#&gt;  4:                    ..due to location differences, Latitude difference=[4.16] degrees, Longitude difference=[34.65] degrees.</span></span>
+<span><span class="co">#&gt;  5:                                ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95] percent, [188.00] meters.</span></span>
+<span><span class="co">#&gt;  6:             FinalSystemSizing: AirLoop="VAV SYS 1", Sizing:System Central Heating Maximum System Air Flow Ratio = 0.300000,</span></span>
+<span><span class="co">#&gt;  7:        is less than the system heating to maximum air flow ratio. Central Heating Maximum System Air Flow Ratio = 0.412991.</span></span>
+<span><span class="co">#&gt;  8: The central heating coil may undersize if autosized. Consider increasing the Central Heating Maximum System Air Flow Ratio.</span></span>
+<span><span class="co">#&gt;  9:                                                                  System heating volumetric air flow rate = 0.423680 [m3/s].</span></span>
+<span><span class="co">#&gt; 10:                                                                  System cooling volumetric air flow rate = 1.025881 [m3/s].</span></span>
+<span><span class="co">#&gt; 11:                                                                     System main volumetric air flow rate = 1.025881 [m3/s].</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
