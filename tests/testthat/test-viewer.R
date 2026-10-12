@@ -56,7 +56,7 @@ test_that("IdfViewer class", {
     expect_null(viewer$show(zone = "Zone 1", surface = names(idf$Window)))
     expect_null(viewer$show(surface = names(idf$Window)))
 
-    # Snapshot capability and file-content checks live in test-viewer-snapshot.R.
+    # Snapshot capability and file-content checks live in test-impl-viewer.R.
     expect_null(viewer$focus())
     expect_null(viewer$close())
 
