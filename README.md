@@ -120,17 +120,17 @@ in interactive mode.
 - Fast 3D geometry visualization
 
 **View IDF geometry in 3D**\
-<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true" alt="" width="60%" />
 
 **Turn RStudio into a model editor via autocompletion**\
-<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true" alt="" width="60%" />
 
 **Query and modify weather file**\
-<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true" alt="" width="60%" />
 
 **Query output via SQL in Tidy format which is much better for data
 analysis**\
-<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true" alt="" width="60%" />
 
 ## Resources
 

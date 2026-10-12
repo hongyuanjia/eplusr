@@ -375,25 +375,129 @@ rgl_view_ground <- function(dev, geoms, expand = 1.02, color = "#EDEDEB", alpha 
 # }}}
 
 # rgl_snapshot {{{
+# Check the optional browser backend without allowing capability probing to emit warnings.
+viewer__can_webshot <- function() {
+    if (
+        !requireNamespace("webshot2", quietly = TRUE) ||
+            !requireNamespace("chromote", quietly = TRUE)
+    ) {
+        return(FALSE)
+    }
+    # Chrome discovery can fail on headless machines; callers report one package error.
+    tryCatch(
+        {
+            path <- suppressWarnings(chromote::find_chrome())
+            !is.null(path) && file.exists(path)
+        },
+        error = function(e) FALSE
+    )
+}
+
+# Export to a private file so unsupported or failed rendering never replaces user output.
 rgl_snapshot <- function(dev, filename, webshot = FALSE, ...) {
     assert_string(filename)
-
-    # set the last plot device as active
-    if (!rgl::rgl.useNULL()) rgl::set3d(dev)
-
-    if (!dir.exists(dirname(filename))) dir.create(dirname(filename), recursive = TRUE)
-
-    if (has_ext(filename, "png")) {
-        rgl::snapshot3d(filename, "png", top = FALSE, webshot = webshot, ...)
-    } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
-        rgl::rgl.postscript(filename, tools::file_ext(filename))
-    } else {
-        abort(paste0("Not supported export format ", surround(tools::file_ext(filename)), ". ",
-            "Current supported: ", collapse(c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"), max_num = 10)
+    assert_flag(webshot)
+    ext <- tolower(tools::file_ext(filename))
+    if (!ext %in% c("png", "ps", "eps", "tex", "pdf", "svg", "pgf")) {
+        abort(paste0(
+            "Not supported export format ",
+            surround(ext),
+            ". ",
+            "Current supported: ",
+            collapse(
+                c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"),
+                max_num = 10
+            )
         ))
     }
+    # Inspect the requested device as well as the default; NULL devices can
+    # coexist with native devices in the same R session.
+    devices <- rgl::rgl.dev.list()
+    use_null <- rgl::rgl.useNULL() ||
+        identical(names(devices)[match(dev, devices)], "null")
+    if (ext == "png" && webshot) {
+        if (!viewer__can_webshot()) {
+            abort(
+                "Browser snapshots require the webshot2 package and a Chrome browser.",
+                "snapshot_unavailable"
+            )
+        }
+    } else if (use_null) {
+        abort(
+            "Native snapshots require an OpenGL device. For PNG output, use webshot = TRUE with webshot2 and Chrome.",
+            "snapshot_unavailable"
+        )
+    }
+    if (!use_null) {
+        rgl::set3d(dev)
+    }
 
-    normalizePath(filename)
+    if (!dir.exists(dirname(filename))) {
+        dir.create(dirname(filename), recursive = TRUE)
+    }
+    # Render in the destination directory, then rename only a completed export.
+    temporary <- tempfile(
+        "eplusr-snapshot-",
+        tmpdir = dirname(filename),
+        fileext = paste0(".", ext)
+    )
+    on.exit(unlink(temporary), add = TRUE)
+    failure <- tryCatch(
+        {
+            if (ext == "png") {
+                rgl::snapshot3d(
+                    temporary,
+                    "png",
+                    top = FALSE,
+                    webshot = webshot,
+                    ...
+                )
+            } else {
+                rgl::rgl.postscript(temporary, ext)
+            }
+            NULL
+        },
+        warning = identity,
+        error = identity
+    )
+    # Backend warnings indicate failed conversion or rendering fallback, not success.
+    if (!is.null(failure)) {
+        abort(
+            paste0("Could not export snapshot: ", conditionMessage(failure)),
+            "snapshot_failed",
+            parent = failure
+        )
+    }
+    size <- file.info(temporary)$size
+    if (is.na(size) || size == 0) {
+        abort("Snapshot export produced no image data.", "snapshot_failed")
+    }
+    # Reject invalid file headers before exposing the result as a saved snapshot.
+    if (
+        ext == "png" &&
+            !identical(
+                readBin(temporary, "raw", n = 8L),
+                as.raw(c(137, 80, 78, 71, 13, 10, 26, 10))
+            )
+    ) {
+        abort("Snapshot export did not produce a PNG image.", "snapshot_failed")
+    }
+    if (
+        ext == "pdf" &&
+            !identical(readBin(temporary, "raw", n = 5L), charToRaw("%PDF-"))
+    ) {
+        abort(
+            "Snapshot export did not produce a PDF document.",
+            "snapshot_failed"
+        )
+    }
+    if (!file.rename(temporary, filename)) {
+        abort(
+            "Could not save the completed snapshot to the requested path.",
+            "snapshot_failed"
+        )
+    }
+    normalizePath(filename, mustWork = TRUE)
 }
 # }}}
 

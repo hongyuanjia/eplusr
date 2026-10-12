@@ -1,8 +1,8 @@
-# eplusr (development version)
+# eplusr 0.18.0
 
 ## New features
 
-* Add support for EnergyPlus v26.2.0 (#647, #648).
+* Add support for EnergyPlus v26.2.0 (#647).
 
 * `IdfObject$is_valid_field()` can now check whether fields are present in the
   current object instead of only being defined in the IDD (#391).
@@ -45,12 +45,22 @@
 
 ## Bug fixes
 
+* Preserve original positions when parsing mixed EPW date formats, including
+  decimal month/day strings ending in zero (#650).
+
+* Report the correct integer fields in truncation warnings (#650).
+
+* Reject unavailable or failed snapshot exports and preserve existing
+  destination files until an export succeeds (#650).
+
+* Match weather dictionary cloneability to its parent IDD class, avoiding
+  R6 inheritance diagnostics when reading EPW files (#650).
+
 * Keep `IdfViewer` triangulation compatible with decido 0.5.0 and infer
   detailed fenestration vertices from populated XYZ coordinate fields (#643).
 
 * Validate active extensible groups using the first-group required-field
-  template, allowing optional fields without defaults to remain empty (#641,
-  #642).
+  template, allowing optional fields without defaults to remain empty (#641).
 
 * Allow optional fields with default values to remain empty inside active
   extensible groups during validation (#640).

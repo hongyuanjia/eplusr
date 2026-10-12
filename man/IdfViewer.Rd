@@ -852,6 +852,11 @@ Default: \code{FALSE}.}
 \subsection{Details}{
 \verb{$snapshot()} captures the current rgl view and saves it as an image
 file to disk using \code{\link[rgl:snapshot]{rgl::snapshot3d()}} and \code{\link[rgl:postscript]{rgl::rgl.postscript()}}.
+Native image and vector exports require an OpenGL device. With a
+NULL device, PNG exports require \code{webshot = TRUE}, the 'webshot2'
+package, and a Chrome browser. Unavailable backends or failed
+exports raise an error. An existing destination is replaced only
+after a successful export.
 }
 
 \subsection{Returns}{

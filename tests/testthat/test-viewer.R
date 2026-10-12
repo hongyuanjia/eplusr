@@ -4,7 +4,10 @@ test_that("IdfViewer class", {
     skip_on_os("mac")
 
     # simple model
-    path <- path_eplus_example(LATEST_EPLUS_VER, "4ZoneWithShading_Simple_1.idf")
+    path <- path_eplus_example(
+        LATEST_EPLUS_VER,
+        "4ZoneWithShading_Simple_1.idf"
+    )
     expect_s3_class(idf <- read_idf(path), "Idf")
 
     expect_warning(viewer <- idf_viewer(idf))
@@ -53,15 +56,7 @@ test_that("IdfViewer class", {
     expect_null(viewer$show(zone = "Zone 1", surface = names(idf$Window)))
     expect_null(viewer$show(surface = names(idf$Window)))
 
-    expect_type(f <- viewer$snapshot(tempfile(fileext = ".pdf")), "character")
-    expect_true(file.exists(f))
-    if (testthat:::on_ci()) {
-        expect_type(f <- viewer$snapshot(tempfile(fileext = ".png"), webshot = TRUE), "character")
-        expect_true(file.exists(f))
-    } else {
-        expect_type(f <- viewer$snapshot(tempfile(fileext = ".png")), "character")
-        expect_true(file.exists(f))
-    }
+    # Snapshot capability and file-content checks live in test-impl-viewer.R.
     expect_null(viewer$focus())
     expect_null(viewer$close())
 
