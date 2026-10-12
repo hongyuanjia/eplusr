@@ -1,5 +1,16 @@
 # eplusr (development version)
 
+## New features
+
+* Add an experimental `eplus_api()` interface for stock EnergyPlus 26.1 with
+  managed state, functional resources, runtime callbacks and data exchange
+  handles. The optional bridge must include the `rdyncall` callback safety fix
+  (#651).
+
+## Bug fixes
+
+* Avoid filename path-length checks when reading long inline IDF model text.
+
 # eplusr 0.18.0
 
 ## New features

@@ -121,6 +121,10 @@ reference:
       - path_eplus_weather
       - path_eplus_dataset
 
+  - title: EnergyPlus library API
+    contents:
+      - eplus_api
+
   - title: Job
     desc: Run EnergyPlus and collect outputs
     contents:
