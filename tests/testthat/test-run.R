@@ -1022,7 +1022,8 @@ test_that("stock API execution adapters support background and run_idf workflows
         echo = FALSE
     )
     on.exit(if (process$is_alive()) process$kill(), add = TRUE)
-    process$wait(60000)
+    # Instrumented worker startup can exceed the ordinary simulation deadline.
+    process$wait(180000)
     expect_false(process$is_alive())
     expect_identical(process$get_result()$api$phase, "completed")
     single <- run_idf(
@@ -1044,7 +1045,7 @@ test_that("stock API execution adapters support background and run_idf workflows
         echo = FALSE
     )
     on.exit(if (low$run$process$is_alive()) low$run$process$kill(), add = TRUE)
-    low$run$process$wait(60000)
+    low$run$process$wait(180000)
     expect_identical(low$run$process$get_result()$run$api$phase, "completed")
 })
 
@@ -1469,7 +1470,7 @@ test_that("function backends initialize once through low-level and standalone ru
                     if (process$is_alive()) run__api_kill(process),
                     add = TRUE
                 )
-                process$wait(60000)
+                process$wait(180000)
                 expect_false(process$is_alive())
                 result <- process$get_result()
             }
@@ -1478,7 +1479,15 @@ test_that("function backends initialize once through low-level and standalone ru
             } else {
                 result$api
             }
-            expect_identical(metadata$phase, "completed")
+            expect_identical(
+                metadata$phase,
+                "completed",
+                info = jsonlite::toJSON(
+                    metadata,
+                    auto_unbox = TRUE,
+                    null = "null"
+                )
+            )
             expect_length(readLines(marker), 1L)
             expect_identical(as.integer(readLines(marker)), metadata$pid)
             expect_false(identical(metadata$pid, Sys.getpid()))

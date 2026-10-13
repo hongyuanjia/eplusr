@@ -1373,8 +1373,14 @@ api__check_bridge <- function() {
     probe <- api__probe_bridge
     environment(probe) <- baseenv()
     safe <- tryCatch(
-        callr::r(probe, libpath = .libPaths(), timeout = 30),
-        error = function(e) FALSE
+        # Coverage-instrumented cold startup needs more time than the callback checks.
+        callr::r(probe, libpath = .libPaths(), timeout = 120),
+        error = function(e) {
+            api__error(paste0(
+                "rdyncall safety probe failed: ",
+                conditionMessage(e)
+            ))
+        }
     )
     if (!all(safe)) {
         api__error(

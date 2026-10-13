@@ -2,6 +2,10 @@
 
 ## New features
 
+* Add `export_eplus_plugin()` to run R hooks inside the stock EnergyPlus 26.1
+  executable through a generated PythonPlugin adapter and embedded R, with
+  borrowed native state ownership and per-instance result summaries (#652).
+
 * Add eplusr-hosted R plugins with multiple lifecycle hooks, independent state,
   ordered execution and safe finalization through the existing `backend`
   initialization function for stock EnergyPlus 26.1 (#652).

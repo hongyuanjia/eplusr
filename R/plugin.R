@@ -2,7 +2,8 @@
 #'
 #' Create a reusable initialization function for `backend`. The plugin runs in
 #' the same R worker and thread as the EnergyPlus 26.1 library. This is an eplusr
-#' host plugin, not a PythonPlugin object or a loader in the EnergyPlus executable.
+#' host plugin. Use [export_eplus_plugin()] to run the same hooks in the
+#' EnergyPlus executable through its plugin loader.
 #'
 #' @param hooks Named list of functions `function(api, state, plugin)`. Names
 #'   are supported state callback names from `eplus_api()$runtime`, without the

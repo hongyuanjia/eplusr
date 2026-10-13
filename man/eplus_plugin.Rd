@@ -22,7 +22,8 @@ An initialization function accepted by \code{backend}.
 \description{
 Create a reusable initialization function for \code{backend}. The plugin runs in
 the same R worker and thread as the EnergyPlus 26.1 library. This is an eplusr
-host plugin, not a PythonPlugin object or a loader in the EnergyPlus executable.
+host plugin. Use \code{\link[=export_eplus_plugin]{export_eplus_plugin()}} to run the same hooks in the
+EnergyPlus executable through its plugin loader.
 }
 \details{
 Pass the returned function directly as \code{backend}, or call several returned

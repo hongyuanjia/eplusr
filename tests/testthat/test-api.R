@@ -709,7 +709,8 @@ test_that("bridge safety gate handles missing, already loaded, failing and cache
     loaded <- FALSE
     safe <- FALSE
     local_mocked_bindings(
-        r = function(...) {
+        r = function(..., timeout) {
+            expect_identical(timeout, 120)
             if (identical(safe, "error")) {
                 stop("probe child failed")
             }
@@ -719,7 +720,7 @@ test_that("bridge safety gate handles missing, already loaded, failing and cache
     )
     expect_error(api__check_bridge(), "complete callback")
     safe <- "error"
-    expect_error(api__check_bridge(), "complete callback")
+    expect_error(api__check_bridge(), "safety probe failed: probe child failed")
     safe <- rep(TRUE, 3L)
     expect_null(api__check_bridge())
     loaded <- TRUE
@@ -2980,4 +2981,574 @@ test_that("backend dependency freezing handles replacement roots and omitted ind
         "live"
     )
     ctx$api$close()
+})
+
+# Borrowed states must never be allocated, reset or deleted by the R plugin owner.
+test_that("executable bindings protect ownership and keep independent hook state", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    pointer <- new.env(parent = emptyenv())
+    pointer$ready <- TRUE
+    pointer$flag <- FALSE
+    pointer$callbacks <- list()
+    contexts <- list()
+    local_mocked_bindings(eplus_api = function(...) {
+        ctx <- testapi__fake()
+        contexts[[length(contexts) + 1L]] <<- ctx
+        ctx$api
+    })
+    plugin <- eplus_plugin(list(
+        initialize = function(api, state, plugin) {
+            plugin$data$n <- 0L
+            plugin$data$blocked <- vapply(
+                list(
+                    function() api$state_manager$new_state(),
+                    function() api$state_manager$delete_state(state),
+                    function() api$state_manager$reset_state(state),
+                    function() api$close(),
+                    function() api$runtime$run_energyplus(state, "missing.idf"),
+                    function() {
+                        api$runtime$callback_begin_new_environment(
+                            state,
+                            function(state) NULL
+                        )
+                    }
+                ),
+                function(call) {
+                    tryCatch(
+                        {
+                            call()
+                            FALSE
+                        },
+                        error = function(e) TRUE
+                    )
+                },
+                logical(1L)
+            )
+        },
+        begin_new_environment = function(api, state, plugin) {
+            plugin$data$n <- plugin$data$n + 1L
+            gc()
+        },
+        finalize = function(api, state, plugin) {
+            plugin$data$cleaned <- TRUE
+            plugin$data$unavailable <- tryCatch(
+                {
+                    api$exchange$current_time(state)
+                    FALSE
+                },
+                error = function(e) TRUE
+            )
+        }
+    ))
+    saveRDS(
+        unserialize(environment(plugin)$payload),
+        file.path(directory, "definition.rds")
+    )
+    config <- list(
+        definition = file.path(directory, "definition.rds"),
+        installation = "fake",
+        directory = directory,
+        name = "plugin"
+    )
+    path <- file.path(directory, "config.json")
+    jsonlite::write_json(config, path, auto_unbox = TRUE)
+    for (id in c("first", "second")) {
+        expect_identical(
+            plugin_cli__dispatch(path, "begin_new_environment", id, pointer),
+            0L
+        )
+    }
+    expect_identical(
+        plugin_cli__dispatch(path, "begin_new_environment", "first", pointer),
+        0L
+    )
+    expect_null(api__running$state)
+    for (id in c("first", "second")) {
+        expect_identical(
+            plugin_cli__dispatch(path, "finalize", id, pointer),
+            0L
+        )
+        expect_identical(
+            plugin_cli__dispatch(path, "finalize", id, pointer),
+            0L
+        )
+        binding <- plugin_cli__instances[[id]]
+        status <- plugin__status(binding$entry)[[1L]]
+        expect_true(all(status$data$blocked))
+        expect_true(status$data$cleaned)
+        expect_true(status$data$unavailable)
+        expect_identical(status$calls[["finalize"]], 1L)
+        expect_identical(status$data$n, if (id == "first") 2L else 1L)
+        expect_true(file.exists(file.path(
+            directory,
+            paste0("plugin-results-", id, ".json")
+        )))
+        expect_identical(
+            plugin_cli__dispatch(path, "begin_new_environment", id, pointer),
+            1L
+        )
+        rm(list = id, envir = plugin_cli__instances)
+    }
+    expect_true(all(vapply(
+        contexts,
+        function(x) x$deleted == 0L && x$unloaded == 0L,
+        logical(1L)
+    )))
+    expect_identical(
+        plugin_cli__dispatch(path, "finalize", "unbound", pointer),
+        0L
+    )
+})
+
+# Failure summaries preserve the first hook condition while finalization still completes.
+test_that("executable dispatch catches hook errors and interrupts before native return", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    local_mocked_bindings(eplus_api = function(...) testapi__fake()$api)
+    for (event in c(
+        "initialize",
+        "begin_new_environment",
+        "finalize",
+        "interrupt"
+    )) {
+        hooks <- list(finalize = function(api, state, plugin) {
+            plugin$data$cleaned <- TRUE
+            stop("second cleanup error")
+        })
+        name <- if (event == "interrupt") "begin_new_environment" else event
+        hooks[[name]] <- if (event == "interrupt") {
+            function(api, state, plugin) {
+                stop(structure(
+                    list(message = "plugin interrupted"),
+                    class = c("interrupt", "condition")
+                ))
+            }
+        } else {
+            function(api, state, plugin) stop("first hook error")
+        }
+        plugin <- eplus_plugin(hooks)
+        saveRDS(
+            unserialize(environment(plugin)$payload),
+            file.path(directory, "definition.rds")
+        )
+        path <- file.path(directory, "config.json")
+        jsonlite::write_json(
+            list(
+                definition = file.path(directory, "definition.rds"),
+                installation = "fake",
+                directory = directory,
+                name = "error"
+            ),
+            path,
+            auto_unbox = TRUE
+        )
+        pointer <- new.env(parent = emptyenv())
+        pointer$ready <- TRUE
+        pointer$flag <- FALSE
+        first <- plugin_cli__dispatch(
+            path,
+            "begin_new_environment",
+            event,
+            pointer
+        )
+        if (event == "finalize") {
+            expect_identical(first, 0L)
+            expect_identical(
+                plugin_cli__dispatch(path, "finalize", event, pointer),
+                1L
+            )
+        } else {
+            expect_identical(first, 1L)
+        }
+        binding <- plugin_cli__instances[[event]]
+        status <- plugin__status(binding$entry)[[1L]]
+        expect_identical(status$phase, "failed")
+        expect_match(
+            status$error$message,
+            if (event == "interrupt") "interrupted" else "first hook error"
+        )
+        expect_identical(status$calls[["finalize"]], 1L)
+        expect_true(binding$entry$closed)
+        expect_true(file.exists(file.path(
+            directory,
+            paste0("error-results-", event, ".json")
+        )))
+        expect_identical(
+            plugin_cli__dispatch(path, "finalize", event, pointer),
+            1L
+        )
+        rm(list = event, envir = plugin_cli__instances)
+    }
+    expect_null(api__running$state)
+    expect_identical(api__running$plugin_depth, 0L)
+    expect_message(expect_identical(
+        plugin_cli__dispatch(
+            file.path(directory, "missing.json"),
+            "begin_new_environment",
+            "missing",
+            NULL
+        ),
+        1L
+    ))
+})
+
+# Exported objects use the executable's actual Python names and reject unsupported versions/paths.
+test_that("executable plugin export validates artifacts and hook mappings", {
+    skip_if_not_installed("rdyncall")
+    directory <- tempfile()
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    plugin <- eplus_plugin(list(
+        end_zone_timestep_after_zone_reporting = function(api, state, plugin) {
+            NULL
+        }
+    ))
+    expect_error(
+        export_eplus_plugin(function() NULL, directory),
+        "EnergyPlusPlugin"
+    )
+    expect_error(
+        export_eplus_plugin(plugin, directory, name = "bad-name"),
+        "pattern"
+    )
+    local_mocked_bindings(eplus_config = function(...) list(version = "26.2.0"))
+    expect_error(export_eplus_plugin(plugin, directory), "26.1")
+    mapping <- plugin_cli__hooks()
+    expect_identical(
+        unname(mapping[["end_zone_timestep_after_zone_reporting"]]),
+        "on_end_of_zone_timestep_after_zone_reporting"
+    )
+    expect_identical(
+        unname(mapping[["end_system_timestep_before_hvac_reporting"]]),
+        "on_end_of_system_timestep_before_hvac_reporting"
+    )
+})
+
+# Run real PythonPlugin-to-R calls in the unmodified executable, sharing one engine process.
+test_that("stock executable hosts two R plugin instances and reports cleanup", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    directory <- file.path(fixture$directory, "plugins")
+    # Factories carry independent labels/control values through export and borrowed state binding.
+    make <- function(label, setting) {
+        eplus_plugin(list(
+            initialize = function(api, state, plugin) {
+                plugin$data$label <- label
+                plugin$data$pid <- Sys.getpid()
+                plugin$data$n <- 0L
+                plugin$data$seen <- numeric()
+                plugin$data$reported <- numeric()
+            },
+            begin_system_timestep_before_predictor = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (
+                    !api$exchange$api_data_fully_ready(state) ||
+                        api$exchange$kind_of_sim(state) != 3L
+                ) {
+                    return(NULL)
+                }
+                if (is.null(plugin$handles$actuator)) {
+                    plugin$handles$actuator <- api$exchange$get_actuator_handle(
+                        state,
+                        "Schedule:Constant",
+                        "Schedule Value",
+                        "Session Heating"
+                    )
+                }
+                plugin$data$seen <- c(
+                    plugin$data$seen,
+                    api$exchange$get_actuator_value(
+                        state,
+                        plugin$handles$actuator
+                    )
+                )
+                api$exchange$set_actuator_value(
+                    state,
+                    plugin$handles$actuator,
+                    setting
+                )
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (
+                    !api$exchange$api_data_fully_ready(state) ||
+                        api$exchange$kind_of_sim(state) != 3L
+                ) {
+                    return(NULL)
+                }
+                if (is.null(plugin$handles$variable)) {
+                    plugin$handles$variable <- api$exchange$get_variable_handle(
+                        state,
+                        "Zone Thermostat Heating Setpoint Temperature",
+                        "ZONE ONE"
+                    )
+                }
+                plugin$data$reported <- c(
+                    plugin$data$reported,
+                    api$exchange$get_variable_value(
+                        state,
+                        plugin$handles$variable
+                    )
+                )
+                plugin$data$n <- plugin$data$n + 1L
+                if (plugin$data$n %% 24L == 0L) gc()
+            },
+            finalize = function(api, state, plugin) {
+                plugin$data$cleaned <- TRUE
+            }
+        ))
+    }
+    exports <- list(
+        export_eplus_plugin(make("A", 22), directory, "PluginA"),
+        export_eplus_plugin(
+            make("B", 24),
+            directory,
+            "PluginB",
+            eplus = eplus_config("26.1")$dir
+        )
+    )
+    expect_error(
+        export_eplus_plugin(make("A", 22), directory, "PluginA"),
+        "already exist"
+    )
+    expect_error(
+        export_eplus_plugin(make("A", 22), paste0(directory, ",bad")),
+        "delimiter"
+    )
+    cat(
+        paste(
+            c(
+                exports[[1L]]$idf[[1L]],
+                exports[[1L]]$idf[[2L]],
+                exports[[2L]]$idf[[2L]]
+            ),
+            collapse = "\n"
+        ),
+        file = fixture$model,
+        append = TRUE
+    )
+    process <- processx::process$new(
+        file.path(eplus_config("26.1")$dir, eplus_config("26.1")$exe),
+        c(
+            "-w",
+            fixture$weather,
+            "-d",
+            file.path(fixture$directory, "output"),
+            fixture$model
+        ),
+        stdout = "|",
+        stderr = "|"
+    )
+    on.exit(if (process$is_alive()) process$kill_tree(), add = TRUE)
+    pid <- process$get_pid()
+    # Instrumented startup and full GC can exceed the ordinary simulation duration.
+    process$wait(180000)
+    expect_false(process$is_alive())
+    expect_identical(
+        process$get_exit_status(),
+        0L,
+        info = paste(process$read_all_output(), process$read_all_error())
+    )
+    results <- lapply(exports, function(x) {
+        paths <- Sys.glob(x$results)
+        expect_length(paths, 1L)
+        jsonlite::read_json(paths[[1L]])$status[[1L]]
+    })
+    for (result in results) {
+        expect_identical(result$data$pid, pid)
+        expect_identical(result$data$n, 96L)
+        expect_true(result$data$cleaned)
+        expect_true(all(unlist(result$data$reported) == 24))
+        expect_identical(result$calls$finalize, 1L)
+        expect_identical(result$phase, "completed")
+    }
+    expect_identical(results[[1L]]$data$label, "A")
+    expect_identical(results[[2L]]$data$label, "B")
+    expect_true(all(unlist(results[[2L]]$data$seen) == 22))
+    expect_false(identical(results[[1L]]$id, results[[2L]]$id))
+})
+
+# R's runtime paths differ from the engine's platform-specific library basename.
+test_that("executable exports select the matching R runtime library", {
+    expect_identical(
+        plugin_cli__r_library("H", "B", "windows", "Windows"),
+        file.path("B", "R.dll")
+    )
+    expect_identical(
+        plugin_cli__r_library("H", "B", "unix", "Darwin"),
+        file.path("H", "lib", "libR.dylib")
+    )
+    expect_identical(
+        plugin_cli__r_library("H", "B", "unix", "Linux"),
+        file.path("H", "lib", "libR.so")
+    )
+})
+
+# A borrowed plugin cannot publish a misleading summary when the destination is a directory.
+test_that("executable summary failures keep borrowed state closed", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    ctx <- testapi__fake()
+    local_mocked_bindings(eplus_api = function(...) ctx$api)
+    plugin <- eplus_plugin(list(finalize = function(api, state, plugin) {
+        plugin$data$cleaned <- TRUE
+    }))
+    definition <- file.path(directory, "definition.rds")
+    saveRDS(unserialize(environment(plugin)$payload), definition)
+    pointer <- new.env(parent = emptyenv())
+    binding <- plugin_cli__bind(
+        list(
+            definition = definition,
+            installation = "fake",
+            directory = directory,
+            name = "disk"
+        ),
+        pointer,
+        "full"
+    )
+    dir.create(file.path(directory, "disk-results-full.json"))
+    expect_warning(
+        expect_error(plugin_cli__finish(binding), "Could not publish"),
+        "cannot rename"
+    )
+    expect_true(binding$entry$closed)
+    expect_true(binding$ctx$closed)
+    expect_identical(binding$record$calls[["finalize"]], 1L)
+    expect_true(binding$record$data$cleaned)
+    expect_identical(ctx$deleted, 0L)
+})
+
+# Reject native-only hooks before producing an executable artifact, and diagnose missing definitions.
+test_that("executable exports reject unavailable hook entrypoints", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    plugin <- eplus_plugin(list(
+        end_zone_timestep_after_zone_reporting = function(api, state, plugin) {
+            NULL
+        }
+    ))
+    local_mocked_bindings(
+        eplus_config = function(...) list(version = "26.1.0", dir = directory),
+        plugin_cli__check_bridge = function() NULL,
+        plugin_cli__hooks = function() {
+            c(begin_new_environment = "on_begin_new_environment")
+        }
+    )
+    expect_error(export_eplus_plugin(plugin, directory), "does not expose")
+    path <- file.path(directory, "config.json")
+    jsonlite::write_json(
+        list(definition = file.path(directory, "missing.rds")),
+        path,
+        auto_unbox = TRUE
+    )
+    expect_message(
+        expect_identical(
+            plugin_cli__dispatch(
+                path,
+                "begin_new_environment",
+                "missing-definition",
+                NULL
+            ),
+            1L
+        ),
+        "definition is missing"
+    )
+})
+
+# The isolated export preflight must delegate to the safety gate and propagate child errors.
+test_that("executable preflight delegates safety checks and preserves failures", {
+    calls <- 0L
+    local_mocked_bindings(api__check_bridge = function() {
+        calls <<- calls + 1L
+        invisible(NULL)
+    })
+    local_mocked_bindings(
+        r = function(func, libpath, timeout) {
+            expect_identical(environment(func), baseenv())
+            expect_identical(libpath, .libPaths())
+            expect_identical(timeout, 60)
+            func()
+        },
+        .package = "callr"
+    )
+    expect_null(plugin_cli__check_bridge())
+    expect_identical(calls, 1L)
+    local_mocked_bindings(api__check_bridge = function() {
+        stop("preflight child failed")
+    })
+    expect_error(plugin_cli__check_bridge(), "preflight child failed")
+})
+
+# A dispatcher preparation error must become the first diagnostic and still finalize once.
+test_that("executable dispatch preparation failures retain diagnostics and cleanup", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    local_mocked_bindings(
+        eplus_api = function(...) testapi__fake()$api,
+        plugin__callback = function(...) stop("callback preparation failed")
+    )
+    plugin <- eplus_plugin(list(
+        begin_new_environment = function(api, state, plugin) NULL,
+        finalize = function(api, state, plugin) {
+            plugin$data$cleaned <- TRUE
+        }
+    ))
+    definition <- file.path(directory, "definition.rds")
+    saveRDS(unserialize(environment(plugin)$payload), definition)
+    path <- file.path(directory, "config.json")
+    jsonlite::write_json(
+        list(
+            definition = definition,
+            installation = "fake",
+            directory = directory,
+            name = "preparation"
+        ),
+        path,
+        auto_unbox = TRUE
+    )
+    pointer <- new.env(parent = emptyenv())
+    pointer$ready <- TRUE
+    pointer$flag <- FALSE
+    pointer$stop <- FALSE
+    instance <- "preparation-failure"
+    on.exit(rm(list = instance, envir = plugin_cli__instances), add = TRUE)
+    expect_message(
+        expect_identical(
+            plugin_cli__dispatch(
+                path,
+                "begin_new_environment",
+                instance,
+                pointer
+            ),
+            1L
+        ),
+        "callback preparation failed"
+    )
+    binding <- plugin_cli__instances[[instance]]
+    expect_identical(binding$record$error, binding$entry$condition)
+    expect_match(
+        conditionMessage(binding$record$error),
+        "callback preparation failed"
+    )
+    expect_identical(binding$entry$stop_reason, "callback_error")
+    expect_true(pointer$stop)
+    expect_true(binding$entry$closed)
+    expect_true(binding$record$data$cleaned)
+    expect_identical(binding$record$calls[["finalize"]], 1L)
+    expect_identical(
+        plugin_cli__dispatch(path, "finalize", instance, pointer),
+        1L
+    )
+    expect_identical(binding$record$calls[["finalize"]], 1L)
 })
