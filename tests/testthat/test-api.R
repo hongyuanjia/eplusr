@@ -1262,8 +1262,8 @@ test_that("session handshakes authenticate before decoding and retain their sele
         cloneable = FALSE,
         public = list(
             # Queue complete frames before the caller begins its event loop.
-            run = function(..., api_setup) {
-                settings <- environment(api_setup)$settings
+            run = function(..., backend) {
+                settings <- environment(backend)$settings
                 for (index in seq_len(3L)) {
                     valid <- index > 1L
                     connection <- socketConnection(

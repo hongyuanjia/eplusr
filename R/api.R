@@ -2696,8 +2696,7 @@ api_session__initialize <- function(ctx, timeout = ctx$config$timeout) {
             echo = FALSE,
             copy_external = TRUE,
             readvars = FALSE,
-            backend = "api",
-            api_setup = setup
+            backend = setup
         )
         ctx$process <- get_priv_env(ctx$job)$m_job
         deadline <- Sys.time() + timeout

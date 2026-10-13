@@ -63,9 +63,22 @@ test_that("Group methods", {
             successful = FALSE, changed_after = FALSE
         )
     )
-    expect_equal(names(status$job_status),
-        c("index", "status", "idf", "epw", "version", "exit_status", "start_time", "end_time",
-          "output_dir", "energyplus", "stdout", "stderr"
+    expect_equal(
+        names(status$job_status),
+        c(
+            "index",
+            "status",
+            "idf",
+            "epw",
+            "version",
+            "exit_status",
+            "start_time",
+            "end_time",
+            "output_dir",
+            "energyplus",
+            "stdout",
+            "stderr",
+            "backend"
         )
     )
     expect_equal(status$job_status$exit_status, c(0L, 1L))
@@ -265,8 +278,7 @@ test_that("killing an API group terminates its worker tree and preserves every c
     group <- group_job(rep(fixture$model, 2L), fixture$weather)
     group$run(
         dir = file.path(fixture$directory, c("kill-a", "kill-b")),
-        backend = "api",
-        api_setup = setup,
+        backend = setup,
         wait = FALSE,
         echo = FALSE,
         readvars = FALSE

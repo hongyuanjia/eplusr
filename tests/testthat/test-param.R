@@ -352,8 +352,7 @@ test_that("stock API parametric jobs run in the background", {
     param$apply_measure(function(idf, value) idf, value = 1:2)
     param$run(
         dir = file.path(fixture$directory, "param"),
-        backend = "api",
-        api_setup = setup,
+        backend = setup,
         echo = FALSE,
         readvars = FALSE,
         wait = FALSE

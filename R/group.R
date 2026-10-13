@@ -135,14 +135,15 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        #' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+        #' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
+        #'   or an initialization `function(api, state)` which selects the API engine.
         #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
         #'   for each engine run. Preprocessing and result collection use the same pipeline.
-        #' @param api_setup Optional `function(api, state)` executed in the engine worker
+        #'   A function is executed once in the engine worker
         #'   before simulation. Register requests and callbacks using the supplied managed
         #'   objects. Capture serializable lexical configuration in a self-contained closure;
         #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
-        #'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+        #'   Controller failures and worker interrupts yield failed
         #'   results with condition metadata; an explicit stop yields a stopped result.
         #'   Inspect API identity and stop metadata with `$status()` (the `job_status`
         #'   table for group jobs). Job orchestration may use additional R processes.
@@ -156,8 +157,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             echo = wait,
             separate = TRUE,
             readvars = TRUE,
-            backend = c("cli", "api"),
-            api_setup = NULL
+            backend = "cli"
         ) {
             epgroup_run(
                 self,
@@ -169,8 +169,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
                 echo,
                 separate,
                 readvars,
-                backend,
-                api_setup
+                backend
             )
         },
         # }}}
@@ -975,8 +974,7 @@ epgroup_run <- function(
     echo = wait,
     separate = TRUE,
     readvars = TRUE,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
     private$m_model_store$assert_cases_valid()
     private$log_new_uuid()
@@ -991,8 +989,7 @@ epgroup_run <- function(
         echo,
         separate,
         readvars,
-        backend,
-        api_setup
+        backend
     )
 }
 # }}}
@@ -1008,13 +1005,11 @@ epgroup_run_models <- function(
     echo = wait,
     separate = TRUE,
     readvars = TRUE,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     assert_flag(wait)
     assert_flag(echo)
     assert_flag(separate)

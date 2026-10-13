@@ -2,6 +2,9 @@
 
 ## New features
 
+* Use one `backend` argument for `"cli"`, `"api"` or a worker initialization
+  function. Remove the separate public `api_setup` argument (#653).
+
 * Add live `eplus_session()` control for stock EnergyPlus 26.1, including zone-step
   advancement, pause/resume, explicit controller state and worker-hosted scripts
   (#654).

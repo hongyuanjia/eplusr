@@ -206,8 +206,7 @@ test_that("killing a background API job reaps its native worker and returns a te
         wait = FALSE,
         echo = FALSE,
         readvars = FALSE,
-        backend = "api",
-        api_setup = setup
+        backend = setup
     )
     on.exit(job$kill(), add = TRUE)
     testrun__api_started(

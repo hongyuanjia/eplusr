@@ -69,7 +69,7 @@ testrun__api_fixture <- function() {
 
 
 # Wait for the worker bootstrap handshake, failing immediately if its owner exits.
-# covr traces the namespace again in each fresh worker before api_setup can run.
+# covr traces the namespace again in each fresh worker before the backend initializer can run.
 testrun__api_started <- function(ready, alive, diagnostic = NULL) {
     deadline <- Sys.time() + 120
     while (!ready() && alive() && Sys.time() < deadline) {

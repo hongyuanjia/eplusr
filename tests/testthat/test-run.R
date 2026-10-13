@@ -398,7 +398,8 @@ test_that("EnergyPlus()", {
     weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
 
     res <- EnergyPlus(path, weather, out_dir, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(names(res), c("file", "run"))
+    expect_equal(names(res), c("file", "run", "backend"))
+    expect_identical(res$backend, "cli")
     expect_equal(length(res$file), 51L)
     expect_equal(
         sort(names(which(vapply(res$file, function(x) !anyNA(x), logical(1))))),
@@ -573,7 +574,7 @@ test_that("energyplus()", {
         copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneMat-Const.imf")
     )
     res_imf <- energyplus(path_imf, weather, out_dir, echo = FALSE, resources = path_resources)
-    expect_equal(names(res_imf), c("version", "energyplus", "start_time", "end_time", "exit_status", "output_dir", "file", "run"))
+    expect_equal(names(res_imf), c("version", "energyplus", "start_time", "end_time", "exit_status", "output_dir", "file", "run", "backend"))
     expect_equal(as.character(res_imf$version), LATEST_EPLUS_VER)
     expect_equal(res_imf$energyplus, eplus_config(LATEST_EPLUS_VER)$dir)
     expect_s3_class(res_imf$start_time, "POSIXct")
@@ -810,7 +811,8 @@ test_that("run_multi()", {
     expect_s3_class(res, "data.table")
     expect_equal(names(res), c("index", "status", "idf", "epw", "version",
             "exit_status", "start_time", "end_time", "output_dir", "energyplus",
-            "stdout", "stderr"))
+            "stdout", "stderr", "backend"))
+    expect_identical(res$backend, rep("cli", 2L))
     expect_equal(res$index, 1:2)
     expect_equal(res$status, rep("failed", 2))
     expect_equal(res$idf, normalizePath(path_idf))
@@ -829,7 +831,8 @@ test_that("run_multi()", {
     expect_s3_class(res, "data.table")
     expect_equal(names(res), c("index", "status", "idf", "epw", "version",
             "exit_status", "start_time", "end_time", "output_dir", "energyplus",
-            "stdout", "stderr"))
+            "stdout", "stderr", "backend"))
+    expect_identical(res$backend, rep("cli", 2L))
     expect_equal(res$index, 1:2)
     expect_equal(res$status, rep("failed", 2))
     expect_equal(res$idf, normalizePath(path_idf, mustWork = FALSE))
@@ -846,27 +849,38 @@ test_that("run_multi()", {
 # vim: set fdm=marker:
 
 test_that("API backend setup is portable and rejects native ownership across workers", {
-    expect_identical(run__backend(c("cli", "api")), "cli")
-    expect_identical(run__backend("api"), "api")
-    expect_error(run__backend("other"), "arg")
-    expect_error(run__backend("cli", function(api, state) NULL), "requires")
-    expect_error(run__backend("api", 1), "function")
+    expect_identical(run__backend("cli"), list(engine = "cli", setup = NULL))
+    expect_identical(run__backend("api"), list(engine = "api", setup = NULL))
+    expect_error(run__backend("other"), "backend")
+    for (invalid in list(
+        NULL,
+        NA_character_,
+        character(),
+        c("cli", "api"),
+        "a",
+        "CLI",
+        1,
+        list(),
+        new.env()
+    )) {
+        expect_error(run__backend(invalid), "backend")
+    }
     ordinary <- local({
         config <- data.table(target = 21)
         function(api, state) config$target
     })
-    expect_identical(run__backend("api", ordinary), "api")
+    expect_identical(run__backend(ordinary)$engine, "api")
     native <- local({
         state <- structure(new.env(), class = "EnergyPlusState")
         function(api, current) state
     })
-    expect_error(run__backend("api", native), "live objects")
+    expect_error(run__backend(native), "live objects")
     skip_if_not_installed("rdyncall")
     pointer <- local({
         value <- rdyncall::as.externalptr(integer(1L))
         function(api, state) value
     })
-    expect_error(run__backend("api", pointer), "live objects")
+    expect_error(run__backend(pointer), "live objects")
     expect_null(run__api_version(numeric_version("26.1")))
     expect_error(run__api_version(numeric_version("26.2")), "26.1")
 })
@@ -1050,8 +1064,7 @@ test_that("stock API controls stop safely and independent parallel jobs retain i
         fixture$model,
         fixture$weather,
         output_dir = file.path(fixture$directory, "stop"),
-        backend = "api",
-        api_setup = setup,
+        backend = setup,
         readvars = FALSE,
         echo = FALSE
     )
@@ -1071,10 +1084,9 @@ test_that("stock API controls stop safely and independent parallel jobs retain i
         fixture$model,
         fixture$weather,
         output_dir = file.path(fixture$directory, "error"),
-        backend = "api",
         readvars = FALSE,
         echo = FALSE,
-        api_setup = function(api, state) {
+        backend = function(api, state) {
             api$runtime$callback_begin_zone_timestep_after_init_heat_balance(
                 state,
                 function(s) stop("controller failed")
@@ -1109,8 +1121,7 @@ test_that("stock API run_multi reports finalized controller stops", {
         rep(fixture$model, 2L),
         fixture$weather,
         output_dir = file.path(fixture$directory, c("multi-a", "multi-b")),
-        backend = "api",
-        api_setup = setup,
+        backend = setup,
         echo = FALSE
     )
     expect_true(all(multiple$status == "stopped"))
@@ -1129,7 +1140,7 @@ test_that("API setup snapshots lexical data and recursive helpers without unrela
         }
         function(api, state) countdown(3L)
     })
-    expect_identical(run__backend("api", setup), "api")
+    expect_identical(run__backend(setup)$engine, "api")
     frozen <- run__prepare_setup(setup)
     portable <- unserialize(serialize(frozen, NULL))
     expect_equal(portable(NULL, NULL), 21)
@@ -1143,7 +1154,7 @@ test_that("API setup snapshots lexical data and recursive helpers without unrela
         config$target <- 22
         function(api, state) config$target
     })
-    expect_identical(run__backend("api", cyclic), "api")
+    expect_identical(run__backend(cyclic)$engine, "api")
     expect_equal(
         unserialize(serialize(run__prepare_setup(cyclic), NULL))(NULL, NULL),
         22
@@ -1156,7 +1167,7 @@ test_that("API setup snapshots lexical data and recursive helpers without unrela
         )
         function(api, state) config
     })
-    expect_error(run__backend("api", attributed), "live objects")
+    expect_error(run__backend(attributed), "live objects")
 })
 
 test_that("unavailable API pipeline results keep explicit failure and termination semantics", {
@@ -1200,14 +1211,14 @@ test_that("API setup rejects native objects in captured environment parent chain
         config$target <- 22
         function(api, state) config$target
     })
-    expect_error(run__backend("api", setup), "live objects")
+    expect_error(run__backend(setup), "live objects")
     pointer <- local({
         parent <- new.env(parent = emptyenv())
         parent$pointer <- new("externalptr")
         config <- new.env(parent = parent)
         function(api, state) config
     })
-    expect_error(run__backend("api", pointer), "live objects")
+    expect_error(run__backend(pointer), "live objects")
 })
 
 test_that("API tree shutdown remains bounded and reports failures explicitly", {
@@ -1270,8 +1281,7 @@ test_that("foreground API loop interruption reaps its actual native engine desce
             fixture$model,
             fixture$weather,
             output_dir = file.path(fixture$directory, "foreground-interrupt"),
-            backend = "api",
-            api_setup = setup,
+            backend = setup,
             echo = FALSE
         ),
         interrupt = identity
@@ -1362,8 +1372,7 @@ test_that("raw background API process death automatically reaps its engine worke
         fixture$model,
         fixture$weather,
         output_dir = file.path(fixture$directory, "parent-death"),
-        backend = "api",
-        api_setup = setup,
+        backend = setup,
         wait = FALSE,
         echo = FALSE,
         readvars = FALSE
@@ -1387,4 +1396,122 @@ test_that("raw background API process death automatically reaps its engine worke
         Sys.sleep(.1)
     }
     expect_false(ps::ps_is_running(handle))
+})
+
+
+# Every public execution entry exposes only the unified backend selector.
+test_that("public runners expose one backend selector without setup compatibility", {
+    methods <- lapply(
+        list(Idf, EplusJob, EplusGroupJob, ParametricJob),
+        function(class) {
+            class$public_methods$run
+        }
+    )
+    for (runner in c(
+        list(EnergyPlus, energyplus, run_idf, run_multi),
+        methods
+    )) {
+        expect_false("api_setup" %in% names(formals(runner)))
+        expect_identical(formals(runner)$backend, "cli")
+    }
+    expect_error(
+        energyplus("unused.idf", NULL, api_setup = function(api, state) NULL),
+        "unused argument"
+    )
+    expect_error(
+        run_idf("unused.idf", NULL, "unused", api_setup = NULL),
+        "unused argument"
+    )
+})
+
+# Check both orchestration modes using actual workers, rather than mocked forwarding.
+test_that("function backends initialize once through low-level and standalone runners", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (runner in c("EnergyPlus", "energyplus", "run_idf")) {
+        for (wait in c(TRUE, FALSE)) {
+            directory <- file.path(
+                fixture$directory,
+                paste(
+                    match(runner, c("EnergyPlus", "energyplus", "run_idf")),
+                    wait,
+                    sep = "-"
+                )
+            )
+            marker <- paste0(directory, ".initialized")
+            setup <- local({
+                file <- marker
+                # A non-NULL return is ignored; initialization still runs once before simulation.
+                function(api, state) {
+                    write(as.character(Sys.getpid()), file, append = TRUE)
+                    "ignored initialization result"
+                }
+            })
+            args <- list(
+                model = fixture$model,
+                weather = fixture$weather,
+                output_dir = directory,
+                backend = setup,
+                wait = wait,
+                echo = FALSE
+            )
+            if (runner == "energyplus") {
+                args$readvars <- FALSE
+            }
+            result <- do.call(get(runner), args)
+            if (!wait) {
+                process <- if (runner == "EnergyPlus") {
+                    result$run$process
+                } else {
+                    result
+                }
+                on.exit(
+                    if (process$is_alive()) run__api_kill(process),
+                    add = TRUE
+                )
+                process$wait(60000)
+                expect_false(process$is_alive())
+                result <- process$get_result()
+            }
+            metadata <- if (runner == "EnergyPlus") {
+                result$run$api
+            } else {
+                result$api
+            }
+            expect_identical(metadata$phase, "completed")
+            expect_length(readLines(marker), 1L)
+            expect_identical(as.integer(readLines(marker)), metadata$pid)
+            expect_false(identical(metadata$pid, Sys.getpid()))
+            expect_identical(result$backend, "api")
+        }
+    }
+})
+
+
+# Stock CLI results expose the same engine identity without native API metadata.
+test_that("standalone CLI results retain a string backend identity", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (runner in c("EnergyPlus", "energyplus", "run_idf")) {
+        directory <- file.path(
+            fixture$directory,
+            paste0(
+                "cli-",
+                match(runner, c("EnergyPlus", "energyplus", "run_idf"))
+            )
+        )
+        args <- list(
+            model = fixture$model,
+            weather = fixture$weather,
+            output_dir = directory,
+            backend = "cli",
+            echo = FALSE
+        )
+        if (runner == "energyplus") {
+            args$readvars <- FALSE
+        }
+        result <- do.call(get(runner), args)
+        expect_identical(result$backend, "cli")
+        expect_null(result$api)
+    }
 })

@@ -1006,13 +1006,11 @@ EnergyPlus <- function(
     design_day = FALSE,
     idd = NULL,
     eplus = NULL,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     if (backend == "api" && !wait) {
         # Orchestration returns a normal R process; live API objects stay in its engine child.
         runner <- run_command(
@@ -1032,8 +1030,7 @@ EnergyPlus <- function(
                 design_day = design_day,
                 idd = idd,
                 eplus = eplus,
-                backend = backend,
-                api_setup = api_setup
+                backend = api_setup %||% backend
             ),
             wd = tempdir(),
             wait = FALSE,
@@ -1041,7 +1038,7 @@ EnergyPlus <- function(
             call_r = TRUE,
             kill_tree = TRUE
         )
-        return(list(file = NULL, run = runner))
+        return(list(file = NULL, run = runner, backend = backend))
     }
     assert_flag(annual)
     assert_flag(design_day)
@@ -1220,7 +1217,7 @@ EnergyPlus <- function(
         file <- file_callback()
     }
 
-    list(file = file, run = run)
+    list(file = file, run = run, backend = backend)
 }
 
 #' @rdname energyplus
@@ -1574,29 +1571,32 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' Any external file dependencies that EnergyPlus will use for simulation. If
 #' not `NULL`, files will be copied to the output directory. Default: `NULL`.
 #'
-#' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+#' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
+#'   or an initialization `function(api, state)` which selects the API engine.
 #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
 #'   for each engine run. Preprocessing and result collection use the same pipeline.
-#' @param api_setup Optional `function(api, state)` executed in the engine worker
+#'   A function is executed once in the engine worker
 #'   before simulation. Register requests and callbacks using the supplied managed
 #'   objects. Capture serializable lexical configuration in a self-contained closure;
 #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
-#'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+#'   Controller failures and worker interrupts yield failed
 #'   results with condition metadata; an explicit stop yields a stopped result.
-#'   API results carry `$backend` and `$api` metadata; existing CLI result fields
+#'   Results record the resolved `"cli"` or `"api"` backend; API results also carry
+#'   `$api` metadata. Existing CLI result fields
 #'   remain available. Job orchestration may use additional R processes.
 #'
 #' @keywords internal
 #' @return
 #'
-#' Functions except for `energyplus()` return a list of two elements:
+#' Functions except for `energyplus()` return a list containing:
 #'
 #' - `file`: a named list of full paths of output files
 #' - `run`: a named list of outputs from the process.
+#'   `EnergyPlus()` also returns `backend`, the resolved engine name.
 #'
-#' `energyplus()` returns a list of 7 elements:
+#' `energyplus()` returns a list containing:
 #'
-#' - `ver`: EnergyPlus [version][numeric_version()] used
+#' - `version`: EnergyPlus [version][numeric_version()] used
 #' - `energyplus`: EnergyPlus installation directory
 #' - `start_time`: a [POSIXct()] giving the local time when the simulation
 #'   starts
@@ -1605,6 +1605,8 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' - `file`: a named list of relative paths of output files under `output_dir`
 #' - `run`: a [data.table][data.table::data.table()] of each outputs from the
 #'   all called processes
+#' - `backend`: the resolved engine name, `"cli"` or `"api"`
+#' - `api`: native identity and outcome metadata, present only for the API engine
 #'
 #' @export
 energyplus <- function(
@@ -1624,13 +1626,11 @@ energyplus <- function(
     idd = NULL,
     eplus = NULL,
     resources = NULL,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     assert_flag(wait)
 
     if (wait) {
@@ -1643,8 +1643,7 @@ energyplus <- function(
             idd = idd,
             eplus = eplus,
             resources = resources,
-            backend = backend,
-            api_setup = api_setup
+            backend = api_setup %||% backend
         )
     } else {
         run_command(
@@ -1659,8 +1658,7 @@ energyplus <- function(
                 idd = idd,
                 eplus = eplus,
                 resources = resources,
-                backend = backend,
-                api_setup = api_setup
+                backend = api_setup %||% backend
             ),
             wd = tempdir(),
             call_r = TRUE,
@@ -1685,13 +1683,11 @@ run_energyplus <- function(
     idd = NULL,
     eplus = NULL,
     resources = NULL,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     assert_flag(epmacro)
     assert_flag(expand_obj)
     assert_flag(eso_to_ip)
@@ -1949,8 +1945,7 @@ run_energyplus <- function(
         design_day = design_day,
         idd = idd,
         eplus = eplus_ver,
-        backend = backend,
-        api_setup = api_setup
+        backend = api_setup %||% backend
     )
     # now it's safe to move all output files to the output directory
     res_eplus$file$idf <- NULL
@@ -2162,8 +2157,9 @@ run_energyplus <- function(
         exit_status = res_eplus$run$exit_status,
         output_dir = cmd$output_dir, file = file, run = run
     )
+    # Keep the resolved engine observable for both CLI and function-based API runs.
+    result$backend <- backend
     if (backend == "api") {
-        result$backend <- backend
         result$api <- res_eplus$run$api
     }
     result
@@ -2365,8 +2361,7 @@ do_sim <- function(state) {
             design_day = design_day, wait = FALSE, echo = FALSE, resources = resources[[1L]],
                 expand_obj = state$options$expand_obj,
                 readvars = state$options$readvars,
-                backend = state$options$backend %||% "cli",
-                api_setup = state$options$api_setup
+                backend = state$options$api_setup %||% state$options$backend %||% "cli"
         )
 
         if (state$options$echo) {
@@ -2517,16 +2512,18 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'        `model`. Note that `design_day` and `annual` cannot be all `TRUE` at
 #'        the same time. Default: `FALSE`.
 #'
-#' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+#' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
+#'   or an initialization `function(api, state)` which selects the API engine.
 #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
 #'   for each engine run. Preprocessing and result collection use the same pipeline.
-#' @param api_setup Optional `function(api, state)` executed in the engine worker
+#'   A function is executed once in the engine worker
 #'   before simulation. Register requests and callbacks using the supplied managed
 #'   objects. Capture serializable lexical configuration in a self-contained closure;
 #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
-#'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+#'   Controller failures and worker interrupts yield failed
 #'   results with condition metadata; an explicit stop yields a stopped result.
-#'   API results carry `$backend` and `$api` metadata; existing CLI result fields
+#'   Results record the resolved `"cli"` or `"api"` backend; API results also carry
+#'   `$api` metadata. Existing CLI result fields
 #'   remain available. Job orchestration may use additional R processes.
 #'
 #' @param expand_obj Whether to run ExpandObjects preprocessor before simulation.
@@ -2561,7 +2558,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'
 #' @return
 #'
-#' * For `run_idf()`, if `wait` is `TRUE`, a named list of 11 elements:
+#' * For `run_idf()`, if `wait` is `TRUE`, a named list containing:
 #'
 #' | No.  | Column        | Type                      | Description                                                          |
 #' | ---: | -----         | -----                     | -----                                                                |
@@ -2576,6 +2573,7 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #' | 9    | `stdout`      | `character(1)` or `NULL`  | Standard output of EnergyPlus during simulation                      |
 #' | 10   | `stderr`      | `character(1)` or `NULL`  | Standard error of EnergyPlus during simulation                       |
 #' | 11   | `process`     | [r_process][callr::r_bg()] | A process object which called EnergyPlus and ran the simulation      |
+#' | 12   | `backend`     | `character(1)`            | Resolved engine name, `"cli"` or `"api"`                            |
 #'
 #'   If `wait` is `FALSE`, the [R process][callr::r_bg()] is directly returned.
 #'   You can get the results by calling `result <- proc$get_result()` (`proc` is
@@ -2583,8 +2581,8 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'   always be `NULL`. But you can easily assign it by running `result$process
 #'   <- proc`
 #'
-#' * For `rum_multi()`, if `wait` is TRUE, a
-#'   [data.table][data.table::data.table()] of 12 columns:
+#' * For `run_multi()`, if `wait` is TRUE, a
+#'   [data.table][data.table::data.table()] containing:
 #'
 #'   | No.  | Column        | Type        | Description                                                      |
 #'   | ---: | -----         | -----       | -----                                                            |
@@ -2600,6 +2598,10 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'   | 10   | `energyplus`  | `character` | Full path of called EnergyPlus executable                        |
 #'   | 11   | `stdout`      | `list`      | Standard output of EnergyPlus during simulation                  |
 #'   | 12   | `stderr`      | `list`      | Standard error of EnergyPlus during simulation                   |
+#'   | 13   | `backend`     | `character` | Resolved engine name, `"cli"` or `"api"`                         |
+#'
+#'   Both result forms also include API outcome metadata as `api` when the
+#'   API engine is selected.
 #'
 #'   For column `status`, there are 4 possible values:
 #'   - `"completed"`: the simulation job is completed successfully
@@ -2662,13 +2664,11 @@ run_idf <- function(
     wait = TRUE,
     echo = TRUE,
     eplus = NULL,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     assert_flag(wait)
 
     if (is.null(weather)) {
@@ -2704,8 +2704,8 @@ run_idf <- function(
         out$stdout <- unlist(res$run$stdout)
         # in case there is no stderr message
         out["stderr"] <- list(unlist(res$run$stderr))
+        out$backend <- res$backend
         if (identical(res$backend, "api")) {
-            out$backend <- "api"
             out$api <- res$api
         }
         out
@@ -2722,8 +2722,7 @@ run_idf <- function(
             eplus,
             post_fun,
             expand_obj,
-            backend,
-            api_setup
+            backend
         ) {
             post_fun(energyplus(
                 model = model,
@@ -2734,8 +2733,7 @@ run_idf <- function(
                 echo = echo,
                 eplus = eplus,
                 expand_obj = expand_obj,
-                backend = backend,
-                api_setup = api_setup
+                backend = backend
             ))
         },
         list(
@@ -2748,8 +2746,7 @@ run_idf <- function(
             eplus = eplus,
             post_fun = post_fun,
             expand_obj = expand_obj,
-            backend = backend,
-            api_setup = api_setup
+            backend = api_setup %||% backend
         ),
         wd = tempdir(),
         call_r = TRUE,
@@ -2778,13 +2775,11 @@ run_multi <- function(
     wait = TRUE,
     echo = TRUE,
     eplus = NULL,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
-    backend <- run__backend(backend, api_setup)
-    if (backend == "api") {
-        api_setup <- run__prepare_setup(api_setup)
-    }
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
     # for weather, NA here means design-day-simulation
     assert_flag(expand_obj)
     assert_flag(wait)
@@ -2847,10 +2842,12 @@ post_process_sim_state <- function(state) {
     cols <- c("index", "status", "idf", "epw", "version", "exit_status",
         "start_time", "end_time", "output_dir", "energyplus", "stdout", "stderr")
 
+    # Batch results retain a scalar engine label, never the initializer closure.
+    set(jobs, NULL, "backend", state$options$backend %||% "cli")
+    cols <- c(cols, "backend")
     if (identical(state$options$backend, "api")) {
-        set(jobs, NULL, "backend", "api")
         set(jobs, NULL, "api", lapply(jobs$result, "[[", "api"))
-        cols <- c(cols, "backend", "api")
+        cols <- c(cols, "api")
     }
     set(jobs, NULL, setdiff(names(jobs), cols), NULL)
     setcolorder(jobs, cols)
@@ -2858,17 +2855,25 @@ post_process_sim_state <- function(state) {
 }
 
 # vim: set fdm=marker:
-# Select an explicit engine and reject configuration that cannot cross a worker boundary.
-run__backend <- function(backend, api_setup = NULL) {
-    backend <- match.arg(backend, c("cli", "api"))
-    assert_function(api_setup, null.ok = TRUE)
-    if (!is.null(api_setup) && backend != "api") {
-        abort("'api_setup' requires backend = 'api'.", "api_setup")
+# Resolve the public selector once, keeping engine identity separate from frozen worker setup.
+run__backend <- function(backend) {
+    if (is.function(backend)) {
+        # Validate before freezing so live native resources never enter the worker payload.
+        run__check_setup(backend)
+        return(list(engine = "api", setup = run__prepare_setup(backend)))
     }
-    if (!is.null(api_setup)) {
-        run__check_setup(api_setup)
+    if (
+        !is.character(backend) ||
+            length(backend) != 1L ||
+            is.na(backend) ||
+            !backend %in% c("cli", "api")
+    ) {
+        abort(
+            "'backend' must be 'cli', 'api', or an initialization function(api, state).",
+            "backend"
+        )
     }
-    backend
+    list(engine = backend, setup = NULL)
 }
 
 # Inspect captured configuration while leaving namespace references and data.table selfrefs portable.
@@ -2892,8 +2897,8 @@ run__check_setup <- function(setup) {
                 typeof(object) %in% c("externalptr", "weakref")
         ) {
             abort(
-                "Create API objects and native handles inside 'api_setup'; live objects cannot be transferred to a worker.",
-                "api_setup"
+                "Create API objects and native handles inside the 'backend' initialization function; live objects cannot be transferred to a worker.",
+                "backend"
             )
         }
         if (is.function(object)) {

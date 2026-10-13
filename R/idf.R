@@ -2645,14 +2645,15 @@ Idf <- R6::R6Class(classname = "Idf",
         #' job$report_data()
         #' }
         #'
-        #' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+        #' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
+        #'   or an initialization `function(api, state)` which selects the API engine.
         #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
         #'   for each engine run. Preprocessing and result collection use the same pipeline.
-        #' @param api_setup Optional `function(api, state)` executed in the engine worker
+        #'   A function is executed once in the engine worker
         #'   before simulation. Register requests and callbacks using the supplied managed
         #'   objects. Capture serializable lexical configuration in a self-contained closure;
         #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
-        #'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+        #'   Controller failures and worker interrupts yield failed
         #'   results with condition metadata; an explicit stop yields a stopped result.
         #'   Inspect API identity and stop metadata with `$status()` (the `job_status`
         #'   table for group jobs). Job orchestration may use additional R processes.
@@ -2666,8 +2667,7 @@ Idf <- R6::R6Class(classname = "Idf",
             copy_external = FALSE,
             echo = wait,
             readvars = TRUE,
-            backend = c("cli", "api"),
-            api_setup = NULL
+            backend = "cli"
         ) {
             idf_run(
                 self,
@@ -2679,8 +2679,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 copy_external = copy_external,
                 echo = echo,
                 readvars = readvars,
-                backend = backend,
-                api_setup = api_setup
+                backend = backend
             )
         },
         # }}}
@@ -3578,8 +3577,7 @@ idf_run <- function(
     copy_external = FALSE,
     echo = wait,
     readvars = TRUE,
-    backend = c("cli", "api"),
-    api_setup = NULL
+    backend = "cli"
 ) {
     # check if the model is still running
     old <- private$m_log$job
@@ -3594,8 +3592,7 @@ idf_run <- function(
         echo = echo,
         copy_external = copy_external,
         readvars = readvars,
-        backend = backend,
-        api_setup = api_setup
+        backend = backend
     )
 }
 # }}}

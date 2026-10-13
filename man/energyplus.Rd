@@ -65,8 +65,7 @@ EnergyPlus(
   design_day = FALSE,
   idd = NULL,
   eplus = NULL,
-  backend = c("cli", "api"),
-  api_setup = NULL
+  backend = "cli"
 )
 
 convertESOMTR(
@@ -116,8 +115,7 @@ energyplus(
   idd = NULL,
   eplus = NULL,
   resources = NULL,
-  backend = c("cli", "api"),
-  api_setup = NULL
+  backend = "cli"
 )
 }
 \arguments{
@@ -174,17 +172,18 @@ If \code{TRUE}, design-day-only simulation is forced. Currently, only support
 EnergyPlus >= v8.3. Note that \code{annual} and \code{design_day} cannot both be
 \code{TRUE}. Default: \code{FALSE}.}
 
-\item{backend}{Simulation engine, \code{"cli"} (default) or experimental \code{"api"}.
+\item{backend}{Simulation engine: \code{"cli"} (default), experimental \code{"api"},
+or an initialization \verb{function(api, state)} which selects the API engine.
 The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
-for each engine run. Preprocessing and result collection use the same pipeline.}
-
-\item{api_setup}{Optional \verb{function(api, state)} executed in the engine worker
+for each engine run. Preprocessing and result collection use the same pipeline.
+A function is executed once in the engine worker
 before simulation. Register requests and callbacks using the supplied managed
 objects. Capture serializable lexical configuration in a self-contained closure;
 Live API objects and native pointers cannot be transferred. The return value is ignored.
-Requires \code{backend = "api"}. Controller failures and worker interrupts yield failed
+Controller failures and worker interrupts yield failed
 results with condition metadata; an explicit stop yields a stopped result.
-API results carry \verb{$backend} and \verb{$api} metadata; existing CLI result fields
+Results record the resolved \code{"cli"} or \code{"api"} backend; API results also carry
+\verb{$api} metadata. Existing CLI result fields
 remain available. Job orchestration may use additional R processes.}
 
 \item{eso}{[\code{character(1)}]\cr
@@ -215,15 +214,16 @@ Any external file dependencies that EnergyPlus will use for simulation. If
 not \code{NULL}, files will be copied to the output directory. Default: \code{NULL}.}
 }
 \value{
-Functions except for \code{energyplus()} return a list of two elements:
+Functions except for \code{energyplus()} return a list containing:
 \itemize{
 \item \code{file}: a named list of full paths of output files
 \item \code{run}: a named list of outputs from the process.
+\code{EnergyPlus()} also returns \code{backend}, the resolved engine name.
 }
 
-\code{energyplus()} returns a list of 7 elements:
+\code{energyplus()} returns a list containing:
 \itemize{
-\item \code{ver}: EnergyPlus \link[=numeric_version]{version} used
+\item \code{version}: EnergyPlus \link[=numeric_version]{version} used
 \item \code{energyplus}: EnergyPlus installation directory
 \item \code{start_time}: a \code{\link[lubridate:posix_utils]{lubridate::POSIXct()}} giving the local time when the simulation
 starts
@@ -232,6 +232,8 @@ starts
 \item \code{file}: a named list of relative paths of output files under \code{output_dir}
 \item \code{run}: a \link[data.table:data.table]{data.table} of each outputs from the
 all called processes
+\item \code{backend}: the resolved engine name, \code{"cli"} or \code{"api"}
+\item \code{api}: native identity and outcome metadata, present only for the API engine
 }
 }
 \description{

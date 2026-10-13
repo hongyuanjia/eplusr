@@ -15,8 +15,7 @@ run_idf(
   wait = TRUE,
   echo = TRUE,
   eplus = NULL,
-  backend = c("cli", "api"),
-  api_setup = NULL
+  backend = "cli"
 )
 
 run_multi(
@@ -29,8 +28,7 @@ run_multi(
   wait = TRUE,
   echo = TRUE,
   eplus = NULL,
-  backend = c("cli", "api"),
-  api_setup = NULL
+  backend = "cli"
 )
 }
 \arguments{
@@ -80,22 +78,23 @@ is the default, the version of EnergyPlus to use is determined by the
 version of input model. For \code{run_multi()}, \code{eplus}, if not \code{NULL},
 should have the same length as \code{model}.}
 
-\item{backend}{Simulation engine, \code{"cli"} (default) or experimental \code{"api"}.
+\item{backend}{Simulation engine: \code{"cli"} (default), experimental \code{"api"},
+or an initialization \verb{function(api, state)} which selects the API engine.
 The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
-for each engine run. Preprocessing and result collection use the same pipeline.}
-
-\item{api_setup}{Optional \verb{function(api, state)} executed in the engine worker
+for each engine run. Preprocessing and result collection use the same pipeline.
+A function is executed once in the engine worker
 before simulation. Register requests and callbacks using the supplied managed
 objects. Capture serializable lexical configuration in a self-contained closure;
 Live API objects and native pointers cannot be transferred. The return value is ignored.
-Requires \code{backend = "api"}. Controller failures and worker interrupts yield failed
+Controller failures and worker interrupts yield failed
 results with condition metadata; an explicit stop yields a stopped result.
-API results carry \verb{$backend} and \verb{$api} metadata; existing CLI result fields
+Results record the resolved \code{"cli"} or \code{"api"} backend; API results also carry
+\verb{$api} metadata. Existing CLI result fields
 remain available. Job orchestration may use additional R processes.}
 }
 \value{
 \itemize{
-\item For \code{run_idf()}, if \code{wait} is \code{TRUE}, a named list of 11 elements:
+\item For \code{run_idf()}, if \code{wait} is \code{TRUE}, a named list containing:
 }\tabular{rlll}{
    No. \tab Column \tab Type \tab Description \cr
    1 \tab \code{idf} \tab \code{character(1)} \tab Full path of input IDF file \cr
@@ -109,6 +108,7 @@ remain available. Job orchestration may use additional R processes.}
    9 \tab \code{stdout} \tab \code{character(1)} or \code{NULL} \tab Standard output of EnergyPlus during simulation \cr
    10 \tab \code{stderr} \tab \code{character(1)} or \code{NULL} \tab Standard error of EnergyPlus during simulation \cr
    11 \tab \code{process} \tab \link[callr:r_bg]{r_process} \tab A process object which called EnergyPlus and ran the simulation \cr
+   12 \tab \code{backend} \tab \code{character(1)} \tab Resolved engine name, \code{"cli"} or \code{"api"} \cr
 }
 
 
@@ -117,8 +117,8 @@ You can get the results by calling \code{result <- proc$get_result()} (\code{pro
 the returned process). Please note that in this case, \code{result$process} will
 always be \code{NULL}. But you can easily assign it by running \code{result$process <- proc}
 \itemize{
-\item For \code{rum_multi()}, if \code{wait} is TRUE, a
-\link[data.table:data.table]{data.table} of 12 columns:\tabular{rlll}{
+\item For \code{run_multi()}, if \code{wait} is TRUE, a
+\link[data.table:data.table]{data.table} containing:\tabular{rlll}{
    No. \tab Column \tab Type \tab Description \cr
    1 \tab \code{index} \tab \code{integer} \tab Index of simulation \cr
    2 \tab \code{status} \tab \code{character} \tab Simulation status \cr
@@ -132,8 +132,12 @@ always be \code{NULL}. But you can easily assign it by running \code{result$proc
    10 \tab \code{energyplus} \tab \code{character} \tab Full path of called EnergyPlus executable \cr
    11 \tab \code{stdout} \tab \code{list} \tab Standard output of EnergyPlus during simulation \cr
    12 \tab \code{stderr} \tab \code{list} \tab Standard error of EnergyPlus during simulation \cr
+   13 \tab \code{backend} \tab \code{character} \tab Resolved engine name, \code{"cli"} or \code{"api"} \cr
 }
 
+
+Both result forms also include API outcome metadata as \code{api} when the
+API engine is selected.
 
 For column \code{status}, there are 4 possible values:
 \itemize{
