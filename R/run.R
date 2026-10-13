@@ -2891,6 +2891,7 @@ run__check_setup <- function(setup) {
                     "EnergyPlusHandle",
                     "EnergyPlusFunctional",
                     "EnergyPlusSession",
+                    "EnergyPlusPluginContext",
                     "connection"
                 )
             ) ||
@@ -2911,7 +2912,7 @@ run__check_setup <- function(setup) {
                 return(invisible(NULL))
             }
             # Inspect free variables, not unrelated jobs or pointers in the surrounding caller frame.
-            for (name in codetools::findGlobals(object, merge = TRUE)) {
+            for (name in run__setup_globals(object)) {
                 if (exists(name, env, inherits = TRUE)) {
                     inspect(get(name, env, inherits = TRUE))
                 }
@@ -2988,6 +2989,9 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
         if (!is.null(state)) {
             status <- api$state_manager$status(state)
             metadata$state_phase <<- status$phase
+            if (length(status$plugins)) {
+                metadata$plugins <<- status$plugins
+            }
             metadata$phase <<- if (identical(status$phase, "quarantined")) {
                 "quarantined"
             } else {
@@ -2995,10 +2999,17 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
             }
             metadata$native_exit_status <<- status$exit_code %||% NA_integer_
             if (
-                identical(status$stop_reason, "callback_error") &&
+                isTRUE(
+                    status$stop_reason %in%
+                        c(
+                            "callback_error",
+                            "plugin_initialize_error",
+                            "plugin_finalize_error"
+                        )
+                ) &&
                     !inherits(condition, "interrupt")
             ) {
-                metadata$stop_reason <<- "callback_error"
+                metadata$stop_reason <<- status$stop_reason
             }
         }
         code <<- if (inherits(condition, "interrupt")) 130L else 1L
@@ -3033,6 +3044,9 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
             metadata$phase <- status$phase
             metadata$stop_reason <- status$stop_reason
             metadata$native_exit_status <- code
+            if (length(status$plugins)) {
+                metadata$plugins <- status$plugins
+            }
             # A stopped simulation has partial finalized results and must not report full completion.
             if (identical(status$phase, "stopped")) code <- 1L
         },
@@ -3073,6 +3087,89 @@ run__api_command <- function(directory, args, wd, echo, api_setup) {
     run
 }
 
+# Include replacement-assignment reads that codetools treats as local bindings.
+run__setup_globals <- function(fun) {
+    # Analyze one lexical scope at a time, so worker-created locals do not capture caller siblings.
+    scope <- function(parameters, expression, outer = character()) {
+        locals <- parameters
+        roots <- character()
+        children <- list()
+        # First collect whole-variable bindings; nested functions define separate scopes.
+        declarations <- function(node) {
+            if (!is.call(node)) {
+                return(invisible(NULL))
+            }
+            operator <- if (is.symbol(node[[1L]])) {
+                as.character(node[[1L]])
+            } else {
+                ""
+            }
+            if (
+                operator %in% c("function", "quote", "substitute", "expression")
+            ) {
+                return(invisible(NULL))
+            }
+            if (operator %in% c("<-", "=") && is.symbol(node[[2L]])) {
+                locals <<- c(locals, as.character(node[[2L]]))
+            }
+            if (operator == "for") {
+                locals <<- c(locals, as.character(node[[2L]]))
+            }
+            for (index in seq_along(node)[-1L]) {
+                if (!identical(node[[index]], quote(expr = ))) {
+                    declarations(node[[index]])
+                }
+            }
+            invisible(NULL)
+        }
+        declarations(expression)
+        # Replacement assignment reads its root object before updating the local binding.
+        references <- function(node) {
+            if (!is.call(node)) {
+                return(invisible(NULL))
+            }
+            operator <- if (is.symbol(node[[1L]])) {
+                as.character(node[[1L]])
+            } else {
+                ""
+            }
+            if (operator %in% c("quote", "substitute", "expression")) {
+                return(invisible(NULL))
+            }
+            if (operator == "function") {
+                children[[length(children) + 1L]] <<- node
+                return(invisible(NULL))
+            }
+            if (operator %in% c("<-", "=", "<<-") && is.call(node[[2L]])) {
+                root <- node[[2L]]
+                while (is.call(root) && length(root) >= 2L) {
+                    root <- root[[2L]]
+                }
+                if (is.symbol(root)) roots <<- c(roots, as.character(root))
+            }
+            for (index in seq_along(node)[-1L]) {
+                if (!identical(node[[index]], quote(expr = ))) {
+                    references(node[[index]])
+                }
+            }
+            invisible(NULL)
+        }
+        references(expression)
+        result <- setdiff(roots, c(locals, outer))
+        for (child in children) {
+            result <- c(
+                result,
+                scope(names(child[[2L]]), child[[3L]], c(outer, locals))
+            )
+        }
+        unique(result)
+    }
+    unique(c(
+        codetools::findGlobals(fun, merge = TRUE),
+        scope(names(formals(fun)), body(fun))
+    ))
+}
+
 # Freeze each controller's lexical dependencies so callr does not serialize its entire caller frame.
 run__prepare_setup <- function(setup) {
     if (is.null(setup)) {
@@ -3080,37 +3177,77 @@ run__prepare_setup <- function(setup) {
     }
     originals <- list()
     copies <- list()
-    # Clone only lexical dependencies, preserving package namespaces and recursive helper identity.
-    freeze <- function(fun) {
-        env <- environment(fun)
-        if (
-            !is.function(fun) ||
-                is.null(env) ||
-                isNamespace(env) ||
-                identical(env, baseenv())
-        ) {
-            return(fun)
-        }
-        index <- which(vlapply(originals, function(x) identical(x, fun)))
-        if (length(index)) {
-            return(copies[[index[1L]]])
-        }
-        target <- new.env(parent = baseenv())
-        copy <- fun
-        environment(copy) <- target
-        # Memoize before resolving dependencies so mutually recursive helpers share the same copies.
-        originals[[length(originals) + 1L]] <<- fun
-        copies[[length(copies) + 1L]] <<- copy
-        for (name in codetools::findGlobals(fun, merge = TRUE)) {
-            if (exists(name, env, inherits = TRUE)) {
-                value <- get(name, env, inherits = TRUE)
-                if (is.function(value)) {
-                    value <- freeze(value)
-                }
-                assign(name, value, envir = target)
+    # Freeze lexical dependencies throughout ordinary containers while preserving cycles and aliases.
+    freeze <- function(value) {
+        if (is.function(value)) {
+            env <- environment(value)
+            if (is.null(env) || isNamespace(env) || identical(env, baseenv())) {
+                return(value)
             }
+            index <- which(vlapply(originals, function(x) identical(x, value)))
+            if (length(index)) {
+                return(copies[[index[1L]]])
+            }
+            target <- new.env(parent = baseenv())
+            copy <- value
+            environment(copy) <- target
+            # Memoize before recursing into helper containers and mutually recursive functions.
+            originals[[length(originals) + 1L]] <<- value
+            copies[[length(copies) + 1L]] <<- copy
+            for (name in run__setup_globals(value)) {
+                if (exists(name, env, inherits = TRUE)) {
+                    assign(
+                        name,
+                        freeze(get(name, env, inherits = TRUE)),
+                        envir = target
+                    )
+                }
+            }
+            return(copy)
         }
-        copy
+        if (is.environment(value)) {
+            if (
+                isNamespace(value) ||
+                    identical(value, globalenv()) ||
+                    identical(value, baseenv()) ||
+                    identical(value, emptyenv())
+            ) {
+                return(value)
+            }
+            index <- which(vlapply(originals, function(x) identical(x, value)))
+            if (length(index)) {
+                return(copies[[index[1L]]])
+            }
+            copy <- new.env(parent = emptyenv())
+            originals[[length(originals) + 1L]] <<- value
+            copies[[length(copies) + 1L]] <<- copy
+            parent.env(copy) <- freeze(parent.env(value))
+            for (name in ls(value, all.names = TRUE)) {
+                if (bindingIsActive(name, value)) {
+                    binding <- activeBindingFunction(name, value)
+                    run__check_setup(binding)
+                    makeActiveBinding(name, freeze(binding), copy)
+                } else {
+                    assign(
+                        name,
+                        freeze(get(name, value, inherits = FALSE)),
+                        envir = copy
+                    )
+                }
+                if (bindingIsLocked(name, value)) lockBinding(name, copy)
+            }
+            attributes(copy) <- attributes(value)
+            if (environmentIsLocked(value)) {
+                lockEnvironment(copy, bindings = FALSE)
+            }
+            return(copy)
+        }
+        if (is.list(value)) {
+            copy <- lapply(value, freeze)
+            attributes(copy) <- attributes(value)
+            return(copy)
+        }
+        value
     }
     freeze(setup)
 }

@@ -2,6 +2,10 @@
 
 ## New features
 
+* Add eplusr-hosted R plugins with multiple lifecycle hooks, independent state,
+  ordered execution and safe finalization through the existing `backend`
+  initialization function for stock EnergyPlus 26.1 (#652).
+
 * Add recorded MPC replay prediction to live sessions. Independent workers
   replay verified history before branching, retaining the original paused
   session; this does not clone native state (#652).

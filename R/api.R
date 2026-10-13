@@ -134,6 +134,7 @@ eplus_api <- function(eplus = "26.1") {
 # Track the one active native simulation in this R process, across API objects.
 api__running <- new.env(parent = emptyenv())
 api__running$state <- NULL
+api__running$plugin_depth <- 0L
 api__bridge_cache <- new.env(parent = emptyenv())
 
 # Throw a conventional R condition before an invalid request can reach native code.
@@ -1552,6 +1553,7 @@ api__construct <- function(ctx) {
     ctx$states <- new.env(parent = emptyenv())
     ctx$quarantined <- FALSE
     ctx$native_depth <- 0L
+    ctx$plugin_depth <- 0L
     native <- ctx$call
     # Native callbacks also occur in standalone functional calls; guard their teardown.
     ctx$call <- function(symbol, arguments = list()) {
@@ -1572,12 +1574,16 @@ api__construct <- function(ctx) {
     # Inspect lifecycle metadata without exposing the native state pointer.
     api$state_manager$status <- function(state) {
         entry <- api__entry(ctx, state, allow_closed = TRUE)
-        list(
+        status <- list(
             phase = entry$phase,
             generation = entry$generation,
             stop_reason = entry$stop_reason,
             exit_code = entry$exit_code
         )
+        if (length(entry$plugins)) {
+            status$plugins <- plugin__status(entry)
+        }
+        status
     }
     # Identify the library and process associated with this managed API.
     api$info <- function() {
@@ -1607,7 +1613,8 @@ api__construct <- function(ctx) {
                     !ctx$quarantined &&
                     ctx$pid == Sys.getpid() &&
                     ctx$native_depth == 0L &&
-                    is.null(api__running$state)
+                    is.null(api__running$state) &&
+                    api__running$plugin_depth == 0L
             ) {
                 api__close(ctx)
             }
@@ -1698,6 +1705,7 @@ api__new_state <- function(ctx) {
     entry$condition <- NULL
     entry$callbacks <- list()
     entry$resources <- list()
+    entry$plugins <- list()
     entry$functional_directory <- NULL
     entry$callback_directory <- NULL
     ctx$states[[entry$id]] <- entry
@@ -1713,7 +1721,8 @@ api__new_state <- function(ctx) {
                     !entry$running &&
                     !ctx$quarantined &&
                     ctx$pid == Sys.getpid() &&
-                    ctx$native_depth == 0L
+                    ctx$native_depth == 0L &&
+                    api__running$plugin_depth == 0L
             ) {
                 api__dispose(ctx, entry)
             }
@@ -1730,10 +1739,18 @@ api__dispose <- function(ctx, entry) {
         return(invisible(NULL))
     }
     if (
-        entry$running || ctx$native_depth > 0L || !is.null(api__running$state)
+        entry$running ||
+            ctx$native_depth > 0L ||
+            ctx$plugin_depth > 0L ||
+            api__running$plugin_depth > 0L ||
+            !is.null(api__running$state)
     ) {
-        api__error("Cannot delete a state while EnergyPlus is running.")
+        api__error(
+            "Cannot delete a state while EnergyPlus or an R plugin is running."
+        )
     }
+    # User finalizers run only at an R boundary, before native resources disappear.
+    plugin__finish(ctx, entry)
     for (resource in entry$resources) {
         api__delete_resource(ctx, entry, resource)
     }
@@ -1756,10 +1773,22 @@ api__dispose <- function(ctx, entry) {
 # Reset ends all prior native registrations and invalidates every typed child handle.
 api__reset <- function(ctx, entry) {
     if (
-        entry$running || ctx$native_depth > 0L || !is.null(api__running$state)
+        entry$running ||
+            ctx$native_depth > 0L ||
+            ctx$plugin_depth > 0L ||
+            api__running$plugin_depth > 0L ||
+            !is.null(api__running$state)
     ) {
-        api__error("Cannot reset a state while EnergyPlus is running.")
+        api__error(
+            "Cannot reset a state while EnergyPlus or an R plugin is running."
+        )
     }
+    plugin__finish(ctx, entry)
+    # The public invocation boundary reports this once after retiring the failed state.
+    if (!is.null(entry$condition)) {
+        return(invisible(NULL))
+    }
+    entry$plugins <- list()
     for (resource in entry$resources) {
         api__delete_resource(ctx, entry, resource)
     }
@@ -1801,16 +1830,24 @@ api__close <- function(ctx) {
     entries <- as.list(ctx$states)
     if (
         ctx$native_depth > 0L ||
+            ctx$plugin_depth > 0L ||
+            api__running$plugin_depth > 0L ||
             !is.null(api__running$state) ||
             any(vapply(entries, function(x) x$running, logical(1)))
     ) {
         api__error("Cannot close an API while EnergyPlus is running.")
     }
+    condition <- NULL
     for (entry in entries) {
         api__dispose(ctx, entry)
+        if (is.null(condition)) condition <- entry$condition
     }
     ctx$ffi$unload()
     ctx$closed <- TRUE
+    # Report cleanup failure only after every state and the library have been drained.
+    if (!is.null(condition)) {
+        stop(condition)
+    }
     invisible(NULL)
 }
 
@@ -2064,8 +2101,10 @@ api__run <- function(ctx, entry, args) {
     }
     if (
         !is.null(api__running$state) ||
+            api__running$plugin_depth > 0L ||
             entry$phase != "created" ||
-            ctx$native_depth > 0L
+            ctx$native_depth > 0L ||
+            ctx$plugin_depth > 0L
     ) {
         api__error(
             "EnergyPlus cannot run recursively or reuse a state without reset."
@@ -2133,11 +2172,6 @@ api__run <- function(ctx, entry, args) {
     if (is.null(entry$condition)) {
         entry$condition <- api__callback_failure(ctx, entry)
     }
-    if (!is.null(entry$condition)) {
-        condition <- entry$condition
-        api__dispose(ctx, entry)
-        stop(condition)
-    }
     entry$phase <- if (!is.null(entry$stop_reason)) {
         "stopped"
     } else if (code == 0L) {
@@ -2147,6 +2181,15 @@ api__run <- function(ctx, entry, args) {
     }
     if (code != 0L && is.null(entry$stop_reason)) {
         entry$stop_reason <- "engine_error"
+    }
+    if (!is.null(entry$condition)) {
+        entry$phase <- "failed"
+    }
+    plugin__finish(ctx, entry)
+    if (!is.null(entry$condition)) {
+        condition <- entry$condition
+        api__dispose(ctx, entry)
+        stop(condition)
     }
     code
 }
@@ -2203,7 +2246,9 @@ api__invoke <- function(ctx, spec, values, resource) {
                     !is.null(entry$condition)
             ) {
                 condition <- entry$condition
-                api__dispose(ctx, entry)
+                if (ctx$plugin_depth == 0L) {
+                    api__dispose(ctx, entry)
+                }
                 stop(condition)
             }
         },
@@ -2221,7 +2266,11 @@ api__invoke <- function(ctx, spec, values, resource) {
         on.exit(setwd(original_directory), add = TRUE, after = FALSE)
     }
     if (spec$kind == "delete_state") {
-        return(api__dispose(ctx, entry))
+        api__dispose(ctx, entry)
+        if (!is.null(entry$condition)) {
+            stop(entry$condition)
+        }
+        return(invisible(NULL))
     }
     if (spec$kind == "reset_state") {
         return(api__reset(ctx, entry))

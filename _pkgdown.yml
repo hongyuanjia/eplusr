@@ -125,6 +125,7 @@ reference:
     contents:
       - eplus_api
       - eplus_session
+      - eplus_plugin
 
   - title: Job
     desc: Run EnergyPlus and collect outputs

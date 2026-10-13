@@ -2158,7 +2158,11 @@ test_that("recorded input snapshots preserve hidden resources and reject ambiguo
         unname(tools::md5sum(ctx$replay$weather)),
         unname(tools::md5sum(fixture$weather))
     )
-    expect_true(copies[[2L]] %in% ctx$replay$files)
+    # Windows may spell the same materialized path with different separators.
+    expect_true(
+        normalizePath(copies[[2L]], winslash = "/") %in%
+            normalizePath(ctx$replay$files, winslash = "/")
+    )
     session$initialize()
     writeLines("changed hidden schedule", copies[[2L]])
     expect_error(session$predict(list(a = list(NULL)), 1L), "inputs.*changed")
@@ -2302,4 +2306,678 @@ test_that("replay branches stop at a completed future boundary and close", {
     expect_identical(steps, 1L)
     expect_true(closed)
     expect_identical(checked, 2L)
+})
+
+# Plugin definitions must remain ordinary reusable backend functions, with frozen dependencies.
+test_that("host plugins validate hooks and freeze independent bindings", {
+    expect_error(eplus_plugin(list()))
+    expect_error(
+        eplus_plugin(list(unknown = function(a, b, c) NULL)),
+        "Unknown"
+    )
+    expect_error(eplus_plugin(list(initialize = function(a) NULL)))
+    expect_error(eplus_plugin(
+        list(initialize = function(a, b, c) NULL),
+        warmup = NA
+    ))
+    ctx <- testapi__fake()
+    api <- ctx$api
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    expect_error(
+        eplus_plugin(list(initialize = function(a, b, c) NULL), data = state),
+        "live"
+    )
+    expect_error(
+        eplus_plugin(list(initialize = function(a, b, c) state)),
+        "live"
+    )
+    amount <- 2L
+    factory <- eplus_plugin(list(
+        initialize = function(api, state, plugin) {
+            plugin$data$total <- amount
+        },
+        end_zone_timestep_after_zone_reporting = function(api, state, plugin) {
+            plugin$data$total <- plugin$data$total + 1L
+        }
+    ))
+    amount <- 100L
+    expect_true(is.function(factory))
+    expect_s3_class(factory, "EnergyPlusPlugin")
+    expect_identical(run__backend(factory)$engine, "api")
+    factory(api, state)
+    api$runtime$run_energyplus(state, testapi__model())
+    first <- api$state_manager$status(state)$plugins[[1L]]
+    expect_identical(first$data$total, 5L)
+    expect_identical(
+        first$calls[["end_zone_timestep_after_zone_reporting"]],
+        3L
+    )
+    api$state_manager$reset_state(state)
+    factory(api, state)
+    api$runtime$run_energyplus(state, testapi__model())
+    expect_identical(
+        api$state_manager$status(state)$plugins[[1L]]$data$total,
+        5L
+    )
+    expect_error(factory(api, state), "fresh or reset")
+    other <- testapi__fake()
+    expect_error(factory(other$api, state), "owned state")
+    other$api$close()
+})
+
+# Warmup suppression affects timestep hooks, while environment lifecycle hooks remain observable.
+test_that("host plugin warmup delivery is explicit", {
+    for (warmup in c(FALSE, TRUE)) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        exchange <- api$exchange
+        exchange$warmup_flag <- function(state) TRUE
+        state <- api$state_manager$new_state()
+        factory <- eplus_plugin(
+            list(
+                begin_new_environment = function(api, state, plugin) {
+                    plugin$data$environment <- plugin$data$environment + 1L
+                },
+                begin_system_timestep_before_predictor = function(
+                    api,
+                    state,
+                    plugin
+                ) {
+                    plugin$data$steps <- plugin$data$steps + 1L
+                }
+            ),
+            data = list(environment = 0L, steps = 0L),
+            warmup = warmup
+        )
+        factory(api, state)
+        api$runtime$run_energyplus(state, testapi__model())
+        data <- api$state_manager$status(state)$plugins[[1L]]$data
+        expect_identical(data$environment, 3L)
+        expect_identical(data$steps, if (warmup) 3L else 0L)
+        api$close()
+    }
+})
+
+# Native return precedes reverse cleanup, and the first controller failure keeps its identity.
+test_that("host plugin cleanup preserves the first error and releases native caches", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    failure <- simpleError("plugin controller failure")
+    eplus_plugin(list(
+        initialize = function(api, state, plugin) {
+            plugin$handles$temperature <- "worker handle cache"
+        },
+        begin_system_timestep_before_predictor = function(api, state, plugin) {
+            stop(failure)
+        },
+        finalize = function(api, state, plugin) {
+            plugin$data$outcome <- plugin$outcome$phase
+            stop("later cleanup failure")
+        }
+    ))(api, state)
+    record <- attr(state, "entry")$plugins[[1L]]
+    condition <- tryCatch(
+        api$runtime$run_energyplus(state, testapi__model()),
+        error = identity
+    )
+    expect_identical(conditionMessage(condition), conditionMessage(failure))
+    expect_identical(api$state_manager$status(state)$phase, "closed")
+    expect_identical(record$calls[["finalize"]], 1L)
+    expect_identical(record$data$outcome, "failed")
+    expect_null(record$context)
+    expect_null(record$hooks)
+    expect_null(record$api)
+    expect_identical(ctx$deleted, 1L)
+    api$close()
+    expect_identical(record$calls[["finalize"]], 1L)
+})
+
+# Initialization and normal finalization failures retire the state at a safe R boundary.
+test_that("host plugin initialization and finalizer errors are visible", {
+    for (event in c("initialize", "finalize")) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        hooks <- list(finalize = function(api, state, plugin) {
+            plugin$data$cleaned <- TRUE
+        })
+        hooks[[event]] <- function(api, state, plugin) {
+            stop("plugin lifecycle failure")
+        }
+        plugin <- eplus_plugin(hooks)
+        if (event == "initialize") {
+            expect_error(plugin(api, state), "plugin lifecycle failure")
+        } else {
+            plugin(api, state)
+            expect_error(
+                api$runtime$run_energyplus(state, testapi__model()),
+                "plugin lifecycle failure"
+            )
+        }
+        expect_identical(api$state_manager$status(state)$phase, "closed")
+        expect_identical(ctx$deleted, 1L)
+        expect_identical(
+            api$state_manager$status(state)$plugins[[1L]]$phase,
+            "failed"
+        )
+        api$close()
+    }
+})
+
+# Reset, deletion and API close also finalize bindings that never entered simulation.
+test_that("unused host plugins finalize once and drain every state on close", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    eplus_plugin(list(finalize = function(api, state, plugin) {
+        plugin$data$cleaned <- TRUE
+    }))(api, state)
+    record <- attr(state, "entry")$plugins[[1L]]
+    api$state_manager$reset_state(state)
+    expect_identical(record$calls[["finalize"]], 1L)
+    expect_true(record$data$cleaned)
+    expect_length(attr(state, "entry")$plugins, 0L)
+    bad <- eplus_plugin(list(finalize = function(api, state, plugin) {
+        stop("cleanup failed")
+    }))
+    bad(api, state)
+    expect_error(api$state_manager$reset_state(state), "cleanup failed")
+    expect_identical(api$state_manager$status(state)$phase, "closed")
+    second <- api$state_manager$new_state()
+    bad(api, second)
+    expect_error(api$close(), "cleanup failed")
+    expect_identical(ctx$deleted, 2L)
+    expect_identical(ctx$unloaded, 1L)
+    expect_true(api$info()$closed)
+    expect_silent(api$close())
+})
+
+# Lifecycle methods cannot tear down or start an engine while plugin R code is active.
+test_that("host plugin hooks cannot recursively change native ownership", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    model <- testapi__model()
+    eplus_plugin(list(initialize = function(api, state, plugin) {
+        plugin$data$errors <- c(
+            tryCatch(
+                api$state_manager$delete_state(state),
+                error = conditionMessage
+            ),
+            tryCatch(
+                api$state_manager$reset_state(state),
+                error = conditionMessage
+            ),
+            tryCatch(api$close(), error = conditionMessage),
+            tryCatch(
+                api$runtime$run_energyplus(state, model),
+                error = conditionMessage
+            )
+        )
+    }))(api, state)
+    api$runtime$run_energyplus(state, model)
+    errors <- api$state_manager$status(state)$plugins[[1L]]$data$errors
+    expect_length(errors, 4L)
+    expect_true(all(grepl("running|recursively", errors)))
+    expect_identical(ctx$plugin_depth, 0L)
+    api$close()
+})
+
+# Returning native resources in ordinary plugin data fails before it can reach Job IPC.
+test_that("host plugin summaries reject live native data", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    eplus_plugin(list(initialize = function(api, state, plugin) {
+        plugin$data <- state
+    }))(api, state)
+    expect_error(api$runtime$run_energyplus(state, testapi__model()), "live")
+    expect_null(api$state_manager$status(state)$plugins[[1L]]$data)
+    api$close()
+})
+
+# Exercise two real plugins on the same 26.1 native state through the existing Job pipeline.
+test_that("stock host plugins control the same state in registration order", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    log <- file.path(fixture$directory, "plugin-order.txt")
+    # Each factory snapshots its own label, control and lexical dependencies.
+    make_plugin <- function(label, setting) {
+        eplus_plugin(
+            list(
+                initialize = function(api, state, plugin) {
+                    api$exchange$request_variable(
+                        state,
+                        "Zone Thermostat Heating Setpoint Temperature",
+                        "ZONE ONE"
+                    )
+                    plugin$data$steps <- 0L
+                    plugin$data$predictions <- 0L
+                    plugin$data$heating <- numeric()
+                    plugin$data$seen <- numeric()
+                    cat(
+                        paste0("initialize-", label, "\n"),
+                        file = log,
+                        append = TRUE
+                    )
+                },
+                begin_system_timestep_before_predictor = function(
+                    api,
+                    state,
+                    plugin
+                ) {
+                    if (
+                        !api$exchange$api_data_fully_ready(state) ||
+                            api$exchange$kind_of_sim(state) != 3L
+                    ) {
+                        return(NULL)
+                    }
+                    if (is.null(plugin$handles$actuator)) {
+                        plugin$handles$actuator <- api$exchange$get_actuator_handle(
+                            state,
+                            "Schedule:Constant",
+                            "Schedule Value",
+                            "Session Heating"
+                        )
+                    }
+                    plugin$data$seen <- c(
+                        plugin$data$seen,
+                        api$exchange$get_actuator_value(
+                            state,
+                            plugin$handles$actuator
+                        )
+                    )
+                    api$exchange$set_actuator_value(
+                        state,
+                        plugin$handles$actuator,
+                        setting
+                    )
+                    if (plugin$data$predictions == 0L) {
+                        cat(
+                            paste0("predictor-", label, "\n"),
+                            file = log,
+                            append = TRUE
+                        )
+                    }
+                    plugin$data$predictions <- plugin$data$predictions + 1L
+                },
+                end_zone_timestep_after_zone_reporting = function(
+                    api,
+                    state,
+                    plugin
+                ) {
+                    if (
+                        !api$exchange$api_data_fully_ready(state) ||
+                            api$exchange$kind_of_sim(state) != 3L
+                    ) {
+                        return(NULL)
+                    }
+                    if (is.null(plugin$handles$variable)) {
+                        plugin$handles$variable <- api$exchange$get_variable_handle(
+                            state,
+                            "Zone Thermostat Heating Setpoint Temperature",
+                            "ZONE ONE"
+                        )
+                    }
+                    plugin$data$heating <- c(
+                        plugin$data$heating,
+                        api$exchange$get_variable_value(
+                            state,
+                            plugin$handles$variable
+                        )
+                    )
+                    if (plugin$data$steps == 0L) {
+                        cat(
+                            paste0("report-", label, "\n"),
+                            file = log,
+                            append = TRUE
+                        )
+                    }
+                    plugin$data$steps <- plugin$data$steps + 1L
+                    # Force collection while C++ owns the simulation and callback/context references.
+                    if (plugin$data$steps %% 24L == 0L) gc()
+                },
+                finalize = function(api, state, plugin) {
+                    plugin$data$outcome <- plugin$outcome$phase
+                    plugin$data$identity <- plugin$identity
+                    cat(
+                        paste0("finalize-", label, "\n"),
+                        file = log,
+                        append = TRUE
+                    )
+                }
+            ),
+            data = list(label = label)
+        )
+    }
+    first <- make_plugin("A", 22)
+    second <- make_plugin("B", 24)
+    backend <- function(api, state) {
+        first(api, state)
+        second(api, state)
+    }
+    job <- eplus_job(fixture$model, fixture$weather)
+    job$run(backend = backend, echo = FALSE)
+    status <- job$status()
+    expect_true(status$successful)
+    plugins <- status$api$plugins
+    expect_length(plugins, 2L)
+    expect_identical(
+        vapply(plugins, function(x) x$data$label, character(1L)),
+        c("A", "B")
+    )
+    expect_true(all(vapply(
+        plugins,
+        function(x) x$data$steps == 96L,
+        logical(1L)
+    )))
+    expect_true(all(plugins[[2L]]$data$seen == 22))
+    expect_true(all(plugins[[2L]]$data$heating == 24))
+    expect_identical(
+        readLines(log),
+        c(
+            "initialize-A",
+            "initialize-B",
+            "predictor-A",
+            "predictor-B",
+            "report-A",
+            "report-B",
+            "finalize-B",
+            "finalize-A"
+        )
+    )
+    expect_true(all(vapply(
+        plugins,
+        function(x) x$calls[["finalize"]] == 1L,
+        logical(1L)
+    )))
+    expect_identical(plugins[[1L]]$data$identity$pid, status$api$pid)
+    expect_identical(plugins[[2L]]$data$identity$pid, status$api$pid)
+    expect_false(identical(status$api$pid, Sys.getpid()))
+})
+
+# A Job reports controller, initialize and finalize failures without serializing live state.
+test_that("stock host plugin failures remain distinct and retain cleanup summaries", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (event in c(
+        "initialize",
+        "begin_system_timestep_before_predictor",
+        "finalize"
+    )) {
+        hooks <- list(finalize = function(api, state, plugin) {
+            plugin$data$cleaned <- TRUE
+        })
+        hooks[[event]] <- function(api, state, plugin) {
+            stop("stock plugin failure")
+        }
+        plugin <- eplus_plugin(hooks)
+        job <- eplus_job(fixture$model, fixture$weather)
+        job$run(
+            backend = plugin,
+            dir = file.path(fixture$directory, event),
+            echo = FALSE
+        )
+        status <- job$status()
+        expect_false(status$successful)
+        expect_match(status$api$error$message, "stock plugin failure")
+        expect_identical(
+            status$api$stop_reason,
+            switch(
+                event,
+                initialize = "plugin_initialize_error",
+                finalize = "plugin_finalize_error",
+                "callback_error"
+            )
+        )
+        expect_identical(status$api$state_phase, "closed")
+        expect_identical(status$api$plugins[[1L]]$phase, "failed")
+        expect_identical(status$api$plugins[[1L]]$calls[["finalize"]], 1L)
+    }
+})
+
+# A partially registered plugin must retire its state even if allocating a trampoline fails.
+test_that("host plugins clean up partial callback registration", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    ctx$ffi$callback <- function(...) {
+        stop("plugin trampoline allocation failed")
+    }
+    plugin <- eplus_plugin(list(
+        begin_system_timestep_before_predictor = function(api, state, plugin) {
+            NULL
+        },
+        finalize = function(api, state, plugin) plugin$data$cleaned <- TRUE
+    ))
+    expect_error(plugin(api, state), "trampoline allocation")
+    status <- api$state_manager$status(state)
+    expect_identical(status$phase, "closed")
+    expect_true(status$plugins[[1L]]$data$cleaned)
+    expect_identical(status$plugins[[1L]]$phase, "failed")
+    expect_identical(ctx$deleted, 1L)
+    api$close()
+})
+
+# Standalone native property errors inside initialize are deferred to the outer plugin boundary.
+test_that("host initialize preserves nested functional callback errors", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    ctx$hook <- function(symbol, arguments) {
+        if (symbol == "psyCpAirFnW") {
+            arguments[[1L]]$callbacks$registerErrorCallback(
+                2L,
+                "property warning"
+            )
+        }
+    }
+    plugin <- eplus_plugin(list(
+        initialize = function(api, state, plugin) {
+            api$functional$callback_error(state, function(...) {
+                stop("nested plugin property failure")
+            })
+            api$functional$psychrometrics(state)$specific_heat(state, .01)
+        },
+        finalize = function(api, state, plugin) plugin$data$cleaned <- TRUE
+    ))
+    expect_error(plugin(api, state), "nested plugin property failure")
+    status <- api$state_manager$status(state)
+    expect_true(status$plugins[[1L]]$data$cleaned)
+    expect_identical(status$phase, "closed")
+    expect_identical(ctx$deleted, 1L)
+    expect_identical(ctx$plugin_depth, 0L)
+    expect_identical(api__running$plugin_depth, 0L)
+    api$close()
+})
+
+# Retired callbacks cannot touch discarded native caches, and live contexts cannot enter another worker.
+test_that("host plugin contexts are local and finished callbacks are inert", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    plugin <- eplus_plugin(
+        list(
+            begin_system_timestep_before_predictor = function(
+                api,
+                state,
+                plugin
+            ) {
+                plugin$data$n <- plugin$data$n + 1L
+            }
+        ),
+        data = list(n = 0L)
+    )
+    expect_error(plugin(api, NULL), "owned state")
+    plugin(api, state)
+    record <- attr(state, "entry")$plugins[[1L]]
+    expect_error(
+        eplus_plugin(
+            list(initialize = function(a, b, c) NULL),
+            data = record$context
+        ),
+        "live"
+    )
+    callback <- attr(
+        state,
+        "entry"
+    )$pointer$callbacks$callbackBeginTimeStepBeforePredictor
+    api$runtime$run_energyplus(state, testapi__model())
+    expect_silent(callback(attr(state, "entry")$pointer))
+    expect_identical(record$data$n, 3L)
+    expect_identical(
+        record$calls[["begin_system_timestep_before_predictor"]],
+        3L
+    )
+    api$close()
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    eplus_plugin(list(finalize = function(a, b, c) {
+        stop("delete cleanup failed")
+    }))(api, state)
+    expect_error(api$state_manager$delete_state(state), "delete cleanup failed")
+    expect_identical(ctx$deleted, 1L)
+    api$close()
+})
+
+# Containers of helper functions must not retain a moving globalenv dependency.
+test_that("host plugin recipes freeze list helpers and shared environment aliases", {
+    for (container in c("list", "environment", "active")) {
+        amount <- 2L
+        if (container == "list") {
+            helpers <- list(calc = function() amount)
+        } else {
+            helpers <- new.env(parent = emptyenv())
+            helpers$n <- 0L
+            helpers$self <- helpers
+            helpers$calc <- function() {
+                helpers$n <- helpers$n + 1L
+                amount
+            }
+            if (container == "active") {
+                makeActiveBinding("value", function(value) amount, helpers)
+                lockBinding("value", helpers)
+                lockEnvironment(helpers, bindings = FALSE)
+            }
+        }
+        factory <- eplus_plugin(list(
+            initialize = function(api, state, plugin) {
+                plugin$data$total <- 0L
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                plugin$data$total <- plugin$data$total + helpers$calc()
+            },
+            finalize = function(api, state, plugin) {
+                plugin$data$alias <- if (is.environment(helpers)) {
+                    identical(helpers$self, helpers)
+                } else {
+                    TRUE
+                }
+                plugin$data$n <- if (is.environment(helpers)) helpers$n else 3L
+                plugin$data$active <- if (container == "active") {
+                    helpers$value
+                } else {
+                    2L
+                }
+            }
+        ))
+        amount <- 100L
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        factory(api, state)
+        api$runtime$run_energyplus(state, testapi__model())
+        data <- api$state_manager$status(state)$plugins[[1L]]$data
+        expect_identical(data$total, 6L)
+        expect_identical(data$n, 3L)
+        expect_true(data$alias)
+        expect_identical(data$active, 2L)
+        api$close()
+    }
+})
+
+# A hook on one API protects all native ownership in the same R process.
+test_that("host plugin lifecycle guards cover another API context", {
+    first <- testapi__fake()
+    second <- testapi__fake()
+    api <- first$api
+    state <- api$state_manager$new_state()
+    other <- second$api$state_manager$new_state()
+    model <- testapi__model()
+    record <- new.env(parent = emptyenv())
+    record$calls <- c(initialize = 0L)
+    record$error <- NULL
+    record$context <- new.env(parent = emptyenv())
+    # Use the same dispatcher as actual plugin initialization to hold the process guard.
+    record$hooks <- list(initialize = function(api, state, plugin) {
+        plugin$errors <- c(
+            tryCatch(
+                second$api$state_manager$delete_state(other),
+                error = conditionMessage
+            ),
+            tryCatch(
+                second$api$state_manager$reset_state(other),
+                error = conditionMessage
+            ),
+            tryCatch(second$api$close(), error = conditionMessage),
+            tryCatch(
+                second$api$runtime$run_energyplus(other, model),
+                error = conditionMessage
+            )
+        )
+    })
+    plugin__call(first, record, "initialize", api, state)
+    expect_length(record$context$errors, 4L)
+    expect_true(all(grepl("running|recursively", record$context$errors)))
+    expect_identical(second$deleted, 0L)
+    expect_identical(second$unloaded, 0L)
+    expect_identical(api__running$plugin_depth, 0L)
+    api$close()
+    second$api$close()
+})
+
+# Dependency analysis must distinguish caller references from worker-created locals and quoted code.
+test_that("backend dependency freezing handles replacement roots and omitted indices", {
+    helper <- new.env(parent = emptyenv())
+    helper$n <- 0L
+    code <- function(argument) {
+        local <- list()
+        local$field <- 1
+        for (index in 1:2) {
+            helper$n <- helper$n + index
+        }
+        matrix <- matrix(1:4, 2)
+        matrix[, 1] <- 0
+        quote(unused$field <- 1)
+        nested <- function(parameter) helper$n <- helper$n + parameter
+        nested(argument)
+        helper$n
+    }
+    globals <- run__setup_globals(code)
+    expect_true("helper" %in% globals)
+    expect_false(any(
+        c("local", "index", "parameter", "matrix", "unused") %in%
+            setdiff(globals, codetools::findGlobals(code, merge = TRUE))
+    ))
+    copy <- run__prepare_setup(code)
+    helper$n <- 100L
+    expect_identical(copy(2L), 5L)
+    expect_identical(helper$n, 100L)
+    ctx <- testapi__fake()
+    cached <- ctx$api$state_manager$new_state()
+    expect_error(
+        eplus_plugin(list(initialize = function(api, state, plugin) {
+            cached$field <- 1
+        })),
+        "live"
+    )
+    ctx$api$close()
 })
