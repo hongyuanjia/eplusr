@@ -416,9 +416,19 @@ copy_energyplus_idd <- function(eplus, output_dir, idd = NULL, name = "Energy+.i
     idd
 }
 
-run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
-                        post_callback = NULL, post_name = NULL,
-                        exit_msg = NULL, exit_callback = NULL, call_r = FALSE) {
+run_command <- function(
+    command,
+    args = NULL,
+    wd,
+    wait = TRUE,
+    echo = TRUE,
+    post_callback = NULL,
+    post_name = NULL,
+    exit_msg = NULL,
+    exit_callback = NULL,
+    call_r = FALSE,
+    kill_tree = FALSE
+) {
     assert_flag(wait)
     assert_flag(echo)
     assert_string(post_name, null.ok = TRUE)
@@ -426,7 +436,10 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
     assert_function(post_callback, null.ok = TRUE)
     assert_function(exit_callback, null.ok = TRUE)
     assert_flag(call_r)
-    if (!call_r) assert_character(args, null.ok = TRUE)
+    assert_flag(kill_tree)
+    if (!call_r) {
+        assert_character(args, null.ok = TRUE)
+    }
 
     start_time <- current()
 
@@ -448,8 +461,12 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             out <- gsub("\r", "", out, fixed = TRUE)
             err <- gsub("\r", "", err, fixed = TRUE)
 
-            if (!length(out)) out <- NULL
-            if (!length(err)) err <- NULL
+            if (!length(out)) {
+                out <- NULL
+            }
+            if (!length(err)) {
+                err <- NULL
+            }
             unlink(c(std_out, std_err))
 
             res <- list(stdout = out, stderr = err, end_time = current())
@@ -466,12 +483,15 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
     }
 
     if (call_r) {
-        if (!length(args)) args <- list()
+        if (!length(args)) {
+            args <- list()
+        }
         proc <- callr::r_bg(func = command, args = args,
             wd = wd, cleanup = TRUE, cleanup_tree = TRUE,
             windows_verbatim_args = FALSE,
             stdout = std_out, stderr = std_err, post_process = post_fun,
-            package = TRUE
+            package = TRUE,
+            supervise = kill_tree
         )
     } else {
         proc <- processx::process$new(command = command, args = args,
@@ -492,22 +512,28 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             end_time = NULL
         )
     } else {
-        # nocov start
+        # Reap API descendants before a foreground condition leaves the caller's stack.
         callback <- function() {
-            if (!proc$is_alive()) return(NULL)
-
-            k <- tryCatch(proc$kill(), error = function(e) FALSE)
-
-            if (!is.null(exit_callback)) exit_callback(command, args)
-
+            if (!proc$is_alive()) {
+                return(NULL)
+            }
+            k <- if (kill_tree) {
+                run__api_kill(proc)
+            } else {
+                # nocov start
+                tryCatch(proc$kill(), error = function(e) FALSE)
+                # nocov end
+            }
+            # nocov start
+            if (!is.null(exit_callback)) {
+                exit_callback(command, args)
+            }
             if (k && !is.null(exit_msg)) {
                 cli::cat_line(exit_msg, col = "white", background_col = "red")
             }
+            # nocov end
         }
-
-        # kill the process when  exits
         on.exit(callback(), add = TRUE)
-        # nocov end
 
         stdout <- c()
         stderr <- c()
@@ -515,14 +541,18 @@ run_command <- function(command, args = NULL, wd, wait = TRUE, echo = TRUE,
             newout <- proc$read_output_lines(2000)
             if (length(newout) && all(nzchar(newout))) {
                 newout <- gsub("\r", "", newout, fixed = TRUE)
-                if (echo) cli::cat_line(newout)
+                if (echo) {
+                    cli::cat_line(newout)
+                }
                 stdout <<- c(stdout, newout)
             }
 
             newerr <- proc$read_error(2000)
             if (length(newerr) && all(nzchar(newerr))) {
                 newerr <- gsub("\r", "", newerr, fixed = TRUE)
-                if (echo) cli::cat_line(newerr, col = "red")
+                if (echo) {
+                    cli::cat_line(newerr, col = "red")
+                }
                 stderr <<- c(stderr, newerr)
             }
         }
@@ -964,11 +994,55 @@ Slab <- function(model, weather,
 #' @rdname energyplus
 #' @keywords internal
 #' @export
-EnergyPlus <- function(model, weather, output_dir = NULL,
-                       output_prefix = NULL, output_suffix = c("C", "L", "D"),
-                       wait = TRUE, echo = TRUE,
-                       annual = FALSE, design_day = FALSE,
-                       idd = NULL, eplus = NULL) {
+EnergyPlus <- function(
+    model,
+    weather,
+    output_dir = NULL,
+    output_prefix = NULL,
+    output_suffix = c("C", "L", "D"),
+    wait = TRUE,
+    echo = TRUE,
+    annual = FALSE,
+    design_day = FALSE,
+    idd = NULL,
+    eplus = NULL,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
+    if (backend == "api" && !wait) {
+        # Orchestration returns a normal R process; live API objects stay in its engine child.
+        runner <- run_command(
+            function(...) {
+                result <- EnergyPlus(..., wait = TRUE)
+                result$run$process <- NULL
+                result
+            },
+            list(
+                model = model,
+                weather = weather,
+                output_dir = output_dir,
+                output_prefix = output_prefix,
+                output_suffix = output_suffix,
+                echo = echo,
+                annual = annual,
+                design_day = design_day,
+                idd = idd,
+                eplus = eplus,
+                backend = backend,
+                api_setup = api_setup
+            ),
+            wd = tempdir(),
+            wait = FALSE,
+            echo = echo,
+            call_r = TRUE,
+            kill_tree = TRUE
+        )
+        return(list(file = NULL, run = runner))
+    }
     assert_flag(annual)
     assert_flag(design_day)
     output_suffix <- match.arg(output_suffix)
@@ -981,6 +1055,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     )
 
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
+    if (backend == "api") {
+        run__api_version(eplus_ver)
+    }
     # just for test purpose
     legacy <- getOption("eplusr.eplus_legacy", eplus_ver < "8.3")
 
@@ -1032,7 +1109,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
         # handle ouput file renaming
         file_callback <- function() {
             remove_eplus_in_files(cmd$model, cmd$weather)
-            if (attr(idd, "copied")) unlink(file.path(wd, "Energy+.idd"))
+            if (attr(idd, "copied")) {
+                unlink(file.path(wd, "Energy+.idd"))
+            }
             unlink(file.path(wd, "Energy+.ini"))
 
             # manually handle file renaming
@@ -1041,7 +1120,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
                 to <- file.path(cmd$output_dir, out_files[[i]])
                 files <- file_rename_if_exist(from, to)
                 files <- files[!is.na(files)]
-                if (!length(files)) files <- NA_character_
+                if (!length(files)) {
+                    files <- NA_character_
+                }
                 files
             })
             names(file) <- names(out_files)
@@ -1052,7 +1133,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
         # no more need "in.idf" and "in.epw"
         remove_eplus_in_files(cmd$model, cmd$weather)
 
-        if (output_suffix == "L") cmd$output_prefix <- "eplus"
+        if (output_suffix == "L") {
+            cmd$output_prefix <- "eplus"
+        }
 
         args <- c(
             "--output-directory", cmd$output_dir,
@@ -1060,10 +1143,22 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
             "--output-suffix", output_suffix
         )
 
-        if (annual) args <- c(args, "--annual")
-        if (design_day) args <- c(args, "--design-day")
-        if (!is.null(idd)) args <- c(args, "--idd", normalizePath(idd, mustWork = FALSE))
-        if (!is.null(weather)) args <- c(args, "--weather", normalizePath(weather, mustWork = FALSE))
+        if (annual) {
+            args <- c(args, "--annual")
+        }
+        if (design_day) {
+            args <- c(args, "--design-day")
+        }
+        if (!is.null(idd)) {
+            args <- c(args, "--idd", normalizePath(idd, mustWork = FALSE))
+        }
+        if (!is.null(weather)) {
+            args <- c(
+                args,
+                "--weather",
+                normalizePath(weather, mustWork = FALSE)
+            )
+        }
 
         # NOTE: if input file has an extension of 'epmidf' or 'epmidf', create
         # an IDF file with the same name
@@ -1075,7 +1170,9 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
         args <- c(args, model)
 
         file_callback <- function() {
-            if (clean_idf) unlink(model)
+            if (clean_idf) {
+                unlink(model)
+            }
             file <- list()
             file$idf <- normalizePath(file.path(cmd$output_dir, basename(cmd$model)))
             if (!is.null(cmd$weather)) {
@@ -1099,12 +1196,29 @@ EnergyPlus <- function(model, weather, output_dir = NULL,
     post_callback <- NULL
     if (!wait) post_callback <- file_callback
 
-    run <- run_command(cmd$exectuable, args, wd = dirname(cmd$idf), wait = wait, echo = echo,
+    run <- if (backend == "api") {
+        run__api_command(
+            dirname(cmd$energyplus),
+            args,
+            dirname(cmd$idf),
+            echo,
+            api_setup
+        )
+    } else {
+        run_command(
+            cmd$exectuable,
+            args,
+            wd = dirname(cmd$idf),
+            wait = wait,
+            echo = echo,
         post_callback = post_callback, post_name = "file",
         exit_msg = interrupted_msg("EnergyPlus", cmd$model, cmd$weather)
     )
+    }
 
-    if (wait) file <- file_callback()
+    if (wait) {
+        file <- file_callback()
+    }
 
     list(file = file, run = run)
 }
@@ -1460,6 +1574,18 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #' Any external file dependencies that EnergyPlus will use for simulation. If
 #' not `NULL`, files will be copied to the output directory. Default: `NULL`.
 #'
+#' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+#'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+#'   for each engine run. Preprocessing and result collection use the same pipeline.
+#' @param api_setup Optional `function(api, state)` executed in the engine worker
+#'   before simulation. Register requests and callbacks using the supplied managed
+#'   objects. Capture serializable lexical configuration in a self-contained closure;
+#'   Live API objects and native pointers cannot be transferred. The return value is ignored.
+#'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+#'   results with condition metadata; an explicit stop yields a stopped result.
+#'   API results carry `$backend` and `$api` metadata; existing CLI result fields
+#'   remain available. Job orchestration may use additional R processes.
+#'
 #' @keywords internal
 #' @return
 #'
@@ -1482,11 +1608,29 @@ HVAC_Diagram <- function(bnd, output_dir = NULL, output_prefix = NULL,
 #'
 #' @export
 energyplus <- function(
-    model, weather, output_dir = NULL, output_prefix = NULL, output_suffix = c("C", "L", "D"),
-    epmacro = TRUE, expand_obj = TRUE, annual = FALSE, design_day = FALSE,
-    eso_to_ip = FALSE, readvars = TRUE, echo = TRUE, wait = TRUE,
-    idd = NULL, eplus = NULL, resources = NULL
+    model,
+    weather,
+    output_dir = NULL,
+    output_prefix = NULL,
+    output_suffix = c("C", "L", "D"),
+    epmacro = TRUE,
+    expand_obj = TRUE,
+    annual = FALSE,
+    design_day = FALSE,
+    eso_to_ip = FALSE,
+    readvars = TRUE,
+    echo = TRUE,
+    wait = TRUE,
+    idd = NULL,
+    eplus = NULL,
+    resources = NULL,
+    backend = c("cli", "api"),
+    api_setup = NULL
 ) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
     assert_flag(wait)
 
     if (wait) {
@@ -1495,7 +1639,12 @@ energyplus <- function(
             epmacro = epmacro, expand_obj = expand_obj,
             annual = annual, design_day = design_day,
             eso_to_ip = eso_to_ip, readvars = readvars,
-            echo = echo, idd = idd, eplus = eplus, resources = resources
+            echo = echo,
+            idd = idd,
+            eplus = eplus,
+            resources = resources,
+            backend = backend,
+            api_setup = api_setup
         )
     } else {
         run_command(
@@ -1506,22 +1655,50 @@ energyplus <- function(
                 epmacro = epmacro, expand_obj = expand_obj,
                 annual = annual, design_day = design_day,
                 eso_to_ip = eso_to_ip, readvars = readvars,
-                echo = echo, idd = idd, eplus = eplus, resources = resources
+                echo = echo,
+                idd = idd,
+                eplus = eplus,
+                resources = resources,
+                backend = backend,
+                api_setup = api_setup
             ),
-            wd = tempdir(), call_r = TRUE, wait = FALSE
+            wd = tempdir(),
+            call_r = TRUE,
+            wait = FALSE,
+            kill_tree = backend == "api"
         )$process
     }
 }
 run_energyplus <- function(
-    model, weather, output_dir = NULL, output_prefix = NULL, output_suffix = c("C", "L", "D"),
-    epmacro = TRUE, expand_obj = TRUE, annual = FALSE, design_day = FALSE,
-    eso_to_ip = FALSE, readvars = TRUE, echo = TRUE, idd = NULL, eplus = NULL, resources = NULL
+    model,
+    weather,
+    output_dir = NULL,
+    output_prefix = NULL,
+    output_suffix = c("C", "L", "D"),
+    epmacro = TRUE,
+    expand_obj = TRUE,
+    annual = FALSE,
+    design_day = FALSE,
+    eso_to_ip = FALSE,
+    readvars = TRUE,
+    echo = TRUE,
+    idd = NULL,
+    eplus = NULL,
+    resources = NULL,
+    backend = c("cli", "api"),
+    api_setup = NULL
 ) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
     assert_flag(epmacro)
     assert_flag(expand_obj)
     assert_flag(eso_to_ip)
     assert_flag(readvars)
-    if (!is.null(resources)) assert_file_exists(resources)
+    if (!is.null(resources)) {
+        assert_file_exists(resources)
+    }
     output_suffix <- match.arg(output_suffix)
 
     start_time <- current()
@@ -1532,6 +1709,9 @@ run_energyplus <- function(
 
     # get EnergyPlus exectuable version
     eplus_ver <- get_ver_from_eplus_path(dirname(cmd$energyplus))
+    if (backend == "api") {
+        run__api_version(eplus_ver)
+    }
     # just for test purpose
     legacy <- getOption("eplusr.eplus_legacy", eplus_ver < "8.3")
 
@@ -1576,14 +1756,18 @@ run_energyplus <- function(
     file_temp <- function(file, ext = NULL) {
         res <- rep(NA_character_, length(file))
         if (all(isna <- is.na(file))) return(res)
-        if (is.null(ext)) ext <- paste0(".", tools::file_ext(file))
+        if (is.null(ext)) {
+            ext <- paste0(".", tools::file_ext(file))
+        }
         res[!isna] <- file_rename(file[!isna], path_sim(sprintf("%s%s", temp_name(), ext)))
         res
     }
     file_out <- function(file, ext = NULL) {
         res <- rep(NA_character_, length(file))
         if (all(isna <- is.na(file))) return(res)
-        if (is.null(ext)) ext <- paste0(".", tools::file_ext(file))
+        if (is.null(ext)) {
+            ext <- paste0(".", tools::file_ext(file))
+        }
         res[!isna] <- file_rename(file[!isna], path_out(sprintf("%s%s", cmd$output_prefix, ext[!isna])))
         res
     }
@@ -1762,12 +1946,19 @@ run_energyplus <- function(
     # temporary simulation directory maybe an option.
     res_eplus <- EnergyPlus(cmd$idf, cmd$epw, cmd$sim_dir, cmd$output_prefix,
         output_suffix, wait = TRUE, echo = echo, annual = annual,
-        design_day = design_day, idd = idd, eplus = eplus_ver)
+        design_day = design_day,
+        idd = idd,
+        eplus = eplus_ver,
+        backend = backend,
+        api_setup = api_setup
+    )
     # now it's safe to move all output files to the output directory
     res_eplus$file$idf <- NULL
     res_eplus$file$epw <- NULL
     res_eplus$file <- lapply(res_eplus$file, function(f) {
-        if (length(f) == 1L && is.na(f)) return(f)
+        if (length(f) == 1L && is.na(f)) {
+            return(f)
+        }
         file_rename_if_exist(path_sim(f), path_out(f))
     })
 
@@ -1812,8 +2003,12 @@ run_energyplus <- function(
 
             # Since convertESOMTR() only handles one type of input, one of
             # `file$eso` and `file$mtr` will always be NA
-            if (!is.na(res_eplus$file$eso)) res_ip$file$eso <- res_eplus$file$eso
-            if (!is.na(res_eplus$file$mtr)) res_ip$file$mtr <- res_eplus$file$mtr
+            if (!is.na(res_eplus$file$eso)) {
+                res_ip$file$eso <- res_eplus$file$eso
+            }
+            if (!is.na(res_eplus$file$mtr)) {
+                res_ip$file$mtr <- res_eplus$file$mtr
+            }
 
             # directly move the error file to the output directory
             res_ip$file$iperr <- file_out(res_ip$file$iperr)
@@ -1938,9 +2133,13 @@ run_energyplus <- function(
     file <- utils::modifyList(res_eplus$file, file)
     file <- file[order(names(file))]
     file$idf <- NA_character_
-    if (is.na(file$imf)) file$idf <- path_out(cmd$model)
+    if (is.na(file$imf)) {
+        file$idf <- path_out(cmd$model)
+    }
     file <- lapply(file, basename)
-    if (is.null(resources)) resources <- NA_character_
+    if (is.null(resources)) {
+        resources <- NA_character_
+    }
     file['resource'] <- list(basename(resources))
 
     run <- data.table(
@@ -1957,12 +2156,17 @@ run_energyplus <- function(
 
     unlink(cmd$sim_dir, recursive = TRUE, force = TRUE)
 
-    list(
+    result <- list(
         version = eplus_ver, energyplus = normalizePath(dirname(cmd$energyplus)),
         start_time = start_time, end_time = current(),
         exit_status = res_eplus$run$exit_status,
         output_dir = cmd$output_dir, file = file, run = run
     )
+    if (backend == "api") {
+        result$backend <- backend
+        result$api <- res_eplus$run$api
+    }
+    result
 }
 
 # reference: https://github.com/r-lib/revdepcheck/blob/master/R/event-loop.R
@@ -2008,29 +2212,55 @@ run_sim_event_loop <- function(state) {
     state
 }
 
-# nocov start
+# Reap every API pipeline and engine worker when the foreground event loop exits abnormally.
 kill_all_sims <- function(state) {
-    # check if any running simulations
-    is_running <- which(vlapply(state$jobs$process, function(p) inherits(p, "r_process") && p$is_alive()))
-
+    is_running <- which(vlapply(state$jobs$process, function(p) {
+        inherits(p, "r_process") && p$is_alive()
+    }))
+    if (identical(state$options$backend, "api")) {
+        for (p in state$jobs$process[is_running]) {
+            run__api_kill(p)
+        }
+    }
+    # nocov start
     if (length(is_running)) {
-        # kill all running simulations
-        for (p in state$jobs$process) p$kill()
+        if (!identical(state$options$backend, "api")) {
+            for (p in state$jobs$process) {
+                p$kill()
+            }
+        }
 
         # change status
         set(state$jobs, is_running, "status", "terminated")
 
         # update the output from terminated jobs
-        set(state$jobs, is_running, "exit_status", viapply(state$jobs$process[is_running], function(p) p$get_exit_status()))
-        set(state$jobs, is_running, "stdout",
-            lapply(state$jobs$process[is_running],
-                function(p) tryCatch(p$read_all_output_lines(), error = function(e) NA_character_)
-            )
+        set(
+            state$jobs,
+            is_running,
+            "exit_status",
+            viapply(state$jobs$process[is_running], function(p) {
+                p$get_exit_status()
+            })
         )
-        set(state$jobs, is_running, "stderr",
-            lapply(state$jobs$process[is_running],
-                function(p) tryCatch(p$read_all_error_lines(), error = function(e) NA_character_)
-            )
+        set(
+            state$jobs,
+            is_running,
+            "stdout",
+            lapply(state$jobs$process[is_running], function(p) {
+                tryCatch(p$read_all_output_lines(), error = function(e) {
+                    NA_character_
+                })
+            })
+        )
+        set(
+            state$jobs,
+            is_running,
+            "stderr",
+            lapply(state$jobs$process[is_running], function(p) {
+                tryCatch(p$read_all_error_lines(), error = function(e) {
+                    NA_character_
+                })
+            })
         )
     }
 
@@ -2054,8 +2284,8 @@ kill_all_sims <- function(state) {
     }
 
     state
+    # nocov end
 }
-# nocov end
 
 schedule_next_sim <- function(state) {
     # cannot run more workers?
@@ -2074,9 +2304,21 @@ handle_sim_events <- function(state) {
     run <- state$jobs$status == "running"
     if (!any(run)) return(state)
 
-    state$jobs[run & vlapply(process, function(x) !is.null(x) && !x$is_alive()),
-        c("stdout", "stderr", "exit_status", "result", "status", "end_time") := {
-            res <- lapply(process, function(p) p$get_result())
+    state$jobs[
+        run & vlapply(process, function(x) !is.null(x) && !x$is_alive()),
+        c(
+            "stdout",
+            "stderr",
+            "exit_status",
+            "result",
+            "status",
+            "end_time"
+        ) := {
+            res <- if (identical(state$options$backend, "api")) {
+                Map(run__api_collect, process, output_dir, weather)
+            } else {
+                lapply(process, function(p) p$get_result())
+            }
 
             # somehow get_exit_status() function may return NA after execution
             # of a (successful) command
@@ -2092,6 +2334,11 @@ handle_sim_events <- function(state) {
 
             status[exit_status == 0L] <- "completed"
             status[exit_status != 0L] <- "failed"
+            # A controller stop is finalized output, but never a completed full simulation.
+            stopped <- vlapply(res, function(x) {
+                identical(x$api$phase, "stopped")
+            })
+            status[stopped] <- "stopped"
 
             list(stdout = lapply(res, function(r) unlist(r$run$stdout)),
                  stderr = lapply(res, function(r) unlist(r$run$stderr)),
@@ -2108,13 +2355,18 @@ do_sim <- function(state) {
     # clean wd
     ready <- which(state$jobs$status == "ready")
 
-    if (!length(ready)) return(state)
+    if (!length(ready)) {
+        return(state)
+    }
 
     state$jobs[ready, by = "index", c("status", "process", "start_time") := {
         process <- energyplus(eplus = energyplus_exe, model = model,
             weather = unlist(weather), output_dir = output_dir, annual = annual,
             design_day = design_day, wait = FALSE, echo = FALSE, resources = resources[[1L]],
-            expand_obj = state$options$expand_obj, readvars = state$options$readvars
+                expand_obj = state$options$expand_obj,
+                readvars = state$options$readvars,
+                backend = state$options$backend %||% "cli",
+                api_setup = state$options$api_setup
         )
 
         if (state$options$echo) {
@@ -2154,7 +2406,7 @@ get_sim_status_string <- function(type, index, model, weather, exit_code = NULL)
 }
 
 are_all_completed <- function(state) {
-    all(state$jobs$status %chin% c("completed", "failed"))
+    all(state$jobs$status %chin% c("completed", "failed", "stopped"))
 }
 
 pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annual = FALSE, eplus = NULL) {
@@ -2264,6 +2516,18 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #'        `annual` can also be a logical vector which has the same length as
 #'        `model`. Note that `design_day` and `annual` cannot be all `TRUE` at
 #'        the same time. Default: `FALSE`.
+#'
+#' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+#'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+#'   for each engine run. Preprocessing and result collection use the same pipeline.
+#' @param api_setup Optional `function(api, state)` executed in the engine worker
+#'   before simulation. Register requests and callbacks using the supplied managed
+#'   objects. Capture serializable lexical configuration in a self-contained closure;
+#'   Live API objects and native pointers cannot be transferred. The return value is ignored.
+#'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+#'   results with condition metadata; an explicit stop yields a stopped result.
+#'   API results carry `$backend` and `$api` metadata; existing CLI result fields
+#'   remain available. Job orchestration may use additional R processes.
 #'
 #' @param expand_obj Whether to run ExpandObjects preprocessor before simulation.
 #'        Default: TRUE.
@@ -2388,11 +2652,28 @@ pre_job_inputs <- function(model, weather, output_dir, design_day = FALSE, annua
 #' interface to run EnergyPlus simulations and collect outputs.
 #' @author Hongyuan Jia
 #' @export
-run_idf <- function(model, weather, output_dir, design_day = FALSE,
-                    annual = FALSE, expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL) {
+run_idf <- function(
+    model,
+    weather,
+    output_dir,
+    design_day = FALSE,
+    annual = FALSE,
+    expand_obj = TRUE,
+    wait = TRUE,
+    echo = TRUE,
+    eplus = NULL,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
     assert_flag(wait)
 
-    if (is.null(weather)) design_day <- TRUE
+    if (is.null(weather)) {
+        design_day <- TRUE
+    }
 
     eplus <- get_eplus_loc_from_input(model, eplus)
 
@@ -2412,28 +2693,73 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
         out$end_time <- res$end_time
         out$output_dir <- res$output_dir
         out$energyplus <- normalizePath(
-            file.path(res$energyplus, sprintf("energyplus%s", c(".exe", "")[c(is_windows(), !is_windows())]))
+            file.path(
+                res$energyplus,
+                sprintf(
+                    "energyplus%s",
+                    c(".exe", "")[c(is_windows(), !is_windows())]
+                )
+            )
         )
         out$stdout <- unlist(res$run$stdout)
         # in case there is no stderr message
         out["stderr"] <- list(unlist(res$run$stderr))
+        if (identical(res$backend, "api")) {
+            out$backend <- "api"
+            out$api <- res$api
+        }
         out
     }
 
     proc <- run_command(
-        function(model, weather, output_dir, annual, design_day, echo, eplus, post_fun) {
-            post_fun(energyplus(model = model, weather = weather, output_dir = output_dir,
-                annual = annual, design_day = design_day, echo = echo, eplus = eplus
+        function(
+            model,
+            weather,
+            output_dir,
+            annual,
+            design_day,
+            echo,
+            eplus,
+            post_fun,
+            expand_obj,
+            backend,
+            api_setup
+        ) {
+            post_fun(energyplus(
+                model = model,
+                weather = weather,
+                output_dir = output_dir,
+                annual = annual,
+                design_day = design_day,
+                echo = echo,
+                eplus = eplus,
+                expand_obj = expand_obj,
+                backend = backend,
+                api_setup = api_setup
             ))
         },
-        list(model = model, weather = weather, output_dir = output_dir,
-            annual = annual, design_day = design_day, echo = echo, eplus = eplus,
-            post_fun = post_fun
+        list(
+            model = model,
+            weather = weather,
+            output_dir = output_dir,
+            annual = annual,
+            design_day = design_day,
+            echo = echo,
+            eplus = eplus,
+            post_fun = post_fun,
+            expand_obj = expand_obj,
+            backend = backend,
+            api_setup = api_setup
         ),
-        wd = tempdir(), call_r = TRUE, wait = wait
+        wd = tempdir(),
+        call_r = TRUE,
+        wait = wait,
+        kill_tree = backend == "api"
     )
 
-    if (!wait) return(proc$process)
+    if (!wait) {
+        return(proc$process)
+    }
 
     out <- proc$process$get_result()
     out$process <- proc$process
@@ -2442,8 +2768,23 @@ run_idf <- function(model, weather, output_dir, design_day = FALSE,
 
 #' @export
 #' @rdname run_model
-run_multi <- function(model, weather, output_dir, design_day = FALSE,
-                      annual = FALSE, expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL) {
+run_multi <- function(
+    model,
+    weather,
+    output_dir,
+    design_day = FALSE,
+    annual = FALSE,
+    expand_obj = TRUE,
+    wait = TRUE,
+    echo = TRUE,
+    eplus = NULL,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
     # for weather, NA here means design-day-simulation
     assert_flag(expand_obj)
     assert_flag(wait)
@@ -2452,7 +2793,11 @@ run_multi <- function(model, weather, output_dir, design_day = FALSE,
     jobs <- pre_job_inputs(model, weather, output_dir, design_day, annual, eplus)
     set(jobs, NULL, "resources", list())
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo,
-        expand_obj = expand_obj, readvars = TRUE)
+        expand_obj = expand_obj,
+        readvars = TRUE,
+        backend = backend,
+        api_setup = api_setup
+    )
     state <- list(jobs = jobs, options = options)
 
     if (wait) {
@@ -2462,7 +2807,9 @@ run_multi <- function(model, weather, output_dir, design_day = FALSE,
         state$options$echo <- TRUE
         callr::r_bg(
             function(state) post_process_sim_state(run_sim_event_loop(state)),
-            args = list(state = state), package = TRUE
+            args = list(state = state),
+            package = TRUE,
+            supervise = backend == "api"
         )
     }
 }
@@ -2484,7 +2831,14 @@ post_process_sim_state <- function(state) {
     )
     set(jobs, NULL, "weather", NULL)
 
-    set(jobs, NULL, "version", vcapply(jobs$energyplus_exe, function(ep) as.character(get_ver_from_eplus_path(dirname(ep)))))
+    set(
+        jobs,
+        NULL,
+        "version",
+        vcapply(jobs$energyplus_exe, function(ep) {
+            as.character(get_ver_from_eplus_path(dirname(ep)))
+        })
+    )
 
     set(jobs, NULL, "output_dir", vcapply(jobs$result, function(res) res$output_dir))
 
@@ -2493,9 +2847,339 @@ post_process_sim_state <- function(state) {
     cols <- c("index", "status", "idf", "epw", "version", "exit_status",
         "start_time", "end_time", "output_dir", "energyplus", "stdout", "stderr")
 
+    if (identical(state$options$backend, "api")) {
+        set(jobs, NULL, "backend", "api")
+        set(jobs, NULL, "api", lapply(jobs$result, "[[", "api"))
+        cols <- c(cols, "backend", "api")
+    }
     set(jobs, NULL, setdiff(names(jobs), cols), NULL)
     setcolorder(jobs, cols)
     jobs
 }
 
 # vim: set fdm=marker:
+# Select an explicit engine and reject configuration that cannot cross a worker boundary.
+run__backend <- function(backend, api_setup = NULL) {
+    backend <- match.arg(backend, c("cli", "api"))
+    assert_function(api_setup, null.ok = TRUE)
+    if (!is.null(api_setup) && backend != "api") {
+        abort("'api_setup' requires backend = 'api'.", "api_setup")
+    }
+    if (!is.null(api_setup)) {
+        run__check_setup(api_setup)
+    }
+    backend
+}
+
+# Inspect captured configuration while leaving namespace references and data.table selfrefs portable.
+run__check_setup <- function(setup) {
+    seen <- list()
+    functions <- list()
+    # Follow the serialized object graph, recording cycles before visiting dependencies.
+    inspect <- function(object) {
+        if (
+            inherits(
+                object,
+                c(
+                    "EnergyPlusAPI",
+                    "EnergyPlusState",
+                    "EnergyPlusHandle",
+                    "EnergyPlusFunctional"
+                )
+            ) ||
+                typeof(object) %in% c("externalptr", "weakref")
+        ) {
+            abort(
+                "Create API objects and native handles inside 'api_setup'; live objects cannot be transferred to a worker.",
+                "api_setup"
+            )
+        }
+        if (is.function(object)) {
+            if (any(vlapply(functions, function(x) identical(x, object)))) {
+                return(invisible(NULL))
+            }
+            functions[[length(functions) + 1L]] <<- object
+            env <- environment(object)
+            if (is.null(env) || isNamespace(env) || identical(env, baseenv())) {
+                return(invisible(NULL))
+            }
+            # Inspect free variables, not unrelated jobs or pointers in the surrounding caller frame.
+            for (name in codetools::findGlobals(object, merge = TRUE)) {
+                if (exists(name, env, inherits = TRUE)) {
+                    inspect(get(name, env, inherits = TRUE))
+                }
+            }
+        } else if (is.environment(object)) {
+            if (
+                isNamespace(object) ||
+                    identical(object, globalenv()) ||
+                    identical(object, baseenv()) ||
+                    identical(object, emptyenv()) ||
+                    any(vlapply(seen, function(x) identical(x, object)))
+            ) {
+                return(invisible(NULL))
+            }
+            seen[[length(seen) + 1L]] <<- object
+            for (name in ls(object, all.names = TRUE)) {
+                inspect(get(name, object, inherits = FALSE))
+            }
+            # Ordinary environment parents are serialized too; special named environments are not.
+            inspect(parent.env(object))
+        } else if (is.list(object)) {
+            for (value in object) {
+                inspect(value)
+            }
+        }
+        # data.table repairs its internal self-reference when deserialized; it is not a user native handle.
+        for (attribute in attributes(object)[setdiff(
+            names(attributes(object)),
+            ".internal.selfref"
+        )]) {
+            inspect(attribute)
+        }
+        invisible(NULL)
+    }
+    inspect(setup)
+}
+
+# Keep the experimental ABI gate independent of normal CLI installation discovery.
+run__api_version <- function(version) {
+    if (as.character(standardize_ver(version)) != "26.1.0") {
+        abort("The API backend requires stock EnergyPlus 26.1.", "api_version")
+    }
+    invisible(NULL)
+}
+
+# Own exactly one engine lifecycle inside a fresh process; only plain result metadata leaves it.
+run__api_engine <- function(directory, args, api_setup = NULL) {
+    api <- NULL
+    state <- NULL
+    stage <- "load"
+    metadata <- list(
+        version = NA_character_,
+        api_version = NA_character_,
+        library = NA_character_,
+        pid = Sys.getpid(),
+        phase = "failed",
+        stop_reason = NULL,
+        native_exit_status = NA_integer_,
+        error = NULL
+    )
+    code <- 1L
+    on.exit(if (!is.null(api)) try(api$close(), silent = TRUE), add = TRUE)
+    # Preserve failure diagnostics while leaving quarantined native ownership to process exit.
+    capture <- function(condition) {
+        metadata$error <<- list(
+            class = class(condition),
+            message = conditionMessage(condition)
+        )
+        metadata$stop_reason <<- if (inherits(condition, "interrupt")) {
+            "interrupt"
+        } else {
+            paste0(stage, "_error")
+        }
+        if (!is.null(state)) {
+            status <- api$state_manager$status(state)
+            metadata$state_phase <<- status$phase
+            metadata$phase <<- if (identical(status$phase, "quarantined")) {
+                "quarantined"
+            } else {
+                "failed"
+            }
+            metadata$native_exit_status <<- status$exit_code %||% NA_integer_
+            if (
+                identical(status$stop_reason, "callback_error") &&
+                    !inherits(condition, "interrupt")
+            ) {
+                metadata$stop_reason <<- "callback_error"
+            }
+        }
+        code <<- if (inherits(condition, "interrupt")) 130L else 1L
+        invisible(NULL)
+    }
+    tryCatch(
+        {
+            api <- eplus_api(directory)
+            info <- api$info()
+            metadata[names(info)[names(info) %in% names(metadata)]] <- info[
+                names(info) %in% names(metadata)
+            ]
+            state <- api$state_manager$new_state()
+            api$runtime$set_console_output_status(state, TRUE)
+            # Every zone boundary enters R so an OS interrupt can request an orderly native stop.
+            api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+                state,
+                function(s) invisible(NULL)
+            )
+            stage <- "setup"
+            if (!is.null(api_setup)) {
+                api_setup(api, state)
+            }
+            stage <- "engine"
+            code <- api$runtime$run_energyplus(state, args)
+            status <- api$state_manager$status(state)
+            metadata$phase <- status$phase
+            metadata$stop_reason <- status$stop_reason
+            metadata$native_exit_status <- code
+            # A stopped simulation has partial finalized results and must not report full completion.
+            if (identical(status$phase, "stopped")) code <- 1L
+        },
+        error = capture,
+        interrupt = capture
+    )
+    list(exit_status = code, api = metadata)
+}
+
+# Capture native stdout/stderr through process pipes rather than accumulating callback messages in RAM.
+run__api_command <- function(directory, args, wd, echo, api_setup) {
+    run <- run_command(
+        function(directory, args, api_setup) {
+            run__api_engine(directory, args, api_setup)
+        },
+        list(directory = directory, args = args, api_setup = api_setup),
+        wd = wd,
+        wait = TRUE,
+        echo = echo,
+        call_r = TRUE,
+        kill_tree = TRUE
+    )
+    result <- tryCatch(run$process$get_result(), error = function(condition) {
+        run__api_failure(condition, wd, NULL)
+    })
+    run$exit_status <- result$exit_status
+    run$api <- result$api
+    if (!is.null(result$api$error)) {
+        run$stderr <- c(run$stderr, result$api$error$message)
+    }
+    run
+}
+
+# Freeze each controller's lexical dependencies so callr does not serialize its entire caller frame.
+run__prepare_setup <- function(setup) {
+    if (is.null(setup)) {
+        return(NULL)
+    }
+    originals <- list()
+    copies <- list()
+    # Clone only lexical dependencies, preserving package namespaces and recursive helper identity.
+    freeze <- function(fun) {
+        env <- environment(fun)
+        if (
+            !is.function(fun) ||
+                is.null(env) ||
+                isNamespace(env) ||
+                identical(env, baseenv())
+        ) {
+            return(fun)
+        }
+        index <- which(vlapply(originals, function(x) identical(x, fun)))
+        if (length(index)) {
+            return(copies[[index[1L]]])
+        }
+        target <- new.env(parent = baseenv())
+        copy <- fun
+        environment(copy) <- target
+        # Memoize before resolving dependencies so mutually recursive helpers share the same copies.
+        originals[[length(originals) + 1L]] <<- fun
+        copies[[length(copies) + 1L]] <<- copy
+        for (name in codetools::findGlobals(fun, merge = TRUE)) {
+            if (exists(name, env, inherits = TRUE)) {
+                value <- get(name, env, inherits = TRUE)
+                if (is.function(value)) {
+                    value <- freeze(value)
+                }
+                assign(name, value, envir = target)
+            }
+        }
+        copy
+    }
+    freeze(setup)
+}
+
+# Report an unavailable pipeline result without inventing native identity or cleanup outcomes.
+run__api_failure <- function(
+    condition,
+    output_dir,
+    weather,
+    terminated = FALSE
+) {
+    # OS interrupt conditions can have no message; retain a usable diagnostic and list-column value.
+    message <- conditionMessage(condition)
+    if (!length(message) || !nzchar(message[[1L]])) {
+        message <- if (inherits(condition, "interrupt")) {
+            "Simulation interrupted."
+        } else {
+            "Simulation pipeline failed."
+        }
+    }
+    list(
+        exit_status = 1L,
+        output_dir = output_dir,
+        backend = "api",
+        file = list(
+            epw = if (is.null(weather) || is.na(weather)) {
+                NA_character_
+            } else {
+                basename(weather)
+            }
+        ),
+        run = list(stdout = NULL, stderr = message),
+        api = list(
+            version = NA_character_,
+            api_version = NA_character_,
+            library = NA_character_,
+            pid = NA_integer_,
+            native_exit_status = NA_integer_,
+            phase = if (terminated) "terminated" else "failed",
+            stop_reason = if (terminated) {
+                "process_terminated"
+            } else {
+                "worker_error"
+            },
+            error = list(
+                class = class(condition),
+                message = message
+            )
+        )
+    )
+}
+
+# Convert a dead API pipeline into a failed result while retaining successful metadata verbatim.
+run__api_collect <- function(process, output_dir, weather, terminated = FALSE) {
+    tryCatch(process$get_result(), error = function(condition) {
+        run__api_failure(condition, output_dir, weather, terminated)
+    })
+}
+
+# A killed group cannot recover completed case results; retain inputs and mark completion unknown.
+run__api_failed_state <- function(state, condition, terminated = FALSE) {
+    jobs <- copy(state$jobs)
+    results <- Map(
+        function(directory, weather) {
+            run__api_failure(condition, directory, weather, terminated)
+        },
+        jobs$output_dir,
+        jobs$weather
+    )
+    set(jobs, NULL, "result", results)
+    set(jobs, NULL, "status", if (terminated) "terminated" else "failed")
+    set(jobs, NULL, "exit_status", 1L)
+    set(jobs, NULL, "stdout", list(lapply(results, function(x) x$run$stdout)))
+    set(jobs, NULL, "stderr", list(lapply(results, function(x) x$run$stderr)))
+    set(jobs, NULL, "start_time", as.POSIXct(NA))
+    set(jobs, NULL, "end_time", current())
+    state$jobs <- jobs
+    state
+}
+
+# Share the bounded tree shutdown across jobs, groups and foreground command cleanup.
+run__api_kill <- function(process) {
+    tryCatch(
+        {
+            process$kill_tree()
+            process$wait(1000)
+            !process$is_alive()
+        },
+        error = function(condition) FALSE
+    )
+}

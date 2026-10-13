@@ -40,6 +40,7 @@ jobs:
       NOT_CRAN: true
       TESTTHAT_CPUS: 1
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
+      _EPLUSR_RUN_API_TESTS_: true
       R_KEEP_PKG_SOURCE: true
       COVR_COVRIGNORE: ".github/workflows/.covrignore"
 
@@ -54,7 +55,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::pkgload, any::xml2, any::DT, any::htmltools
+          extra-packages: any::covr, any::pkgload, any::xml2, any::DT, any::htmltools, any::remotes
           needs: coverage
 
       - name: Locate DuckDB extension cache
@@ -82,13 +83,13 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.local/EnergyPlus-*
-          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-22.2-9.6
+          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-26.1-22.2-9.6
 
       - name: Prepare EnergyPlus
         run: |
           pkgload::load_all(".", quiet = TRUE, export_all = FALSE)
           latest <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
-          versions <- c(latest, "22.2", "9.6")
+          versions <- c(latest, "26.1", "22.2", "9.6")
           for (ver in versions) {
             if (!eplusr::is_avail_eplus(ver)) eplusr::install_eplus(ver, local = TRUE)
             stopifnot(eplusr::is_avail_eplus(ver))
@@ -116,6 +117,11 @@ jobs:
         with:
           path: ~/.local/EnergyPlus-*
           key: ${{ steps.cache-eplus.outputs.cache-primary-key }}
+
+      - name: Prepare merged API bridge
+        run: |
+          remotes::install_github("hongyuanjia/rdyncall@98aac679adf8ace0c85075c5f4928075289eebbd", upgrade = "never")
+        shell: Rscript {0}
 
       - name: Test coverage
         run: |

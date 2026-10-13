@@ -506,8 +506,44 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' print(param)
         #' }
         #'
-        run = function(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait, separate = TRUE, readvars = TRUE)
-            param_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
+        #' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+        #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+        #'   for each engine run. Preprocessing and result collection use the same pipeline.
+        #' @param api_setup Optional `function(api, state)` executed in the engine worker
+        #'   before simulation. Register requests and callbacks using the supplied managed
+        #'   objects. Capture serializable lexical configuration in a self-contained closure;
+        #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
+        #'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+        #'   results with condition metadata; an explicit stop yields a stopped result.
+        #'   Inspect API identity and stop metadata with `$status()` (the `job_status`
+        #'   table for group jobs). Job orchestration may use additional R processes.
+        #'   Foreground caller conditions update the job status before being rethrown.
+        #'
+        run = function(
+            dir = NULL,
+            wait = TRUE,
+            force = FALSE,
+            copy_external = FALSE,
+            echo = wait,
+            separate = TRUE,
+            readvars = TRUE,
+            backend = c("cli", "api"),
+            api_setup = NULL
+        ) {
+            param_run(
+                self,
+                private,
+                dir,
+                wait,
+                force,
+                copy_external,
+                echo,
+                separate,
+                readvars,
+                backend,
+                api_setup
+            )
+        },
         # }}}
 
         # print {{{
@@ -959,17 +995,41 @@ param_apply_measure <- function(self, private, measure, ..., .names = NULL, .env
 }
 # }}}
 # param_run {{{
-param_run <- function(self, private, output_dir = NULL, wait = TRUE,
-                       force = FALSE, copy_external = FALSE, echo = wait,
-                       separate = TRUE, readvars = TRUE) {
+param_run <- function(
+    self,
+    private,
+    output_dir = NULL,
+    wait = TRUE,
+    force = FALSE,
+    copy_external = FALSE,
+    echo = wait,
+    separate = TRUE,
+    readvars = TRUE,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
     if (!private$m_model_store$has_cases()) {
         abort("No measure has been applied.")
     }
     private$m_model_store$assert_cases_valid()
 
     private$log_new_uuid()
-    if (is.null(output_dir)) output_dir <- private$m_model_store$default_dir(seed = TRUE)
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
+    if (is.null(output_dir)) {
+        output_dir <- private$m_model_store$default_dir(seed = TRUE)
+    }
+    epgroup_run_models(
+        self,
+        private,
+        output_dir,
+        wait,
+        force,
+        copy_external,
+        echo,
+        separate,
+        readvars,
+        backend,
+        api_setup
+    )
 }
 # }}}
 # param_save {{{

@@ -1985,6 +1985,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
     if (entry$running || entry$phase != "created" || ctx$native_depth > 0L) {
         api__error("Register callbacks before starting a fresh or reset state.")
     }
+    # Return normally from the R callback so no condition unwinds an active C++ frame.
     guarded <- function(...) {
         if (!entry$running && !is.null(entry$callback_directory)) {
             native_directory <- getwd()
@@ -1995,6 +1996,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
             return(invisible(NULL))
         }
         payload <- if (spec$callback == "p)v") list(state) else list(...)
+        # Retain the first condition and request a native stop without deleting the running state.
         capture <- function(condition) {
             if (is.null(entry$condition)) {
                 entry$condition <- condition

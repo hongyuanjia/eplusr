@@ -4189,7 +4189,9 @@ Run simulation using EnergyPlus
   force = FALSE,
   copy_external = FALSE,
   echo = wait,
-  readvars = TRUE
+  readvars = TRUE,
+  backend = c("cli", "api"),
+  api_setup = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -4229,6 +4231,20 @@ to generate CSV files from the ESO output. Since those CSV
 files are never used when extracting simulation data in eplusr,
 setting it to \code{FALSE} can speed up the simulation if there are
 hundreds of output variables or meters. Default: \code{TRUE}.}
+
+\item{\code{backend}}{Simulation engine, \code{"cli"} (default) or experimental \code{"api"}.
+The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+for each engine run. Preprocessing and result collection use the same pipeline.}
+
+\item{\code{api_setup}}{Optional \verb{function(api, state)} executed in the engine worker
+before simulation. Register requests and callbacks using the supplied managed
+objects. Capture serializable lexical configuration in a self-contained closure;
+Live API objects and native pointers cannot be transferred. The return value is ignored.
+Requires \code{backend = "api"}. Controller failures and worker interrupts yield failed
+results with condition metadata; an explicit stop yields a stopped result.
+Inspect API identity and stop metadata with \verb{$status()} (the \code{job_status}
+table for group jobs). Job orchestration may use additional R processes.
+Foreground caller conditions update the job status before being rethrown.}
 }
 \if{html}{\out{</div>}}
 }

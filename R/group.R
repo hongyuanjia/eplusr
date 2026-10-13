@@ -135,9 +135,44 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
-        run = function(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE,
-                        echo = wait, separate = TRUE, readvars = TRUE)
-            epgroup_run(self, private, dir, wait, force, copy_external, echo, separate, readvars),
+        #' @param backend Simulation engine, `"cli"` (default) or experimental `"api"`.
+        #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+        #'   for each engine run. Preprocessing and result collection use the same pipeline.
+        #' @param api_setup Optional `function(api, state)` executed in the engine worker
+        #'   before simulation. Register requests and callbacks using the supplied managed
+        #'   objects. Capture serializable lexical configuration in a self-contained closure;
+        #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
+        #'   Requires `backend = "api"`. Controller failures and worker interrupts yield failed
+        #'   results with condition metadata; an explicit stop yields a stopped result.
+        #'   Inspect API identity and stop metadata with `$status()` (the `job_status`
+        #'   table for group jobs). Job orchestration may use additional R processes.
+        #'   Foreground caller conditions update the job status before being rethrown.
+        #'
+        run = function(
+            dir = NULL,
+            wait = TRUE,
+            force = FALSE,
+            copy_external = FALSE,
+            echo = wait,
+            separate = TRUE,
+            readvars = TRUE,
+            backend = c("cli", "api"),
+            api_setup = NULL
+        ) {
+            epgroup_run(
+                self,
+                private,
+                dir,
+                wait,
+                force,
+                copy_external,
+                echo,
+                separate,
+                readvars,
+                backend,
+                api_setup
+            )
+        },
         # }}}
 
         # kill {{{
@@ -930,20 +965,56 @@ group_job <- function(idfs, epws) {
 # }}}
 
 # epgroup_run {{{
-epgroup_run <- function(self, private, output_dir = NULL, wait = TRUE,
-                         force = FALSE, copy_external = FALSE, echo = wait,
-                         separate = TRUE, readvars = TRUE) {
+epgroup_run <- function(
+    self,
+    private,
+    output_dir = NULL,
+    wait = TRUE,
+    force = FALSE,
+    copy_external = FALSE,
+    echo = wait,
+    separate = TRUE,
+    readvars = TRUE,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
     private$m_model_store$assert_cases_valid()
     private$log_new_uuid()
 
-    epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo, separate, readvars)
+    epgroup_run_models(
+        self,
+        private,
+        output_dir,
+        wait,
+        force,
+        copy_external,
+        echo,
+        separate,
+        readvars,
+        backend,
+        api_setup
+    )
 }
 # }}}
 # epgroup_run_models {{{
 #' @importFrom checkmate test_names
-epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
-                                force = FALSE, copy_external = FALSE, echo = wait,
-                                separate = TRUE, readvars = TRUE) {
+epgroup_run_models <- function(
+    self,
+    private,
+    output_dir = NULL,
+    wait = TRUE,
+    force = FALSE,
+    copy_external = FALSE,
+    echo = wait,
+    separate = TRUE,
+    readvars = TRUE,
+    backend = c("cli", "api"),
+    api_setup = NULL
+) {
+    backend <- run__backend(backend, api_setup)
+    if (backend == "api") {
+        api_setup <- run__prepare_setup(api_setup)
+    }
     assert_flag(wait)
     assert_flag(echo)
     assert_flag(separate)
@@ -973,9 +1044,9 @@ epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
         design_day <- is.na(path_epw)
     }
 
-    if (is.null(output_dir))
+    if (is.null(output_dir)) {
         output_dir <- dirname(path_idf)
-    else if (length(output_dir) == 1L) {
+    } else if (length(output_dir) == 1L) {
         output_dir <- rep(output_dir, length(path_idf))
     } else {
         assert_same_len(path_idf, output_dir)
@@ -1038,23 +1109,62 @@ epgroup_run_models <- function(self, private, output_dir = NULL, wait = TRUE,
     }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo,
-        expand_obj = TRUE, readvars = readvars)
+        expand_obj = TRUE,
+        readvars = readvars,
+        backend = backend,
+        api_setup = api_setup
+    )
     state <- list(jobs = jobs, options = options)
+    # Keep input metadata for a background orchestration process that exits without a result.
+    private$m_log$api_state <- if (backend == "api") state else NULL
 
+    failure <- NULL
     if (wait) {
-        private$m_job <- run_sim_event_loop(state)
+        # Keep case inputs and failure metadata even when the foreground event loop cannot return.
+        capture <- function(condition) {
+            failure <<- condition
+            interrupted <- inherits(condition, "interrupt")
+            private$m_log$killed <- interrupted
+            result <- run__api_failed_state(state, condition, interrupted)
+            result$jobs$result <- lapply(result$jobs$result, function(entry) {
+                entry$api$stop_reason <- if (interrupted) {
+                    "interrupt"
+                } else {
+                    "pipeline_error"
+                }
+                entry
+            })
+            result
+        }
+        private$m_job <- if (backend == "api") {
+            tryCatch(
+                run_sim_event_loop(state),
+                error = capture,
+                interrupt = capture
+            )
+        } else {
+            run_sim_event_loop(state)
+        }
     } else {
         # always echo in order to catch standard output and error
         state$options$echo <- TRUE
         private$m_job <- callr::r_bg(
             function(state) run_sim_event_loop(state),
-            args = list(state = state), package = TRUE
+            args = list(state = state),
+            package = TRUE,
+            supervise = backend == "api"
         )
     }
 
     private$log_new_uuid()
-    if (wait) private$m_log$end_time <- current()
+    if (wait) {
+        private$m_log$end_time <- current()
+    }
 
+    # Preserve the original condition after the failed run has a stable status record.
+    if (!is.null(failure)) {
+        stop(failure)
+    }
     self
 }
 # }}}
@@ -1077,7 +1187,12 @@ epgroup_kill <- function(self, private) {
         return(invisible(FALSE))
     }
 
-    k <- tryCatch(proc$kill(), error = function(e) FALSE)
+    # Killing API orchestration must also reap each native engine worker.
+    k <- if (!is.null(private$m_log$api_state)) {
+        run__api_kill(proc)
+    } else {
+        tryCatch(proc$kill(), error = function(e) FALSE)
+    }
 
     if (isTRUE(k)) {
         verbose_info("The parametric job has been successfully killed.")
@@ -1116,7 +1231,9 @@ epgroup_status <- function(self, private) {
             if (is.null(private$m_epws_path)) {
                 epw <- NA_character_
             } else {
-                epw <- vcapply(private$m_epws_path, function(epw) if (is.null(epw)) NA_character_ else epw)
+                epw <- vcapply(private$m_epws_path, function(epw) {
+                    if (is.null(epw)) NA_character_ else epw
+                })
             }
             set(status$job_status, NULL, "epw", epw)
         }
@@ -1144,7 +1261,18 @@ epgroup_status <- function(self, private) {
             exit_status <- proc$get_exit_status()
 
             # retrieve results
-            res <- tryCatch(proc$get_result(), error = function(e) data.table())
+            res <- tryCatch(proc$get_result(), error = function(e) {
+                # Retain the existing empty CLI result; API failures carry every case input.
+                fallback <- status$job_status
+                if (!is.null(private$m_log$api_state)) {
+                    fallback <- run__api_failed_state(
+                        private$m_log$api_state,
+                        e,
+                        status$terminated
+                    )
+                }
+                fallback
+            })
 
             if (!is.null(res)) {
                 # update job

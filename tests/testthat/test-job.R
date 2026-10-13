@@ -126,3 +126,157 @@ test_that("Job methods", {
 })
 
 # vim: set fdm=marker:
+
+test_that("stock API jobs preserve SQL results and separate consecutive worker lifecycles", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    cli <- eplus_job(fixture$model, fixture$weather)
+    cli$run(
+        dir = file.path(fixture$directory, "cli"),
+        readvars = FALSE,
+        echo = FALSE,
+        wait = FALSE
+    )
+    cli_process <- cli$.__enclos_env__$private$m_job
+    on.exit(if (cli_process$is_alive()) cli$kill(), add = TRUE)
+    api <- read_idf(fixture$model)$run(
+        fixture$weather,
+        dir = file.path(fixture$directory, "api"),
+        readvars = FALSE,
+        echo = FALSE,
+        backend = "api"
+    )
+    expect_true(api$status()$successful)
+    expect_identical(api$status()$backend, "api")
+    expect_match(api$status()$api$version, "26.1.0")
+    expect_false(identical(api$status()$api$pid, Sys.getpid()))
+    api_data <- api$read_table("ReportData")
+    cli_process$wait(60000)
+    expect_false(cli_process$is_alive())
+    expect_identical(
+        cli$status(),
+        list(
+            run_before = TRUE,
+            alive = FALSE,
+            terminated = FALSE,
+            successful = TRUE,
+            changed_after = FALSE
+        )
+    )
+    cli_data <- cli$read_table("ReportData")
+    expect_gt(nrow(api_data), 0L)
+    expect_identical(nrow(api_data), nrow(cli_data))
+    expect_equal(api_data$value, cli_data$value, tolerance = 1e-10)
+    first_pid <- api$status()$api$pid
+    api$run(
+        dir = file.path(fixture$directory, "api-second"),
+        readvars = TRUE,
+        echo = FALSE,
+        backend = "api"
+    )
+    expect_true(api$status()$successful)
+    expect_false(identical(api$status()$api$pid, first_pid))
+    expect_true(any(grepl("\\.csv$", api$list_files(simplify = TRUE))))
+})
+
+test_that("killing a background API job reaps its native worker and returns a terminated status", {
+    skip_if_not_installed("ps")
+    fixture <- testrun__api_fixture()
+    marker <- tempfile()
+    setup <- local({
+        path <- marker
+        function(api, state) {
+            api$runtime$callback_begin_new_environment(state, function(state) {
+                writeLines(as.character(Sys.getpid()), path)
+                Sys.sleep(60)
+            })
+            writeLines("started", paste0(path, ".started"))
+        }
+    })
+    job <- read_idf(fixture$model)$run(
+        fixture$weather,
+        dir = file.path(tempdir(), "api-kill"),
+        wait = FALSE,
+        echo = FALSE,
+        readvars = FALSE,
+        backend = "api",
+        api_setup = setup
+    )
+    on.exit(job$kill(), add = TRUE)
+    testrun__api_started(
+        function() file.exists(paste0(marker, ".started")),
+        function() job$status()$alive
+    )
+    deadline <- Sys.time() + 30
+    while (!file.exists(marker) && Sys.time() < deadline) {
+        Sys.sleep(0.1)
+    }
+    expect_true(file.exists(marker))
+    pid <- as.integer(readLines(marker))
+    handle <- ps::ps_handle(pid)
+    expect_true(ps::ps_is_running(handle))
+    expect_true(job$kill())
+    status <- job$status()
+    expect_false(status$alive)
+    expect_false(status$successful)
+    expect_true(status$terminated)
+    expect_identical(status$api$stop_reason, "process_terminated")
+    deadline <- Sys.time() + 10
+    while (ps::ps_is_running(handle) && Sys.time() < deadline) {
+        Sys.sleep(0.1)
+    }
+    expect_false(ps::ps_is_running(handle))
+})
+
+test_that("foreground API Job conditions replace previous success before rethrow", {
+    fixture <- testrun__api_fixture()
+    condition <- NULL
+    local_mocked_bindings(energyplus = function(...) {
+        if (!is.null(condition)) {
+            stop(condition)
+        }
+        list(exit_status = 0L, backend = "api", api = list(phase = "completed"))
+    })
+    job <- eplus_job(fixture$model, fixture$weather)
+    directory <- file.path(fixture$directory, "foreground-failure")
+    job$run(dir = directory, backend = "api", echo = FALSE, readvars = FALSE)
+    expect_true(job$status()$successful)
+    for (cause in list(
+        simpleError("foreground failure"),
+        structure(
+            list(message = "foreground interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+    )) {
+        condition <- cause
+        caught <- tryCatch(
+            job$run(
+                dir = directory,
+                backend = "api",
+                echo = FALSE,
+                readvars = FALSE
+            ),
+            error = identity,
+            interrupt = identity
+        )
+        expect_identical(caught, cause)
+        status <- job$status()
+        expect_true(status$run_before)
+        expect_false(status$successful)
+        expect_identical(status$terminated, inherits(cause, "interrupt"))
+        expect_identical(
+            status$api$stop_reason,
+            if (inherits(cause, "interrupt")) "interrupt" else "pipeline_error"
+        )
+        expect_identical(status$api$error$class, class(cause))
+    }
+})
+
+
+test_that("CLI job cancellation failures do not claim successful termination", {
+    private <- new.env(parent = emptyenv())
+    private$m_job <- testrun__denied_process()
+    private$m_log <- list(backend = "cli")
+    expect_false(job_kill(NULL, private))
+    expect_false(isTRUE(private$m_log$killed))
+})

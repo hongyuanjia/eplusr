@@ -64,7 +64,9 @@ EnergyPlus(
   annual = FALSE,
   design_day = FALSE,
   idd = NULL,
-  eplus = NULL
+  eplus = NULL,
+  backend = c("cli", "api"),
+  api_setup = NULL
 )
 
 convertESOMTR(
@@ -113,7 +115,9 @@ energyplus(
   wait = TRUE,
   idd = NULL,
   eplus = NULL,
-  resources = NULL
+  resources = NULL,
+  backend = c("cli", "api"),
+  api_setup = NULL
 )
 }
 \arguments{
@@ -169,6 +173,19 @@ v8.3. Note that \code{annual} and \code{design_day} cannot both be \code{TRUE}. 
 If \code{TRUE}, design-day-only simulation is forced. Currently, only support
 EnergyPlus >= v8.3. Note that \code{annual} and \code{design_day} cannot both be
 \code{TRUE}. Default: \code{FALSE}.}
+
+\item{backend}{Simulation engine, \code{"cli"} (default) or experimental \code{"api"}.
+The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+for each engine run. Preprocessing and result collection use the same pipeline.}
+
+\item{api_setup}{Optional \verb{function(api, state)} executed in the engine worker
+before simulation. Register requests and callbacks using the supplied managed
+objects. Capture serializable lexical configuration in a self-contained closure;
+Live API objects and native pointers cannot be transferred. The return value is ignored.
+Requires \code{backend = "api"}. Controller failures and worker interrupts yield failed
+results with condition metadata; an explicit stop yields a stopped result.
+API results carry \verb{$backend} and \verb{$api} metadata; existing CLI result fields
+remain available. Job orchestration may use additional R processes.}
 
 \item{eso}{[\code{character(1)}]\cr
 A path of an EnergyPlus standard output (\code{.eso}) or EnergyPlus meter output
