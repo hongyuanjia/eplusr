@@ -14,7 +14,8 @@ eplus_session(
   controller = NULL,
   controller_state = NULL,
   dir = NULL,
-  timeout = 120
+  timeout = 120,
+  record = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,9 @@ controller, not an EnergyPlus executable plugin loader.}
 
 \item{timeout}{Maximum seconds to wait for a command or worker startup.
 Expiry terminates the session; it never advances a waiting simulation.}
+
+\item{record}{Retain immutable input copies and a disk journal of completed
+observations and effective actuator actions for replay prediction. Default FALSE.}
 }
 \value{
 An \code{EnergyPlusSession} environment with the following methods:
@@ -56,6 +60,10 @@ next predictor; \code{NA_real_} releases the named actuator to native control.
 \item \verb{$pause(timeout = ...)}: wait until the next completed zone boundary and pause.
 \item \verb{$resume(action = NULL, timeout = ...)}: continue asynchronously until
 completion or a pause request. An installed controller runs at each boundary.
+\item \verb{$predict(branches, horizon, tolerance = 1e-8, timeout = ..., history_limit = 128 * 1024^2, dir = NULL)}: from a recorded paused session,
+replay history in independent workers and predict future zone steps.
+\code{branches} is a uniquely named list of action lists (length \code{horizon})
+or \verb{function(observation, controller_state)} controllers.
 \item \verb{$status()}: inspect phase, worker identity, last observation and final outcome.
 \item \verb{$result(timeout = ...)}: wait for a running session's final \link{EplusJob}.
 A paused session must first be resumed or closed.
@@ -81,10 +89,30 @@ The first returned observation already represents one completed zone step.
 A multi-step action is held until the next action or release. With a controller,
 each subsequent step computes its action from the last completed observation
 and explicit state; manual actions and controller operation cannot be mixed.
-No unbounded per-step history is retained. On natural completion the final
+By default no unbounded per-step history is retained. On natural completion the final
 observation and finalized Job remain available. Errors, caller interrupts,
 timeout and disconnection stop or terminate the worker; a failed native state
 cannot be resumed. Closing early is distinct from completing the run period.
+
+With \code{record = TRUE}, historical observations, explicit controller state and
+effective actions are journaled to disk; no native pointers are saved. Prediction
+freezes a prefix ending at the paused boundary, replays its actions without
+re-running the original controller, and checks every registered observation
+and calendar field before applying future branch controls. Future function
+controllers start with the original boundary's explicit controller state.
+A NULL future action holds prior actuator claims; NA releases them.
+Each branch uses a fresh worker, executes sequentially and is closed before
+the next branch. Results contain ordinary observations, worker identity,
+elapsed time, replay/future step counts and \code{method = "replay"}.
+\code{tolerance} is an absolute bound for each registered numeric value.
+An early natural end returns a shorter horizon with \code{complete = FALSE}.
+Errors or caller interrupts abort prediction and close its worker while the
+original session remains paused. A single timeout budget covers each branch.
+Input and library fingerprints are rechecked; journal loading is bounded by
+\code{history_limit}. Journaling consumes disk and replay cost grows with history.
+Matching exposed observations does not establish equality of hidden native
+state. Randomness, external side effects and unrecorded inputs can diverge.
+This is deterministic-input replay, not clone, checkpoint or saved native state.
 
 Models, external resources and SQL outputs use the existing Job pipeline.
 PythonPlugin models and persistent restart/state cloning are outside this scope.
@@ -101,6 +129,22 @@ observation <- session$initialize()
 observation <- session$step(n = 4L)
 session$resume()
 job <- session$result()
+session$close()
+
+# With a prepared model whose heating schedule is named Heating:
+session <- eplus_session(
+    "model.idf", "weather.epw", record = TRUE,
+    variables = list(temperature = c("Zone Mean Air Temperature", "ZONE ONE")),
+    actuators = list(heating = c("Schedule:Constant", "Schedule Value", "Heating"))
+)
+session$initialize()
+session$step(c(heating = 21), n = 4L)
+prediction <- session$predict(
+    list(hold = rep(list(NULL), 4L), warm = rep(list(c(heating = 23)), 4L)),
+    horizon = 4L
+)
+# The original is still paused; apply a chosen action independently.
+session$step(c(heating = 23))
 session$close()
 }
 }

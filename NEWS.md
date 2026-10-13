@@ -2,6 +2,10 @@
 
 ## New features
 
+* Add recorded MPC replay prediction to live sessions. Independent workers
+  replay verified history before branching, retaining the original paused
+  session; this does not clone native state (#652).
+
 * Use one `backend` argument for `"cli"`, `"api"` or a worker initialization
   function. Remove the separate public `api_setup` argument (#653).
 

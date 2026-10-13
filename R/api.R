@@ -2362,6 +2362,8 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' @param dir Output directory. A new temporary directory is used by default.
 #' @param timeout Maximum seconds to wait for a command or worker startup.
 #'   Expiry terminates the session; it never advances a waiting simulation.
+#' @param record Retain immutable input copies and a disk journal of completed
+#'   observations and effective actuator actions for replay prediction. Default FALSE.
 #' @return An `EnergyPlusSession` environment with the following methods:
 #'   * `$initialize(timeout = ...)`: run through the first completed weather zone
 #'     step and return its observation while paused. Initialization happens once.
@@ -2373,6 +2375,11 @@ api__invoke <- function(ctx, spec, values, resource) {
 #'   * `$pause(timeout = ...)`: wait until the next completed zone boundary and pause.
 #'   * `$resume(action = NULL, timeout = ...)`: continue asynchronously until
 #'     completion or a pause request. An installed controller runs at each boundary.
+#'   * `$predict(branches, horizon, tolerance = 1e-8, timeout = ...,
+#'     history_limit = 128 * 1024^2, dir = NULL)`: from a recorded paused session,
+#'     replay history in independent workers and predict future zone steps.
+#'     `branches` is a uniquely named list of action lists (length `horizon`)
+#'     or `function(observation, controller_state)` controllers.
 #'   * `$status()`: inspect phase, worker identity, last observation and final outcome.
 #'   * `$result(timeout = ...)`: wait for a running session's final [EplusJob].
 #'     A paused session must first be resumed or closed.
@@ -2391,10 +2398,30 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' A multi-step action is held until the next action or release. With a controller,
 #' each subsequent step computes its action from the last completed observation
 #' and explicit state; manual actions and controller operation cannot be mixed.
-#' No unbounded per-step history is retained. On natural completion the final
+#' By default no unbounded per-step history is retained. On natural completion the final
 #' observation and finalized Job remain available. Errors, caller interrupts,
 #' timeout and disconnection stop or terminate the worker; a failed native state
 #' cannot be resumed. Closing early is distinct from completing the run period.
+#'
+#' With `record = TRUE`, historical observations, explicit controller state and
+#' effective actions are journaled to disk; no native pointers are saved. Prediction
+#' freezes a prefix ending at the paused boundary, replays its actions without
+#' re-running the original controller, and checks every registered observation
+#' and calendar field before applying future branch controls. Future function
+#' controllers start with the original boundary's explicit controller state.
+#' A NULL future action holds prior actuator claims; NA releases them.
+#' Each branch uses a fresh worker, executes sequentially and is closed before
+#' the next branch. Results contain ordinary observations, worker identity,
+#' elapsed time, replay/future step counts and `method = "replay"`.
+#' `tolerance` is an absolute bound for each registered numeric value.
+#' An early natural end returns a shorter horizon with `complete = FALSE`.
+#' Errors or caller interrupts abort prediction and close its worker while the
+#' original session remains paused. A single timeout budget covers each branch.
+#' Input and library fingerprints are rechecked; journal loading is bounded by
+#' `history_limit`. Journaling consumes disk and replay cost grows with history.
+#' Matching exposed observations does not establish equality of hidden native
+#' state. Randomness, external side effects and unrecorded inputs can diverge.
+#' This is deterministic-input replay, not clone, checkpoint or saved native state.
 #'
 #' Models, external resources and SQL outputs use the existing Job pipeline.
 #' PythonPlugin models and persistent restart/state cloning are outside this scope.
@@ -2411,6 +2438,22 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' session$resume()
 #' job <- session$result()
 #' session$close()
+#'
+#' # With a prepared model whose heating schedule is named Heating:
+#' session <- eplus_session(
+#'     "model.idf", "weather.epw", record = TRUE,
+#'     variables = list(temperature = c("Zone Mean Air Temperature", "ZONE ONE")),
+#'     actuators = list(heating = c("Schedule:Constant", "Schedule Value", "Heating"))
+#' )
+#' session$initialize()
+#' session$step(c(heating = 21), n = 4L)
+#' prediction <- session$predict(
+#'     list(hold = rep(list(NULL), 4L), warm = rep(list(c(heating = 23)), 4L)),
+#'     horizon = 4L
+#' )
+#' # The original is still paused; apply a chosen action independently.
+#' session$step(c(heating = 23))
+#' session$close()
 #' }
 #' @export
 eplus_session <- function(
@@ -2423,8 +2466,10 @@ eplus_session <- function(
     controller = NULL,
     controller_state = NULL,
     dir = NULL,
-    timeout = 120
+    timeout = 120,
+    record = FALSE
 ) {
+    checkmate::assert_flag(record)
     config <- if (
         is.character(eplus) && length(eplus) == 1L && is_eplus_path(eplus)
     ) {
@@ -2464,6 +2509,7 @@ eplus_session <- function(
         controller = controller,
         controller_state = controller_state,
         timeout = timeout,
+        record = record,
         directory = normalizePath(
             dir %||% tempfile("eplusr-session-"),
             mustWork = FALSE
@@ -2482,6 +2528,11 @@ eplus_session <- function(
     ctx$connection <- NULL
     ctx$request <- 0L
     ctx$terminal <- FALSE
+    ctx$replay <- NULL
+    ctx$journal_hash <- NULL
+    if (record) {
+        api_replay__freeze(ctx)
+    }
     api_session__construct(ctx)
 }
 
@@ -2606,7 +2657,8 @@ api_session__construct <- function(ctx) {
         resume = api_session__resume,
         status = api_session__status,
         result = api_session__result,
-        close = api_session__close
+        close = api_session__close,
+        predict = api_replay__predict
     )
     for (name in names(methods)) {
         session[[name]] <- api_session__bind(methods[[name]], ctx)
@@ -2822,12 +2874,14 @@ api_session__wait <- function(ctx, id, timeout) {
                 ctx$connection <- NULL
             } else if (identical(message$type, "terminal")) {
                 ctx$observation <- message$observation
+                ctx$journal_hash <- message$journal_hash
                 ctx$terminal <- TRUE
             } else if (
                 identical(message$id, id) && identical(message$type, "boundary")
             ) {
                 ctx$phase <- message$phase
                 ctx$observation <- message$observation
+                ctx$journal_hash <- message$journal_hash
                 return(ctx$observation)
             } else {
                 api_session__error("Unexpected session response.")
@@ -2866,6 +2920,7 @@ api_session__collect <- function(ctx) {
             api_session__error("Unexpected final session response.")
         }
         ctx$observation <- message$observation
+        ctx$journal_hash <- message$journal_hash
         ctx$terminal <- TRUE
     }
     status <- ctx$job$status()
@@ -3082,6 +3137,7 @@ api_session__setup <- function(api, state, settings) {
     control$id <- 0L
     control$observation <- NULL
     control$action <- settings$initial_action
+    control$journal_hash <- NULL
     control$controller_state <- settings$controller_state
     control$controller <- settings$controller
     control$variable_handles <- NULL
@@ -3142,6 +3198,15 @@ api_session__setup <- function(api, state, settings) {
                 settings,
                 control
             )
+            if (isTRUE(settings$record)) {
+                # Commit the actual held action before exposing its completed boundary.
+                control$journal_hash <- api_replay__write(
+                    settings$journal,
+                    control$observation,
+                    control$action,
+                    control$journal_hash
+                )
+            }
             if (control$mode == "stepping") {
                 control$remaining <- control$remaining - 1L
             }
@@ -3182,6 +3247,7 @@ api_session__setup <- function(api, state, settings) {
                 list(
                     type = "terminal",
                     observation = control$observation,
+                    journal_hash = control$journal_hash,
                     metadata = metadata
                 )
             ),
@@ -3273,7 +3339,8 @@ api_session__reply <- function(control, id) {
             type = "boundary",
             id = id,
             phase = if (control$mode == "paused") "paused" else "running",
-            observation = control$observation
+            observation = control$observation,
+            journal_hash = control$journal_hash
         )
     )
 }
@@ -3361,4 +3428,364 @@ api_session__diagnostic <- function(ctx, fallback) {
         return("EnergyPlus worker interrupted.")
     }
     fallback
+}
+
+# Preserve the exact model, weather and external resources before the first native run.
+api_replay__freeze <- function(ctx) {
+    root <- tempfile("eplusr-replay-")
+    inputs <- file.path(root, "inputs")
+    dir.create(inputs, recursive = TRUE)
+    private <- get_priv_env(ctx$job)
+    source <- private$m_model_store$load_model(private$m_model_store$case_model_ids()[[
+        1L
+    ]])
+    dependencies <- as.character(source$external_deps())
+    if (any(!file.exists(dependencies))) {
+        api_session__error(
+            "Replay requires all declared external resources to exist."
+        )
+    }
+    dependencies <- unique(normalizePath(dependencies, mustWork = TRUE))
+    reserved <- tolower(basename(dependencies))
+    if (anyDuplicated(reserved)) {
+        api_session__error(
+            "Replay resources must have distinct basenames before copying."
+        )
+    }
+    # Reserve a model name which cannot overwrite a declared copied resource.
+    candidates <- sprintf("replay-%d.idf", seq_len(length(reserved) + 1L))
+    model <- file.path(
+        inputs,
+        candidates[which(!candidates %in% reserved)[[1L]]]
+    )
+    private$m_model_store$materialize_cases(model, copy_external = TRUE)
+    # Keep weather separate even if a schedule happens to be named weather.epw.
+    weather_directory <- file.path(root, "weather")
+    dir.create(weather_directory)
+    # The Job pipeline later flattens weather and resources, so reserve its basename too.
+    weather_candidates <- sprintf(
+        "replay-weather-%d.epw",
+        seq_len(length(reserved) + 1L)
+    )
+    weather <- file.path(
+        weather_directory,
+        weather_candidates[which(!weather_candidates %in% reserved)[[1L]]]
+    )
+    file_copy(private$m_epw_path, weather)
+    ctx$job <- eplus_job(model, weather)
+    library <- file.path(ctx$config$installation, api__library_name())
+    files <- c(
+        list.files(
+            root,
+            recursive = TRUE,
+            full.names = TRUE,
+            all.files = TRUE,
+            no.. = TRUE
+        ),
+        library,
+        file.path(
+            ctx$config$installation,
+            c(
+                "Energy+.idd",
+                "Energy+.schema.epJSON",
+                "ExpandObjects",
+                "ExpandObjects.exe",
+                "epmacro",
+                "EPMacro.exe"
+            )
+        )
+    )
+    files <- files[file.exists(files)]
+    ctx$replay <- list(
+        model = model,
+        weather = weather,
+        files = files,
+        fingerprint = tools::md5sum(files)
+    )
+    ctx$config$journal <- file.path(root, "history")
+    dir.create(ctx$config$journal)
+    invisible(NULL)
+}
+
+# Atomically journal ordinary observations and effective actions, including held claims and releases.
+api_replay__write <- function(directory, observation, action, previous_hash) {
+    entry <- list(
+        observation = observation,
+        action = action,
+        previous_hash = previous_hash
+    )
+    path <- file.path(directory, sprintf("%010d.rds", observation$step))
+    temporary <- paste0(path, ".writing")
+    saveRDS(entry, temporary, compress = FALSE)
+    if (!file.rename(temporary, path)) {
+        api_session__error("Cannot commit replay journal.")
+    }
+    unname(tools::md5sum(path))
+}
+
+# Recheck immutable inputs before and after each worker so one policy cannot alter another branch.
+api_replay__check_inputs <- function(ctx) {
+    if (
+        any(!file.exists(ctx$replay$files)) ||
+            !identical(tools::md5sum(ctx$replay$files), ctx$replay$fingerprint)
+    ) {
+        api_session__error("Replay inputs or selected library have changed.")
+    }
+    invisible(NULL)
+}
+
+# Validate and bound one immutable prefix before launching a prediction worker.
+api_replay__history <- function(ctx, limit) {
+    checkmate::assert_number(limit, lower = 1, finite = TRUE)
+    api_replay__check_inputs(ctx)
+    paths <- file.path(
+        ctx$config$journal,
+        sprintf("%010d.rds", seq_len(ctx$observation$step))
+    )
+    sizes <- file.info(paths)$size
+    if (anyNA(sizes) || sum(sizes) > limit) {
+        api_session__error(
+            "Replay history is missing or exceeds history_limit."
+        )
+    }
+    history <- lapply(paths, readRDS)
+    previous_hash <- NULL
+    for (index in seq_along(history)) {
+        entry <- history[[index]]
+        if (!identical(entry$previous_hash, previous_hash)) {
+            api_session__error("Replay journal integrity check failed.")
+        }
+        previous_hash <- unname(tools::md5sum(paths[[index]]))
+        api_session__plain(entry)
+        if (
+            !is.list(entry) ||
+                !identical(entry$observation$step, as.integer(index))
+        ) {
+            api_session__error("Invalid replay history sequence.")
+        }
+        api_session__action(entry$action, names(ctx$config$actuators))
+    }
+    if (!identical(previous_hash, ctx$journal_hash)) {
+        api_session__error("Replay journal integrity check failed.")
+    }
+    if (!identical(history[[length(history)]]$observation, ctx$observation)) {
+        api_session__error(
+            "Replay journal does not match the original paused boundary."
+        )
+    }
+    history
+}
+
+# Compare registered outputs and exact boundary semantics without claiming hidden-state equivalence.
+api_replay__match <- function(actual, expected, tolerance) {
+    exact <- setdiff(names(expected), "values")
+    values <- actual$values
+    reference <- expected$values
+    # Absolute tolerance applies to every registered value, not their mean error.
+    equal <- identical(names(values), names(reference)) &&
+        length(values) == length(reference) &&
+        identical(is.na(values), is.na(reference)) &&
+        isTRUE(all(
+            is.na(reference) |
+                values == reference |
+                (is.finite(values) &
+                    is.finite(reference) &
+                    abs(values - reference) <= tolerance)
+        ))
+    if (!identical(actual[exact], expected[exact]) || !equal) {
+        api_session__error(paste(
+            "Replay diverged at completed step",
+            expected$step
+        ))
+    }
+    invisible(NULL)
+}
+
+# Produce recorded actions during the prefix and execute only future branch policy thereafter.
+api_replay__controller <- function(history, future, tolerance) {
+    count <- length(history)
+    # Select recorded prefix controls before advancing the chosen future policy.
+    controller <- function(observation, state) {
+        # Verify each prefix boundary inside the worker, avoiding an IPC round trip per past step.
+        if (observation$step <= count) {
+            api_replay__match(
+                observation,
+                history[[observation$step]]$observation,
+                tolerance
+            )
+        }
+        next_step <- observation$step + 1L
+        if (next_step <= count) {
+            entry <- history[[next_step]]
+            return(list(
+                action = entry$action,
+                state = entry$observation$controller_state
+            ))
+        }
+        if (is.function(future)) {
+            return(future(observation, state))
+        }
+        list(action = future[[next_step - count]], state = state)
+    }
+    # Freeze only ordinary recorded data and the selected future policy.
+    run__prepare_setup(controller)
+}
+
+# Replay and predict sequentially with one fresh worker per branch, leaving the original untouched.
+api_replay__predict <- function(
+    ctx,
+    branches,
+    horizon,
+    tolerance = 1e-8,
+    timeout = ctx$config$timeout,
+    history_limit = 128 * 1024^2,
+    dir = NULL
+) {
+    api_session__owner(ctx)
+    if (
+        !isTRUE(ctx$config$record) || api_session__status(ctx)$phase != "paused"
+    ) {
+        api_session__error(
+            "Prediction requires a recorded paused session (record = TRUE)."
+        )
+    }
+    checkmate::assert_int(horizon, lower = 1L)
+    checkmate::assert_number(tolerance, lower = 0, finite = TRUE)
+    api_session__timeout(timeout)
+    checkmate::assert_list(branches, min.len = 1L, names = "unique")
+    for (future in branches) {
+        if (is.function(future)) {
+            checkmate::assert_function(future, nargs = 2L)
+            run__check_setup(future)
+        } else {
+            checkmate::assert_list(future, len = horizon)
+            for (action in future) {
+                api_session__action(action, names(ctx$config$actuators))
+            }
+        }
+    }
+    history <- api_replay__history(ctx, history_limit)
+    origin <- list(
+        identity = ctx$identity,
+        observation = ctx$observation,
+        step = length(history),
+        history_hash = ctx$journal_hash,
+        input_fingerprint = ctx$replay$fingerprint
+    )
+    directory <- dir %||% tempfile("eplusr-prediction-")
+    checkmate::assert_string(directory)
+    if (
+        dir.exists(directory) &&
+            length(list.files(directory, all.files = TRUE, no.. = TRUE))
+    ) {
+        api_session__error("Prediction output directory must be empty or new.")
+    }
+    results <- vector("list", length(branches))
+    names(results) <- names(branches)
+    for (index in seq_along(branches)) {
+        results[[index]] <- api_replay__branch(
+            ctx,
+            history,
+            branches[[index]],
+            horizon,
+            tolerance,
+            timeout,
+            file.path(directory, sprintf("branch-%03d", index))
+        )
+    }
+    # Recheck identity and observation without sending a command to the original engine.
+    if (
+        !identical(ctx$identity, origin$identity) ||
+            !identical(ctx$observation, origin$observation) ||
+            api_session__status(ctx)$phase != "paused"
+    ) {
+        api_session__error("Original session changed during prediction.")
+    }
+    structure(
+        list(
+            method = "replay",
+            origin = origin,
+            branches = results,
+            tolerance = tolerance
+        ),
+        class = "EnergyPlusPrediction"
+    )
+}
+
+# Close the branch on every exit, including history mismatch, policy error and caller interrupt.
+api_replay__branch <- function(
+    ctx,
+    history,
+    future,
+    horizon,
+    tolerance,
+    timeout,
+    directory
+) {
+    started <- Sys.time()
+    api_replay__check_inputs(ctx)
+    # Share one deadline across startup, replay and every future step.
+    budget <- function() {
+        remaining <- timeout -
+            as.numeric(difftime(Sys.time(), started, units = "secs"))
+        if (remaining <= 0) {
+            api_session__error("Prediction branch timed out.")
+        }
+        remaining
+    }
+    branch <- eplus_session(
+        ctx$replay$model,
+        ctx$replay$weather,
+        eplus = ctx$config$installation,
+        variables = ctx$config$variables,
+        actuators = ctx$config$actuators,
+        initial_action = history[[1L]]$action,
+        controller = api_replay__controller(history, future, tolerance),
+        controller_state = history[[1L]]$observation$controller_state,
+        dir = directory
+    )
+    on.exit(try(branch$close(), silent = TRUE), add = TRUE)
+    observation <- branch$initialize(timeout = budget())
+    identity <- branch$status()$identity
+    api_replay__match(observation, history[[1L]]$observation, tolerance)
+    if (length(history) > 1L) {
+        # The worker checks intermediate observations; the owner verifies the final fork itself.
+        observation <- branch$step(
+            n = as.integer(length(history) - 1L),
+            timeout = budget()
+        )
+        api_replay__match(
+            observation,
+            history[[length(history)]]$observation,
+            tolerance
+        )
+    }
+    boundary <- observation
+    observations <- list()
+    for (step in seq_len(horizon)) {
+        if (branch$status()$phase != "paused") {
+            break
+        }
+        next_observation <- branch$step(timeout = budget())
+        # Completion can return the same final snapshot without advancing another zone.
+        if (next_observation$step == observation$step) {
+            break
+        }
+        observations[[length(observations) + 1L]] <- next_observation
+        observation <- next_observation
+    }
+    complete <- length(observations) == horizon
+    branch$close()
+    api_replay__check_inputs(ctx)
+    list(
+        method = "replay",
+        identity = identity,
+        boundary = boundary,
+        observations = observations,
+        replay_steps = length(history),
+        future_steps = length(observations),
+        complete = complete,
+        outcome = branch$status()$outcome,
+        elapsed = as.numeric(difftime(Sys.time(), started, units = "secs"))
+    )
 }
