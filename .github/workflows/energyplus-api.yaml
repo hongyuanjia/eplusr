@@ -35,8 +35,14 @@ jobs:
           # The merged bridge is used until its next CRAN release contains both required capabilities.
           remotes::install_github("hongyuanjia/rdyncall@98aac679adf8ace0c85075c5f4928075289eebbd", upgrade = "never")
           pkgload::load_all(".", quiet = TRUE)
-          eplusr::install_eplus("26.1", local = TRUE)
-          eplusr::install_eplus(get("LATEST_EPLUS_VER", asNamespace("eplusr")), local = TRUE)
+          # Helpers and restored installations may already provide either engine.
+          versions <- unique(c("26.1", get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
+          for (version in versions) {
+              if (!eplusr::is_avail_eplus(version)) {
+                  eplusr::install_eplus(version, local = TRUE)
+              }
+              stopifnot(eplusr::is_avail_eplus(version))
+          }
           devtools::install(".", upgrade = FALSE, quiet = TRUE)
       - name: Exercise API jobs
         shell: Rscript {0}
