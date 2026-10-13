@@ -64,8 +64,8 @@ version/API identity is checked. Do not serialize live API objects to workers.
 \code{close()} deletes states and resources before unloading the library. A
 finalizer is a fallback. Close/reset/delete and nested runs are rejected during
 simulation. Original 26.1 library leaks are not repaired: use a fresh R process
-for each long-lived simulation lifecycle. PythonPlugin models, Job integration,
-worker sessions, step/pause and clone are outside this stage.
+for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
+\code{backend = "api"}; \code{\link[=eplus_session]{eplus_session()}} provides live worker stepping and pause.
 }
 \examples{
 \dontrun{

@@ -1055,7 +1055,15 @@ test_that("stock API controls stop safely and independent parallel jobs retain i
         readvars = FALSE,
         echo = FALSE
     )
-    expect_identical(stopped$api$phase, "stopped")
+    expect_identical(
+        stopped$api$phase,
+        "stopped",
+        info = jsonlite::toJSON(
+            list(api = stopped$api, stderr = stopped$stderr),
+            auto_unbox = TRUE,
+            null = "null"
+        )
+    )
     expect_identical(stopped$api$stop_reason, "user_stop")
     expect_identical(stopped$api$native_exit_status, 0L)
     expect_false(stopped$exit_status == 0L)
@@ -1073,7 +1081,15 @@ test_that("stock API controls stop safely and independent parallel jobs retain i
             )
         }
     )
-    expect_identical(failed$api$stop_reason, "callback_error")
+    expect_identical(
+        failed$api$stop_reason,
+        "callback_error",
+        info = jsonlite::toJSON(
+            list(api = failed$api, stderr = failed$stderr),
+            auto_unbox = TRUE,
+            null = "null"
+        )
+    )
     expect_match(failed$api$error$message, "controller failed")
     expect_identical(failed$api$state_phase, "closed")
 })

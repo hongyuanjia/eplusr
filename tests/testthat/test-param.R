@@ -361,7 +361,21 @@ test_that("stock API parametric jobs run in the background", {
     on.exit(if (param$status()$alive) param$kill(), add = TRUE)
     testrun__api_started(
         function() length(list.files(marker, pattern = "[.]started$")) == 2L,
-        function() param$status()$alive
+        function() param$status()$alive,
+        diagnostic = function() {
+            status <- param$status()
+            list(
+                alive = status$alive,
+                started = list.files(marker),
+                jobs = status$job_status[,
+                    intersect(
+                        c("status", "exit_status", "api"),
+                        names(status$job_status)
+                    ),
+                    with = FALSE
+                ]
+            )
+        }
     )
     deadline <- Sys.time() + 30
     while (param$status()$alive && Sys.time() < deadline) {

@@ -287,7 +287,8 @@ JobModelStore <- R6::R6Class(classname = "JobModelStore", cloneable = FALSE,
                     idf <- self$load_model(model_id)
                     idf$save(paths[[i]], overwrite = TRUE, copy_external = TRUE)
                     deps <- idf$external_deps()
-                    resources[[i]] <- if (length(deps)) deps else NULL
+                    # Keep one resource entry per case; assigning NULL with [[ would delete it.
+                    resources[i] <- list(if (length(deps)) deps else NULL)
                 } else {
                     file_copy(self$model_prepared_path(model_id), paths[[i]])
                 }

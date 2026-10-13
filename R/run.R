@@ -2884,7 +2884,9 @@ run__check_setup <- function(setup) {
                     "EnergyPlusAPI",
                     "EnergyPlusState",
                     "EnergyPlusHandle",
-                    "EnergyPlusFunctional"
+                    "EnergyPlusFunctional",
+                    "EnergyPlusSession",
+                    "connection"
                 )
             ) ||
                 typeof(object) %in% c("externalptr", "weakref")
@@ -3013,7 +3015,12 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
             )
             stage <- "setup"
             if (!is.null(api_setup)) {
-                api_setup(api, state)
+                setup_result <- api_setup(api, state)
+                # A package-owned session bridge sends its final snapshot after the cleanup handler.
+                # Ordinary user setup return values remain ignored.
+                if (inherits(setup_result, "EnergyPlusSessionBridge")) {
+                    on.exit(setup_result$finish(metadata), add = TRUE)
+                }
             }
             stage <- "engine"
             code <- api$runtime$run_energyplus(state, args)
@@ -3027,6 +3034,13 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
         error = capture,
         interrupt = capture
     )
+    # Preserve the session command reason alongside the underlying native stop reason.
+    if (
+        exists("setup_result", inherits = FALSE) &&
+            inherits(setup_result, "EnergyPlusSessionBridge")
+    ) {
+        metadata <- setup_result$metadata(metadata)
+    }
     list(exit_status = code, api = metadata)
 }
 

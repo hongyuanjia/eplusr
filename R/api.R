@@ -53,8 +53,8 @@
 #' `close()` deletes states and resources before unloading the library. A
 #' finalizer is a fallback. Close/reset/delete and nested runs are rejected during
 #' simulation. Original 26.1 library leaks are not repaired: use a fresh R process
-#' for each long-lived simulation lifecycle. PythonPlugin models, Job integration,
-#' worker sessions, step/pause and clone are outside this stage.
+#' for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
+#' `backend = "api"`; [eplus_session()] provides live worker stepping and pause.
 #' @examples
 #' \dontrun{
 #' api <- eplus_api("26.1")
@@ -2339,4 +2339,1027 @@ api__invoke <- function(ctx, spec, values, resource) {
         return(invisible(NULL))
     }
     result
+}
+
+#' Control a live EnergyPlus simulation
+#'
+#' Create an experimental session proxy for stock EnergyPlus 26.1. Native state,
+#' handles and callbacks stay in one fresh engine worker. Pausing preserves that
+#' worker and the current native call; it is not a checkpoint or state copy.
+#'
+#' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
+#' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
+#' @param eplus EnergyPlus version or installation directory. Only 26.1 is supported.
+#' @param variables Named list of character pairs `c(variable_name, key)`.
+#' @param actuators Named list of character triples `c(component_type, control_type, key)`.
+#' @param initial_action Optional named numeric actuator values for the first
+#'   weather step. Without it, the first step retains the model's native control.
+#' @param controller Optional `function(observation, controller_state)` or path to
+#'   an R script defining `controller`. It must return `list(action = ..., state = ...)`.
+#'   Scripts are sourced once in the engine worker; this is a library-hosted
+#'   controller, not an EnergyPlus executable plugin loader.
+#' @param controller_state Initial serializable controller state.
+#' @param dir Output directory. A new temporary directory is used by default.
+#' @param timeout Maximum seconds to wait for a command or worker startup.
+#'   Expiry terminates the session; it never advances a waiting simulation.
+#' @return An `EnergyPlusSession` environment with the following methods:
+#'   * `$initialize(timeout = ...)`: run through the first completed weather zone
+#'     step and return its observation while paused. Initialization happens once.
+#'   * `$observe(timeout = ...)`: return the paused observation, or sample the next
+#'     completed zone boundary of a running session without pausing it.
+#'   * `$step(action = NULL, n = 1L, timeout = ...)`: advance a paused session by
+#'     `n` zone steps, then pause. Named numeric actions take effect before the
+#'     next predictor; `NA_real_` releases the named actuator to native control.
+#'   * `$pause(timeout = ...)`: wait until the next completed zone boundary and pause.
+#'   * `$resume(action = NULL, timeout = ...)`: continue asynchronously until
+#'     completion or a pause request. An installed controller runs at each boundary.
+#'   * `$status()`: inspect phase, worker identity, last observation and final outcome.
+#'   * `$result(timeout = ...)`: wait for a running session's final [EplusJob].
+#'     A paused session must first be resumed or closed.
+#'   * `$close(timeout = 10)`: request an orderly native stop and reap the pipeline.
+#'     A finalizer terminates the process tree as a fallback.
+#' @details
+#' Observations contain named `values`, explicit `controller_state`, completed
+#' weather `step`, `environment`, `kind_of_sim`, calendar fields, zone-step index
+#' and the interval `[time_start, time_end]` in hours. `year` is the simulation
+#' calendar year; `weather_year` retains the EPW year. `callback` identifies the
+#' sampling point. Output-variable averaging follows EnergyPlus's variable
+#' definition: for example, Zone Mean Air Temperature is a zone-step average,
+#' not an instantaneous endpoint measurement. Warmup and sizing are excluded.
+#'
+#' The first returned observation already represents one completed zone step.
+#' A multi-step action is held until the next action or release. With a controller,
+#' each subsequent step computes its action from the last completed observation
+#' and explicit state; manual actions and controller operation cannot be mixed.
+#' No unbounded per-step history is retained. On natural completion the final
+#' observation and finalized Job remain available. Errors, caller interrupts,
+#' timeout and disconnection stop or terminate the worker; a failed native state
+#' cannot be resumed. Closing early is distinct from completing the run period.
+#'
+#' Models, external resources and SQL outputs use the existing Job pipeline.
+#' PythonPlugin models and persistent restart/state cloning are outside this scope.
+#' Live sessions cannot be captured by another worker controller or serialized
+#' as a way of resuming a simulation in a different process.
+#' @examples
+#' \dontrun{
+#' session <- eplus_session(
+#'     "model.idf", "weather.epw",
+#'     variables = list(temperature = c("Zone Mean Air Temperature", "ZONE ONE"))
+#' )
+#' observation <- session$initialize()
+#' observation <- session$step(n = 4L)
+#' session$resume()
+#' job <- session$result()
+#' session$close()
+#' }
+#' @export
+eplus_session <- function(
+    model,
+    weather,
+    eplus = "26.1",
+    variables = list(),
+    actuators = list(),
+    initial_action = NULL,
+    controller = NULL,
+    controller_state = NULL,
+    dir = NULL,
+    timeout = 120
+) {
+    config <- if (
+        is.character(eplus) && length(eplus) == 1L && is_eplus_path(eplus)
+    ) {
+        suppressMessages(use_eplus(eplus))
+    } else {
+        suppressMessages(eplus_config(eplus))
+    }
+    run__api_version(config$version)
+    api_session__timeout(timeout)
+    variables <- api_session__definitions(variables, 2L, "variables")
+    actuators <- api_session__definitions(actuators, 3L, "actuators")
+    initial_action <- api_session__action(initial_action, names(actuators))
+    api_session__plain(controller_state)
+    # Snapshot ordinary state so its caller environment cannot retain the public proxy.
+    controller_state <- unserialize(serialize(controller_state, NULL))
+    if (is.character(controller)) {
+        controller <- normalizePath(checkmate::assert_file_exists(
+            controller,
+            "r"
+        ))
+    } else if (!is.null(controller)) {
+        checkmate::assert_function(controller, nargs = 2L)
+        run__check_setup(controller)
+        controller <- run__prepare_setup(controller)
+    }
+    if (is.null(weather)) {
+        api_session__error("A session requires weather run periods.")
+    }
+    job <- eplus_job(model, weather)
+    run__api_version(job$version())
+    ctx <- new.env(parent = emptyenv())
+    ctx$config <- list(
+        installation = normalizePath(config$dir),
+        variables = variables,
+        actuators = actuators,
+        initial_action = initial_action,
+        controller = controller,
+        controller_state = controller_state,
+        timeout = timeout,
+        directory = normalizePath(
+            dir %||% tempfile("eplusr-session-"),
+            mustWork = FALSE
+        )
+    )
+    ctx$job <- job
+    ctx$id <- basename(tempfile("session-proxy-"))
+    ctx$owner_pid <- Sys.getpid()
+    ctx$phase <- "created"
+    ctx$outcome <- NULL
+    ctx$error <- NULL
+    ctx$observation <- NULL
+    ctx$identity <- NULL
+    ctx$process <- NULL
+    ctx$server <- NULL
+    ctx$connection <- NULL
+    ctx$request <- 0L
+    ctx$terminal <- FALSE
+    api_session__construct(ctx)
+}
+
+# Keep process-local proxy identities so deserialization cannot acquire an existing live session.
+api_session__registry <- new.env(parent = emptyenv())
+
+# Reject copied or cross-process proxies before touching process handles or connection numbers.
+api_session__owner <- function(ctx) {
+    if (!api_session__is_owner(ctx)) {
+        api_session__error(
+            "A live session proxy belongs to its original R process and cannot be restored from serialization."
+        )
+    }
+    invisible(NULL)
+}
+
+# Share one ownership predicate between rejecting operations and the silent GC fallback.
+api_session__is_owner <- function(ctx) {
+    identical(ctx$owner_pid, Sys.getpid()) &&
+        exists(ctx$id, api_session__registry, inherits = FALSE) &&
+        identical(get(ctx$id, api_session__registry, inherits = FALSE), ctx)
+}
+
+# Use ordinary R conditions so caller-side failures never enter a native callback stack.
+api_session__error <- function(message) {
+    stop(structure(
+        list(message = message, call = NULL),
+        class = c(
+            "eplusr_session_error",
+            "eplusr_api_error",
+            "error",
+            "condition"
+        )
+    ))
+}
+
+# Validate budgets before launching or sending a request, leaving invalid calls recoverable.
+api_session__timeout <- function(timeout) {
+    checkmate::assert_number(timeout, lower = 0, finite = TRUE)
+    if (timeout == 0) {
+        api_session__error("'timeout' must be positive.")
+    }
+    invisible(NULL)
+}
+
+# Validate names and positional SDK identifiers before starting any worker.
+api_session__definitions <- function(definitions, size, argument) {
+    checkmate::assert_list(definitions)
+    if (!length(definitions)) {
+        return(definitions)
+    }
+    if (
+        is.null(names(definitions)) ||
+            anyNA(names(definitions)) ||
+            any(!nzchar(names(definitions))) ||
+            anyDuplicated(names(definitions))
+    ) {
+        api_session__error(paste0(
+            "'",
+            argument,
+            "' requires unique nonempty names."
+        ))
+    }
+    for (value in definitions) {
+        checkmate::assert_character(
+            value,
+            len = size,
+            any.missing = FALSE,
+            min.chars = 1L
+        )
+    }
+    definitions
+}
+
+# Require finite named actions; NA explicitly releases a previously claimed actuator.
+api_session__action <- function(action, names) {
+    api_session__plain(action)
+    if (is.null(action)) {
+        return(NULL)
+    }
+    checkmate::assert_numeric(action, any.missing = TRUE)
+    if (
+        is.null(names(action)) ||
+            anyNA(names(action)) ||
+            any(!nzchar(names(action))) ||
+            anyDuplicated(names(action)) ||
+            any(!names(action) %in% names) ||
+            any(is.infinite(action)) ||
+            any(is.nan(action))
+    ) {
+        api_session__error(
+            "Actions require known, unique actuator names and finite values or NA."
+        )
+    }
+    action
+}
+
+# Reuse the native-resource exclusion when serializing explicit controller state.
+api_session__plain <- function(value) {
+    inspect <- function() value
+    run__check_setup(inspect)
+    invisible(NULL)
+}
+
+# Bind one private context without retaining the public proxy through a finalizer closure.
+api_session__bind <- function(fun, ctx) {
+    environment(fun) <- list2env(list(ctx = ctx), parent = environment(fun))
+    formals(fun) <- formals(fun)[-1L]
+    fun
+}
+
+# Build the session proxy; native objects remain inaccessible to the caller.
+api_session__construct <- function(ctx) {
+    assign(ctx$id, ctx, envir = api_session__registry)
+    session <- new.env(parent = emptyenv())
+    class(session) <- "EnergyPlusSession"
+    methods <- list(
+        initialize = api_session__initialize,
+        observe = api_session__observe,
+        step = api_session__step,
+        pause = api_session__pause,
+        resume = api_session__resume,
+        status = api_session__status,
+        result = api_session__result,
+        close = api_session__close
+    )
+    for (name in names(methods)) {
+        session[[name]] <- api_session__bind(methods[[name]], ctx)
+    }
+    reg.finalizer(
+        session,
+        api_session__bind(api_session__finalize, ctx),
+        onexit = TRUE
+    )
+    lockEnvironment(session, bindings = TRUE)
+    session
+}
+
+# Frame small ordinary R messages so a socket never transfers native handles or pointers.
+api_session__send <- function(connection, message) {
+    payload <- serialize(message, NULL, xdr = TRUE)
+    if (length(payload) > 8L * 1024L * 1024L) {
+        api_session__error("Session message exceeds 8 MiB.")
+    }
+    writeBin(as.integer(length(payload)), connection, endian = "big")
+    writeBin(payload, connection)
+    flush(connection)
+    invisible(NULL)
+}
+
+# Read a complete bounded frame; an empty header means the peer has disconnected.
+api_session__receive <- function(connection) {
+    size <- readBin(connection, integer(), n = 1L, endian = "big")
+    if (!length(size)) {
+        return(NULL)
+    }
+    if (size < 1L || size > 8L * 1024L * 1024L) {
+        api_session__error("Invalid session message size.")
+    }
+    payload <- readBin(connection, raw(), n = size)
+    if (length(payload) != size) {
+        api_session__error("Incomplete session message.")
+    }
+    message <- unserialize(payload)
+    if (!is.list(message)) {
+        api_session__error("Invalid session message.")
+    }
+    message
+}
+
+# Reserve a listening socket atomically rather than choosing an already-used free port.
+api_session__listen <- function() {
+    # Transport bookkeeping must not perturb a caller's controller RNG stream.
+    start <- (Sys.getpid() +
+        as.integer((as.numeric(Sys.time()) %% 1) * 100000)) %%
+        50000L
+    for (offset in seq_len(20L)) {
+        port <- 10000L + (start + offset) %% 50000L
+        server <- tryCatch(serverSocket(port), error = function(e) NULL)
+        if (!is.null(server)) return(list(server = server, port = port))
+    }
+    api_session__error("Unable to reserve a local session socket.")
+}
+
+# Materialize and launch the existing Job pipeline, then wait for its first completed weather step.
+api_session__initialize <- function(ctx, timeout = ctx$config$timeout) {
+    api_session__owner(ctx)
+    api_session__timeout(timeout)
+    if (ctx$phase != "created") {
+        api_session__error("A session can only be initialized once.")
+    }
+    listener <- api_session__listen()
+    ctx$server <- listener$server
+    settings <- ctx$config
+    settings$port <- listener$port
+    settings$token <- paste0(
+        basename(tempfile("session-")),
+        basename(tempfile("session-"))
+    )
+    setup <- function(api, state) api_session__setup(api, state, settings)
+    environment(setup) <- list2env(
+        list(settings = settings),
+        parent = asNamespace("eplusr")
+    )
+    ctx$phase <- "initializing"
+    api_session__guard(ctx, {
+        # Select the constructor's frozen installation immediately before dispatch resolves its path.
+        suppressMessages(use_eplus(ctx$config$installation))
+        ctx$job$run(
+            dir = ctx$config$directory,
+            wait = FALSE,
+            echo = FALSE,
+            copy_external = TRUE,
+            readvars = FALSE,
+            backend = "api",
+            api_setup = setup
+        )
+        ctx$process <- get_priv_env(ctx$job)$m_job
+        deadline <- Sys.time() + timeout
+        while (
+            is.null(ctx$connection) &&
+                ctx$process$is_alive() &&
+                Sys.time() < deadline
+        ) {
+            if (socketSelect(list(ctx$server), timeout = 0.05)) {
+                connection <- socketAccept(
+                    ctx$server,
+                    blocking = TRUE,
+                    open = "a+b",
+                    timeout = 2
+                )
+                # Authenticate bounded raw bytes before decoding an R object from the accepted socket.
+                expected <- charToRaw(settings$token)
+                preface <- readBin(connection, raw(), n = length(expected))
+                if (!identical(preface, expected)) {
+                    close(connection)
+                    next
+                }
+                hello <- api_session__receive(connection)
+                if (!is.null(hello) && identical(hello$type, "hello")) {
+                    ctx$connection <- connection
+                    ctx$identity <- hello$identity
+                    ctx$identity$pipeline_pid <- ctx$process$get_pid()
+                } else {
+                    close(connection)
+                }
+            }
+        }
+        if (is.null(ctx$connection)) {
+            if (!ctx$process$is_alive()) {
+                api_session__collect(ctx)
+            }
+            api_session__error(
+                api_session__diagnostic(
+                    ctx,
+                    "Session worker startup timed out."
+                )
+            )
+        }
+        close(ctx$server)
+        ctx$server <- NULL
+        api_session__wait(
+            ctx,
+            0L,
+            max(
+                0.01,
+                as.numeric(difftime(deadline, Sys.time(), units = "secs"))
+            )
+        )
+    })
+}
+
+# Validate and issue a serialized command, then await its boundary acknowledgement.
+api_session__command <- function(
+    ctx,
+    operation,
+    timeout,
+    action = NULL,
+    n = NULL
+) {
+    api_session__timeout(timeout)
+    ctx$request <- ctx$request + 1L
+    api_session__guard(ctx, {
+        # Natural completion can race with a running observe/pause/close request.
+        # A readable terminal/EOF lets the regular wait path collect the finalized Job.
+        send <- function() {
+            api_session__send(
+                ctx$connection,
+                list(
+                    id = ctx$request,
+                    operation = operation,
+                    action = action,
+                    n = n
+                )
+            )
+        }
+        if (
+            !ctx$terminal && !is.null(ctx$connection) && ctx$process$is_alive()
+        ) {
+            tryCatch(suppressWarnings(send()), error = function(condition) {
+                if (
+                    ctx$process$is_alive() &&
+                        !socketSelect(list(ctx$connection), timeout = 0)
+                ) {
+                    stop(condition)
+                }
+            })
+        }
+        api_session__wait(ctx, ctx$request, timeout)
+    })
+}
+
+# Any caller interrupt or protocol failure reaps the whole pipeline before rethrowing its condition.
+api_session__guard <- function(ctx, expression) {
+    tryCatch(
+        expression,
+        error = function(condition) {
+            api_session__fail(ctx, condition)
+            stop(condition)
+        },
+        interrupt = function(condition) {
+            api_session__fail(ctx, condition)
+            stop(condition)
+        }
+    )
+}
+
+# Wait only for the requested acknowledgement, retaining the same worker during a pause.
+api_session__wait <- function(ctx, id, timeout) {
+    deadline <- Sys.time() + timeout
+    while (Sys.time() < deadline) {
+        if (
+            !is.null(ctx$connection) &&
+                socketSelect(list(ctx$connection), timeout = 0.05)
+        ) {
+            message <- api_session__receive(ctx$connection)
+            if (is.null(message)) {
+                close(ctx$connection)
+                ctx$connection <- NULL
+            } else if (identical(message$type, "terminal")) {
+                ctx$observation <- message$observation
+                ctx$terminal <- TRUE
+            } else if (
+                identical(message$id, id) && identical(message$type, "boundary")
+            ) {
+                ctx$phase <- message$phase
+                ctx$observation <- message$observation
+                return(ctx$observation)
+            } else {
+                api_session__error("Unexpected session response.")
+            }
+        }
+        if (!ctx$process$is_alive()) {
+            api_session__collect(ctx)
+            if (ctx$phase == "failed") {
+                api_session__error(
+                    api_session__diagnostic(ctx, "Session simulation failed.")
+                )
+            }
+            return(ctx$observation)
+        }
+        if (is.null(ctx$connection)) Sys.sleep(0.05)
+    }
+    api_session__error(
+        "Session command timed out; the worker will be terminated."
+    )
+}
+
+# Collect finalized pipeline diagnostics without inventing native cleanup on an abrupt process exit.
+api_session__collect <- function(ctx) {
+    # Natural completion may precede a caller query; recover its final buffered snapshot.
+    while (
+        !is.null(ctx$connection) &&
+            socketSelect(list(ctx$connection), timeout = 0)
+    ) {
+        message <- api_session__receive(ctx$connection)
+        if (is.null(message)) {
+            close(ctx$connection)
+            ctx$connection <- NULL
+            break
+        }
+        if (!identical(message$type, "terminal")) {
+            api_session__error("Unexpected final session response.")
+        }
+        ctx$observation <- message$observation
+        ctx$terminal <- TRUE
+    }
+    status <- ctx$job$status()
+    ctx$outcome <- status$api
+    ctx$error <- status$api$error
+    ctx$phase <- if (isTRUE(status$successful)) {
+        "completed"
+    } else if (identical(status$api$phase, "stopped")) {
+        "stopped"
+    } else {
+        "failed"
+    }
+    invisible(NULL)
+}
+
+# Retain last completed measurements while reporting abrupt caller-side termination honestly.
+api_session__fail <- function(ctx, condition) {
+    if (!is.null(ctx$process) && ctx$process$is_alive()) {
+        # Use Job cancellation so its final public result records termination too.
+        try(ctx$job$kill(), silent = TRUE)
+        if (ctx$process$is_alive()) run__api_kill(ctx$process)
+    }
+    message <- conditionMessage(condition)
+    if (
+        !is.character(message) ||
+            length(message) != 1L ||
+            is.na(message) ||
+            !nzchar(message)
+    ) {
+        message <- if (inherits(condition, "interrupt")) {
+            "Session interrupted."
+        } else {
+            "Session protocol failed."
+        }
+    }
+    if (ctx$phase != "failed" || is.null(ctx$error)) {
+        ctx$error <- list(class = class(condition), message = message)
+    } else if (!nzchar(ctx$error$message %||% "")) {
+        # Keep the native condition class while adding a usable transport-side diagnostic.
+        ctx$error$message <- message
+    }
+    if (!ctx$phase %in% c("failed", "completed", "stopped")) {
+        ctx$phase <- "terminated"
+    }
+    api_session__disconnect(ctx)
+    invisible(NULL)
+}
+
+# Close only R IPC resources; native cleanup belongs to the engine worker.
+api_session__disconnect <- function(ctx) {
+    for (field in c("connection", "server")) {
+        if (!is.null(ctx[[field]])) {
+            try(close(ctx[[field]]), silent = TRUE)
+        }
+        ctx[[field]] <- NULL
+    }
+    invisible(NULL)
+}
+
+# Inspect completion locally; this method never advances a paused native simulation.
+api_session__status <- function(ctx) {
+    api_session__owner(ctx)
+    if (
+        !is.null(ctx$process) &&
+            !ctx$process$is_alive() &&
+            !ctx$phase %in%
+                c("closed", "terminated", "completed", "failed", "stopped")
+    ) {
+        api_session__collect(ctx)
+    }
+    list(
+        phase = ctx$phase,
+        alive = !is.null(ctx$process) && ctx$process$is_alive(),
+        identity = ctx$identity,
+        observation = ctx$observation,
+        outcome = ctx$outcome,
+        error = ctx$error
+    )
+}
+
+# Return a stable paused observation, or sample the next completed running boundary.
+api_session__observe <- function(ctx, timeout = ctx$config$timeout) {
+    phase <- api_session__status(ctx)$phase
+    if (phase == "running") {
+        return(api_session__command(ctx, "observe", timeout))
+    }
+    if (phase %in% c("paused", "completed", "stopped", "closed")) {
+        return(ctx$observation)
+    }
+    api_session__error("The session has no available observation.")
+}
+
+# Advance an exact positive number of weather zone steps from a paused boundary.
+api_session__step <- function(
+    ctx,
+    action = NULL,
+    n = 1L,
+    timeout = ctx$config$timeout
+) {
+    if (api_session__status(ctx)$phase != "paused") {
+        api_session__error("Stepping requires a paused session.")
+    }
+    checkmate::assert_int(n, lower = 1L)
+    action <- api_session__action(action, names(ctx$config$actuators))
+    if (!is.null(action) && !is.null(ctx$config$controller)) {
+        api_session__error(
+            "Manual actions cannot be combined with a controller."
+        )
+    }
+    api_session__command(ctx, "step", timeout, action, as.integer(n))
+}
+
+# Pause a running simulation at its next completed zone boundary; repeated pause is harmless.
+api_session__pause <- function(ctx, timeout = ctx$config$timeout) {
+    phase <- api_session__status(ctx)$phase
+    if (phase %in% c("paused", "completed", "stopped")) {
+        return(ctx$observation)
+    }
+    if (phase != "running") {
+        api_session__error("Pausing requires a running session.")
+    }
+    api_session__command(ctx, "pause", timeout)
+}
+
+# Release a paused boundary without resetting native state, then return immediately after acknowledgement.
+api_session__resume <- function(
+    ctx,
+    action = NULL,
+    timeout = ctx$config$timeout
+) {
+    if (api_session__status(ctx)$phase != "paused") {
+        api_session__error("Resuming requires a paused session.")
+    }
+    action <- api_session__action(action, names(ctx$config$actuators))
+    if (!is.null(action) && !is.null(ctx$config$controller)) {
+        api_session__error(
+            "Manual actions cannot be combined with a controller."
+        )
+    }
+    api_session__command(ctx, "resume", timeout, action)
+}
+
+# Expose the existing finalized Job only after the live session has left its native call.
+api_session__result <- function(ctx, timeout = ctx$config$timeout) {
+    api_session__timeout(timeout)
+    phase <- api_session__status(ctx)$phase
+    if (phase %in% c("paused", "created", "initializing")) {
+        api_session__error(
+            "Resume or close the session before collecting its result."
+        )
+    }
+    if (phase == "running") {
+        api_session__guard(ctx, api_session__wait(ctx, -1L, timeout))
+    }
+    ctx$job
+}
+
+# Stop at a control boundary and wait for cleanup, falling back to bounded process-tree termination.
+api_session__close <- function(ctx, timeout = 10) {
+    api_session__owner(ctx)
+    if (ctx$phase == "closed") {
+        return(invisible(TRUE))
+    }
+    if (!is.null(ctx$process) && ctx$process$is_alive()) {
+        api_session__command(ctx, "close", timeout)
+        api_session__guard(ctx, api_session__wait(ctx, -1L, timeout))
+    }
+    api_session__disconnect(ctx)
+    ctx$phase <- "closed"
+    invisible(TRUE)
+}
+
+# A collected or exiting proxy cannot leave its paused engine or descendants behind.
+api_session__finalize <- function(ctx, session) {
+    # A copied proxy has no authority over the original process or its R connection identifiers.
+    if (!api_session__is_owner(ctx)) {
+        return(invisible(NULL))
+    }
+    rm(list = ctx$id, envir = api_session__registry)
+    if (!is.null(ctx$process) && ctx$process$is_alive()) {
+        try(run__api_kill(ctx$process), silent = TRUE)
+    }
+    api_session__disconnect(ctx)
+    invisible(NULL)
+}
+
+# Reconstruct the controller once in the engine process and retain the authenticated IPC connection.
+api_session__setup <- function(api, state, settings) {
+    control <- new.env(parent = emptyenv())
+    control$connection <- socketConnection(
+        "127.0.0.1",
+        settings$port,
+        blocking = TRUE,
+        open = "a+b",
+        timeout = 2
+    )
+    # Prove this is the private worker before the owner deserializes any IPC payload.
+    writeBin(charToRaw(settings$token), control$connection)
+    flush(control$connection)
+    api_session__send(
+        control$connection,
+        list(
+            type = "hello",
+            identity = c(
+                api$info()[c("version", "api_version", "library", "pid")],
+                list(generation = api$state_manager$status(state)$generation)
+            )
+        )
+    )
+    control$mode <- "initializing"
+    control$step <- 0L
+    control$remaining <- 0L
+    control$need_control <- FALSE
+    control$id <- 0L
+    control$observation <- NULL
+    control$action <- settings$initial_action
+    control$controller_state <- settings$controller_state
+    control$controller <- settings$controller
+    control$variable_handles <- NULL
+    control$actuator_handles <- NULL
+    if (is.character(control$controller)) {
+        scope <- new.env(parent = globalenv())
+        sys.source(control$controller, envir = scope)
+        if (!exists("controller", scope, inherits = FALSE)) {
+            api_session__error("Controller script must define 'controller'.")
+        }
+        control$controller <- get("controller", scope, inherits = FALSE)
+        checkmate::assert_function(control$controller, nargs = 2L)
+    }
+    for (definition in settings$variables) {
+        api$exchange$request_variable(state, definition[1L], definition[2L])
+    }
+    # Apply controls before predictor reads schedules, repeating through system substeps of a zone step.
+    api$runtime$callback_begin_system_timestep_before_predictor(
+        state,
+        function(s) {
+            if (!api_session__weather(api, s)) {
+                return(invisible(NULL))
+            }
+            api_session__handles(api, s, settings, control)
+            # Compute a controller action only when a new zone step actually reaches its predictor.
+            # This avoids advancing controller memory after the final simulated step.
+            if (control$need_control && !is.null(control$observation)) {
+                api_session__control(settings, control)
+                control$need_control <- FALSE
+            }
+            for (name in names(control$action)) {
+                handle <- control$actuator_handles[[name]]
+                if (is.na(control$action[[name]])) {
+                    api$exchange$reset_actuator(s, handle)
+                } else {
+                    api$exchange$set_actuator_value(
+                        s,
+                        handle,
+                        control$action[[name]]
+                    )
+                }
+            }
+            invisible(NULL)
+        }
+    )
+    # Each completed weather zone step is a safe waiting point within the same native run.
+    api$runtime$callback_end_zone_timestep_after_zone_reporting(
+        state,
+        function(s) {
+            if (!api_session__weather(api, s)) {
+                return(invisible(NULL))
+            }
+            api_session__handles(api, s, settings, control)
+            control$step <- control$step + 1L
+            control$observation <- api_session__snapshot(
+                api,
+                s,
+                settings,
+                control
+            )
+            if (control$mode == "stepping") {
+                control$remaining <- control$remaining - 1L
+            }
+            if (
+                control$mode == "initializing" ||
+                    (control$mode == "stepping" && control$remaining == 0L)
+            ) {
+                control$mode <- "paused"
+                api_session__reply(control, control$id)
+            }
+            repeat {
+                ready <- socketSelect(
+                    list(control$connection),
+                    timeout = if (control$mode == "paused") 0.05 else 0
+                )
+                if (ready) {
+                    command <- api_session__receive(control$connection)
+                    if (is.null(command)) {
+                        api$runtime$stop_simulation(s)
+                        control$mode <- "disconnected"
+                        break
+                    }
+                    api_session__dispatch(api, s, settings, control, command)
+                }
+                if (control$mode != "paused") break
+            }
+            if (control$mode %in% c("running", "stepping")) {
+                control$need_control <- TRUE
+            }
+            invisible(NULL)
+        }
+    )
+    # The package engine calls this only after native return and its public cleanup.
+    finish <- function(metadata) {
+        try(
+            api_session__send(
+                control$connection,
+                list(
+                    type = "terminal",
+                    observation = control$observation,
+                    metadata = metadata
+                )
+            ),
+            silent = TRUE
+        )
+        try(close(control$connection), silent = TRUE)
+        invisible(NULL)
+    }
+    # Distinguish a deliberate close and a lost client without rewriting the native stop classification.
+    metadata <- function(value) {
+        value$session_reason <- switch(
+            control$mode,
+            closing = "user_close",
+            disconnected = "connection_lost",
+            value$stop_reason %||% value$phase
+        )
+        value
+    }
+    structure(
+        list(finish = finish, metadata = metadata),
+        class = "EnergyPlusSessionBridge"
+    )
+}
+
+# Sessions participate only after API readiness in non-warmup weather simulations.
+api_session__weather <- function(api, state) {
+    api$exchange$api_data_fully_ready(state) &&
+        !api$exchange$warmup_flag(state) &&
+        api$exchange$kind_of_sim(state) == 3L
+}
+
+# Resolve typed handles once per engine lifecycle, entirely inside its worker.
+api_session__handles <- function(api, state, settings, control) {
+    if (!is.null(control$variable_handles)) {
+        return(invisible(NULL))
+    }
+    control$variable_handles <- lapply(settings$variables, function(d) {
+        api$exchange$get_variable_handle(state, d[1L], d[2L])
+    })
+    control$actuator_handles <- lapply(settings$actuators, function(d) {
+        api$exchange$get_actuator_handle(state, d[1L], d[2L], d[3L])
+    })
+    # SDK handle lookup returns -1 for an unknown binding, even before the first write.
+    if (any(vapply(control$variable_handles, as.integer, integer(1L)) < 0L)) {
+        api_session__error("Unknown session output variable or key.")
+    }
+    if (any(vapply(control$actuator_handles, as.integer, integer(1L)) < 0L)) {
+        api_session__error("Unknown session actuator or key.")
+    }
+    invisible(NULL)
+}
+
+# Report explicit completed-zone metadata without representing an average as an instantaneous sample.
+api_session__snapshot <- function(api, state, settings, control) {
+    exchange <- api$exchange
+    # current_time() can retain an HVAC substep offset after zone reporting.
+    # The hour and zone index identify the completed zone boundary itself.
+    end <- exchange$hour(state) +
+        exchange$zone_time_step_number(state) /
+            exchange$num_time_steps_in_hour(state)
+    list(
+        step = control$step,
+        environment = exchange$current_environment_num(state),
+        kind_of_sim = exchange$kind_of_sim(state),
+        year = exchange$calendar_year(state),
+        weather_year = exchange$year(state),
+        month = exchange$month(state),
+        day = exchange$day_of_month(state),
+        hour = exchange$hour(state),
+        zone_time_step_number = exchange$zone_time_step_number(state),
+        time_start = end - exchange$zone_time_step(state),
+        time_end = end,
+        callback = "end_zone_timestep_after_zone_reporting",
+        values = vapply(
+            control$variable_handles,
+            function(handle) exchange$get_variable_value(state, handle),
+            numeric(1L)
+        ),
+        variables = settings$variables,
+        controller_state = control$controller_state
+    )
+}
+
+# Acknowledge a control boundary with ordinary data; no native state crosses IPC.
+api_session__reply <- function(control, id) {
+    api_session__send(
+        control$connection,
+        list(
+            type = "boundary",
+            id = id,
+            phase = if (control$mode == "paused") "paused" else "running",
+            observation = control$observation
+        )
+    )
+}
+
+# Interpret one validated request at a zone boundary, holding the native stack while paused.
+api_session__dispatch <- function(api, state, settings, control, command) {
+    if (
+        !is.numeric(command$id) ||
+            length(command$id) != 1L ||
+            !command$operation %in%
+                c("step", "resume", "pause", "observe", "close")
+    ) {
+        api_session__error("Invalid session command.")
+    }
+    if (command$operation %in% c("step", "resume")) {
+        if (control$mode != "paused") {
+            api_session__error("The engine is not paused.")
+        }
+        action <- api_session__action(command$action, names(settings$actuators))
+        if (!is.null(action)) {
+            control$action <- api_session__merge_action(control$action, action)
+        }
+        control$id <- command$id
+        control$mode <- if (command$operation == "step") {
+            "stepping"
+        } else {
+            "running"
+        }
+        if (command$operation == "step") {
+            checkmate::assert_int(command$n, lower = 1L)
+            control$remaining <- command$n
+        } else {
+            api_session__reply(control, command$id)
+        }
+    } else if (command$operation == "pause") {
+        control$mode <- "paused"
+        api_session__reply(control, command$id)
+    } else if (command$operation == "observe") {
+        api_session__reply(control, command$id)
+    } else {
+        api$runtime$stop_simulation(state)
+        control$mode <- "closing"
+        api_session__reply(control, command$id)
+    }
+    invisible(NULL)
+}
+
+# Advance explicit controller memory only when the next simulation step is authorized.
+api_session__control <- function(settings, control) {
+    if (is.null(control$controller)) {
+        return(invisible(NULL))
+    }
+    result <- control$controller(control$observation, control$controller_state)
+    if (!is.list(result) || !all(c("action", "state") %in% names(result))) {
+        api_session__error(
+            "A controller must return list(action = ..., state = ...)."
+        )
+    }
+    api_session__plain(result$state)
+    action <- api_session__action(result$action, names(settings$actuators))
+    if (!is.null(action)) {
+        control$action <- api_session__merge_action(control$action, action)
+    }
+    control$controller_state <- result$state
+    invisible(NULL)
+}
+
+# Keep unspecified actuator claims while replacing only the explicitly supplied values or releases.
+api_session__merge_action <- function(current, action) {
+    c(current[setdiff(names(current), names(action))], action)
+}
+
+# Use meaningful diagnostics for native interrupts whose R condition message is empty.
+api_session__diagnostic <- function(ctx, fallback) {
+    message <- ctx$error$message
+    if (
+        is.character(message) &&
+            length(message) == 1L &&
+            !is.na(message) &&
+            nzchar(message)
+    ) {
+        return(message)
+    }
+    if (identical(ctx$outcome$stop_reason, "interrupt")) {
+        return("EnergyPlus worker interrupted.")
+    }
+    fallback
 }

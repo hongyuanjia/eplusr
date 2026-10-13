@@ -2,6 +2,10 @@
 
 ## New features
 
+* Add live `eplus_session()` control for stock EnergyPlus 26.1, including zone-step
+  advancement, pause/resume, explicit controller state and worker-hosted scripts
+  (#654).
+
 * Add an experimental API backend to single, group and parametric simulation
   jobs. Run each EnergyPlus 26.1 library lifecycle in a fresh R worker, with
   worker-local setup, backend identity and stop/condition metadata (#653).

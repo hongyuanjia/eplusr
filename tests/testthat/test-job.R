@@ -146,7 +146,14 @@ test_that("stock API jobs preserve SQL results and separate consecutive worker l
         echo = FALSE,
         backend = "api"
     )
-    expect_true(api$status()$successful)
+    expect_true(
+        api$status()$successful,
+        info = jsonlite::toJSON(
+            api$status()$api,
+            auto_unbox = TRUE,
+            null = "null"
+        )
+    )
     expect_identical(api$status()$backend, "api")
     expect_match(api$status()$api$version, "26.1.0")
     expect_false(identical(api$status()$api$pid, Sys.getpid()))

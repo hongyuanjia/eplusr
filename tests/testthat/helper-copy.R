@@ -70,15 +70,19 @@ testrun__api_fixture <- function() {
 
 # Wait for the worker bootstrap handshake, failing immediately if its owner exits.
 # covr traces the namespace again in each fresh worker before api_setup can run.
-testrun__api_started <- function(ready, alive) {
+testrun__api_started <- function(ready, alive, diagnostic = NULL) {
     deadline <- Sys.time() + 120
     while (!ready() && alive() && Sys.time() < deadline) {
         Sys.sleep(0.1)
     }
-    expect_true(
-        ready(),
-        info = "API worker bootstrap did not complete before timeout or owner exit"
-    )
+    info <- "API worker bootstrap did not complete before timeout or owner exit"
+    if (!ready() && !is.null(diagnostic)) {
+        info <- paste(
+            info,
+            jsonlite::toJSON(diagnostic(), auto_unbox = TRUE, null = "null")
+        )
+    }
+    expect_true(ready(), info = info)
 }
 
 
