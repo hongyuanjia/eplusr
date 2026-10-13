@@ -41,12 +41,13 @@ jobs:
         run: |
           # The merged bridge is used until its next CRAN release contains both required capabilities.
           remotes::install_github("hongyuanjia/rdyncall@98aac679adf8ace0c85075c5f4928075289eebbd", upgrade = "never")
-          pkgload::load_all(".", quiet = TRUE)
+          # Engine preparation owns installation; test helpers run in the test step.
+          pkgload::load_all(".", quiet = TRUE, helpers = FALSE)
           # Helpers and restored installations may already provide either engine.
           versions <- unique(c("26.1", get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
           for (version in versions) {
               if (!eplusr::is_avail_eplus(version)) {
-                  eplusr::install_eplus(version, local = TRUE)
+                  eplusr::install_eplus(version, local = TRUE, portable = TRUE)
               }
               stopifnot(eplusr::is_avail_eplus(version))
           }
