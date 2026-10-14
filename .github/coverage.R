@@ -390,6 +390,10 @@ coverage__save_trace <- function(directory) {
 
 # Require every shard's full denominator, then combine ordinary covr objects for one report.
 coverage__combine <- function(files, expected = 8L) {
+    # Load covr S3 methods before inspecting serialized coverage objects.
+    if (!requireNamespace("covr", quietly = TRUE)) {
+        stop("covr is required to merge coverage.")
+    }
     objects <- lapply(files, function(file) {
         coverage__native_keys(readRDS(file))
     })
@@ -443,7 +447,11 @@ coverage__native_keys <- function(object) {
     }
     positions <- match(keys, unique_keys)
     first <- match(unique_keys, keys)
-    result <- object[first]
+    result <- unclass(object)[first]
+    # Explicitly retain report metadata even when called before S3 methods are registered.
+    for (name in setdiff(names(attributes(object)), "names")) {
+        attr(result, name) <- attr(object, name)
+    }
     for (i in seq_along(result)) {
         result[[i]]$value <- 0
     }
