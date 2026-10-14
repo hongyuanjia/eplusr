@@ -134,11 +134,30 @@ jobs:
         run: |
           dir.create("coverage", showWarnings = FALSE)
           started <- proc.time()[["elapsed"]]
-          cov <- covr::package_coverage(
-              path = ".",
-              type = "tests",
-              quiet = FALSE,
-              clean = FALSE
+          # Keep failed test output available while covr's error message truncates it.
+          instrumented <- tempfile("eplusr-coverage-library-")
+          cov <- tryCatch(
+              covr::package_coverage(
+                  path = ".",
+                  type = "tests",
+                  quiet = FALSE,
+                  clean = FALSE,
+                  install_path = instrumented
+              ),
+              error = function(error) {
+                  # Print the failure details before the R temporary directory disappears.
+                  failures <- list.files(
+                      instrumented,
+                      pattern = "\\.Rout\\.fail$",
+                      recursive = TRUE,
+                      full.names = TRUE
+                  )
+                  for (file in failures) {
+                      cat("\nTest failure output: ", file, "\n", sep = "")
+                      cat(tail(readLines(file, warn = FALSE), 200L), sep = "\n")
+                  }
+                  stop(error)
+              }
           )
           message("Coverage collection seconds: ", proc.time()[["elapsed"]] - started)
           print(cov)
