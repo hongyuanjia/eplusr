@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [api, replay, plugins, engine, ordinary]
+        shard: [api, session-errors, replay, plugins, run, run-api, engine, ordinary]
     if: >-
       ${{
         (
@@ -199,8 +199,7 @@ jobs:
           use-public-rspm: true
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::xml2${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
-          needs: coverage
+          packages: any::covr, any::xml2${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
@@ -209,7 +208,7 @@ jobs:
         shell: Rscript {0}
         run: |
           source(".github/coverage.R")
-          files <- file.path("coverage-shards", paste0("coverage-", c("api", "replay", "plugins", "engine", "ordinary")), "coverage.rds")
+          files <- file.path("coverage-shards", paste0("coverage-", c("api", "session-errors", "replay", "plugins", "run", "run-api", "engine", "ordinary")), "coverage.rds")
           stopifnot(all(file.exists(files)))
           started <- proc.time()[["elapsed"]]
           cov <- coverage__combine(files)

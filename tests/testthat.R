@@ -37,10 +37,13 @@ shard <- Sys.getenv("_EPLUSR_TEST_SHARD_")
 if (nzchar(shard)) {
     filters <- c(
         api = "^api(-session)?$",
+        `session-errors` = "^api-session-errors$",
         replay = "^api-replay$",
         plugins = "^api-plugins$",
-        engine = "^(run|job|group|param)$",
-        ordinary = "^(api(-.*)?|run|job|group|param)$"
+        run = "^run$",
+        `run-api` = "^run-api$",
+        engine = "^(job|group|param)$",
+        ordinary = "^(api(-.*)?|run(-.*)?|job|group|param)$"
     )
     if (!shard %in% names(filters)) {
         stop("Unknown coverage test shard.")
@@ -51,7 +54,7 @@ if (nzchar(shard)) {
         invert = shard == "ordinary"
     )
 } else if (identical(Sys.getenv("_EPLUSR_SERIAL_API_TESTS_"), "true")) {
-    worker_tests <- "^(api(-.*)?|run|job|group|param)$"
+    worker_tests <- "^(api(-.*)?|run(-.*)?|job|group|param)$"
     withr::with_envvar(
         c(TESTTHAT_PARALLEL = "false"),
         testrun__phase("engine", filter = worker_tests)

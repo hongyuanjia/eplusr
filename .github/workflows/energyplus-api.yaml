@@ -56,4 +56,4 @@ jobs:
       - name: Exercise API jobs
         shell: Rscript {0}
         run: |
-          devtools::test(filter = "^(api(-.*)?|run|job|group|param)$", stop_on_failure = TRUE)
+          devtools::test(filter = "^(api(-.*)?|run(-.*)?|job|group|param)$", stop_on_failure = TRUE)

@@ -389,18 +389,30 @@ coverage__save_trace <- function(directory) {
 }
 
 # Require every shard's full denominator, then combine ordinary covr objects for one report.
-coverage__combine <- function(files) {
-    objects <- lapply(files, readRDS)
-    if (length(objects) != 5L) {
-        stop("All five coverage shards are required.")
+coverage__combine <- function(files, expected = 8L) {
+    objects <- lapply(files, function(file) {
+        coverage__native_keys(readRDS(file))
+    })
+    if (length(objects) != expected) {
+        stop("All eight coverage shards are required.")
     }
     reference <- objects[[1L]]
+    # R tracing has one fixed denominator; gcov can omit differently executed C lines.
+    r_keys <- function(object) {
+        names(object)[vapply(
+            object,
+            function(counter) {
+                endsWith(attr(counter$srcref, "srcfile")$filename, ".R")
+            },
+            logical(1L)
+        )]
+    }
     for (object in objects[-1L]) {
-        if (!setequal(names(reference), names(object))) {
-            stop("Coverage shard expression keys differ.")
+        if (!setequal(r_keys(reference), r_keys(object))) {
+            stop("Coverage shard R expression keys differ.")
         }
         positions <- match(names(reference), names(object))
-        for (i in seq_along(reference)) {
+        for (i in which(!is.na(positions))) {
             left <- reference[[i]]
             right <- object[[positions[[i]]]]
             if (
@@ -420,4 +432,45 @@ coverage__combine <- function(files) {
         attr(merged, name) <- attr(reference, name)
     }
     merged
+}
+
+# Multiple gcno objects may report the same C source location; retain one location and all counts.
+coverage__native_keys <- function(object) {
+    keys <- names(object)
+    unique_keys <- unique(keys)
+    if (length(keys) == length(unique_keys)) {
+        return(object)
+    }
+    positions <- match(keys, unique_keys)
+    first <- match(unique_keys, keys)
+    result <- object[first]
+    for (i in seq_along(result)) {
+        result[[i]]$value <- 0
+    }
+    for (i in seq_along(object)) {
+        j <- positions[[i]]
+        reference <- result[[j]]
+        counter <- object[[i]]
+        if (
+            i != first[[j]] &&
+                endsWith(attr(counter$srcref, "srcfile")$filename, ".R")
+        ) {
+            stop("Duplicate R expression keys cannot be merged.")
+        }
+        if (
+            !identical(
+                as.integer(reference$srcref),
+                as.integer(counter$srcref)
+            ) ||
+                !identical(
+                    attr(reference$srcref, "srcfile")$filename,
+                    attr(counter$srcref, "srcfile")$filename
+                ) ||
+                !identical(reference$functions, counter$functions)
+        ) {
+            stop("Duplicate native coverage source metadata differs.")
+        }
+        result[[j]]$value <- result[[j]]$value + counter$value
+    }
+    result
 }
