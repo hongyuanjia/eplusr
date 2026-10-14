@@ -10,6 +10,11 @@ on:
       - master
       - main
   workflow_dispatch:
+    inputs:
+      html_report:
+        description: Generate the interactive HTML report in addition to complete RDS/XML coverage
+        type: boolean
+        default: false
 
 name: test-coverage
 
@@ -38,7 +43,9 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: true
       NOT_CRAN: true
-      TESTTHAT_CPUS: 1
+      # Independent test files overlap expensive worker startup on the two-core runner.
+      TESTTHAT_PARALLEL: true
+      TESTTHAT_CPUS: 2
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
       _EPLUSR_RUN_API_TESTS_: true
       R_KEEP_PKG_SOURCE: true
@@ -55,7 +62,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::pkgload, any::xml2, any::DT, any::htmltools, any::remotes
+          extra-packages: any::covr, any::pkgload, any::xml2, any::remotes${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
           needs: coverage
 
       - name: Locate DuckDB extension cache
@@ -126,21 +133,37 @@ jobs:
       - name: Test coverage
         run: |
           dir.create("coverage", showWarnings = FALSE)
+          started <- proc.time()[["elapsed"]]
           cov <- covr::package_coverage(
-            path = ".",
-            type = "tests",
-            quiet = FALSE,
-            clean = FALSE
+              path = ".",
+              type = "tests",
+              quiet = FALSE,
+              clean = FALSE
           )
+          message("Coverage collection seconds: ", proc.time()[["elapsed"]] - started)
           print(cov)
           vals <- vapply(cov, function(x) x$value, numeric(1))
           if (!any(vals > 0)) {
-            stop("covr returned all-zero coverage; tests likely did not run")
+              stop("covr returned all-zero coverage; tests likely did not run")
           }
+          # Keep the full expression data and Codecov input on every run.
+          started <- proc.time()[["elapsed"]]
           saveRDS(cov, "coverage/coverage.rds")
+          message("Coverage RDS seconds: ", proc.time()[["elapsed"]] - started)
+          started <- proc.time()[["elapsed"]]
           covr::to_cobertura(cov, "coverage/cobertura.xml")
-          covr::report(cov, file = "coverage/index.html", browse = FALSE)
+          message("Coverage XML seconds: ", proc.time()[["elapsed"]] - started)
         shell: Rscript {0}
+
+      - name: Generate optional HTML report
+        if: github.event_name == 'workflow_dispatch' && inputs.html_report
+        shell: Rscript {0}
+        run: |
+          # Source rendering is optional; it does not change collected coverage or test selection.
+          cov <- readRDS("coverage/coverage.rds")
+          started <- proc.time()[["elapsed"]]
+          covr::report(cov, file = "coverage/index.html", browse = FALSE)
+          message("Coverage HTML seconds: ", proc.time()[["elapsed"]] - started)
 
       - uses: actions/upload-artifact@v4
         if: always()

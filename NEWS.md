@@ -1,5 +1,11 @@
 # eplusr (development version)
 
+## Performance
+
+* Plugin exports reuse a successful isolated bridge check while installed code
+  and library paths remain unchanged; each engine worker still performs its own
+  safety check (#652).
+
 ## New features
 
 * Add `export_eplus_plugin()` to run R hooks inside the stock EnergyPlus 26.1

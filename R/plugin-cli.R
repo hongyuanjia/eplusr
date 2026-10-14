@@ -148,15 +148,69 @@ export_eplus_plugin <- function(
     )
 }
 
+# Retain only successful exporter proofs; every engine worker still checks its own bridge.
+plugin_cli__bridge_cache <- new.env(parent = emptyenv())
+
+# Identify the exact installed code selected by a fresh child without loading rdyncall here.
+plugin_cli__bridge_identity <- function(libpath = .libPaths()) {
+    packages <- tryCatch(
+        find.package(c("eplusr", "rdyncall"), lib.loc = libpath, quiet = TRUE),
+        error = function(e) character()
+    )
+    if (length(packages) != 2L) {
+        return(NULL)
+    }
+    # Track both R wrappers and native code so reinstalling either invalidates proof.
+    files <- unlist(
+        lapply(packages, function(directory) {
+            c(
+                file.path(directory, "DESCRIPTION"),
+                list.files(file.path(directory, "R"), full.names = TRUE),
+                list.files(
+                    file.path(directory, "libs"),
+                    recursive = TRUE,
+                    full.names = TRUE
+                )
+            )
+        }),
+        use.names = FALSE
+    )
+    metadata <- file.info(files)[, c("size", "mtime", "ctime"), drop = FALSE]
+    if (anyNA(metadata)) {
+        return(NULL)
+    }
+    list(
+        pid = Sys.getpid(),
+        libpath = libpath,
+        files = files,
+        metadata = metadata
+    )
+}
+
 # Verify native bridge capabilities in a fresh process without loading it in the exporting R session.
 plugin_cli__check_bridge <- function() {
+    identity <- plugin_cli__bridge_identity()
+    if (
+        !is.null(identity) &&
+            identical(plugin_cli__bridge_cache$identity, identity)
+    ) {
+        return(invisible(NULL))
+    }
+    # Clear stale proof before probing; a failed or incomplete check cannot populate the cache.
+    plugin_cli__bridge_cache$identity <- NULL
     # The isolated preflight can load the optional bridge even if the caller already used rdyncall.
     probe <- function() {
         get("api__check_bridge", asNamespace("eplusr"))()
         TRUE
     }
     environment(probe) <- baseenv()
-    callr::r(probe, libpath = .libPaths(), timeout = 60)
+    result <- callr::r(probe, libpath = .libPaths(), timeout = 60)
+    if (!isTRUE(result)) {
+        api__error(
+            "The isolated plugin bridge safety check did not complete successfully."
+        )
+    }
+    plugin_cli__bridge_cache$identity <- identity
     invisible(NULL)
 }
 

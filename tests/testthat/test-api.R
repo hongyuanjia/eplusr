@@ -3467,6 +3467,7 @@ test_that("executable exports reject unavailable hook entrypoints", {
 
 # The isolated export preflight must delegate to the safety gate and propagate child errors.
 test_that("executable preflight delegates safety checks and preserves failures", {
+    local_mocked_bindings(plugin_cli__bridge_identity = function(...) NULL)
     calls <- 0L
     local_mocked_bindings(api__check_bridge = function() {
         calls <<- calls + 1L
@@ -3551,4 +3552,98 @@ test_that("executable dispatch preparation failures retain diagnostics and clean
         1L
     )
     expect_identical(binding$record$calls[["finalize"]], 1L)
+})
+
+# Exporter proof reuse is process-local and never applies to failed or changed checks.
+test_that("executable preflight reuses only successful unchanged build proofs", {
+    identity <- list(pid = Sys.getpid(), build = "first")
+    cache <- new.env(parent = emptyenv())
+    local_mocked_bindings(
+        plugin_cli__bridge_cache = cache,
+        plugin_cli__bridge_identity = function(...) identity
+    )
+    calls <- 0L
+    result <- TRUE
+    local_mocked_bindings(
+        r = function(...) {
+            calls <<- calls + 1L
+            if (inherits(result, "condition")) {
+                stop(result)
+            }
+            result
+        },
+        .package = "callr"
+    )
+    expect_null(plugin_cli__check_bridge())
+    expect_null(plugin_cli__check_bridge())
+    expect_identical(calls, 1L)
+    identity$build <- "second"
+    expect_null(plugin_cli__check_bridge())
+    expect_identical(calls, 2L)
+    identity$pid <- identity$pid + 1L
+    result <- FALSE
+    expect_error(plugin_cli__check_bridge(), "did not complete successfully")
+    expect_null(cache$identity)
+    result <- simpleError("preflight failed")
+    expect_error(plugin_cli__check_bridge(), "preflight failed")
+    expect_null(cache$identity)
+    result <- TRUE
+    expect_null(plugin_cli__check_bridge())
+    expect_identical(calls, 5L)
+    identity <- NULL
+    expect_null(plugin_cli__check_bridge())
+    expect_null(plugin_cli__check_bridge())
+    expect_identical(calls, 7L)
+})
+
+# Identity includes wrapper/native files and resolves the child library without loading namespaces.
+test_that("executable bridge identity detects library and installed code changes", {
+    directory <- tempfile()
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    expect_null(plugin_cli__bridge_identity(directory))
+    packages <- file.path(directory, c("eplusr", "rdyncall"))
+    for (i in seq_along(packages)) {
+        dir.create(packages[i])
+        writeLines(
+            c(paste0("Package: ", basename(packages[i])), "Version: 1.0"),
+            file.path(packages[i], "DESCRIPTION")
+        )
+        if (i == 1L) {
+            expect_silent(expect_null(plugin_cli__bridge_identity(directory)))
+        }
+        dir.create(file.path(packages[i], "R"))
+        writeLines("wrappers", file.path(packages[i], "R", "code.rdb"))
+        dir.create(file.path(packages[i], "libs"))
+        writeLines("native", file.path(packages[i], "libs", "bridge.so"))
+    }
+    identity <- plugin_cli__bridge_identity(directory)
+    expect_identical(identity$pid, Sys.getpid())
+    expect_identical(identity$libpath, directory)
+    expect_identical(length(identity$files), 6L)
+    expect_identical(plugin_cli__bridge_identity(directory), identity)
+    writeLines(
+        "modified native bridge",
+        file.path(packages[2L], "libs", "bridge.so")
+    )
+    expect_false(identical(plugin_cli__bridge_identity(directory), identity))
+    identity <- plugin_cli__bridge_identity(directory)
+    writeLines("modified wrappers", file.path(packages[2L], "R", "code.rdb"))
+    expect_false(identical(plugin_cli__bridge_identity(directory), identity))
+    expect_false(identical(
+        plugin_cli__bridge_identity(c(directory, .Library)),
+        identity
+    ))
+    # A disappearing installation cannot produce a reusable proof.
+    local_mocked_bindings(
+        find.package = function(...) packages,
+        .package = "base"
+    )
+    unlink(file.path(packages[2L], "DESCRIPTION"))
+    expect_null(plugin_cli__bridge_identity(directory))
+    local_mocked_bindings(
+        find.package = function(...) stop("lookup failed"),
+        .package = "base"
+    )
+    expect_null(plugin_cli__bridge_identity(directory))
 })
