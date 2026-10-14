@@ -21,6 +21,11 @@ name: test-coverage
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    name: test-coverage (${{ matrix.shard }})
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [api, replay, plugins, engine, ordinary]
     if: >-
       ${{
         (
@@ -44,9 +49,9 @@ jobs:
       RGL_USE_NULL: true
       NOT_CRAN: true
       # Parallelize ordinary files; isolate files that start their own engine worker trees.
-      TESTTHAT_PARALLEL: true
+      TESTTHAT_PARALLEL: ${{ matrix.shard == 'ordinary' }}
       TESTTHAT_CPUS: 2
-      _EPLUSR_SERIAL_API_TESTS_: true
+      _EPLUSR_TEST_SHARD_: ${{ matrix.shard }}
       # Weather archive transfers can outlast R's default 60-second network budget.
       R_DEFAULT_INTERNET_TIMEOUT: 180
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
@@ -136,12 +141,15 @@ jobs:
       - name: Test coverage
         run: |
           dir.create("coverage", showWarnings = FALSE)
+          source(".github/coverage.R")
+          timing_dir <- tempfile("coverage-timings-")
           started <- proc.time()[["elapsed"]]
           # Keep failed test output available while covr's error message truncates it.
           instrumented <- tempfile("eplusr-coverage-library-")
           cov <- tryCatch(
-              covr::package_coverage(
+              coverage__run(
                   path = ".",
+                  timing_dir = timing_dir,
                   type = "tests",
                   quiet = FALSE,
                   clean = FALSE,
@@ -168,33 +176,65 @@ jobs:
           if (!any(vals > 0)) {
               stop("covr returned all-zero coverage; tests likely did not run")
           }
-          # Keep the full expression data and Codecov input on every run.
+          # Every shard retains complete expression data; the merged job creates Codecov input.
+          started <- proc.time()[["elapsed"]]
+          saveRDS(cov, "coverage/coverage.rds")
+          message("Coverage RDS seconds: ", proc.time()[["elapsed"]] - started)
+        shell: Rscript {0}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.shard }}
+          path: coverage/
+
+  coverage-report:
+    name: test-coverage
+    needs: test-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr, any::xml2${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
+          needs: coverage
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-shards
+      - name: Merge complete test coverage
+        shell: Rscript {0}
+        run: |
+          source(".github/coverage.R")
+          files <- file.path("coverage-shards", paste0("coverage-", c("api", "replay", "plugins", "engine", "ordinary")), "coverage.rds")
+          stopifnot(all(file.exists(files)))
+          started <- proc.time()[["elapsed"]]
+          cov <- coverage__combine(files)
+          message("Coverage shard merge seconds: ", proc.time()[["elapsed"]] - started)
+          print(cov)
+          dir.create("coverage", showWarnings = FALSE)
           started <- proc.time()[["elapsed"]]
           saveRDS(cov, "coverage/coverage.rds")
           message("Coverage RDS seconds: ", proc.time()[["elapsed"]] - started)
           started <- proc.time()[["elapsed"]]
           covr::to_cobertura(cov, "coverage/cobertura.xml")
           message("Coverage XML seconds: ", proc.time()[["elapsed"]] - started)
-        shell: Rscript {0}
-
       - name: Generate optional HTML report
         if: github.event_name == 'workflow_dispatch' && inputs.html_report
         shell: Rscript {0}
         run: |
-          # Source rendering is optional; it does not change collected coverage or test selection.
           cov <- readRDS("coverage/coverage.rds")
           started <- proc.time()[["elapsed"]]
           covr::report(cov, file = "coverage/index.html", browse = FALSE)
           message("Coverage HTML seconds: ", proc.time()[["elapsed"]] - started)
-
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: coverage-artifacts
           path: coverage/
-
       - uses: codecov/codecov-action@v7
-        if: always() && hashFiles('coverage/cobertura.xml') != ''
         with:
           files: coverage/cobertura.xml
           flags: full-tests

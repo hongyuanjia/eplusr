@@ -2,8 +2,9 @@
 
 ## Performance
 
-* Coverage runs serialize worker-intensive test files while retaining real
-  parallel engine groups and parallelizing the remaining test files (#652).
+* Coverage runs reuse source coordinates and merge compact worker counters,
+  record stage timings, and partition the full suite across independent runners
+  while retaining real parallel engine groups (#652).
 
 * Plugin exports reuse a successful isolated bridge check while installed code
   and library paths remain unchanged; each engine worker still performs its own
