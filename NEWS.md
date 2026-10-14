@@ -2,6 +2,9 @@
 
 ## Performance
 
+* Coverage runs serialize worker-intensive test files while retaining real
+  parallel engine groups and parallelizing the remaining test files (#652).
+
 * Plugin exports reuse a successful isolated bridge check while installed code
   and library paths remain unchanged; each engine worker still performs its own
   safety check (#652).

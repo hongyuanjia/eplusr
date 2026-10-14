@@ -43,9 +43,12 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: true
       NOT_CRAN: true
-      # Independent test files overlap expensive worker startup on the two-core runner.
+      # Parallelize ordinary files; isolate files that start their own engine worker trees.
       TESTTHAT_PARALLEL: true
       TESTTHAT_CPUS: 2
+      _EPLUSR_SERIAL_API_TESTS_: true
+      # Weather archive transfers can outlast R's default 60-second network budget.
+      R_DEFAULT_INTERNET_TIMEOUT: 180
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
       _EPLUSR_RUN_API_TESTS_: true
       R_KEEP_PKG_SOURCE: true
@@ -154,7 +157,7 @@ jobs:
                   )
                   for (file in failures) {
                       cat("\nTest failure output: ", file, "\n", sep = "")
-                      cat(tail(readLines(file, warn = FALSE), 200L), sep = "\n")
+                      cat(readLines(file, warn = FALSE), sep = "\n")
                   }
                   stop(error)
               }
