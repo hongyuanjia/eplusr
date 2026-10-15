@@ -596,10 +596,18 @@ test_that("sparse running commands obtain their actual boundary rather than an o
     )
     on.exit(try(session$close(), silent = TRUE), add = TRUE)
     first <- session$initialize()
+    # Force a second calendar day so the assertion cannot depend on the worker winning an IPC race.
+    boundary <- session$step(n = 96L)
+    expect_gt(boundary$step, first$step)
     session$resume()
     observed <- session$observe()
-    expect_gt(observed$step, first$step)
-    expect_equal(observed$time_end, observed$step / 4, tolerance = 1e-10)
+    expect_gte(observed$step, boundary$step)
+    expect_equal(
+        observed$time_end,
+        ((observed$step - 1L) %% 96L + 1L) / 4,
+        tolerance = 1e-10
+    )
+    expect_equal(observed$day, 1L + (observed$step - 1L) %/% 96L)
     paused <- session$pause()
     expect_gte(paused$step, observed$step)
     if (session$status()$phase == "paused") {
