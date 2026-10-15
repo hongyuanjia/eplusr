@@ -2001,6 +2001,20 @@ api__check_handle <- function(value, ctx, entry, kind) {
     as.integer(value)
 }
 
+# Retain the first callback condition and its stop category at every safe return boundary.
+api__retain_callback_failure <- function(entry, condition) {
+    if (is.null(condition)) {
+        return(invisible(NULL))
+    }
+    entry$condition <- entry$condition %||% condition
+    entry$stop_reason <- if (inherits(entry$condition, "interrupt")) {
+        "interrupt"
+    } else {
+        "callback_error"
+    }
+    invisible(NULL)
+}
+
 # Diagnose foreign-thread delivery and bridge-level marshalling failures on the R thread.
 api__callback_failure <- function(ctx, entry) {
     for (callback in entry$callbacks) {
@@ -2013,6 +2027,15 @@ api__callback_failure <- function(ctx, entry) {
                     "The native callback bridge disabled a callback:",
                     diagnostic$bridge$disable_reason
                 )
+            }
+            if (
+                diagnostic$foreign == 0 &&
+                    identical(diagnostic$bridge$disable_reason, "r_interrupt")
+            ) {
+                return(structure(
+                    list(message = message, call = NULL),
+                    class = c("interrupt", "condition")
+                ))
             }
             return(simpleError(message))
         }
@@ -2041,10 +2064,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
         payload <- if (spec$callback == "p)v") list(state) else list(...)
         # Retain the first condition and request a native stop without deleting the running state.
         capture <- function(condition) {
-            if (is.null(entry$condition)) {
-                entry$condition <- condition
-            }
-            entry$stop_reason <- "callback_error"
+            api__retain_callback_failure(entry, condition)
             if (entry$running) {
                 ctx$call("stopSimulation", list(entry$pointer))
             }
@@ -2176,7 +2196,7 @@ api__run <- function(ctx, entry, args) {
     api__running$state <- NULL
     entry$exit_code <- code
     if (is.null(entry$condition)) {
-        entry$condition <- api__callback_failure(ctx, entry)
+        api__retain_callback_failure(entry, api__callback_failure(ctx, entry))
     }
     entry$phase <- if (!is.null(entry$stop_reason)) {
         "stopped"
@@ -2241,7 +2261,10 @@ api__invoke <- function(ctx, spec, values, resource) {
                     ctx$native_depth == 0L
             ) {
                 if (is.null(entry$condition)) {
-                    entry$condition <- api__callback_failure(ctx, entry)
+                    api__retain_callback_failure(
+                        entry,
+                        api__callback_failure(ctx, entry)
+                    )
                 }
             }
             if (

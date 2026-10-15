@@ -43,6 +43,9 @@
 
 ## Bug fixes
 
+* Preserve shared lexical state and metadata dependencies across plugin hooks,
+  and classify callback interrupts separately from ordinary callback errors (#651).
+
 * Avoid filename path-length checks when reading long inline IDF model text.
 
 # eplusr 0.18.0

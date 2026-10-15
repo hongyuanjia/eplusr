@@ -161,6 +161,14 @@ test_that("callback errors and interrupts rethrow only after native state deleti
             interrupt = identity
         )
         expect_identical(result, condition)
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            if (inherits(condition, "interrupt")) {
+                "interrupt"
+            } else {
+                "callback_error"
+            }
+        )
         expect_equal(count, 1L)
         expect_equal(ctx$deleted, 1L)
         expect_equal(api$state_manager$status(state)$phase, "closed")
@@ -350,7 +358,7 @@ test_that("native callback proxies reject foreign threads without entering R", {
 })
 
 test_that("thread and bridge diagnostics stop control without a false completion result", {
-    for (kind in c("foreign", "bridge")) {
+    for (kind in c("foreign", "bridge", "interrupt")) {
         ctx <- testapi__fake()
         api <- ctx$api
         state <- api$state_manager$new_state()
@@ -362,14 +370,31 @@ test_that("thread and bridge diagnostics stop control without a false completion
             list(
                 foreign = as.integer(kind == "foreign"),
                 bridge = list(
-                    error_invocations = as.integer(kind == "bridge"),
-                    disable_reason = "boundary_error"
+                    error_invocations = as.integer(kind != "foreign"),
+                    disable_reason = if (kind == "interrupt") {
+                        "r_interrupt"
+                    } else {
+                        "boundary_error"
+                    }
                 )
             )
         }
-        expect_error(
+        failure <- tryCatch(
             api$runtime$run_energyplus(state, testapi__model()),
+            error = identity,
+            interrupt = identity
+        )
+        expect_s3_class(
+            failure,
+            if (kind == "interrupt") "interrupt" else "error"
+        )
+        expect_match(
+            conditionMessage(failure),
             "foreign thread|bridge disabled"
+        )
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            if (kind == "interrupt") "interrupt" else "callback_error"
         )
         expect_false(invoked)
         expect_equal(api$state_manager$status(state)$phase, "closed")
@@ -779,4 +804,111 @@ test_that("stop and nested simulation commands require an active outer runtime",
     )
     ctx$native_depth <- 0L
     api$close()
+})
+
+# A bridge interrupt may be observable only after the last native callback or a standalone property call.
+test_that("late bridge interrupts retain their category after native return", {
+    for (mode in c("run", "functional")) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        if (mode == "run") {
+            api$runtime$callback_begin_new_environment(state, function(s) NULL)
+        } else {
+            api$functional$callback_error(state, function(...) NULL)
+        }
+        interrupted <- FALSE
+        native <- ctx$call
+        ctx$call <- function(symbol, arguments = list()) {
+            result <- native(symbol, arguments)
+            if (
+                symbol ==
+                    if (mode == "run") {
+                        "energyplus"
+                    } else {
+                        "initializeFunctionalAPI"
+                    }
+            ) {
+                interrupted <<- TRUE
+            }
+            result
+        }
+        ctx$ffi$diagnostic <- function(callback) {
+            list(
+                foreign = 0L,
+                bridge = list(
+                    error_invocations = as.integer(interrupted),
+                    disable_reason = "r_interrupt"
+                )
+            )
+        }
+        result <- tryCatch(
+            if (mode == "run") {
+                api$runtime$run_energyplus(state, testapi__model())
+            } else {
+                api$functional$psychrometrics(state)
+            },
+            error = identity,
+            interrupt = identity
+        )
+        expect_s3_class(result, "interrupt")
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            "interrupt"
+        )
+        expect_identical(api$state_manager$status(state)$phase, "closed")
+        expect_equal(ctx$deleted, 1L)
+        expect_false(ctx$quarantined)
+        api$close()
+    }
+})
+
+# A stock property error can enter rdyncall's boundary before the managed R handler runs.
+test_that("stock functional bridge interrupts return safely with their original category", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    result <- callr::r(
+        function(directory) {
+            api <- eplusr::eplus_api(directory)
+            on.exit(api$close(), add = TRUE)
+            ctx <- environment(api$close)$ctx
+            original <- ctx$ffi$callback
+            enabled <- FALSE
+            # Inject before the managed wrapper, while retaining the real native guard and rdyncall trampoline.
+            ctx$ffi$callback <- function(signature, fun) {
+                original(signature, function(...) {
+                    if (enabled) {
+                        stop(structure(
+                            list(
+                                message = "bridge interrupt probe",
+                                call = NULL
+                            ),
+                            class = c("interrupt", "condition")
+                        ))
+                    }
+                    fun(...)
+                })
+            }
+            state <- api$state_manager$new_state()
+            api$functional$callback_error(state, function(...) NULL)
+            fluid <- api$functional$glycol(state, "WATER")
+            enabled <- TRUE
+            condition <- tryCatch(
+                fluid$specific_heat(state, -1000),
+                error = identity,
+                interrupt = identity
+            )
+            list(
+                class = class(condition),
+                status = api$state_manager$status(state),
+                quarantined = ctx$quarantined
+            )
+        },
+        args = list(eplus_config("26.1")$dir),
+        libpath = .libPaths()
+    )
+    expect_true("interrupt" %in% result$class)
+    expect_identical(result$status$stop_reason, "interrupt")
+    expect_identical(result$status$phase, "closed")
+    expect_false(result$quarantined)
 })

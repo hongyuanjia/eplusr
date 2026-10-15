@@ -3177,6 +3177,44 @@ run__prepare_setup <- function(setup) {
     }
     originals <- list()
     copies <- list()
+    populated <- list()
+    pending <- list()
+    bindings <- list()
+    scheduled <- new.env(parent = emptyenv())
+    # Reuse each lexical frame, copying only referenced bindings rather than the caller's whole frame.
+    scope <- function(env) {
+        if (
+            identical(env, baseenv()) ||
+                identical(env, emptyenv()) ||
+                isNamespace(env)
+        ) {
+            return(env)
+        }
+        index <- which(vlapply(originals, function(x) identical(x, env)))
+        if (length(index)) {
+            return(copies[[index[1L]]])
+        }
+        copy <- new.env(parent = baseenv())
+        originals[[length(originals) + 1L]] <<- env
+        copies[[length(copies) + 1L]] <<- copy
+        parent.env(copy) <- scope(parent.env(env))
+        copy
+    }
+    # Locate the actual binding owner so closures in sibling frames share inherited mutable state too.
+    binding_owner <- function(name, env) {
+        while (!exists(name, env, inherits = FALSE)) {
+            env <- parent.env(env)
+        }
+        env
+    }
+    # Freeze metadata dependencies too; data.table alone owns and repairs its native self-reference.
+    freeze_attributes <- function(value) {
+        result <- attributes(value)
+        for (name in setdiff(names(result), ".internal.selfref")) {
+            result[[name]] <- freeze(result[[name]])
+        }
+        result
+    }
     # Freeze lexical dependencies throughout ordinary containers while preserving cycles and aliases.
     freeze <- function(value) {
         if (is.function(value)) {
@@ -3188,19 +3226,40 @@ run__prepare_setup <- function(setup) {
             if (length(index)) {
                 return(copies[[index[1L]]])
             }
-            target <- new.env(parent = baseenv())
             copy <- value
-            environment(copy) <- target
+            environment(copy) <- scope(env)
             # Memoize before recursing into helper containers and mutually recursive functions.
             originals[[length(originals) + 1L]] <<- value
             copies[[length(copies) + 1L]] <<- copy
+            copy_index <- length(copies)
+            # Register the closure before visiting metadata, which may refer back to its lexical frame.
+            attributes(copy) <- freeze_attributes(value)
+            copies[[copy_index]] <<- copy
             for (name in run__setup_globals(value)) {
                 if (exists(name, env, inherits = TRUE)) {
-                    assign(
-                        name,
-                        freeze(get(name, env, inherits = TRUE)),
-                        envir = target
+                    owner <- binding_owner(name, env)
+                    if (isNamespace(owner) || identical(owner, baseenv())) {
+                        next
+                    }
+                    target <- scope(owner)
+                    key <- paste(
+                        which(vlapply(originals, function(x) {
+                            identical(x, owner)
+                        }))[[1L]],
+                        name
                     )
+                    # Defer binding installation until every closure has its final attribute graph.
+                    if (
+                        !exists(name, target, inherits = FALSE) &&
+                            !exists(key, scheduled, inherits = FALSE)
+                    ) {
+                        assign(key, TRUE, scheduled)
+                        bindings[[length(bindings) + 1L]] <<- list(
+                            owner = owner,
+                            name = name,
+                            target = target
+                        )
+                    }
                 }
             }
             return(copy)
@@ -3214,42 +3273,83 @@ run__prepare_setup <- function(setup) {
             ) {
                 return(value)
             }
-            index <- which(vlapply(originals, function(x) identical(x, value)))
-            if (length(index)) {
-                return(copies[[index[1L]]])
+            copy <- scope(value)
+            if (any(vlapply(populated, function(x) identical(x, value)))) {
+                return(copy)
             }
-            copy <- new.env(parent = emptyenv())
-            originals[[length(originals) + 1L]] <<- value
-            copies[[length(copies) + 1L]] <<- copy
-            parent.env(copy) <- freeze(parent.env(value))
-            for (name in ls(value, all.names = TRUE)) {
-                if (bindingIsActive(name, value)) {
-                    binding <- activeBindingFunction(name, value)
-                    run__check_setup(binding)
-                    makeActiveBinding(name, freeze(binding), copy)
-                } else {
-                    assign(
-                        name,
-                        freeze(get(name, value, inherits = FALSE)),
-                        envir = copy
-                    )
-                }
-                if (bindingIsLocked(name, value)) lockBinding(name, copy)
-            }
-            attributes(copy) <- attributes(value)
-            if (environmentIsLocked(value)) {
-                lockEnvironment(copy, bindings = FALSE)
-            }
+            # Queue full fields until closures have their final attributes, retaining metadata cycles safely.
+            populated[[length(populated) + 1L]] <<- value
+            pending[[length(pending) + 1L]] <<- value
             return(copy)
         }
         if (is.list(value)) {
             copy <- lapply(value, freeze)
-            attributes(copy) <- attributes(value)
+            attributes(copy) <- freeze_attributes(value)
             return(copy)
         }
+        attributes(value) <- freeze_attributes(value)
         value
     }
-    freeze(setup)
+    # Install lexical dependencies only after recursive closure metadata has finished freezing.
+    populate_binding <- function(binding) {
+        if (exists(binding$name, binding$target, inherits = FALSE)) {
+            return(invisible(NULL))
+        }
+        if (bindingIsActive(binding$name, binding$owner)) {
+            fun <- activeBindingFunction(binding$name, binding$owner)
+            run__check_setup(fun)
+            makeActiveBinding(binding$name, freeze(fun), binding$target)
+        } else {
+            assign(
+                binding$name,
+                freeze(get(binding$name, binding$owner, inherits = FALSE)),
+                binding$target
+            )
+        }
+        invisible(NULL)
+    }
+    # Fill mutable environment shells after immutable closure copies are fully memoized.
+    populate <- function(value) {
+        copy <- scope(value)
+        for (name in ls(value, all.names = TRUE)) {
+            if (bindingIsActive(name, value)) {
+                binding <- activeBindingFunction(name, value)
+                run__check_setup(binding)
+                if (!exists(name, copy, inherits = FALSE)) {
+                    makeActiveBinding(name, freeze(binding), copy)
+                }
+            } else {
+                assign(
+                    name,
+                    freeze(get(name, value, inherits = FALSE)),
+                    envir = copy
+                )
+            }
+            if (bindingIsLocked(name, value)) lockBinding(name, copy)
+        }
+        # Keep the lazy global-frame snapshot: the live global environment is not portable.
+        if (!identical(parent.env(value), globalenv())) {
+            parent.env(copy) <- freeze(parent.env(value))
+        }
+        attributes(copy) <- freeze_attributes(value)
+        if (environmentIsLocked(value)) {
+            lockEnvironment(copy, bindings = FALSE)
+        }
+        invisible(NULL)
+    }
+    result <- freeze(setup)
+    while (length(bindings) || length(pending)) {
+        if (length(bindings)) {
+            binding <- bindings[[1L]]
+            bindings[[1L]] <- NULL
+            populate_binding(binding)
+        } else {
+            value <- pending[[1L]]
+            pending[[1L]] <- NULL
+            populate(value)
+        }
+    }
+    result
 }
 
 # Report an unavailable pipeline result without inventing native identity or cleanup outcomes.

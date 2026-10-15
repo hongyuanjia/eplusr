@@ -674,3 +674,135 @@ test_that("standalone CLI results retain a string backend identity", {
         expect_null(result$api)
     }
 })
+
+# A frame can be both a function's lexical scope and an explicit environment with active fields.
+test_that("freezing shares active bindings between lexical and explicit environments", {
+    holder <- new.env(parent = baseenv())
+    makeActiveBinding(
+        "value",
+        local({
+            count <- 0L
+            function(value) {
+                if (missing(value)) {
+                    count <<- count + 1L
+                    count
+                } else {
+                    count <<- value
+                }
+            }
+        }),
+        holder
+    )
+    fun <- function() value
+    environment(fun) <- holder
+    recipe <- local({
+        afun <- fun
+        zdata <- holder
+        function() list(afun = afun, zdata = zdata)
+    })
+    frozen <- run__prepare_setup(recipe)()
+    expect_identical(environment(frozen$afun), frozen$zdata)
+    expect_true(bindingIsActive("value", frozen$zdata))
+    expect_identical(frozen$afun(), 1L)
+    expect_identical(frozen$zdata$value, 2L)
+    frozen$zdata$value <- 10L
+    expect_identical(frozen$afun(), 11L)
+    expect_identical(holder$value, 1L)
+})
+
+# Explicit environment values must not reconnect frozen closures to the caller's live globals.
+test_that("explicit environments preserve frozen global parent bindings", {
+    assign(".eplusr_freeze_test_value", 7L, globalenv())
+    on.exit(rm(".eplusr_freeze_test_value", envir = globalenv()), add = TRUE)
+    holder <- new.env(parent = globalenv())
+    fun <- function() .eplusr_freeze_test_value
+    environment(fun) <- holder
+    recipe <- local({
+        afun <- fun
+        zdata <- holder
+        function() list(afun = afun, zdata = zdata)
+    })
+    frozen <- run__prepare_setup(recipe)
+    assign(".eplusr_freeze_test_value", 99L, globalenv())
+    value <- unserialize(serialize(frozen, NULL))()
+    expect_identical(environment(value$afun), value$zdata)
+    expect_identical(value$afun(), 7L)
+})
+
+# Ordinary metadata can carry dependencies and aliases just like list elements and environment fields.
+test_that("freezing snapshots helpers in ordinary object attributes", {
+    amount <- 7L
+    helper <- function() amount
+    holder <- new.env(parent = baseenv())
+    holder$self <- holder
+    attr(holder, "helper") <- helper
+    vector <- structure(1L, helper = helper)
+    fun <- structure(function() NULL, helper = helper)
+    container <- structure(list(holder, vector, fun), helper = helper)
+    recipe <- function() container
+    run__check_setup(recipe)
+    frozen <- run__prepare_setup(recipe)
+    amount <- 99L
+    value <- unserialize(serialize(frozen, NULL))()
+    expect_identical(attr(value, "helper")(), 7L)
+    expect_identical(attr(value[[1L]], "helper")(), 7L)
+    expect_identical(attr(value[[2L]], "helper")(), 7L)
+    expect_identical(attr(value[[3L]], "helper")(), 7L)
+    expect_identical(value[[1L]]$self, value[[1L]])
+    expect_identical(attr(value, "helper"), attr(value[[1L]], "helper"))
+    expect_identical(helper(), 99L)
+})
+
+# Function metadata may point through an environment back to the same function.
+test_that("freezing preserves cyclic function metadata without retaining caller state", {
+    amount <- 7L
+    metadata <- new.env(parent = baseenv())
+    helper <- structure(function() amount, metadata = metadata)
+    metadata$helper <- helper
+    recipe <- function() helper
+    frozen <- run__prepare_setup(recipe)
+    amount <- 99L
+    value <- unserialize(serialize(frozen, NULL))()
+    expect_identical(value(), 7L)
+    expect_identical(attr(value, "metadata")$helper(), 7L)
+    expect_identical(
+        attr(attr(value, "metadata")$helper, "metadata"),
+        attr(value, "metadata")
+    )
+})
+
+# An attribute can reach the original closure indirectly through another closure's lexical binding.
+test_that("freezing closes metadata cycles through deferred lexical bindings", {
+    amount <- 7L
+    holder <- new.env(parent = baseenv())
+    sibling <- function() helper
+    environment(sibling) <- holder
+    helper <- structure(function() amount, sibling = sibling)
+    holder$helper <- helper
+    frozen <- run__prepare_setup(function() helper)
+    amount <- 99L
+    value <- unserialize(serialize(frozen, NULL))()
+    second <- attr(value, "sibling")()
+    third <- attr(second, "sibling")()
+    expect_identical(value(), 7L)
+    expect_identical(second(), 7L)
+    expect_identical(third(), 7L)
+    expect_identical(value, second)
+    expect_identical(second, third)
+})
+
+# A method stored on an ordinary environment must read and update the same frozen object's fields.
+test_that("freezing preserves methods stored in their own lexical environment", {
+    object <- new.env(parent = baseenv())
+    object$value <- 7L
+    object$read <- function() value
+    environment(object$read) <- object
+    frozen <- run__prepare_setup(function() object)
+    object$value <- 99L
+    value <- unserialize(serialize(frozen, NULL))()
+    expect_identical(environment(value$read), value)
+    expect_identical(value$read(), 7L)
+    value$value <- 8L
+    expect_identical(value$read(), 8L)
+    expect_identical(object$value, 99L)
+})

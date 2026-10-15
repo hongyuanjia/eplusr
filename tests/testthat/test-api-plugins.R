@@ -55,6 +55,39 @@ test_that("host plugins validate hooks and freeze independent bindings", {
     other$api$close()
 })
 
+# Hooks share their lexical bindings within one plugin, while every binding gets a fresh copy.
+test_that("plugin freezing preserves shared and inherited lexical state", {
+    hooks <- local({
+        count <- 0L
+        increment <- function() count <<- count + 1L
+        list(
+            initialize = function(api, state, plugin) increment(),
+            begin_new_environment = local({
+                update <- increment
+                function(api, state, plugin) update()
+            }),
+            finalize = function(api, state, plugin) plugin$data$count <- count
+        )
+    })
+    factory <- eplus_plugin(hooks)
+    # Mutating the source after factory creation must not change its frozen initial state.
+    hooks$initialize(NULL, NULL, NULL)
+    ctx <- testapi__fake()
+    api <- ctx$api
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    for (index in seq_len(2L)) {
+        state <- api$state_manager$new_state()
+        factory(api, state)
+        api$runtime$run_energyplus(state, testapi__model())
+        expect_identical(
+            api$state_manager$status(state)$plugins[[1L]]$data$count,
+            4L
+        )
+        api$state_manager$delete_state(state)
+    }
+    expect_identical(environment(hooks$finalize)$count, 1L)
+})
+
 # Warmup suppression affects timestep hooks, while environment lifecycle hooks remain observable.
 test_that("host plugin warmup delivery is explicit", {
     for (warmup in c(FALSE, TRUE)) {
