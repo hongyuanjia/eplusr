@@ -12,6 +12,9 @@
 
 ## New features
 
+* Add nonblocking session snapshot reads and configurable continuous-run sampling,
+  retaining exact control boundaries and complete replay recording (#653).
+
 * Add `export_eplus_plugin()` to run R hooks inside the stock EnergyPlus 26.1
   executable through a generated PythonPlugin adapter and embedded R, with
   borrowed native state ownership and per-instance result summaries (#652).

@@ -15,7 +15,8 @@ eplus_session(
   controller_state = NULL,
   dir = NULL,
   timeout = 120,
-  record = FALSE
+  record = FALSE,
+  sample_every = 1L
 )
 }
 \arguments{
@@ -46,14 +47,20 @@ Expiry terminates the session; it never advances a waiting simulation.}
 
 \item{record}{Retain immutable input copies and a disk journal of completed
 observations and effective actuator actions for replay prediction. Default FALSE.}
+
+\item{sample_every}{Positive number of completed zone timesteps between
+published snapshots during continuous running. Default 1. Controllers and
+replay recording still collect every step; publication follows this interval.}
 }
 \value{
 An \code{EnergyPlusSession} environment with the following methods:
 \itemize{
 \item \verb{$initialize(timeout = ...)}: run through the first completed weather zone
 step and return its observation while paused. Initialization happens once.
-\item \verb{$observe(timeout = ...)}: return the paused observation, or sample the next
-completed zone boundary of a running session without pausing it.
+\item \verb{$observe(timeout = ..., wait = TRUE)}: with \code{wait = TRUE}, return the paused
+observation or request the next completed running boundary. With \code{wait = FALSE},
+read the latest published snapshot immediately without sending a worker command.
+Return NULL before initialization; repeated reads can return the same step.
 \item \verb{$step(action = NULL, n = 1L, timeout = ...)}: advance a paused session by
 \code{n} zone steps, then pause. Named numeric actions take effect before the
 next predictor; \code{NA_real_} releases the named actuator to native control.
@@ -89,7 +96,18 @@ The first returned observation already represents one completed zone step.
 A multi-step action is held until the next action or release. With a controller,
 each subsequent step computes its action from the last completed observation
 and explicit state; manual actions and controller operation cannot be mixed.
-By default no unbounded per-step history is retained. On natural completion the final
+Publication retains at most two complete snapshots, independently of replay
+recording. A slow or absent reader never holds up the worker; if an open file
+prevents rotation, that publication is skipped. Snapshot \code{step}
+and simulation interval identify freshness; intermediate unpublished steps are
+not retained. Sampling and file publication have a cost, even though reading
+requires no engine acknowledgement. Explicit control commands
+retain their exact boundary, regardless of \code{sample_every}. At natural completion,
+the latest sample can precede the last step; normal sampling lags by fewer
+than \code{sample_every} steps, while skipped publications can lag further;
+final outcome \code{completed_steps} records the actual number of completed steps.
+The finalized Job's configured output reports are separate from this cache.
+By default no unbounded per-step history is retained. On natural completion the last collected
 observation and finalized Job remain available. Errors, caller interrupts,
 timeout and disconnection stop or terminate the worker; a failed native state
 cannot be resumed. Closing early is distinct from completing the run period.

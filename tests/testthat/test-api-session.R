@@ -453,3 +453,159 @@ test_that("HVAC substeps do not shift completed zone intervals and actuator rele
     expect_equal(fourth$values[["heating"]], 20)
     session$close()
 })
+
+test_that("published snapshots are bounded, complete and independent of session commands", {
+    ctx <- testapi__session_context()
+    session <- api_session__construct(ctx)
+    on.exit(session$close(), add = TRUE)
+    expect_null(session$observe(wait = FALSE))
+    expect_error(session$observe(wait = NA))
+    dir.create(ctx$config$snapshot_dir)
+    control <- new.env(parent = emptyenv())
+    control$snapshot_files <- character()
+    ctx$phase <- "running"
+    for (step in 1:4) {
+        control$observation <- list(step = step, values = c(t = step))
+        api_session__publish(ctx$config, control)
+        expect_identical(session$observe(wait = FALSE), control$observation)
+        expect_lte(length(list.files(ctx$config$snapshot_dir)), 2L)
+    }
+    expect_identical(ctx$request, 0L)
+    # A reader-held file may prevent deletion on Windows; skip publication instead of growing the cache.
+    control$observation <- list(step = 5L, values = c(t = 5))
+    with_mocked_bindings(
+        {
+            expect_null(api_session__publish(ctx$config, control))
+            expect_length(list.files(ctx$config$snapshot_dir), 2L)
+            expect_identical(session$observe(wait = FALSE)$step, 4L)
+        },
+        unlink = function(...) 1L,
+        .package = "base"
+    )
+    control$observation <- list(step = 4L, values = c(t = 4))
+    expect_silent(api_session__publish(ctx$config, control))
+    # A failed read during rotation retains the last complete caller-side value.
+    writeLines("incomplete", control$snapshot_files[[1L]])
+    expect_identical(session$observe(wait = FALSE)$step, 4L)
+    unlink(control$snapshot_files)
+    expect_identical(session$observe(wait = FALSE)$step, 4L)
+    ctx$observation <- NULL
+    expect_null(session$observe(wait = FALSE))
+    # An interrupted writer never exposes the temporary file as a completed sample.
+    saveRDS(list(step = 99L), file.path(ctx$config$snapshot_dir, "pending"))
+    expect_null(session$observe(wait = FALSE))
+    local_mocked_bindings(file.rename = function(...) FALSE, .package = "base")
+    expect_error(api_session__publish(ctx$config, control), "Cannot publish")
+    session$close()
+    expect_false(dir.exists(ctx$config$snapshot_dir))
+})
+
+test_that("stock sparse snapshots skip unrequested steps without losing exact commands or replay", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    expect_error(eplus_session(
+        fixture$model,
+        fixture$weather,
+        sample_every = 0L
+    ))
+    expect_error(eplus_session(
+        fixture$model,
+        fixture$weather,
+        sample_every = 1.5
+    ))
+    for (record in c(FALSE, TRUE)) {
+        session <- eplus_session(
+            fixture$model,
+            fixture$weather,
+            variables = list(t = c("Zone Mean Air Temperature", "ZONE ONE")),
+            sample_every = 31L,
+            record = record,
+            dir = file.path(fixture$directory, paste0("sparse-", record))
+        )
+        on.exit(try(session$close(), silent = TRUE), add = TRUE)
+        first <- session$initialize()
+        expect_identical(session$observe(wait = FALSE), first)
+        expect_identical(session$step(n = 3L)$step, 4L)
+        session$resume()
+        expect_true(session$result()$status()$successful)
+        expect_identical(session$status()$outcome$completed_steps, 96L)
+        expect_identical(
+            session$observe(wait = FALSE)$step,
+            if (record) 96L else 93L
+        )
+        ctx <- environment(session$observe)$ctx
+        expect_lte(length(list.files(ctx$config$snapshot_dir)), 2L)
+        if (record) {
+            expect_length(list.files(ctx$config$journal), 96L)
+        }
+        session$close()
+    }
+})
+
+test_that("nonblocking stock observation does not wait for a busy controller", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "controller-entered")
+    # Block a genuine engine callback after announcing entry; cached reads need no reply.
+    controller <- function(observation, state) {
+        if (state == 0L) {
+            writeLines("entered", marker)
+            Sys.sleep(2)
+        }
+        list(action = NULL, state = state + 1L)
+    }
+    session <- eplus_session(
+        fixture$model,
+        fixture$weather,
+        controller = controller,
+        controller_state = 0L,
+        sample_every = 31L,
+        dir = file.path(fixture$directory, "busy-controller")
+    )
+    on.exit(try(session$close(), silent = TRUE), add = TRUE)
+    first <- session$initialize()
+    session$resume()
+    deadline <- Sys.time() + 30
+    while (!file.exists(marker) && Sys.time() < deadline) {
+        Sys.sleep(0.01)
+    }
+    expect_true(file.exists(marker))
+    ctx <- environment(session$observe)$ctx
+    request <- ctx$request
+    started <- proc.time()[["elapsed"]]
+    expect_identical(session$observe(wait = FALSE), first)
+    expect_lt(proc.time()[["elapsed"]] - started, 1)
+    expect_identical(ctx$request, request)
+    expect_identical(ctx$phase, "running")
+    expect_true(session$result()$status()$successful)
+    expect_identical(session$observe(wait = FALSE)$controller_state, 95L)
+})
+
+test_that("sparse running commands obtain their actual boundary rather than an older sample", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    model <- read_idf(fixture$model)
+    model$set(RunPeriod := list(end_day_of_month = 7))
+    model$save(overwrite = TRUE)
+    session <- eplus_session(
+        model,
+        fixture$weather,
+        sample_every = 100000L,
+        variables = list(t = c("Zone Mean Air Temperature", "ZONE ONE")),
+        dir = file.path(fixture$directory, "sparse-commands")
+    )
+    on.exit(try(session$close(), silent = TRUE), add = TRUE)
+    first <- session$initialize()
+    session$resume()
+    observed <- session$observe()
+    expect_gt(observed$step, first$step)
+    expect_equal(observed$time_end, observed$step / 4, tolerance = 1e-10)
+    paused <- session$pause()
+    expect_gte(paused$step, observed$step)
+    if (session$status()$phase == "paused") {
+        expect_identical(session$observe(wait = FALSE), paused)
+        session$resume()
+    }
+    expect_true(session$result()$status()$successful)
+    expect_identical(session$status()$outcome$completed_steps, 672L)
+})

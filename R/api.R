@@ -2442,11 +2442,16 @@ api__invoke <- function(ctx, spec, values, resource) {
 #'   Expiry terminates the session; it never advances a waiting simulation.
 #' @param record Retain immutable input copies and a disk journal of completed
 #'   observations and effective actuator actions for replay prediction. Default FALSE.
+#' @param sample_every Positive number of completed zone timesteps between
+#'   published snapshots during continuous running. Default 1. Controllers and
+#'   replay recording still collect every step; publication follows this interval.
 #' @return An `EnergyPlusSession` environment with the following methods:
 #'   * `$initialize(timeout = ...)`: run through the first completed weather zone
 #'     step and return its observation while paused. Initialization happens once.
-#'   * `$observe(timeout = ...)`: return the paused observation, or sample the next
-#'     completed zone boundary of a running session without pausing it.
+#'   * `$observe(timeout = ..., wait = TRUE)`: with `wait = TRUE`, return the paused
+#'     observation or request the next completed running boundary. With `wait = FALSE`,
+#'     read the latest published snapshot immediately without sending a worker command.
+#'     Return NULL before initialization; repeated reads can return the same step.
 #'   * `$step(action = NULL, n = 1L, timeout = ...)`: advance a paused session by
 #'     `n` zone steps, then pause. Named numeric actions take effect before the
 #'     next predictor; `NA_real_` releases the named actuator to native control.
@@ -2476,7 +2481,18 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' A multi-step action is held until the next action or release. With a controller,
 #' each subsequent step computes its action from the last completed observation
 #' and explicit state; manual actions and controller operation cannot be mixed.
-#' By default no unbounded per-step history is retained. On natural completion the final
+#' Publication retains at most two complete snapshots, independently of replay
+#' recording. A slow or absent reader never holds up the worker; if an open file
+#' prevents rotation, that publication is skipped. Snapshot `step`
+#' and simulation interval identify freshness; intermediate unpublished steps are
+#' not retained. Sampling and file publication have a cost, even though reading
+#' requires no engine acknowledgement. Explicit control commands
+#' retain their exact boundary, regardless of `sample_every`. At natural completion,
+#' the latest sample can precede the last step; normal sampling lags by fewer
+#' than `sample_every` steps, while skipped publications can lag further;
+#' final outcome `completed_steps` records the actual number of completed steps.
+#' The finalized Job's configured output reports are separate from this cache.
+#' By default no unbounded per-step history is retained. On natural completion the last collected
 #' observation and finalized Job remain available. Errors, caller interrupts,
 #' timeout and disconnection stop or terminate the worker; a failed native state
 #' cannot be resumed. Closing early is distinct from completing the run period.
@@ -2545,9 +2561,11 @@ eplus_session <- function(
     controller_state = NULL,
     dir = NULL,
     timeout = 120,
-    record = FALSE
+    record = FALSE,
+    sample_every = 1L
 ) {
     checkmate::assert_flag(record)
+    checkmate::assert_int(sample_every, lower = 1L)
     config <- if (
         is.character(eplus) && length(eplus) == 1L && is_eplus_path(eplus)
     ) {
@@ -2588,6 +2606,8 @@ eplus_session <- function(
         controller_state = controller_state,
         timeout = timeout,
         record = record,
+        sample_every = as.integer(sample_every),
+        snapshot_dir = tempfile("eplusr-snapshots-"),
         directory = normalizePath(
             dir %||% tempfile("eplusr-session-"),
             mustWork = FALSE
@@ -2803,6 +2823,7 @@ api_session__initialize <- function(ctx, timeout = ctx$config$timeout) {
     if (ctx$phase != "created") {
         api_session__error("A session can only be initialized once.")
     }
+    dir.create(ctx$config$snapshot_dir, mode = "0700")
     listener <- api_session__listen()
     ctx$server <- listener$server
     settings <- ctx$config
@@ -3079,8 +3100,71 @@ api_session__status <- function(ctx) {
     )
 }
 
+# Publish immutable files with unique step names; rotation never waits for a reader.
+api_session__publish <- function(settings, control) {
+    directory <- settings$snapshot_dir
+    path <- file.path(directory, sprintf("%010d.rds", control$observation$step))
+    if (file.exists(path)) {
+        return(invisible(NULL))
+    }
+    # Rotate before writing, retaining two slots even when Windows cannot remove an open file.
+    previous <- control$snapshot_files
+    retired <- utils::tail(previous, -1L)
+    unlink(retired)
+    if (any(file.exists(retired))) {
+        return(invisible(NULL))
+    }
+    temporary <- file.path(directory, "pending")
+    saveRDS(control$observation, temporary, compress = FALSE)
+    if (!file.rename(temporary, path)) {
+        api_session__error("Cannot publish session snapshot.")
+    }
+    # Retain a previous complete file while a reader races with publication/rotation.
+    control$snapshot_files <- c(path, utils::head(previous, 1L))
+    invisible(NULL)
+}
+
+# Read only complete published files; a rotation race falls back to the caller's last snapshot.
+api_session__latest <- function(ctx) {
+    if (!ctx$phase %in% c("running", "terminated", "failed")) {
+        return(ctx$observation)
+    }
+    paths <- sort(
+        list.files(
+            ctx$config$snapshot_dir,
+            pattern = "^[0-9]{10}\\.rds$",
+            full.names = TRUE
+        ),
+        decreasing = TRUE
+    )
+    for (path in paths) {
+        observation <- tryCatch(
+            suppressWarnings(readRDS(path)),
+            error = function(e) NULL
+        )
+        if (
+            !is.null(observation) &&
+                (is.null(ctx$observation) ||
+                    observation$step >= ctx$observation$step)
+        ) {
+            ctx$observation <- observation
+            break
+        }
+    }
+    ctx$observation
+}
+
 # Return a stable paused observation, or sample the next completed running boundary.
-api_session__observe <- function(ctx, timeout = ctx$config$timeout) {
+api_session__observe <- function(
+    ctx,
+    timeout = ctx$config$timeout,
+    wait = TRUE
+) {
+    api_session__owner(ctx)
+    checkmate::assert_flag(wait)
+    if (!wait) {
+        return(api_session__latest(ctx))
+    }
     phase <- api_session__status(ctx)$phase
     if (phase == "running") {
         return(api_session__command(ctx, "observe", timeout))
@@ -3167,6 +3251,7 @@ api_session__close <- function(ctx, timeout = 10) {
         api_session__guard(ctx, api_session__wait(ctx, -1L, timeout))
     }
     api_session__disconnect(ctx)
+    unlink(ctx$config$snapshot_dir, recursive = TRUE)
     ctx$phase <- "closed"
     invisible(TRUE)
 }
@@ -3182,6 +3267,7 @@ api_session__finalize <- function(ctx, session) {
         try(run__api_kill(ctx$process), silent = TRUE)
     }
     api_session__disconnect(ctx)
+    unlink(ctx$config$snapshot_dir, recursive = TRUE)
     invisible(NULL)
 }
 
@@ -3214,6 +3300,7 @@ api_session__setup <- function(api, state, settings) {
     control$need_control <- FALSE
     control$id <- 0L
     control$observation <- NULL
+    control$snapshot_files <- character()
     control$action <- settings$initial_action
     control$journal_hash <- NULL
     control$controller_state <- settings$controller_state
@@ -3233,34 +3320,36 @@ api_session__setup <- function(api, state, settings) {
         api$exchange$request_variable(state, definition[1L], definition[2L])
     }
     # Apply controls before predictor reads schedules, repeating through system substeps of a zone step.
-    api$runtime$callback_begin_system_timestep_before_predictor(
-        state,
-        function(s) {
-            if (!api_session__weather(api, s)) {
-                return(invisible(NULL))
-            }
-            api_session__handles(api, s, settings, control)
-            # Compute a controller action only when a new zone step actually reaches its predictor.
-            # This avoids advancing controller memory after the final simulated step.
-            if (control$need_control && !is.null(control$observation)) {
-                api_session__control(settings, control)
-                control$need_control <- FALSE
-            }
-            for (name in names(control$action)) {
-                handle <- control$actuator_handles[[name]]
-                if (is.na(control$action[[name]])) {
-                    api$exchange$reset_actuator(s, handle)
-                } else {
-                    api$exchange$set_actuator_value(
-                        s,
-                        handle,
-                        control$action[[name]]
-                    )
+    if (length(settings$actuators) || !is.null(control$controller)) {
+        api$runtime$callback_begin_system_timestep_before_predictor(
+            state,
+            function(s) {
+                if (!api_session__weather(api, s)) {
+                    return(invisible(NULL))
                 }
+                api_session__handles(api, s, settings, control)
+                # Compute a controller action only when a new zone step actually reaches its predictor.
+                # This avoids advancing controller memory after the final simulated step.
+                if (control$need_control && !is.null(control$observation)) {
+                    api_session__control(settings, control)
+                    control$need_control <- FALSE
+                }
+                for (name in names(control$action)) {
+                    handle <- control$actuator_handles[[name]]
+                    if (is.na(control$action[[name]])) {
+                        api$exchange$reset_actuator(s, handle)
+                    } else {
+                        api$exchange$set_actuator_value(
+                            s,
+                            handle,
+                            control$action[[name]]
+                        )
+                    }
+                }
+                invisible(NULL)
             }
-            invisible(NULL)
-        }
-    )
+        )
+    }
     # Each completed weather zone step is a safe waiting point within the same native run.
     api$runtime$callback_end_zone_timestep_after_zone_reporting(
         state,
@@ -3270,12 +3359,24 @@ api_session__setup <- function(api, state, settings) {
             }
             api_session__handles(api, s, settings, control)
             control$step <- control$step + 1L
-            control$observation <- api_session__snapshot(
-                api,
-                s,
-                settings,
-                control
-            )
+            # Sparse running skips variable reads and calendar construction, but never control or replay.
+            due <- control$step %% settings$sample_every == 0L
+            if (
+                control$mode != "running" ||
+                    due ||
+                    !is.null(control$controller) ||
+                    isTRUE(settings$record)
+            ) {
+                control$observation <- api_session__snapshot(
+                    api,
+                    s,
+                    settings,
+                    control
+                )
+            }
+            if (due) {
+                api_session__publish(settings, control)
+            }
             if (isTRUE(settings$record)) {
                 # Commit the actual held action before exposing its completed boundary.
                 control$journal_hash <- api_replay__write(
@@ -3293,6 +3394,7 @@ api_session__setup <- function(api, state, settings) {
                     (control$mode == "stepping" && control$remaining == 0L)
             ) {
                 control$mode <- "paused"
+                api_session__publish(settings, control)
                 api_session__reply(control, control$id)
             }
             repeat {
@@ -3306,6 +3408,15 @@ api_session__setup <- function(api, state, settings) {
                         api$runtime$stop_simulation(s)
                         control$mode <- "disconnected"
                         break
+                    }
+                    # A command arriving after the initial poll still gets this exact boundary.
+                    if (control$observation$step != control$step) {
+                        control$observation <- api_session__snapshot(
+                            api,
+                            s,
+                            settings,
+                            control
+                        )
                     }
                     api_session__dispatch(api, s, settings, control, command)
                 }
@@ -3336,6 +3447,7 @@ api_session__setup <- function(api, state, settings) {
     }
     # Distinguish a deliberate close and a lost client without rewriting the native stop classification.
     metadata <- function(value) {
+        value$completed_steps <- control$step
         value$session_reason <- switch(
             control$mode,
             closing = "user_close",

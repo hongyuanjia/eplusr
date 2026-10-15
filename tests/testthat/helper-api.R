@@ -252,6 +252,8 @@ testapi__session_context <- function() {
     ctx <- new.env(parent = emptyenv())
     ctx$config <- list(
         timeout = 1,
+        sample_every = 1L,
+        snapshot_dir = tempfile("test-snapshots-"),
         actuators = list(
             heating = c("Schedule:Constant", "Schedule Value", "Heating")
         ),
