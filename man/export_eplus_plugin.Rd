@@ -32,7 +32,10 @@ The executable owns the native state. R hooks may read data, write actuators
 and use functional methods, but cannot create/delete/reset states, register
 native callbacks, recursively run simulations, or close the borrowed API.
 Each PythonPlugin instance has an independent R context in a shared embedded
-R interpreter. A synchronous hook runs on the R initialization thread.
+R interpreter. Global variables and trend aggregates declared in the model
+are available through the borrowed exchange API. Individual trend reads remain
+disabled because stock 26.1 has an unsafe upper index boundary.
+A synchronous hook runs on the R initialization thread.
 
 Finalization runs once on handled hook failure or adapter shutdown. At shutdown
 the native state may already be destroyed: finalizers can use ordinary R data

@@ -41,6 +41,21 @@
 #' before calling C. Invalid native exchange values are checked with the API
 #' error flag. `get_api_data(state)` copies a data frame and uses `freeAPIData()`.
 #' `methods()` lists exact bindings, arguments, ownership, and unsupported methods.
+#' `list_available_api_data_csv()` returns a character string reconstructed from
+#' that safely released data, without calling the unfreeable native CSV allocator.
+#' Its `plugin_only` column identifies global/trend methods available only to
+#' executable-hosted R plugins. Their handles remain state- and kind-bound.
+#' Missing globals return a negative handle without entering the native fatal path;
+#' negative plugin handles cannot be used for reading or writing. Trend aggregates
+#' require `count >= 2`, matching stock 26.1. `get_trend_value()` remains disabled:
+#' the native upper index check permits an out-of-bounds read.
+#'
+#' `callback_register_external_hvac_manager()` uses the same callback safety
+#' boundary as other runtime hooks, but replaces the native HVAC manager entirely.
+#' This is an experimental engine interface, not a general HVAC control hook;
+#' the caller must supply its HVAC calculations. Native initialization is limited.
+#' `clear_callbacks()` remains disabled because stock 26.1 has no unregister API;
+#' resetting or deleting the state retires callbacks safely.
 #'
 #' `rdyncall` is optional and is loaded only here. A build containing its native
 #' callback-boundary fix (PR 75), existing-handle dynport loading and signature
@@ -647,7 +662,6 @@ api__manifest <- function() {
                 "registerExternalHVACManager",
                 parameters = "state, f",
                 kind = "callback",
-                reason = "Experimental replacement of internal HVAC management is not validated in M1.",
                 callback = "p)v",
                 ownership = "callback"
             ),
@@ -669,10 +683,11 @@ api__manifest <- function() {
             api__rule(
                 "exchange",
                 "list_available_api_data_csv",
-                "listAllAPIDataCSV",
+                "getAPIData",
                 parameters = "state",
-                reason = "Allocated char[] has no public deleter; use get_api_data instead.",
-                ownership = "allocated_string"
+                kind = "api_data_csv",
+                requires_ready = TRUE,
+                ownership = "api_data"
             ),
             api__rule(
                 "exchange",
@@ -852,7 +867,8 @@ api__manifest <- function() {
                 "get_global_handle",
                 "getPluginGlobalVariableHandle",
                 parameters = "state, var_name",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                handle_kind = "plugin_global",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -860,7 +876,8 @@ api__manifest <- function() {
                 "get_global_value",
                 "getPluginGlobalVariableValue",
                 parameters = "state, handle",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_global",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -868,7 +885,8 @@ api__manifest <- function() {
                 "set_global_value",
                 "setPluginGlobalVariableValue",
                 parameters = "state, handle, value",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_global",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -876,7 +894,8 @@ api__manifest <- function() {
                 "get_trend_handle",
                 "getPluginTrendVariableHandle",
                 parameters = "state, trend_var_name",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -884,7 +903,9 @@ api__manifest <- function() {
                 "get_trend_value",
                 "getPluginTrendVariableValue",
                 parameters = "state, trend_handle, time_index",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                reason = "Stock 26.1 indexes trend history out of bounds at time_index = history size; no public history-size query.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -892,7 +913,8 @@ api__manifest <- function() {
                 "get_trend_average",
                 "getPluginTrendVariableAverage",
                 parameters = "state, trend_handle, count",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -900,7 +922,8 @@ api__manifest <- function() {
                 "get_trend_min",
                 "getPluginTrendVariableMin",
                 parameters = "state, trend_handle, count",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -908,7 +931,8 @@ api__manifest <- function() {
                 "get_trend_max",
                 "getPluginTrendVariableMax",
                 parameters = "state, trend_handle, count",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -916,7 +940,8 @@ api__manifest <- function() {
                 "get_trend_sum",
                 "getPluginTrendVariableSum",
                 parameters = "state, trend_handle, count",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule(
@@ -924,7 +949,8 @@ api__manifest <- function() {
                 "get_trend_direction",
                 "getPluginTrendVariableDirection",
                 parameters = "state, trend_handle, count",
-                reason = "PythonPlugin global/trend API is outside the external R library workflow.",
+                plugin_only = TRUE,
+                input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
             ),
             api__rule("exchange", "year", "year", parameters = "state"),
@@ -1263,6 +1289,7 @@ api__rule <- function(
     reason = "",
     callback = "",
     boolean = FALSE,
+    plugin_only = FALSE,
     handle_kind = "",
     requires_ready = FALSE,
     input_handle_kind = "",
@@ -1297,6 +1324,7 @@ api__rule <- function(
         kind = kind,
         callback = callback,
         boolean = boolean,
+        plugin_only = plugin_only,
         handle_kind = handle_kind,
         requires_ready = requires_ready,
         input_handle_kind = input_handle_kind,
@@ -1560,6 +1588,7 @@ api__construct <- function(ctx) {
     ctx$quarantined <- FALSE
     ctx$native_depth <- 0L
     ctx$plugin_depth <- 0L
+    ctx$plugin_mode <- FALSE
     native <- ctx$call
     # Native callbacks also occur in standalone functional calls; guard their teardown.
     ctx$call <- function(symbol, arguments = list()) {
@@ -1998,6 +2027,13 @@ api__check_handle <- function(value, ctx, entry, kind) {
             "Handle belongs to another state, reset generation, or data kind."
         )
     }
+    if (
+        kind %in% c("plugin_global", "plugin_trend") && as.integer(value) < 0L
+    ) {
+        api__error(
+            "Plugin variable was not found; cannot use a negative handle."
+        )
+    }
     as.integer(value)
 }
 
@@ -2120,6 +2156,49 @@ api__data <- function(ctx, entry) {
     stats::setNames(as.data.frame(matrix, stringsAsFactors = FALSE), fields)
 }
 
+# Reconstruct the stock CSV from safely copied APIDataEntry rows, avoiding its unfreeable char[].
+api__data_csv <- function(data) {
+    sections <- list(
+        ACTUATORS = c("Actuator", "name", "type", "key", "unit"),
+        INTERNAL_VARIABLES = c("InternalVariable", "name", "key", "unit"),
+        PLUGIN_GLOBAL_VARIABLES = c("PluginGlobalVariable", "key"),
+        TRENDS = c("PluginTrendVariable", "key"),
+        METERS = c("OutputMeter", "key", "unit"),
+        VARIABLES = c("OutputVariable", "name", "key", "unit")
+    )
+    # Stock 26.1 appends a comma to trend entry kinds; its CSV spells the kind normally.
+    kinds <- sub(",$", "", data$what)
+    lines <- unlist(
+        lapply(names(sections), function(name) {
+            spec <- sections[[name]]
+            rows <- data[kinds == spec[[1L]], spec[-1L], drop = FALSE]
+            values <- if (nrow(rows)) {
+                vapply(
+                    seq_len(nrow(rows)),
+                    function(i) {
+                        paste(
+                            c(
+                                spec[[1L]],
+                                unlist(
+                                    rows[i, , drop = FALSE],
+                                    use.names = FALSE
+                                )
+                            ),
+                            collapse = ","
+                        )
+                    },
+                    character(1L)
+                )
+            } else {
+                character()
+            }
+            c(paste0("**", name, "**"), values)
+        }),
+        use.names = FALSE
+    )
+    paste0(paste(lines, collapse = "\n"), "\n")
+}
+
 # Execute one native lifecycle, retaining argv/callbacks and reporting failures only after cleanup.
 api__run <- function(ctx, entry, args) {
     if (!is.character(args) || anyNA(args) || !length(args)) {
@@ -2234,6 +2313,9 @@ api__invoke <- function(ctx, spec, values, resource) {
     }
     if (spec$status != "supported") {
         api__error(spec$reason)
+    }
+    if (spec$plugin_only && !ctx$plugin_mode) {
+        api__error("This method requires an executable-hosted R plugin state.")
     }
     if (ctx$closed) {
         api__error("EnergyPlus API is closed.")
@@ -2351,6 +2433,9 @@ api__invoke <- function(ctx, spec, values, resource) {
     if (spec$kind == "api_data") {
         return(api__data(ctx, entry))
     }
+    if (spec$kind == "api_data_csv") {
+        return(api__data_csv(api__data(ctx, entry)))
+    }
     if (spec$method == "request_variable" && entry$phase != "created") {
         api__error("Request variables before running a fresh or reset state.")
     }
@@ -2395,6 +2480,26 @@ api__invoke <- function(ctx, spec, values, resource) {
         names(values)
     )
     arguments <- api__arguments(spec$signature, arguments, parameters)
+    # Reject missing globals before the native lookup, which fatally terminates stock 26.1.
+    if (spec$method == "get_global_handle") {
+        data <- api__data(ctx, entry)
+        names <- data$key[data$what == "PluginGlobalVariable"]
+        # The engine folds bytes, not Unicode case; pass its exact stored spelling to the fatal lookup.
+        lower <- "abcdefghijklmnopqrstuvwxyz"
+        upper <- "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        index <- match(
+            chartr(lower, upper, arguments[[2L]]),
+            chartr(lower, upper, names)
+        )
+        if (is.na(index)) {
+            return(api__handle(-1L, ctx, entry, spec$handle_kind))
+        }
+        arguments[[2L]] <- names[[index]]
+    }
+    # Stock aggregate functions require at least two historical values, including min/max/sum.
+    if (spec$input_handle_kind == "plugin_trend" && arguments[[3L]] < 2L) {
+        api__error("Stock 26.1 trend aggregates require count >= 2.")
+    }
     check_flag <- spec$group == "exchange" &&
         (length(handle_name) || nzchar(spec$handle_kind))
     if (check_flag) {

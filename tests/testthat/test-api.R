@@ -912,3 +912,239 @@ test_that("stock functional bridge interrupts return safely with their original 
     expect_identical(result$status$phase, "closed")
     expect_false(result$quarantined)
 })
+
+# The manifest distinguishes native ownership defects from mode-dependent capabilities.
+test_that("audited API methods expose the remaining native safety restrictions", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    methods <- ctx$api$methods()
+    blocked <- methods$method[methods$status == "unsupported"]
+    expect_length(blocked, 6L)
+    expect_setequal(
+        blocked,
+        c(
+            "clear_callbacks",
+            "clear_callbacks",
+            "get_input_file_path",
+            "get_weather_file_path",
+            "get_object_names",
+            "get_trend_value"
+        )
+    )
+    expect_equal(sum(methods$plugin_only), 10L)
+    expect_equal(sum(methods$status == "supported"), 149L)
+    state <- ctx$api$state_manager$new_state()
+    for (method in methods$method[
+        methods$plugin_only & methods$status == "supported"
+    ]) {
+        expect_error(ctx$api$exchange[[method]](state), "executable-hosted")
+    }
+    expect_error(ctx$api$exchange$get_trend_value(state), "out of bounds")
+})
+
+# Borrowed plugin handles must remain state- and kind-bound before entering native arrays.
+test_that("plugin exchange checks handles, missing globals and aggregate ranges", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    ctx$plugin_mode <- TRUE
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    on.exit(
+        {
+            entry$running <- FALSE
+            api$close()
+        },
+        add = TRUE
+    )
+    available <- "R Shared"
+    local_mocked_bindings(api__data = function(...) {
+        data.frame(what = "PluginGlobalVariable", key = available)
+    })
+    global <- api$exchange$get_global_handle(state, "r shared")
+    trend <- api$exchange$get_trend_handle(state, "R History")
+    expect_identical(attr(global, "kind"), "plugin_global")
+    expect_identical(attr(trend, "kind"), "plugin_trend")
+    missing <- api$exchange$get_global_handle(state, "missing")
+    expect_identical(as.integer(missing), -1L)
+    expect_error(
+        api$exchange$get_global_value(state, missing),
+        "negative handle"
+    )
+    expect_error(api$exchange$set_global_value(state, trend, 2), "data kind")
+    missing_trend <- api$exchange$get_trend_handle(state, "missing")
+    expect_error(
+        api$exchange$get_trend_sum(state, missing_trend, 2),
+        "negative handle"
+    )
+    expect_error(api$exchange$get_trend_sum(state, global, 2), "data kind")
+    expect_error(api$exchange$get_trend_sum(state, trend, 1), "count >= 2")
+    expect_error(api$exchange$get_trend_sum(state, trend, 2.5), "C integer")
+    expect_error(api$exchange$get_trend_sum(state, trend, Inf), "finite")
+    api$exchange$set_global_value(state, global, 3)
+    expect_equal(api$exchange$get_global_value(state, global), 0)
+    for (method in c(
+        "get_trend_average",
+        "get_trend_min",
+        "get_trend_max",
+        "get_trend_sum",
+        "get_trend_direction"
+    )) {
+        expect_equal(api$exchange[[method]](state, trend, 2), 0)
+    }
+    # Unicode case folding must never admit a name that the byte-oriented native lookup cannot find.
+    available <- "\u00e9 SHARED"
+    accent <- api$exchange$get_global_handle(state, "\u00e9 shared")
+    expect_identical(as.integer(accent), 1L)
+    calls <- Filter(
+        function(x) x$symbol == "getPluginGlobalVariableHandle",
+        ctx$log
+    )
+    expect_identical(utils::tail(calls, 1L)[[1L]]$arguments[[2L]], available)
+    expect_identical(
+        as.integer(api$exchange$get_global_handle(state, "\u00c9 shared")),
+        -1L
+    )
+    entry$generation <- entry$generation + 1L
+    expect_error(api$exchange$get_global_value(state, global), "generation")
+    expect_error(api$exchange$get_trend_sum(state, trend, 2), "generation")
+})
+
+# External HVAC callbacks share the same deferred-error, GC and orderly-stop boundary.
+test_that("stock external HVAC manager callback stops and reports callback failures", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (mode in c("stop", "error", "interrupt")) {
+        marker <- file.path(fixture$directory, paste0(mode, ".txt"))
+        setup <- function(api, state) {
+            api$runtime$callback_register_external_hvac_manager(
+                state,
+                function(s) {
+                    cat("called\n", file = marker, append = TRUE)
+                    gc()
+                    if (mode == "error") {
+                        stop("external HVAC callback failed")
+                    }
+                    if (mode == "interrupt") {
+                        stop(structure(
+                            list(message = "HVAC interrupt", call = NULL),
+                            class = c("interrupt", "condition")
+                        ))
+                    }
+                    api$runtime$stop_simulation(s)
+                }
+            )
+        }
+        result <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "26.1",
+            output_dir = file.path(fixture$directory, mode),
+            backend = setup,
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_true(file.exists(marker))
+        expect_identical(
+            result$api$stop_reason,
+            switch(
+                mode,
+                stop = "user_stop",
+                error = "callback_error",
+                interrupt = "interrupt"
+            )
+        )
+    }
+})
+
+# All six native CSV sections preserve their original field order and trailing newline.
+test_that("CSV discovery uses the matching releasable API data array", {
+    data <- data.frame(
+        what = c(
+            "Actuator",
+            "InternalVariable",
+            "PluginGlobalVariable",
+            "PluginTrendVariable,",
+            "OutputMeter",
+            "OutputVariable"
+        ),
+        name = c("Schedule:Constant", "Zone Volume", "", "", "", "Temperature"),
+        key = c(
+            "Heating",
+            "ZONE ONE",
+            "R GLOBAL",
+            "R TREND",
+            "Electricity:Facility",
+            "ZONE ONE"
+        ),
+        type = c("Schedule Value", "", "", "", "", ""),
+        unit = c("C", "m3", "", "", "J", "C")
+    )
+    expect_identical(
+        api__data_csv(data),
+        paste0(
+            paste(
+                c(
+                    "**ACTUATORS**",
+                    "Actuator,Schedule:Constant,Schedule Value,Heating,C",
+                    "**INTERNAL_VARIABLES**",
+                    "InternalVariable,Zone Volume,ZONE ONE,m3",
+                    "**PLUGIN_GLOBAL_VARIABLES**",
+                    "PluginGlobalVariable,R GLOBAL",
+                    "**TRENDS**",
+                    "PluginTrendVariable,R TREND",
+                    "**METERS**",
+                    "OutputMeter,Electricity:Facility,J",
+                    "**VARIABLES**",
+                    "OutputVariable,Temperature,ZONE ONE,C"
+                ),
+                collapse = "\n"
+            ),
+            "\n"
+        )
+    )
+    expect_identical(
+        api__data_csv(data[FALSE, ]),
+        paste0(
+            paste(
+                paste0(
+                    "**",
+                    c(
+                        "ACTUATORS",
+                        "INTERNAL_VARIABLES",
+                        "PLUGIN_GLOBAL_VARIABLES",
+                        "TRENDS",
+                        "METERS",
+                        "VARIABLES"
+                    ),
+                    "**"
+                ),
+                collapse = "\n"
+            ),
+            "\n"
+        )
+    )
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    on.exit(
+        {
+            entry$running <- FALSE
+            api$close()
+        },
+        add = TRUE
+    )
+    expect_error(api$exchange$list_available_api_data_csv(state), "initialized")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    expect_match(
+        api$exchange$list_available_api_data_csv(state),
+        "OutputVariable,Temperature,ZONE ONE,C",
+        fixed = TRUE
+    )
+    symbols <- vapply(ctx$log, function(x) x$symbol, character(1L))
+    expect_true("freeAPIData" %in% symbols)
+    expect_false("listAllAPIDataCSV" %in% symbols)
+})

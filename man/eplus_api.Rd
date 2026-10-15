@@ -52,6 +52,21 @@ Passing a handle from another state, kind, or reset generation is rejected
 before calling C. Invalid native exchange values are checked with the API
 error flag. \code{get_api_data(state)} copies a data frame and uses \code{freeAPIData()}.
 \code{methods()} lists exact bindings, arguments, ownership, and unsupported methods.
+\code{list_available_api_data_csv()} returns a character string reconstructed from
+that safely released data, without calling the unfreeable native CSV allocator.
+Its \code{plugin_only} column identifies global/trend methods available only to
+executable-hosted R plugins. Their handles remain state- and kind-bound.
+Missing globals return a negative handle without entering the native fatal path;
+negative plugin handles cannot be used for reading or writing. Trend aggregates
+require \code{count >= 2}, matching stock 26.1. \code{get_trend_value()} remains disabled:
+the native upper index check permits an out-of-bounds read.
+
+\code{callback_register_external_hvac_manager()} uses the same callback safety
+boundary as other runtime hooks, but replaces the native HVAC manager entirely.
+This is an experimental engine interface, not a general HVAC control hook;
+the caller must supply its HVAC calculations. Native initialization is limited.
+\code{clear_callbacks()} remains disabled because stock 26.1 has no unregister API;
+resetting or deleting the state retires callbacks safely.
 
 \code{rdyncall} is optional and is loaded only here. A build containing its native
 callback-boundary fix (PR 75), existing-handle dynport loading and signature

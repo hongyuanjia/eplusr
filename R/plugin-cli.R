@@ -18,7 +18,10 @@
 #' and use functional methods, but cannot create/delete/reset states, register
 #' native callbacks, recursively run simulations, or close the borrowed API.
 #' Each PythonPlugin instance has an independent R context in a shared embedded
-#' R interpreter. A synchronous hook runs on the R initialization thread.
+#' R interpreter. Global variables and trend aggregates declared in the model
+#' are available through the borrowed exchange API. Individual trend reads remain
+#' disabled because stock 26.1 has an unsafe upper index boundary.
+#' A synchronous hook runs on the R initialization thread.
 #'
 #' Finalization runs once on handled hook failure or adapter shutdown. At shutdown
 #' the native state may already be destroyed: finalizers can use ordinary R data
@@ -258,6 +261,8 @@ plugin_cli__bind <- function(config, pointer, instance) {
     api <- eplus_api(config$installation)
     ctx <- environment(api$close)$ctx
     ctx$native_depth <- 1L
+    # Only the executable loader initializes native PythonPlugin globals and trends.
+    ctx$plugin_mode <- TRUE
     entry <- list2env(
         list(
             id = "1",

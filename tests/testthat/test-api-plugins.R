@@ -1020,6 +1020,100 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
                     )
                 )
                 plugin$data$n <- plugin$data$n + 1L
+                # Declared native globals and trend aggregates are available only in executable plugins.
+                if (is.null(plugin$handles$global)) {
+                    plugin$handles$global <- api$exchange$get_global_handle(
+                        state,
+                        "R Shared"
+                    )
+                    plugin$handles$trend <- api$exchange$get_trend_handle(
+                        state,
+                        "R History"
+                    )
+                    missing <- api$exchange$get_global_handle(
+                        state,
+                        "Missing R Global"
+                    )
+                    plugin$data$missing <- as.integer(missing)
+                    plugin$data$csv <- api$exchange$list_available_api_data_csv(
+                        state
+                    )
+                    # Rejected calls must return R conditions without poisoning the native plugin.
+                    plugin$data$rejected <- vapply(
+                        list(
+                            function() {
+                                api$exchange$get_global_value(state, missing)
+                            },
+                            function() {
+                                api$exchange$get_trend_sum(
+                                    state,
+                                    plugin$handles$global,
+                                    2L
+                                )
+                            },
+                            function() {
+                                api$exchange$get_trend_sum(
+                                    state,
+                                    plugin$handles$trend,
+                                    1L
+                                )
+                            },
+                            function() {
+                                api$exchange$get_trend_value(
+                                    state,
+                                    plugin$handles$trend,
+                                    4L
+                                )
+                            }
+                        ),
+                        function(call) {
+                            tryCatch(
+                                {
+                                    call()
+                                    FALSE
+                                },
+                                error = function(e) TRUE
+                            )
+                        },
+                        logical(1L)
+                    )
+                }
+                api$exchange$set_global_value(
+                    state,
+                    plugin$handles$global,
+                    setting
+                )
+                plugin$data$global <- api$exchange$get_global_value(
+                    state,
+                    plugin$handles$global
+                )
+                plugin$data$trend <- list(
+                    average = api$exchange$get_trend_average(
+                        state,
+                        plugin$handles$trend,
+                        2L
+                    ),
+                    minimum = api$exchange$get_trend_min(
+                        state,
+                        plugin$handles$trend,
+                        2L
+                    ),
+                    maximum = api$exchange$get_trend_max(
+                        state,
+                        plugin$handles$trend,
+                        2L
+                    ),
+                    sum = api$exchange$get_trend_sum(
+                        state,
+                        plugin$handles$trend,
+                        2L
+                    ),
+                    direction = api$exchange$get_trend_direction(
+                        state,
+                        plugin$handles$trend,
+                        2L
+                    )
+                )
                 if (plugin$data$n %% 24L == 0L) gc()
             },
             finalize = function(api, state, plugin) {
@@ -1049,7 +1143,9 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
             c(
                 exports[[1L]]$idf[[1L]],
                 exports[[1L]]$idf[[2L]],
-                exports[[2L]]$idf[[2L]]
+                exports[[2L]]$idf[[2L]],
+                "PythonPlugin:Variables,R Globals,R Shared;",
+                "PythonPlugin:TrendVariable,R History,R Shared,4;"
             ),
             collapse = "\n"
         ),
@@ -1090,6 +1186,37 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
         expect_true(all(unlist(result$data$reported) == 24))
         expect_identical(result$calls$finalize, 1L)
         expect_identical(result$phase, "completed")
+        expect_identical(result$data$missing, -1L)
+        expect_match(
+            result$data$csv,
+            "PluginGlobalVariable,R SHARED",
+            fixed = TRUE
+        )
+        expect_match(
+            result$data$csv,
+            "PluginTrendVariable,R HISTORY",
+            fixed = TRUE
+        )
+        expect_identical(
+            result$data$global,
+            if (result$data$label == "A") 22L else 24L
+        )
+        expect_true(all(unlist(result$data$rejected)))
+        trend <- unlist(result$data$trend)
+        expect_equal(
+            trend,
+            c(
+                average = 24,
+                minimum = 24,
+                maximum = 24,
+                sum = 48,
+                direction = 0
+            ),
+            tolerance = 1e-8
+        )
+        expect_equal(trend[["sum"]], 2 * trend[["average"]])
+        expect_lte(trend[["minimum"]], trend[["average"]])
+        expect_gte(trend[["maximum"]], trend[["average"]])
     }
     expect_identical(results[[1L]]$data$label, "A")
     expect_identical(results[[2L]]$data$label, "B")
