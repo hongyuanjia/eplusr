@@ -196,8 +196,10 @@ plugin__register <- function(api, state, payload) {
                 names(record$hooks),
                 c("initialize", "finalize")
             )) {
-                api$runtime[[plugin__hooks()[[hook]]]](
+                api__host_callback(
+                    api,
                     state,
+                    plugin__hooks()[[hook]],
                     plugin__callback(ctx, record, hook, definition$warmup)
                 )
             }

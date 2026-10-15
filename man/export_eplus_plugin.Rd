@@ -35,6 +35,9 @@ Each PythonPlugin instance has an independent R context in a shared embedded
 R interpreter. Global variables and trend aggregates declared in the model
 are available through the borrowed exchange API. Individual trend reads remain
 disabled because stock 26.1 has an unsafe upper index boundary.
+Prepared-input metadata queries require an R-managed launch context and are
+unavailable through this standalone executable adapter. Callback clearers do
+not remove the adapter's host hooks.
 A synchronous hook runs on the R initialization thread.
 
 Finalization runs once on handled hook failure or adapter shutdown. At shutdown

@@ -49,7 +49,15 @@ test_that("API workers clean up on completion, stops, setup and callback conditi
             )
         },
         state_manager = list(
-            new_state = function() new.env(),
+            new_state = function() {
+                # Host callback registration keeps its retention record on the owning state.
+                state <- new.env(parent = emptyenv())
+                attr(state, "entry") <- list2env(
+                    list(callback_records = list()),
+                    parent = emptyenv()
+                )
+                state
+            },
             status = function(state) {
                 list(
                     phase = if (stopped) "closed" else phase,
@@ -61,9 +69,15 @@ test_that("API workers clean up on completion, stops, setup and callback conditi
         runtime = list(
             set_console_output_status = function(...) NULL,
             callback_begin_zone_timestep_before_init_heat_balance = function(
-                ...
+                state,
+                f
             ) {
-                NULL
+                # Mirror registration without entering a native engine in lifecycle-only checks.
+                entry <- attr(state, "entry")
+                entry$callback_records[[
+                    length(entry$callback_records) + 1L
+                ]] <- new.env(parent = emptyenv())
+                invisible(NULL)
             },
             run_energyplus = function(...) {
                 if (stopped) {

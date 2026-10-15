@@ -54,8 +54,21 @@
 #' boundary as other runtime hooks, but replaces the native HVAC manager entirely.
 #' This is an experimental engine interface, not a general HVAC control hook;
 #' the caller must supply its HVAC calculations. Native initialization is limited.
-#' `clear_callbacks()` remains disabled because stock 26.1 has no unregister API;
-#' resetting or deleting the state retires callbacks safely.
+#' Each group's `clear_callbacks()` detaches its user functions across this API's
+#' states, including during a callback. Native proxies remain pinned until reset
+#' or delete, so clearing does not recover callback capacity. Host session/plugin
+#' callbacks and callbacks supplying external HVAC/component calculations remain
+#' active. Other API objects and the other callback group are unaffected.
+#'
+#' Input/weather path queries read captured run metadata. Object-name queries
+#' lazily convert a frozen copy of the prepared IDF with stock `--convert-only`,
+#' then cache epJSON keys (epJSON input needs no conversion). Names retain snapshot
+#' key order; this interface does not promise native ordering. No allocating native
+#' getter is called. Queries require a ready callback. Low-level runs requesting
+#' EPMacro, ExpandObjects or a custom IDD cannot supply this metadata; prepare the
+#' input first. Executable-hosted plugins lack this R launch context and report
+#' metadata unavailable. Reset discards metadata; source edits after run entry do
+#' not change the captured object names.
 #'
 #' `rdyncall` is optional and is loaded only here. A build containing its native
 #' callback-boundary fix (PR 75), existing-handle dynport loading and signature
@@ -436,7 +449,8 @@ api__manifest <- function() {
                 "functional",
                 "clear_callbacks",
                 "",
-                reason = "No native unregister function; reset or delete the owning state instead."
+                kind = "clear_callbacks",
+                ownership = "logical_callbacks"
             ),
             api__rule(
                 "runtime",
@@ -669,7 +683,8 @@ api__manifest <- function() {
                 "runtime",
                 "clear_callbacks",
                 "",
-                reason = "No native unregister function; reset or delete the owning state instead."
+                kind = "clear_callbacks",
+                ownership = "logical_callbacks"
             ),
             api__rule(
                 "exchange",
@@ -712,29 +727,29 @@ api__manifest <- function() {
             api__rule(
                 "exchange",
                 "get_input_file_path",
-                "inputFilePath",
+                "",
                 parameters = "state",
-                reason = "Allocated char[] has no public deleter in stock 26.1.",
+                kind = "input_metadata",
                 requires_ready = TRUE,
-                ownership = "allocated_string"
+                ownership = "input_metadata"
             ),
             api__rule(
                 "exchange",
                 "get_weather_file_path",
-                "epwFilePath",
+                "",
                 parameters = "state",
-                reason = "Allocated char[] has no public deleter in stock 26.1.",
+                kind = "input_metadata",
                 requires_ready = TRUE,
-                ownership = "allocated_string"
+                ownership = "input_metadata"
             ),
             api__rule(
                 "exchange",
                 "get_object_names",
-                "getObjectNames",
+                "",
                 parameters = "state, object_type_name",
-                reason = "Stock freeObjectNames does not release the allocated name strings.",
+                kind = "input_metadata",
                 requires_ready = TRUE,
-                ownership = "object_names"
+                ownership = "input_metadata"
             ),
             api__rule(
                 "exchange",
@@ -1303,11 +1318,11 @@ api__rule <- function(
         scalar = "scalar return or copied argument; no caller-owned native allocation",
         resource = "state/generation-owned view; native allocations may survive public deletion",
         static_string = "borrowed static string copied to R character",
-        callback = "retained trampoline and R function until stateReset/stateDelete",
+        callback = "retained trampoline until stateReset/stateDelete; user function may be detached",
         run = "argv and callbacks retained for synchronous run; state survives normal return",
         api_data = "owned array copied to R then freeAPIData",
-        allocated_string = "allocated char[]; no public deleter; unsupported",
-        object_names = "allocated array/name strings; incomplete public deleter; unsupported",
+        input_metadata = "R-owned frozen prepared input; no allocating native getter",
+        logical_callbacks = "detach user functions; retain native proxies until reset/delete",
         request = "argument strings copied by engine; requests retained until reset/delete"
     )
     list(
@@ -1739,10 +1754,12 @@ api__new_state <- function(ctx) {
     entry$exit_code <- NULL
     entry$condition <- NULL
     entry$callbacks <- list()
+    entry$callback_records <- list()
     entry$resources <- list()
     entry$plugins <- list()
     entry$functional_directory <- NULL
     entry$callback_directory <- NULL
+    entry$input_metadata <- NULL
     ctx$states[[entry$id]] <- entry
     state <- new.env(parent = emptyenv())
     class(state) <- "EnergyPlusState"
@@ -1796,10 +1813,12 @@ api__dispose <- function(ctx, entry) {
     entry$closed <- TRUE
     entry$phase <- "closed"
     entry$pointer <- NULL
+    entry$input_metadata <- NULL
     for (callback in entry$callbacks) {
         ctx$ffi$release(callback)
     }
     entry$callbacks <- list()
+    entry$callback_records <- list()
     entry$resources <- list()
     rm(list = entry$id, envir = ctx$states)
     invisible(NULL)
@@ -1829,6 +1848,7 @@ api__reset <- function(ctx, entry) {
     }
     ctx$call("stateReset", list(entry$pointer))
     entry$generation <- entry$generation + 1L
+    entry$input_metadata <- NULL
     entry$phase <- "created"
     entry$initialized <- FALSE
     entry$condition <- NULL
@@ -1838,6 +1858,7 @@ api__reset <- function(ctx, entry) {
         ctx$ffi$release(callback)
     }
     entry$callbacks <- list()
+    entry$callback_records <- list()
     entry$resources <- list()
     invisible(NULL)
 }
@@ -2087,6 +2108,16 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
     if (entry$running || entry$phase != "created" || ctx$native_depth > 0L) {
         api__error("Register callbacks before starting a fresh or reset state.")
     }
+    record <- new.env(parent = emptyenv())
+    record$group <- spec$group
+    record$fun <- fun
+    # These callbacks supply engine calculations and cannot be safely made inert.
+    record$protected <- spec$method %in%
+        c(
+            "callback_register_external_hvac_manager",
+            "callback_user_defined_component_model"
+        )
+    rm(fun)
     # Return normally from the R callback so no condition unwinds an active C++ frame.
     guarded <- function(...) {
         if (!entry$running && !is.null(entry$callback_directory)) {
@@ -2094,7 +2125,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
             setwd(entry$callback_directory)
             on.exit(setwd(native_directory), add = TRUE)
         }
-        if (!is.null(entry$condition)) {
+        if (!is.null(entry$condition) || is.null(record$fun)) {
             return(invisible(NULL))
         }
         payload <- if (spec$callback == "p)v") list(state) else list(...)
@@ -2111,7 +2142,11 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
             capture(failure)
             return(invisible(NULL))
         }
-        tryCatch(do.call(fun, payload), error = capture, interrupt = capture)
+        tryCatch(
+            do.call(record$fun, payload),
+            error = capture,
+            interrupt = capture
+        )
         invisible(NULL)
     }
     if (length(extra)) {
@@ -2119,6 +2154,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
     }
     callback <- ctx$ffi$callback(spec$callback, guarded)
     entry$callbacks[[length(entry$callbacks) + 1L]] <- callback
+    entry$callback_records[[length(entry$callback_records) + 1L]] <- record
     ctx$call(spec$symbol, c(list(entry$pointer, callback), extra))
     invisible(NULL)
 }
@@ -2199,6 +2235,179 @@ api__data_csv <- function(data) {
     paste0(paste(lines, collapse = "\n"), "\n")
 }
 
+# Detach only user callbacks in this group; native proxies and host hooks stay alive.
+api__clear_callbacks <- function(ctx, group) {
+    for (entry in as.list(ctx$states)) {
+        for (record in entry$callback_records) {
+            if (record$group == group && !record$protected) {
+                record$fun <- NULL
+            }
+        }
+    }
+    invisible(NULL)
+}
+
+# Register a host lifecycle hook that logical user clearing must never disable.
+api__host_callback <- function(api, state, method, fun) {
+    api$runtime[[method]](state, fun)
+    entry <- attr(state, "entry")
+    entry$callback_records[[length(entry$callback_records)]]$protected <- TRUE
+    invisible(NULL)
+}
+
+# Resolve even missing default weather files without adding a filesystem dependency.
+api__absolute_path <- function(path) {
+    path <- normalizePath(path.expand(path), winslash = "/", mustWork = FALSE)
+    if (!grepl("^(/|[A-Za-z]:/)", path)) {
+        path <- file.path(getwd(), path)
+    }
+    path
+}
+
+# Freeze prepared input contents and explicit/default weather paths before native entry.
+api__capture_input <- function(args, model, source) {
+    metadata <- new.env(parent = emptyenv())
+    metadata$input <- api__absolute_path(model)
+    metadata$weather <- api__absolute_path("in.epw")
+    metadata$source <- source
+    metadata$objects <- NULL
+    metadata$reason <- NULL
+    # Only prepared runs have an unambiguous correspondence with this captured input.
+    i <- 1L
+    while (i <= length(args)) {
+        arg <- args[[i]]
+        if (arg == "--") {
+            break
+        }
+        if (arg %in% c("-w", "--weather")) {
+            i <- i + 1L
+            if (i > length(args) || !nzchar(args[[i]])) {
+                metadata$reason <- "Missing weather path in run arguments."
+                break
+            }
+            metadata$weather <- api__absolute_path(args[[i]])
+        } else if (grepl("^(--weather=|-w.)", arg)) {
+            value <- sub("^(--weather=|-w)", "", arg)
+            if (!nzchar(value)) {
+                metadata$reason <- "Missing weather path in run arguments."
+                break
+            }
+            metadata$weather <- api__absolute_path(value)
+        } else if (
+            arg %in%
+                c(
+                    "-d",
+                    "--output-directory",
+                    "-p",
+                    "--output-prefix",
+                    "-s",
+                    "--output-suffix",
+                    "-j",
+                    "--jobs"
+                )
+        ) {
+            i <- i + 1L
+        } else if (
+            arg %in%
+                c(
+                    "-a",
+                    "--annual",
+                    "-D",
+                    "--design-day",
+                    "-r",
+                    "--readvars",
+                    "-c",
+                    "--convert",
+                    "--convert-only",
+                    model
+                ) ||
+                grepl(
+                    "^(--(output-directory|output-prefix|output-suffix|jobs)=|-[dpsj].)",
+                    arg
+                )
+        ) {
+            # These options do not change the prepared input or selected weather.
+        } else {
+            metadata$reason <- "Run metadata requires prepared input and standard IDD; unsupported run options were supplied."
+            break
+        }
+        i <- i + 1L
+    }
+    metadata
+}
+
+# Convert only a frozen IDF copy, in an isolated process/directory, on the first name query.
+api__convert_input <- function(directory, source) {
+    temporary <- tempfile("eplusr-api-input-")
+    dir.create(temporary)
+    on.exit(unlink(temporary, recursive = TRUE), add = TRUE)
+    input <- file.path(temporary, "input.idf")
+    writeLines(enc2utf8(source), input, useBytes = TRUE)
+    executable <- file.path(
+        directory,
+        if (is_windows()) "energyplus.exe" else "energyplus"
+    )
+    result <- processx::run(
+        executable,
+        c("--convert-only", "-d", temporary, input),
+        error_on_status = FALSE,
+        timeout = 60
+    )
+    output <- file.path(temporary, "input.epJSON")
+    if (result$status != 0L || !file.exists(output)) {
+        api__error(
+            "Cannot derive object names: stock EnergyPlus input conversion failed."
+        )
+    }
+    jsonlite::read_json(output, simplifyVector = FALSE)
+}
+
+# Serve ready-state queries from R-owned metadata, never the leaking native getters.
+api__input_metadata <- function(ctx, entry, method, values) {
+    metadata <- entry$input_metadata
+    if (is.null(metadata)) {
+        api__error(
+            "Input metadata unavailable: this state has no R-managed run context."
+        )
+    }
+    if (!is.null(metadata$reason)) {
+        api__error(metadata$reason)
+    }
+    if (method == "get_input_file_path") {
+        return(metadata$input)
+    }
+    if (method == "get_weather_file_path") {
+        return(metadata$weather)
+    }
+    kind <- values$object_type_name
+    if (
+        !is.character(kind) ||
+            length(kind) != 1L ||
+            is.na(kind) ||
+            !nzchar(kind)
+    ) {
+        api__error("object_type_name must be one nonempty character string.")
+    }
+    if (is.null(metadata$objects)) {
+        objects <- if (
+            grepl("[.]epjson$", metadata$input, ignore.case = TRUE)
+        ) {
+            jsonlite::fromJSON(metadata$source, simplifyVector = FALSE)
+        } else {
+            api__convert_input(ctx$directory, metadata$source)
+        }
+        # An epJSON object maps canonical class names to named instance objects.
+        if (!is.list(objects) || is.null(names(objects))) {
+            api__error("Cannot derive object names from invalid epJSON input.")
+        }
+        metadata$objects <- lapply(objects, function(instances) {
+            enc2utf8(names(instances) %||% character())
+        })
+        metadata$source <- NULL
+    }
+    metadata$objects[[kind]] %||% character()
+}
+
 # Execute one native lifecycle, retaining argv/callbacks and reporting failures only after cleanup.
 api__run <- function(ctx, entry, args) {
     if (!is.character(args) || anyNA(args) || !length(args)) {
@@ -2219,7 +2428,10 @@ api__run <- function(ctx, entry, args) {
     if (length(models) != 1L || !file.exists(models)) {
         api__error("Provide one existing prepared IDF or epJSON model.")
     }
-    source <- paste(readLines(models, warn = FALSE), collapse = "\n")
+    source <- paste(
+        readLines(models, warn = FALSE, encoding = "UTF-8"),
+        collapse = "\n"
+    )
     # IDF names are case-insensitive and comments may precede a plugin object.
     idf_source <- gsub("![^\n]*", "", source)
     if (
@@ -2235,6 +2447,7 @@ api__run <- function(ctx, entry, args) {
             "PythonPlugin models are outside the EnergyPlus 26.1 R library workflow."
         )
     }
+    entry$input_metadata <- api__capture_input(args, models, source)
     argv <- ctx$ffi$argv(enc2utf8(c("energyplus", args)))
     ctx$call("setEnergyPlusRootDirectory", list(entry$pointer, ctx$directory))
     for (resource in entry$resources) {
@@ -2330,6 +2543,9 @@ api__invoke <- function(ctx, spec, values, resource) {
     }
     if (spec$method == "ep_version") {
         return(ctx$call("energyPlusVersion"))
+    }
+    if (spec$kind == "clear_callbacks") {
+        return(api__clear_callbacks(ctx, spec$group))
     }
     state <- values$state
     entry <- api__entry(ctx, state, allow_closed = spec$kind == "delete_state")
@@ -2429,6 +2645,9 @@ api__invoke <- function(ctx, spec, values, resource) {
         api__error(
             "Exchange data is only available in an initialized simulation callback."
         )
+    }
+    if (spec$kind == "input_metadata") {
+        return(api__input_metadata(ctx, entry, spec$method, values))
     }
     if (spec$kind == "api_data") {
         return(api__data(ctx, entry))
@@ -3435,8 +3654,10 @@ api_session__setup <- function(api, state, settings) {
     }
     # Apply controls before predictor reads schedules, repeating through system substeps of a zone step.
     if (length(settings$actuators) || !is.null(control$controller)) {
-        api$runtime$callback_begin_system_timestep_before_predictor(
+        api__host_callback(
+            api,
             state,
+            "callback_begin_system_timestep_before_predictor",
             function(s) {
                 if (!api_session__weather(api, s)) {
                     return(invisible(NULL))
@@ -3465,8 +3686,10 @@ api_session__setup <- function(api, state, settings) {
         )
     }
     # Each completed weather zone step is a safe waiting point within the same native run.
-    api$runtime$callback_end_zone_timestep_after_zone_reporting(
+    api__host_callback(
+        api,
         state,
+        "callback_end_zone_timestep_after_zone_reporting",
         function(s) {
             if (!api_session__weather(api, s)) {
                 return(invisible(NULL))

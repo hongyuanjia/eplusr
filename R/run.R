@@ -3025,8 +3025,10 @@ run__api_engine <- function(directory, args, api_setup = NULL) {
             state <- api$state_manager$new_state()
             api$runtime$set_console_output_status(state, TRUE)
             # Every zone boundary enters R so an OS interrupt can request an orderly native stop.
-            api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+            api__host_callback(
+                api,
                 state,
+                "callback_begin_zone_timestep_before_init_heat_balance",
                 function(s) invisible(NULL)
             )
             stage <- "setup"

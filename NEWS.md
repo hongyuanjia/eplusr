@@ -12,11 +12,15 @@
 
 ## New features
 
+* Add managed callback clearing and prepared-input path/object-name queries without
+  the leaking stock 26.1 getters. Keep host and engine-calculation callbacks active
+  and retain native proxies until reset/delete. Individual trend reads remain
+  restricted (#651).
+
 * Enable executable R plugin globals and trend aggregates with typed handles,
   guard missing globals before native lookup, and expose the experimental external
   HVAC manager callback. Build CSV discovery from safely released API data.
-  Retain explicit restrictions for unsafe stock 26.1 allocations, callback
-  clearing and individual trend reads (#652).
+  Retain explicit restrictions for individual stock 26.1 trend reads (#652).
 
 * Add nonblocking session snapshot reads and configurable continuous-run sampling,
   retaining exact control boundaries and complete replay recording (#653).

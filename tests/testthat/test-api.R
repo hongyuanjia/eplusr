@@ -461,12 +461,16 @@ test_that("library loading audits identity and releases failed probe states", {
     expect_error(api__load(ctx$directory), "API version")
     expect_equal(ctx$deleted, 2L)
     ctx$api_version <- "0.2"
-    # Unsupported methods remain inspectable when their optional native symbol is absent.
-    ctx$omit <- "inputFilePath"
+    # Managed metadata avoids its native getter; a restricted trend getter remains optional.
+    ctx$omit <- c("inputFilePath", "getPluginTrendVariableValue")
     api <- api__load(ctx$directory)
     expect_match(api$info()$version, "26.1.0")
     methods <- api$methods()
-    expect_equal(methods$signature[methods$symbol == ctx$omit], "")
+    expect_false("inputFilePath" %in% methods$symbol)
+    expect_identical(
+        methods$signature[methods$symbol == "getPluginTrendVariableValue"],
+        ""
+    )
     state <- api$state_manager$new_state()
     api$runtime$issue_text(state, "positional arguments")
     expect_null(names(ctx$arguments))
@@ -608,7 +612,7 @@ test_that("process and pointer guards prevent restored or foreign ownership", {
     expect_match(api$functional$ep_version(), "26.1")
     expect_error(
         api$exchange$get_object_names(state, "Zone"),
-        "ownership|strings|allocat|reclaim"
+        "initialized"
     )
     api$close()
     expect_error(api__new_state(ctx), "closed")
@@ -919,20 +923,9 @@ test_that("audited API methods expose the remaining native safety restrictions",
     on.exit(ctx$api$close(), add = TRUE)
     methods <- ctx$api$methods()
     blocked <- methods$method[methods$status == "unsupported"]
-    expect_length(blocked, 6L)
-    expect_setequal(
-        blocked,
-        c(
-            "clear_callbacks",
-            "clear_callbacks",
-            "get_input_file_path",
-            "get_weather_file_path",
-            "get_object_names",
-            "get_trend_value"
-        )
-    )
+    expect_identical(blocked, "get_trend_value")
     expect_equal(sum(methods$plugin_only), 10L)
-    expect_equal(sum(methods$status == "supported"), 149L)
+    expect_equal(sum(methods$status == "supported"), 154L)
     state <- ctx$api$state_manager$new_state()
     for (method in methods$method[
         methods$plugin_only & methods$status == "supported"
@@ -1147,4 +1140,449 @@ test_that("CSV discovery uses the matching releasable API data array", {
     symbols <- vapply(ctx$log, function(x) x$symbol, character(1L))
     expect_true("freeAPIData" %in% symbols)
     expect_false("listAllAPIDataCSV" %in% symbols)
+})
+
+# Logical clearing drops user closures without retiring native proxies or host calculations.
+test_that("callback clearing is group- and API-scoped and retains native proxies", {
+    ctx <- testapi__fake()
+    other <- testapi__fake()
+    on.exit(other$api$close(), add = TRUE)
+    on.exit(ctx$api$close(), add = TRUE)
+    states <- lapply(1:2, function(i) ctx$api$state_manager$new_state())
+    calls <- new.env(parent = emptyenv())
+    calls$user <- calls$functional <- calls$host <- calls$hvac <- calls$component <- 0L
+    for (state in states) {
+        ctx$api$runtime$callback_progress(state, function(x) {
+            calls$user <- calls$user + 1L
+        })
+        ctx$api$functional$callback_error(state, function(...) {
+            calls$functional <- calls$functional + 1L
+        })
+    }
+    state <- states[[1L]]
+    entry <- attr(state, "entry")
+    api__host_callback(
+        ctx$api,
+        state,
+        "callback_begin_new_environment",
+        function(s) calls$host <- calls$host + 1L
+    )
+    ctx$api$runtime$callback_register_external_hvac_manager(state, function(s) {
+        calls$hvac <- calls$hvac + 1L
+    })
+    ctx$api$runtime$callback_user_defined_component_model(
+        state,
+        function(s) calls$component <- calls$component + 1L,
+        "component"
+    )
+    other_state <- other$api$state_manager$new_state()
+    other$api$runtime$callback_progress(other_state, function(x) {
+        calls$user <- calls$user + 1L
+    })
+    retained <- entry$callbacks
+    ctx$api$runtime$clear_callbacks()
+    ctx$api$runtime$clear_callbacks()
+    for (callback in entry$callbacks) {
+        callback(entry$pointer)
+    }
+    second <- attr(states[[2L]], "entry")
+    second$pointer$callbacks$registerProgressCallback(1L)
+    other_entry <- attr(other_state, "entry")
+    other_entry$pointer$callbacks$registerProgressCallback(1L)
+    expect_identical(entry$callbacks, retained)
+    expect_equal(calls$user, 1L)
+    expect_equal(calls$functional, 1L)
+    expect_equal(calls$host, 1L)
+    expect_equal(calls$hvac, 1L)
+    expect_equal(calls$component, 1L)
+    ctx$api$functional$clear_callbacks()
+    entry$pointer$callbacks$registerErrorCallback(1L, "ignored")
+    second$pointer$callbacks$registerErrorCallback(1L, "ignored")
+    expect_equal(calls$functional, 1L)
+    expect_true(all(vapply(
+        second$callback_records,
+        function(x) is.null(x$fun),
+        logical(1L)
+    )))
+    ctx$api$state_manager$reset_state(state)
+    expect_length(entry$callbacks, 0L)
+    expect_length(entry$callback_records, 0L)
+    ctx$api$close()
+    expect_error(ctx$api$runtime$clear_callbacks(), "closed")
+})
+
+# Clearing from inside delivery must not unwind C or retain the user's captured data.
+test_that("a callback can clear itself and release its captured environment", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    state <- ctx$api$state_manager$new_state()
+    counter <- new.env(parent = emptyenv())
+    counter$calls <- counter$finalized <- 0L
+    ctx$api$runtime$callback_begin_new_environment(
+        state,
+        local({
+            token <- new.env(parent = emptyenv())
+            reg.finalizer(token, function(x) {
+                counter$finalized <- counter$finalized + 1L
+            })
+            function(s) {
+                invisible(token)
+                counter$calls <- counter$calls + 1L
+                ctx$api$runtime$clear_callbacks()
+            }
+        })
+    )
+    expect_equal(ctx$api$runtime$run_energyplus(state, testapi__model()), 0L)
+    gc()
+    expect_equal(counter$calls, 1L)
+    expect_equal(counter$finalized, 1L)
+    ctx$api$state_manager$reset_state(state)
+    ctx$api$runtime$callback_progress(state, function(x) {
+        stop("fresh registration")
+    })
+    expect_error(
+        ctx$api$runtime$run_energyplus(state, testapi__model()),
+        "fresh registration"
+    )
+})
+
+# Metadata parsing never mistakes option values for weather flags or resolves paths after cwd changes.
+test_that("captured run paths handle defaults, options and unsupported preprocessing", {
+    model <- testapi__model()
+    capture <- function(args) api__capture_input(args, model, "Version,26.1;")
+    default <- capture(model)
+    expect_identical(default$input, api__absolute_path(model))
+    expect_identical(default$weather, api__absolute_path("in.epw"))
+    for (args in list(
+        c("-w", "weather one.epw", model),
+        c("--weather", "weather one.epw", model),
+        c("--weather=weather one.epw", model),
+        c("-wweather one.epw", model)
+    )) {
+        metadata <- capture(args)
+        expect_null(metadata$reason)
+        expect_identical(
+            metadata$weather,
+            api__absolute_path("weather one.epw")
+        )
+    }
+    options <- c(
+        "-d",
+        "--output-directory",
+        "-p",
+        "--output-prefix",
+        "-s",
+        "--output-suffix",
+        "-j",
+        "--jobs"
+    )
+    for (option in options) {
+        expect_null(capture(c(option, "ignored", model))$reason)
+    }
+    expect_null(
+        capture(c(
+            "--annual",
+            "--design-day",
+            "--readvars",
+            "--convert",
+            "--convert-only",
+            "-a",
+            "-D",
+            "-r",
+            "-c",
+            "--jobs=1",
+            "--output-directory=out",
+            "-dout",
+            "-pname",
+            "-sL",
+            "-j1",
+            model
+        ))$reason
+    )
+    expect_identical(capture(c("--", model))$weather, default$weather)
+    for (option in c(
+        "-m",
+        "--epmacro",
+        "-x",
+        "--expandobjects",
+        "-i",
+        "--idd",
+        "--unknown"
+    )) {
+        expect_match(capture(c(option, model))$reason, "prepared input")
+    }
+    expect_match(capture("-w")$reason, "Missing weather")
+    expect_match(capture("--weather=")$reason, "Missing weather")
+    expect_match(capture(c("-w", ""))$reason, "Missing weather")
+    expect_equal(
+        capture(c("-wfirst.epw", "-wlast.epw", model))$weather,
+        api__absolute_path("last.epw")
+    )
+})
+
+# epJSON keys are frozen at entry, preserve canonical case, and never call allocating getters.
+test_that("metadata queries use immutable prepared epJSON and state lifecycle gates", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    on.exit(api$close(), add = TRUE)
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    input <- tempfile(fileext = ".epJSON")
+    text <- '{"Zone":{"Zulu":{},"alpha":{},"é":{}},"Version":{"Version 1":{"version_identifier":"26.1"}}}'
+    writeLines(text, input, useBytes = TRUE)
+    expect_error(api$exchange$get_input_file_path(state), "initialized")
+    api$runtime$callback_begin_new_environment(state, function(s) {
+        writeLines("changed", input)
+        expect_identical(
+            api$exchange$get_input_file_path(s),
+            api__absolute_path(input)
+        )
+        expect_identical(
+            api$exchange$get_weather_file_path(s),
+            api__absolute_path("weather.epw")
+        )
+        expect_identical(
+            api$exchange$get_object_names(s, "Zone"),
+            c("Zulu", "alpha", "é")
+        )
+        expect_identical(
+            api$exchange$get_object_names(s, "Version"),
+            "Version 1"
+        )
+        expect_identical(api$exchange$get_object_names(s, "zone"), character())
+        for (value in list(
+            NULL,
+            NA_character_,
+            character(),
+            "",
+            1,
+            c("Zone", "Building")
+        )) {
+            expect_error(
+                api$exchange$get_object_names(s, value),
+                "object_type_name"
+            )
+        }
+    })
+    api$runtime$run_energyplus(state, c("-w", "weather.epw", input))
+    expect_null(entry$input_metadata$source)
+    expect_error(api$exchange$get_object_names(state, "Zone"), "initialized")
+    expect_false(any(vapply(
+        ctx$log,
+        function(x) {
+            x$symbol %in%
+                c(
+                    "inputFilePath",
+                    "epwFilePath",
+                    "getObjectNames",
+                    "freeObjectNames"
+                )
+        },
+        logical(1L)
+    )))
+    api$state_manager$reset_state(state)
+    expect_null(entry$input_metadata)
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    expect_error(
+        api$exchange$get_input_file_path(state),
+        "no R-managed run context"
+    )
+    entry$input_metadata <- api__capture_input(c("-x", input), input, text)
+    expect_error(api$exchange$get_input_file_path(state), "prepared input")
+    entry$input_metadata <- api__capture_input(input, input, "[]")
+    expect_error(api$exchange$get_object_names(state, "Zone"), "invalid epJSON")
+    entry$running <- FALSE
+})
+
+# Conversion is lazy, cached after success, and retried rather than caching a failed snapshot.
+test_that("IDF metadata conversion is isolated, cached and fails clearly", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    state <- ctx$api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    entry$input_metadata <- api__capture_input(
+        "input.idf",
+        "input.idf",
+        "Version,26.1;"
+    )
+    calls <- 0L
+    local_mocked_bindings(api__convert_input = function(directory, source) {
+        calls <<- calls + 1L
+        expect_identical(source, "Version,26.1;")
+        list(Version = list("Version 1" = list()))
+    })
+    for (i in 1:2) {
+        expect_identical(
+            ctx$api$exchange$get_object_names(state, "Version"),
+            "Version 1"
+        )
+    }
+    expect_identical(calls, 1L)
+    entry$running <- FALSE
+})
+
+# Stand-in converter processes exercise output verification and unconditional temporary cleanup.
+test_that("the stock converter checks exit status and removes its private files", {
+    mode <- "ok"
+    temporary <- NULL
+    local_mocked_bindings(
+        run = function(command, args, ...) {
+            expect_match(command, "energyplus")
+            expect_identical(args[[1L]], "--convert-only")
+            temporary <<- dirname(tail(args, 1L))
+            expect_identical(readLines(tail(args, 1L)), "Version,26.1;")
+            if (mode == "ok") {
+                writeLines(
+                    '{"Version":{"Version 1":{}}}',
+                    file.path(temporary, "input.epJSON")
+                )
+            }
+            list(status = if (mode == "failure") 1L else 0L)
+        },
+        .package = "processx"
+    )
+    expect_named(api__convert_input(tempdir(), "Version,26.1;"), "Version")
+    expect_false(dir.exists(temporary))
+    for (value in c("missing", "failure")) {
+        mode <- value
+        expect_error(
+            api__convert_input(tempdir(), "Version,26.1;"),
+            "conversion failed"
+        )
+        expect_false(dir.exists(temporary))
+    }
+})
+
+# Exercise both clearing groups, lazy conversion and GC with the unmodified native engine.
+test_that("stock managed clearing and metadata queries preserve the native lifecycle", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "managed-metadata.rds")
+    setup <- function(api, state) {
+        counts <- new.env(parent = emptyenv())
+        counts$functional <- counts$user <- counts$host <- counts$finalized <- 0L
+        counts$metadata <- NULL
+        functional_state <- api$state_manager$new_state()
+        api$functional$callback_error(functional_state, function(...) {
+            counts$functional <- counts$functional + 1L
+        })
+        fluid <- api$functional$glycol(functional_state, "water")
+        fluid$specific_heat(functional_state, -1000)
+        counts$before <- counts$functional
+        api$functional$clear_callbacks()
+        fluid$specific_heat(functional_state, -1000)
+        counts$after <- counts$functional
+        api$state_manager$delete_state(functional_state)
+        api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+            state,
+            local({
+                token <- new.env(parent = emptyenv())
+                reg.finalizer(token, function(x) {
+                    counts$finalized <- counts$finalized + 1L
+                })
+                function(s) {
+                    invisible(token)
+                    counts$user <- counts$user + 1L
+                    if (counts$user == 2L) api$runtime$clear_callbacks()
+                }
+            })
+        )
+        eplusr:::api__host_callback(
+            api,
+            state,
+            "callback_end_zone_timestep_after_zone_reporting",
+            function(s) {
+                counts$host <- counts$host + 1L
+                if (
+                    api$exchange$api_data_fully_ready(s) &&
+                        is.null(counts$metadata)
+                ) {
+                    counts$metadata <- list(
+                        input = api$exchange$get_input_file_path(s),
+                        weather = api$exchange$get_weather_file_path(s),
+                        zones = api$exchange$get_object_names(s, "Zone"),
+                        reports = api$exchange$get_object_names(
+                            s,
+                            "Output:Variable"
+                        ),
+                        missing = api$exchange$get_object_names(
+                            s,
+                            "NoSuchType"
+                        ),
+                        input_exists = file.exists(api$exchange$get_input_file_path(
+                            s
+                        )),
+                        weather_exists = file.exists(api$exchange$get_weather_file_path(
+                            s
+                        ))
+                    )
+                }
+                if (counts$host == 20L) {
+                    gc()
+                    saveRDS(as.list(counts), marker)
+                    api$runtime$stop_simulation(s)
+                }
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "26.1",
+        output_dir = file.path(fixture$directory, "managed"),
+        backend = setup,
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(result$api$stop_reason, "user_stop")
+    expect_true(file.exists(marker))
+    if (!file.exists(marker)) {
+        return(invisible(NULL))
+    }
+    data <- readRDS(marker)
+    expect_gt(data$before, 0L)
+    expect_identical(data$after, data$before)
+    expect_equal(data$user, 2L)
+    expect_equal(data$host, 20L)
+    expect_equal(data$finalized, 1L)
+    expect_identical(data$metadata$zones, "ZONE ONE")
+    expect_gt(length(data$metadata$reports), 10L)
+    expect_identical(
+        data$metadata$reports,
+        paste0("Output:Variable ", seq_along(data$metadata$reports))
+    )
+    expect_identical(data$metadata$missing, character())
+    expect_true(data$metadata$input_exists)
+    expect_true(data$metadata$weather_exists)
+})
+
+# Logical clearing never erases an error or interrupt raised by the current delivery.
+test_that("clearing a callback preserves its subsequent failure and native cleanup", {
+    for (condition in list(
+        simpleError("after clearing"),
+        structure(
+            list(message = "after clearing interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+    )) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        api$runtime$callback_begin_new_environment(state, function(s) {
+            api$runtime$clear_callbacks()
+            stop(condition)
+        })
+        actual <- tryCatch(
+            api$runtime$run_energyplus(state, testapi__model()),
+            error = identity,
+            interrupt = identity
+        )
+        expect_identical(actual, condition)
+        expect_identical(api$state_manager$status(state)$phase, "closed")
+        expect_equal(ctx$deleted, 1L)
+        api$close()
+    }
 })

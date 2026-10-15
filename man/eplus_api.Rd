@@ -65,8 +65,21 @@ the native upper index check permits an out-of-bounds read.
 boundary as other runtime hooks, but replaces the native HVAC manager entirely.
 This is an experimental engine interface, not a general HVAC control hook;
 the caller must supply its HVAC calculations. Native initialization is limited.
-\code{clear_callbacks()} remains disabled because stock 26.1 has no unregister API;
-resetting or deleting the state retires callbacks safely.
+Each group's \code{clear_callbacks()} detaches its user functions across this API's
+states, including during a callback. Native proxies remain pinned until reset
+or delete, so clearing does not recover callback capacity. Host session/plugin
+callbacks and callbacks supplying external HVAC/component calculations remain
+active. Other API objects and the other callback group are unaffected.
+
+Input/weather path queries read captured run metadata. Object-name queries
+lazily convert a frozen copy of the prepared IDF with stock \code{--convert-only},
+then cache epJSON keys (epJSON input needs no conversion). Names retain snapshot
+key order; this interface does not promise native ordering. No allocating native
+getter is called. Queries require a ready callback. Low-level runs requesting
+EPMacro, ExpandObjects or a custom IDD cannot supply this metadata; prepare the
+input first. Executable-hosted plugins lack this R launch context and report
+metadata unavailable. Reset discards metadata; source edits after run entry do
+not change the captured object names.
 
 \code{rdyncall} is optional and is loaded only here. A build containing its native
 callback-boundary fix (PR 75), existing-handle dynport loading and signature
