@@ -335,3 +335,51 @@ test_that("socket reservation stops after twenty occupied candidates", {
 })
 
 # Reject invalid branch specifications before creating a prediction worker.
+
+test_that("idle readiness polling avoids the Windows empty-select floor without reporting writable sockets as input", {
+    pair <- testapi__protocol_pair()
+    on.exit(
+        {
+            api_session__disconnect(pair$ctx)
+            try(close(pair$client), silent = TRUE)
+        },
+        add = TRUE
+    )
+    select <- base::socketSelect
+    # Keep actual TCP readiness but emulate R's Windows minimum wait when no descriptor is ready.
+    local_mocked_bindings(
+        socketSelect = function(socklist, write = FALSE, timeout = 0) {
+            ready <- select(socklist, write = write, timeout = timeout)
+            if (timeout == 0 && !any(ready)) {
+                Sys.sleep(0.2)
+            }
+            ready
+        },
+        .package = "base"
+    )
+    started <- proc.time()[["elapsed"]]
+    for (index in 1:5) {
+        expect_false(api_session__readable(pair$ctx$connection))
+    }
+    expect_lt(proc.time()[["elapsed"]] - started, 0.5)
+    message <- list(type = "boundary", id = 1L)
+    api_session__send(pair$client, message)
+    # TCP delivery itself is asynchronous; poll until the message arrives without blocking an idle probe.
+    deadline <- Sys.time() + 2
+    while (
+        !api_session__readable(pair$ctx$connection) && Sys.time() < deadline
+    ) {
+        Sys.sleep(0.001)
+    }
+    expect_true(api_session__readable(pair$ctx$connection))
+    expect_identical(api_session__receive(pair$ctx$connection), message)
+    close(pair$client)
+    deadline <- Sys.time() + 2
+    while (
+        !api_session__readable(pair$ctx$connection) && Sys.time() < deadline
+    ) {
+        Sys.sleep(0.001)
+    }
+    expect_true(api_session__readable(pair$ctx$connection))
+    expect_null(api_session__receive(pair$ctx$connection))
+})

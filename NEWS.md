@@ -46,6 +46,9 @@
 
 ## Bug fixes
 
+* Avoid Windows socket polling delays that could make continuously running
+  sessions exceed their result timeout (#653).
+
 * Preserve shared lexical state and metadata dependencies across plugin hooks,
   and classify callback interrupts separately from ordinary callback errors (#651).
 

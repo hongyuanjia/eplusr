@@ -2802,6 +2802,15 @@ api_session__receive <- function(connection) {
     message
 }
 
+# A writable sentinel bypasses Windows R's 200 ms empty-select floor without treating writability as input.
+api_session__readable <- function(connection) {
+    socketSelect(
+        list(connection, connection),
+        write = c(FALSE, TRUE),
+        timeout = 0
+    )[[1L]]
+}
+
 # Reserve a listening socket atomically rather than choosing an already-used free port.
 api_session__listen <- function() {
     # Transport bookkeeping must not perturb a caller's controller RNG stream.
@@ -2934,7 +2943,7 @@ api_session__command <- function(
             tryCatch(suppressWarnings(send()), error = function(condition) {
                 if (
                     ctx$process$is_alive() &&
-                        !socketSelect(list(ctx$connection), timeout = 0)
+                        !api_session__readable(ctx$connection)
                 ) {
                     stop(condition)
                 }
@@ -3007,7 +3016,7 @@ api_session__collect <- function(ctx) {
     # Natural completion may precede a caller query; recover its final buffered snapshot.
     while (
         !is.null(ctx$connection) &&
-            socketSelect(list(ctx$connection), timeout = 0)
+            api_session__readable(ctx$connection)
     ) {
         message <- api_session__receive(ctx$connection)
         if (is.null(message)) {
@@ -3398,10 +3407,11 @@ api_session__setup <- function(api, state, settings) {
                 api_session__reply(control, control$id)
             }
             repeat {
-                ready <- socketSelect(
-                    list(control$connection),
-                    timeout = if (control$mode == "paused") 0.05 else 0
-                )
+                ready <- if (control$mode == "paused") {
+                    socketSelect(list(control$connection), timeout = 0.05)
+                } else {
+                    api_session__readable(control$connection)
+                }
                 if (ready) {
                     command <- api_session__receive(control$connection)
                     if (is.null(command)) {
