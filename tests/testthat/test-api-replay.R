@@ -77,6 +77,8 @@ test_that("stock replay branches match history and preserve the original live se
         expect_identical(branch$replay_steps, 4L)
         expect_identical(branch$future_steps, 3L)
         expect_true(branch$complete)
+        expect_identical(branch$status, "success")
+        expect_null(branch$reason)
         expect_false(identical(branch$identity$pid, identity$pid))
         expect_false(tryCatch(
             ps::ps_is_running(ps::ps_handle(branch$identity$pid)),
@@ -117,30 +119,70 @@ test_that("stock replay branches match history and preserve the original live se
         session$predict(list(a = list(NULL)), 1L, dir = occupied),
         "empty or new"
     )
-    expect_error(
-        session$predict(
-            list(fail = function(observation, state) stop("future failure")),
-            1L
+    before_failures <- session$observe()
+    mixed <- session$predict(
+        list(
+            first = list(NULL),
+            fail = function(observation, state) stop("future failure"),
+            last = list(NULL)
         ),
-        "future failure"
+        1L
     )
+    expect_identical(names(mixed$branches), c("first", "fail", "last"))
+    expect_identical(
+        vapply(mixed$branches, `[[`, character(1L), "status"),
+        c(first = "success", fail = "failed", last = "success")
+    )
+    expect_match(mixed$branches$fail$reason, "future failure")
+    expect_true("error" %in% mixed$branches$fail$error$class)
+    expect_false(mixed$branches$fail$complete)
+    expect_null(mixed$branches$fail$observations)
+    expect_identical(
+        mixed$branches$first$observations,
+        mixed$branches$last$observations
+    )
+    expect_identical(session$observe(), before_failures)
+    expect_identical(session$status()$identity, identity)
     expect_identical(session$status()$phase, "paused")
-    expect_error(
-        session$predict(
-            list(slow = function(observation, state) {
-                Sys.sleep(5)
-                list(action = NULL, state = state)
-            }),
-            1L,
-            timeout = 0.1
-        ),
-        "timed out"
+    expect_identical(session$step()$step, before_failures$step + 1L)
+    slow <- session$predict(
+        list(slow = function(observation, state) {
+            Sys.sleep(5)
+            list(action = NULL, state = state)
+        }),
+        1L,
+        timeout = 0.1
     )
+    expect_identical(slow$branches$slow$status, "failed")
+    expect_match(slow$branches$slow$reason, "timed out")
     expect_identical(session$status()$phase, "paused")
-    expect_error(
-        session$predict(list(a = list(NULL)), 1L, timeout = 1e-9),
-        "branch timed out"
+    expired <- session$predict(list(a = list(NULL)), 1L, timeout = 1e-9)
+    expect_identical(expired$branches$a$status, "failed")
+    expect_match(expired$branches$a$reason, "branch timed out")
+    expect_identical(session$step()$step, before_failures$step + 2L)
+    # A native callback interrupt must survive IPC wrapping and stop the candidate loop.
+    interrupted <- tryCatch(
+        {
+            session$predict(
+                list(
+                    cancel = function(observation, state) {
+                        stop(structure(
+                            list(message = "cancel branch", call = NULL),
+                            class = c("interrupt", "condition")
+                        ))
+                    },
+                    later = list(NULL)
+                ),
+                1L
+            )
+            FALSE
+        },
+        interrupt = function(condition) TRUE
     )
+    expect_true(interrupted)
+    expect_identical(session$status()$identity, identity)
+    expect_identical(session$status()$phase, "paused")
+    expect_identical(session$step()$step, before_failures$step + 3L)
     # A mismatch during worker-side replay is caught through the native callback boundary.
     history <- api_replay__history(context, 128 * 1024^2)
     history[[2L]]$observation$values[["temperature"]] <- history[[
@@ -212,6 +254,8 @@ test_that("stock replay restores explicit controller memory and reports short ho
     session$step(n = 93L)
     short <- session$predict(list(hold = list(NULL, NULL)), 2L)
     expect_false(short$branches$hold$complete)
+    expect_identical(short$branches$hold$status, "incomplete")
+    expect_match(short$branches$hold$reason, "ended before")
     expect_identical(short$branches$hold$future_steps, 0L)
     expect_identical(session$status()$phase, "paused")
 })
@@ -451,3 +495,54 @@ test_that("replay branches stop at a completed future boundary and close", {
 })
 
 # Plugin definitions must remain ordinary reusable backend functions, with frozen dependencies.
+
+# Isolate orchestration to cover repeated failures, ordinary metadata and interrupt propagation.
+test_that("replay prediction retains failed entries but never swallows caller interrupts", {
+    ctx <- testapi__session_context()
+    session <- api_session__construct(ctx)
+    on.exit(session$close(), add = TRUE)
+    ctx$config$record <- TRUE
+    ctx$phase <- "paused"
+    ctx$observation <- list(step = 1L)
+    calls <- 0L
+    local_mocked_bindings(
+        api_replay__history = function(...) {
+            list(list(observation = ctx$observation))
+        },
+        api_replay__check_inputs = function(...) invisible(NULL),
+        api_replay__branch = function(...) {
+            calls <<- calls + 1L
+            stop(simpleError(if (calls == 1L) "" else "candidate failure"))
+        }
+    )
+    result <- session$predict(list(first = list(NULL), second = list(NULL)), 1L)
+    expect_identical(calls, 2L)
+    expect_identical(result$branches$first$status, "failed")
+    expect_identical(result$branches$first$reason, "Prediction branch failed.")
+    expect_identical(result$branches$second$error$message, "candidate failure")
+    expect_identical(
+        result$branches$second$error$class,
+        c("simpleError", "error", "condition")
+    )
+    expect_gte(result$branches$second$elapsed, 0)
+    expect_identical(ctx$phase, "paused")
+    calls <- 0L
+    # Even a condition that inherits both error and interrupt must terminate prediction.
+    local_mocked_bindings(api_replay__branch = function(...) {
+        calls <<- calls + 1L
+        stop(structure(
+            list(message = "cancel prediction", call = NULL),
+            class = c("interrupt", "error", "condition")
+        ))
+    })
+    interrupted <- tryCatch(
+        {
+            session$predict(list(first = list(NULL), later = list(NULL)), 1L)
+            FALSE
+        },
+        interrupt = function(condition) TRUE
+    )
+    expect_true(interrupted)
+    expect_identical(calls, 1L)
+    expect_identical(ctx$phase, "paused")
+})

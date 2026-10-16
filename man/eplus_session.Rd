@@ -124,8 +124,14 @@ the next branch. Results contain ordinary observations, worker identity,
 elapsed time, replay/future step counts and \code{method = "replay"}.
 \code{tolerance} is an absolute bound for each registered numeric value.
 An early natural end returns a shorter horizon with \code{complete = FALSE}.
-Errors or caller interrupts abort prediction and close its worker while the
-original session remains paused. A single timeout budget covers each branch.
+Each branch reports \code{status = "success"}, \code{"incomplete"} (natural end before
+the requested horizon), or \code{"failed"}, with a textual \code{reason} for non-success.
+Ordinary branch errors and timeouts return a failed entry with ordinary error
+class/message metadata and elapsed time, without a partial trajectory. Earlier
+results are retained and later candidates still run. Caller or worker interrupts
+abort prediction and close the active worker; invalid shared inputs or history abort
+the prediction too. The original session remains paused and can be resumed.
+A single timeout budget covers each branch.
 Input and library fingerprints are rechecked; journal loading is bounded by
 \code{history_limit}. Journaling consumes disk and replay cost grows with history.
 Matching exposed observations does not establish equality of hidden native

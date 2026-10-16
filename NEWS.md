@@ -56,6 +56,10 @@
 
 ## Bug fixes
 
+* Keep successful replay predictions and continue remaining candidates after an
+  ordinary branch failure or timeout. Return each candidate's status and reason;
+  caller interrupts still abort prediction and preserve the original session (#651).
+
 * Avoid Windows socket polling delays that could make continuously running
   sessions exceed their result timeout (#653).
 

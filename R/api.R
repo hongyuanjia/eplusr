@@ -2833,8 +2833,14 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' elapsed time, replay/future step counts and `method = "replay"`.
 #' `tolerance` is an absolute bound for each registered numeric value.
 #' An early natural end returns a shorter horizon with `complete = FALSE`.
-#' Errors or caller interrupts abort prediction and close its worker while the
-#' original session remains paused. A single timeout budget covers each branch.
+#' Each branch reports `status = "success"`, `"incomplete"` (natural end before
+#' the requested horizon), or `"failed"`, with a textual `reason` for non-success.
+#' Ordinary branch errors and timeouts return a failed entry with ordinary error
+#' class/message metadata and elapsed time, without a partial trajectory. Earlier
+#' results are retained and later candidates still run. Caller or worker interrupts
+#' abort prediction and close the active worker; invalid shared inputs or history abort
+#' the prediction too. The original session remains paused and can be resumed.
+#' A single timeout budget covers each branch.
 #' Input and library fingerprints are rechecked; journal loading is bounded by
 #' `history_limit`. Journaling consumes disk and replay cost grows with history.
 #' Matching exposed observations does not establish equality of hidden native
@@ -4211,14 +4217,43 @@ api_replay__predict <- function(
     results <- vector("list", length(branches))
     names(results) <- names(branches)
     for (index in seq_along(branches)) {
-        results[[index]] <- api_replay__branch(
-            ctx,
-            history,
-            branches[[index]],
-            horizon,
-            tolerance,
-            timeout,
-            file.path(directory, sprintf("branch-%03d", index))
+        started <- Sys.time()
+        # A candidate failure is data; an interrupt still unwinds the active worker.
+        results[[index]] <- tryCatch(
+            api_replay__branch(
+                ctx,
+                history,
+                branches[[index]],
+                horizon,
+                tolerance,
+                timeout,
+                file.path(directory, sprintf("branch-%03d", index))
+            ),
+            interrupt = function(condition) stop(condition),
+            error = function(condition) {
+                # Conditions may inherit both classes; never turn an interrupt into a candidate result.
+                if (inherits(condition, "interrupt")) {
+                    stop(condition)
+                }
+                # Branch cleanup has run before this handler. Shared input damage is fatal.
+                api_replay__check_inputs(ctx)
+                reason <- conditionMessage(condition)
+                if (!nzchar(reason)) {
+                    reason <- "Prediction branch failed."
+                }
+                list(
+                    method = "replay",
+                    status = "failed",
+                    reason = reason,
+                    error = list(class = class(condition), message = reason),
+                    complete = FALSE,
+                    elapsed = as.numeric(difftime(
+                        Sys.time(),
+                        started,
+                        units = "secs"
+                    ))
+                )
+            }
         )
     }
     # Recheck identity and observation without sending a command to the original engine.
@@ -4237,6 +4272,23 @@ api_replay__predict <- function(
             tolerance = tolerance
         ),
         class = "EnergyPlusPrediction"
+    )
+}
+
+# Restore worker-side interrupt semantics after the session transport reports a failed command.
+api_replay__advance <- function(branch, expression) {
+    tryCatch(
+        expression,
+        error = function(condition) {
+            # Session diagnostics retain the native stop reason even when IPC wraps its condition.
+            if (identical(branch$status()$outcome$stop_reason, "interrupt")) {
+                stop(structure(
+                    list(message = conditionMessage(condition), call = NULL),
+                    class = c("interrupt", "condition")
+                ))
+            }
+            stop(condition)
+        }
     )
 }
 
@@ -4273,14 +4325,20 @@ api_replay__branch <- function(
         dir = directory
     )
     on.exit(try(branch$close(), silent = TRUE), add = TRUE)
-    observation <- branch$initialize(timeout = budget())
+    observation <- api_replay__advance(
+        branch,
+        branch$initialize(timeout = budget())
+    )
     identity <- branch$status()$identity
     api_replay__match(observation, history[[1L]]$observation, tolerance)
     if (length(history) > 1L) {
         # The worker checks intermediate observations; the owner verifies the final fork itself.
-        observation <- branch$step(
-            n = as.integer(length(history) - 1L),
-            timeout = budget()
+        observation <- api_replay__advance(
+            branch,
+            branch$step(
+                n = as.integer(length(history) - 1L),
+                timeout = budget()
+            )
         )
         api_replay__match(
             observation,
@@ -4294,7 +4352,10 @@ api_replay__branch <- function(
         if (branch$status()$phase != "paused") {
             break
         }
-        next_observation <- branch$step(timeout = budget())
+        next_observation <- api_replay__advance(
+            branch,
+            branch$step(timeout = budget())
+        )
         # Completion can return the same final snapshot without advancing another zone.
         if (next_observation$step == observation$step) {
             break
@@ -4313,6 +4374,12 @@ api_replay__branch <- function(
         replay_steps = length(history),
         future_steps = length(observations),
         complete = complete,
+        status = if (complete) "success" else "incomplete",
+        reason = if (complete) {
+            NULL
+        } else {
+            "Simulation ended before the requested horizon."
+        },
         outcome = branch$status()$outcome,
         elapsed = as.numeric(difftime(Sys.time(), started, units = "secs"))
     )
