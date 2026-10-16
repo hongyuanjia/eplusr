@@ -10,12 +10,22 @@ on:
       - master
       - main
   workflow_dispatch:
+    inputs:
+      html_report:
+        description: Generate the interactive HTML report in addition to complete RDS/XML coverage
+        type: boolean
+        default: false
 
 name: test-coverage
 
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    name: test-coverage (${{ matrix.shard }})
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [api, session-errors, replay, plugins, run, run-api, engine, ordinary]
     if: >-
       ${{
         (
@@ -38,8 +48,14 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: true
       NOT_CRAN: true
-      TESTTHAT_CPUS: 1
+      # Parallelize ordinary files; isolate files that start their own engine worker trees.
+      TESTTHAT_PARALLEL: ${{ matrix.shard == 'ordinary' }}
+      TESTTHAT_CPUS: 2
+      _EPLUSR_TEST_SHARD_: ${{ matrix.shard }}
+      # Weather archive transfers can outlast R's default 60-second network budget.
+      R_DEFAULT_INTERNET_TIMEOUT: 180
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
+      _EPLUSR_RUN_API_TESTS_: true
       R_KEEP_PKG_SOURCE: true
       COVR_COVRIGNORE: ".github/workflows/.covrignore"
 
@@ -54,7 +70,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::pkgload, any::xml2, any::DT, any::htmltools
+          extra-packages: any::covr, any::pkgload, any::xml2, any::remotes${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
           needs: coverage
 
       - name: Locate DuckDB extension cache
@@ -82,13 +98,13 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.local/EnergyPlus-*
-          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-22.2-9.6
+          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-26.1-22.2-9.6
 
       - name: Prepare EnergyPlus
         run: |
           pkgload::load_all(".", quiet = TRUE, export_all = FALSE)
           latest <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
-          versions <- c(latest, "22.2", "9.6")
+          versions <- c(latest, "26.1", "22.2", "9.6")
           for (ver in versions) {
             if (!eplusr::is_avail_eplus(ver)) eplusr::install_eplus(ver, local = TRUE)
             stopifnot(eplusr::is_avail_eplus(ver))
@@ -117,33 +133,107 @@ jobs:
           path: ~/.local/EnergyPlus-*
           key: ${{ steps.cache-eplus.outputs.cache-primary-key }}
 
+      - name: Prepare merged API bridge
+        run: |
+          remotes::install_github("hongyuanjia/rdyncall@98aac679adf8ace0c85075c5f4928075289eebbd", upgrade = "never")
+        shell: Rscript {0}
+
       - name: Test coverage
         run: |
           dir.create("coverage", showWarnings = FALSE)
-          cov <- covr::package_coverage(
-            path = ".",
-            type = "tests",
-            quiet = FALSE,
-            clean = FALSE
+          source(".github/coverage.R")
+          timing_dir <- tempfile("coverage-timings-")
+          started <- proc.time()[["elapsed"]]
+          # Keep failed test output available while covr's error message truncates it.
+          instrumented <- tempfile("eplusr-coverage-library-")
+          cov <- tryCatch(
+              coverage__run(
+                  path = ".",
+                  timing_dir = timing_dir,
+                  type = "tests",
+                  quiet = FALSE,
+                  clean = FALSE,
+                  install_path = instrumented
+              ),
+              error = function(error) {
+                  # Print the failure details before the R temporary directory disappears.
+                  failures <- list.files(
+                      instrumented,
+                      pattern = "\\.Rout\\.fail$",
+                      recursive = TRUE,
+                      full.names = TRUE
+                  )
+                  for (file in failures) {
+                      cat("\nTest failure output: ", file, "\n", sep = "")
+                      cat(readLines(file, warn = FALSE), sep = "\n")
+                  }
+                  stop(error)
+              }
           )
+          message("Coverage collection seconds: ", proc.time()[["elapsed"]] - started)
           print(cov)
           vals <- vapply(cov, function(x) x$value, numeric(1))
           if (!any(vals > 0)) {
-            stop("covr returned all-zero coverage; tests likely did not run")
+              stop("covr returned all-zero coverage; tests likely did not run")
           }
+          # Every shard retains complete expression data; the merged job creates Codecov input.
+          started <- proc.time()[["elapsed"]]
           saveRDS(cov, "coverage/coverage.rds")
-          covr::to_cobertura(cov, "coverage/cobertura.xml")
-          covr::report(cov, file = "coverage/index.html", browse = FALSE)
+          message("Coverage RDS seconds: ", proc.time()[["elapsed"]] - started)
         shell: Rscript {0}
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-artifacts
+          name: coverage-${{ matrix.shard }}
           path: coverage/
 
+  coverage-report:
+    name: test-coverage
+    needs: test-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::covr, any::xml2${{ inputs.html_report && ', any::DT, any::htmltools' || '' }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-shards
+      - name: Merge complete test coverage
+        shell: Rscript {0}
+        run: |
+          source(".github/coverage.R")
+          files <- file.path("coverage-shards", paste0("coverage-", c("api", "session-errors", "replay", "plugins", "run", "run-api", "engine", "ordinary")), "coverage.rds")
+          stopifnot(all(file.exists(files)))
+          started <- proc.time()[["elapsed"]]
+          cov <- coverage__combine(files)
+          message("Coverage shard merge seconds: ", proc.time()[["elapsed"]] - started)
+          print(cov)
+          dir.create("coverage", showWarnings = FALSE)
+          started <- proc.time()[["elapsed"]]
+          saveRDS(cov, "coverage/coverage.rds")
+          message("Coverage RDS seconds: ", proc.time()[["elapsed"]] - started)
+          started <- proc.time()[["elapsed"]]
+          covr::to_cobertura(cov, "coverage/cobertura.xml")
+          message("Coverage XML seconds: ", proc.time()[["elapsed"]] - started)
+      - name: Generate optional HTML report
+        if: github.event_name == 'workflow_dispatch' && inputs.html_report
+        shell: Rscript {0}
+        run: |
+          cov <- readRDS("coverage/coverage.rds")
+          started <- proc.time()[["elapsed"]]
+          covr::report(cov, file = "coverage/index.html", browse = FALSE)
+          message("Coverage HTML seconds: ", proc.time()[["elapsed"]] - started)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: coverage/
       - uses: codecov/codecov-action@v7
-        if: always() && hashFiles('coverage/cobertura.xml') != ''
         with:
           files: coverage/cobertura.xml
           flags: full-tests

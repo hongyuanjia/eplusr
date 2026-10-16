@@ -185,8 +185,43 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$run(epw, dir = tempdir(), readvars = FALSE)
         #' }
         #'
-        run = function(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE, readvars = TRUE)
-            job_run(self, private, epw, dir, wait, force, echo, copy_external, readvars),
+        #' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
+        #'   or an initialization `function(api, state)` which selects the API engine.
+        #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+        #'   for each engine run. Preprocessing and result collection use the same pipeline.
+        #'   A function is executed once in the engine worker
+        #'   before simulation. Register requests and callbacks using the supplied managed
+        #'   objects. Capture serializable lexical configuration in a self-contained closure;
+        #'   Live API objects and native pointers cannot be transferred. The return value is ignored.
+        #'   Controller failures and worker interrupts yield failed
+        #'   results with condition metadata; an explicit stop yields a stopped result.
+        #'   Inspect API identity and stop metadata with `$status()` (the `job_status`
+        #'   table for group jobs). Job orchestration may use additional R processes.
+        #'   Foreground caller conditions update the job status before being rethrown.
+        #'
+        run = function(
+            epw,
+            dir = NULL,
+            wait = TRUE,
+            force = FALSE,
+            echo = wait,
+            copy_external = FALSE,
+            readvars = TRUE,
+            backend = "cli"
+        ) {
+            job_run(
+                self,
+                private,
+                epw,
+                dir,
+                wait,
+                force,
+                echo,
+                copy_external,
+                readvars,
+                backend
+            )
+        },
         # }}}
 
         # kill {{{
@@ -226,7 +261,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' * `changed_after`: `TRUE` if the IDF file has been changed since last
         #'    simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
         #'
-        #' @return A named list of 5 elements.
+        #' @return A named list of 5 elements. Finished API runs also include `backend`
+        #'   and `api`, with the engine identity, phase, stop reason and error metadata.
         #'
         #' @examples
         #' \dontrun{
@@ -918,9 +954,24 @@ job_path <- function(self, private, type = c("all", "idf", "epw")) {
 }
 # }}}
 # job_run {{{
-job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
-                     echo = wait, copy_external = FALSE, readvars = TRUE) {
-    if (missing(epw)) epw <- private$m_epw_path
+job_run <- function(
+    self,
+    private,
+    epw,
+    dir = NULL,
+    wait = TRUE,
+    force = FALSE,
+    echo = wait,
+    copy_external = FALSE,
+    readvars = TRUE,
+    backend = "cli"
+) {
+    configuration <- run__backend(backend)
+    backend <- configuration$engine
+    api_setup <- configuration$setup
+    if (missing(epw)) {
+        epw <- private$m_epw_path
+    }
 
     if (is.null(epw)) {
         private$m_epw_path <- NULL
@@ -976,19 +1027,61 @@ job_run <- function(self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     # reset status
     private$m_log$start_time <- current()
     private$m_log$killed <- NULL
+    private$m_log$backend <- backend
+    private$m_log$output_dir <- run_dir
 
     resrc <- if (copy_external) materialized$resources[[1L]] else NULL
 
-    private$m_job <- energyplus(
-        model = path_idf, weather = path_epw, design_day = is.null(private$m_epw_path),
-        output_dir = run_dir, eso_to_ip = FALSE, readvars = readvars, echo = echo,
-        wait = wait, eplus = private$m_model_store$model_version(model_id),
-        resources = resrc
-    )
+    # An interrupted new API run must not leave a previous successful result in the job.
+    failure <- NULL
+    if (backend == "api") {
+        private$m_job <- NULL
+    }
+    # Keep CLI dispatch unchanged while applying failure recording only to the API backend.
+    launch <- function() {
+        energyplus(
+            model = path_idf,
+            weather = path_epw,
+            design_day = is.null(private$m_epw_path),
+            output_dir = run_dir,
+            eso_to_ip = FALSE,
+            readvars = readvars,
+            echo = echo,
+            wait = wait,
+            eplus = private$m_model_store$model_version(model_id),
+            resources = resrc,
+            backend = api_setup %||% backend
+        )
+    }
+    # Record a caller-side pipeline failure without claiming native return or deletion.
+    capture <- function(condition) {
+        failure <<- condition
+        interrupted <- inherits(condition, "interrupt")
+        private$m_log$killed <- interrupted
+        result <- run__api_failure(condition, run_dir, path_epw, interrupted)
+        result$api$stop_reason <- if (interrupted) {
+            "interrupt"
+        } else {
+            "pipeline_error"
+        }
+        result$exit_status <- if (interrupted) 130L else 1L
+        result
+    }
+    private$m_job <- if (backend == "api") {
+        tryCatch(launch(), error = capture, interrupt = capture)
+    } else {
+        launch()
+    }
 
     private$log_new_uuid()
-    if (wait) private$m_log$end_time <- current()
+    if (wait) {
+        private$m_log$end_time <- current()
+    }
 
+    # Metadata is committed before the original caller-side condition is rethrown.
+    if (!is.null(failure)) {
+        stop(failure)
+    }
     self
 }
 # }}}
@@ -1006,7 +1099,12 @@ job_kill <- function(self, private) {
         return(invisible(FALSE))
     }
 
-    k <- tryCatch(proc$kill(), error = function(e) FALSE)
+    # API execution owns an engine descendant; terminate the full tree before collecting status.
+    k <- if (identical(private$m_log$backend, "api")) {
+        run__api_kill(proc)
+    } else {
+        tryCatch(proc$kill(), error = function(e) FALSE)
+    }
 
     if (isTRUE(k)) {
         private$m_log$killed <- TRUE
@@ -1060,7 +1158,16 @@ job_status <- function(self, private) {
         # in non-waiting mode
         } else {
             proc$wait()
-            private$m_job <- proc$get_result()
+            private$m_job <- if (identical(private$m_log$backend, "api")) {
+                run__api_collect(
+                    proc,
+                    private$m_log$output_dir,
+                    private$m_epw_path,
+                    status$terminated
+                )
+            } else {
+                proc$get_result()
+            }
             exit_status <- private$m_job$exit_status
         }
 
@@ -1069,6 +1176,11 @@ job_status <- function(self, private) {
         } else {
             status$successful <- FALSE
         }
+    }
+
+    if (!status$alive && identical(private$m_job$backend, "api")) {
+        status$backend <- "api"
+        status$api <- private$m_job$api
     }
 
     status$changed_after <- FALSE

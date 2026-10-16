@@ -1,0 +1,2 @@
+# POSIX owner-thread checks need explicit linkage on pre-merged-libpthread Linux.
+PKG_LIBS = -pthread

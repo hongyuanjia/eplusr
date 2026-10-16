@@ -1,0 +1,1 @@
+# Windows uses kernel thread IDs and has no POSIX pthread dependency.

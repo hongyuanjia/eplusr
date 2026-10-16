@@ -2,19 +2,31 @@ test_that("clean_wd()", {
     skip_on_cran()
 
     expect_true(file.create(f <- tempfile()))
-    expect_true({clean_wd(f); file.exists(f)})
+    expect_true({
+        clean_wd(f)
+        file.exists(f)
+    })
     unlink(f)
 
     expect_true(file.create(f <- tempfile(fileext = ".idf")))
-    expect_silent({clean_wd(f); file.exists(f)})
+    expect_silent({
+        clean_wd(f)
+        file.exists(f)
+    })
     unlink(f)
 
     expect_true(file.create(f <- file.path(tempdir(), "in.idf")))
-    expect_true({clean_wd(f); file.exists(f)})
+    expect_true({
+        clean_wd(f)
+        file.exists(f)
+    })
 
     expect_true(file.create(fidf <- file.path(tempdir(), "test.idf")))
     expect_true(file.create(fcsv <- file.path(tempdir(), "test.csv")))
-    expect_true({.clean_wd(fidf, "D", basename(fcsv)); file.exists(fcsv)})
+    expect_true({
+        .clean_wd(fidf, "D", basename(fcsv))
+        file.exists(fcsv)
+    })
     unlink(c(fidf, fcsv))
 })
 
@@ -22,24 +34,59 @@ test_that("path_eplus()", {
     skip_on_cran()
 
     expect_equal(basename(path_eplus(LATEST_EPLUS_VER, "a", "b")), "b")
-    expect_error(basename(path_eplus(LATEST_EPLUS_VER, "a", "b", strict = TRUE)))
+    expect_error(basename(path_eplus(
+        LATEST_EPLUS_VER,
+        "a",
+        "b",
+        strict = TRUE
+    )))
 
-    expect_true(is.character(path_eplus_processor(LATEST_EPLUS_VER, "EPMacro", strict = TRUE)))
-    expect_true(is.character(path_eplus_processor(LATEST_EPLUS_VER, "PreProcess", "GrndTempCalc", "Slab", strict = TRUE)))
+    expect_true(is.character(path_eplus_processor(
+        LATEST_EPLUS_VER,
+        "EPMacro",
+        strict = TRUE
+    )))
+    expect_true(is.character(path_eplus_processor(
+        LATEST_EPLUS_VER,
+        "PreProcess",
+        "GrndTempCalc",
+        "Slab",
+        strict = TRUE
+    )))
 
-    expect_true(is.character(path_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")))
-    expect_true(is.character(path_eplus_example(LATEST_EPLUS_VER, "BasicFiles/Exercise1A.idf")))
+    expect_true(is.character(path_eplus_example(
+        LATEST_EPLUS_VER,
+        "1ZoneUncontrolled.idf"
+    )))
+    expect_true(is.character(path_eplus_example(
+        LATEST_EPLUS_VER,
+        "BasicFiles/Exercise1A.idf"
+    )))
 
-    expect_true(is.character(path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy")))
+    expect_true(is.character(path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
+    )))
 
-    expect_true(is.character(path_eplus_dataset(LATEST_EPLUS_VER, "Boilers.idf")))
-    expect_true(is.character(path_eplus_dataset(LATEST_EPLUS_VER, "FMUs/MoistAir.fmu")))
+    expect_true(is.character(path_eplus_dataset(
+        LATEST_EPLUS_VER,
+        "Boilers.idf"
+    )))
+    expect_true(is.character(path_eplus_dataset(
+        LATEST_EPLUS_VER,
+        "FMUs/MoistAir.fmu"
+    )))
 })
 
 test_that("copy_energyplus_idd()", {
     skip_on_cran()
 
-    expect_silent(res <- copy_energyplus_idd(path_eplus(LATEST_EPLUS_VER, "energyplus"), tempdir()))
+    expect_silent(
+        res <- copy_energyplus_idd(
+            path_eplus(LATEST_EPLUS_VER, "energyplus"),
+            tempdir()
+        )
+    )
     expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
     expect_true(attr(res, "copied"))
 
@@ -49,7 +96,13 @@ test_that("copy_energyplus_idd()", {
 
     unlink(file.path(tempdir(), "Energy+.idd"))
 
-    expect_silent(res <- copy_energyplus_idd(NULL, tempdir(), path_eplus(LATEST_EPLUS_VER, "Energy+.idd")))
+    expect_silent(
+        res <- copy_energyplus_idd(
+            NULL,
+            tempdir(),
+            path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+        )
+    )
     expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
     unlink(file.path(tempdir(), "Energy+.idd"))
 })
@@ -59,11 +112,16 @@ test_that("EPMacro()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "EPMacro")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     main <- file.path(out_dir, "macro.imf")
     part <- file.path(out_dir, "part.idf")
-    write_lines(sprintf("##include part.idf\nVersion,%s;", LATEST_EPLUS_VER), main)
+    write_lines(
+        sprintf("##include part.idf\nVersion,%s;", LATEST_EPLUS_VER),
+        main
+    )
     write_lines("Building,\nBldg;", part)
 
     res <- EPMacro(part, echo = FALSE, eplus = LATEST_EPLUS_VER)
@@ -77,8 +135,17 @@ test_that("EPMacro()", {
     expect_true(file.exists(res$file$epmidf))
     expect_true(file.exists(res$file$epmdet))
     expect_equal(names(res$file), c("imf", "epmidf", "epmdet"))
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(res$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_equal(res$run$stdout, NULL)
     expect_equal(res$run$stderr, NULL)
     unlink(c(res$file$epmidf, res$file$epmdet))
@@ -100,7 +167,9 @@ test_that("EPMacro()", {
     expect_equal(res$run$stdout, NULL)
     expect_equal(res$run$stderr, NULL)
     expect_equal(res$run$end_time, NULL)
-    while(res$run$process$is_alive()) Sys.sleep(0.1)
+    while (res$run$process$is_alive()) {
+        Sys.sleep(0.1)
+    }
     post <- res$run$process$get_result()
     expect_equal(names(post), c("file", "run"))
     res <- modifyList(res, post)
@@ -121,31 +190,52 @@ test_that("ExpandObjects()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "ExpandObjects")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- file.path(out_dir, "expandobj.idf")
-    write_lines(sprintf(
-        "Version, %s;
+    write_lines(
+        sprintf(
+            "Version, %s;
         HVACTemplate:Thermostat,
             All Zones,
             ,
             20,
             ,
             26;
-        ", LATEST_EPLUS_VER),
+        ",
+            LATEST_EPLUS_VER
+        ),
         path
     )
 
-    res <- ExpandObjects(path, echo = FALSE, idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd"))
+    res <- ExpandObjects(
+        path,
+        echo = FALSE,
+        idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+    )
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "expidf", "basement", "slab", "experr"))
+    expect_equal(
+        names(res$file),
+        c("idf", "expidf", "basement", "slab", "experr")
+    )
     expect_true(file.exists(res$file$idf))
     expect_true(file.exists(res$file$expidf))
     expect_equal(res$file$basement, NA_character_)
     expect_equal(res$file$slab, NA_character_)
     expect_equal(res$file$experr, NA_character_)
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(res$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(res$run$stdout))
     expect_null(res$run$stderr)
     unlink(res$file$expidf)
@@ -171,7 +261,9 @@ test_that("ExpandObjects()", {
     expect_equal(res$run$stdout, NULL)
     expect_equal(res$run$stderr, NULL)
     expect_equal(res$run$end_time, NULL)
-    while(res$run$process$is_alive()) Sys.sleep(0.1)
+    while (res$run$process$is_alive()) {
+        Sys.sleep(0.1)
+    }
     post <- res$run$process$get_result()
     expect_equal(names(post), c("file", "run"))
     res <- modifyList(res, post)
@@ -190,7 +282,9 @@ test_that("Basement()", {
     skip_on_cran()
     skip_if_not_integration()
     out_dir <- file.path(tempdir(), "Basement")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- file.path(out_dir, "basement.idf")
     write_lines(
@@ -274,21 +368,45 @@ test_that("Basement()", {
         ",
         path
     )
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- Basement(path, weather, echo = FALSE, eplus = LATEST_EPLUS_VER,
-        idd = path_eplus(LATEST_EPLUS_VER, "PreProcess", "GrndTempCalc", "BasementGHT.idd")
+    res <- Basement(
+        path,
+        weather,
+        echo = FALSE,
+        eplus = LATEST_EPLUS_VER,
+        idd = path_eplus(
+            LATEST_EPLUS_VER,
+            "PreProcess",
+            "GrndTempCalc",
+            "BasementGHT.idd"
+        )
     )
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit"))
+    expect_equal(
+        names(res$file),
+        c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit")
+    )
     expect_true(file.exists(res$file$idf))
     expect_true(file.exists(res$file$epw))
     expect_equal(basename(res$file$bsmt_idf), "basement_bsmt.idf")
     expect_equal(basename(res$file$bsmt_csv), "basement_bsmt.csv")
     expect_equal(basename(res$file$bsmt_out), "basement_bsmt.out")
     expect_equal(basename(res$file$bsmt_audit), "basement_bsmt.audit")
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(res$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(res$run$stdout))
     expect_false(is.null(res$run$stderr))
     unlink(unlist(res$file))
@@ -301,7 +419,9 @@ test_that("Slab()", {
     skip_on_cran()
     skip_if_not_integration()
     out_dir <- file.path(tempdir(), "Basement")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- file.path(out_dir, "slab.idf")
     write_lines(
@@ -365,20 +485,44 @@ test_that("Slab()", {
         ",
         path
     )
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- Slab(path, weather, eplus = LATEST_EPLUS_VER, echo = FALSE,
-        idd = path_eplus(LATEST_EPLUS_VER, "PreProcess", "GrndTempCalc", "SlabGHT.idd")
+    res <- Slab(
+        path,
+        weather,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE,
+        idd = path_eplus(
+            LATEST_EPLUS_VER,
+            "PreProcess",
+            "GrndTempCalc",
+            "SlabGHT.idd"
+        )
     )
     expect_equal(names(res), c("file", "run"))
-    expect_equal(names(res$file), c("idf", "epw", "slab_gtp", "slab_out", "slab_ger"))
+    expect_equal(
+        names(res$file),
+        c("idf", "epw", "slab_gtp", "slab_out", "slab_ger")
+    )
     expect_true(file.exists(res$file$idf))
     expect_true(file.exists(res$file$epw))
     expect_equal(basename(res$file$slab_gtp), "slab_slab.gtp")
     expect_equal(basename(res$file$slab_out), "slab_slab.out")
     expect_equal(basename(res$file$slab_ger), "slab_slab.ger")
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(res$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(res$run$stdout))
     expect_false(is.null(res$run$stderr))
     unlink(unlist(res$file))
@@ -392,42 +536,99 @@ test_that("EnergyPlus()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "Energyplus")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- EnergyPlus(path, weather, out_dir, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(names(res), c("file", "run"))
+    res <- EnergyPlus(
+        path,
+        weather,
+        out_dir,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE
+    )
+    expect_equal(names(res), c("file", "run", "backend"))
+    expect_identical(res$backend, "cli")
     expect_equal(length(res$file), 51L)
     expect_equal(
         sort(names(which(vapply(res$file, function(x) !anyNA(x), logical(1))))),
-        c("audit", "bnd", "dxf", "eio", "end", "epw", "err", "eso", "idf",
+        c(
+            "audit",
+            "bnd",
+            "dxf",
+            "eio",
+            "end",
+            "epw",
+            "err",
+            "eso",
+            "idf",
             # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
             # a SQLite output
-            "mdd", "mtd", "mtr", "rdd", "shd", "table")
+            "mdd",
+            "mtd",
+            "mtr",
+            "rdd",
+            "shd",
+            "table"
+        )
     )
-    expect_equal(names(res$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(res$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(res$run$stdout))
 
     # can use legacy output name style
-    res_legacy <- EnergyPlus(path, weather, out_dir, output_suffix = "L", eplus = LATEST_EPLUS_VER, echo = FALSE)
+    res_legacy <- EnergyPlus(
+        path,
+        weather,
+        out_dir,
+        output_suffix = "L",
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE
+    )
     files <- basename(unlist(res_legacy$file, FALSE, FALSE))
     files <- files[!is.na(files)]
-    expect_equal(setdiff(
-        names(tbl <- table(tools::file_path_sans_ext(files))),
-        c("1ZoneUncontrolled", "eplusout", "eplustbl", "sqlite",
-          "USA_CO_Golden-NREL.724666_TMY3")
-    ), character())
+    expect_equal(
+        setdiff(
+            names(tbl <- table(tools::file_path_sans_ext(files))),
+            c(
+                "1ZoneUncontrolled",
+                "eplusout",
+                "eplustbl",
+                "sqlite",
+                "USA_CO_Golden-NREL.724666_TMY3"
+            )
+        ),
+        character()
+    )
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
     expect_equal(sort(as.integer(tbl)), c(1L, 1L, 5L, 12L))
 
     # can run annual simulation with custom IDD
     expect_silent(
-        EnergyPlus(path, weather, out_dir, annual = TRUE, eplus = LATEST_EPLUS_VER,
-            echo = FALSE, idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+        EnergyPlus(
+            path,
+            weather,
+            out_dir,
+            annual = TRUE,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE,
+            idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
         )
     )
 
@@ -440,15 +641,34 @@ test_that("convertESOMTR()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "convertESOMTR")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- EnergyPlus(path, weather, out_dir, eplus = LATEST_EPLUS_VER, echo = FALSE)
+    res <- EnergyPlus(
+        path,
+        weather,
+        out_dir,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE
+    )
 
-    eso <- convertESOMTR(res$file$eso, eplus = LATEST_EPLUS_VER, echo = FALSE,
-        rules = path_eplus(LATEST_EPLUS_VER, "PostProcess", "convertESOMTRpgm", "convert.txt")
+    eso <- convertESOMTR(
+        res$file$eso,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE,
+        rules = path_eplus(
+            LATEST_EPLUS_VER,
+            "PostProcess",
+            "convertESOMTRpgm",
+            "convert.txt"
+        )
     )
     expect_equal(names(eso), c("file", "run"))
     expect_equal(names(eso$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
@@ -457,8 +677,17 @@ test_that("convertESOMTR()", {
     expect_true(is.na(eso$file$mtr))
     expect_true(is.na(eso$file$ipmtr))
     expect_true(is.na(eso$file$iperr))
-    expect_equal(names(eso$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(eso$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(eso$run$stdout))
     expect_true(is.null(eso$run$stderr))
     unlink(unlist(eso$file))
@@ -471,8 +700,17 @@ test_that("convertESOMTR()", {
     expect_true(is.na(mtr$file$eso))
     expect_true(is.na(mtr$file$ipeso))
     expect_true(is.na(mtr$file$iperr))
-    expect_equal(names(mtr$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(mtr$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_false(is.null(mtr$run$stdout))
     expect_true(is.null(mtr$run$stderr))
     unlink(unlist(mtr$file))
@@ -487,37 +725,72 @@ test_that("ReadVarsESO()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "ReadVarsESO")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- EnergyPlus(path, weather, out_dir, eplus = LATEST_EPLUS_VER, echo = FALSE)
+    res <- EnergyPlus(
+        path,
+        weather,
+        out_dir,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE
+    )
 
     eso <- ReadVarsESO(res$file$eso, eplus = LATEST_EPLUS_VER, echo = FALSE)
     expect_equal(names(eso), c("file", "run"))
-    expect_equal(names(eso$file), c("eso", "mtr", "variable", "meter", "rvaudit"))
+    expect_equal(
+        names(eso$file),
+        c("eso", "mtr", "variable", "meter", "rvaudit")
+    )
     expect_true(file.exists(eso$file$eso))
     expect_true(file.exists(eso$file$variable))
     expect_true(file.exists(eso$file$rvaudit))
     expect_true(is.na(eso$file$mtr))
     expect_true(is.na(eso$file$meter))
-    expect_equal(names(eso$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(eso$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_true(!is.na(eso$file$variable))
     expect_true(is.na(eso$file$meter))
     expect_true(!is.na(eso$file$rvaudit))
     unlink(unlist(eso$file))
 
     mtr <- ReadVarsESO(res$file$mtr, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(names(mtr$file), c("eso", "mtr", "variable", "meter", "rvaudit"))
+    expect_equal(
+        names(mtr$file),
+        c("eso", "mtr", "variable", "meter", "rvaudit")
+    )
     expect_true(file.exists(mtr$file$mtr))
     expect_true(file.exists(mtr$file$meter))
     expect_true(file.exists(mtr$file$rvaudit))
     expect_true(is.na(mtr$file$eso))
     expect_true(is.na(mtr$file$variable))
-    expect_equal(names(mtr$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(mtr$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_true(is.na(mtr$file$variable))
     expect_true(!is.na(mtr$file$meter))
     expect_true(!is.na(mtr$file$rvaudit))
@@ -533,20 +806,40 @@ test_that("HVAC_Diagram()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "HVAC_Diagram")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
     model <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
-    res <- EnergyPlus(model, weather, out_dir, eplus = LATEST_EPLUS_VER, echo = FALSE)
+    res <- EnergyPlus(
+        model,
+        weather,
+        out_dir,
+        eplus = LATEST_EPLUS_VER,
+        echo = FALSE
+    )
 
     svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
     expect_equal(names(svg), c("file", "run"))
     expect_equal(names(svg$file), c("bnd", "svg"))
     expect_true(file.exists(svg$file$bnd))
     expect_true(file.exists(svg$file$bnd))
-    expect_equal(names(svg$run), c("process", "exit_status", "stdout",
-        "stderr", "start_time", "end_time"))
+    expect_equal(
+        names(svg$run),
+        c(
+            "process",
+            "exit_status",
+            "stdout",
+            "stderr",
+            "start_time",
+            "end_time"
+        )
+    )
     expect_true(!is.na(svg$file$svg))
     unlink(unlist(svg$file))
     unlink(unlist(res$file))
@@ -560,20 +853,47 @@ test_that("energyplus()", {
     skip_if_not_integration()
 
     out_dir <- file.path(tempdir(), "run-energyplus")
-    if (!dir.exists(out_dir)) dir.create(out_dir)
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir)
+    }
 
-    weather <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    weather <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
     # can run EPMacro
-    path_imf <- copy_eplus_example(LATEST_EPLUS_VER, "AbsorptionChiller_Macro.imf")
+    path_imf <- copy_eplus_example(
+        LATEST_EPLUS_VER,
+        "AbsorptionChiller_Macro.imf"
+    )
     path_resources <- c(
         copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneChillerSpec.imf"),
         copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneGeometry.imf"),
         copy_eplus_example(LATEST_EPLUS_VER, "HVAC3Zone-IntGains-Def.imf"),
         copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneMat-Const.imf")
     )
-    res_imf <- energyplus(path_imf, weather, out_dir, echo = FALSE, resources = path_resources)
-    expect_equal(names(res_imf), c("version", "energyplus", "start_time", "end_time", "exit_status", "output_dir", "file", "run"))
+    res_imf <- energyplus(
+        path_imf,
+        weather,
+        out_dir,
+        echo = FALSE,
+        resources = path_resources
+    )
+    expect_equal(
+        names(res_imf),
+        c(
+            "version",
+            "energyplus",
+            "start_time",
+            "end_time",
+            "exit_status",
+            "output_dir",
+            "file",
+            "run",
+            "backend"
+        )
+    )
     expect_equal(as.character(res_imf$version), LATEST_EPLUS_VER)
     expect_equal(res_imf$energyplus, eplus_config(LATEST_EPLUS_VER)$dir)
     expect_s3_class(res_imf$start_time, "POSIXct")
@@ -582,18 +902,47 @@ test_that("energyplus()", {
     expect_equal(length(res_imf$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files <- unlist(res_imf$file); files <- files[!is.na(files)]; length(files)}, 23L)
+    expect_equal(
+        {
+            files <- unlist(res_imf$file)
+            files <- files[!is.na(files)]
+            length(files)
+        },
+        23L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])),
-        sort(c(list.files(out_dir, "AbsorptionChiller_Macro"), basename(path_resources)))
+    expect_equal(
+        sort(unname(files[names(files) != "epw"])),
+        sort(c(
+            list.files(out_dir, "AbsorptionChiller_Macro"),
+            basename(path_resources)
+        ))
     )
     expect_s3_class(res_imf$run, "data.table")
-    expect_equal(names(res_imf$run),
-        c("program", "exit_status", "start_time", "end_time", "stdout", "stderr")
+    expect_equal(
+        names(res_imf$run),
+        c(
+            "program",
+            "exit_status",
+            "start_time",
+            "end_time",
+            "stdout",
+            "stderr"
+        )
     )
-    expect_equal(res_imf$run$program,
-        c("EPMacro", "ExpandObjects", "Basement", "Slab", "EnergyPlus",
-          "convertESOMTR", "ReadVarsESO_MTR", "ReadVarsESO_ESO", "HVAC_Diagram")
+    expect_equal(
+        res_imf$run$program,
+        c(
+            "EPMacro",
+            "ExpandObjects",
+            "Basement",
+            "Slab",
+            "EnergyPlus",
+            "convertESOMTR",
+            "ReadVarsESO_MTR",
+            "ReadVarsESO_ESO",
+            "HVAC_Diagram"
+        )
     )
     expect_equal(res_imf$run[program == "EPMacro", exit_status], list(0L))
     expect_true(file.exists(file.path(out_dir, files["epmidf"])))
@@ -605,14 +954,27 @@ test_that("energyplus()", {
     unlink(c(path_imf, path_resources, out_dir), recursive = TRUE)
 
     # can run ExpandObjects
-    path_exp <- copy_eplus_example(LATEST_EPLUS_VER, "HVACTemplate-5ZoneFanCoil.idf")
+    path_exp <- copy_eplus_example(
+        LATEST_EPLUS_VER,
+        "HVACTemplate-5ZoneFanCoil.idf"
+    )
     res_exp <- energyplus(path_exp, weather, out_dir, echo = FALSE)
     expect_equal(length(res_exp$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files <- unlist(res_exp$file); files <- files[!is.na(files)]; length(files)}, 22L)
+    expect_equal(
+        {
+            files <- unlist(res_exp$file)
+            files <- files[!is.na(files)]
+            length(files)
+        },
+        22L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "HVACTemplate-5ZoneFanCoil"))
+    expect_equal(
+        sort(unname(files[names(files) != "epw"])),
+        list.files(out_dir, "HVACTemplate-5ZoneFanCoil")
+    )
     expect_equal(res_exp$run[program == "ExpandObjects", exit_status], list(0L))
     expect_true(file.exists(file.path(out_dir, files["expidf"])))
     expect_true(is.na(files["experr"]))
@@ -622,22 +984,53 @@ test_that("energyplus()", {
     # Ref: https://github.com/NREL/EnergyPlus/pull/9356
     if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
         # can run Basement
-        path_base <- copy_eplus_example(LATEST_EPLUS_VER, "LgOffVAVusingBasement.idf")
+        path_base <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "LgOffVAVusingBasement.idf"
+        )
         expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
         # modify the input in order to reduce the simulation time
         l <- read_lines(path_base)
-        l[grepl("IYRS: Maximum number of yearly iterations", string), string := "1;"]
-        l[grepl("NMAT: Number of materials in this domain", string), string := "1,"]
-        l[grepl("CLEARANCE: Distance from outside of wall", string), string := "1,"]
-        l[grepl("BaseDepth: Depth of the basement wall", string), string := "0.5;"]
+        l[
+            grepl("IYRS: Maximum number of yearly iterations", string),
+            string := "1;"
+        ]
+        l[
+            grepl("NMAT: Number of materials in this domain", string),
+            string := "1,"
+        ]
+        l[
+            grepl("CLEARANCE: Distance from outside of wall", string),
+            string := "1,"
+        ]
+        l[
+            grepl("BaseDepth: Depth of the basement wall", string),
+            string := "0.5;"
+        ]
         write_lines(l, path_base)
-        res_base <- energyplus(path_base, weather, out_dir, design_day = TRUE, echo = FALSE)
+        res_base <- energyplus(
+            path_base,
+            weather,
+            out_dir,
+            design_day = TRUE,
+            echo = FALSE
+        )
         expect_equal(length(res_base$file), 57L)
         # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
         # a SQLite output
-        expect_equal({files <- unlist(res_base$file); files <- files[!is.na(files)]; length(files)}, 26L)
+        expect_equal(
+            {
+                files <- unlist(res_base$file)
+                files <- files[!is.na(files)]
+                length(files)
+            },
+            26L
+        )
         expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-        expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "LgOffVAVusingBasement"))
+        expect_equal(
+            sort(unname(files[names(files) != "epw"])),
+            list.files(out_dir, "LgOffVAVusingBasement")
+        )
         expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
         expect_true(file.exists(file.path(out_dir, files["expidf"])))
         expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
@@ -648,7 +1041,10 @@ test_that("energyplus()", {
     }
 
     # can run Slab
-    path_slab <- copy_eplus_example(LATEST_EPLUS_VER, "5ZoneAirCooledWithSlab.idf")
+    path_slab <- copy_eplus_example(
+        LATEST_EPLUS_VER,
+        "5ZoneAirCooledWithSlab.idf"
+    )
     expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
     # modify the input in order to reduce the simulation time
     l <- read_lines(path_slab)
@@ -659,9 +1055,19 @@ test_that("energyplus()", {
     expect_equal(length(res_slab$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files <- unlist(res_slab$file); files <- files[!is.na(files)]; length(files)}, 25L)
+    expect_equal(
+        {
+            files <- unlist(res_slab$file)
+            files <- files[!is.na(files)]
+            length(files)
+        },
+        25L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "5ZoneAirCooledWithSlab"))
+    expect_equal(
+        sort(unname(files[names(files) != "epw"])),
+        list.files(out_dir, "5ZoneAirCooledWithSlab")
+    )
     expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
     expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
     expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
@@ -670,23 +1076,53 @@ test_that("energyplus()", {
 
     # can convert eso to IP
     path_ip <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    res_ip <- energyplus(path_ip, weather, out_dir, eso_to_ip = TRUE, echo = FALSE)
+    res_ip <- energyplus(
+        path_ip,
+        weather,
+        out_dir,
+        eso_to_ip = TRUE,
+        echo = FALSE
+    )
     expect_equal(length(res_ip$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files <- unlist(res_ip$file); files <- files[!is.na(files)]; length(files)}, 25L)
+    expect_equal(
+        {
+            files <- unlist(res_ip$file)
+            files <- files[!is.na(files)]
+            length(files)
+        },
+        25L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
+    expect_equal(
+        sort(unname(files[names(files) != "epw"])),
+        list.files(out_dir, "1ZoneUncontrolled")
+    )
     expect_equal(res_ip$run[program == "convertESOMTR", exit_status], list(0L))
     expect_true(file.exists(file.path(out_dir, files["ipeso"])))
     expect_true(file.exists(file.path(out_dir, files["ipmtr"])))
     expect_true(is.na(files["iperr"]))
     unlink(out_dir, recursive = TRUE)
-    res_ip2 <- energyplus(path_ip, weather, out_dir, eso_to_ip = TRUE, readvars = FALSE, echo = FALSE)
+    res_ip2 <- energyplus(
+        path_ip,
+        weather,
+        out_dir,
+        eso_to_ip = TRUE,
+        readvars = FALSE,
+        echo = FALSE
+    )
     expect_equal(length(res_ip2$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files2 <- unlist(res_ip2$file); files2 <- files2[!is.na(files2)]; length(files2)}, 22L)
+    expect_equal(
+        {
+            files2 <- unlist(res_ip2$file)
+            files2 <- files2[!is.na(files2)]
+            length(files2)
+        },
+        22L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files2))), 0L)
     expect_true(file.exists(file.path(out_dir, files2["ipeso"])))
     expect_true(file.exists(file.path(out_dir, files2["ipmtr"])))
@@ -696,17 +1132,40 @@ test_that("energyplus()", {
     # can run with EnergyPlus < 8.3
     options("eplusr.eplus_legacy" = TRUE)
     path_legacy <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    expect_error(energyplus(path_legacy, weather, out_dir, design_day = TRUE, echo = FALSE))
+    expect_error(energyplus(
+        path_legacy,
+        weather,
+        out_dir,
+        design_day = TRUE,
+        echo = FALSE
+    ))
     res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
     expect_equal(length(res_legacy$file), 57L)
     # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
     # a SQLite output
-    expect_equal({files <- unlist(res_legacy$file); files <- files[!is.na(files)]; length(files)}, 23L)
+    expect_equal(
+        {
+            files <- unlist(res_legacy$file)
+            files <- files[!is.na(files)]
+            length(files)
+        },
+        23L
+    )
     expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(sort(unname(files[names(files) != "epw"])), list.files(out_dir, "1ZoneUncontrolled"))
+    expect_equal(
+        sort(unname(files[names(files) != "epw"])),
+        list.files(out_dir, "1ZoneUncontrolled")
+    )
     unlink(out_dir, recursive = TRUE)
     options("eplusr.eplus_legacy" = NULL)
-    expect_error(energyplus(path_legacy, weather, out_dir, design_day = TRUE, annual = TRUE, echo = FALSE))
+    expect_error(energyplus(
+        path_legacy,
+        weather,
+        out_dir,
+        design_day = TRUE,
+        annual = TRUE,
+        echo = FALSE
+    ))
     res_norm <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
     expect_equal(res_legacy$file, res_norm$file)
 
@@ -718,28 +1177,57 @@ test_that("run_idf()", {
     skip_if_not_integration()
 
     path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CO_Golden-NREL.724666_TMY3.epw")
+    path_epw <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CO_Golden-NREL.724666_TMY3.epw"
+    )
 
     # can run ddy simulation
-    expect_type(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE), "list")
+    expect_type(
+        res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE),
+        "list"
+    )
     # can specify EnergyPlus version
-    expect_type(res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE, LATEST_EPLUS_VER), "list")
+    expect_type(
+        res <- run_idf(
+            path_idf,
+            NULL,
+            output_dir = tempdir(),
+            echo = FALSE,
+            LATEST_EPLUS_VER
+        ),
+        "list"
+    )
     expect_null(res$epw)
     # can stop if failed to find version
-    expect_error({
-        f <- tempfile(fileext = ".idf")
-        write_lines(read_lines(path_idf)[-91], f)
-        run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
-    }, "Missing version field")
+    expect_error(
+        {
+            f <- tempfile(fileext = ".idf")
+            write_lines(read_lines(path_idf)[-91], f)
+            run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
+        },
+        "Missing version field"
+    )
     # can use input file directory
-    expect_type({
-        f <- tempfile(fileext = ".idf")
-        file.copy(path_idf, f, overwrite = TRUE)
-        res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
-    }, "list")
+    expect_type(
+        {
+            f <- tempfile(fileext = ".idf")
+            file.copy(path_idf, f, overwrite = TRUE)
+            res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
+        },
+        "list"
+    )
 
     # can run simulation with weather
-    expect_type(res <- run_idf(path_idf, path_epw, output_dir = tempdir(), echo = FALSE), "list")
+    expect_type(
+        res <- run_idf(
+            path_idf,
+            path_epw,
+            output_dir = tempdir(),
+            echo = FALSE
+        ),
+        "list"
+    )
     expect_equal(res$idf, normalizePath(path_idf))
     expect_equal(res$epw, normalizePath(path_epw))
     expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
@@ -755,8 +1243,17 @@ test_that("run_idf()", {
     expect_true(file.exists(res$epw))
 
     # can run in the background
-    expect_s3_class(proc <- run_idf(path_idf, NULL, output_dir = tempdir(), wait = FALSE), "r_process")
-    expect_type({proc$wait(); res <- proc$get_result()}, "list")
+    expect_s3_class(
+        proc <- run_idf(path_idf, NULL, output_dir = tempdir(), wait = FALSE),
+        "r_process"
+    )
+    expect_type(
+        {
+            proc$wait()
+            res <- proc$get_result()
+        },
+        "list"
+    )
     expect_equal(res$idf, normalizePath(path_idf))
     expect_null(res$epw)
     expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
@@ -773,44 +1270,99 @@ test_that("run_multi()", {
     skip_on_cran()
     skip_if_not_integration()
 
-    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, c("1ZoneUncontrolled.idf", "5Zone_Transformer.idf"))
-    path_epw <- path_eplus_weather(LATEST_EPLUS_VER, "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+    path_idf <- copy_eplus_example(
+        LATEST_EPLUS_VER,
+        c("1ZoneUncontrolled.idf", "5Zone_Transformer.idf")
+    )
+    path_epw <- path_eplus_weather(
+        LATEST_EPLUS_VER,
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    )
 
     # can stop if idf and epw does not have the same length
-    expect_error(run_multi(path_idf, rep(path_epw, 3), NULL), "Must have same length")
+    expect_error(
+        run_multi(path_idf, rep(path_epw, 3), NULL),
+        "Must have same length"
+    )
     # can stop if idf and eplus does not have the same length
-    expect_error(run_multi(path_idf, NULL, NULL, eplus = rep(LATEST_EPLUS_VER, 3)), "Must have same length")
+    expect_error(
+        run_multi(path_idf, NULL, NULL, eplus = rep(LATEST_EPLUS_VER, 3)),
+        "Must have same length"
+    )
     # can stop if idf and design does not have the same length
-    expect_error(run_multi(path_idf, NULL, NULL, design_day = rep(FALSE, 3)), "Must have same length")
+    expect_error(
+        run_multi(path_idf, NULL, NULL, design_day = rep(FALSE, 3)),
+        "Must have same length"
+    )
     # can stop if idf and annual does not have the same length
-    expect_error(run_multi(path_idf, NULL, NULL, annual = rep(FALSE, 3)), "Must have same length")
+    expect_error(
+        run_multi(path_idf, NULL, NULL, annual = rep(FALSE, 3)),
+        "Must have same length"
+    )
     # can stop if both design and annual is TRUE
-    expect_error(run_multi(path_idf, NULL, NULL, annual = TRUE, design_day = TRUE), "both design-day-only", class = "eplusr_error_both_ddy_annual")
+    expect_error(
+        run_multi(path_idf, NULL, NULL, annual = TRUE, design_day = TRUE),
+        "both design-day-only",
+        class = "eplusr_error_both_ddy_annual"
+    )
     # can stop if model does not exist
     expect_error(run_multi(tempfile(), NULL))
     # can stop if model does not contain version
-    expect_error({
-        f <- tempfile(fileext = ".idf")
-        write_lines(read_lines(path_idf[1])[-91], f)
-        run_multi(f, NULL, output_dir = tempdir())
-    }, "Failed to determine the version of EnergyPlus", class = "eplusr_error_miss_idf_ver")
+    expect_error(
+        {
+            f <- tempfile(fileext = ".idf")
+            write_lines(read_lines(path_idf[1])[-91], f)
+            run_multi(f, NULL, output_dir = tempdir())
+        },
+        "Failed to determine the version of EnergyPlus",
+        class = "eplusr_error_miss_idf_ver"
+    )
     # can stop if target EnergyPlus is not found
-    expect_error(run_multi(path_idf, NULL, NULL, eplus = 8.0), "Cannot locate EnergyPlus", class = "eplusr_error_locate_eplus")
+    expect_error(
+        run_multi(path_idf, NULL, NULL, eplus = 8.0),
+        "Cannot locate EnergyPlus",
+        class = "eplusr_error_locate_eplus"
+    )
     # can stop if input idf contain duplications
-    expect_error(run_multi(rep(path_idf, 2), NULL, NULL), class = "eplusr_error_duplicated_sim")
+    expect_error(
+        run_multi(rep(path_idf, 2), NULL, NULL),
+        class = "eplusr_error_duplicated_sim"
+    )
     # can stop if idf and output directory does not have the same length
-    expect_error(run_multi(path_idf, NULL, output_dir = tempdir()), "Must have same length")
+    expect_error(
+        run_multi(path_idf, NULL, output_dir = tempdir()),
+        "Must have same length"
+    )
     # can stop if idf and output directory combines same job
-    expect_error(run_multi(rep(path_idf[1], 2), NULL, rep(tempdir(), 2L)), "Duplication found")
+    expect_error(
+        run_multi(rep(path_idf[1], 2), NULL, rep(tempdir(), 2L)),
+        "Duplication found"
+    )
 
     expect_message(
         res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b"))),
         "FAILED"
     )
     expect_s3_class(res, "data.table")
-    expect_equal(names(res), c("index", "status", "idf", "epw", "version",
-            "exit_status", "start_time", "end_time", "output_dir", "energyplus",
-            "stdout", "stderr"))
+    expect_equal(
+        names(res),
+        c(
+            "index",
+            "status",
+            "idf",
+            "epw",
+            "version",
+            "exit_status",
+            "start_time",
+            "end_time",
+            "output_dir",
+            "energyplus",
+            "stdout",
+            "stderr",
+            "backend"
+        )
+    )
+    expect_identical(res$backend, rep("cli", 2L))
     expect_equal(res$index, 1:2)
     expect_equal(res$status, rep("failed", 2))
     expect_equal(res$idf, normalizePath(path_idf))
@@ -822,14 +1374,43 @@ test_that("run_multi()", {
     expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
     checkmate::expect_list(res$stdout, "character")
 
-    expect_silent(res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b")), wait = FALSE))
+    expect_silent(
+        res <- run_multi(
+            path_idf,
+            NULL,
+            file.path(tempdir(), c("a", "b")),
+            wait = FALSE
+        )
+    )
     expect_s3_class(res, "r_process")
-    expect_equal({res$wait(); res$get_exit_status()}, 0L)
+    expect_equal(
+        {
+            res$wait()
+            res$get_exit_status()
+        },
+        0L
+    )
     expect_silent(res <- res$get_result())
     expect_s3_class(res, "data.table")
-    expect_equal(names(res), c("index", "status", "idf", "epw", "version",
-            "exit_status", "start_time", "end_time", "output_dir", "energyplus",
-            "stdout", "stderr"))
+    expect_equal(
+        names(res),
+        c(
+            "index",
+            "status",
+            "idf",
+            "epw",
+            "version",
+            "exit_status",
+            "start_time",
+            "end_time",
+            "output_dir",
+            "energyplus",
+            "stdout",
+            "stderr",
+            "backend"
+        )
+    )
+    expect_identical(res$backend, rep("cli", 2L))
     expect_equal(res$index, 1:2)
     expect_equal(res$status, rep("failed", 2))
     expect_equal(res$idf, normalizePath(path_idf, mustWork = FALSE))
@@ -838,7 +1419,10 @@ test_that("run_multi()", {
     expect_equal(res$exit_status > 0, rep(TRUE, 2))
     expect_s3_class(res$start_time, "POSIXct")
     expect_s3_class(res$end_time, "POSIXct")
-    expect_equal(res$output_dir, normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE))
+    expect_equal(
+        res$output_dir,
+        normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE)
+    )
     expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
     checkmate::expect_list(res$stdout, "character")
 })

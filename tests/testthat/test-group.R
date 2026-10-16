@@ -63,9 +63,22 @@ test_that("Group methods", {
             successful = FALSE, changed_after = FALSE
         )
     )
-    expect_equal(names(status$job_status),
-        c("index", "status", "idf", "epw", "version", "exit_status", "start_time", "end_time",
-          "output_dir", "energyplus", "stdout", "stderr"
+    expect_equal(
+        names(status$job_status),
+        c(
+            "index",
+            "status",
+            "idf",
+            "epw",
+            "version",
+            "exit_status",
+            "start_time",
+            "end_time",
+            "output_dir",
+            "energyplus",
+            "stdout",
+            "stderr",
+            "backend"
         )
     )
     expect_equal(status$job_status$exit_status, c(0L, 1L))
@@ -219,3 +232,141 @@ test_that("Group methods", {
 })
 
 # vim: set fdm=marker:
+
+test_that("stock API group jobs keep parallel worker identity", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    previous <- eplusr_option(num_parallel = 2L)
+    on.exit(do.call(eplusr_option, previous), add = TRUE)
+    group <- group_job(rep(fixture$model, 2L), fixture$weather)
+    group$run(
+        dir = file.path(fixture$directory, c("case-a", "case-b")),
+        backend = "api",
+        echo = FALSE,
+        readvars = FALSE
+    )
+    statuses <- group$status()$job_status
+    expect_true(all(statuses$status == "completed"))
+    expect_identical(
+        length(unique(vapply(statuses$api, "[[", integer(1L), "pid"))),
+        2L
+    )
+})
+test_that("killing an API group terminates its worker tree and preserves every case status", {
+    skip_if_not_installed("ps")
+    fixture <- testrun__api_fixture()
+    marker <- tempfile()
+    dir.create(marker)
+    setup <- local({
+        directory <- marker
+        function(api, state) {
+            api$runtime$callback_begin_new_environment(state, function(state) {
+                writeLines(
+                    as.character(Sys.getpid()),
+                    file.path(directory, paste0(Sys.getpid(), ".ready"))
+                )
+                Sys.sleep(60)
+            })
+            writeLines(
+                "started",
+                file.path(directory, paste0(Sys.getpid(), ".started"))
+            )
+        }
+    })
+    old <- eplusr_option(num_parallel = 2L)
+    on.exit(do.call(eplusr_option, old), add = TRUE)
+    group <- group_job(rep(fixture$model, 2L), fixture$weather)
+    group$run(
+        dir = file.path(fixture$directory, c("kill-a", "kill-b")),
+        backend = setup,
+        wait = FALSE,
+        echo = FALSE,
+        readvars = FALSE
+    )
+    on.exit(group$kill(), add = TRUE)
+    testrun__api_started(
+        function() length(list.files(marker, pattern = "[.]started$")) == 2L,
+        function() group$status()$alive
+    )
+    deadline <- Sys.time() + 30
+    while (
+        length(list.files(marker, pattern = "[.]ready$")) < 2L &&
+            Sys.time() < deadline
+    ) {
+        Sys.sleep(0.1)
+    }
+    expect_length(list.files(marker, pattern = "[.]ready$"), 2L)
+    handles <- lapply(
+        list.files(marker, pattern = "[.]ready$", full.names = TRUE),
+        function(path) {
+            ps::ps_handle(as.integer(readLines(path)))
+        }
+    )
+    expect_true(group$kill())
+    status <- group$status()
+    expect_true(status$terminated)
+    expect_false(status$alive)
+    expect_false(status$successful)
+    expect_true(all(status$job_status$status == "terminated"))
+    expect_true(all(
+        vapply(status$job_status$api, "[[", character(1L), "stop_reason") ==
+            "process_terminated"
+    ))
+    deadline <- Sys.time() + 10
+    while (
+        any(vapply(handles, ps::ps_is_running, logical(1L))) &&
+            Sys.time() < deadline
+    ) {
+        Sys.sleep(0.1)
+    }
+    expect_false(any(vapply(handles, ps::ps_is_running, logical(1L))))
+})
+
+test_that("foreground API Group conditions retain every failed case before rethrow", {
+    fixture <- testrun__api_fixture()
+    condition <- NULL
+    local_mocked_bindings(run_sim_event_loop = function(state) stop(condition))
+    group <- group_job(rep(fixture$model, 2L), fixture$weather)
+    for (cause in list(
+        simpleError("foreground group failure"),
+        structure(
+            list(message = "foreground group interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+    )) {
+        condition <- cause
+        caught <- tryCatch(
+            group$run(
+                dir = file.path(fixture$directory, c("failed-a", "failed-b")),
+                backend = "api",
+                echo = FALSE,
+                readvars = FALSE
+            ),
+            error = identity,
+            interrupt = identity
+        )
+        expect_identical(caught, cause)
+        status <- group$status()
+        expect_true(status$run_before)
+        expect_false(status$successful)
+        expect_identical(status$terminated, inherits(cause, "interrupt"))
+        expect_equal(nrow(status$job_status), 2L)
+        expect_true(all(
+            vapply(status$job_status$api, "[[", character(1L), "stop_reason") ==
+                if (inherits(cause, "interrupt")) {
+                    "interrupt"
+                } else {
+                    "pipeline_error"
+                }
+        ))
+    }
+})
+
+
+test_that("CLI group cancellation failures retain their previous status", {
+    private <- new.env(parent = emptyenv())
+    private$m_job <- testrun__denied_process()
+    private$m_log <- list()
+    expect_false(epgroup_kill(NULL, private))
+    expect_false(isTRUE(private$m_log$killed))
+})

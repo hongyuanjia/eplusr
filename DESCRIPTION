@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.18.0.9000
+Version: 0.18.0.9023
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -25,6 +25,7 @@ BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
     R (>= 4.2.0)
 Imports:
+    codetools,
     callr (>= 2.0.4),
     checkmate (>= 2.0.0),
     cli (>= 3.0.0),
@@ -37,10 +38,12 @@ Imports:
     S7 (>= 0.2.1),
     stringi
 Suggests:
+    rdyncall (>= 0.10.2),
     chromote,
     hms,
     decido,
     png,
+    ps,
     rgl (>= 0.105.13),
     testthat (>= 3.0.0),
     units,
@@ -53,6 +56,10 @@ RoxygenNote: 7.3.3
 SystemRequirements: EnergyPlus (optional)
     (<https://energyplus.net>); udunits2 (optional, for units support)
 Collate:
+    'api-binding.R'
+    'api-capabilities.R'
+    'api-profile.R'
+    'api.R'
     'constants.R'
     'assert.R'
     'diagram.R'
@@ -86,6 +93,8 @@ Collate:
     'job.R'
     'options.R'
     'param.R'
+    'plugin.R'
+    'plugin-cli.R'
     'rdd.R'
     'reload.R'
     'run.R'

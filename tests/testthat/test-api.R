@@ -1,0 +1,1747 @@
+test_that("API metadata and state ownership are explicit", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    expect_s3_class(api, "EnergyPlusAPI")
+    expect_equal(api$info()$version, "26.1.0-fake")
+    expect_equal(nrow(api$methods()), 155L)
+    state <- api$state_manager$new_state()
+    expect_equal(api$state_manager$status(state)$phase, "created")
+    other <- testapi__fake()
+    expect_error(other$api$state_manager$delete_state(state), "different API")
+    expect_error(api$state_manager$reset_state(1), "managed")
+    api$state_manager$delete_state(state)
+    api$state_manager$delete_state(state)
+    expect_equal(ctx$deleted, 1L)
+    expect_error(api$exchange$year(state), "closed")
+    api$close()
+    api$close()
+    expect_equal(ctx$unloaded, 1L)
+    expect_error(api$state_manager$new_state(), "closed")
+    other$api$close()
+})
+
+test_that("functional resources invalidate across reset and state changes", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    other <- api$state_manager$new_state()
+    glycol <- api$functional$glycol(state, "water")
+    refrigerant <- api$functional$refrigerant(state, "R22")
+    psych <- api$functional$psychrometrics(state)
+    expect_equal(glycol$specific_heat(state, 35), 0)
+    expect_equal(refrigerant$saturation_pressure(state, 25), 0)
+    expect_equal(psych$relative_humidity_b(state, 24, .009, 101325), 0)
+    expect_error(glycol$density(other, 35), "Functional object")
+    expect_error(api$functional$glycol(state, NA_character_), "string")
+    api$functional$initialize(state)
+    api$state_manager$reset_state(state)
+    expect_error(psych$density(state, 101325, 24, .009), "Functional object")
+    expect_equal(api$state_manager$status(state)$generation, 1L)
+    next_glycol <- api$functional$glycol(state, "water")
+    next_glycol$delete(state)
+    expect_error(next_glycol$density(state, 35), "closed")
+    ctx$null_resource <- TRUE
+    expect_error(
+        api$functional$refrigerant(state, "missing"),
+        "Unknown EnergyPlus"
+    )
+    api$close()
+    expect_equal(ctx$deleted, 2L)
+})
+
+test_that("exchange handles are checked by state, kind, generation and API flag", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    expect_error(
+        api$exchange$get_variable_handle(state, "T", "Z"),
+        "initialized"
+    )
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    handle <- api$exchange$get_variable_handle(state, "T", "Z")
+    expect_s3_class(handle, "EnergyPlusHandle")
+    expect_equal(api$exchange$get_variable_value(state, handle), 0)
+    expect_error(api$exchange$get_meter_value(state, handle), "data kind")
+    expect_error(api$exchange$get_variable_value(state, 1L), "data kind")
+    ctx$bad_value <- TRUE
+    expect_error(
+        api$exchange$get_variable_value(state, handle),
+        "invalid exchange"
+    )
+    expect_true(api$exchange$api_error_flag(state))
+    api$exchange$reset_api_error_flag(state)
+    expect_false(api$exchange$api_error_flag(state))
+    ctx$bad_value <- FALSE
+    expect_error(
+        api$exchange$today_weather_outdoor_dry_bulb_at_time(state, -1L, 1L),
+        "hour"
+    )
+    expect_error(
+        api$exchange$today_weather_outdoor_dry_bulb_at_time(state, 0L, 0L),
+        "interval"
+    )
+    expect_error(
+        api$exchange$today_weather_outdoor_dry_bulb_at_time(state, 0L, 5L),
+        "interval"
+    )
+    expect_equal(
+        api$exchange$today_weather_outdoor_dry_bulb_at_time(state, 0L, 1L),
+        0
+    )
+    entry$running <- FALSE
+    api$state_manager$reset_state(state)
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    expect_error(api$exchange$get_variable_value(state, handle), "generation")
+    entry$running <- FALSE
+    api$close()
+})
+
+test_that("API data arrays are copied and freed on success and R conversion failure", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    data <- api$exchange$get_api_data(state)
+    expect_equal(names(data), c("what", "name", "key", "type", "unit"))
+    expect_equal(data$name, "Temperature")
+    # Honor a generated padded layout for every row rather than assuming five packed pointers.
+    ctx$rows <- 2L
+    ctx$api_data$size <- 64L
+    ctx$api_data$fields$offset <- c(0L, 16L, 24L, 32L, 48L)
+    offsets <- integer()
+    ctx$ffi$unpack <- function(pointer, offset, type) {
+        offsets <<- c(offsets, offset)
+        c("OutputVariable", "Temperature", "ZONE ONE", "", "C")[
+            match(offset %% 64L, ctx$api_data$fields$offset)
+        ]
+    }
+    expect_equal(api$exchange$get_api_data(state)$name, rep("Temperature", 2L))
+    expect_equal(
+        offsets,
+        c(ctx$api_data$fields$offset, 64L + ctx$api_data$fields$offset)
+    )
+    ctx$rows <- 0L
+    expect_equal(nrow(api$exchange$get_api_data(state)), 0L)
+    ctx$rows <- 1L
+    ctx$ffi$string <- function(pointer) stop("decode failed")
+    expect_error(api$exchange$get_api_data(state), "decode failed")
+    freed <- Filter(function(x) x$symbol == "freeAPIData", ctx$log)
+    expect_equal(length(freed), 4L)
+    entry$running <- FALSE
+    api$close()
+})
+
+test_that("callback errors and interrupts rethrow only after native state deletion", {
+    for (condition in list(
+        simpleError("controller error"),
+        structure(
+            list(message = "controller interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+    )) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        count <- 0L
+        api$runtime$callback_begin_system_timestep_before_predictor(
+            state,
+            function(s) {
+                count <<- count + 1L
+                stop(condition)
+            }
+        )
+        result <- tryCatch(
+            api$runtime$run_energyplus(state, testapi__model()),
+            error = identity,
+            interrupt = identity
+        )
+        expect_identical(result, condition)
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            if (inherits(condition, "interrupt")) {
+                "interrupt"
+            } else {
+                "callback_error"
+            }
+        )
+        expect_equal(count, 1L)
+        expect_equal(ctx$deleted, 1L)
+        expect_equal(api$state_manager$status(state)$phase, "closed")
+        expect_null(api__running$state)
+        api$close()
+    }
+})
+
+test_that("close, reset, deletion and recursive runs are forbidden inside callbacks", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    api$runtime$callback_begin_new_environment(state, function(s) {
+        expect_error(api$close(), "running")
+        expect_error(api$state_manager$delete_state(s), "running")
+        expect_error(api$state_manager$reset_state(s), "running")
+        expect_error(
+            api$runtime$run_energyplus(s, testapi__model()),
+            "recursively"
+        )
+    })
+    expect_equal(api$runtime$run_energyplus(state, testapi__model()), 0L)
+    expect_equal(api$state_manager$status(state)$phase, "completed")
+    expect_error(api$runtime$run_energyplus(state, testapi__model()), "reset")
+    api$state_manager$reset_state(state)
+    expect_length(attr(state, "entry")$callbacks, 0L)
+    expect_equal(api$runtime$run_energyplus(state, testapi__model()), 0L)
+    api$close()
+})
+
+test_that("functional callbacks also protect their active native frame", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    condition <- simpleError("functional handler")
+    api$functional$callback_error(state, function(level, message) {
+        expect_error(api$state_manager$reset_state(state), "running")
+        expect_error(api$close(), "running")
+        stop(condition)
+    })
+    psych <- api$functional$psychrometrics(state)
+    ctx$hook <- function(symbol, args) {
+        if (symbol == "psyCpAirFnW") {
+            args[[1L]]$callbacks$registerErrorCallback(2L, "warning")
+        }
+    }
+    result <- tryCatch(psych$specific_heat(state, .01), error = identity)
+    expect_identical(result, condition)
+    expect_equal(ctx$deleted, 1L)
+    api$close()
+})
+
+test_that("user stops, input rejection and unknown native unwinds remain distinct", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    expect_error(
+        api$runtime$run_energyplus(state, NA_character_),
+        "character vector"
+    )
+    expect_error(api$runtime$run_energyplus(state, "missing.idf"), "existing")
+    expect_error(
+        api$runtime$run_energyplus(
+            state,
+            testapi__model("PythonPlugin:Instance,x;")
+        ),
+        "PythonPlugin"
+    )
+    expect_error(
+        api$runtime$run_energyplus(
+            state,
+            testapi__model('{"PythonPlugin:Instance":{}}')
+        ),
+        "PythonPlugin"
+    )
+    expect_error(
+        api$runtime$callback_begin_new_environment(state, 1),
+        "R function"
+    )
+    api$runtime$callback_begin_new_environment(state, function(s) {
+        api$runtime$stop_simulation(s)
+    })
+    api$runtime$run_energyplus(state, testapi__model())
+    expect_equal(api$state_manager$status(state)$phase, "stopped")
+    expect_equal(api$state_manager$status(state)$stop_reason, "user_stop")
+    api$state_manager$reset_state(state)
+    ctx$fail_native <- TRUE
+    expect_error(
+        api$runtime$run_energyplus(state, testapi__model()),
+        "native unwind"
+    )
+    expect_equal(api$state_manager$status(state)$phase, "quarantined")
+    expect_error(api$close(), "quarantined")
+    expect_error(api$exchange$year(state), "quarantined")
+    expect_null(api__running$state)
+    ctx$quarantined <- FALSE
+    api$close()
+})
+
+test_that("argument validation never forwards arbitrary R objects", {
+    expect_error(api__arguments("Z)v", list(NA_character_), "name"), "string")
+    expect_error(api__arguments("d)v", list(new.env()), "value"), "finite")
+    expect_error(api__arguments("i)v", list(1.5), "value"), "integer")
+    expect_error(api__arguments("I)v", list(-1), "value"), "integer")
+    expect_equal(
+        api__arguments("id)v", list(TRUE, 2L), c("flag", "value")),
+        list(1L, 2)
+    )
+})
+
+test_that("native callback proxies reject foreign threads without entering R", {
+    skip_if_not_installed("rdyncall")
+    directory <- tempfile("eplusr-guard-fixture-")
+    dir.create(directory)
+    source <- test_path("fixtures", "callback-thread.c")
+    file.copy(source, file.path(directory, "callback-thread.c"))
+    old <- setwd(directory)
+    on.exit(setwd(old), add = TRUE)
+    compile <- system2(
+        file.path(R.home("bin"), "R"),
+        c("CMD", "SHLIB", "callback-thread.c"),
+        stdout = TRUE,
+        stderr = TRUE
+    )
+    expect_null(attr(compile, "status"), info = paste(compile, collapse = "\n"))
+    library <- rdyncall::dynload(
+        file.path(directory, paste0("callback-thread", .Platform$dynlib.ext)),
+        auto.unload = FALSE
+    )
+    on.exit(rdyncall::dynunload(library), add = TRUE)
+    owner <- rdyncall::dynsym(library, "callback_on_owner")
+    worker <- rdyncall::dynsym(library, "callback_on_worker")
+    signatures <- c("p)v", "i)v", "Z)v", "iZ)v")
+    for (kind in seq_along(signatures)) {
+        count <- 0L
+        original <- rdyncall::ccallback(signatures[kind], function(...) {
+            count <<- count + 1L
+            invisible(NULL)
+        })
+        guard <- .Call(
+            "eplusr_guard_create",
+            original,
+            signatures[kind],
+            PACKAGE = "eplusr"
+        )
+        rdyncall::dyncall(owner, "pi)v", guard, kind - 1L)
+        expect_equal(count, 1L)
+        expect_equal(
+            .Call("eplusr_guard_foreign", guard, PACKAGE = "eplusr"),
+            0
+        )
+        expect_equal(rdyncall::dyncall(worker, "pi)i", guard, kind - 1L), 0L)
+        expect_equal(count, 1L)
+        expect_equal(
+            .Call("eplusr_guard_foreign", guard, PACKAGE = "eplusr"),
+            1
+        )
+        expect_identical(
+            .Call("eplusr_guard_original", guard, PACKAGE = "eplusr"),
+            original
+        )
+        .Call("eplusr_guard_release", guard, PACKAGE = "eplusr")
+        expect_error(
+            .Call("eplusr_guard_foreign", guard, PACKAGE = "eplusr"),
+            "closed"
+        )
+    }
+    original <- rdyncall::ccallback("p)v", function(s) NULL)
+    expect_error(
+        .Call("eplusr_guard_create", 1L, "p)v", PACKAGE = "eplusr"),
+        "live"
+    )
+    expect_error(
+        .Call("eplusr_guard_create", original, ")i", PACKAGE = "eplusr"),
+        "Unsupported"
+    )
+    guards <- lapply(seq_len(256L), function(i) {
+        .Call("eplusr_guard_create", original, "p)v", PACKAGE = "eplusr")
+    })
+    expect_error(
+        .Call("eplusr_guard_create", original, "p)v", PACKAGE = "eplusr"),
+        "256"
+    )
+    invisible(lapply(guards, function(g) {
+        .Call("eplusr_guard_release", g, PACKAGE = "eplusr")
+    }))
+})
+
+test_that("thread and bridge diagnostics stop control without a false completion result", {
+    for (kind in c("foreign", "bridge", "interrupt")) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        invoked <- FALSE
+        api$runtime$callback_begin_new_environment(state, function(s) {
+            invoked <<- TRUE
+        })
+        ctx$ffi$diagnostic <- function(callback) {
+            list(
+                foreign = as.integer(kind == "foreign"),
+                bridge = list(
+                    error_invocations = as.integer(kind != "foreign"),
+                    disable_reason = if (kind == "interrupt") {
+                        "r_interrupt"
+                    } else {
+                        "boundary_error"
+                    }
+                )
+            )
+        }
+        failure <- tryCatch(
+            api$runtime$run_energyplus(state, testapi__model()),
+            error = identity,
+            interrupt = identity
+        )
+        expect_s3_class(
+            failure,
+            if (kind == "interrupt") "interrupt" else "error"
+        )
+        expect_match(
+            conditionMessage(failure),
+            "foreign thread|bridge disabled"
+        )
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            if (kind == "interrupt") "interrupt" else "callback_error"
+        )
+        expect_false(invoked)
+        expect_equal(api$state_manager$status(state)$phase, "closed")
+        expect_equal(ctx$deleted, 1L)
+        api$close()
+    }
+})
+
+test_that("library loading audits identity and releases failed probe states", {
+    skip_if_not_installed("rdyncall")
+    ctx <- testapi__loader()
+    local_mocked_bindings(
+        dynload = function(...) if (ctx$load) ctx$pointer else NULL,
+        dynport_load_into = function(portfile, envir, libhandle = NULL) {
+            ctx$handle <- libhandle
+            if (ctx$symbols) {
+                for (symbol in setdiff(
+                    names(testapi__signatures()),
+                    ctx$omit
+                )) {
+                    # Capture each binding separately to preserve its own symbol and ABI.
+                    binding <- local({
+                        name <- symbol
+                        signature <- testapi__signatures()[[symbol]]
+                        f <- function(...) ctx$call(name, signature, ...)
+                        attr(f, "signature") <- signature
+                        f
+                    })
+                    envir[[symbol]] <- binding
+                }
+            }
+            if (ctx$layout) {
+                envir$APIDataEntry <- testapi__layout()
+                if (isTRUE(ctx$bad_fields)) {
+                    envir$APIDataEntry$fields$name[5L] <- "wrong"
+                }
+            }
+            invisible(envir)
+        },
+        dynunload = function(...) {
+            ctx$unloaded <- ctx$unloaded + 1L
+        },
+        is.nullptr = is.null,
+        .package = "rdyncall"
+    )
+    expect_error(api__load(tempfile()), "not found")
+    ctx$load <- FALSE
+    expect_error(api__load(ctx$directory), "Cannot load")
+    ctx$load <- TRUE
+    ctx$symbols <- FALSE
+    expect_error(api__load(ctx$directory), "Missing required")
+    ctx$symbols <- TRUE
+    ctx$layout <- FALSE
+    expect_error(api__load(ctx$directory), "APIDataEntry layout")
+    ctx$layout <- TRUE
+    ctx$bad_fields <- TRUE
+    expect_error(api__load(ctx$directory), "APIDataEntry layout")
+    ctx$bad_fields <- FALSE
+    ctx$version <- "EnergyPlus, Version 26.2.0-test"
+    expect_error(api__load(ctx$directory), "not EnergyPlus 26.1")
+    ctx$version <- "EnergyPlus, Version 26.1.0-test"
+    ctx$null_state <- TRUE
+    expect_error(api__load(ctx$directory), "identity-check state")
+    ctx$null_state <- FALSE
+    ctx$fail_identity <- TRUE
+    expect_error(api__load(ctx$directory), "identity conversion")
+    expect_equal(ctx$deleted, 1L)
+    ctx$fail_identity <- FALSE
+    ctx$api_version <- "wrong"
+    expect_error(api__load(ctx$directory), "API version")
+    expect_equal(ctx$deleted, 2L)
+    ctx$api_version <- "0.2"
+    # Managed metadata avoids its native getter; a restricted trend getter remains optional.
+    ctx$omit <- c("inputFilePath", "getPluginTrendVariableValue")
+    api <- api__load(ctx$directory)
+    expect_match(api$info()$version, "26.1.0")
+    methods <- api$methods()
+    expect_false("inputFilePath" %in% methods$symbol)
+    expect_identical(
+        methods$signature[methods$symbol == "getPluginTrendVariableValue"],
+        ""
+    )
+    state <- api$state_manager$new_state()
+    api$runtime$issue_text(state, "positional arguments")
+    expect_null(names(ctx$arguments))
+    # Create and diagnose the real guarded trampoline, while registration is mocked.
+    api$runtime$callback_begin_new_environment(state, function(s) NULL)
+    api$state_manager$delete_state(state)
+    api$close()
+    expect_equal(ctx$deleted, 4L)
+    expect_identical(ctx$handle, ctx$pointer)
+    expect_equal(ctx$unloaded, 8L)
+    ctx$version <- "EnergyPlus, Version 26.2.0-test"
+    api <- api__load(ctx$directory, "26.2.0")
+    expect_match(api$info()$version, "26.2.0")
+    expect_identical(api$info()$abi, "26.1-26.2")
+    api$close()
+})
+
+test_that("constructor uses installation discovery and rejects unreviewed versions", {
+    local_mocked_bindings(
+        is_eplus_path = function(path) identical(path, "stock-installation"),
+        use_eplus = function(path) list(version = "26.1.0", dir = path),
+        eplus_config = function(version) {
+            list(version = paste0(version, ".0"), dir = "discovered")
+        },
+        api__check_bridge = function() invisible(NULL),
+        api__load = function(directory, version) directory
+    )
+    expect_equal(eplus_api("stock-installation"), "stock-installation")
+    expect_equal(eplus_api("26.1"), "discovered")
+    expect_equal(eplus_api("26.2"), "discovered")
+    expect_error(eplus_api("25.2"), "26.1 or 26.2 installation")
+})
+
+test_that("bridge safety gate handles missing, already loaded, failing and cached builds", {
+    available <- FALSE
+    loaded <- FALSE
+    # Limit base replacements to this test; avoid ever entering an unsafe real callback.
+    local_mocked_bindings(
+        requireNamespace = function(...) available,
+        isNamespaceLoaded = function(...) loaded,
+        .package = "base"
+    )
+    expect_error(api__check_bridge(), "Install a rdyncall build")
+    available <- TRUE
+    local_mocked_bindings(
+        dynport_load_into = function(portfile, envir) NULL,
+        .package = "rdyncall"
+    )
+    expect_error(api__check_bridge(), "existing-handle")
+    local_mocked_bindings(
+        dynport_load_into = function(portfile, envir, libhandle = NULL) NULL,
+        .package = "rdyncall"
+    )
+    loaded <- TRUE
+    saved <- as.list(api__bridge_cache)
+    rm(list = ls(api__bridge_cache), envir = api__bridge_cache)
+    on.exit(
+        {
+            rm(list = ls(api__bridge_cache), envir = api__bridge_cache)
+            list2env(saved, api__bridge_cache)
+        },
+        add = TRUE
+    )
+    expect_error(api__check_bridge(), "Restart R")
+    loaded <- FALSE
+    safe <- FALSE
+    local_mocked_bindings(
+        r = function(..., timeout) {
+            expect_identical(timeout, 120)
+            if (identical(safe, "error")) {
+                stop("probe child failed")
+            }
+            safe
+        },
+        .package = "callr"
+    )
+    expect_error(api__check_bridge(), "complete callback")
+    safe <- "error"
+    expect_error(api__check_bridge(), "safety probe failed: probe child failed")
+    safe <- rep(TRUE, 3L)
+    expect_null(api__check_bridge())
+    loaded <- TRUE
+    expect_null(api__check_bridge())
+    key <- ls(api__bridge_cache)[1L]
+    api__bridge_cache[[key]]$namespace <- new.env(parent = emptyenv())
+    expect_error(api__check_bridge(), "Restart R")
+})
+
+test_that("bridge probe requires all three diagnostic contracts", {
+    skip_if_not_installed("rdyncall")
+    reason <- NULL
+    local_mocked_bindings(
+        ccallback = function(signature, fun) fun,
+        dyncall = function(fun, signature) {
+            result <- tryCatch(fun(), error = identity, interrupt = identity)
+            reason <<- if (inherits(result, "interrupt")) {
+                "r_interrupt"
+            } else if (inherits(result, "error")) {
+                "r_error"
+            } else {
+                "boundary_error"
+            }
+            0L
+        },
+        callback_status = function(...) {
+            list(
+                disabled = TRUE,
+                disable_reason = reason,
+                error_invocations = 1
+            )
+        },
+        .package = "rdyncall"
+    )
+    previous <- getOption("warn")
+    expect_true(all(api__probe_bridge()))
+    expect_identical(getOption("warn"), previous)
+})
+
+test_that("process and pointer guards prevent restored or foreign ownership", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    ctx$pid <- -1L
+    expect_error(api$exchange$year(state), "another R process")
+    expect_error(api$state_manager$status(state), "another R process")
+    expect_error(api$close(), "another R process")
+    expect_error(api__new_state(ctx), "owning R process")
+    ctx$pid <- Sys.getpid()
+    saved <- entry$pointer
+    entry$pointer <- NULL
+    expect_error(api$exchange$year(state), "serialized")
+    entry$pointer <- saved
+    ctx$ffi$live <- function() FALSE
+    expect_error(api$exchange$year(state), "serialize API")
+    expect_error(api$close(), "serialize API")
+    ctx$ffi$live <- function() TRUE
+    old_call <- ctx$call
+    ctx$call <- function(...) NULL
+    expect_error(api__new_state(ctx), "allocate a state")
+    ctx$call <- old_call
+    ctx$native_depth <- 1L
+    expect_error(api__new_state(ctx), "active native")
+    ctx$native_depth <- 0L
+    expect_match(api$functional$ep_version(), "26.1")
+    expect_error(
+        api$exchange$get_object_names(state, "Zone"),
+        "initialized"
+    )
+    api$close()
+    expect_error(api__new_state(ctx), "closed")
+})
+
+test_that("unreferenced APIs and unregistered states reach deterministic fallback cleanup", {
+    ctx <- testapi__fake()
+    state <- ctx$api$state_manager$new_state()
+    rm(state)
+    gc()
+    expect_equal(ctx$deleted, 1L)
+    ctx$api$state_manager$new_state()
+    # Release the full self-referencing API graph, retaining only an external observer.
+    observer <- new.env()
+    ctx$ffi$unload <- local({
+        target <- observer
+        function() target$unloaded <- TRUE
+    })
+    rm(ctx)
+    gc()
+    expect_true(observer$unloaded)
+})
+
+test_that("standalone diagnostics and non-callback interrupts cannot report success", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    api$functional$callback_error(state, function(...) NULL)
+    ctx$ffi$diagnostic <- function(callback) {
+        list(foreign = 1L, bridge = list(error_invocations = 0L))
+    }
+    expect_error(api$functional$psychrometrics(state), "foreign thread")
+    expect_equal(ctx$deleted, 1L)
+    api$close()
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    native <- ctx$call
+    ctx$call <- function(symbol, arguments = list()) {
+        if (symbol == "energyplus") {
+            stop(structure(
+                list(message = "outer interrupt", call = NULL),
+                class = c("interrupt", "condition")
+            ))
+        }
+        native(symbol, arguments)
+    }
+    result <- tryCatch(
+        api$runtime$run_energyplus(state, testapi__model()),
+        interrupt = identity
+    )
+    expect_s3_class(result, "interrupt")
+    expect_true(ctx$quarantined)
+    expect_equal(ctx$deleted, 0L)
+    ctx$quarantined <- FALSE
+    api$close()
+})
+
+test_that("resource retirement, late registration and engine failure have explicit results", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    glycol <- api$functional$glycol(state, "water")
+    api$runtime$run_energyplus(state, testapi__model())
+    expect_error(glycol$density(state, 25), "Functional object")
+    expect_error(
+        api$exchange$request_variable(state, "T", "Z"),
+        "before running"
+    )
+    expect_error(
+        api$runtime$callback_begin_new_environment(state, function(s) NULL),
+        "Register callbacks"
+    )
+    api$state_manager$reset_state(state)
+    entry <- attr(state, "entry")
+    cause <- simpleError("first condition")
+    api$runtime$callback_begin_new_environment(state, function(s) NULL)
+    entry$condition <- cause
+    # The callback returns without calling user code after the first recorded condition.
+    result <- tryCatch(
+        api$runtime$run_energyplus(state, testapi__model()),
+        error = identity
+    )
+    expect_identical(result, cause)
+    api$close()
+    ctx <- testapi__fake()
+    state <- ctx$api$state_manager$new_state()
+    native <- ctx$call
+    ctx$call <- function(symbol, arguments = list()) {
+        if (symbol == "energyplus") 1L else native(symbol, arguments)
+    }
+    expect_equal(ctx$api$runtime$run_energyplus(state, testapi__model()), 1L)
+    expect_equal(
+        ctx$api$state_manager$status(state)$stop_reason,
+        "engine_error"
+    )
+    ctx$api$close()
+})
+
+test_that("null API data and custom callback names cannot bypass validation", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    spec <- Filter(
+        function(x) x$method == "callback_user_defined_component_model",
+        ctx$manifest$methods
+    )[[1L]]
+    expect_null(api__callback(
+        ctx,
+        attr(state, "entry"),
+        state,
+        spec,
+        function(s) NULL,
+        list(program_name = "program")
+    ))
+    entry <- attr(state, "entry")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    ctx$ffi$unpack <- function(...) NULL
+    expect_equal(api$exchange$get_api_data(state)$name, "")
+    native <- ctx$call
+    ctx$call <- function(symbol, arguments = list()) {
+        if (symbol == "getAPIData") NULL else native(symbol, arguments)
+    }
+    expect_error(api$exchange$get_api_data(state), "null API data")
+    entry$running <- FALSE
+    api$close()
+})
+
+test_that("platform library names match the installation ABI layouts", {
+    expect_equal(api__library_name("windows", "Windows"), "EnergyPlusAPI.dll")
+    expect_equal(api__library_name("unix", "Darwin"), "libenergyplusapi.dylib")
+    expect_equal(api__library_name("unix", "Linux"), "libenergyplusapi.so")
+    binding <- api_bind__select("26.1-26.2")
+    binding$pointer_bytes <- 4L
+    local_mocked_bindings(api_bind__select = function(abi) binding)
+    expect_error(api__load(tempfile()), "64-bit")
+})
+
+test_that("plugin rejection respects IDF comments and case-insensitive object names", {
+    ctx <- testapi__fake()
+    state <- ctx$api$state_manager$new_state()
+    for (text in c(
+        "Version,26.1;\n! configuration\nPythonPlugin:Instances,x;",
+        "Version,26.1;\npythonplugin:instances,x;"
+    )) {
+        expect_error(
+            ctx$api$runtime$run_energyplus(state, testapi__model(text)),
+            "PythonPlugin"
+        )
+    }
+    ctx$api$close()
+})
+
+test_that("nested functional callbacks defer cleanup to the outer native return", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    psych <- api$functional$psychrometrics(state)
+    cause <- simpleError("nested property callback")
+    depth <- 0L
+    api$functional$callback_error(state, function(level, message) {
+        depth <<- depth + 1L
+        if (depth == 1L) {
+            psych$specific_heat(state, .01)
+            expect_equal(ctx$deleted, 0L)
+            expect_gt(ctx$native_depth, 0L)
+        } else {
+            stop(cause)
+        }
+    })
+    ctx$hook <- function(symbol, arguments) {
+        if (symbol == "psyCpAirFnW") {
+            arguments[[1L]]$callbacks$registerErrorCallback(2L, "nested")
+        }
+    }
+    result <- tryCatch(psych$specific_heat(state, .01), error = identity)
+    expect_identical(result, cause)
+    expect_equal(ctx$deleted, 1L)
+    expect_equal(depth, 2L)
+    api$close()
+})
+
+test_that("stop and nested simulation commands require an active outer runtime", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    expect_error(api$runtime$stop_simulation(state), "active runtime")
+    ctx$native_depth <- 1L
+    expect_error(
+        api$runtime$run_energyplus(state, testapi__model()),
+        "recursively"
+    )
+    ctx$native_depth <- 0L
+    api$close()
+})
+
+# A bridge interrupt may be observable only after the last native callback or a standalone property call.
+test_that("late bridge interrupts retain their category after native return", {
+    for (mode in c("run", "functional")) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        if (mode == "run") {
+            api$runtime$callback_begin_new_environment(state, function(s) NULL)
+        } else {
+            api$functional$callback_error(state, function(...) NULL)
+        }
+        interrupted <- FALSE
+        native <- ctx$call
+        ctx$call <- function(symbol, arguments = list()) {
+            result <- native(symbol, arguments)
+            if (
+                symbol ==
+                    if (mode == "run") {
+                        "energyplus"
+                    } else {
+                        "initializeFunctionalAPI"
+                    }
+            ) {
+                interrupted <<- TRUE
+            }
+            result
+        }
+        ctx$ffi$diagnostic <- function(callback) {
+            list(
+                foreign = 0L,
+                bridge = list(
+                    error_invocations = as.integer(interrupted),
+                    disable_reason = "r_interrupt"
+                )
+            )
+        }
+        result <- tryCatch(
+            if (mode == "run") {
+                api$runtime$run_energyplus(state, testapi__model())
+            } else {
+                api$functional$psychrometrics(state)
+            },
+            error = identity,
+            interrupt = identity
+        )
+        expect_s3_class(result, "interrupt")
+        expect_identical(
+            api$state_manager$status(state)$stop_reason,
+            "interrupt"
+        )
+        expect_identical(api$state_manager$status(state)$phase, "closed")
+        expect_equal(ctx$deleted, 1L)
+        expect_false(ctx$quarantined)
+        api$close()
+    }
+})
+
+# A stock property error can enter rdyncall's boundary before the managed R handler runs.
+test_that("stock functional bridge interrupts return safely with their original category", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    result <- callr::r(
+        function(directory) {
+            api <- eplusr::eplus_api(directory)
+            on.exit(api$close(), add = TRUE)
+            ctx <- environment(api$close)$ctx
+            original <- ctx$ffi$callback
+            enabled <- FALSE
+            # Inject before the managed wrapper, while retaining the real native guard and rdyncall trampoline.
+            ctx$ffi$callback <- function(signature, fun) {
+                original(signature, function(...) {
+                    if (enabled) {
+                        stop(structure(
+                            list(
+                                message = "bridge interrupt probe",
+                                call = NULL
+                            ),
+                            class = c("interrupt", "condition")
+                        ))
+                    }
+                    fun(...)
+                })
+            }
+            state <- api$state_manager$new_state()
+            api$functional$callback_error(state, function(...) NULL)
+            fluid <- api$functional$glycol(state, "WATER")
+            enabled <- TRUE
+            condition <- tryCatch(
+                fluid$specific_heat(state, -1000),
+                error = identity,
+                interrupt = identity
+            )
+            list(
+                class = class(condition),
+                status = api$state_manager$status(state),
+                quarantined = ctx$quarantined
+            )
+        },
+        args = list(
+            eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$dir
+        ),
+        libpath = .libPaths()
+    )
+    expect_true("interrupt" %in% result$class)
+    expect_identical(result$status$stop_reason, "interrupt")
+    expect_identical(result$status$phase, "closed")
+    expect_false(result$quarantined)
+})
+
+# The manifest distinguishes native ownership defects from mode-dependent capabilities.
+test_that("audited API methods expose the remaining native safety restrictions", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    methods <- ctx$api$methods()
+    blocked <- methods$method[methods$status == "unsupported"]
+    expect_identical(blocked, "get_trend_value")
+    expect_equal(sum(methods$plugin_only), 10L)
+    expect_equal(sum(methods$status == "supported"), 154L)
+    state <- ctx$api$state_manager$new_state()
+    for (method in methods$method[
+        methods$plugin_only & methods$status == "supported"
+    ]) {
+        expect_error(ctx$api$exchange[[method]](state), "executable-hosted")
+    }
+    expect_error(ctx$api$exchange$get_trend_value(state), "out of bounds")
+})
+
+# Borrowed plugin handles must remain state- and kind-bound before entering native arrays.
+test_that("plugin exchange checks handles, missing globals and aggregate ranges", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    ctx$plugin_mode <- TRUE
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    on.exit(
+        {
+            entry$running <- FALSE
+            api$close()
+        },
+        add = TRUE
+    )
+    available <- "R Shared"
+    local_mocked_bindings(api__data = function(...) {
+        data.frame(what = "PluginGlobalVariable", key = available)
+    })
+    global <- api$exchange$get_global_handle(state, "r shared")
+    trend <- api$exchange$get_trend_handle(state, "R History")
+    expect_identical(attr(global, "kind"), "plugin_global")
+    expect_identical(attr(trend, "kind"), "plugin_trend")
+    missing <- api$exchange$get_global_handle(state, "missing")
+    expect_identical(as.integer(missing), -1L)
+    expect_error(
+        api$exchange$get_global_value(state, missing),
+        "negative handle"
+    )
+    expect_error(api$exchange$set_global_value(state, trend, 2), "data kind")
+    missing_trend <- api$exchange$get_trend_handle(state, "missing")
+    expect_error(
+        api$exchange$get_trend_sum(state, missing_trend, 2),
+        "negative handle"
+    )
+    expect_error(api$exchange$get_trend_sum(state, global, 2), "data kind")
+    expect_error(api$exchange$get_trend_sum(state, trend, 1), "count >= 2")
+    expect_error(api$exchange$get_trend_sum(state, trend, 2.5), "C integer")
+    expect_error(api$exchange$get_trend_sum(state, trend, Inf), "finite")
+    api$exchange$set_global_value(state, global, 3)
+    expect_equal(api$exchange$get_global_value(state, global), 0)
+    for (method in c(
+        "get_trend_average",
+        "get_trend_min",
+        "get_trend_max",
+        "get_trend_sum",
+        "get_trend_direction"
+    )) {
+        expect_equal(api$exchange[[method]](state, trend, 2), 0)
+    }
+    # Unicode case folding must never admit a name that the byte-oriented native lookup cannot find.
+    available <- "\u00e9 SHARED"
+    accent <- api$exchange$get_global_handle(state, "\u00e9 shared")
+    expect_identical(as.integer(accent), 1L)
+    calls <- Filter(
+        function(x) x$symbol == "getPluginGlobalVariableHandle",
+        ctx$log
+    )
+    expect_identical(utils::tail(calls, 1L)[[1L]]$arguments[[2L]], available)
+    expect_identical(
+        as.integer(api$exchange$get_global_handle(state, "\u00c9 shared")),
+        -1L
+    )
+    entry$generation <- entry$generation + 1L
+    expect_error(api$exchange$get_global_value(state, global), "generation")
+    expect_error(api$exchange$get_trend_sum(state, trend, 2), "generation")
+})
+
+# External HVAC callbacks share the same deferred-error, GC and orderly-stop boundary.
+test_that("stock external HVAC manager callback stops and reports callback failures", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (mode in c("stop", "error", "interrupt")) {
+        marker <- file.path(fixture$directory, paste0(mode, ".txt"))
+        setup <- function(api, state) {
+            api$runtime$callback_register_external_hvac_manager(
+                state,
+                function(s) {
+                    cat("called\n", file = marker, append = TRUE)
+                    gc()
+                    if (mode == "error") {
+                        stop("external HVAC callback failed")
+                    }
+                    if (mode == "interrupt") {
+                        stop(structure(
+                            list(message = "HVAC interrupt", call = NULL),
+                            class = c("interrupt", "condition")
+                        ))
+                    }
+                    api$runtime$stop_simulation(s)
+                }
+            )
+        }
+        result <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            output_dir = file.path(fixture$directory, mode),
+            backend = setup,
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_true(file.exists(marker))
+        expect_identical(
+            result$api$stop_reason,
+            switch(
+                mode,
+                stop = "user_stop",
+                error = "callback_error",
+                interrupt = "interrupt"
+            )
+        )
+    }
+})
+
+# All six native CSV sections preserve their original field order and trailing newline.
+test_that("CSV discovery uses the matching releasable API data array", {
+    data <- data.frame(
+        what = c(
+            "Actuator",
+            "InternalVariable",
+            "PluginGlobalVariable",
+            "PluginTrendVariable,",
+            "OutputMeter",
+            "OutputVariable"
+        ),
+        name = c("Schedule:Constant", "Zone Volume", "", "", "", "Temperature"),
+        key = c(
+            "Heating",
+            "ZONE ONE",
+            "R GLOBAL",
+            "R TREND",
+            "Electricity:Facility",
+            "ZONE ONE"
+        ),
+        type = c("Schedule Value", "", "", "", "", ""),
+        unit = c("C", "m3", "", "", "J", "C")
+    )
+    expect_identical(
+        api__data_csv(data),
+        paste0(
+            paste(
+                c(
+                    "**ACTUATORS**",
+                    "Actuator,Schedule:Constant,Schedule Value,Heating,C",
+                    "**INTERNAL_VARIABLES**",
+                    "InternalVariable,Zone Volume,ZONE ONE,m3",
+                    "**PLUGIN_GLOBAL_VARIABLES**",
+                    "PluginGlobalVariable,R GLOBAL",
+                    "**TRENDS**",
+                    "PluginTrendVariable,R TREND",
+                    "**METERS**",
+                    "OutputMeter,Electricity:Facility,J",
+                    "**VARIABLES**",
+                    "OutputVariable,Temperature,ZONE ONE,C"
+                ),
+                collapse = "\n"
+            ),
+            "\n"
+        )
+    )
+    expect_identical(
+        api__data_csv(data[FALSE, ]),
+        paste0(
+            paste(
+                paste0(
+                    "**",
+                    c(
+                        "ACTUATORS",
+                        "INTERNAL_VARIABLES",
+                        "PLUGIN_GLOBAL_VARIABLES",
+                        "TRENDS",
+                        "METERS",
+                        "VARIABLES"
+                    ),
+                    "**"
+                ),
+                collapse = "\n"
+            ),
+            "\n"
+        )
+    )
+    ctx <- testapi__fake()
+    api <- ctx$api
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    on.exit(
+        {
+            entry$running <- FALSE
+            api$close()
+        },
+        add = TRUE
+    )
+    expect_error(api$exchange$list_available_api_data_csv(state), "initialized")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    expect_match(
+        api$exchange$list_available_api_data_csv(state),
+        "OutputVariable,Temperature,ZONE ONE,C",
+        fixed = TRUE
+    )
+    symbols <- vapply(ctx$log, function(x) x$symbol, character(1L))
+    expect_true("freeAPIData" %in% symbols)
+    expect_false("listAllAPIDataCSV" %in% symbols)
+})
+
+# Logical clearing drops user closures without retiring native proxies or host calculations.
+test_that("callback clearing is group- and API-scoped and retains native proxies", {
+    ctx <- testapi__fake()
+    other <- testapi__fake()
+    on.exit(other$api$close(), add = TRUE)
+    on.exit(ctx$api$close(), add = TRUE)
+    states <- lapply(1:2, function(i) ctx$api$state_manager$new_state())
+    calls <- new.env(parent = emptyenv())
+    calls$user <- calls$functional <- calls$host <- calls$hvac <- calls$component <- 0L
+    for (state in states) {
+        ctx$api$runtime$callback_progress(state, function(x) {
+            calls$user <- calls$user + 1L
+        })
+        ctx$api$functional$callback_error(state, function(...) {
+            calls$functional <- calls$functional + 1L
+        })
+    }
+    state <- states[[1L]]
+    entry <- attr(state, "entry")
+    api__host_callback(
+        ctx$api,
+        state,
+        "callback_begin_new_environment",
+        function(s) calls$host <- calls$host + 1L
+    )
+    ctx$api$runtime$callback_register_external_hvac_manager(state, function(s) {
+        calls$hvac <- calls$hvac + 1L
+    })
+    ctx$api$runtime$callback_user_defined_component_model(
+        state,
+        function(s) calls$component <- calls$component + 1L,
+        "component"
+    )
+    other_state <- other$api$state_manager$new_state()
+    other$api$runtime$callback_progress(other_state, function(x) {
+        calls$user <- calls$user + 1L
+    })
+    retained <- entry$callbacks
+    ctx$api$runtime$clear_callbacks()
+    ctx$api$runtime$clear_callbacks()
+    for (callback in entry$callbacks) {
+        callback(entry$pointer)
+    }
+    second <- attr(states[[2L]], "entry")
+    second$pointer$callbacks$registerProgressCallback(1L)
+    other_entry <- attr(other_state, "entry")
+    other_entry$pointer$callbacks$registerProgressCallback(1L)
+    expect_identical(entry$callbacks, retained)
+    expect_equal(calls$user, 1L)
+    expect_equal(calls$functional, 1L)
+    expect_equal(calls$host, 1L)
+    expect_equal(calls$hvac, 1L)
+    expect_equal(calls$component, 1L)
+    ctx$api$functional$clear_callbacks()
+    entry$pointer$callbacks$registerErrorCallback(1L, "ignored")
+    second$pointer$callbacks$registerErrorCallback(1L, "ignored")
+    expect_equal(calls$functional, 1L)
+    expect_true(all(vapply(
+        second$callback_records,
+        function(x) is.null(x$fun),
+        logical(1L)
+    )))
+    ctx$api$state_manager$reset_state(state)
+    expect_length(entry$callbacks, 0L)
+    expect_length(entry$callback_records, 0L)
+    ctx$api$close()
+    expect_error(ctx$api$runtime$clear_callbacks(), "closed")
+})
+
+# Clearing from inside delivery must not unwind C or retain the user's captured data.
+test_that("a callback can clear itself and release its captured environment", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    state <- ctx$api$state_manager$new_state()
+    counter <- new.env(parent = emptyenv())
+    counter$calls <- counter$finalized <- 0L
+    ctx$api$runtime$callback_begin_new_environment(
+        state,
+        local({
+            token <- new.env(parent = emptyenv())
+            reg.finalizer(token, function(x) {
+                counter$finalized <- counter$finalized + 1L
+            })
+            function(s) {
+                invisible(token)
+                counter$calls <- counter$calls + 1L
+                ctx$api$runtime$clear_callbacks()
+            }
+        })
+    )
+    expect_equal(ctx$api$runtime$run_energyplus(state, testapi__model()), 0L)
+    gc()
+    expect_equal(counter$calls, 1L)
+    expect_equal(counter$finalized, 1L)
+    ctx$api$state_manager$reset_state(state)
+    ctx$api$runtime$callback_progress(state, function(x) {
+        stop("fresh registration")
+    })
+    expect_error(
+        ctx$api$runtime$run_energyplus(state, testapi__model()),
+        "fresh registration"
+    )
+})
+
+# Metadata parsing never mistakes option values for weather flags or resolves paths after cwd changes.
+test_that("captured run paths handle defaults, options and unsupported preprocessing", {
+    model <- testapi__model()
+    capture <- function(args) api__capture_input(args, model, "Version,26.1;")
+    default <- capture(model)
+    expect_identical(default$input, api__absolute_path(model))
+    expect_identical(default$weather, api__absolute_path("in.epw"))
+    for (args in list(
+        c("-w", "weather one.epw", model),
+        c("--weather", "weather one.epw", model),
+        c("--weather=weather one.epw", model),
+        c("-wweather one.epw", model)
+    )) {
+        metadata <- capture(args)
+        expect_null(metadata$reason)
+        expect_identical(
+            metadata$weather,
+            api__absolute_path("weather one.epw")
+        )
+    }
+    options <- c(
+        "-d",
+        "--output-directory",
+        "-p",
+        "--output-prefix",
+        "-s",
+        "--output-suffix",
+        "-j",
+        "--jobs"
+    )
+    for (option in options) {
+        expect_null(capture(c(option, "ignored", model))$reason)
+    }
+    expect_null(
+        capture(c(
+            "--annual",
+            "--design-day",
+            "--readvars",
+            "--convert",
+            "--convert-only",
+            "-a",
+            "-D",
+            "-r",
+            "-c",
+            "--jobs=1",
+            "--output-directory=out",
+            "-dout",
+            "-pname",
+            "-sL",
+            "-j1",
+            model
+        ))$reason
+    )
+    expect_identical(capture(c("--", model))$weather, default$weather)
+    for (option in c(
+        "-m",
+        "--epmacro",
+        "-x",
+        "--expandobjects",
+        "-i",
+        "--idd",
+        "--unknown"
+    )) {
+        expect_match(capture(c(option, model))$reason, "prepared input")
+    }
+    expect_match(capture("-w")$reason, "Missing weather")
+    expect_match(capture("--weather=")$reason, "Missing weather")
+    expect_match(capture(c("-w", ""))$reason, "Missing weather")
+    expect_equal(
+        capture(c("-wfirst.epw", "-wlast.epw", model))$weather,
+        api__absolute_path("last.epw")
+    )
+})
+
+# epJSON keys are frozen at entry, preserve canonical case, and never call allocating getters.
+test_that("metadata queries use immutable prepared epJSON and state lifecycle gates", {
+    ctx <- testapi__fake()
+    api <- ctx$api
+    on.exit(api$close(), add = TRUE)
+    state <- api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    input <- tempfile(fileext = ".epJSON")
+    text <- '{"Zone":{"Zulu":{},"alpha":{},"é":{}},"Version":{"Version 1":{"version_identifier":"26.1"}}}'
+    writeLines(text, input, useBytes = TRUE)
+    expect_error(api$exchange$get_input_file_path(state), "initialized")
+    api$runtime$callback_begin_new_environment(state, function(s) {
+        writeLines("changed", input)
+        expect_identical(
+            api$exchange$get_input_file_path(s),
+            api__absolute_path(input)
+        )
+        expect_identical(
+            api$exchange$get_weather_file_path(s),
+            api__absolute_path("weather.epw")
+        )
+        expect_identical(
+            api$exchange$get_object_names(s, "Zone"),
+            c("Zulu", "alpha", "é")
+        )
+        expect_identical(
+            api$exchange$get_object_names(s, "Version"),
+            "Version 1"
+        )
+        expect_identical(api$exchange$get_object_names(s, "zone"), character())
+        for (value in list(
+            NULL,
+            NA_character_,
+            character(),
+            "",
+            1,
+            c("Zone", "Building")
+        )) {
+            expect_error(
+                api$exchange$get_object_names(s, value),
+                "object_type_name"
+            )
+        }
+    })
+    api$runtime$run_energyplus(state, c("-w", "weather.epw", input))
+    expect_null(entry$input_metadata$source)
+    expect_error(api$exchange$get_object_names(state, "Zone"), "initialized")
+    expect_false(any(vapply(
+        ctx$log,
+        function(x) {
+            x$symbol %in%
+                c(
+                    "inputFilePath",
+                    "epwFilePath",
+                    "getObjectNames",
+                    "freeObjectNames"
+                )
+        },
+        logical(1L)
+    )))
+    api$state_manager$reset_state(state)
+    expect_null(entry$input_metadata)
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    expect_error(
+        api$exchange$get_input_file_path(state),
+        "no R-managed run context"
+    )
+    entry$input_metadata <- api__capture_input(c("-x", input), input, text)
+    expect_error(api$exchange$get_input_file_path(state), "prepared input")
+    entry$input_metadata <- api__capture_input(input, input, "[]")
+    expect_error(api$exchange$get_object_names(state, "Zone"), "invalid epJSON")
+    entry$running <- FALSE
+})
+
+# Conversion is lazy, cached after success, and retried rather than caching a failed snapshot.
+test_that("IDF metadata conversion is isolated, cached and fails clearly", {
+    ctx <- testapi__fake()
+    on.exit(ctx$api$close(), add = TRUE)
+    state <- ctx$api$state_manager$new_state()
+    entry <- attr(state, "entry")
+    entry$running <- TRUE
+    entry$pointer$ready <- TRUE
+    entry$input_metadata <- api__capture_input(
+        "input.idf",
+        "input.idf",
+        "Version,26.1;"
+    )
+    calls <- 0L
+    local_mocked_bindings(api__convert_input = function(directory, source) {
+        calls <<- calls + 1L
+        expect_identical(source, "Version,26.1;")
+        list(Version = list("Version 1" = list()))
+    })
+    for (i in 1:2) {
+        expect_identical(
+            ctx$api$exchange$get_object_names(state, "Version"),
+            "Version 1"
+        )
+    }
+    expect_identical(calls, 1L)
+    entry$running <- FALSE
+})
+
+# Stand-in converter processes exercise output verification and unconditional temporary cleanup.
+test_that("the stock converter checks exit status and removes its private files", {
+    mode <- "ok"
+    temporary <- NULL
+    local_mocked_bindings(
+        run = function(command, args, ...) {
+            expect_match(command, "energyplus")
+            expect_identical(args[[1L]], "--convert-only")
+            temporary <<- dirname(tail(args, 1L))
+            expect_identical(readLines(tail(args, 1L)), "Version,26.1;")
+            if (mode == "ok") {
+                writeLines(
+                    '{"Version":{"Version 1":{}}}',
+                    file.path(temporary, "input.epJSON")
+                )
+            }
+            list(status = if (mode == "failure") 1L else 0L)
+        },
+        .package = "processx"
+    )
+    expect_named(api__convert_input(tempdir(), "Version,26.1;"), "Version")
+    expect_false(dir.exists(temporary))
+    for (value in c("missing", "failure")) {
+        mode <- value
+        expect_error(
+            api__convert_input(tempdir(), "Version,26.1;"),
+            "conversion failed"
+        )
+        expect_false(dir.exists(temporary))
+    }
+})
+
+# Exercise both clearing groups, lazy conversion and GC with the unmodified native engine.
+test_that("stock managed clearing and metadata queries preserve the native lifecycle", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "managed-metadata.rds")
+    setup <- function(api, state) {
+        counts <- new.env(parent = emptyenv())
+        counts$functional <- counts$user <- counts$host <- counts$finalized <- 0L
+        counts$metadata <- NULL
+        functional_state <- api$state_manager$new_state()
+        api$functional$callback_error(functional_state, function(...) {
+            counts$functional <- counts$functional + 1L
+        })
+        fluid <- api$functional$glycol(functional_state, "water")
+        fluid$specific_heat(functional_state, -1000)
+        counts$before <- counts$functional
+        api$functional$clear_callbacks()
+        fluid$specific_heat(functional_state, -1000)
+        counts$after <- counts$functional
+        api$state_manager$delete_state(functional_state)
+        api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+            state,
+            local({
+                token <- new.env(parent = emptyenv())
+                reg.finalizer(token, function(x) {
+                    counts$finalized <- counts$finalized + 1L
+                })
+                function(s) {
+                    invisible(token)
+                    counts$user <- counts$user + 1L
+                    if (counts$user == 2L) api$runtime$clear_callbacks()
+                }
+            })
+        )
+        eplusr:::api__host_callback(
+            api,
+            state,
+            "callback_end_zone_timestep_after_zone_reporting",
+            function(s) {
+                counts$host <- counts$host + 1L
+                if (
+                    api$exchange$api_data_fully_ready(s) &&
+                        is.null(counts$metadata)
+                ) {
+                    counts$metadata <- list(
+                        input = api$exchange$get_input_file_path(s),
+                        weather = api$exchange$get_weather_file_path(s),
+                        zones = api$exchange$get_object_names(s, "Zone"),
+                        reports = api$exchange$get_object_names(
+                            s,
+                            "Output:Variable"
+                        ),
+                        missing = api$exchange$get_object_names(
+                            s,
+                            "NoSuchType"
+                        ),
+                        input_exists = file.exists(api$exchange$get_input_file_path(
+                            s
+                        )),
+                        weather_exists = file.exists(api$exchange$get_weather_file_path(
+                            s
+                        ))
+                    )
+                }
+                if (counts$host == 20L) {
+                    gc()
+                    saveRDS(as.list(counts), marker)
+                    api$runtime$stop_simulation(s)
+                }
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        output_dir = file.path(fixture$directory, "managed"),
+        backend = setup,
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(result$api$stop_reason, "user_stop")
+    expect_true(file.exists(marker))
+    if (!file.exists(marker)) {
+        return(invisible(NULL))
+    }
+    data <- readRDS(marker)
+    expect_gt(data$before, 0L)
+    expect_identical(data$after, data$before)
+    expect_equal(data$user, 2L)
+    expect_equal(data$host, 20L)
+    expect_equal(data$finalized, 1L)
+    expect_identical(data$metadata$zones, "ZONE ONE")
+    expect_gt(length(data$metadata$reports), 10L)
+    expect_identical(
+        data$metadata$reports,
+        paste0("Output:Variable ", seq_along(data$metadata$reports))
+    )
+    expect_identical(data$metadata$missing, character())
+    expect_true(data$metadata$input_exists)
+    expect_true(data$metadata$weather_exists)
+})
+
+# Logical clearing never erases an error or interrupt raised by the current delivery.
+test_that("clearing a callback preserves its subsequent failure and native cleanup", {
+    for (condition in list(
+        simpleError("after clearing"),
+        structure(
+            list(message = "after clearing interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+    )) {
+        ctx <- testapi__fake()
+        api <- ctx$api
+        state <- api$state_manager$new_state()
+        api$runtime$callback_begin_new_environment(state, function(s) {
+            api$runtime$clear_callbacks()
+            stop(condition)
+        })
+        actual <- tryCatch(
+            api$runtime$run_energyplus(state, testapi__model()),
+            error = identity,
+            interrupt = identity
+        )
+        expect_identical(actual, condition)
+        expect_identical(api$state_manager$status(state)$phase, "closed")
+        expect_equal(ctx$deleted, 1L)
+        api$close()
+    }
+})
+
+# Both reviewed releases share declarations but retain independent installation identity.
+test_that("version profiles select shared ABI and preserve the trend safety boundary", {
+    for (version in c("26.1.0", "26.2.0")) {
+        manifest <- api__manifest(version)
+        expect_identical(manifest$energyplus, version)
+        expect_identical(manifest$abi, "26.1-26.2")
+        trend <- Filter(
+            function(x) x$method == "get_trend_value",
+            manifest$methods
+        )
+        expect_identical(trend[[1L]]$status, "unsupported")
+    }
+    expect_error(api_profile__select(character()), "installation")
+    expect_error(api_profile__select("25.2.0"), "installation")
+    expect_error(api_bind__select("unknown"))
+})
+
+# Verify 26.2 fixes through node humidity and meter behavior, not actuator readback alone.
+test_that("stock 26.2 exposes the first meter and recalculates overridden outdoor node humidity", {
+    skip_if_not(identical(
+        Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        "26.2"
+    ))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    cat(
+        "\nOutdoorAir:Node,API Outdoor Node;\n",
+        file = fixture$model,
+        append = TRUE
+    )
+    marker <- file.path(fixture$directory, "weather-and-meter.rds")
+    setup <- function(api, state) {
+        exchange <- api$exchange
+        variables <- c(
+            temperature = "System Node Temperature",
+            humidity = "System Node Humidity Ratio",
+            pressure = "System Node Pressure"
+        )
+        for (name in variables) {
+            exchange$request_variable(state, name, "API OUTDOOR NODE")
+        }
+        handles <- NULL
+        api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+            state,
+            function(s) {
+                if (
+                    !exchange$api_data_fully_ready(s) ||
+                        exchange$warmup_flag(s) ||
+                        exchange$kind_of_sim(s) != 3L
+                ) {
+                    return(NULL)
+                }
+                if (is.null(handles)) {
+                    data <- exchange$get_api_data(s)
+                    meters <- data$key[data$what == "OutputMeter"]
+                    actuators <- subset(
+                        data,
+                        what == "Actuator" & key == "API OUTDOOR NODE"
+                    )
+                    # Discover the stock node actuator names from the engine's copied metadata.
+                    actuator <- function(pattern) {
+                        row <- actuators[grepl(pattern, actuators$type), ]
+                        stopifnot(nrow(row) == 1L)
+                        exchange$get_actuator_handle(
+                            s,
+                            row$name,
+                            row$type,
+                            row$key
+                        )
+                    }
+                    handles <<- list(
+                        meter = exchange$get_meter_handle(s, meters[[1L]]),
+                        dry = actuator("Dry"),
+                        wet = actuator("Wet"),
+                        variables = lapply(variables, function(name) {
+                            exchange$get_variable_handle(
+                                s,
+                                name,
+                                "API OUTDOOR NODE"
+                            )
+                        })
+                    )
+                }
+                exchange$set_actuator_value(s, handles$dry, 26.7)
+                exchange$set_actuator_value(s, handles$wet, 19.4)
+            }
+        )
+        api$runtime$callback_end_zone_timestep_after_zone_reporting(
+            state,
+            function(s) {
+                if (
+                    is.null(handles) ||
+                        exchange$warmup_flag(s) ||
+                        exchange$kind_of_sim(s) != 3L
+                ) {
+                    return(NULL)
+                }
+                values <- vapply(
+                    handles$variables,
+                    function(handle) exchange$get_variable_value(s, handle),
+                    numeric(1L)
+                )
+                psych <- api$functional$psychrometrics(s)
+                saveRDS(
+                    list(
+                        meter = as.integer(handles$meter),
+                        values = values,
+                        expected_humidity = psych$humidity_ratio_d(
+                            s,
+                            26.7,
+                            19.4,
+                            values[["pressure"]]
+                        )
+                    ),
+                    marker
+                )
+                api$runtime$stop_simulation(s)
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "26.2",
+        backend = setup,
+        output_dir = file.path(fixture$directory, "weather"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        result$api$stop_reason,
+        "user_stop",
+        info = result$api$error$message
+    )
+    expect_true(file.exists(marker))
+    measured <- readRDS(marker)
+    expect_identical(measured$meter, 0L)
+    expect_equal(measured$values[["temperature"]], 26.7)
+    expect_equal(
+        measured$values[["humidity"]],
+        measured$expected_humidity,
+        tolerance = 1e-8
+    )
+})
