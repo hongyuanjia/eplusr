@@ -1,6 +1,6 @@
 #' Export an R plugin for the EnergyPlus executable
 #'
-#' Generate a PythonPlugin adapter that embeds R in the stock EnergyPlus 26.1
+#' Generate a PythonPlugin adapter that embeds R in the stock EnergyPlus 26.1/26.2
 #' executable process. Add the returned `idf` objects to the simulation model.
 #' The export records this R installation and package library paths; regenerate
 #' it after moving or updating R or the package libraries. Initialization occurs
@@ -11,7 +11,7 @@
 #' @param plugin A factory returned by [eplus_plugin()].
 #' @param dir Directory for the adapter and serialized plugin definition.
 #' @param name Python module/class identifier, unique among exported plugins.
-#' @param eplus EnergyPlus 26.1 version or installation directory.
+#' @param eplus EnergyPlus 26.1 or 26.2 version or installation directory.
 #' @return A list containing `idf`, `directory`, `module`, and `results` pattern.
 #' @details
 #' The executable owns the native state. R hooks may read data, write actuators
@@ -20,7 +20,7 @@
 #' Each PythonPlugin instance has an independent R context in a shared embedded
 #' R interpreter. Global variables and trend aggregates declared in the model
 #' are available through the borrowed exchange API. Individual trend reads remain
-#' disabled because stock 26.1 has an unsafe upper index boundary.
+#' disabled because stock 26.1/26.2 have an unsafe upper index boundary.
 #' Prepared-input metadata queries require an R-managed launch context and are
 #' unavailable through this standalone executable adapter. Callback clearers do
 #' not remove the adapter's host hooks.
@@ -52,11 +52,7 @@ export_eplus_plugin <- function(
     } else {
         eplus_config(eplus)
     }
-    if (!identical(as.character(config$version), "26.1.0")) {
-        api__error(
-            "Executable R plugins currently support only EnergyPlus 26.1."
-        )
-    }
+    api_profile__select(config$version)
     plugin_cli__check_bridge()
     definition <- unserialize(environment(plugin)$payload)
     mapping <- plugin_cli__hooks()

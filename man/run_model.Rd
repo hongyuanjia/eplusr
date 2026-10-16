@@ -80,7 +80,7 @@ should have the same length as \code{model}.}
 
 \item{backend}{Simulation engine: \code{"cli"} (default), experimental \code{"api"},
 or an initialization \verb{function(api, state)} which selects the API engine.
-The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+The API backend supports stock EnergyPlus 26.1/26.2 and creates a fresh R process
 for each engine run. Preprocessing and result collection use the same pipeline.
 A function is executed once in the engine worker
 before simulation. Register requests and callbacks using the supplied managed

@@ -934,7 +934,7 @@ test_that("executable plugin export validates artifacts and hook mappings", {
         export_eplus_plugin(plugin, directory, name = "bad-name"),
         "pattern"
     )
-    local_mocked_bindings(eplus_config = function(...) list(version = "26.2.0"))
+    local_mocked_bindings(eplus_config = function(...) list(version = "25.2.0"))
     expect_error(export_eplus_plugin(plugin, directory), "26.1")
     mapping <- plugin_cli__hooks()
     expect_identical(
@@ -1122,16 +1122,29 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
         ))
     }
     exports <- list(
-        export_eplus_plugin(make("A", 22), directory, "PluginA"),
+        export_eplus_plugin(
+            make("A", 22),
+            directory,
+            "PluginA",
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+        ),
         export_eplus_plugin(
             make("B", 24),
             directory,
             "PluginB",
-            eplus = eplus_config("26.1")$dir
+            eplus = eplus_config(Sys.getenv(
+                "_EPLUSR_TEST_API_VERSION_",
+                "26.1"
+            ))$dir
         )
     )
     expect_error(
-        export_eplus_plugin(make("A", 22), directory, "PluginA"),
+        export_eplus_plugin(
+            make("A", 22),
+            directory,
+            "PluginA",
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+        ),
         "already exist"
     )
     expect_error(
@@ -1153,7 +1166,10 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
         append = TRUE
     )
     process <- processx::process$new(
-        file.path(eplus_config("26.1")$dir, eplus_config("26.1")$exe),
+        file.path(
+            eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$dir,
+            eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$exe
+        ),
         c(
             "-w",
             fixture$weather,

@@ -12,6 +12,11 @@
 
 ## New features
 
+* Support the stock EnergyPlus 26.2 library, sessions, replay predictions and R
+  plugin hosts alongside 26.1. Separate generated ABI bindings, reviewed R version
+  rules and required-capability checks. Individual trend reads remain disabled
+  for both releases because of the native history-index defect (#652).
+
 * Add managed callback clearing and prepared-input path/object-name queries without
   the leaking stock 26.1 getters. Keep host and engine-calculation callbacks active
   and retain native proxies until reset/delete. Individual trend reads remain

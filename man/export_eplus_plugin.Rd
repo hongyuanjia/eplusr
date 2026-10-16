@@ -13,13 +13,13 @@ export_eplus_plugin(plugin, dir, name = "eplusr_rplugin", eplus = "26.1")
 
 \item{name}{Python module/class identifier, unique among exported plugins.}
 
-\item{eplus}{EnergyPlus 26.1 version or installation directory.}
+\item{eplus}{EnergyPlus 26.1 or 26.2 version or installation directory.}
 }
 \value{
 A list containing \code{idf}, \code{directory}, \code{module}, and \code{results} pattern.
 }
 \description{
-Generate a PythonPlugin adapter that embeds R in the stock EnergyPlus 26.1
+Generate a PythonPlugin adapter that embeds R in the stock EnergyPlus 26.1/26.2
 executable process. Add the returned \code{idf} objects to the simulation model.
 The export records this R installation and package library paths; regenerate
 it after moving or updating R or the package libraries. Initialization occurs
@@ -34,7 +34,7 @@ native callbacks, recursively run simulations, or close the borrowed API.
 Each PythonPlugin instance has an independent R context in a shared embedded
 R interpreter. Global variables and trend aggregates declared in the model
 are available through the borrowed exchange API. Individual trend reads remain
-disabled because stock 26.1 has an unsafe upper index boundary.
+disabled because stock 26.1/26.2 have an unsafe upper index boundary.
 Prepared-input metadata queries require an R-managed launch context and are
 unavailable through this standalone executable adapter. Callback clearers do
 not remove the adapter's host hooks.

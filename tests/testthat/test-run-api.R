@@ -32,7 +32,8 @@ test_that("API backend setup is portable and rejects native ownership across wor
     })
     expect_error(run__backend(pointer), "live objects")
     expect_null(run__api_version(numeric_version("26.1")))
-    expect_error(run__api_version(numeric_version("26.2")), "26.1")
+    expect_null(run__api_version(numeric_version("26.2")))
+    expect_error(run__api_version(numeric_version("25.2")), "26.1")
 })
 
 test_that("API workers clean up on completion, stops, setup and callback conditions", {

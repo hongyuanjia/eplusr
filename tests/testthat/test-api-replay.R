@@ -37,6 +37,7 @@ test_that("stock replay branches match history and preserve the original live se
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         variables = list(
             temperature = c("Zone Mean Air Temperature", "ZONE ONE"),
@@ -236,6 +237,7 @@ test_that("stock replay restores explicit controller memory and reports short ho
     }
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         controller = controller,
         controller_state = 0L,
@@ -331,7 +333,12 @@ test_that("recorded input snapshots preserve hidden resources and reject ambiguo
         file = fixture$model,
         append = TRUE
     )
-    session <- eplus_session(fixture$model, fixture$weather, record = TRUE)
+    session <- eplus_session(
+        fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        fixture$weather,
+        record = TRUE
+    )
     on.exit(session$close(), add = TRUE)
     ctx <- environment(session$observe)$ctx
     expect_identical(basename(ctx$replay$model), "replay-2.idf")
@@ -377,7 +384,12 @@ test_that("recorded input snapshots preserve hidden resources and reject ambiguo
         append = TRUE
     )
     expect_error(
-        eplus_session(fixture$model, fixture$weather, record = TRUE),
+        eplus_session(
+            fixture$model,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            fixture$weather,
+            record = TRUE
+        ),
         "distinct basenames"
     )
     missing <- file.path(fixture$directory, "missing.csv")
@@ -391,6 +403,7 @@ test_that("recorded input snapshots preserve hidden resources and reject ambiguo
     expect_error(
         suppressWarnings(eplus_session(
             fixture$model,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
             fixture$weather,
             record = TRUE
         )),

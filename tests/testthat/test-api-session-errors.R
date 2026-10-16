@@ -23,6 +23,7 @@ test_that("script setup errors, unknown bindings and command timeout stop stock 
         }
         session <- eplus_session(
             fixture$model,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
             fixture$weather,
             controller = controller,
             variables = variables,
@@ -48,13 +49,14 @@ test_that("worker scripts can observe a running session, pause, and detect clien
     fixture <- testrun__api_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     # Direct installation selection and invalid weather fail before launching an engine.
-    root <- eplus_config("26.1")$dir
+    root <- eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$dir
     expect_error(
         eplus_session(fixture$model, NULL, eplus = root),
         "requires weather"
     )
     expect_error(eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         controller = function(x) x
     ))
@@ -72,6 +74,7 @@ test_that("worker scripts can observe a running session, pause, and detect clien
     )
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         controller = script,
         controller_state = 0L,

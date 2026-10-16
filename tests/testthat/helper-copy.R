@@ -42,7 +42,7 @@ testrun__api_fixture <- function() {
         "API integration tests are disabled"
     )
     skip_if_not_installed("rdyncall")
-    root <- eplus_config("26.1")$dir
+    root <- eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$dir
     model <- read_idf(file.path(root, "ExampleFiles", "1ZoneUncontrolled.idf"))
     model$set(
         RunPeriod := list(

@@ -9,17 +9,19 @@ permissions: read-all
 
 jobs:
   api:
-    name: Stock 26.1 (${{ matrix.os }})
+    name: Stock ${{ matrix.eplus }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        eplus: ["26.1", "26.2"]
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: true
       RGL_USE_NULL: true
       _EPLUSR_RUN_API_TESTS_: true
+      _EPLUSR_TEST_API_VERSION_: ${{ matrix.eplus }}
     steps:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-r@v2
@@ -44,7 +46,7 @@ jobs:
           # Engine preparation owns installation; test helpers run in the test step.
           pkgload::load_all(".", quiet = TRUE, helpers = FALSE)
           # Helpers and restored installations may already provide either engine.
-          versions <- unique(c("26.1", get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
+          versions <- unique(c("26.1", "26.2", get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
           for (version in versions) {
               if (!eplusr::is_avail_eplus(version)) {
                   eplusr::install_eplus(version, local = TRUE, portable = TRUE)

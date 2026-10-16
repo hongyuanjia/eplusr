@@ -155,7 +155,11 @@ test_that("stock API jobs preserve SQL results and separate consecutive worker l
         )
     )
     expect_identical(api$status()$backend, "api")
-    expect_match(api$status()$api$version, "26.1.0")
+    expect_match(
+        api$status()$api$version,
+        paste0(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"), ".0"),
+        fixed = TRUE
+    )
     expect_false(identical(api$status()$api$pid, Sys.getpid()))
     api_data <- api$read_table("ReportData")
     cli_process$wait(60000)

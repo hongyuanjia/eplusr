@@ -428,6 +428,9 @@ test_that("library loading audits identity and releases failed probe states", {
             }
             if (ctx$layout) {
                 envir$APIDataEntry <- testapi__layout()
+                if (isTRUE(ctx$bad_fields)) {
+                    envir$APIDataEntry$fields$name[5L] <- "wrong"
+                }
             }
             invisible(envir)
         },
@@ -447,6 +450,9 @@ test_that("library loading audits identity and releases failed probe states", {
     ctx$layout <- FALSE
     expect_error(api__load(ctx$directory), "APIDataEntry layout")
     ctx$layout <- TRUE
+    ctx$bad_fields <- TRUE
+    expect_error(api__load(ctx$directory), "APIDataEntry layout")
+    ctx$bad_fields <- FALSE
     ctx$version <- "EnergyPlus, Version 26.2.0-test"
     expect_error(api__load(ctx$directory), "not EnergyPlus 26.1")
     ctx$version <- "EnergyPlus, Version 26.1.0-test"
@@ -480,10 +486,15 @@ test_that("library loading audits identity and releases failed probe states", {
     api$close()
     expect_equal(ctx$deleted, 4L)
     expect_identical(ctx$handle, ctx$pointer)
-    expect_equal(ctx$unloaded, 7L)
+    expect_equal(ctx$unloaded, 8L)
+    ctx$version <- "EnergyPlus, Version 26.2.0-test"
+    api <- api__load(ctx$directory, "26.2.0")
+    expect_match(api$info()$version, "26.2.0")
+    expect_identical(api$info()$abi, "26.1-26.2")
+    api$close()
 })
 
-test_that("constructor uses installation discovery and rejects non-26.1 versions", {
+test_that("constructor uses installation discovery and rejects unreviewed versions", {
     local_mocked_bindings(
         is_eplus_path = function(path) identical(path, "stock-installation"),
         use_eplus = function(path) list(version = "26.1.0", dir = path),
@@ -491,11 +502,12 @@ test_that("constructor uses installation discovery and rejects non-26.1 versions
             list(version = paste0(version, ".0"), dir = "discovered")
         },
         api__check_bridge = function() invisible(NULL),
-        api__load = identity
+        api__load = function(directory, version) directory
     )
     expect_equal(eplus_api("stock-installation"), "stock-installation")
     expect_equal(eplus_api("26.1"), "discovered")
-    expect_error(eplus_api("26.2"), "26.1 installation")
+    expect_equal(eplus_api("26.2"), "discovered")
+    expect_error(eplus_api("25.2"), "26.1 or 26.2 installation")
 })
 
 test_that("bridge safety gate handles missing, already loaded, failing and cached builds", {
@@ -746,9 +758,9 @@ test_that("platform library names match the installation ABI layouts", {
     expect_equal(api__library_name("windows", "Windows"), "EnergyPlusAPI.dll")
     expect_equal(api__library_name("unix", "Darwin"), "libenergyplusapi.dylib")
     expect_equal(api__library_name("unix", "Linux"), "libenergyplusapi.so")
-    manifest <- api__manifest()
-    manifest$pointer_bytes <- 4L
-    local_mocked_bindings(api__manifest = function() manifest)
+    binding <- api_bind__select("26.1-26.2")
+    binding$pointer_bytes <- 4L
+    local_mocked_bindings(api_bind__select = function(abi) binding)
     expect_error(api__load(tempfile()), "64-bit")
 })
 
@@ -908,7 +920,9 @@ test_that("stock functional bridge interrupts return safely with their original 
                 quarantined = ctx$quarantined
             )
         },
-        args = list(eplus_config("26.1")$dir),
+        args = list(
+            eplus_config(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))$dir
+        ),
         libpath = .libPaths()
     )
     expect_true("interrupt" %in% result$class)
@@ -1032,7 +1046,7 @@ test_that("stock external HVAC manager callback stops and reports callback failu
         result <- energyplus(
             fixture$model,
             fixture$weather,
-            eplus = "26.1",
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
             output_dir = file.path(fixture$directory, mode),
             backend = setup,
             readvars = FALSE,
@@ -1531,7 +1545,7 @@ test_that("stock managed clearing and metadata queries preserve the native lifec
     result <- energyplus(
         fixture$model,
         fixture$weather,
-        eplus = "26.1",
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         output_dir = file.path(fixture$directory, "managed"),
         backend = setup,
         readvars = FALSE,
@@ -1585,4 +1599,149 @@ test_that("clearing a callback preserves its subsequent failure and native clean
         expect_equal(ctx$deleted, 1L)
         api$close()
     }
+})
+
+# Both reviewed releases share declarations but retain independent installation identity.
+test_that("version profiles select shared ABI and preserve the trend safety boundary", {
+    for (version in c("26.1.0", "26.2.0")) {
+        manifest <- api__manifest(version)
+        expect_identical(manifest$energyplus, version)
+        expect_identical(manifest$abi, "26.1-26.2")
+        trend <- Filter(
+            function(x) x$method == "get_trend_value",
+            manifest$methods
+        )
+        expect_identical(trend[[1L]]$status, "unsupported")
+    }
+    expect_error(api_profile__select(character()), "installation")
+    expect_error(api_profile__select("25.2.0"), "installation")
+    expect_error(api_bind__select("unknown"))
+})
+
+# Verify 26.2 fixes through node humidity and meter behavior, not actuator readback alone.
+test_that("stock 26.2 exposes the first meter and recalculates overridden outdoor node humidity", {
+    skip_if_not(identical(
+        Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        "26.2"
+    ))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    cat(
+        "\nOutdoorAir:Node,API Outdoor Node;\n",
+        file = fixture$model,
+        append = TRUE
+    )
+    marker <- file.path(fixture$directory, "weather-and-meter.rds")
+    setup <- function(api, state) {
+        exchange <- api$exchange
+        variables <- c(
+            temperature = "System Node Temperature",
+            humidity = "System Node Humidity Ratio",
+            pressure = "System Node Pressure"
+        )
+        for (name in variables) {
+            exchange$request_variable(state, name, "API OUTDOOR NODE")
+        }
+        handles <- NULL
+        api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
+            state,
+            function(s) {
+                if (
+                    !exchange$api_data_fully_ready(s) ||
+                        exchange$warmup_flag(s) ||
+                        exchange$kind_of_sim(s) != 3L
+                ) {
+                    return(NULL)
+                }
+                if (is.null(handles)) {
+                    data <- exchange$get_api_data(s)
+                    meters <- data$key[data$what == "OutputMeter"]
+                    actuators <- subset(
+                        data,
+                        what == "Actuator" & key == "API OUTDOOR NODE"
+                    )
+                    # Discover the stock node actuator names from the engine's copied metadata.
+                    actuator <- function(pattern) {
+                        row <- actuators[grepl(pattern, actuators$type), ]
+                        stopifnot(nrow(row) == 1L)
+                        exchange$get_actuator_handle(
+                            s,
+                            row$name,
+                            row$type,
+                            row$key
+                        )
+                    }
+                    handles <<- list(
+                        meter = exchange$get_meter_handle(s, meters[[1L]]),
+                        dry = actuator("Dry"),
+                        wet = actuator("Wet"),
+                        variables = lapply(variables, function(name) {
+                            exchange$get_variable_handle(
+                                s,
+                                name,
+                                "API OUTDOOR NODE"
+                            )
+                        })
+                    )
+                }
+                exchange$set_actuator_value(s, handles$dry, 26.7)
+                exchange$set_actuator_value(s, handles$wet, 19.4)
+            }
+        )
+        api$runtime$callback_end_zone_timestep_after_zone_reporting(
+            state,
+            function(s) {
+                if (
+                    is.null(handles) ||
+                        exchange$warmup_flag(s) ||
+                        exchange$kind_of_sim(s) != 3L
+                ) {
+                    return(NULL)
+                }
+                values <- vapply(
+                    handles$variables,
+                    function(handle) exchange$get_variable_value(s, handle),
+                    numeric(1L)
+                )
+                psych <- api$functional$psychrometrics(s)
+                saveRDS(
+                    list(
+                        meter = as.integer(handles$meter),
+                        values = values,
+                        expected_humidity = psych$humidity_ratio_d(
+                            s,
+                            26.7,
+                            19.4,
+                            values[["pressure"]]
+                        )
+                    ),
+                    marker
+                )
+                api$runtime$stop_simulation(s)
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "26.2",
+        backend = setup,
+        output_dir = file.path(fixture$directory, "weather"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        result$api$stop_reason,
+        "user_stop",
+        info = result$api$error$message
+    )
+    expect_true(file.exists(marker))
+    measured <- readRDS(marker)
+    expect_identical(measured$meter, 0L)
+    expect_equal(measured$values[["temperature"]], 26.7)
+    expect_equal(
+        measured$values[["humidity"]],
+        measured$expected_humidity,
+        tolerance = 1e-8
+    )
 })

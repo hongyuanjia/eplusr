@@ -153,6 +153,7 @@ test_that("stock sessions initialize, step, pause, resume and finalize the exist
     variables <- list(temperature = c("Zone Mean Air Temperature", "ZONE ONE"))
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         variables = variables,
         dir = file.path(fixture$directory, "session")
@@ -205,6 +206,7 @@ test_that("stock sessions preserve controller state and stop safely on controlle
     }
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         variables = list(
             temperature = c("Zone Mean Air Temperature", "ZONE ONE")
@@ -343,6 +345,7 @@ test_that("collecting a paused stock session reaps the native worker and pipelin
     handles <- local({
         session <- eplus_session(
             fixture$model,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
             fixture$weather,
             dir = file.path(fixture$directory, "gc-session")
         )
@@ -374,6 +377,7 @@ test_that("closing a paused stock session records early stop and forbids continu
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         dir = file.path(fixture$directory, "early-close")
     )
@@ -418,6 +422,7 @@ test_that("HVAC substeps do not shift completed zone intervals and actuator rele
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         variables = list(
             heating = c(
@@ -505,17 +510,20 @@ test_that("stock sparse snapshots skip unrequested steps without losing exact co
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     expect_error(eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         sample_every = 0L
     ))
     expect_error(eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         sample_every = 1.5
     ))
     for (record in c(FALSE, TRUE)) {
         session <- eplus_session(
             fixture$model,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
             fixture$weather,
             variables = list(t = c("Zone Mean Air Temperature", "ZONE ONE")),
             sample_every = 31L,
@@ -556,6 +564,7 @@ test_that("nonblocking stock observation does not wait for a busy controller", {
     }
     session <- eplus_session(
         fixture$model,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         fixture$weather,
         controller = controller,
         controller_state = 0L,
@@ -590,6 +599,7 @@ test_that("sparse running commands obtain their actual boundary rather than an o
     session <- eplus_session(
         model,
         fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
         sample_every = 100000L,
         variables = list(t = c("Zone Mean Air Temperature", "ZONE ONE")),
         dir = file.path(fixture$directory, "sparse-commands")
@@ -616,4 +626,16 @@ test_that("sparse running commands obtain their actual boundary rather than an o
     }
     expect_true(session$result()$status()$successful)
     expect_identical(session$status()$outcome$completed_steps, 672L)
+})
+
+# A model from another supported release must not bypass the frozen installation identity.
+test_that("sessions reject model and installation version mismatches before starting workers", {
+    local_mocked_bindings(
+        eplus_config = function(...) list(version = "26.1.0", dir = tempdir()),
+        eplus_job = function(...) list(version = function() "26.2.0")
+    )
+    expect_error(
+        eplus_session("model.idf", "weather.epw"),
+        "model version must match"
+    )
 })

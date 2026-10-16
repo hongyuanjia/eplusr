@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.18.0.9022
+Version: 0.18.0.9023
 Authors@R: c(
     person(given = "Hongyuan",
            family = "Jia",
@@ -56,6 +56,9 @@ RoxygenNote: 7.3.3
 SystemRequirements: EnergyPlus (optional)
     (<https://energyplus.net>); udunits2 (optional, for units support)
 Collate:
+    'api-binding.R'
+    'api-capabilities.R'
+    'api-profile.R'
     'api.R'
     'constants.R'
     'assert.R'
