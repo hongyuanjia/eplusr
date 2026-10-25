@@ -1,0 +1,6 @@
+dependencies:
+  - name: eplusr-viewer
+    version: 0.1.0
+    src: htmlwidgets/lib
+    script: eplusr-viewer.js
+    stylesheet: eplusr-viewer.css

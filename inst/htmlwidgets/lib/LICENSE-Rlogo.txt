@@ -1,0 +1,5 @@
+R logo © 2016 The R Foundation.
+Source: https://www.r-project.org/logo/Rlogo.svg
+License: GPL version 2, as offered at https://www.r-project.org/logo/
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+The SVG was recovered from the previously bundled browser asset, with its rendered logo unchanged. CSS displays grayscale and a separate slash for inactive/disconnected states.

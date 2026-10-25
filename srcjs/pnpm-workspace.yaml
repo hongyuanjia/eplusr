@@ -1,0 +1,9 @@
+packages:
+  - "."
+
+# Vite requires esbuild's platform binary; all other dependency scripts stay disabled.
+onlyBuiltDependencies:
+  - esbuild
+confirmModulesPurge: false
+allowBuilds:
+  esbuild: set this to true or false

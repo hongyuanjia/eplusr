@@ -1,0 +1,20 @@
+{
+  "name": "eplusr-idfviewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "check": "vite build",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "lucide": "1.59.0",
+    "three": "0.184.0"
+  },
+  "devDependencies": {
+    "vite": "7.1.4"
+  }
+}

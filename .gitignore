@@ -7,3 +7,8 @@ try.R
 inst/doc
 .lintr
 docs/
+
+node_modules/
+.pnpm-store/
+output/
+.playwright-cli/

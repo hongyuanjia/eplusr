@@ -23,3 +23,11 @@
 ^vignettes$
 ^revdep$
 ^\.devcontainer$
+
+^srcjs$
+^GLOSSARY\.md$
+^air\.toml$
+^\.playwright-cli$
+
+^DESIGN\.md$
+^output$

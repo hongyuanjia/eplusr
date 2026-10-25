@@ -41,7 +41,9 @@ Suggests:
     hms,
     decido,
     png,
-    rgl (>= 0.105.13),
+    htmlwidgets,
+    httpuv,
+    later,
     testthat (>= 3.0.0),
     units,
     webshot2,
@@ -49,7 +51,6 @@ Suggests:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
     "collate"))
-RoxygenNote: 7.3.3
 SystemRequirements: EnergyPlus (optional)
     (<https://energyplus.net>); udunits2 (optional, for units support)
 Collate:
@@ -78,6 +79,9 @@ Collate:
     'impl-iddobj.R'
     'impl-idfobj-sch.R'
     'impl-sql.R'
+    'impl-viewer-query.R'
+    'impl-viewer-session.R'
+    'impl-viewer-webgl.R'
     'impl-viewer.R'
     'install.R'
     'standalone-schema.R'
@@ -93,7 +97,9 @@ Collate:
     'transition.R'
     'units.R'
     'validate.R'
+    'viewer-provider.R'
     'viewer.R'
     'zzz.R'
 Config/testthat/edition: 3
 Config/testthat/parallel: false
+Config/roxygen2/version: 8.0.0

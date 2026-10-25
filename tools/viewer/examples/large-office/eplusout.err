@@ -1,0 +1,28 @@
+Program Version,EnergyPlus, Version 23.1.0-87ed9199d4, YMD=2026.09.30 14:59,
+   ************* Beginning Zone Sizing Calculations
+   ************* Beginning System Sizing Calculations
+   ************* Beginning Plant Sizing Calculations
+   ** Warning ** In calculating the design coil UA for Coil:Cooling:Water VAV_5_COOLC
+   **   ~~~   ** the coil bypass factor is unrealistically large;
+   **   ~~~   ** The initial design conditions are: Tair,in = 23.6616
+   **   ~~~   **                                    Wair,in = 1.005218E-002
+   **   ~~~   **                                    Twater,in = 6.6700
+   **   ~~~   **                                    Tair,out = 11.2433
+   **   ~~~   **                                    Wair,out = 8.500000E-003
+   ** Warning ** Output:Meter: invalid Key Name="INTERIOREQUIPMENT:NATURALGAS" - not found.
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ** Warning ** Output:Table:Monthly requested with SimulationControl Run Simulation for Weather File Run Periods set to No so Output:Table:Monthly will not be generated
+   ** Warning ** Output:Table:TimeBins requested with SimulationControl Run Simulation for Weather File Run Periods set to No so Output:Table:TimeBins will not be generated
+   ************* Beginning Simulation
+   ************* Simulation Error Summary *************
+   ************* There are 8 unused objects in input.
+   ************* Use Output:Diagnostics,DisplayUnusedObjects; to see them.
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 4 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  2.13sec
