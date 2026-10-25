@@ -21,13 +21,12 @@ An \code{IdfGeometry} object.
 \description{
 \code{IdfGeometry} is an abstraction of a collection of geometry in an \link{Idf}. It
 provides more detail methods to query geometry properties, update geometry
-vertices and visualize geometry in 3D using the
-\href{https://cran.r-project.org/package=rgl}{rgl} package.
+vertices and visualize geometry in an interactive Three.js/WebGL widget.
 }
 \examples{
 
 ## ------------------------------------------------
-## Method `IdfGeometry$new`
+## Method `IdfGeometry$new()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -45,7 +44,7 @@ geom <- IdfGeometry$new(path_idf)
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$parent`
+## Method `IdfGeometry$parent()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -53,7 +52,7 @@ geom$parent()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$rules`
+## Method `IdfGeometry$rules()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -61,7 +60,7 @@ geom$rules()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$convert`
+## Method `IdfGeometry$convert()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -69,7 +68,7 @@ geom$convert()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$coord_system`
+## Method `IdfGeometry$coord_system()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -77,7 +76,7 @@ geom$coord_system("world", "world", "world")
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$round_digits`
+## Method `IdfGeometry$round_digits()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -85,7 +84,7 @@ geom$round_digits()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$area`
+## Method `IdfGeometry$area()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -93,7 +92,7 @@ geom$area()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$azimuth`
+## Method `IdfGeometry$azimuth()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -101,7 +100,7 @@ geom$azimuth()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$tilt`
+## Method `IdfGeometry$tilt()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -109,7 +108,7 @@ geom$tilt()
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$view`
+## Method `IdfGeometry$view()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -119,7 +118,7 @@ idf$view(new = TRUE, render_by = "construction")
 }
 
 ## ------------------------------------------------
-## Method `IdfGeometry$print`
+## Method `IdfGeometry$print()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -134,47 +133,46 @@ Hongyuan Jia
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-IdfGeometry-new}{\code{IdfGeometry$new()}}
-\item \href{#method-IdfGeometry-parent}{\code{IdfGeometry$parent()}}
-\item \href{#method-IdfGeometry-rules}{\code{IdfGeometry$rules()}}
-\item \href{#method-IdfGeometry-convert}{\code{IdfGeometry$convert()}}
-\item \href{#method-IdfGeometry-coord_system}{\code{IdfGeometry$coord_system()}}
-\item \href{#method-IdfGeometry-round_digits}{\code{IdfGeometry$round_digits()}}
-\item \href{#method-IdfGeometry-area}{\code{IdfGeometry$area()}}
-\item \href{#method-IdfGeometry-azimuth}{\code{IdfGeometry$azimuth()}}
-\item \href{#method-IdfGeometry-tilt}{\code{IdfGeometry$tilt()}}
-\item \href{#method-IdfGeometry-view}{\code{IdfGeometry$view()}}
-\item \href{#method-IdfGeometry-print}{\code{IdfGeometry$print()}}
-}
+  \itemize{
+    \item \href{#method-IdfGeometry-initialize}{\code{IdfGeometry$new()}}
+    \item \href{#method-IdfGeometry-parent}{\code{IdfGeometry$parent()}}
+    \item \href{#method-IdfGeometry-rules}{\code{IdfGeometry$rules()}}
+    \item \href{#method-IdfGeometry-convert}{\code{IdfGeometry$convert()}}
+    \item \href{#method-IdfGeometry-coord_system}{\code{IdfGeometry$coord_system()}}
+    \item \href{#method-IdfGeometry-round_digits}{\code{IdfGeometry$round_digits()}}
+    \item \href{#method-IdfGeometry-area}{\code{IdfGeometry$area()}}
+    \item \href{#method-IdfGeometry-azimuth}{\code{IdfGeometry$azimuth()}}
+    \item \href{#method-IdfGeometry-tilt}{\code{IdfGeometry$tilt()}}
+    \item \href{#method-IdfGeometry-view}{\code{IdfGeometry$view()}}
+    \item \href{#method-IdfGeometry-print}{\code{IdfGeometry$print()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-IdfGeometry-new"></a>}}
-\if{latex}{\out{\hypertarget{method-IdfGeometry-new}{}}}
-\subsection{Method \code{new()}}{
-Create an \code{IdfGeometry} object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$new(parent, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{parent}}{A path to an IDF file or an \link{Idf} object.}
-
-\item{\code{object}}{A character vector of valid names or an integer
+\if{html}{\out{<a id="method-IdfGeometry-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-IdfGeometry-initialize}{}}}
+\subsection{\code{IdfGeometry$new()}}{
+  Create an \code{IdfGeometry} object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$new(parent, object = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{parent}}{A path to an IDF file or an \link{Idf} object.}
+      \item{\code{object}}{A character vector of valid names or an integer
 vector of valid IDs of objects to extract. If \code{NULL}, all
 objects in geometry classes will be extracted.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An \code{IdfGeometry} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-# example model shipped with eplusr from EnergyPlus v8.8
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An \code{IdfGeometry} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# example model shipped with eplusr from EnergyPlus v8.8
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 
 # create from an Idf object
@@ -186,88 +184,81 @@ geom <- IdfGeometry$new(idf)
 geom <- idf_geometry(path_idf)
 geom <- IdfGeometry$new(path_idf)
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-parent"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-parent}{}}}
-\subsection{Method \code{parent()}}{
-Get parent \link{Idf} object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$parent()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-\verb{$parent()} returns the parent \link{Idf} object of current \code{IdfGeometry}
+\subsection{\code{IdfGeometry$parent()}}{
+  Get parent \link{Idf} object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$parent()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$parent()} returns the parent \link{Idf} object of current \code{IdfGeometry}
 object.
+  }
+  \subsection{Returns}{
+    An \link{Idf} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$parent()
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Returns}{
-An \link{Idf} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$parent()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-rules"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-rules}{}}}
-\subsection{Method \code{rules()}}{
-Get global geometry rules
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$rules()}\if{html}{\out{</div>}}
+\subsection{\code{IdfGeometry$rules()}}{
+  Get global geometry rules
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$rules()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$rules()} returns global geometry rules.
+  }
+  \subsection{Returns}{
+    An \link{Idf} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$rules()
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Details}{
-\verb{$rules()} returns global geometry rules.
-}
-
-\subsection{Returns}{
-An \link{Idf} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$rules()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-convert"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-convert}{}}}
-\subsection{Method \code{convert()}}{
-Convert simple geometry objects
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$convert(type = c("surface", "subsurface", "shading"))}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{A character vector giving what types of simplified
+\subsection{\code{IdfGeometry$convert()}}{
+  Convert simple geometry objects
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$convert(type = c("surface", "subsurface", "shading"))}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{A character vector giving what types of simplified
 geometries should be converted. Should be a subset of
 \code{"surface"}, \code{"subsurface"} and \code{"shading"}. Default is set to
 all of them.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-EnergyPlus provides several classes that allow for simplified entry
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    EnergyPlus provides several classes that allow for simplified entry
 of geometries, such as \code{Wall:Exterior}, \code{Window} and etc.
 \verb{$convert()} will generate detailed vertices from simplified geometry
 specifications and replace the original object with its corresponding
@@ -279,134 +270,122 @@ detailed class, including:
 \item \code{Shading:Building:Detailed}
 \item \code{Shading:Zone:Detailed}
 }
+  }
+  \subsection{Returns}{
+    The modified \link{Idf} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$convert()
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Returns}{
-The modified \link{Idf} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$convert()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-coord_system"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-coord_system}{}}}
-\subsection{Method \code{coord_system()}}{
-Convert vertices to specified coordinate systems
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$coord_system(detailed = NULL, simple = NULL, daylighting = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{detailed, simple, daylighting}}{A string specifying the coordinate
+\subsection{\code{IdfGeometry$coord_system()}}{
+  Convert vertices to specified coordinate systems
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$coord_system(detailed = NULL, simple = NULL, daylighting = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{detailed, simple, daylighting}}{A string specifying the coordinate
 system for detailed geometries, simple (rectangular surface)
 geometries, and daylighting reference points. Should be one of
 \code{"relative"}, \code{"world"} and \code{"absolute"}. \code{"absolute"} is the
 same as \code{"world"} and converted to it.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$coord_system()} converts all vertices of geometries into specified
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$coord_system()} converts all vertices of geometries into specified
 coordinate systems, e.g. from world to relative, and vice versa.
 Besides, it also updates the \code{GlobalGeometryRules} in parent \link{Idf}
 accordingly.
+  }
+  \subsection{Returns}{
+    The modified \link{Idf} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$coord_system("world", "world", "world")
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Returns}{
-The modified \link{Idf} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$coord_system("world", "world", "world")
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-round_digits"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-round_digits}{}}}
-\subsection{Method \code{round_digits()}}{
-Round digits on geometry vertices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$round_digits(digits = 4L)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{digits}}{An integer giving the number of decimal places to be
+\subsection{\code{IdfGeometry$round_digits()}}{
+  Round digits on geometry vertices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$round_digits(digits = 4L)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{digits}}{An integer giving the number of decimal places to be
 used. Default: \code{4}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$round_digits()} performs number rounding on vertices of detailed
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$round_digits()} performs number rounding on vertices of detailed
 geometry object vertices, e.g. \code{BuildingSurface:Detailed},
 \code{FenestrationSurface:Detailed} and etc.
 
 \verb{$round_digits()} may be useful for clean up IDF files generated
 using OpenStudio which often gives vertices with long trailing
 digits.
+  }
+  \subsection{Returns}{
+    The modified \link{Idf} object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$round_digits()
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Returns}{
-The modified \link{Idf} object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$round_digits()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-area"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-area}{}}}
-\subsection{Method \code{area()}}{
-Get area
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$area(class = NULL, object = NULL, net = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{class}}{A character vector of valid geometry class names.
+\subsection{\code{IdfGeometry$area()}}{
+  Get area
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$area(class = NULL, object = NULL, net = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{class}}{A character vector of valid geometry class names.
 Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
+      \item{\code{object}}{A character vector of valid names or an integer
 vector of valid IDs of targeting objects.
 Default: \code{NULL}.}
-
-\item{\code{net}}{If \code{TRUE}, the gross area is returned. If \code{FALSE}, the net
+      \item{\code{net}}{If \code{TRUE}, the gross area is returned. If \code{FALSE}, the net
 area is returned. Default: \code{FALSE}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$area()} returns the area of surfaces in square meters.
-}
-
-\subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$area()} returns the area of surfaces in square meters.
+  }
+  \subsection{Returns}{
+    A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -416,45 +395,41 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{type}: Character type. Surface types.
 \item \code{area}: Numeric type. Surface Area in m2.
 }
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$area()
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$area()
-}
-}
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-azimuth"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-azimuth}{}}}
-\subsection{Method \code{azimuth()}}{
-Get azimuth
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$azimuth(class = NULL, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{class}}{A character vector of valid geometry class names.
+\subsection{\code{IdfGeometry$azimuth()}}{
+  Get azimuth
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$azimuth(class = NULL, object = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{class}}{A character vector of valid geometry class names.
 Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
+      \item{\code{object}}{A character vector of valid names or an integer
 vector of valid IDs of targeting objects.
 Default: \code{NULL}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$azimuth()} returns the azimuth of surfaces in degree.
-}
-
-\subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$azimuth()} returns the azimuth of surfaces in degree.
+  }
+  \subsection{Returns}{
+    A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -464,45 +439,41 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{type}: Character type. Surface types.
 \item \code{azimuth}: Numeric type. Azimuth in degree.
 }
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$azimuth()
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$azimuth()
-}
-}
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-tilt"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-tilt}{}}}
-\subsection{Method \code{tilt()}}{
-Get tilt
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$tilt(class = NULL, object = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{class}}{A character vector of valid geometry class names.
+\subsection{\code{IdfGeometry$tilt()}}{
+  Get tilt
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$tilt(class = NULL, object = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{class}}{A character vector of valid geometry class names.
 Default: \code{NULL}.}
-
-\item{\code{object}}{A character vector of valid names or an integer
+      \item{\code{object}}{A character vector of valid names or an integer
 vector of valid IDs of targeting objects.
 Default: \code{NULL}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$tilt()} returns the tilt of surfaces in degree.
-}
-
-\subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$tilt()} returns the tilt of surfaces in degree.
+  }
+  \subsection{Returns}{
+    A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -512,41 +483,37 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 6 columns:
 \item \code{type}: Character type. Surface types.
 \item \code{tilt}: Numeric type. Azimuth in degree.
 }
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$tilt()
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$tilt()
-}
-}
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-view"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-view}{}}}
-\subsection{Method \code{view()}}{
-View 3D geometry
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$view(
+\subsection{\code{IdfGeometry$view()}}{
+  View 3D geometry
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$view(
   new = FALSE,
   render_by = "surface_type",
   wireframe = TRUE,
   x_ray = FALSE,
   axis = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{new}}{If \code{TRUE}, a new rgl window will be open using
-\code{\link[rgl:open3d]{rgl::open3d()}}. If \code{FALSE}, existing rgl window will be
-reused if possible. Default: \code{FALSE}.}
-
-\item{\code{render_by}}{A single string specifying the way of rendering the
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{new}}{If \code{TRUE}, create a new viewer widget. If \code{FALSE}, reuse
+the existing viewer object when possible. Default: \code{FALSE}.}
+      \item{\code{render_by}}{A single string specifying the way of rendering the
 geometry. Possible values are:
 \itemize{
 \item \code{"surface_type"}: Default. Render the model by surface type model.
@@ -562,74 +529,66 @@ color. All other surfaces will be white.
 a heat transfer face will be rendered as white and the inside face
 will be rendered as red.
 }}
-
-\item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
+      \item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
 shown. Default: \code{TRUE}.}
-
-\item{\code{x_ray}}{If \code{TRUE}, all surfaces will be rendered translucently.
+      \item{\code{x_ray}}{If \code{TRUE}, all surfaces will be rendered translucently.
 Default: \code{FALSE}.}
-
-\item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the
+      \item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the
 global origin. Default: \code{TRUE}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-\verb{$view()} uses the \href{https://cran.r-project.org/package=rgl}{rgl}
-package to visualize the IDF geometry in 3D in a similar way as
-\href{https://openstudio.net/}{OpenStudio}.
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    \verb{$view()} uses an interactive Three.js/WebGL widget to visualize the
+IDF geometry in 3D in a similar way as \href{https://openstudio.net/}{OpenStudio}.
 
 \verb{$view()} returns an \link{IdfViewer} object which can be used to further
 tweak the viewer scene.
 
-In the rgl window, you can control the view using your mouse:
+In the browser viewer, you can control the view using your mouse:
 \itemize{
 \item Left button: Trackball
 \item Right button: Pan
-projection.
 \item Wheel: Zoom
+\item Click: Select a surface
+\item Shift/Ctrl/Command-click: Select multiple surfaces
+\item Double-click: Isolate the current selection
 }
 
 For more detailed control on the scene, see \link{IdfViewer}.
-}
-
-\subsection{Returns}{
-An \link{IdfViewer} object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-idf$view()
+  }
+  \subsection{Returns}{
+    An \link{IdfViewer} object
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{idf$view()
 idf$view(render_by = "zone")
 idf$view(new = TRUE, render_by = "construction")
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-IdfGeometry-print"></a>}}
 \if{latex}{\out{\hypertarget{method-IdfGeometry-print}{}}}
-\subsection{Method \code{print()}}{
-Print an \code{IdfGeometry} object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfGeometry$print()}\if{html}{\out{</div>}}
+\subsection{\code{IdfGeometry$print()}}{
+  Print an \code{IdfGeometry} object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{IdfGeometry$print()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The \code{IdfGeometry} itself, invisibly.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{geom$print()
+}
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Returns}{
-The \code{IdfGeometry} itself, invisibly.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-geom$print()
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 }

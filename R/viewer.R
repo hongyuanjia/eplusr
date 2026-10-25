@@ -1,28 +1,29 @@
 #' @importFrom R6 R6Class
 #' @include impl-idf.R
+#' @include impl-viewer-webgl.R
+#' @include viewer-provider.R
 NULL
 
 #' Visualize an EnergyPlus Model Geometry and Simulation Results
 #'
-#' `IdfViewer` is a class designed to view geometry of an [Idf] and map
-#' simulation results to the geometries.
+#' `IdfViewer` renders an [IdfGeometry] in a browser using Three.js. Geometry is
+#' transferred as compact binary buffers; metadata and viewer options remain
+#' small JSON structures. Browser interactions include surface picking,
+#' multi-selection, Zone/Space filtering, isolation, clipping, result coloring,
+#' standard viewpoints, wireframes, X-ray rendering, and snapshots.
 #'
-#' @importFrom R6 R6Class
 #' @docType class
 #' @name IdfViewer
-#' @seealso [IdfGeometry] class
+#' @seealso [IdfGeometry]
 #' @author Hongyuan Jia
 NULL
 
 # idf_viewer {{{
 #' Create an `IdfViewer` object
 #'
-#' @param geometry An [IdfGeometry] object. `geometry` can also be a
-#'        path to an IDF file or an [Idf] object. In this case, an
-#'        `IdfGeometry` is created based on input [Idf].
+#' @param geometry An [IdfGeometry], [Idf], or path to an IDF file.
 #'
 #' @return An `IdfViewer` object.
-#'
 #' @name IdfViewer
 #' @export
 idf_viewer <- function(geometry) {
@@ -32,43 +33,24 @@ idf_viewer <- function(geometry) {
 
 # IdfViewer {{{
 #' @export
-IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
+IdfViewer <- R6Class(
+    "IdfViewer",
+    cloneable = FALSE,
     public = list(
         # initialize {{{
-        #' @description
-        #' Create an `IdfViewer` object
-        #'
-        #' @param geometry An [IdfGeometry] object. `geometry` can also be a
-        #'        path to an IDF file or an [Idf] object. In this case, an
-        #'        `IdfGeometry` is created based on input [Idf].
-        #'
-        #' @return An `IdfViewer` object.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' # example model shipped with eplusr from EnergyPlus v8.8
-        #' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
-        #'
-        #' # create from an Idf object
-        #' idf <- read_idf(path_idf, use_idd(8.8, "auto"))
-        #' viewer <- idf_viewer(idf)
-        #' viewer <- IdfViewer$new(idf)
-        #'
-        #' # create from an IDF file
-        #' viewer <- idf_viewer(path_idf)
-        #' viewer <- IdfViewer$new(path_idf)
-        #' }
+        #' @description Create an `IdfViewer` object.
+        #' @param geometry An [IdfGeometry], [Idf], or path to an IDF file.
         initialize = function(geometry) {
-            if (!requireNamespace("rgl", quietly = TRUE)) {
+            if (!requireNamespace("htmlwidgets", quietly = TRUE)) {
                 abort(paste0(
-                    "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
-                    "please add this to your library with 'install.packages(\"rgl\")' and try agian."
+                    "'eplusr' uses the 'htmlwidgets' package to view 3D IDF geometry; ",
+                    "install it with install.packages('htmlwidgets') and try again."
                 ))
             }
             if (!requireNamespace("decido", quietly = TRUE)) {
                 abort(paste0(
-                    "'eplusr' relies on the 'decido' package to view 3D IDF geometry; ",
-                    "please add this to your library with 'install.packages(\"decido\")' and try agian."
+                    "'eplusr' uses the 'decido' package to triangulate IDF geometry; ",
+                    "install it with install.packages('decido') and try again."
                 ))
             }
 
@@ -76,832 +58,986 @@ IdfViewer <- R6Class("IdfViewer", cloneable = FALSE,
                 private$m_geom <- geometry
             } else if (is_idf(geometry)) {
                 private$m_geom <- geometry$geometry()
-            } else if (is.character(geometry)) {
+            } else if (is.character(geometry) && length(geometry) == 1L) {
                 private$m_geom <- read_idf(geometry)$geometry()
+            } else {
+                abort("'geometry' must be an IdfGeometry, Idf, or IDF path.")
             }
 
-            # init log env
-            private$m_log <- new.env(parent = emptyenv())
-
-            # add a uuid
-            private$m_log$uuid <- unique_id()
-
-            # log geomtry id
-            private$log_geom_uuid()
+            # Keep the element ID stable across repeated standalone or local HTTP renders.
+            private$m_element_id <- paste0(
+                "eplusr-viewer-",
+                gsub("[^A-Za-z0-9_-]", "", unique_id())
+            )
         },
         # }}}
 
         # parent {{{
-        #' @description
-        #' Get parent [Idf] object
-        #'
-        #' @details
-        #' `$parent()` returns the parent [Idf] object of current `IdfGeometry`
-        #' object.
-        #'
-        #' @return An [Idf] object.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$parent()
-        #' }
-        parent = function()
-            idfviewer_parent(self, private),
+        #' @description Return the parent [Idf].
+        parent = function() private$m_geom$parent(),
         # }}}
 
         # geometry {{{
-        #' @description
-        #' Get parent [IdfGeometry] object
-        #'
-        #' @details
-        #' `$geometry()` returns the parent [IdfGeometry] object.
-        #'
-        #' @return An [IdfGeometry] object.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$geometry()
-        #' }
-        geometry = function()
-            idfviewer_geometry(self, private),
+        #' @description Return the parent [IdfGeometry].
+        geometry = function() private$m_geom,
         # }}}
 
         # device {{{
-        #' @description
-        #' Get Rgl device ID
-        #'
-        #' @details
-        #' If Rgl is used, the Rgl device ID is returned. If WebGL is
-        #' used, the `elementID` is returned. If no viewer has been open, `NULL`
-        #' is returned.
-        #'
-        #' @return A number or `NULL`
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$device()
-        #' }
-        device = function()
-            idfviewer_device(self, private),
+        #' @description Return the current htmlwidget element ID, or `NULL` before rendering.
+        device = function() {
+            if (is.null(private$m_widget)) NULL else private$m_element_id
+        },
         # }}}
 
-        # background {{{
-        #' @description
-        #' Set the background color of the scene
-        #'
-        #' @param color A single string giving the background color. Default:
-        #'        `white`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$background("blue")
-        #' }
-        background = function(color = "white")
-            idfviewer_background(self, private, color),
+        # widget {{{
+        #' @description Build a portable or live Three.js htmlwidget.
+        #' @param width,height Optional CSS or pixel dimensions.
+        #' @param frame_endpoint Optional external result-frame URL.
+        #' @param live Start a lightweight loopback connection to this R session.
+        #'   Use TRUE for R commands and selection readback; FALSE for reports.
+        widget = function(
+            width = NULL,
+            height = NULL,
+            frame_endpoint = NULL,
+            live = FALSE
+        ) {
+            assert_flag(live)
+            if (is.null(width)) {
+                width <- private$m_size$width
+            }
+            if (is.null(height)) {
+                height <- private$m_size$height
+            }
+            provider_mode <- length(private$m_results) &&
+                all(vapply(
+                    private$m_results,
+                    function(spec) identical(spec$mode, "provider"),
+                    logical(1L)
+                ))
+            provider <- if (provider_mode) self$frame_provider() else NULL
+            if (provider_mode && !live) {
+                assert_string(frame_endpoint, min.chars = 1L)
+            }
+            scene <- viewer__build_idf_view_scene(
+                private$m_geom,
+                options = private$options(),
+                results = if (provider_mode) list() else private$m_results,
+                frame_provider = provider,
+                frame_endpoint = frame_endpoint %||% "/frames"
+            )
+            if (live) {
+                # A new payload gets its own scene identity and closes the prior channel.
+                private$stop_live()
+                private$m_live <- viewer__session(
+                    scene,
+                    provider,
+                    private$m_on_select
+                )
+                private$m_live$query_results <- private$query_results
+                scene$live <- private$m_live$config
+                if (provider_mode) {
+                    scene$results <- provider$metadata(
+                        scene$live$frame_endpoint
+                    )
+                }
+            }
+            if (!is.null(private$m_sql_source)) {
+                objects <- viewer__selected_objects(
+                    scene$objects,
+                    vapply(
+                        scene$objects,
+                        function(object) as.character(object$id),
+                        ""
+                    )
+                )
+                scene$results <- viewer__result_query_payload(
+                    scene$results,
+                    private$m_sql_source,
+                    private$m_sql_filters,
+                    objects,
+                    live
+                )
+            }
+            private$m_widget <- viewer__create_idf_view_widget(
+                scene,
+                width = width,
+                height = height,
+                element_id = private$m_element_id
+            )
+            private$m_widget
+        },
+        # }}}        # background {{{
+        #' @description Set the scene background color.
+        #' @param color Any CSS color understood by Three.js.
+        background = function(color = "#f3f5f7") {
+            assert_string(color)
+            private$m_background <- color
+            if (!is.null(private$m_live)) {
+                private$m_live$send("background", list(value = color))
+            }
+            invisible()
+        },
         # }}}
 
         # viewpoint {{{
-        #' @description
-        #' Set the viewpoint orientation of the scene
-        #'
-        #' @param look_at A single string indicating a standard view. If
-        #'        specified, `theta` and `phi` will be ignored. Should be
-        #'        one of `c("top", "bottom", "left", "right", "front", "back",
-        #'        "iso")`. `look_at` will be ignored if any of `theta` and `phi`
-        #'        is specified. Default: `iso` (i.e. isometric).
-        #'
-        #' @param theta Theta in polar coordinates. If `NULL`, no changes will
-        #'        be made to current scene. Default: `NULL`.
-        #'
-        #' @param phi Phi in polar coordinates. If `NULL`, no changes will be
-        #'        made to current scene. Default: `NULL`.
-        #'
-        #' @param fov Field-of-view angle in degrees. If `0`, a parallel or
-        #'        orthogonal projection is used. If `NULL`, no changes will
-        #'        be made to current scene. Default: `NULL`.
-        #'
-        #' @param zoom Zoom factor. If `NULL`, no changes will be made to
-        #'        current scene. Default: `NULL`.
-        #'
-        #' @param scale A numeric vector of length 3 giving the rescaling to
-        #'        apply to each axis. If `NULL`, no changes will be made to
-        #'        current scene. Default: `NULL`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$viewpoint()
-        #' }
-        viewpoint = function(look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL)
-            idfviewer_viewpoint(self, private, look_at, theta, phi, fov, zoom, scale),
+        #' @description Set the initial camera viewpoint.
+        #' @param look_at One of `iso`, `top`, `bottom`, `front`, `back`, `left`, or `right`.
+        #' @param theta,phi,fov,zoom,scale Compatibility arguments retained from the former viewer.
+        viewpoint = function(
+            look_at = "iso",
+            theta = NULL,
+            phi = NULL,
+            fov = NULL,
+            zoom = NULL,
+            scale = NULL
+        ) {
+            assert_choice(
+                look_at,
+                c("iso", "top", "bottom", "front", "back", "left", "right")
+            )
+            assert_number(fov, lower = 1, upper = 179, null.ok = TRUE)
+            private$m_viewpoint <- list(
+                look_at = look_at,
+                theta = theta,
+                phi = phi,
+                fov = fov,
+                zoom = zoom,
+                scale = scale
+            )
+            if (!is.null(private$m_live)) {
+                private$m_live$send("view", list(value = look_at))
+            }
+            invisible()
+        },
         # }}}
 
         # win_size {{{
-        #' @description
-        #' Set the window size
-        #'
-        #' @param left,top,right,bottom A single number indicating the pixels of
-        #'        the displayed window. Defaults: `0` (`left`), `0` (`top`),
-        #'        `600` (`right`) and `600` (`bottom`).
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$win_size(0, 0, 400, 500)
-        #' }
-        win_size = function(left = 0, top = 0, right = 600, bottom = 600)
-            idfviewer_win_size(self, private, left, top, right, bottom),
+        #' @description Set widget dimensions using the former window rectangle convention.
+        #' @param left,top,right,bottom Window coordinates in pixels.
+        win_size = function(left = 0, top = 0, right = 900, bottom = 640) {
+            assert_number(left, lower = 0, finite = TRUE)
+            assert_number(top, lower = 0, finite = TRUE)
+            assert_number(right, lower = left, finite = TRUE)
+            assert_number(bottom, lower = top, finite = TRUE)
+            private$m_size <- list(width = right - left, height = bottom - top)
+            invisible()
+        },
         # }}}
 
         # mouse_mode {{{
-        #' @description
-        #' Set the handlers of mouse control
-        #'
-        #' @details
-        #' Possible values are:
-        #'
-        #' | Mode                      | Description                                                                                                                      |
-        #' | ---                       | ---                                                                                                                              |
-        #' | "none"                    | No action                                                                                                                        |
-        #' | "trackball"               | The mouse acts as a virtual trackball. Clicking and dragging rotates the scene                                                   |
-        #' | "xAxis", "yAxis", "zAxis" | Like "trackball", but restricted to rotation about one axis                                                                      |
-        #' | "polar"                   | The mouse affects rotations by controlling polar coordinates directly                                                            |
-        #' | "zoom"                    | The mouse zooms the display                                                                                                      |
-        #' | "fov"                     | The mouse affects perspective by changing the field of view                                                                      |
-        #' | "pull"                    | Rotating the mouse wheel towards the user “ pulls the scene closer”                                                              |
-        #' | "push"                    | The same rotation “pushes the scene away”                                                                                        |
-        #' | "pan"                     | Pan the camera view vertically or horizontally                                                                                   |
-        #'
-        #' @param left,right,middle Refer to the buttons on a three button
-        #'        mouse, or simulations of them on other mice. Defaults:
-        #'        `"trackball"` (`left`), `"pan"` (`right`) and `"fov"`
-        #'        (`middle`).
-        #'
-        #' @param wheel Refer to the mouse wheel. Default: `"pull"`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$mouse_mode()
-        #' }
-        mouse_mode = function(left = "trackball", right = "pan", middle = "fov", wheel = "pull")
-            idfviewer_mouse_mode(self, private, left, right, middle, wheel),
+        #' @description Configure browser mouse controls.
+        #' @param left,right,middle,wheel Mouse action names retained for API compatibility.
+        mouse_mode = function(
+            left = "trackball",
+            right = "pan",
+            middle = "fov",
+            wheel = "pull"
+        ) {
+            choices <- c(
+                "none",
+                "trackball",
+                "polar",
+                "zoom",
+                "fov",
+                "pull",
+                "push",
+                "pan"
+            )
+            assert_choice(left, choices)
+            assert_choice(right, choices)
+            assert_choice(middle, choices)
+            assert_choice(wheel, c("none", "pull", "push", "zoom"))
+            private$m_mouse_mode <- list(
+                left = left,
+                right = right,
+                middle = middle,
+                wheel = wheel
+            )
+            invisible()
+        },
         # }}}
 
         # axis {{{
-        #' @description
-        #' Toggle axis in the scene
-        #'
-        #' @details
-        #' `$axis()` adds or removes X, Y and Z axis in the scene.
-        #'
-        #' @param add If `TRUE`, axis is added to the scene. If `FALSE`, axis is
-        #'        removed in the scene.
-        #'
-        #' @param expand A single number giving the factor to expand based on
-        #'        the largest X, Y and Z coordinate values. Default: `2.0`.
-        #'
-        #' @param width A number giving the line width of axis. `width * 2` is
-        #'        used for the true north axis. Default: `1.5`.
-        #'
-        #' @param color A character of length 4 giving the color of X, Y, Z and
-        #'        true north axis. Default: `c("red", "green", "blue", "orange")`.
-        #'
-        #' @param alpha A number giving the alpha value of axis. Default: `1.0`.
-        #'
-        #' @return A single logical value as `add`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$axis()
-        #' }
-        axis = function(add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0)
-            idfviewer_axis(self, private, add, expand, width, color, alpha),
+        #' @description Toggle coordinate axes.
+        #' @param add Whether axes are shown.
+        #' @param expand,width,color,alpha Compatibility styling arguments.
+        axis = function(
+            add = TRUE,
+            expand = 2,
+            width = 1.5,
+            color = c("red", "green", "blue", "orange"),
+            alpha = 1
+        ) {
+            assert_flag(add)
+            private$m_axis <- add
+            if (!is.null(private$m_live)) {
+                private$m_live$send("axis", list(on = add))
+            }
+            invisible(add)
+        },
         # }}}
 
         # ground {{{
-        #' @description
-        #' Toggle ground in the scene
-        #'
-        #' @details
-        #' `$ground()` adds or removes ground in the scene.
-        #'
-        #' @param add If `TRUE`, ground is added to the scene. If `FALSE`,
-        #'        ground is removed in the scene.
-        #'
-        #' @param expand A single number giving the factor to expand based on
-        #'        the largest X, Y and Z coordinate values. Default: `1.02`.
-        #'
-        #' @param color A string giving the color of ground. Default: `#EDEDEB`.
-        #'
-        #' @param alpha A number giving the alpha value of ground. Default: `1.0`.
-        #'
-        #' @return A single logical value as `add`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$ground()
-        #' }
-        ground = function(add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0)
-            idfviewer_ground(self, private, add, expand, color, alpha),
+        #' @description Toggle the ground plane.
+        #' @param add Whether the ground is shown.
+        #' @param expand,color,alpha Ground styling options.
+        ground = function(
+            add = TRUE,
+            expand = 1.02,
+            color = "#e3e5e7",
+            alpha = 1
+        ) {
+            assert_flag(add)
+            private$m_ground <- add
+            if (!is.null(private$m_live)) {
+                private$m_live$send("ground", list(on = add))
+            }
+            invisible(add)
+        },
         # }}}
 
         # wireframe {{{
-        #' @description
-        #' Toggle wireframe
-        #'
-        #' @details
-        #' `$wireframe()` turns on/off wireframes.
-        #'
-        #' @param add If `TRUE`, wireframe is turned on. If `FALSE`, wireframe
-        #'        is turned off. Default: `TRUE`.
-        #'
-        #' @param width A number giving the line width of axis. Default: `1.5`.
-        #'
-        #' @param color A character of length 3 giving the color of X, Y and Z
-        #'        axis. Default: `c("red", "green", "blue")`.
-        #'
-        #' @param alpha A number giving the alpha value of axis. Default: `1.0`.
-        #'
-        #' @return A single logical value as `add`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$wireframe()
-        #' }
-        wireframe = function(add = TRUE, width = 1.5, color = "black", alpha = 1.0)
-            idfviewer_wireframe(self, private, add, width, color, alpha),
+        #' @description Toggle surface boundary wireframes.
+        #' @param add Whether wireframes are shown.
+        #' @param width,color,alpha Wireframe styling options.
+        wireframe = function(
+            add = TRUE,
+            width = 1.5,
+            color = "#24282f",
+            alpha = 1
+        ) {
+            assert_flag(add)
+            private$m_wireframe <- add
+            if (!is.null(private$m_live)) {
+                private$m_live$send("wireframe", list(on = add))
+            }
+            invisible(add)
+        },
         # }}}
 
         # x_ray {{{
-        #' @description
-        #' Toggle X-ray face style
-        #'
-        #' @details
-        #' `$x_ray()` turns on/off X-ray face style.
-        #'
-        #' @param on If `TRUE`, X-ray is turned on. If `FALSE`, X-ray is turned
-        #'        off. Default: `TRUE`.
-        #'
-        #' @return A single logical value as `on`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$x_ray()
-        #' }
-        x_ray = function(on = TRUE)
-            idfviewer_x_ray(self, private, on),
+        #' @description Toggle translucent X-ray rendering.
+        #' @param on Whether X-ray rendering is enabled.
+        x_ray = function(on = TRUE) {
+            assert_flag(on)
+            private$m_x_ray <- on
+            if (!is.null(private$m_live)) {
+                private$m_live$send("x_ray", list(on = on))
+            }
+            invisible(on)
+        },
         # }}}
 
         # render_by {{{
-        #' @description
-        #' Set render style
-        #'
-        #' @details
-        #' `$render_by()` sets the render style of geometries.
-        #'
-        #' @param type A single string giving the render style. Should be one
-        #' of:
-        #'
-        #' * `"surface_type"`: Default. Render the model by surface type
-        #'   model. Walls, roofs, windows, doors, floors, and shading
-        #'   surfaces will have unique colors.
-        #' * `"boundary"`: Render the model by outside boundary condition.
-        #'   Only surfaces that have boundary conditions will be rendered
-        #'   with a color. All other surfaces will be white.
-        #' * `"construction"`: Render the model by surface constructions.
-        #' * `"zone"`: Render the model by zones assigned.
-        #' * `"space"`: Render the model by spaces assigned.
-        #' * `"normal"`: Render the model by surface normal. The outside
-        #'   face of a heat transfer face will be rendered as white and the
-        #'   inside face will be rendered as red.
-        #'
-        #' @return A same value as `style`.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$render_by()
-        #' }
-        render_by = function(type = "surface_type")
-            idfviewer_render_by(self, private, type),
+        #' @description Set the categorical or numerical render style.
+        #' @param type One of `surface_type`, `boundary`, `construction`, `zone`,
+        #' `space`, `normal`, or `result` after calling `$color_by()`.
+        render_by = function(type = "surface_type") {
+            choices <- c(
+                "surface_type",
+                "boundary",
+                "construction",
+                "zone",
+                "space",
+                "normal",
+                "result"
+            )
+            assert_choice(type, choices)
+            if (type == "result" && !length(private$m_results)) {
+                abort(
+                    "Call '$color_by()' or '$results()' before rendering simulation results."
+                )
+            }
+            private$m_render_by <- type
+            if (!is.null(private$m_live)) {
+                private$m_live$send("render_by", list(value = type))
+            }
+            invisible(type)
+        },
+        # }}}
+
+        # color_by {{{
+        #' @description Map numerical data to surfaces and enable result coloring.
+        #' @param data A data frame containing object keys, values, and optional times.
+        #' @param value Names of one or more numeric result columns.
+        #' @param object Result scope: `surface`, `zone`, `space`, or `building`.
+        #' @param key Optional object-key column. It is inferred from common names by default.
+        #' @param time Optional timestamp or period column.
+        #' @param label,units Optional legend labels and units. Scalar values are
+        #'   recycled across result columns.
+        #' @param palette One or more palettes: `viridis`, `diverging`,
+        #'   `grayscale`, `sequential`, or `rainbow`.
+        #' @param limits Optional numeric limits of length two, or a list with
+        #'   one pair per result column.
+        #' @param mode `embed` packs all frames into the widget; `provider`
+        #'   exposes on-demand frames through [IdfViewerFrameProvider].
+        color_by = function(
+            data,
+            value,
+            object = "surface",
+            key = NULL,
+            time = NULL,
+            label = NULL,
+            units = NULL,
+            palette = "viridis",
+            limits = NULL,
+            mode = "embed"
+        ) {
+            assert_data_frame(data, min.rows = 1L)
+            assert_character(value, min.len = 1L, any.missing = FALSE)
+            assert_choice(object, c("surface", "zone", "space", "building"))
+            assert_string(key, null.ok = TRUE)
+            assert_string(time, null.ok = TRUE)
+            assert_character(label, any.missing = FALSE, null.ok = TRUE)
+            assert_character(units, any.missing = FALSE, null.ok = TRUE)
+            assert_subset(
+                palette,
+                c("viridis", "diverging", "grayscale", "sequential", "rainbow")
+            )
+            assert_choice(mode, c("embed", "provider"))
+            limit_list <- viewer__normalize_viewer_limits(limits, length(value))
+            private$reset_frame_provider()
+            labels <- rep_len(label %||% value, length(value))
+            unit_values <- rep_len(units %||% "", length(value))
+            palettes <- rep_len(palette, length(value))
+            private$m_sql_source <- NULL
+            private$m_results <- lapply(seq_along(value), function(index) {
+                list(
+                    source_type = "data",
+                    data = data,
+                    value = value[[index]],
+                    object = object,
+                    key = key,
+                    time = time,
+                    label = labels[[index]],
+                    units = unit_values[[index]],
+                    palette = palettes[[index]],
+                    limits = limit_list[[index]],
+                    mode = mode
+                )
+            })
+            private$m_render_by <- "result"
+            private$refresh_results()
+            invisible(self)
+        },
+        # }}}
+
+        # results {{{
+        #' @description Attach EnergyPlus SQLite output variables to the model.
+        #' @param source An [EplusSql] or completed [EplusJob]. NULL uses the parent Idf's last_job().
+        #' @param name Alias of variable, matching EplusSql$report_data().
+        #' @param key_value Result keys or a key_value/name dictionary data.frame.
+        #' @param year,tz,period,month,day,hour,minute,interval,simulation_days,day_type Selectors with the same semantics as EplusSql$report_data().
+        #' @details Live widgets expose source variable, environment, frequency, key and calendar selectors under Results > Select result data. case, all and wide describe table output and do not apply to a 3D viewer.
+        #' @param variable Optional variable names. `NULL` selects spatial
+        #'   Surface, Zone, and Space variables discoverable from the result dictionary.
+        #' @param reporting_frequency Optional reporting frequencies.
+        #' @param environment_name Optional environment period names.
+        #' @param palette Default result palette.
+        #' @param limits Optional named list of display limits by variable name.
+        #' @param mode `embed` stores all selected frames; `provider` queries
+        #'   the attached EnergyPlus SQLite file lazily from an local connection.
+        results = function(
+            source = NULL,
+            variable = NULL,
+            reporting_frequency = NULL,
+            environment_name = NULL,
+            palette = "viridis",
+            limits = NULL,
+            mode = "embed",
+            key_value = NULL,
+            name = NULL,
+            year = NULL,
+            tz = NULL,
+            period = NULL,
+            month = NULL,
+            day = NULL,
+            hour = NULL,
+            minute = NULL,
+            interval = NULL,
+            simulation_days = NULL,
+            day_type = NULL
+        ) {
+            if (is.null(source)) {
+                source <- self$parent()$last_job()
+            }
+            if (is.null(source)) {
+                abort(
+                    "The parent Idf has no last job. Supply an existing EplusJob or EplusSql; no simulation is started automatically."
+                )
+            }
+            assert_character(variable, any.missing = FALSE, null.ok = TRUE)
+            assert_character(name, any.missing = FALSE, null.ok = TRUE)
+            if (
+                !is.null(variable) &&
+                    !is.null(name) &&
+                    !setequal(tolower(variable), tolower(name))
+            ) {
+                abort("'variable' and 'name' are aliases; supply only one.")
+            }
+            assert_character(
+                reporting_frequency,
+                any.missing = FALSE,
+                null.ok = TRUE
+            )
+            assert_character(
+                environment_name,
+                any.missing = FALSE,
+                null.ok = TRUE
+            )
+            assert_string(tz, null.ok = TRUE)
+            if (!is.null(tz) && !tz %chin% OlsonNames()) {
+                abort("Unknown time zone.")
+            }
+            assert_choice(
+                palette,
+                c("viridis", "diverging", "grayscale", "sequential", "rainbow")
+            )
+            assert_choice(mode, c("embed", "provider"))
+            filters <- list(
+                name = name %||% variable,
+                key_value = key_value,
+                year = year,
+                tz = tz,
+                period = period,
+                month = month,
+                day = day,
+                hour = hour,
+                minute = minute,
+                interval = interval,
+                simulation_days = simulation_days,
+                day_type = day_type,
+                environment_name = environment_name,
+                reporting_frequency = reporting_frequency
+            )
+            specs <- viewer__sql_result_specs(
+                source,
+                variable = filters$name,
+                reporting_frequency = reporting_frequency,
+                environment_name = environment_name,
+                palette = palette,
+                limits = limits,
+                mode = mode,
+                report_filters = filters
+            )
+            provider <- NULL
+            payload <- NULL
+            if (!is.null(private$m_live)) {
+                objects <- viewer__selected_objects(
+                    private$m_live$objects,
+                    vapply(
+                        private$m_live$objects,
+                        function(object) as.character(object$id),
+                        ""
+                    )
+                )
+                # Prepare and validate the replacement before releasing the last working query.
+                if (mode == "provider") {
+                    provider <- IdfViewerFrameProvider$new(specs, objects)
+                    payload <- provider$metadata(
+                        private$m_live$config$frame_endpoint
+                    )
+                } else {
+                    payload <- viewer__results_payload(specs, objects)
+                }
+                payload <- tryCatch(
+                    viewer__result_query_payload(
+                        payload,
+                        source,
+                        filters,
+                        objects,
+                        TRUE
+                    ),
+                    error = function(error) {
+                        if (!is.null(provider)) {
+                            provider$close()
+                        }
+                        stop(error)
+                    }
+                )
+            }
+            private$reset_frame_provider()
+            private$m_results <- specs
+            private$m_sql_source <- source
+            private$m_sql_filters <- filters
+            private$m_sql_options <- list(
+                palette = palette,
+                limits = limits,
+                mode = mode
+            )
+            private$m_frame_provider <- provider
+            private$m_render_by <- "result"
+            if (!is.null(private$m_live)) {
+                private$m_live$provider <- provider
+                private$m_live$send("results", list(results = payload))
+            }
+            invisible(self)
+        },
+        # }}}
+
+        # frame_provider {{{
+        #' @description Return the framework-independent result frame provider.
+        #' @details Configure `$color_by()` or `$results()` with
+        #'   `mode = "provider"` first. In an local HTTP route, pass
+        #'   `req$query$variable` and `req$query$frames` directly to
+        #'   `provider$fetch()`, set `Content-Type` to
+        #'   `application/octet-stream`, and send the returned raw vector.
+        #' @return An [IdfViewerFrameProvider] object.
+        frame_provider = function() {
+            modes <- vapply(
+                private$m_results,
+                function(spec) spec$mode %||% "embed",
+                character(1L)
+            )
+            if (!length(modes) || any(modes != "provider")) {
+                abort(
+                    "Call '$color_by(..., mode = \"provider\")' or '$results(..., mode = \"provider\")' first."
+                )
+            }
+            if (is.null(private$m_frame_provider)) {
+                context <- viewer__scene_context(
+                    private$m_geom,
+                    private$options()
+                )
+                private$m_frame_provider <- IdfViewerFrameProvider$new(
+                    private$m_results,
+                    context$objects
+                )
+            }
+            private$m_frame_provider
+        },
+        # }}}
+
+        # update {{{
+        #' @description Send an incremental command to the current live view.
+        #' @param command One of time, variable, render_by, view, projection,
+        #'   fit, fit_model, fit_selection, range_mode, show_all,
+        #'   play, pause, palette, range, aggregation, explode, clip, measure,
+        #'   hide_selected, isolate, exit_isolation, clear_selection, panel,
+        #'   diagnostics, background, wireframe, x_ray, window_style, axis, or ground.
+        #'   For window_style, use value = "glass" (default) or "opaque".
+        #'   The panel command controls the transient property inspector.
+        #' @param ... Named arguments for the browser command.
+        update = function(command, ...) {
+            assert_choice(
+                command,
+                c(
+                    "time",
+                    "variable",
+                    "render_by",
+                    "view",
+                    "fit",
+                    "fit_model",
+                    "fit_selection",
+                    "projection",
+                    "range_mode",
+                    "show_all",
+                    "play",
+                    "pause",
+                    "palette",
+                    "range",
+                    "aggregation",
+                    "explode",
+                    "clip",
+                    "measure",
+                    "hide_selected",
+                    "isolate",
+                    "exit_isolation",
+                    "clear_selection",
+                    "panel",
+                    "diagnostics",
+                    "background",
+                    "wireframe",
+                    "x_ray",
+                    "window_style",
+                    "axis",
+                    "ground"
+                )
+            )
+            private$require_live()$send(command, list(...))
+            invisible(self)
+        },
+        # }}}
+
+        # select {{{
+        #' @description Select existing objects by their semantic metadata.
+        #' @details Zone and Space criteria select their member surfaces;
+        #'   several supplied criteria are combined by intersection.
+        #' @param zone,space Zone and Space names.
+        #' @param surface Surface names or IDs.
+        select = function(zone = NULL, space = NULL, surface = NULL) {
+            live <- private$require_live()
+            objects <- viewer__selected_objects(
+                live$objects,
+                vapply(
+                    live$objects,
+                    function(object) as.character(object$id),
+                    ""
+                )
+            )
+            keep <- if (is.null(zone) && is.null(space) && is.null(surface)) {
+                rep(FALSE, nrow(objects))
+            } else {
+                rep(TRUE, nrow(objects))
+            }
+            for (criterion in c("zone", "space", "surface")) {
+                values <- get(criterion)
+                if (is.null(values)) {
+                    next
+                }
+                checkmate::assert_atomic_vector(values, any.missing = FALSE)
+                column <- switch(
+                    criterion,
+                    zone = "zone_name",
+                    space = "space_name",
+                    surface = "name"
+                )
+                matches <- tolower(as.character(objects[[column]])) %chin%
+                    tolower(as.character(values))
+                if (criterion == "surface") {
+                    matches <- matches |
+                        as.character(objects$id) %chin% as.character(values)
+                }
+                keep <- keep & matches
+            }
+            live$send(
+                "select_ids",
+                list(ids = as.list(as.character(objects$id[keep])))
+            )
+            invisible(self)
+        },
+        # }}}
+
+        # filter {{{
+        #' @description Filter the current live scene without sending geometry again.
+        #' @param zone,space,surface Names to include; NULL removes that filter.
+        #' @param type Component names such as wall, roof, floor or window.
+        filter = function(
+            zone = NULL,
+            space = NULL,
+            surface = NULL,
+            type = NULL
+        ) {
+            values <- list(
+                zone = zone,
+                space = space,
+                surface = surface,
+                type = type
+            )
+            for (value in values) {
+                assert_character(value, any.missing = FALSE, null.ok = TRUE)
+            }
+            private$require_live()$send(
+                "filter",
+                lapply(values, function(value) {
+                    if (is.null(value)) NULL else as.list(value)
+                })
+            )
+            invisible(self)
+        },
+        # }}}
+
+        # selection {{{
+        #' @description Return selected model metadata last reported by the browser.
+        #' @return A data.table containing the original object IDs and metadata.
+        selection = function() private$require_live()$read()$selection,
+        # }}}
+
+        # state {{{
+        #' @description Return connection status and the last acknowledged browser state.
+        #' @details Commands are asynchronous. The acknowledged counter allows
+        #'   scripts to distinguish a sent update from a completed update.
+        state = function() private$require_live()$read(),
+        # }}}
+
+        # on_select {{{
+        #' @description Register a callback called with selected model metadata.
+        #' @param callback An R function taking one data.table, or NULL to remove it.
+        on_select = function(callback = NULL) {
+            if (!is.null(callback) && !is.function(callback)) {
+                abort("'callback' must be a function or NULL.")
+            }
+            private$m_on_select <- callback
+            if (!is.null(private$m_live)) {
+                private$m_live$callback <- callback
+            }
+            invisible(self)
+        },
+        # }}}
+
+        # diagnostics {{{
+        #' @description Configure geometry-quality diagnostics.
+        #' @param on Whether potential adjacency issues are calculated and shown.
+        #' @param tolerance Maximum vertex separation in metres treated as a
+        #'   potential near-miss. Exact coincident vertices are not flagged.
+        diagnostics = function(on = TRUE, tolerance = 0.01) {
+            assert_flag(on)
+            assert_number(tolerance, lower = 1e-6, finite = TRUE)
+            private$m_diagnostics <- list(enabled = on, tolerance = tolerance)
+            invisible(self)
+        },
+        # }}}
+
+        # clear_color {{{
+        #' @description Remove mapped results and return to surface-type coloring.
+        clear_color = function() {
+            private$reset_frame_provider()
+            private$m_results <- list()
+            private$m_sql_source <- NULL
+            private$m_render_by <- "surface_type"
+            private$refresh_results()
+            invisible(self)
+        },
         # }}}
 
         # show {{{
-        #' @description
-        #' Show [Idf] geometry
-        #'
-        #' @param type A character vector of geometry components to show. If
-        #'        `"all"` (default), all geometry components will be shown. If
-        #'        `NULL`, no geometry faces will be shown. Otherwise, should be
-        #'        a subset of following:
-        #'
-        #' * `"floor"`
-        #' * `"wall"`
-        #' * `"roof"`
-        #' * `"window"`
-        #' * `"door"`
-        #' * `"shading"`
-        #' * `"daylighting"`
-        #'
-        #' @param zone A character vector of names or an integer vector of IDs
-        #'        of zones in current [Idf] to show. If `NULL`, no subsetting is
-        #'        performed.
-        #'
-        #' @param space A character vector of names or an integer vector of IDs
-        #'        of spaces in current [Idf] to show. If `NULL`, no subsetting is
-        #'        performed.
-        #'
-        #' @param surface A character vector of names or an integer vector of IDs
-        #'        of surfaces in current [Idf] to show. If `NULL`, no subsetting
-        #'        is performed.
-        #'
-        #' @param width The line width for the geometry components. Default:
-        #'        `1.5`.
-        #'
-        #' @param dayl_color,dayl_size The color and size of daylighting
-        #'        reference points. Defaults: `"red"` (`dayl_color`) and `5`
-        #'        (`dayl_size`).
-        #'
-        #' @return The `IdfViewer` itself, invisibly.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$show()
-        #' }
-        show = function(type = "all", zone = NULL, space = NULL, surface = NULL, width = 1.5, dayl_color = "red", dayl_size = 5)
-            idfviewer_show(self, private, type, zone, surface, width = 1.5, dayl_color, dayl_size),
-        # }}}
-
-        # focus {{{
-        #' @description
-        #' Bring the scene window to the top
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$top()
-        #' }
-        focus = function()
-            idfviewer_focus(self, private),
+        #' @description Show existing geometry without modifying the source model.
+        #' @param type Geometry components to include.
+        #' @param zone,space,surface Zone, Space, and Surface IDs or names.
+        #' @param width,dayl_color,dayl_size Former viewer styling arguments.
+        #' @param live Enable R updates and selection readback. Defaults to
+        #'   interactive R; reports remain self-contained by default.
+        show = function(
+            type = "all",
+            zone = NULL,
+            space = NULL,
+            surface = NULL,
+            width = 1.5,
+            dayl_color = "red",
+            dayl_size = 5,
+            live = interactive()
+        ) {
+            private$stop_live()
+            private$reset_frame_provider()
+            private$m_show <- list(
+                type = type,
+                zone = zone,
+                space = space,
+                surface = surface
+            )
+            widget <- self$widget(live = live)
+            if (interactive()) {
+                print(widget)
+            }
+            invisible(widget)
+        },
+        # }}}        # focus {{{
+        #' @description Re-display the current widget.
+        focus = function() {
+            if (is.null(private$m_widget)) {
+                verbose_info("No viewer widget found. Skip.")
+            } else if (interactive()) {
+                print(private$m_widget)
+            }
+            invisible()
+        },
         # }}}
 
         # close {{{
-        #' @description
-        #' Close the scene window
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$close()
-        #' }
-        close = function()
-            idfviewer_close(self, private),
+        #' @description Forget the current widget instance.
+        close = function() {
+            private$stop_live()
+            private$reset_frame_provider()
+            private$m_widget <- NULL
+            invisible()
+        },
         # }}}
 
         # snapshot {{{
-        #' @description
-        #' Capture and save current rgl view as an image
-        #'
-        #' @details
-        #' `$snapshot()` captures the current rgl view and saves it as an image
-        #' file to disk using [rgl::snapshot3d()] and [rgl::rgl.postscript()].
-        #' Native image and vector exports require an OpenGL device. With a
-        #' NULL device, PNG exports require `webshot = TRUE`, the 'webshot2'
-        #' package, and a Chrome browser. Unavailable backends or failed
-        #' exports raise an error. An existing destination is replaced only
-        #' after a successful export.
-        #'
-        #' @param filename A single string specifying the file name. Current
-        #'        supported formats are `png`, `pdf`, `svg`, `ps`, `eps`, `tex`
-        #'        and `pgf`.
-        #' @param webshot Whether to use the 'webshot2' package to take the
-        #'        snapshot. For more details, please see [rgl::snapshot3d()].
-        #'        Default: `FALSE`.
-        #' @param ... Arguments to pass to `webshot2::webshot()`.
-        #'
-        #' @return A single string of the file path.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$show()
-        #' viewer$snapshot(tempfile(fileext = ".png"))
-        #' }
-        #'
-        snapshot = function(filename, webshot = FALSE, ...)
-            idfviewer_snapshot(self, private, filename, webshot, ...),
+        #' @description Export the configured scene as portable HTML or PNG.
+        #' @details Exports rebuild the configured scene. Use the browser's
+        #'   screenshot button to capture its current camera and selection.
+        #' @param filename Output .html or .png path.
+        #' @param selfcontained Embed dependencies in an HTML export.
+        #' @param ... Additional arguments to webshot2::webshot().
+        snapshot = function(filename, selfcontained = TRUE, ...) {
+            if (
+                length(private$m_results) &&
+                    any(vapply(
+                        private$m_results,
+                        function(spec) identical(spec$mode, "provider"),
+                        logical(1L)
+                    ))
+            ) {
+                abort("Snapshots require embedded results; use mode = 'embed'.")
+            }
+            viewer__snapshot(self, filename, selfcontained, ...)
+        },
+        # }}}        # print {{{
+        #' @description Print a concise viewer summary.
+        print = function() {
+            cli::cat_rule("EnergyPlus IDF Three.js Viewer", line = 1)
+            path <- private$m_geom$parent()$path()
+            if (is.null(path)) {
+                path <- cli::style_bold(cli::bg_red("NOT LOCAL"))
+            } else {
+                path <- surround(path)
+            }
+            cli::cat_line(cli::ansi_strtrim(c(
+                paste0(" ", cli::symbol$bullet, " Path: ", path),
+                paste0(
+                    " ",
+                    cli::symbol$bullet,
+                    " Version: ",
+                    surround(private$m_geom$parent()$version())
+                ),
+                paste0(" ", cli::symbol$bullet, " Renderer: Three.js/WebGL")
+            )))
+            invisible(self)
+        }
         # }}}
-
-        # print {{{
-        #' @description
-        #' Print an `IdfViewer` object
-        #'
-        #' @return The `IdfViewer` itself, invisibly.
-        #'
-        #' @examples
-        #' \dontrun{
-        #' viewer$print()
-        #' }
-        print = function()
-            idfviewer_print(self, private)
-        # }}}
-
-        # TODO: as.mesh3d
     ),
 
     private = list(
-        # PRIVATE FIELDS {{{
         m_geom = NULL,
-        m_device = NULL,
-        m_background = "white",
-        m_viewpoint = list(look_at = "iso", fov = 30),
-        m_mouse_mode = list(left = "trackball", right = "pan", middle = "fov", wheel = "pull"),
+        m_widget = NULL,
+        m_live = NULL,
+        m_on_select = NULL,
+        m_element_id = NULL,
+        m_background = "#f3f5f7",
+        m_viewpoint = list(look_at = "iso", fov = 38),
+        m_mouse_mode = list(
+            left = "trackball",
+            right = "pan",
+            middle = "fov",
+            wheel = "pull"
+        ),
+        m_size = list(width = NULL, height = 640),
+        m_axis = TRUE,
+        m_ground = FALSE,
+        m_wireframe = TRUE,
         m_x_ray = FALSE,
-        m_show_hidden = FALSE,
         m_render_by = "surface_type",
-        m_win_size = c(0, 0, 600, 600),
-        m_axis = list(expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0),
-        m_ground = list(add = FALSE),
-        m_wireframe = list(width = 1.5, color = "black", alpha = 1.0),
-        m_id_axis = NULL,
-        m_id_ground = NULL,
-        m_id_wireframe = NULL,
-        m_id_surface = NULL,
-        m_id_dayl = NULL,
-        m_log = NULL,
+        m_show = list(type = "all", zone = NULL, space = NULL, surface = NULL),
+        m_results = list(),
+        m_sql_source = NULL,
+        m_sql_filters = list(),
+        m_sql_options = list(),
+        m_frame_provider = NULL,
+        m_diagnostics = list(enabled = FALSE, tolerance = 0.01),
+
+        # options {{{
+        # Keep a single options contract between R, standalone widgets, and local HTTP.
+        options = function() {
+            list(
+                background = private$m_background,
+                viewpoint = private$m_viewpoint,
+                mouse_mode = private$m_mouse_mode,
+                axis = private$m_axis,
+                ground = private$m_ground,
+                wireframe = private$m_wireframe,
+                x_ray = private$m_x_ray,
+                render_by = private$m_render_by,
+                show = private$m_show,
+                diagnostics = private$m_diagnostics
+            )
+        },
         # }}}
 
-        # PRIVATE FUNCTIONS {{{
-        uuid = function() private$m_log$uuid,
-        log_new_uuid = function() log_new_uuid(private$m_log),
-
-        geom_uuid = function() get_priv_env(private$m_geom)$m_log$uuid,
-        log_geom_uuid = function() private$m_log$geom_uuid <- get_priv_env(private$m_geom)$m_log$uuid,
-        cached_geom_uuid = function() private$m_log$geom_uuid,
-
-        geoms = function(opengl = TRUE) {
-            if (private$geom_uuid() != private$cached_geom_uuid() || is.null(private$m_log$geoms)) {
-                private$m_log$geoms <- copy_list(get_priv_env(private$m_geom)$geoms())
-                private$m_log$geoms$in_opengl <- FALSE
-
-                # change all vertices to world coordinate system
-                private$m_log$geoms <- align_coord_system(
-                    private$m_log$geoms, "world", "world", "world"
+        # require_live {{{
+        # Fail clearly instead of pretending a portable widget has an R connection.
+        require_live = function() {
+            if (is.null(private$m_live) || private$m_live$closed) {
+                abort(
+                    "Render '$widget(live = TRUE)' or '$show(live = TRUE)' first."
                 )
-
-                # vertices2 for triangulation
-                private$m_log$geoms$vertices2 <- triangulate_geoms(private$m_log$geoms)
             }
-
-            if (opengl) private$to_opengl_coord() else private$to_eplus_coord()
+            private$m_live
         },
+        # }}}
 
-        to_opengl_coord = function() {
-            if (private$m_log$geoms$in_opengl) return(private$m_log$geoms)
-
-            private$m_log$geoms$vertices <- rgl_vertice_trans_to_opengl(private$m_log$geoms$vertices)
-            private$m_log$geoms$vertices2 <- rgl_vertice_trans_to_opengl(private$m_log$geoms$vertices2)
-            private$m_log$geoms$in_opengl <- TRUE
-            private$m_log$geoms
+        # stop_live {{{
+        # Close this connection before replacing its scene or releasing the viewer.
+        stop_live = function() {
+            if (!is.null(private$m_live)) {
+                private$m_live$close()
+            }
+            private$m_live <- NULL
+            invisible()
         },
+        # }}}
 
-        to_eplus_coord = function() {
-            if (!private$m_log$geoms$in_opengl) return(private$m_log$geoms)
+        # query_results {{{
+        # Reuse the public selectors for browser queries and keep failures transactional.
+        query_results = function(filters) {
+            if (is.null(private$m_sql_source)) {
+                abort("No EnergyPlus result source is attached.")
+            }
+            filters <- viewer__browser_result_filters(filters)
+            filters <- utils::modifyList(
+                private$m_sql_filters,
+                filters,
+                keep.null = TRUE
+            )
+            do.call(
+                self$results,
+                c(
+                    list(source = private$m_sql_source),
+                    private$m_sql_options,
+                    filters
+                )
+            )
+        },
+        # }}}
 
-            private$m_log$geoms$vertices <- rgl_vertice_trans_to_eplus(private$m_log$geoms$vertices)
-            private$m_log$geoms$vertices2 <- rgl_vertice_trans_to_eplus(private$m_log$geoms$vertices2)
-            private$m_log$geoms$in_opengl <- FALSE
-            private$m_log$geoms
+        # refresh_results {{{
+        # Replace only result buffers and metadata; camera and geometry stay in the browser.
+        refresh_results = function() {
+            if (is.null(private$m_live)) {
+                return(invisible())
+            }
+            objects <- viewer__selected_objects(
+                private$m_live$objects,
+                vapply(
+                    private$m_live$objects,
+                    function(object) as.character(object$id),
+                    ""
+                )
+            )
+            provider <- length(private$m_results) &&
+                all(vapply(
+                    private$m_results,
+                    function(spec) identical(spec$mode, "provider"),
+                    logical(1L)
+                ))
+            if (provider) {
+                private$m_frame_provider <- IdfViewerFrameProvider$new(
+                    private$m_results,
+                    objects
+                )
+                private$m_live$provider <- private$m_frame_provider
+                results <- private$m_frame_provider$metadata(
+                    private$m_live$config$frame_endpoint
+                )
+            } else {
+                private$m_live$provider <- NULL
+                results <- viewer__results_payload(private$m_results, objects)
+            }
+            private$m_live$send("results", list(results = results))
+            invisible()
+        },
+        # }}}
+
+        # reset_frame_provider {{{
+        # Close stale query state whenever geometry filters or result specifications change.
+        reset_frame_provider = function() {
+            if (!is.null(private$m_frame_provider)) {
+                private$m_frame_provider$close()
+            }
+            private$m_frame_provider <- NULL
+            invisible()
+        },
+        # }}}
+
+        # finalize {{{
+        # Ensure provider-owned DuckDB connections do not outlive the viewer object.
+        finalize = function() {
+            private$stop_live()
+            private$reset_frame_provider()
         }
         # }}}
     )
 )
-# }}}
-
-# idfviewer_parent {{{
-idfviewer_parent <- function(self, private) {
-    private$m_geom$parent()
-}
-# }}}
-# idfviewer_geometry {{{
-idfviewer_geometry <- function(self, private) {
-    private$m_geom
-}
-# }}}
-# idfviewer_device {{{
-idfviewer_device <- function(self, private) {
-    # in case the window has been killed accidentally
-    if (length(private$m_device) && !private$m_device %in% rgl::rgl.dev.list()) {
-        private$m_device <- NULL
-    }
-    private$m_device
-}
-# }}}
-# idfviewer_background {{{
-idfviewer_background <- function(self, private, color = "white") {
-    assert_string(color)
-    private$m_background <- color
-    if (!is.null(self$device())) rgl::bg3d(color = color)
-    invisible()
-}
-# }}}
-# idfviewer_viewpoint {{{
-idfviewer_viewpoint <- function(self, private, look_at = "iso", theta = NULL, phi = NULL, fov = NULL, zoom = NULL, scale = NULL) {
-    private$m_viewpoint <- list(look_at = look_at, theta = theta, phi = phi, fov = fov, zoom = zoom, scale = scale)
-    if (is.null(self$device())) return(invisible())
-    do.call(rgl_viewpoint, c(list(dev = private$m_device), private$m_viewpoint))
-    invisible()
-}
-# }}}
-# idfviewer_win_size {{{
-idfviewer_win_size <- function(self, private, left = 0, top = 0, right = 600, bottom = 600) {
-    assert_number(left, lower = 0, finite = TRUE)
-    assert_number(top, lower = 0, finite = TRUE)
-    assert_number(right, lower = 0, finite = TRUE)
-    assert_number(bottom, lower = 0, finite = TRUE)
-
-    private$m_win_size <- c(left = left, top = top, right = right, bottom = bottom)
-    if (!is.null(self$device())) {
-        rgl::par3d(dev = private$m_device, windowRect = private$m_win_size)
-    }
-    invisible()
-}
-# }}}
-# idfviewer_mouse_mode {{{
-idfviewer_mouse_mode <- function(self, private, left = "trackball", right = "pan", middle = "fov", wheel = "pull") {
-    choices <- c("none", "trackball", "xAxis", "yAxis", "zAxis", "polar", "zoom", "fov", "pull", "push", "pan")
-    assert_choice(left, choices)
-    assert_choice(right, choices)
-    assert_choice(middle, choices)
-    assert_choice(wheel, c("none", "pull", "push", "zoom"))
-
-    if (length(self$device())) {
-        cur <- rgl::par3d(dev = private$m_device, "mouseMode")
-        pan_but <- 0L
-        if (left == "pan") pan_but <- 1L else cur[["left"]] <- left
-        if (right == "pan") pan_but <- 2L else cur[["right"]] <- right
-        if (middle == "pan") pan_but <- 3L else cur[["middle"]] <- middle
-        cur[["wheel"]] <- wheel
-
-        rgl::par3d(dev = private$m_device, mouseMode = cur)
-        if (pan_but > 0L) pan3d(pan_but)
-    }
-
-    private$m_mouse_mode <- list(left = left, right = right, middle = middle, wheel = wheel)
-    invisible()
-}
-# }}}
-# idfviewer_axis {{{
-idfviewer_axis <- function(self, private, add = TRUE, expand = 2.0, width = 1.5, color = c("red", "green", "blue", "orange"), alpha = 1.0) {
-    assert_flag(add)
-    assert_number(expand, lower = 1.0)
-    assert_number(width, lower = 1E-5, finite = TRUE)
-    assert_character(color, len = 4, any.missing = TRUE)
-    assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
-
-    if (add) {
-        private$m_axis <- list(expand = expand, width = width, color = color, alpha = alpha)
-        if (length(self$device())) {
-            # only extent when nothing else
-            if (length(private$m_id_wireframe) || length(private$m_id_surface) || length(private$m_id_dayl)) {
-                par <- rgl::par3d(dev = private$m_device, "ignoreExtent")
-                on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
-                rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
-            }
-
-            if (length(private$m_id_axis)) {
-                rgl_pop(id = private$m_id_axis)
-            }
-
-            private$m_id_axis <- do.call(rgl_view_axis,
-                c(list(dev = private$m_device, geoms = private$geoms()), private$m_axis))
-        }
-    } else {
-        if (length(self$device()) && length(private$m_id_axis)) {
-            par <- rgl::par3d(dev = private$m_device, "ignoreExtent")
-            on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
-            rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
-
-            rgl_pop(id = private$m_id_axis)
-        }
-        private$m_id_axis <- NULL
-        private$m_axis <- NULL
-    }
-    invisible(add)
-}
-# }}}
-# idfviewer_ground {{{
-idfviewer_ground <- function(self, private, add = TRUE, expand = 1.02, color = "#EDEDEB", alpha = 1.0) {
-    assert_flag(add)
-    assert_number(expand, lower = 1.0)
-    assert_string(color)
-    assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
-
-    if (add) {
-        private$m_ground <- list(expand = expand, color = color, alpha = alpha)
-        if (length(self$device())) {
-            # only extent when nothing else
-            if (length(private$m_id_wireframe) || length(private$m_id_surface) || length(private$m_id_dayl)) {
-                par <- rgl::par3d(dev = private$m_device, "ignoreExtent")
-                on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
-                rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
-            }
-
-            if (length(private$m_id_ground)) {
-                rgl_pop(id = private$m_id_ground)
-            }
-
-            private$m_id_ground <- do.call(rgl_view_ground,
-                c(list(dev = private$m_device, geoms = private$geoms()), private$m_ground))
-        }
-    } else {
-        if (length(self$device()) && length(private$m_id_ground)) {
-            # only extent when nothing else
-            if (length(private$m_id_wireframe) || length(private$m_id_surface) || length(private$m_id_dayl)) {
-                par <- rgl::par3d(dev = private$m_device, "ignoreExtent")
-                on.exit(rgl::par3d(dev = private$m_device, ignoreExtent = par), add = TRUE)
-                rgl::par3d(dev = private$m_device, ignoreExtent = TRUE)
-            }
-            rgl_pop(id = private$m_id_ground)
-        }
-        private$m_id_ground <- NULL
-        private$m_ground <- NULL
-    }
-    invisible(add)
-}
-# }}}
-# idfviewer_wireframe {{{
-idfviewer_wireframe <- function(self, private, add = TRUE, width = 1.5, color = "black", alpha = 1.0) {
-    assert_flag(add)
-    assert_number(width, lower = 1E-5, finite = TRUE)
-    assert_string(color)
-    assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
-
-    if (add) {
-        private$m_wireframe <- list(width = width, color = color, alpha = alpha)
-        if (length(self$device())) {
-            if (length(id <- private$m_id_wireframe)) {
-                rgl_pop("shapes", id = id)
-            }
-
-            geoms <- private$geoms()
-            private$m_id_wireframe <- do.call(rgl_view_wireframe,
-                c(list(dev = private$m_device, geoms = geoms), private$m_wireframe))
-        }
-    } else {
-        if (length(self$device())) {
-            if (length(id <- private$m_id_wireframe)) {
-                rgl_pop("shapes", id = id)
-            }
-        }
-        private$m_id_wireframe <- NULL
-        private$m_wireframe <- NULL
-    }
-    invisible(add)
-}
-# }}}
-# idfviewer_x_ray {{{
-idfviewer_x_ray <- function(self, private, on = TRUE) {
-    assert_flag(on)
-
-    private$m_x_ray <- on
-
-    if (length(self$device()) && length(private$m_id_surface)) {
-        if (length(id <- private$m_id_surface)) {
-            rgl_pop(id = id)
-        }
-        private$m_id_surface <- rgl_view_surface(
-            private$m_device, private$m_log$geoms_show,
-            type = private$m_render_by, x_ray = private$m_x_ray
-        )
-    }
-
-    invisible(on)
-}
-# }}}
-# idfviewer_render_by {{{
-idfviewer_render_by <- function(self, private, style = c("surface_type", "boundary", "construction", "zone", "space", "normal")) {
-    assert_choice(style, c("surface_type", "boundary", "construction", "zone", "space", "normal"))
-
-    private$m_render_by <- style
-
-    if (length(self$device()) && length(private$m_id_surface)) {
-        if (length(id <- private$m_id_surface)) {
-            rgl_pop(id = id)
-        }
-        private$m_id_surface <- rgl_view_surface(
-            private$m_device, private$m_log$geoms_show,
-            type = private$m_render_by, x_ray = private$m_x_ray
-        )
-    }
-
-    invisible(style)
-}
-# }}}
-# idfviewer_show {{{
-idfviewer_show <- function(self, private, type = "all", zone = NULL, surface = NULL,
-                            width = 1.5, dayl_color = "red", dayl_size = 5) {
-    geoms <- subset_geom(private$geoms(), type = type, zone = zone, surface = surface)
-
-    # open a new device
-    if (!length(self$device())) {
-        rgl::open3d()
-        private$m_device <- rgl::cur3d()
-
-        # apply window size
-        rgl::par3d(dev = private$m_device, windowRect = private$m_win_size)
-
-        # apply viewpoint
-        do.call(self$viewpoint, private$m_viewpoint)
-
-        # apply background
-        rgl::bg3d(color = private$m_background)
-
-        # apply mouse mode
-        do.call(self$mouse_mode, private$m_mouse_mode)
-
-        # add axis
-        if (length(private$m_axis)) do.call(self$axis, private$m_axis)
-
-        # add ground
-        if (length(private$m_ground)) do.call(self$ground, private$m_ground)
-
-        # add wireframe
-        if (length(private$m_wireframe)) do.call(self$wireframe, private$m_wireframe)
-
-        # make sure building is at roughly the center with default settings
-        pan_view(private$m_device, 0.75, 0.5, 0.5)
-    }
-
-    if (length(private$m_id_dayl)) {
-        rgl_pop(id = private$m_id_dayl)
-        private$m_id_dayl <- NULL
-    }
-
-    if (any(c("all", "daylighting") %chin% type)) {
-        private$m_id_dayl <- rgl_view_point(private$m_device, geoms,
-            color = dayl_color, size = dayl_size)
-    }
-
-    if (length(private$m_id_surface)) {
-        if (length(id <- private$m_id_surface)) {
-            rgl_pop(id = id)
-        }
-        private$m_id_surface <- NULL
-    }
-
-    private$m_id_surface <- rgl_view_surface(private$m_device,
-        geoms, type = private$m_render_by, x_ray = private$m_x_ray,
-        width = width
-    )
-
-    private$m_log$geoms_show <- geoms
-
-    invisible()
-}
-# }}}
-# idfviewer_focus {{{
-idfviewer_focus <- function(self, private) {
-    if (is.null(self$device())) {
-        verbose_info("No viewer window found. Skip.")
-    } else {
-        rgl::set3d(private$m_device)
-        rgl::rgl.bringtotop()
-    }
-
-    invisible()
-}
-# }}}
-# idfviewer_close {{{
-idfviewer_close <- function(self, private) {
-    if (is.null(self$device())) {
-        verbose_info("No viewer window found. Skip.")
-    } else {
-        rgl::set3d(private$m_device)
-        rgl::close3d()
-    }
-
-    invisible()
-}
-# }}}
-# idfviewer_snapshot {{{
-idfviewer_snapshot <- function(self, private, filename, webshot = FALSE, ...) {
-    if (!rgl::rgl.useNULL() && !length(self$device())) {
-        abort("No viewer window currently open. Please run '$show()' first.")
-    }
-
-    rgl_snapshot(private$m_device, filename, webshot, ...)
-}
-# }}}
-# idfviewer_print {{{
-idfviewer_print <- function(self, private) {
-    cli::cat_rule("EnergPlus IDF Geometry Viewer", line = 1)
-
-    if (is.null(private$m_geom$parent()$path())) {
-        path <- cli::style_bold(cli::bg_red("NOT LOCAL"))
-    } else {
-        path <- surround(private$m_geom$parent()$path())
-    }
-
-    cli::cat_line(cli::ansi_strtrim(c(
-        paste0(" ", cli::symbol$bullet, " Path: ", path),
-        paste0(" ", cli::symbol$bullet, " Version: ", surround(private$m_geom$parent()$version()))
-    )))
-}
 # }}}
 
 # vim: set fdm=marker:

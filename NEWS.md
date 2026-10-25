@@ -1,5 +1,14 @@
 # eplusr (development version)
 
+## New features
+
+* Replace the `rgl` geometry window with a read-only Three.js htmlwidget, with
+  object/Zone/Space selection, filtering, display controls and coloring from
+  existing tabular or EnergyPlus SQLite results. Optional local R connections
+  update the current view, report selections and serve result frames. The
+  viewer includes a model tree, task panels, searchable result filters and
+  hierarchical Zone-to-surface double-click selection (#309).
+
 # eplusr 0.18.0
 
 ## New features

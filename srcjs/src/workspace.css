@@ -1,0 +1,159 @@
+/* A compact command strip frames a model-first workspace with persistent task panes. */
+.eplusr-viewer__ribbon { flex: 0 0 auto; z-index: 6; background: #f8fafc; border-bottom: 1px solid var(--border); }
+.eplusr-viewer__ribbon-header { display: flex; align-items: center; gap: 14px; height: 34px; padding: 0 10px; background: #eaf0f6; border-bottom: 1px solid var(--border); }
+.eplusr-viewer__brand { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: #304966; }
+.eplusr-viewer__ribbon-tabs { display: flex; align-self: stretch; gap: 2px; }
+.eplusr-viewer .eplusr-viewer__ribbon-tabs button { min-width: 60px; padding: 3px 13px; border: 0; border-radius: 0; background: transparent; color: var(--muted); box-shadow: inset 0 -2px transparent; transition: background .15s, box-shadow .15s; }
+.eplusr-viewer .eplusr-viewer__ribbon-tabs button[aria-selected="true"] { color: #174f88; font-weight: 600; background: #f8fafc; box-shadow: inset 0 -2px var(--accent); }
+.eplusr-viewer__quick-actions { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.eplusr-viewer__quick-actions > button { min-height: 30px; height: 30px; border-color: transparent; background: transparent; font-size: 12px; }
+.eplusr-viewer__quick-actions .eplusr-viewer__connection { margin-left: 0; }
+.eplusr-viewer__ribbon-band { position: relative; }
+.eplusr-viewer__ribbon-content { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.eplusr-viewer__ribbon-page { display: flex; width: max-content; min-width: 100%; animation: eplusr-tab-in .14s ease; }
+.eplusr-viewer__ribbon-group { display: flex; flex-direction: column; padding: 4px 8px 2px; border-right: 1px solid var(--border); }
+.eplusr-viewer__ribbon-group:last-child { border: 0; }
+.eplusr-viewer__ribbon-commands { display: flex; align-items: center; gap: 3px; height: 30px; }
+.eplusr-viewer__ribbon-commands > button, .eplusr-viewer__ribbon-commands .eplusr-viewer__selection-actions button { min-height: 28px; height: 28px; border-color: transparent; background: transparent; white-space: nowrap; padding: 3px 6px; font-size: 12px; }
+.eplusr-viewer__ribbon-caption { color: var(--muted); font-size: 10px; line-height: 13px; text-align: center; }
+.eplusr-viewer__ribbon-commands .eplusr-viewer__selection-actions { display: flex; margin: 0; flex-wrap: nowrap; gap: 2px; }
+.eplusr-viewer .eplusr-viewer__ribbon-commands button[aria-pressed="true"], .eplusr-viewer__quick-actions button[aria-pressed="true"] { background: #e0ebf7; color: #174b83; border-color: #b1c6dd; }
+.eplusr-viewer__ribbon .eplusr-viewer__fit-model, .eplusr-viewer__ribbon .eplusr-viewer__fit-selection { width: auto; padding: 3px 6px; }
+.eplusr-viewer__ribbon .eplusr-viewer__fit-model .eplusr-viewer__button-label, .eplusr-viewer__ribbon .eplusr-viewer__fit-selection .eplusr-viewer__button-label { display: inline; }
+.eplusr-viewer .eplusr-viewer__ribbon-scroll { position: absolute; z-index: 2; top: 0; bottom: 0; height: 100%; min-width: 20px; width: 20px; border-radius: 0; border: 0; background: #eef2f9f2; padding: 1px; }
+.eplusr-viewer__ribbon-scroll--previous { left: 0; }
+.eplusr-viewer__ribbon-scroll--next { right: 0; }
+.eplusr-viewer__ribbon-band:has(.eplusr-viewer__ribbon-scroll:not([hidden])) .eplusr-viewer__ribbon-content { margin-inline: 20px; }
+
+/* Desktop panes occupy real grid columns; narrow hosts use one temporary drawer at a time. */
+.eplusr-viewer__workspace { display: grid; grid-template-columns: 0 minmax(0,1fr) 0; overflow: hidden; }
+.eplusr-viewer--browser-open .eplusr-viewer__workspace { grid-template-columns: 250px minmax(0,1fr) 0; }
+.eplusr-viewer--task-open .eplusr-viewer__workspace { grid-template-columns: 0 minmax(0,1fr) 360px; }
+.eplusr-viewer--browser-open.eplusr-viewer--task-open .eplusr-viewer__workspace { grid-template-columns: 250px minmax(0,1fr) 360px; }
+.eplusr-viewer__viewport { grid-column: 2; display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }
+.eplusr-viewer__canvas { position: relative; inset: auto; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.eplusr-viewer__model-browser, .eplusr-viewer__task-pane { min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #f9fafc; z-index: 5; }
+.eplusr-viewer__model-browser { grid-column: 1; grid-row: 1; border-right: 1px solid var(--border); }
+.eplusr-viewer__task-pane { grid-column: 3; grid-row: 1; border-left: 1px solid var(--border); }
+.eplusr-viewer__pane-header { display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto; height: 38px; padding: 0 10px 0 14px; border-bottom: 1px solid var(--border); background: #f0f3f7; }
+.eplusr-viewer__pane-header h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.eplusr-viewer__pane-header button { min-height: 26px; height: 26px; border-color: transparent; background: transparent; }
+.eplusr-viewer__task-body { padding: 6px 14px 16px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; animation: eplusr-task-in .15s ease-out; }
+.eplusr-viewer__task-section { border: 0; }
+.eplusr-viewer__task-section > summary { display: none; }
+.eplusr-viewer__task-section > .eplusr-viewer__section-body { padding-top: 0; }
+.eplusr-viewer__task-body .eplusr-viewer__view-presets { display: block; }
+.eplusr-viewer__task-body .eplusr-viewer__projection { width: 100%; }
+.eplusr-viewer__task-body .eplusr-viewer__result-query { margin: 0; padding: 0; border: 0; }
+.eplusr-viewer__task-body .eplusr-viewer__result-query fieldset { min-width: 0; padding: 0; border: 0; }
+.eplusr-viewer__task-body .eplusr-viewer__result-query fieldset > .eplusr-viewer__button-row { position: sticky; bottom: -16px; background: #f9fafc; padding: 10px 0; border-top: 1px solid var(--border); z-index: 3; }
+.eplusr-viewer__task-body button[type="submit"] { background: #285d99; border-color: #285d99; color: white; }
+.eplusr-viewer__task-body .eplusr-viewer__field { margin: 10px 0; }
+.eplusr-viewer__task-body .eplusr-viewer__checks { grid-template-columns: 1fr 1fr; }
+.eplusr-viewer__task-body .eplusr-viewer__diagnostics { display: block; }
+.eplusr-viewer--drawers .eplusr-viewer__workspace { grid-template-columns: 0 minmax(0,1fr) 0; }
+.eplusr-viewer--drawers .eplusr-viewer__model-browser, .eplusr-viewer--drawers .eplusr-viewer__task-pane { position: absolute; grid-column: auto; grid-row: auto; box-sizing: border-box; top: 0; bottom: 0; width: min(360px,calc(100% - 40px)); box-shadow: 0 3px 18px #20375420; }
+.eplusr-viewer--drawers .eplusr-viewer__model-browser { left: 0; width: min(300px,calc(100% - 40px)); }
+.eplusr-viewer--drawers .eplusr-viewer__task-pane { right: 0; }
+.eplusr-viewer--drawers .eplusr-viewer__task-pane:not([hidden]) { animation: eplusr-task-in .15s ease-out; }
+
+/* Tree rows have a stable name/count/visibility alignment and independent scroll. */
+.eplusr-viewer__tree-search { display: flex; gap: 3px; padding: 10px 9px 0; }
+.eplusr-viewer__tree-search input { width: 100%; min-width: 0; font-size: 12px; }
+.eplusr-viewer__tree-search > button { width: 27px; min-width: 27px; }
+.eplusr-viewer__tree-status { margin: 6px 12px; font-size: 11px; color: var(--muted); }
+.eplusr-viewer__tree { flex: 1; min-height: 0; overflow: auto; margin: 0; padding: 4px 0 10px; overscroll-behavior: contain; }
+.eplusr-viewer__tree, .eplusr-viewer__tree ul { list-style: none; }
+.eplusr-viewer__tree ul { padding-left: 15px; }
+.eplusr-viewer__tree-row { display: flex; align-items: center; min-height: 30px; padding: 0 6px; cursor: pointer; border-left: 2px solid transparent; font-size: 12px; outline-offset: -3px !important; }
+.eplusr-viewer__tree-row:hover { background: #eef2f7; }
+.eplusr-viewer__tree-row[aria-selected="true"] { background: #e0ebf7; border-left-color: #2563b5; color: #174f88; }
+.eplusr-viewer__tree-row[data-partial="true"] { border-left-color: #9db8d9; background: #edf3fa; }
+.eplusr-viewer__tree-row[data-hidden="true"] .eplusr-viewer__tree-name { opacity: .55; }
+.eplusr-viewer__tree-name { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eplusr-viewer__tree-name svg { width: 13px; height: 13px; }
+.eplusr-viewer__tree-count { flex: 0 0 auto; color: var(--muted); font-size: 10px; padding-left: 4px; }
+.eplusr-viewer .eplusr-viewer__tree-row button { width: 24px; min-width: 24px; height: 26px; min-height: 26px; border: 0; background: transparent; padding: 2px; color: #657187; }
+.eplusr-viewer__tree-row[aria-expanded="true"] > button:first-child svg { transform: rotate(90deg); }
+.eplusr-viewer__tree-hint { flex: 0 0 auto; margin: 0; padding: 8px 10px; border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; }
+.eplusr-viewer__scope { min-height: 26px; padding: 3px 10px; border-top: 1px solid var(--border); border-bottom: 0; font-size: 11px; background: #f8fafc; }
+.eplusr-viewer__scope button { min-height: 23px; height: 23px; font-size: 11px; padding-block: 1px; }
+.eplusr-viewer__scope .eplusr-viewer__visible-count { white-space: nowrap; }
+.eplusr-viewer__timeline { padding: 6px 12px; }
+.eplusr-viewer__timeline-variable { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eplusr-viewer__timeline-heading > button { flex: 0 0 auto; }
+.eplusr-viewer__restore-controls { position: absolute; top: 10px; right: 10px; z-index: 6; }
+.eplusr-viewer--model-only .eplusr-viewer__workspace { grid-template-columns: 0 minmax(0,1fr) 0; }
+.eplusr-viewer--model-only .eplusr-viewer__model-browser, .eplusr-viewer--model-only .eplusr-viewer__task-pane { display: none; }
+.eplusr-viewer__result-status { display: none; position: absolute; bottom: 10px; right: 12px; max-width: min(380px,calc(100% - 24px)); z-index: 5; padding: 7px 10px; border: 1px solid var(--border); border-radius: 5px; background: #fafbfd; }
+
+/* Narrow central viewports give the color key its own strip below the selectable canvas. */
+.eplusr-viewer__viewport > .eplusr-viewer__legend { position: relative; inset: auto; flex: 0 0 auto; box-sizing: border-box; width: 100%; max-width: none; max-height: 108px; padding: 6px 10px; border-radius: 0; border-width: 1px 0 0; box-shadow: none; font-size: 11px; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result { grid-template-columns: minmax(0,1fr) auto; gap: 2px 12px; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result.eplusr-viewer__legend--visible { display: grid; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-title, .eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-gradient, .eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-labels { grid-column: 1 / -1; margin: 0; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-gradient { height: 8px; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-item, .eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-policy { margin: 0; }
+.eplusr-viewer__navigation > .eplusr-viewer__navigation-collapse { transform: none; inset: auto auto 4px 4px; width: 42px; height: 24px; min-height: 24px; border-radius: 4px; font-size: 10px; }
+.eplusr-viewer__navigation--collapsible .eplusr-viewer__navigation-caption { display: none; }
+.eplusr-viewer__navigation--collapsed { width: 86px; height: 32px; }
+.eplusr-viewer__navigation--collapsed > button:not(.eplusr-viewer__navigation-collapse):not(.eplusr-viewer__navigation-iso), .eplusr-viewer__navigation--collapsed .eplusr-viewer__navigation-lines { display: none; }
+@container (max-width: 700px) {
+  .eplusr-viewer__brand { display: none; }
+  .eplusr-viewer__ribbon-header { padding: 0 5px; gap: 3px; }
+  .eplusr-viewer__quick-actions .eplusr-viewer__connection { flex-basis: auto; font-size: 0; }
+  .eplusr-viewer__quick-actions .eplusr-viewer__connection::before { margin-right: 0; }
+  .eplusr-viewer__ribbon-tabs button { min-width: 48px !important; padding-inline: 9px !important; }
+  .eplusr-viewer__scope { gap: 4px; padding: 3px 6px; }
+  .eplusr-viewer__scope .eplusr-viewer__filter-chips { flex-basis: 100%; }
+}
+@container (max-width: 420px) {
+  .eplusr-viewer__quick-actions > button { padding-inline: 3px; font-size: 11px; gap: 3px; white-space: nowrap; }
+  .eplusr-viewer__ribbon-tabs button { min-width: 43px !important; padding-inline: 6px !important; }
+}
+@keyframes eplusr-task-in { from { opacity: .5; transform: translateX(5px); } to { opacity: 1; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .eplusr-viewer__ribbon-page, .eplusr-viewer__task-body, .eplusr-viewer--drawers .eplusr-viewer__task-pane:not([hidden]) { animation: none; }
+  .eplusr-viewer__ribbon-tabs button { transition: none !important; }
+}
+
+/* Clean viewing leaves only the model and an explicit route back to controls. */
+.eplusr-viewer--model-only .eplusr-viewer__legend, .eplusr-viewer--model-only .eplusr-viewer__navigation, .eplusr-viewer--model-only .eplusr-viewer__tool-feedback { display: none !important; }
+
+/* Explicit clear and overflow buttons provide a single visible affordance. */
+.eplusr-viewer__tree-search input::-webkit-search-cancel-button { appearance: none; }
+.eplusr-viewer__ribbon-content::-webkit-scrollbar { display: none; }
+
+/* Export previews use the same on-demand task surface as other model operations. */
+.eplusr-viewer__snapshot-preview { display: block; width: 100%; height: auto; margin-block: 10px; border: 1px solid var(--border); box-sizing: border-box; }
+.eplusr-viewer__snapshot-download { display: inline-flex; align-items: center; justify-content: center; min-height: 30px; padding: 3px 12px; border-radius: 5px; background: #285d99; color: white; text-decoration: none; }
+
+/* Command labels remain accessible while the model, data names and units stay visible. */
+.eplusr-viewer .eplusr-viewer__ribbon-commands .eplusr-viewer__icon-only { width: 32px; min-width: 32px; padding: 4px; }
+.eplusr-viewer .eplusr-viewer__ribbon-commands .eplusr-viewer__icon { width: 18px; height: 18px; }
+.eplusr-viewer__command-hint { position: absolute; z-index: 40; max-width: min(320px,calc(100% - 10px)); padding: 8px 10px; border: 1px solid #c2cbd7; border-radius: 5px; box-shadow: 0 3px 10px #142b491c; background: #fff; color: var(--text); font-size: 12px; line-height: 1.45; box-sizing: border-box; pointer-events: auto; }
+.eplusr-viewer__connection { display: inline-flex; position: relative; align-items: center; justify-content: center; width: 32px; min-width: 32px; height: 30px; flex: 0 0 32px; margin: 0; border-radius: 4px; vertical-align: middle; }
+.eplusr-viewer__connection img { display: block; width: 24px; height: 19px; }
+.eplusr-viewer__connection:not([data-state="connected"]) img { filter: grayscale(1); opacity: .55; }
+.eplusr-viewer__connection[data-state="closed"]::after, .eplusr-viewer__connection[data-state="error"]::after { content: ""; position: absolute; width: 26px; height: 2px; background: #68768a; transform: rotate(-45deg); box-shadow: 0 0 0 1px #f4f6fa; }
+.eplusr-viewer__connection[data-state="connecting"]::before { content: ""; position: absolute; inset: 1px 2px; border: 1px solid #bbc5d1; border-top-color: #35699f; border-radius: 50%; animation: eplusr-connecting 1s linear infinite; }
+.eplusr-viewer__result-query > form > .eplusr-viewer__status[data-state="applied"] { display: inline-flex; color: #38845e; margin-block: 5px 0; }
+.eplusr-viewer__result-query > form > .eplusr-viewer__status[data-state="error"] { color: #a53b32; }
+.eplusr-viewer__navigation-help p { line-height: 1.65; }
+.eplusr-viewer__legend-time { margin: 2px 0 5px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result > .eplusr-viewer__legend-time { grid-column: 1 / -1; margin: 0; }
+.eplusr-viewer--short .eplusr-viewer__viewport > .eplusr-viewer__legend--result { max-height: 116px; }
+@keyframes eplusr-connecting { to { transform: rotate(360deg); } }
+
+/* Keep the primary query action readable while the pointer remains over it. */
+.eplusr-viewer__task-body button[type="submit"]:hover:not(:disabled) { background: #204f86; border-color: #204f86; color: #fff; }
+
+/* Very narrow embeds wrap quick controls instead of clipping the R status target. */
+@container (max-width: 339px) {
+  .eplusr-viewer__ribbon-header { height: auto; flex-wrap: wrap; row-gap: 0; }
+  .eplusr-viewer__ribbon-tabs { height: 32px; }
+  .eplusr-viewer__quick-actions { gap: 2px; }
+}
+
+/* Retain the live page rule that exposes result legends and asynchronous status. */
+.eplusr-viewer--loading .eplusr-viewer__result-status, .eplusr-viewer--error .eplusr-viewer__result-status, .eplusr-viewer__legend--visible { display: block; }

@@ -1,0 +1,49 @@
+{
+  "copiedOn": "2026-10-18",
+  "engine": "EnergyPlus 23.1.0-87ed9199d4",
+  "completedOn": "2026-09-30",
+  "zones": 19,
+  "environment": "CHICAGO ANN CLG .4% CONDNS WB=>MDB",
+  "environmentType": "Summer design day",
+  "variable": "Zone Mean Air Temperature",
+  "frequency": "Hourly",
+  "frames": 24,
+  "units": "C",
+  "range": [
+    22.245809979743882,
+    26.594660261230498
+  ],
+  "originalRun": {
+    "completedSuccessfully": true,
+    "warnings": 4,
+    "severeErrors": 0
+  },
+  "simulatedDuringThisTask": false,
+  "files": [
+    {
+      "file": "in.idf",
+      "source": "/Users/hongyuanjia/Library/CloudStorage/SynologyDrive-Personal/repos/replus/output/geometry/geo0-20260930/energyplus-shared/large_office_shared_wall_offset/source/in.idf",
+      "sha256": "d777fea4329605cbf3ff03181a34f9631737d89d115b366e4430cd084982a4e1"
+    },
+    {
+      "file": "eplusout.sql",
+      "source": "/Users/hongyuanjia/Library/CloudStorage/SynologyDrive-Personal/repos/replus/output/geometry/geo0-20260930/energyplus-shared/large_office_shared_wall_offset/source/eplusout.sql",
+      "sha256": "7eea0e86866a55f6eade9323b297b295a59e6c293280e42fce327ab5d3628ff2"
+    },
+    {
+      "file": "eplusout.err",
+      "source": "/Users/hongyuanjia/Library/CloudStorage/SynologyDrive-Personal/repos/replus/output/geometry/geo0-20260930/energyplus-shared/large_office_shared_wall_offset/source/eplusout.err",
+      "sha256": "91b90dfac86410cbb18436e35f0dddb6b8f71df4bcb852b5f1e5226d93eeea5d"
+    },
+    {
+      "file": "eplusout.end",
+      "source": "/Users/hongyuanjia/Library/CloudStorage/SynologyDrive-Personal/repos/replus/output/geometry/geo0-20260930/energyplus-shared/large_office_shared_wall_offset/source/eplusout.end",
+      "sha256": "567fa7624333c299b7646100ea0627a9562d288231d891d74570fce46c7564e5"
+    },
+    {
+      "file": "Energy+.idd",
+      "source": "/Users/hongyuanjia/Library/CloudStorage/SynologyDrive-Personal/repos/replus/crates/replus-idd/tests/fixtures/idd/V23-1-0-Energy+.idd",
+      "sha256": "d171e0583cd43c8c0abe39a5ffcf95d7100f4ec6809c887963e25c9cbcfe1df3"
+    }
+  ]
+}

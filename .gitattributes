@@ -1,0 +1,5 @@
+# Preserve generated shader strings and byte-identical external model fixtures.
+inst/htmlwidgets/lib/eplusr-viewer.js linguist-generated=true -whitespace
+inst/htmlwidgets/lib/eplusr-viewer.css linguist-generated=true
+tools/viewer/examples/large-office/Energy+.idd linguist-vendored=true
+tools/viewer/examples/large-office/* -whitespace

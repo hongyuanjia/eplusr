@@ -6,8 +6,7 @@ NULL
 #'
 #' `IdfGeometry` is an abstraction of a collection of geometry in an [Idf]. It
 #' provides more detail methods to query geometry properties, update geometry
-#' vertices and visualize geometry in 3D using the
-#' [rgl](https://cran.r-project.org/package=rgl) package.
+#' vertices and visualize geometry in an interactive Three.js/WebGL widget.
 #'
 #' @importFrom R6 R6Class
 #' @docType class
@@ -36,7 +35,9 @@ idf_geometry <- function(parent, object = NULL) {
 
 # IdfGeometry {{{
 #' @export
-IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
+IdfGeometry <- R6Class(
+    "IdfGeometry",
+    cloneable = FALSE,
     public = list(
         # initialize {{{
         #' @description
@@ -65,7 +66,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' geom <- IdfGeometry$new(path_idf)
         #' }
         initialize = function(parent, object = NULL) {
-            if (!is_idf(parent)) parent <- read_idf(parent)
+            if (!is_idf(parent)) {
+                parent <- read_idf(parent)
+            }
             private$m_parent <- parent
 
             # extract geometry surfaces
@@ -76,7 +79,10 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
 
             # log input object
             if (!is.null(object)) {
-                private$m_log$object <- get_geom_class(private$m_parent, object)$id
+                private$m_log$object <- get_geom_class(
+                    private$m_parent,
+                    object
+                )$id
             }
 
             # add a uuid
@@ -103,8 +109,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$parent()
         #' }
-        parent = function()
-            idfgeom_parent(self, private),
+        parent = function() {
+            idfgeom_parent(self, private)
+        },
         # }}}
 
         # rules {{{
@@ -120,8 +127,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$rules()
         #' }
-        rules = function()
-            idfgeom_rules(self, private),
+        rules = function() {
+            idfgeom_rules(self, private)
+        },
         # }}}
 
         # convert {{{
@@ -152,8 +160,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$convert()
         #' }
-        convert = function(type = c("surface", "subsurface", "shading"))
-            idfgeom_convert(self, private, type),
+        convert = function(type = c("surface", "subsurface", "shading")) {
+            idfgeom_convert(self, private, type)
+        },
         # }}}
 
         # coord_system {{{
@@ -178,8 +187,13 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$coord_system("world", "world", "world")
         #' }
-        coord_system = function(detailed = NULL, simple = NULL, daylighting = NULL)
-            idfgeom_coord_system(self, private, detailed, simple, daylighting),
+        coord_system = function(
+            detailed = NULL,
+            simple = NULL,
+            daylighting = NULL
+        ) {
+            idfgeom_coord_system(self, private, detailed, simple, daylighting)
+        },
         # }}}
 
         # round_digits {{{
@@ -204,8 +218,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$round_digits()
         #' }
-        round_digits = function(digits = 4L)
-            idfgeom_round_digits(self, private, digits),
+        round_digits = function(digits = 4L) {
+            idfgeom_round_digits(self, private, digits)
+        },
         # }}}
 
         # area {{{
@@ -239,8 +254,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$area()
         #' }
-        area = function(class = NULL, object = NULL, net = FALSE)
-            idfgeom_area(self, private, class, object, net),
+        area = function(class = NULL, object = NULL, net = FALSE) {
+            idfgeom_area(self, private, class, object, net)
+        },
         # }}}
 
         # azimuth {{{
@@ -271,8 +287,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$azimuth()
         #' }
-        azimuth = function(class = NULL, object = NULL)
-            idfgeom_azimuth(self, private, class, object),
+        azimuth = function(class = NULL, object = NULL) {
+            idfgeom_azimuth(self, private, class, object)
+        },
         # }}}
 
         # tilt {{{
@@ -303,8 +320,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$tilt()
         #' }
-        tilt = function(class = NULL, object = NULL)
-            idfgeom_tilt(self, private, class, object),
+        tilt = function(class = NULL, object = NULL) {
+            idfgeom_tilt(self, private, class, object)
+        },
         # }}}
 
         # view {{{
@@ -312,26 +330,25 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' View 3D geometry
         #'
         #' @details
-        #' `$view()` uses the [rgl](https://cran.r-project.org/package=rgl)
-        #' package to visualize the IDF geometry in 3D in a similar way as
-        #' [OpenStudio](https://openstudio.net/).
+        #' `$view()` uses an interactive Three.js/WebGL widget to visualize the
+        #' IDF geometry in 3D in a similar way as [OpenStudio](https://openstudio.net/).
         #'
         #' `$view()` returns an [IdfViewer] object which can be used to further
         #' tweak the viewer scene.
         #'
-        #' In the rgl window, you can control the view using your mouse:
+        #' In the browser viewer, you can control the view using your mouse:
         #'
         #' * Left button: Trackball
         #' * Right button: Pan
-        #` * Middle button: Field-of-view (FOV). `0' means orthographic
-        #'   projection.
         #' * Wheel: Zoom
+        #' * Click: Select a surface
+        #' * Shift/Ctrl/Command-click: Select multiple surfaces
+        #' * Double-click: Isolate the current selection
         #'
         #' For more detailed control on the scene, see [IdfViewer].
         #'
-        #' @param new If `TRUE`, a new rgl window will be open using
-        #'        [rgl::open3d()]. If `FALSE`, existing rgl window will be
-        #'        reused if possible. Default: `FALSE`.
+        #' @param new If `TRUE`, create a new viewer widget. If `FALSE`, reuse
+        #'        the existing viewer object when possible. Default: `FALSE`.
         #'
         #' @param render_by A single string specifying the way of rendering the
         #'        geometry. Possible values are:
@@ -366,10 +383,23 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' idf$view(render_by = "zone")
         #' idf$view(new = TRUE, render_by = "construction")
         #' }
-        view = function(new = FALSE, render_by = "surface_type",
-                         wireframe = TRUE, x_ray = FALSE, axis = TRUE)
-            idfgeom_view(self, private, new = new, render_by = render_by,
-                axis = axis, wireframe = wireframe, x_ray = x_ray),
+        view = function(
+            new = FALSE,
+            render_by = "surface_type",
+            wireframe = TRUE,
+            x_ray = FALSE,
+            axis = TRUE
+        ) {
+            idfgeom_view(
+                self,
+                private,
+                new = new,
+                render_by = render_by,
+                axis = axis,
+                wireframe = wireframe,
+                x_ray = x_ray
+            )
+        },
         # }}}
 
         # print {{{
@@ -382,8 +412,9 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         #' \dontrun{
         #' geom$print()
         #' }
-        print = function()
+        print = function() {
             idfgeom_print(self, private)
+        }
         # }}}
 
         # TODO: set_wwr
@@ -411,11 +442,17 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
         log_new_uuid = function() log_new_uuid(private$m_log),
 
         parent_uuid = function() get_priv_env(private$m_parent)$uuid(),
-        log_parent_uuid = function() private$m_log$parent_uuid <- get_priv_env(private$m_parent)$uuid(),
+        log_parent_uuid = function() {
+            private$m_log$parent_uuid <- get_priv_env(private$m_parent)$uuid()
+        },
         cached_parent_uuid = function() private$m_log$parent_uuid,
 
         parent_order = function() get_priv_env(private$m_parent)$m_log$order,
-        log_parent_order = function() private$m_log$parent_order <- copy(get_priv_env(private$m_parent)$m_log$order),
+        log_parent_order = function() {
+            private$m_log$parent_order <- copy(
+                get_priv_env(private$m_parent)$m_log$order
+            )
+        },
         cached_parent_order = function() private$m_log$parent_order,
 
         geom_class = function() {
@@ -425,27 +462,68 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
 
             cls <- c("Building", "GlobalGeometryRules")
             cls <- cls[private$m_parent$is_valid_class(cls)]
-            if (!length(cls)) cls <- NULL
+            if (!length(cls)) {
+                cls <- NULL
+            }
 
-            if (!length(grp)) return(data.table())
+            if (!length(grp)) {
+                return(data.table())
+            }
 
             obj <- get_idf_object_multi_scope(
                 get_priv_env(private$m_parent)$idd_env(),
                 get_priv_env(private$m_parent)$idf_env(),
-                class = cls, group = grp
+                class = cls,
+                group = grp
             )
-            set(obj, NULL, setdiff(names(obj), c("class_name", "object_id", "object_name")), NULL)
+            set(
+                obj,
+                NULL,
+                setdiff(
+                    names(obj),
+                    c("class_name", "object_id", "object_name")
+                ),
+                NULL
+            )
 
             # category by class names
-            set(obj, NULL, c("type", "subtype", "misc"),
-                as.data.table(stri_split_fixed(obj$class_name, ":", n = 3L, simplify = TRUE))
+            set(
+                obj,
+                NULL,
+                c("type", "subtype", "misc"),
+                as.data.table(stri_split_fixed(
+                    obj$class_name,
+                    ":",
+                    n = 3L,
+                    simplify = TRUE
+                ))
             )
-            obj[type %chin% c("Building", "GlobalGeometryRules",
-                "Zone", "Space", "BuildingSurface", "Wall", "RoofCeiling", "Floor",
-                "Wall", "Roof", "Ceiling", "FenestrationSurface", "Window",
-                "Door", "GlazedDoor", "Shading", "Daylighting")]
+            obj[
+                type %chin%
+                    c(
+                        "Building",
+                        "GlobalGeometryRules",
+                        "Zone",
+                        "Space",
+                        "BuildingSurface",
+                        "Wall",
+                        "RoofCeiling",
+                        "Floor",
+                        "Wall",
+                        "Roof",
+                        "Ceiling",
+                        "FenestrationSurface",
+                        "Window",
+                        "Door",
+                        "GlazedDoor",
+                        "Shading",
+                        "Daylighting"
+                    )
+            ]
         },
-        log_geom_class = function() private$m_log$geom_class <- private$geom_class(),
+        log_geom_class = function() {
+            private$m_log$geom_class <- private$geom_class()
+        },
         cached_geom_class = function() private$m_log$geom_class,
 
         # dynamic update data when parent IDF has been changed
@@ -455,12 +533,29 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             }
 
             # find out objects that has been changed
-            set <- data.table::fsetdiff(private$parent_order(), private$cached_parent_order())
-            del <- data.table::fsetdiff(private$cached_parent_order(), private$parent_order())
+            set <- data.table::fsetdiff(
+                private$parent_order(),
+                private$cached_parent_order()
+            )
+            del <- data.table::fsetdiff(
+                private$cached_parent_order(),
+                private$parent_order()
+            )
 
             # should re-extract geometry
-            if (any(c(set$object_id, del$object_id) %in% c(private$geom_class()$object_id, private$cached_geom_class()$object_id))) {
-                private$m_geoms <- extract_geom(private$m_parent, private$m_log$object)
+            if (
+                any(
+                    c(set$object_id, del$object_id) %in%
+                        c(
+                            private$geom_class()$object_id,
+                            private$cached_geom_class()$object_id
+                        )
+                )
+            ) {
+                private$m_geoms <- extract_geom(
+                    private$m_parent,
+                    private$m_log$object
+                )
 
                 # log parent data
                 private$log_parent_uuid()
@@ -471,7 +566,6 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             private$m_geoms
         }
         # }}}
-
     )
 )
 # }}}
@@ -487,26 +581,53 @@ idfgeom_rules <- function(self, private) {
 }
 # }}}
 # idfgeom_coord_system {{{
-idfgeom_coord_system <- function(self, private, detailed = NULL, simple = NULL, daylighting = NULL) {
-    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) return(self)
+idfgeom_coord_system <- function(
+    self,
+    private,
+    detailed = NULL,
+    simple = NULL,
+    daylighting = NULL
+) {
+    if (is.null(detailed) && is.null(simple) && is.null(daylighting)) {
+        return(self)
+    }
 
     assert_choice(detailed, c("world", "absolute", "relative"), null.ok = TRUE)
     assert_choice(simple, c("world", "absolute", "relative"), null.ok = TRUE)
-    assert_choice(daylighting, c("world", "absolute", "relative"), null.ok = TRUE)
+    assert_choice(
+        daylighting,
+        c("world", "absolute", "relative"),
+        null.ok = TRUE
+    )
 
-    if (!is.null(detailed) && detailed == "absolute") detailed <- "world"
-    if (!is.null(simple) && simple == "absolute") simple <- "world"
-    if (!is.null(daylighting) && daylighting == "absolute") daylighting <- "world"
+    if (!is.null(detailed) && detailed == "absolute") {
+        detailed <- "world"
+    }
+    if (!is.null(simple) && simple == "absolute") {
+        simple <- "world"
+    }
+    if (!is.null(daylighting) && daylighting == "absolute") {
+        daylighting <- "world"
+    }
 
     rules <- private$geoms()$rules
 
-    private$m_geoms <- align_coord_system(private$geoms(), detailed, simple, daylighting)
+    private$m_geoms <- align_coord_system(
+        private$geoms(),
+        detailed,
+        simple,
+        daylighting
+    )
 
     # update the global geometry rules if exists, otherwise add one
     if (!private$m_parent$is_valid_class("GlobalGeometryRules")) {
-        ggr <- private$m_parent$add(GlobalGeometryRules = private$m_geoms$rules)[[1L]]
+        ggr <- private$m_parent$add(
+            GlobalGeometryRules = private$m_geoms$rules
+        )[[1L]]
     } else {
-        ggr <- private$m_parent$set(GlobalGeometryRules := private$m_geoms$rules)[[1L]]
+        ggr <- private$m_parent$set(
+            GlobalGeometryRules := private$m_geoms$rules
+        )[[1L]]
     }
     val <- standardize_idf_value(
         get_priv_env(private$m_parent)$idd_env(),
@@ -518,16 +639,29 @@ idfgeom_coord_system <- function(self, private, detailed = NULL, simple = NULL, 
         ),
         "choice"
     )
-    get_priv_env(private$m_parent)$idf_env()$value[val, on = "value_id", value_chr := i.value_chr]
+    get_priv_env(private$m_parent)$idf_env()$value[
+        val,
+        on = "value_id",
+        value_chr := i.value_chr
+    ]
 
     # update vertices of detailed geometries
     if (rules$coordinate_system != private$m_geoms$rules$coordinate_system) {
         meta <- rbindlist(list(
-            if (nrow(private$m_geoms$surface)) fast_subset(private$m_geoms$surface, c("id", "class")),
-            if (nrow(private$m_geoms$subsurface)) fast_subset(private$m_geoms$subsurface, c("id", "class")),
-            if (nrow(private$m_geoms$shading)) fast_subset(private$m_geoms$shading, c("id", "class"))
+            if (nrow(private$m_geoms$surface)) {
+                fast_subset(private$m_geoms$surface, c("id", "class"))
+            },
+            if (nrow(private$m_geoms$subsurface)) {
+                fast_subset(private$m_geoms$subsurface, c("id", "class"))
+            },
+            if (nrow(private$m_geoms$shading)) {
+                fast_subset(private$m_geoms$shading, c("id", "class"))
+            }
         ))
-        set_geom_vertices(private$m_parent, list(meta = meta, vertices = private$m_geoms$vertices))
+        set_geom_vertices(
+            private$m_parent,
+            list(meta = meta, vertices = private$m_geoms$vertices)
+        )
     }
 
     # add a uuid
@@ -542,7 +676,11 @@ idfgeom_coord_system <- function(self, private, detailed = NULL, simple = NULL, 
 }
 # }}}
 # idfgeom_convert {{{
-idfgeom_convert <- function(self, private, type = c("surface", "subsurface", "shading")) {
+idfgeom_convert <- function(
+    self,
+    private,
+    type = c("surface", "subsurface", "shading")
+) {
     conv <- convert_geom(private$m_parent, private$geoms(), type = type)
     private$m_parent <- conv$idf
 
@@ -550,10 +688,17 @@ idfgeom_convert <- function(self, private, type = c("surface", "subsurface", "sh
     # originally store whole IDF geometry data
     if (!length(private$m_log$object)) {
         private$m_geoms <- extract_geom(private$m_parent)
-    # originally store a subset of IDF geometry data
+        # originally store a subset of IDF geometry data
     } else {
-        id <- conv$map[J(private$m_log$object), on = "ori_id", nomatch = NULL, new_id]
-        if (!length(id)) id <- NULL
+        id <- conv$map[
+            J(private$m_log$object),
+            on = "ori_id",
+            nomatch = NULL,
+            new_id
+        ]
+        if (!length(id)) {
+            id <- NULL
+        }
         private$m_geoms <- extract_geom(private$m_parent, id)
         private$m_log$object <- id
     }
@@ -583,7 +728,8 @@ idfgeom_round_digits <- function(self, private, digits = 4L) {
     }
 
     check_empty <- function(dt) if (!nrow(dt)) data.table() else dt
-    meta <- rbindlist(list(zone,
+    meta <- rbindlist(list(
+        zone,
         check_empty(fast_subset(private$m_geoms$surface, c("id", "class"))),
         check_empty(fast_subset(private$m_geoms$subsurface, c("id", "class"))),
         check_empty(fast_subset(private$m_geoms$shading, c("id", "class")))
@@ -597,47 +743,81 @@ idfgeom_round_digits <- function(self, private, digits = 4L) {
     private$log_parent_order()
 
     vert <- rbindlist(list(private$m_geoms$vertices, origin), use.names = TRUE)
-    set_geom_vertices(private$m_parent, list(meta = meta, vertices = vert), digits = digits)
+    set_geom_vertices(
+        private$m_parent,
+        list(meta = meta, vertices = vert),
+        digits = digits
+    )
 
     invisible(private$m_parent)
 }
 # }}}
 # idfgeom_subset_vertices {{{
-idfgeom_subset_vertices <- function(self, private, class = NULL, object = NULL) {
+idfgeom_subset_vertices <- function(
+    self,
+    private,
+    class = NULL,
+    object = NULL
+) {
     geoms <- private$geoms()
     obj <- data.table()
 
-    if (is.null(class) && is.null(object)) return(list(geoms = geoms, object = obj))
+    if (is.null(class) && is.null(object)) {
+        return(list(geoms = geoms, object = obj))
+    }
 
     # match object
     obj <- get_idf_object_multi_scope(
         get_priv_env(private$m_parent)$idd_env(),
         get_priv_env(private$m_parent)$idf_env(),
-        class = class, object = object
+        class = class,
+        object = object
     )
     geom_class <- get_geom_class(private$m_parent, obj$object_id)
-    geoms$vertices <- geoms$vertices[J(geom_class$id), on = "id", nomatch = NULL]
+    geoms$vertices <- geoms$vertices[
+        J(geom_class$id),
+        on = "id",
+        nomatch = NULL
+    ]
 
     list(geoms = geoms, object = obj)
 }
 # }}}
 # idfgeom_cal_property {{{
-idfgeom_cal_property <- function(self, private, class = NULL, object = NULL, fun) {
+idfgeom_cal_property <- function(
+    self,
+    private,
+    class = NULL,
+    object = NULL,
+    fun
+) {
     l <- idfgeom_subset_vertices(self, private, class, object)
     geoms <- l$geoms
     obj <- l$object
 
     if (!nrow(geoms$vertices)) {
-        return(data.table(id = integer(), name = character(), class = character(),
-            zone = character(), space = character(), type = character(), property = double()
+        return(data.table(
+            id = integer(),
+            name = character(),
+            class = character(),
+            zone = character(),
+            space = character(),
+            type = character(),
+            property = double()
         ))
     }
 
     # remove daylighting points
     if (NROW(geoms$daylighting_point)) {
-        geoms$vertices <- geoms$vertices[!J(geoms$daylighting_point$id), on = "id"]
+        geoms$vertices <- geoms$vertices[
+            !J(geoms$daylighting_point$id),
+            on = "id"
+        ]
     }
-    prop <- get_newall_vector(geoms$vertices)[, by = "id", list(property = fun(c(x, y, z)))]
+    prop <- get_newall_vector(geoms$vertices)[,
+        by = "id",
+        list(property = fun(c(x, y, z)))
+    ]
 
     add_zone_space_name(geoms)
     cols <- c("id", "name", "class", "zone_name", "space_name", "surface_type")
@@ -657,17 +837,38 @@ idfgeom_cal_property <- function(self, private, class = NULL, object = NULL, fun
 }
 # }}}
 # idfgeom_area {{{
-idfgeom_area <- function(self, private, class = NULL, object = NULL, net = FALSE) {
+idfgeom_area <- function(
+    self,
+    private,
+    class = NULL,
+    object = NULL,
+    net = FALSE
+) {
     assert_flag(net)
     prop <- idfgeom_cal_property(self, private, class, object, get_area)
     setnames(prop, "property", "area")
 
-    if (!net) return(prop[])
+    if (!net) {
+        return(prop[])
+    }
 
-    hole <- prop[J(c("Window", "Door", "GlazedDoor")), on = "type", nomatch = NULL]
+    hole <- prop[
+        J(c("Window", "Door", "GlazedDoor")),
+        on = "type",
+        nomatch = NULL
+    ]
     if (nrow(hole)) {
-        add_joined_cols(private$geoms()$subsurface, hole, "id", "building_surface_name")
-        prop[hole, on = c("name" = "building_surface_name"), area := area - i.area]
+        add_joined_cols(
+            private$geoms()$subsurface,
+            hole,
+            "id",
+            "building_surface_name"
+        )
+        prop[
+            hole,
+            on = c("name" = "building_surface_name"),
+            area := area - i.area
+        ]
     }
 
     prop[]
@@ -686,8 +887,15 @@ idfgeom_tilt <- function(self, private, class = NULL, object = NULL) {
 }
 # }}}
 # idfgeom_view {{{
-idfgeom_view <- function(self, private, new = FALSE, render_by = "surface_type",
-                          wireframe = TRUE, x_ray = FALSE, axis = TRUE) {
+idfgeom_view <- function(
+    self,
+    private,
+    new = FALSE,
+    render_by = "surface_type",
+    wireframe = TRUE,
+    x_ray = FALSE,
+    axis = TRUE
+) {
     assert_flag(new)
     assert_flag(wireframe)
     assert_flag(x_ray)
@@ -703,7 +911,9 @@ idfgeom_view <- function(self, private, new = FALSE, render_by = "surface_type",
     private$m_viewer$x_ray(x_ray)
     private$m_viewer$axis(axis)
 
-    if (is.null(private$m_viewer$device())) private$m_viewer$show()
+    if (is.null(private$m_viewer$device())) {
+        private$m_viewer$show()
+    }
 
     invisible(private$m_viewer)
 }
@@ -712,27 +922,86 @@ idfgeom_view <- function(self, private, new = FALSE, render_by = "surface_type",
 idfgeom_print <- function(self, private) {
     cli::cat_rule("EnergPlus IDF Geometry", line = 1)
 
-    if (is.null(private$m_parent$path())) path <- cli::style_bold(cli::bg_red("NOT LOCAL")) else path <- surround(private$m_parent$path())
+    if (is.null(private$m_parent$path())) {
+        path <- cli::style_bold(cli::bg_red("NOT LOCAL"))
+    } else {
+        path <- surround(private$m_parent$path())
+    }
 
     cli::cat_line(cli::ansi_strtrim(c(
         paste0(" ", cli::symbol$bullet, " Path: ", path),
-        paste0(" ", cli::symbol$bullet, " Version: ", surround(private$m_parent$version()))
+        paste0(
+            " ",
+            cli::symbol$bullet,
+            " Version: ",
+            surround(private$m_parent$version())
+        )
     )))
 
     geoms <- private$geoms()
 
-    cli::cat_line(sprintf(" %s Building: '%s'", cli::symbol$bullet, geoms$building$name))
-    cli::cat_line(sprintf(" %s North Axis: %s\u00B0", cli::symbol$bullet, geoms$building$north_axis))
-    cli::cat_line(sprintf(" %s Zone Num: %s", cli::symbol$bullet, NROW(geoms$zone)))
-    cli::cat_line(sprintf(" %s Surface Num: %s", cli::symbol$bullet, NROW(geoms$surface)))
-    cli::cat_line(sprintf(" %s SubSurface Num: %s", cli::symbol$bullet, NROW(geoms$subsurface)))
-    cli::cat_line(sprintf(" %s Shading Num: %s", cli::symbol$bullet, NROW(geoms$shading)))
-    cli::cat_line(sprintf(" %s Dayl Ref Pnt Num: %s", cli::symbol$bullet, NROW(geoms$daylighting_point)))
+    cli::cat_line(sprintf(
+        " %s Building: '%s'",
+        cli::symbol$bullet,
+        geoms$building$name
+    ))
+    cli::cat_line(sprintf(
+        " %s North Axis: %s\u00B0",
+        cli::symbol$bullet,
+        geoms$building$north_axis
+    ))
+    cli::cat_line(sprintf(
+        " %s Zone Num: %s",
+        cli::symbol$bullet,
+        NROW(geoms$zone)
+    ))
+    cli::cat_line(sprintf(
+        " %s Surface Num: %s",
+        cli::symbol$bullet,
+        NROW(geoms$surface)
+    ))
+    cli::cat_line(sprintf(
+        " %s SubSurface Num: %s",
+        cli::symbol$bullet,
+        NROW(geoms$subsurface)
+    ))
+    cli::cat_line(sprintf(
+        " %s Shading Num: %s",
+        cli::symbol$bullet,
+        NROW(geoms$shading)
+    ))
+    cli::cat_line(sprintf(
+        " %s Dayl Ref Pnt Num: %s",
+        cli::symbol$bullet,
+        NROW(geoms$daylighting_point)
+    ))
     cli::cat_line(sprintf(" %s Coordinate System:", cli::symbol$bullet))
     cli::cat_line(c(
-        sprintf("   - Detailed: '%s'", ifelse(geoms$rules$coordinate_system == "world", "World", "Relative")),
-        sprintf("   - Simple:   '%s'", ifelse(geoms$rules$rectangular_surface_coordinate_system == "world", "World", "Relative")),
-        sprintf("   - Daylighting: '%s'", ifelse(geoms$rules$daylighting_reference_point_coordinate_system == "world", "World", "Relative"))
+        sprintf(
+            "   - Detailed: '%s'",
+            ifelse(
+                geoms$rules$coordinate_system == "world",
+                "World",
+                "Relative"
+            )
+        ),
+        sprintf(
+            "   - Simple:   '%s'",
+            ifelse(
+                geoms$rules$rectangular_surface_coordinate_system == "world",
+                "World",
+                "Relative"
+            )
+        ),
+        sprintf(
+            "   - Daylighting: '%s'",
+            ifelse(
+                geoms$rules$daylighting_reference_point_coordinate_system ==
+                    "world",
+                "World",
+                "Relative"
+            )
+        )
     ))
 }
 # }}}

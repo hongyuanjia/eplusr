@@ -45,9 +45,8 @@ library(eplusr)
 
 This vignette introduces the `IdfGeometry` and `IdfViewer` classes.
 `IdfGeometry` is designed to extract data for all geometry objects and perform
-geometric operations on them, while `IdfViewer` is to view IDF geometry in 3D
-using the [rgl](https://cran.r-project.org/package=rgl) package in a similar
-way as OpenStudio SketchUp Plugin.
+geometric operations on them, while `IdfViewer` displays IDF geometry in an
+interactive Three.js/WebGL widget inspired by OpenStudio's geometry workflow.
 
 ---
 
@@ -174,20 +173,20 @@ geom$parent()$to_table("Floor 1 Cafe Slab")
 
 # View geometry in 3D
 
-`$view()` uses the [rgl](https://cran.r-project.org/package=rgl)
-package to visualize the IDF geometry in 3D in a similar way as
-[OpenStudio](https://www.openstudio.net).
+`$view()` uses a Three.js/WebGL widget to visualize the IDF geometry in 3D in
+a similar way as [OpenStudio](https://www.openstudio.net).
 
 `$view()` returns an [IdfViewer] object which can be used to further
 tweak the viewer scene.
 
-In the rgl window, the default mouse modes are:
+In the browser viewer, the default mouse interactions are:
 
 * Left button: Trackball
 * Right button: Pan
-* Middle button: Field-of-view (FOV). '0' means orthographic
-  projection.
 * Wheel: Zoom
+* Click: Select a surface
+* Shift/Ctrl/Command-click: Select multiple surfaces
+* Double-click: Isolate the current selection
 
 ```{r, eval = FALSE}
 viewer <- geom$view()
@@ -213,6 +212,9 @@ similar style as the OpenStudio SketchUp Plugin:
 | `$x_ray()`      | Turn on/of X-ray style.                                 |
 | `$render_by()`  | Change how surfaces should be colored.                  |
 | `$show()`       | Change what components/zones/surfaces to show           |
+| `$color_by()`   | Map time-varying simulation results to model objects.    |
+| `$results()`    | Attach an `EplusSql` or completed `EplusJob` directly.   |
+| `$diagnostics()`| Enable geometry-quality checks and linked issue markers. |
 
 Below shows the effects of each method:
 
@@ -344,8 +346,7 @@ knitr::include_graphics("geom-viewer_show_wall.png")
 
 ## Save the snapshot
 
-`$snapshot()` captures the current rgl view and saves it as an image
-file to disk.
+`$snapshot()` saves the interactive widget as HTML or captures it as a PNG.
 
 ```{r, eval = FALSE}
 viewer$show()
@@ -356,10 +357,10 @@ viewer$snapshot("view.png")
 knitr::include_graphics("geom-viewer_ground.png")
 ```
 
-## Work with the rgl window
+## Work with the viewer widget
 
-`$win_size()` lets you control the size of the rgl window. `$focus()` brings
-the rgl window to the top. `$close()` closes the rgl window.
+`$win_size()` controls the widget size. `$focus()` displays the current widget
+again, and `$close()` forgets the current widget instance.
 
 # Summary
 
@@ -369,5 +370,59 @@ visualize model geometries.
 Currently, `IdfGeometry` is still evolving and more
 methods will be added to perform geometric transformations in the near future.
 
-Also, new methods will be added in `IdfViewer` to allow visualize simulation
-results dynamically.
+Simulation results can be colored dynamically with `$color_by()`. Multiple
+variables can be switched, stepped, searched, played back, and aggregated to
+daily or monthly means in the browser. `$results()` can also attach an
+`EplusSql` or completed `EplusJob` directly; its Shiny kernel mode asks DuckDB
+for only the active variable and requested frame group and returns one compact
+binary object-value frame. `$diagnostics()` links issue markers and affected
+objects for adjacency gaps, duplicate or overlapping surfaces, non-planarity,
+reversed normals, self-intersections, and subsurfaces outside their parents.
+
+
+## Read-only views with a live R connection
+
+The widget displays existing geometry. Selection, filtering, clipping and result
+coloring do not change the IDF. It has no geometry editor or simulation runner.
+
+The ordinary widget is portable and needs no R service after rendering. Opt into
+a lightweight loopback connection when R should update the open view or read
+selections. The listener runs in the current R session and closes with the viewer.
+
+```{r, eval = FALSE}
+viewer <- idf_viewer(idf)
+viewer$on_select(function(objects) print(objects[, c("id", "name", "zone_name")]))
+widget <- viewer$widget(live = TRUE)
+widget
+
+# These commands update the same browser view.
+viewer$select(zone = "Zone 1")
+viewer$filter(zone = "Zone 1", type = c("wall", "window"))
+viewer$render_by("zone")
+viewer$selection()
+viewer$state()  # connection and command acknowledgement status
+viewer$filter()  # remove live filters
+```
+
+R callbacks run while R is idle, or when the event loop is serviced. Commands are
+asynchronous; the acknowledgement counter in `$state()` distinguishes sending
+an update from completing it. Separate viewer objects have independent channels.
+Use surface, Space or Zone selection mode in the widget to choose the pick scope.
+
+Existing numerical results can be attached before or after opening a live view:
+
+```{r, eval = FALSE}
+viewer$color_by(zone_results, value = "temperature", object = "zone",
+    key = "zone", time = "datetime", units = "degC")
+viewer$update("time", frame = 0L)  # browser frame indices start at zero
+
+# Read completed EnergyPlus outputs; this does not run a simulation.
+viewer$results(sql, variable = "Zone Mean Air Temperature", mode = "provider")
+viewer$close()
+```
+
+Zone values are repeated across their member surfaces for display; they are not
+surface temperatures or an interpolated room temperature field. Use results from
+the model being displayed. A portable HTML export requires embedded results and
+contains no live connection. `$snapshot()` exports the configured scene; the
+widget's screenshot button captures the current browser camera and visible scene.
