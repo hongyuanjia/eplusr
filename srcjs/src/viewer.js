@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { doubleClickSelection } from "./selection.js";
+import { componentFor, matchesNameFilter, objectVisibilityReasons } from "./geometry-filter.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { float32, int32 } from "./binary.js";
 import { objectColor, resultGradient } from "./colors.js";
@@ -39,19 +40,6 @@ function option(value, label = value) {
   node.value = value;
   node.textContent = label;
   return node;
-}
-
-// Map EnergyPlus surface types to the visible component controls.
-function componentFor(object) {
-  if (object.category === "shading") return "shading";
-  if (object.category === "daylighting") return "daylighting";
-  const type = String(object.surface_type ?? "").toLowerCase();
-  if (type === "floor") return "floor";
-  if (type === "wall") return "wall";
-  if (type === "roof" || type === "ceiling") return "roof";
-  if (type === "window" || type === "glassdoor") return "window";
-  if (type === "door") return "door";
-  return "wall";
 }
 
 // Ignore missing values when deriving the numerical display range.
@@ -151,6 +139,7 @@ export class IdfViewer {
     this.componentVisibility = Object.fromEntries(COMPONENTS.map((name) => [name, true]));
     this.zoneFilter = "";
     this.spaceFilter = "";
+    this.nameFilter = "";
     this.remoteFilters = {};
     this.selectionMode = "surface";
     this.renderBy = "surface_type";
@@ -309,40 +298,45 @@ export class IdfViewer {
 
     this.buildTaskContainers();
 
-    const searchSection = this.panelSection("Find and filter", true);
+    const searchSection = this.panelSection("Visibility filters", true);
     const searchRow = element("div", "eplusr-viewer__search");
     const searchLabel = element("label", "eplusr-viewer__field");
-    const searchTitle = element("span", "eplusr-viewer__field-title", "Search objects");
-    searchTitle.prepend(icon("search"));
-    searchLabel.appendChild(searchTitle);
-    this.searchInput = element("input");
-    this.searchInput.placeholder = "Surface, Zone, or Space";
-    this.searchInput.setAttribute("aria-describedby", `${this.panel.id}-search-status`);
+    searchLabel.appendChild(element("span", "eplusr-viewer__field-title", "Name contains"));
+    this.nameFilterInput = element("input");
+    this.nameFilterInput.type = "search";
+    this.nameFilterInput.placeholder = "Part of an object name";
+    this.nameFilterInput.setAttribute("aria-label", "Name contains");
+    this.nameFilterInput.setAttribute("aria-describedby", this.panel.id + "-name-filter-status");
     this.searchList = element("datalist");
-    this.searchList.id = `${this.panel.id}-search-options`;
-    this.searchInput.setAttribute("list", this.searchList.id);
-    searchLabel.append(this.searchInput, this.searchList);
-    const clearSearch = element("button", "", "Clear");
-    clearSearch.type = "button";
-    clearSearch.addEventListener("click", () => this.clearSearch());
-    searchRow.append(searchLabel, clearSearch);
-    searchSection.body.appendChild(searchRow);
-    this.searchStatus = element("div", "eplusr-viewer__status");
-    this.searchStatus.id = `${this.panel.id}-search-status`;
-    this.searchStatus.setAttribute("role", "status");
-    this.searchStatus.setAttribute("aria-live", "polite");
-    searchSection.body.appendChild(this.searchStatus);
-    this.searchInput.addEventListener("input", () => this.updateSearchStatus(this.searchInput.value));
-    this.searchInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") this.selectSearch(this.searchInput.value);
-      if (event.key === "Escape") this.clearSearch();
+    this.searchList.id = this.panel.id + "-name-filter-options";
+    this.nameFilterInput.setAttribute("list", this.searchList.id);
+    searchLabel.append(this.nameFilterInput, this.searchList);
+    this.clearNameFilterButton = element("button");
+    this.clearNameFilterButton.type = "button";
+    buttonIcon(this.clearNameFilterButton, "clear", "Clear name filter", true);
+    this.clearNameFilterButton.addEventListener("click", () => {
+      this.setNameFilter(""); this.nameFilterInput.focus();
+    });
+    searchRow.append(searchLabel, this.clearNameFilterButton);
+    this.nameFilterStatus = element("div", "eplusr-viewer__status");
+    this.nameFilterStatus.id = this.panel.id + "-name-filter-status";
+    this.nameFilterStatus.setAttribute("role", "status");
+    this.nameFilterStatus.setAttribute("aria-live", "polite");
+    searchSection.body.append(searchRow, this.nameFilterStatus);
+    this.nameFilterInput.addEventListener("input", () => this.setNameFilter(this.nameFilterInput.value));
+    this.nameFilterInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") event.preventDefault();
+      if (event.key === "Escape" && this.nameFilterInput.value) {
+        event.preventDefault(); event.stopPropagation(); this.setNameFilter("");
+      }
     });
 
-    this.selectionModeSelect = this.field("Select", "select", searchSection.body);
+    this.selectionModeSelect = this.field("Pick as", "select", searchSection.body);
     this.selectionModeSelect.append(option("surface", "Surfaces"), option("space", "Spaces"), option("zone", "Zones"));
     this.selectionModeSelect.addEventListener("change", () => {
       this.selectionMode = this.selectionModeSelect.value;
-      this.clearSelection();
+      this.updateViewportFeedback();
+      this.root.dispatchEvent(new CustomEvent("eplusr-view"));
     });
     this.zoneSelect = this.field("Zone", "select", searchSection.body);
     this.zoneSelect.addEventListener("change", () => this.setZoneFilter(this.zoneSelect.value));
@@ -377,7 +371,7 @@ export class IdfViewer {
 
     const componentSection = this.panelSection("Components", true);
     const checks = element("div", "eplusr-viewer__checks");
-    const labels = { floor: "Floors", wall: "Walls", roof: "Roofs", window: "Windows", door: "Doors", shading: "Shading", daylighting: "Daylighting points" };
+    const labels = { floor: "Floors", wall: "Walls", roof: "Roofs / ceilings", window: "Windows", door: "Doors", shading: "Shading", daylighting: "Daylighting points" };
     this.componentInputs = {};
     COMPONENTS.forEach((component) => {
       const label = element("label");
@@ -948,11 +942,9 @@ export class IdfViewer {
     this.zoneSelect.replaceChildren(option("", "All zones"));
     unique("zone_name").forEach((value) => this.zoneSelect.appendChild(option(value)));
     this.populateSpaceFilter();
-    const suggestions = [...new Set(this.objects.flatMap((object) => [
-      object.name, object.zone_name, object.space_name, object.construction_name
-    ]).filter(Boolean))].sort();
+    const suggestions = [...new Set(this.objects.map(object => object.name).filter(Boolean))].sort();
     this.searchList.replaceChildren(...suggestions.slice(0, 5000).map((value) => option(value)));
-    this.updateSearchStatus("");
+    this.updateNameFilterStatus();
   }
 
   // Restrict Space choices to the selected Zone while preserving valid current selections.
@@ -972,6 +964,7 @@ export class IdfViewer {
   effectiveFilters() {
     return {
       ...this.remoteFilters,
+      name: this.remoteFilters.name ?? (this.nameFilter.trim() ? [this.nameFilter.trim().toLowerCase()] : null),
       zone: this.remoteFilters.zone ?? (this.zoneFilter ? [this.zoneFilter.toLowerCase()] : null),
       space: this.remoteFilters.space ?? (this.spaceFilter ? [this.spaceFilter.toLowerCase()] : null),
       type: COMPONENTS.every((name) => this.componentVisibility[name]) ? null
@@ -1026,6 +1019,11 @@ export class IdfViewer {
         this.applyVisibilityChange({ fit: true });
       });
     });
+    if (filters.name) chip("Name contains: " + (this.nameFilter || filters.name.join(", ")), () => this.setNameFilter(""));
+    const name = this.remoteFilters.name?.[0] ?? this.nameFilter;
+    if (this.nameFilterInput.value !== name) this.nameFilterInput.value = name;
+    this.clearNameFilterButton.hidden = !filters.name;
+    this.updateNameFilterStatus();
     if (filters.type) chip("Types: " + (filters.type.join(", ") || "None"), () => {
       this.remoteFilters.type = null;
       COMPONENTS.forEach((name) => { this.componentVisibility[name] = true; });
@@ -1050,6 +1048,7 @@ export class IdfViewer {
   // Clear visibility criteria together while retaining the still-visible selected objects.
   clearFilters() {
     this.remoteFilters = {};
+    this.nameFilter = "";
     this.zoneFilter = "";
     this.spaceFilter = "";
     this.hidden.clear();
@@ -1103,28 +1102,26 @@ export class IdfViewer {
     else this.updateSelectionPanel();
   }
 
-  // Report search matches as the user types without changing the current model state.
-  updateSearchStatus(query) {
-    const needle = query.trim().toLowerCase();
-    if (!needle) {
-      this.searchStatus.textContent = "Type a name, Zone, Space, or construction.";
-      return [];
-    }
-    const matches = this.objects
-      .map((object, index) => ({ object, index }))
-      .filter(({ object }) => [object.name, object.zone_name, object.space_name, object.construction_name, object.class]
-        .some((value) => String(value ?? "").toLowerCase().includes(needle)))
-      .map(({ index }) => index);
-    this.searchStatus.textContent = matches.length ? `${matches.length} matching objects.` : "No matching objects.";
-    return matches;
+  // Update only the name criterion; keep the camera, remaining criteria and valid selection intact.
+  setNameFilter(value) {
+    this.nameFilter = value;
+    this.remoteFilters.name = null;
+    this.applyVisibilityChange();
+    this.root.dispatchEvent(new CustomEvent("eplusr-view"));
   }
 
-  // Clear search text and its search-created selection while leaving explicit filters intact.
-  clearSearch() {
-    this.searchInput.value = "";
-    this.updateSearchStatus("");
-    this.clearSelection();
-    this.searchInput.focus();
+  // Distinguish model-wide name matches from the objects allowed by all active criteria.
+  updateNameFilterStatus() {
+    const queries = this.effectiveFilters().name;
+    this.nameFilterStatus.hidden = !queries;
+    if (!queries) return;
+    const matches = this.objects.flatMap((object, index) => matchesNameFilter(object, queries) ? [index] : []);
+    const visible = matches.filter(index => this.isObjectVisible(index));
+    const reasons = [...new Set(matches.flatMap(index => this.visibilityReasons(index)))];
+    this.nameFilterStatus.textContent = !matches.length ? "No object names match."
+      : visible.length + " of " + matches.length + " name matches visible" +
+        (visible.length < matches.length ? " · " + reasons.join(" · ") : "");
+    this.nameFilterStatus.dataset.state = visible.length ? "matches" : "excluded";
   }
 
   // Keep the existing R panel command as an alias for the transient property inspector.
@@ -1278,23 +1275,18 @@ export class IdfViewer {
     this.configureClipRange();
   }
 
-  // Combine semantic filters, isolation and component visibility.
+  // Keep the tree's explanations identical to the geometry and picking visibility rules.
+  visibilityReasons(objectIndex) {
+    return objectVisibilityReasons(this.objects[objectIndex], objectIndex, {
+      filters: this.effectiveFilters(), componentVisibility: this.componentVisibility,
+      hidden: this.hidden, isolated: this.isolated, diagnosticOnly: this.diagnosticOnly,
+      diagnosticObjectSet: this.diagnosticObjectSet
+    });
+  }
+
+  // A model object is visible only when every active criterion allows it.
   isObjectVisible(objectIndex) {
-    const object = this.objects[objectIndex];
-    if (!object) return false;
-    const fields = { zone: "zone_name", space: "space_name", surface: "name" };
-    for (const [key, column] of Object.entries(fields)) {
-      const accepted = this.remoteFilters[key];
-      if (accepted && !accepted.includes(String(object[column] ?? "").toLowerCase())) return false;
-    }
-    if (this.remoteFilters.type && !this.remoteFilters.type.includes(componentFor(object))) return false;
-    if (this.hidden.has(objectIndex)) return false;
-    if (this.isolated && !this.isolated.has(objectIndex)) return false;
-    if (!this.componentVisibility[componentFor(object)]) return false;
-    if (this.zoneFilter && object.zone_name !== this.zoneFilter) return false;
-    if (this.spaceFilter && object.space_name !== this.spaceFilter) return false;
-    if (this.diagnosticOnly && !this.diagnosticObjectSet.has(objectIndex)) return false;
-    return true;
+    return this.visibilityReasons(objectIndex).length === 0;
   }
 
   // Rebuild only the visible non-indexed triangles, preserving a direct face-to-ID lookup.
@@ -2317,24 +2309,10 @@ export class IdfViewer {
     this.requestRender();
   }
 
-  // Update select search for this viewer instance.
-  selectSearch(query) {
-    const matches = this.updateSearchStatus(query).filter(index => this.isObjectVisible(index));
-    if (!matches.length) {
-      this.searchInput.setAttribute("aria-invalid", "true");
-      this.searchStatus.textContent = "No matching visible objects. Adjust the search or visibility filters.";
-      return;
-    }
-    this.searchInput.removeAttribute("aria-invalid");
-    this.selected = new Set(matches.flatMap(index => this.selectionGroup(index)));
-    this.selected = new Set([...this.selected].filter(index => this.isObjectVisible(index)));
-    this.fitView(this.selected);
-    this.emitSelection();
-  }
-
   // Restore every visibility control and clear transient search, selection, and isolation state.
   showAll() {
     this.remoteFilters = {};
+    this.nameFilter = "";
     this.isolated = null;
     this.isolationHistory = [];
     this.hidden.clear();
@@ -2348,8 +2326,7 @@ export class IdfViewer {
     COMPONENTS.forEach((component) => { this.componentVisibility[component] = true; });
     Object.values(this.componentInputs).forEach((input) => { input.checked = true; });
     this.selected.clear();
-    this.searchInput.value = "";
-    this.updateSearchStatus("");
+    this.updateNameFilterStatus();
     this.rebuildGeometry();
     this.fitView();
     this.emitSelection();
@@ -2840,6 +2817,7 @@ export class IdfViewer {
         [key, values === null ? null : (Array.isArray(values) ? values : [values]).map((value) => String(value).toLowerCase())]));
       this.zoneFilter = "";
       this.spaceFilter = "";
+      this.nameFilter = this.remoteFilters.name?.[0] ?? "";
       // Mirror a single R criterion in the native select; retain arrays for multi-value filters.
       const matchingName = (key, field) => this.remoteFilters[key]?.length === 1
         ? this.objects.find((object) => String(object[field] ?? "").toLowerCase() === this.remoteFilters[key][0])?.[field] ?? "" : "";

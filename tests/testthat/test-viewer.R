@@ -300,3 +300,29 @@ test_that("frame provider exposes validated binary frames without an HTTP framew
     closed <- catch_cnd(provider$fetch("0", "0"))
     expect_identical(closed$status, 410L)
 })
+
+# Name filtering must survive the public R-to-browser transport unchanged.
+test_that("live name filters combine with other criteria and can be cleared", {
+    skip_on_cran()
+    skip_if_not_installed("httpuv")
+    skip_if_not_installed("htmlwidgets")
+    skip_if_not_installed("decido")
+    idf <- read_idf(path_eplus_example(
+        Sys.getenv("EPLUSR_VIEWER_TEST_VERSION", LATEST_EPLUS_VER),
+        "5ZoneAirCooledWithSpaces.idf"
+    ))
+    viewer <- idf_viewer(idf)
+    on.exit(viewer$close(), add = TRUE)
+    viewer$widget(live = TRUE)
+    zone <- names(idf$Zone)[[1L]]
+    viewer$filter(zone = zone, type = "wall", name = "TOP")
+    session <- get_priv_env(viewer)$m_live
+    message <- tail(session$pending, 1L)[[1L]]
+    expect_identical(message$command, "filter")
+    expect_identical(message$args$name, list("TOP"))
+    expect_identical(message$args$zone, list(zone))
+    expect_identical(message$args$type, list("wall"))
+    viewer$filter(name = NULL)
+    expect_null(tail(session$pending, 1L)[[1L]]$args$name)
+    expect_error(viewer$filter(name = c("A", "B")), "name")
+})

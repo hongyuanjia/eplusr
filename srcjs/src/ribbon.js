@@ -100,7 +100,8 @@ export class ViewerRibbon {
     viewer.connectionStatus = new ConnectionStatus();
     this.quick.append(this.treeButton, this.modelButton, this.collapseButton, this.helpButton, viewer.connectionStatus.root);
 
-    this.dialog("objects", "Find and filter", [viewer.selectionModeSelect.closest("label"), sections.search]);
+    this.dialog("objects", "Visibility filters", [sections.search]);
+    this.dialog("selection", "Selection mode", [viewer.selectionModeSelect.closest("label")]);
     this.dialog("components", "Visible components", [sections.components]);
     this.dialog("appearance", "Model appearance", [this.field("Color by", viewer.renderSelect), viewer.windowStyleSelect.closest("label")]);
     this.dialog("camera", "Camera", [this.field("View", viewer.viewSelect), this.field("Projection", viewer.projectionSelect)]);
@@ -134,8 +135,8 @@ export class ViewerRibbon {
 
     const home = this.pages.home;
     this.group(home, "Navigate").append(viewer.fitModelButton, viewer.fitSelectionButton);
-    this.group(home, "Objects").append(this.launcher("Find / filter", "filters", "objects"), this.launcher("Components", "components", "components"));
-    this.group(home, "Selection").append(viewer.selectionActions);
+    this.group(home, "Objects").append(this.launcher("Filter objects", "filters", "objects"), this.launcher("Components", "components", "components"));
+    this.group(home, "Selection").append(this.launcher("Selection mode", "select", "selection"), viewer.selectionActions);
     buttonIcon(viewer.panelButton, "properties", "Properties");
     viewer.panelButton.setAttribute("aria-controls", this.taskPane.id = viewer.panel.id + "-task-pane");
     this.group(home, "Inspect").append(viewer.panelButton, actions.reset, this.launcher("Appearance", "appearance", "appearance"));

@@ -712,17 +712,22 @@ IdfViewer <- R6Class(
         #' @description Filter the current live scene without sending geometry again.
         #' @param zone,space,surface Names to include; NULL removes that filter.
         #' @param type Component names such as wall, roof, floor or window.
+        #' @param name Optional literal substring of the object name, matched without
+        #'   regard to case. Combined with the other visibility filters.
         filter = function(
             zone = NULL,
             space = NULL,
             surface = NULL,
-            type = NULL
+            type = NULL,
+            name = NULL
         ) {
+            assert_string(name, null.ok = TRUE)
             values <- list(
                 zone = zone,
                 space = space,
                 surface = surface,
-                type = type
+                type = type,
+                name = name
             )
             for (value in values) {
                 assert_character(value, any.missing = FALSE, null.ok = TRUE)

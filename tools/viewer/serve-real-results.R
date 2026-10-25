@@ -54,7 +54,13 @@ viewer__serve_real_example <- function(root) {
             tryCatch(
                 {
                     if (command$action == "filter") {
-                        viewer$filter(zone = command$zone, type = command$type)
+                        do.call(
+                            viewer$filter,
+                            command[intersect(
+                                names(command),
+                                c("zone", "space", "surface", "type", "name")
+                            )]
+                        )
                     }
                     if (command$action == "select") {
                         viewer$select(zone = command$zone)

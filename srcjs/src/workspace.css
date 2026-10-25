@@ -157,3 +157,12 @@
 
 /* Retain the live page rule that exposes result legends and asynchronous status. */
 .eplusr-viewer--loading .eplusr-viewer__result-status, .eplusr-viewer--error .eplusr-viewer__result-status, .eplusr-viewer__legend--visible { display: block; }
+
+/* Hidden-state explanations stay under the source name and wrap within narrow trees. */
+.eplusr-viewer__tree-label { display: flex; flex: 1; flex-direction: column; min-width: 0; padding-block: 4px; }
+.eplusr-viewer__tree-reason { color: #79552c; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+.eplusr-viewer__task-body .eplusr-viewer__search input::-webkit-search-cancel-button { appearance: none; }
+.eplusr-viewer__task-body [id$="-name-filter-status"][data-state="excluded"] { color: #79552c; }
+
+/* Keep the idle hierarchy compact; expose exclusion details during search or keyboard inspection. */
+.eplusr-viewer__tree:not([data-searching="true"]) .eplusr-viewer__tree-row:not(:focus-within) .eplusr-viewer__tree-reason { display: none; }

@@ -33,6 +33,13 @@ export class ModelBrowser {
     this.tree.setAttribute("aria-multiselectable", "true");
     this.root.append(header, searchField, this.status, this.tree);
     this.search.addEventListener("input", () => this.filter());
+    this.search.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault(); event.stopPropagation();
+      const leaves = this.visibleNodes().filter(item => item.key.startsWith("object:"));
+      const target = leaves.find(item => item.indices.some(index => this.viewer.isObjectVisible(index))) ?? leaves[0];
+      if (target) this.focus(target);
+    });
     this.root.addEventListener("keydown", event => {
       if (event.key === "Escape" && !event.defaultPrevented) {
         event.preventDefault(); workspace.showBrowser(false);
@@ -74,7 +81,8 @@ export class ModelBrowser {
     item.row = node("div", "eplusr-viewer__tree-row");
     item.row.setAttribute("role", "treeitem"); item.row.tabIndex = -1;
     item.row.setAttribute("aria-level", String(item.level));
-    item.row.title = indices.length === 1 ? this.viewer.objects[indices[0]].name : label;
+    item.sourceName = indices.length === 1 ? this.viewer.objects[indices[0]].name : label;
+    item.row.title = item.sourceName;
     item.row.setAttribute("aria-label", kind + ": " + item.row.title);
     item.twist = this.workspace.button("Expand " + label, "next", () => this.expand(item, !this.expanded.has(key)), true);
     item.twist.tabIndex = -1;
@@ -84,7 +92,12 @@ export class ModelBrowser {
     item.count = node("span", "eplusr-viewer__tree-count");
     item.eye = this.workspace.button("Hide " + label, "eye", () => this.visibility(item), true);
     item.eye.tabIndex = -1; item.eye.addEventListener("click", event => event.stopPropagation());
-    item.row.append(item.twist, name, item.count, item.eye);
+    const labelStack = node("span", "eplusr-viewer__tree-label");
+    item.reason = node("span", "eplusr-viewer__tree-reason");
+    item.reason.id = this.viewer.panel.id + "-tree-reason-" + this.nodes.length;
+    item.reason.hidden = true;
+    labelStack.append(name, item.reason);
+    item.row.append(item.twist, labelStack, item.count, item.eye);
     item.children = node("ul"); item.children.setAttribute("role", "group");
     item.li.append(item.row, item.children); container.append(item.li);
     item.row.addEventListener("click", event => this.select(item, event));
@@ -96,9 +109,10 @@ export class ModelBrowser {
   // Search the tree's source names without changing model visibility, camera or filters.
   filter() {
     const query = this.search.value.trim().toLowerCase();
-    let matches = 0;
+    this.tree.dataset.searching = String(Boolean(query));
     for (const item of [...this.nodes].reverse()) {
-      const own = (item.label + " " + item.kind + " " + item.row.title).toLowerCase().includes(query);
+      const object = item.key.startsWith("object:") ? this.viewer.objects[item.indices[0]] : null;
+      const own = [item.label, item.kind, item.sourceName, object?.construction_name, object?.class].join(" ").toLowerCase().includes(query);
       item.match = !query || own || this.ancestors(item).some(parent => parent.label.toLowerCase().includes(query))
         || [...item.children.children].some(child => !child.hidden);
       item.li.hidden = !item.match;
@@ -106,11 +120,19 @@ export class ModelBrowser {
       item.twist.hidden = !branch;
       item.children.hidden = !branch || !(query ? item.match : this.expanded.has(item.key));
       if (branch) item.row.setAttribute("aria-expanded", String(!item.children.hidden));
-      if (item.match && !branch) matches++;
     }
-    this.status.textContent = query ? matches + " matching surfaces" : this.viewer.objects.length + " surfaces · " + this.tree.children.length + " groups";
+    this.updateSearchSummary();
     const rows = this.visibleNodes();
     this.nodes.forEach(item => { item.row.tabIndex = item === rows[0] ? 0 : -1; });
+  }
+
+  // Search counts include hidden source objects while exposing the currently drawable subset.
+  updateSearchSummary() {
+    const query = this.search.value.trim();
+    const matches = this.nodes.filter(item => item.key.startsWith("object:") && item.match);
+    const visible = matches.filter(item => this.viewer.isObjectVisible(item.indices[0])).length;
+    this.status.textContent = query ? matches.length + " matching surfaces · " + visible + " visible"
+      : this.viewer.objects.length + " surfaces · " + this.tree.children.length + " groups";
   }
 
   // Expand an existing branch while keeping the selected object independent of disclosure.
@@ -131,13 +153,19 @@ export class ModelBrowser {
       const start = leaves.indexOf(this.anchor), end = leaves.indexOf(item);
       if (start >= 0 && end >= 0) members = leaves.slice(Math.min(start,end), Math.max(start,end) + 1).flatMap(entry => entry.indices).filter(index => this.viewer.isObjectVisible(index));
     }
-    if (!members.length) { this.status.textContent = "Hidden by current filters. Use Show all or clear filters to select."; this.focus(item); return; }
+    if (!members.length) {
+      const reasons = [...new Set(item.indices.flatMap(index => this.viewer.visibilityReasons(index)))];
+      this.status.textContent = "Hidden · " + reasons.join(" · ") + ". Adjust the matching visibility filter to locate.";
+      this.focus(item); return;
+    }
     const additive = event.ctrlKey || event.metaKey || event.shiftKey;
     if (!additive) this.viewer.selected.clear();
     const remove = additive && !event.shiftKey && members.every(index => this.viewer.selected.has(index));
     members.forEach(index => remove ? this.viewer.selected.delete(index) : this.viewer.selected.add(index));
     if (!event.shiftKey) this.anchor = item;
-    this.viewer.updateColors(); this.viewer.emitSelection(); this.focus(item);
+    this.viewer.updateColors();
+    if (!additive) this.viewer.fitView(new Set(members));
+    this.viewer.emitSelection(); this.focus(item);
   }
 
   // Visibility controls cannot silently clear a Zone/component filter in order to reveal an object.
@@ -198,8 +226,19 @@ export class ModelBrowser {
       item.row.dataset.partial = String(selected > 0 && selected < visible);
       item.row.dataset.hidden = String(!visible);
       item.count.textContent = item.indices.length > 1 ? visible + "/" + item.indices.length : "";
+      item.reason.hidden = visible > 0;
+      if (!visible) {
+        const reasons = [...new Set(item.indices.flatMap(index => this.viewer.visibilityReasons(index)))];
+        item.reason.textContent = "Hidden · " + reasons.join(" · ");
+        item.row.setAttribute("aria-describedby", item.reason.id);
+        item.row.title = item.sourceName + " · " + item.reason.textContent;
+      } else {
+        item.row.removeAttribute("aria-describedby");
+        item.row.title = item.sourceName;
+      }
       buttonIcon(item.eye, visible ? "eye" : "hide", (visible ? "Hide " : "Show ") + item.label, true);
       item.eye.setAttribute("aria-pressed", String(Boolean(visible)));
     }
+    this.updateSearchSummary();
   }
 }

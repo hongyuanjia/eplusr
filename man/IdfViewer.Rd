@@ -512,7 +512,13 @@ several supplied criteria are combined by intersection.
   Filter the current live scene without sending geometry again.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{IdfViewer$filter(zone = NULL, space = NULL, surface = NULL, type = NULL)}
+    \preformatted{IdfViewer$filter(
+  zone = NULL,
+  space = NULL,
+  surface = NULL,
+  type = NULL,
+  name = NULL
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -520,6 +526,8 @@ several supplied criteria are combined by intersection.
     \describe{
       \item{\code{zone, space, surface}}{Names to include; NULL removes that filter.}
       \item{\code{type}}{Component names such as wall, roof, floor or window.}
+      \item{\code{name}}{Optional literal substring of the object name, matched without
+regard to case. Combined with the other visibility filters.}
     }
     \if{html}{\out{</div>}}
   }

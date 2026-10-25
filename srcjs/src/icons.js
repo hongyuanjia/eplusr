@@ -1,6 +1,6 @@
 import {
   createElement, Box, Boxes, Camera, ChartNoAxesCombined, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
-  Clock3, Database, Expand, Palette, Paintbrush, Orbit, PanelsTopLeft, TriangleAlert, CircleHelp, Check,
+  MousePointer2, Clock3, Database, Expand, Palette, Paintbrush, Orbit, PanelsTopLeft, TriangleAlert, CircleHelp, Check,
   Circle, Eye, EyeOff, FolderTree, Focus, Grid2X2, Grid3X3, Layers, ListFilter, Move3D,
   PanelRight, PanelRightClose, Pause, Play, RotateCcw, Ruler, Save, Scan,
   ScanEye, Search, Settings2, SlidersHorizontal, Trash2, Undo2, X
@@ -15,7 +15,7 @@ const symbols = {
   reset: RotateCcw, measure: Ruler, save: Save, fit: Scan, xray: ScanEye,
   search: Search, display: Settings2, properties: SlidersHorizontal,
   delete: Trash2, undo: Undo2, clear: X, eye: Eye, tree: FolderTree,
-  components: Boxes, colors: Palette, appearance: Paintbrush, camera: Orbit, data: Database,
+  select: MousePointer2, components: Boxes, colors: Palette, appearance: Paintbrush, camera: Orbit, data: Database,
   time: Clock3, timeline: PanelRight, explode: Expand, diagnostics: TriangleAlert,
   collapse: ChevronUp, expand: ChevronDown, controls: PanelsTopLeft, help: CircleHelp, check: Check
 };
