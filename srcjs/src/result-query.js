@@ -44,6 +44,10 @@ export class ResultQueryPanel {
     legend.className = "eplusr-viewer__sr-only";
     this.fieldset.appendChild(legend);
     this.field("name", "Variables", "select", this.fieldset);
+    this.sourceSummary = document.createElement("details");
+    this.sourceSummary.className = "eplusr-viewer__source-summary";
+    this.sourceSummary.append(document.createElement("summary"), document.createElement("p"));
+    this.fieldset.append(this.sourceSummary);
     this.field("environment_name", "Environments", "select", this.fieldset);
     this.field("reporting_frequency", "Reporting frequency", "select", this.fieldset);
     const note = document.createElement("p");
@@ -143,6 +147,11 @@ export class ResultQueryPanel {
     this.config = config;
     this.section.hidden = !config;
     if (!config) { this.applied = null; return; }
+    const catalog = config.catalog;
+    const unmapped = array(catalog.unmapped_variables);
+    this.sourceSummary.hidden = !unmapped.length;
+    this.sourceSummary.firstChild.textContent = array(catalog.variables).length + " spatial / " + catalog.source_variable_count + " SQL variables";
+    this.sourceSummary.lastChild.textContent = "Only recorded results with keys matching this model’s Surface, Zone or Space names can color geometry. Other SQL dictionary variables: " + unmapped.join(", ") + ". Record additional spatial outputs in a future simulation to display other quantities.";
     this.paired = Boolean(config.paired_keys);
     this.keysChanged = false;
     this.applied = config.filters ?? {};

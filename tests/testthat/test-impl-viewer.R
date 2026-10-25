@@ -768,6 +768,11 @@ test_that("viewer catalogs retain only recorded spatial filter combinations", {
     })
     catalog <- viewer__result_catalog(sql, objects)
     expect_length(catalog$combinations, 2L)
+    expect_equal(
+        catalog$source_variable_count,
+        length(unique(sql$report_data_dict()$name))
+    )
+    expect_true("Unused variable" %in% catalog$unmapped_variables)
     expect_false("Unused variable" %in% catalog$variables)
     expect_false("WinterDesignDay" %in% catalog$day_types)
     rows <- rbindlist(catalog$combinations)

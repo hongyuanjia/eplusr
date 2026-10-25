@@ -113,6 +113,7 @@ viewer__sql_filtered_times <- function(path, filters) {
 viewer__result_catalog <- function(source, objects) {
     resolved <- viewer__sql_source(source)
     dict <- copy(resolved$dictionary)
+    source_variables <- sort(unique(dict$name))
     spatial_keys <- unique(tolower(unlist(
         objects[,
             intersect(names(objects), c("name", "zone_name", "space_name")),
@@ -168,6 +169,8 @@ viewer__result_catalog <- function(source, objects) {
     setorderv(available, names(available))
     list(
         variables = sort(unique(available$name)),
+        source_variable_count = length(source_variables),
+        unmapped_variables = setdiff(source_variables, available$name),
         frequencies = sort(unique(available$reporting_frequency)),
         environments = sort(unique(available$environment_name)),
         keys = sort(unique(available$key_value)),

@@ -325,4 +325,15 @@ test_that("live name filters combine with other criteria and can be cleared", {
     viewer$filter(name = NULL)
     expect_null(tail(session$pending, 1L)[[1L]]$args$name)
     expect_error(viewer$filter(name = c("A", "B")), "name")
+    # Numeric visibility is distinct from the palette limits and round-trips through update().
+    viewer$update("result_filter", minimum = 23, maximum = 25)
+    message <- tail(session$pending, 1L)[[1L]]
+    expect_identical(message$command, "result_filter")
+    expect_identical(message$args, list(minimum = 23, maximum = 25))
+    viewer$update("back_faces", on = FALSE)
+    message <- tail(session$pending, 1L)[[1L]]
+    expect_identical(message$command, "back_faces")
+    expect_identical(message$args, list(on = FALSE))
+    viewer$update("result_filter")
+    expect_length(tail(session$pending, 1L)[[1L]]$args, 0L)
 })

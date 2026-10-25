@@ -34,6 +34,7 @@ export function objectVisibilityReasons(object, index, state) {
   if ((filters.type && !filters.type.includes(component)) || state.componentVisibility?.[component] === false) {
     reasons.push("Type filter (" + (component === "roof" ? "roof / ceiling" : component) + ")");
   }
+  if (state.resultValueAllowed === false) reasons.push("Result value filter");
   if (state.hidden?.has(index)) reasons.push("Hidden manually");
   if (state.isolated && !state.isolated.has(index)) reasons.push("Isolation");
   if (state.diagnosticOnly && !state.diagnosticObjectSet?.has(index)) reasons.push("Diagnostics filter");

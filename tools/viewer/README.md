@@ -67,3 +67,21 @@ The icon-specific CUA regression module is tools/viewer/check-icon-controls.cua.
 Run `Rscript --vanilla tools/viewer/serve-real-results.R` from the package source root to serve the archived real-result example at port 40680. This is a preview harness for the R htmlwidget. No simulation is started.
 
 Double-click a surface to select its visible Zone. Double-click again inside that Zone to inspect a face. Further double-clicks remain at face level until the context changes. Another Zone starts at Zone level. Single-click uses the explicit picking mode; Control/Command-click adds/removes selection. Double-click no longer isolates. Use Isolate or I explicitly. The tree is the keyboard alternative for choosing Zones and surfaces.
+
+### Visible result values
+
+The two native color-key handles restrict visible objects by the current numerical result. Limits are inclusive and intersect existing name, Zone, Space, component, hide and isolation criteria. Missing values are excluded while an interval is active. Clearing this interval preserves the other criteria; Clear filters and Show all remove it. The palette limits stay independent. Re-querying the same variable and units retains absolute thresholds, and a new quantity starts without an interval. Pending streamed frames retain selection until actual values arrive.
+
+Use Results > Filter result values (or the color-key filter icon) for exact numeric limits. Apply or Enter submits the draft; Reset removes both bounds. The task and the geometry filter task both offer Fit visible objects, which does not require a selection. Fit selection remains specific to selected objects.
+
+```r
+viewer$update("result_filter", minimum = 23, maximum = 25)
+viewer$update("time", frame = 5L)
+viewer$update("result_filter") # remove the numerical interval
+```
+
+Transparent panes render once as separate meshes with their own depth-sort centers. This preserves source geometry, object selection, clipping, explosion and opaque result colors. Reciprocal boundaries whose source rings disagree are listed in Geometry diagnostics without moving or welding their coordinates. Genuine interior geometry remains visible through transparent glass.
+
+The example SQL dictionary contains 51 variable names. Only `Zone Mean Air Temperature` has recorded keys matching this model. The Result data source summary identifies the other dictionary variables; equipment and facility outputs are not projected onto unrelated Zone surfaces. More quantities require corresponding spatial output in an existing or future simulation result.
+
+Back faces are culled by default using source triangle winding. Filled surfaces, glass, edge lines, selection/hover outlines and pointer picking all obey the same camera-facing rule, including orthographic views. Appearance > Show back faces explicitly enables inspection; `viewer$update("back_faces", on = TRUE)` is its R equivalent. An explicit Fit can turn towards a selected sheet when all targets face away, while requested standard camera views keep their direction.

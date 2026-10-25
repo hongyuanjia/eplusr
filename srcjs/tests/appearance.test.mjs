@@ -32,3 +32,39 @@ test("glass uses independent draw groups while preserving paired side and source
   assert.deepEqual(grouped.groups,[{start:0,count:12,materialIndex:3},{start:12,count:3,materialIndex:0}]);
   assert.deepEqual([...faces],[0,0,1,1,2]);
 });
+
+// Independent real Three.js meshes must provide different depth-sort origins and a single glass pass.
+test("transparent panes sort independently, retain source IDs, and render each flat pane once",async()=>{
+  const {GlazingLayer}=await import('../src/glazing.js');
+  const scene=new THREE.Scene(),positions=new Float32Array([0,0,0,2,0,0,0,0,2, 0,5,0,2,5,0,0,5,2]);
+  const original=positions.slice();
+  const layer=new GlazingLayer(scene,positions,new Int32Array([0,1]),new Set([0,1]));
+  const [a,b]=[...layer.meshes.values()];
+  assert.notDeepEqual(a.position.toArray(),b.position.toArray());
+  assert.equal(a.material.forceSinglePass,true); assert.equal(a.material.depthWrite,false);
+  assert.equal(a.userData.objectIndex,0); assert.equal(b.userData.objectIndex,1);
+  layer.update(new Set([1]),[new THREE.Vector3(),new THREE.Vector3(3,0,0)],new Int32Array([0,1]),[]);
+  assert.equal(a.visible,false);assert.equal(b.visible,true);assert.equal(b.material.side,THREE.FrontSide);
+  layer.update(new Set([1]),[new THREE.Vector3(),new THREE.Vector3(3,0,0)],new Int32Array([0,1]),[],true);
+  assert.equal(b.material.side,THREE.BackSide);
+  assert.equal(b.position.x,3+b.userData.sourceCenter.x);
+  assert.deepEqual(positions,original);
+  layer.dispose();assert.equal(scene.children.length,0);
+});
+
+// A real pane must reject back-facing rays under the default rendering policy.
+test("default glass shows and picks only the camera-facing side",async()=>{
+  const {GlazingLayer}=await import('../src/glazing.js');
+  const scene=new THREE.Scene();
+  const positions=new Float32Array([0,0,0,2,0,0,0,0,2]);
+  const layer=new GlazingLayer(scene,positions,new Int32Array([0]),new Set([0]));
+  layer.update(new Set([0]),[new THREE.Vector3()],new Int32Array([0]),[]);
+  scene.updateMatrixWorld(true);
+  const mesh=layer.meshes.get(0);
+  assert.equal(mesh.material.side,THREE.FrontSide);
+  const front=new THREE.Raycaster(new THREE.Vector3(.25,-1,.5),new THREE.Vector3(0,1,0));
+  const back=new THREE.Raycaster(new THREE.Vector3(.25,1,.5),new THREE.Vector3(0,-1,0));
+  assert.equal(front.intersectObject(mesh).length,1);
+  assert.equal(back.intersectObject(mesh).length,0);
+  layer.dispose();
+});

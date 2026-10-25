@@ -19,7 +19,7 @@
 source("tools/viewer/real-results.R")
 ```
 
-脚本会加载此 worktree，打开连接当前 R 会话的 htmlwidget，筛选顶层四个周边 Zone，选中其中两个，并显示第 6 个逐时结果（06:00）。对象保留为 `viewer`、`widget`、`idf`、`sql` 和 `zones`，可继续操作。浏览器工具面板的 Select 选为 Zones 后，Shift 点击可增加或取消 Zone 选择。
+脚本会加载此 worktree，打开连接当前 R 会话的 htmlwidget，筛选顶层四个周边 Zone，选中其中两个，并显示第 6 个逐时结果（06:00）。对象保留为 `viewer`、`widget`、`idf`、`sql` 和 `zones`，可继续操作。浏览器中通过 Model > Selection mode 将 Pick as 选为 Zones 后，Shift 点击可增加或取消 Zone 选择。默认只显示正面；示例显示朝上的天花边界（组件 `roof` 同时包含天花）。
 
 ```r
 viewer$filter(zone = zones[1])            # 只显示一个 Zone

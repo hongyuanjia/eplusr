@@ -33,9 +33,9 @@ viewer$results(
 )
 widget <- viewer$widget(live = TRUE, height = "700px")
 
-# 筛选顶层四个周边 Zone。去掉屋顶，方便看到各 Zone 内部的结果颜色。
+# 筛选顶层四个周边 Zone，显示朝上的天花边界，匹配默认的背面剔除规则。
 zones <- paste0("Perimeter_top_ZN_", 1:4)
-viewer$filter(zone = zones, type = c("wall", "window", "floor"))
+viewer$filter(zone = zones, type = c("wall", "window", "roof"))
 
 # 一次选中两个 Zone 的全部可见表面；选中边界不会替换结果颜色。
 viewer$select(zone = zones[c(1, 2)])

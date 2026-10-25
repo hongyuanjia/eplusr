@@ -32,11 +32,23 @@ test('different openings leave boundaries unresolved for geometry inspection',()
   assert.deepEqual([...findSharedBoundaries(f.objects,f.positions,f.faces,f.edges,f.edgeObjects)],[-1,-1,-1]);
 });
 
-test('single-Zone filtering and separated explosion restore independent two-sided faces',()=>{
+test('single-Zone filtering and separated explosion retain independent source faces',()=>{
   const f=fixture(),pairs=new Int32Array([1,0]),offsets=[{x:0,y:0,z:0},{x:0,y:0,z:0}];
   const together=sharedBoundaryGroups(f.faces,pairs,new Set([0,1]),offsets);
   assert.deepEqual([...together.active],[1,1]);assert.deepEqual(together.groups,[{start:0,count:12,materialIndex:1}]);
   assert.deepEqual([...sharedBoundaryGroups(f.faces,pairs,new Set([0]),offsets).active],[0,0]);
   offsets[1].x=1;assert.deepEqual([...sharedBoundaryGroups(f.faces,pairs,new Set([0,1]),offsets).active],[0,0]);
   assert.deepEqual([...f.faces],[0,0,1,1]);
+});
+
+// Genuine source mismatches must be discoverable without silently snapping vertices or erasing objects.
+test('shifted reciprocal boundaries are reported and retain their source coordinates',async()=>{
+  const {mismatchedBoundaryIssues}=await import('../src/shared-boundaries.js');
+  const f=fixture();assert.deepEqual(mismatchedBoundaryIssues(f.objects,f.edges,f.edgeObjects),[]);
+  for(let i=24;i<f.edges.length;i+=3)f.edges[i]+=0.04;
+  const original=f.edges.slice(),issues=mismatchedBoundaryIssues(f.objects,f.edges,f.edgeObjects);
+  assert.equal(issues.length,1);assert.ok(Math.abs(issues[0].distance-0.04)<1e-6);
+  assert.deepEqual(issues[0].object_indices,[0,1]);assert.deepEqual(f.edges,original);
+  f.objects[1].outside_boundary_condition_object='Other';
+  assert.deepEqual(mismatchedBoundaryIssues(f.objects,f.edges,f.edgeObjects),[]);
 });

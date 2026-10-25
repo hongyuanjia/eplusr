@@ -611,11 +611,15 @@ IdfViewer <- R6Class(
         # update {{{
         #' @description Send an incremental command to the current live view.
         #' @param command One of time, variable, render_by, view, projection,
-        #'   fit, fit_model, fit_selection, range_mode, show_all,
+        #'   fit, fit_model, fit_selection, range_mode, result_filter, show_all,
         #'   play, pause, palette, range, aggregation, explode, clip, measure,
         #'   hide_selected, isolate, exit_isolation, clear_selection, panel,
-        #'   diagnostics, background, wireframe, x_ray, window_style, axis, or ground.
+        #'   diagnostics, background, wireframe, x_ray, window_style, back_faces, axis, or ground.
         #'   For window_style, use value = "glass" (default) or "opaque".
+        #'   Back faces are culled by default; back_faces with on = TRUE enables inspection.
+        #'   For result_filter, minimum and maximum specify inclusive visible values;
+        #'   NULL removes a bound. Setting a bound activates Results coloring.
+        #'   Color-scale limits remain unchanged.
         #'   The panel command controls the transient property inspector.
         #' @param ... Named arguments for the browser command.
         update = function(command, ...) {
@@ -631,6 +635,7 @@ IdfViewer <- R6Class(
                     "fit_selection",
                     "projection",
                     "range_mode",
+                    "result_filter",
                     "show_all",
                     "play",
                     "pause",
@@ -650,6 +655,7 @@ IdfViewer <- R6Class(
                     "wireframe",
                     "x_ray",
                     "window_style",
+                    "back_faces",
                     "axis",
                     "ground"
                 )

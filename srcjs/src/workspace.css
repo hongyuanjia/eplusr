@@ -166,3 +166,34 @@
 
 /* Keep the idle hierarchy compact; expose exclusion details during search or keyboard inspection. */
 .eplusr-viewer__tree:not([data-searching="true"]) .eplusr-viewer__tree-row:not(:focus-within) .eplusr-viewer__tree-reason { display: none; }
+
+/* Native thumbs filter values while the quantitative palette remains fixed beneath them. */
+.eplusr-viewer__value-track { position: relative; height: 20px; margin-block: 10px 2px; }
+.eplusr-viewer .eplusr-viewer__value-track input[type="range"] { position: absolute; inset: -8px 0 auto; width: 100%; min-width: 0; height: 36px; margin: 0; padding: 0; border: 0; appearance: none; background: transparent; pointer-events: none; }
+.eplusr-viewer__value-track input::-webkit-slider-runnable-track { height: 20px; background: transparent; border: 0; }
+.eplusr-viewer__value-track input::-webkit-slider-thumb { appearance: none; height: 28px; width: 12px; margin-top: -4px; border: 2px solid #536579; border-radius: 4px; background: #fff; pointer-events: auto; cursor: ew-resize; }
+.eplusr-viewer__value-track input::-moz-range-track { height: 20px; background: transparent; border: 0; }
+.eplusr-viewer__value-track input::-moz-range-thumb { height: 24px; width: 8px; border: 2px solid #536579; border-radius: 4px; background: #fff; pointer-events: auto; cursor: ew-resize; }
+.eplusr-viewer__value-track input:focus-visible { z-index: 3; outline: 2px solid #2579c6; outline-offset: 4px; }
+.eplusr-viewer__value-shade { position: absolute; top: 0; height: 100%; background: rgba(243,245,247,.7); pointer-events: none; }
+.eplusr-viewer__value-policy { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.eplusr-viewer__value-actions { display: inline-flex; gap: 2px; }
+.eplusr-viewer .eplusr-viewer__value-actions button { width: 26px; min-width: 26px; min-height: 26px; padding: 3px; border-color: transparent; background: transparent; }
+.eplusr-viewer__source-summary { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+.eplusr-viewer__source-summary p { line-height: 1.5; overflow-wrap: anywhere; }
+.eplusr-viewer--short .eplusr-viewer__legend--result { max-height: 132px; }
+
+/* Persistent legend controls remain grid items when the key docks under a narrow canvas. */
+.eplusr-viewer__result-legend-body { display: contents; }
+.eplusr-viewer__legend--result { max-height: min(230px, 42%); }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result .eplusr-viewer__result-legend-body > :is(.eplusr-viewer__legend-title, .eplusr-viewer__legend-time, .eplusr-viewer__value-track, .eplusr-viewer__legend-labels, .eplusr-viewer__value-policy, .eplusr-viewer__legend-summary) { grid-column: 1 / -1; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result .eplusr-viewer__legend-labels { margin-top: 0; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result { max-height: 146px; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result .eplusr-viewer__result-legend-body > .eplusr-viewer__legend-title { grid-column: 1; margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result .eplusr-viewer__result-legend-body > .eplusr-viewer__legend-time { grid-column: 2; margin: 0; white-space: nowrap; }
+.eplusr-viewer__viewport > .eplusr-viewer__legend--result .eplusr-viewer__value-track { height: 12px; }
+.eplusr-viewer--short .eplusr-viewer__viewport > .eplusr-viewer__legend--result { max-height: 116px; }
+
+/* Double-sided rendering is an explicit inspection choice, never the default view. */
+.eplusr-viewer__back-face-option { display: flex; align-items: center; gap: 6px; margin-block: 10px; font-size: 12px; }
+.eplusr-viewer__back-face-option input[type="checkbox"] { width: 16px; height: 16px; min-height: 16px; margin: 0; padding: 0; }

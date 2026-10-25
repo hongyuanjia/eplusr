@@ -103,7 +103,8 @@ export class ViewerRibbon {
     this.dialog("objects", "Visibility filters", [sections.search]);
     this.dialog("selection", "Selection mode", [viewer.selectionModeSelect.closest("label")]);
     this.dialog("components", "Visible components", [sections.components]);
-    this.dialog("appearance", "Model appearance", [this.field("Color by", viewer.renderSelect), viewer.windowStyleSelect.closest("label")]);
+    this.dialog("value-filter", "Result value filter", [viewer.resultValueFilter.panel]);
+    this.dialog("appearance", "Model appearance", [this.field("Color by", viewer.renderSelect), viewer.windowStyleSelect.closest("label"), viewer.backFaceField]);
     this.dialog("camera", "Camera", [this.field("View", viewer.viewSelect), this.field("Projection", viewer.projectionSelect)]);
     this.dialog("explode", "Exploded view", [viewer.explodeSelect.closest("label"), viewer.explodeSlider]);
     this.dialog("display", "Section plane", [sections.clipping]);
@@ -147,6 +148,8 @@ export class ViewerRibbon {
     const results = this.pages.results;
     this.group(results, "Source").append(this.launcher("Select result data", "data", "results"));
     this.colorScaleButton = this.launcher("Color scale", "colors", "colors");
+    this.valueFilterButton = this.launcher("Filter result values", "filters", "value-filter");
+    this.group(results, "Filter").append(this.valueFilterButton);
     this.group(results, "Appearance").append(this.colorScaleButton, this.launcher("Glass / color by", "glass", "appearance"));
     this.timelineButton = this.button("Timeline", "timeline", () => this.showTimeline(!this.timelineVisible));
     this.timeSettingsButton = this.launcher("Time settings", "time", "time");
@@ -342,7 +345,7 @@ export class ViewerRibbon {
   syncResults() {
     const available = Boolean(this.viewer.resultSet.length);
     this.viewer.timeline.hidden = !available || !this.timelineVisible || this.clean;
-    [this.timelineButton, this.colorScaleButton, this.timeSettingsButton, this.viewer.variableSelect,
+    [this.valueFilterButton, this.timelineButton, this.colorScaleButton, this.timeSettingsButton, this.viewer.variableSelect,
       this.viewer.paletteSelect, this.viewer.rangeModeSelect, this.viewer.aggregationSelect, this.viewer.timeJumpInput]
       .filter(Boolean).forEach(control => { control.disabled = !available; });
     this.timelineButton.setAttribute("aria-pressed", String(available && this.timelineVisible));

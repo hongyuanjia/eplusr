@@ -164,7 +164,7 @@ export class ModelBrowser {
     members.forEach(index => remove ? this.viewer.selected.delete(index) : this.viewer.selected.add(index));
     if (!event.shiftKey) this.anchor = item;
     this.viewer.updateColors();
-    if (!additive) this.viewer.fitView(new Set(members));
+    if (!additive) this.viewer.fitView(new Set(members), {reveal:true});
     this.viewer.emitSelection(); this.focus(item);
   }
 

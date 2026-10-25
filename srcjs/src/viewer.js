@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import {GlazingLayer} from "./glazing.js";
+import {surfaceSide, faceIsVisible} from "./face-visibility.js";
+import {ResultValueFilter, matchesResultValue, validateResultBounds} from "./result-value-filter.js";
 import { doubleClickSelection } from "./selection.js";
 import { componentFor, matchesNameFilter, objectVisibilityReasons } from "./geometry-filter.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -9,7 +12,7 @@ import { ViewerRibbon } from "./ribbon.js";
 import { ViewNavigation } from "./navigation.js";
 import { displayUnit, timeCaption } from "./presentation.js";
 import { ResultQueryPanel } from "./result-query.js";
-import { findSharedBoundaries, sharedBoundaryGroups } from "./shared-boundaries.js";
+import { findSharedBoundaries, sharedBoundaryGroups, mismatchedBoundaryIssues, faceNormals } from "./shared-boundaries.js";
 import { boundaryColor, isGlazing, GLASS_COLOR, GLASS_OPACITY } from "./appearance.js";
 
 // Share familiar action symbols across the toolbar, panel, and playback strip.
@@ -136,6 +139,8 @@ export class IdfViewer {
     this.isolationHistory = [];
     this.hovered = null;
     this.visibleObjects = new Set();
+    this.showBackFaces = false;
+    this.facingObjects = new Set();
     this.componentVisibility = Object.fromEntries(COMPONENTS.map((name) => [name, true]));
     this.zoneFilter = "";
     this.spaceFilter = "";
@@ -152,6 +157,7 @@ export class IdfViewer {
     this.playbackSpeed = 1;
     this.xray = false;
     this.windowStyle = "glass";
+    this.objectNormals = [];
     this.glazingObjects = new Set();
     this.windowParents = new Map();
     this.showWireframe = true;
@@ -252,12 +258,12 @@ export class IdfViewer {
     this.projectionSelect.addEventListener("change", () => this.setProjection(this.projectionSelect.value === "orthographic"));
     this.fitModelButton = element("button", "eplusr-viewer__fit-model", "Fit model");
     this.fitModelButton.type = "button";
-    this.fitModelButton.addEventListener("click", () => this.fitView());
+    this.fitModelButton.addEventListener("click", () => this.fitView(null, {reveal:true}));
     this.fitSelectionButton = element("button", "eplusr-viewer__fit-selection", "Fit selection");
     this.fitSelectionButton.type = "button";
     this.fitSelectionButton.disabled = true;
     this.fitSelectionButton.addEventListener("click", () => {
-      if (this.selected.size) this.fitView(this.selected);
+      if (this.selected.size) this.fitView(this.selected, {reveal:true});
     });
     cameraGroup.append(this.projectionSelect, this.fitModelButton, this.fitSelectionButton);
 
@@ -322,7 +328,13 @@ export class IdfViewer {
     this.nameFilterStatus.id = this.panel.id + "-name-filter-status";
     this.nameFilterStatus.setAttribute("role", "status");
     this.nameFilterStatus.setAttribute("aria-live", "polite");
-    searchSection.body.append(searchRow, this.nameFilterStatus);
+    this.fitVisibleButton = element("button");
+    this.fitVisibleButton.type = "button";
+    buttonIcon(this.fitVisibleButton, "fit", "Fit visible objects", true);
+    this.fitVisibleButton.addEventListener("click", () => this.fitView(null, {reveal:true}));
+    const fitVisibleRow = element("div", "eplusr-viewer__button-row");
+    fitVisibleRow.append(this.fitVisibleButton);
+    searchSection.body.append(searchRow, this.nameFilterStatus, fitVisibleRow);
     this.nameFilterInput.addEventListener("input", () => this.setNameFilter(this.nameFilterInput.value));
     this.nameFilterInput.addEventListener("keydown", event => {
       if (event.key === "Enter") event.preventDefault();
@@ -576,6 +588,13 @@ export class IdfViewer {
     this.tabBodies.results.appendChild(this.resultEmpty);
     this.timeline.appendChild(this.resultStatus);
 
+    const backFaceLabel = element("label", "eplusr-viewer__back-face-option");
+    this.backFaceToggle = element("input"); this.backFaceToggle.type = "checkbox";
+    this.backFaceToggle.setAttribute("aria-label", "Show back faces");
+    this.backFaceToggle.addEventListener("change", () => this.setBackFaces(this.backFaceToggle.checked));
+    backFaceLabel.append(this.backFaceToggle, document.createTextNode(" Show back faces · inspection"));
+    this.backFaceField = backFaceLabel;
+    this.resultValueFilter = new ResultValueFilter(this);
     this.queryPanel = new ResultQueryPanel(this);
     const diagnosticPanel = this.panelSection("Geometry diagnostics", false, "eplusr-viewer__diagnostics");
     this.diagnosticSection = diagnosticPanel.details;
@@ -588,7 +607,7 @@ export class IdfViewer {
       this.showDiagnostics = this.diagnosticToggle.checked;
       this.updateHelpers();
     });
-    showDiagnosticLabel.append(this.diagnosticToggle, document.createTextNode(" Show nearby vertex candidates"));
+    showDiagnosticLabel.append(this.diagnosticToggle, document.createTextNode(" Show issue markers"));
     const onlyDiagnosticLabel = element("label");
     this.diagnosticOnlyToggle = element("input");
     this.diagnosticOnlyToggle.type = "checkbox";
@@ -726,20 +745,30 @@ export class IdfViewer {
     this.edgePositions = float32(payload.geometry?.edge_positions);
     this.edgeObjects = int32(payload.geometry?.edge_objects);
     this.pointPositions = float32(payload.geometry?.point_positions);
+    this.objectNormals = faceNormals(this.objects, this.positions, this.faceObjects);
+    this.showBackFaces = Boolean(payload.options?.back_faces);
+    this.backFaceToggle.checked = this.showBackFaces;
+    this.facingObjects = new Set();
     this.sharedBoundaryPairs = findSharedBoundaries(this.objects, this.positions, this.faceObjects, this.edgePositions, this.edgeObjects);
     this.glazingObjects = new Set(this.objects.flatMap((object,index) => isGlazing(object) ? [index] : []));
     const namedObjects = new Map(this.objects.map((object,index) => [object.name?.toLowerCase(), index]));
     this.windowParents = new Map([...this.glazingObjects].map(index => [index, namedObjects.get(this.objects[index].building_surface_name?.toLowerCase())]));
+    this.glazingLayer?.dispose();
+    this.glazingLayer = new GlazingLayer(this.scene, this.positions, this.faceObjects, this.glazingObjects);
     this.computeObjectMetrics();
     this.setResults(payload.results, false);
     this.diagnostics = {
       ...(payload.diagnostics ?? {}),
       pointPositions: float32(payload.diagnostics?.point_positions),
       objectIndices: int32(payload.diagnostics?.object_indices),
-      issues: payload.diagnostics?.issues ?? []
+      issues: [...(payload.diagnostics?.issues ?? [])]
     };
+    const boundaryIssues = mismatchedBoundaryIssues(this.objects, this.edgePositions, this.edgeObjects);
+    this.diagnostics.issues.push(...boundaryIssues);
+    this.diagnostics.count = this.diagnosticIssues().length;
+    this.diagnostics.enabled ||= boundaryIssues.length > 0;
     this.diagnosticObjectSet = new Set(this.diagnostics.objectIndices ?? []);
-    this.showDiagnostics = Boolean(this.diagnostics.enabled && this.diagnostics.count);
+    this.showDiagnostics = Boolean(payload.diagnostics?.enabled && this.diagnostics.count);
     this.diagnosticOnly = false;
     this.renderBy = payload.options?.render_by ?? "surface_type";
     this.xray = Boolean(payload.options?.x_ray);
@@ -789,9 +818,14 @@ export class IdfViewer {
 
   // Replace numerical result buffers while preserving geometry, camera and selection.
   setResults(payload, update = true) {
+    this.resultValueFilter.error = null;
+    this.resultValueFilter.draft = false;
     this.queryPanel.configure(payload?.query ?? null);
     this.pause();
     this.resultAbortController?.abort();
+    // Keep absolute thresholds when re-querying the same quantity and units (for example another environment).
+    const filterKey = result => JSON.stringify([result.label, result.units]);
+    const retainedFilters = new Map((this.resultSet ?? []).map(result => [filterKey(result), result.visibilityRange]));
     const variablePayloads = payload?.variables ?? (payload ? [payload] : []);
     this.resultSet = variablePayloads.map((result) => {
       const values = float32(result.values);
@@ -804,6 +838,7 @@ export class IdfViewer {
         sourceTimes: [...times],
         sourceRange: [...(result.range ?? finiteRange(values))],
         rangeMode: "all", coverage: 1, manualRange: null, loadedFrame: null,
+        visibilityRange: retainedFilters.get(filterKey(result))?.slice() ?? null,
         aggregation: "frame",
         frameGroups: times.map((_, index) => [index]),
         cache: new Map(),
@@ -822,7 +857,7 @@ export class IdfViewer {
     this.renderBy = this.resultSet.length ? "result" : "surface_type";
     this.renderSelect.value = this.renderBy;
     this.configureResultControls();
-    this.updateColors();
+    this.applyVisibilityChange({preserveSelection: this.results?.mode === "provider" && Boolean(this.results.visibilityRange)});
     if (this.results?.mode === "provider") return this.setTime(0);
   }
 
@@ -835,6 +870,7 @@ export class IdfViewer {
       zone: this.zoneFilter, space: this.spaceFilter, filters: this.effectiveFilters(),
       frame: this.frame, variable: this.resultVariableIndex,
       x_ray: this.xray, wireframe: this.showWireframe, window_style: this.windowStyle,
+      back_faces: this.showBackFaces,
       axis: this.showAxis, ground: this.showGround,
       timeline_visible: !this.timeline.hidden, model_only: Boolean(this.ribbon?.clean),
       ribbon_tab: this.ribbon?.active ?? null,
@@ -845,6 +881,7 @@ export class IdfViewer {
       view: this.viewSelect.value,
       result_query: this.queryPanel.applied ?? null,
       range_mode: this.results?.rangeMode ?? null, result_range: this.results?.range ?? null,
+      result_value_filter: this.results?.visibilityRange ?? null,
       camera: { position: this.camera.position.toArray(), target: this.controls.target.toArray() }
     };
   }
@@ -1024,6 +1061,12 @@ export class IdfViewer {
     if (this.nameFilterInput.value !== name) this.nameFilterInput.value = name;
     this.clearNameFilterButton.hidden = !filters.name;
     this.updateNameFilterStatus();
+    if (this.results?.visibilityRange && this.renderBy === "result") {
+      const bounds = this.results.visibilityRange;
+      chip("Result values: " + (bounds[0] == null ? "−∞" : formatNumber(bounds[0], 6)) + " – " + (bounds[1] == null ? "+∞" : formatNumber(bounds[1], 6)) + " " + displayUnit(this.results.units), () => this.setResultValueFilter(null, null));
+    }
+    this.fitVisibleButton.disabled = !this.visibleObjects.size;
+    this.resultValueFilter.fit.disabled = !this.visibleObjects.size;
     if (filters.type) chip("Types: " + (filters.type.join(", ") || "None"), () => {
       this.remoteFilters.type = null;
       COMPONENTS.forEach((name) => { this.componentVisibility[name] = true; });
@@ -1047,6 +1090,9 @@ export class IdfViewer {
 
   // Clear visibility criteria together while retaining the still-visible selected objects.
   clearFilters() {
+    this.resultValueFilter.error = null;
+    this.resultValueFilter.draft = false;
+    if (this.results) this.results.visibilityRange = null;
     this.remoteFilters = {};
     this.nameFilter = "";
     this.zoneFilter = "";
@@ -1168,6 +1214,7 @@ export class IdfViewer {
     this.resultStatus.textContent = this.results ? "" : "No simulation results attached.";
     this.speedSelect.disabled = frames < 2;
     this.syncRangeControls();
+    this.resultValueFilter.sync(this.results, resultGradient(this.results?.palette));
     const diagnosticCount = Number(this.diagnostics?.count ?? 0);
     this.diagnosticSection.style.display = "block";
     this.diagnosticEmpty.hidden = Boolean(this.diagnostics?.enabled);
@@ -1217,6 +1264,7 @@ export class IdfViewer {
     const previous = this.diagnosticTypeSelect.value;
     const types = [...new Set(issues.map((issue) => issue.type))].sort();
     const labels = {
+      boundary_mismatch: "Shared boundary mismatch",
       near_vertex: "Adjacency gaps",
       nonplanar: "Non-planar surfaces",
       duplicate: "Duplicate surfaces",
@@ -1280,13 +1328,44 @@ export class IdfViewer {
     return objectVisibilityReasons(this.objects[objectIndex], objectIndex, {
       filters: this.effectiveFilters(), componentVisibility: this.componentVisibility,
       hidden: this.hidden, isolated: this.isolated, diagnosticOnly: this.diagnosticOnly,
-      diagnosticObjectSet: this.diagnosticObjectSet
+      diagnosticObjectSet: this.diagnosticObjectSet,
+      resultValueAllowed: this.renderBy !== "result" || matchesResultValue(this.currentResultValue(objectIndex), this.results?.visibilityRange)
     });
   }
 
   // A model object is visible only when every active criterion allows it.
   isObjectVisible(objectIndex) {
     return this.visibilityReasons(objectIndex).length === 0;
+  }
+
+  // Use immutable source winding and the actual camera type for fills, outlines and picking.
+  isObjectFacingCamera(index) {
+    if (index == null) return false;
+    const center = this.objectCenters?.[index]?.clone().add(this.currentOffsets?.[index] ?? this.objectOffset(index));
+    if (!center) return true;
+    return faceIsVisible(this.objectNormals?.[index], center, this.camera.position,
+      this.camera.isOrthographicCamera ? this.camera.getWorldDirection(new THREE.Vector3()) : null,
+      {backFaces: this.showBackFaces, paired: Boolean(this.activeSharedBoundaries?.[index]), normalMode: this.renderBy === "normal"});
+  }
+
+  // Camera movement must remove back-facing boundary and highlight lines as well as filled triangles.
+  syncFacingOutlines() {
+    if (!this.mesh || !this.objectNormals) return;
+    const current = new Set([...this.visibleObjects].filter(index => this.isObjectFacingCamera(index)));
+    if (current.size === this.facingObjects.size && [...current].every(index => this.facingObjects.has(index))) return;
+    this.facingObjects = current;
+    this.rebuildEdges(); this.rebuildSelectionOutline(); this.updateHoverOutline();
+    if (this.hovered != null && !current.has(this.hovered)) {
+      this.hovered = null; this.updateColors();
+    }
+    this.refreshTooltip();
+  }
+
+  // Restore double-sided rendering only when the user explicitly requests a geometry inspection.
+  setBackFaces(on) {
+    this.showBackFaces = Boolean(on); this.backFaceToggle.checked = this.showBackFaces;
+    this.updateColors(); this.rebuildEdges(); this.rebuildSelectionOutline();
+    this.root.dispatchEvent(new CustomEvent("eplusr-view"));
   }
 
   // Rebuild only the visible non-indexed triangles, preserving a direct face-to-ID lookup.
@@ -1319,6 +1398,7 @@ export class IdfViewer {
     const box = this.visibleBox();
     this.mesh.geometry.boundingBox = box;
     this.mesh.geometry.boundingSphere = box.getBoundingSphere(new THREE.Sphere());
+    this.updateGeometryGroups();
     this.rebuildEdges();
     this.rebuildSelectionOutline();
     this.rebuildPoints();
@@ -1337,6 +1417,8 @@ export class IdfViewer {
     this.glassIndices = this.windowStyle === "glass" && this.renderBy !== "normal" ? this.glazingObjects : new Set();
     const shared = sharedBoundaryGroups(this.faceObjects, this.sharedBoundaryPairs ?? new Int32Array(), this.visibleObjects, this.currentOffsets ?? [], this.glassIndices);
     this.activeSharedBoundaries = shared.active;
+    const visibleGlass = new Set([...this.glassIndices].filter(index => this.visibleObjects.has(index)));
+    this.glazingLayer?.update(visibleGlass, this.currentOffsets ?? [], shared.active, this.clipEnabled ? [this.clipPlane] : [], this.showBackFaces);
     this.mesh.geometry.clearGroups();
     for (const group of shared.groups) this.mesh.geometry.addGroup(group.start, group.count, group.materialIndex);
   }
@@ -1368,7 +1450,7 @@ export class IdfViewer {
     }
     this.surfaceMaterial = new THREE.MeshStandardMaterial({
       vertexColors: true,
-      side: THREE.DoubleSide,
+      side: THREE.FrontSide,
       // Separate filled surfaces from their exact boundary lines in depth, without moving vertices.
       polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
       roughness: 0.92,
@@ -1379,19 +1461,21 @@ export class IdfViewer {
     });
     this.resultMaterial = new THREE.MeshBasicMaterial({
       polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
-      vertexColors: true, side: THREE.DoubleSide, transparent: this.xray,
+      vertexColors: true, side: THREE.FrontSide, transparent: this.xray,
       opacity: this.xray ? 0.34 : 1, depthWrite: !this.xray
     });
     this.pairedSurfaceMaterial = this.surfaceMaterial.clone();
-    this.pairedSurfaceMaterial.side = THREE.BackSide;
+    this.pairedSurfaceMaterial.side = THREE.FrontSide;
     this.pairedResultMaterial = this.resultMaterial.clone();
-    this.pairedResultMaterial.side = THREE.BackSide;
+    this.pairedResultMaterial.side = THREE.FrontSide;
     // Neutral glass remains independent of scientific result colors and never occludes the interior depth.
-    this.glassMaterial = new THREE.MeshBasicMaterial({ color: GLASS_COLOR, side: THREE.DoubleSide,
+    this.glassMaterial = new THREE.MeshBasicMaterial({ color: GLASS_COLOR, side: THREE.FrontSide,
       transparent: true, opacity: GLASS_OPACITY, depthWrite: false,
       polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
     this.pairedGlassMaterial = this.glassMaterial.clone();
-    this.pairedGlassMaterial.side = THREE.BackSide;
+    this.pairedGlassMaterial.side = THREE.FrontSide;
+    this.glassMaterial.visible = false;
+    this.pairedGlassMaterial.visible = false;
     this.material = this.surfaceMaterial;
     this.pairedMaterial = this.pairedSurfaceMaterial;
     this.mesh = new THREE.Mesh(geometry, [this.material, this.pairedMaterial, this.glassMaterial, this.pairedGlassMaterial]);
@@ -1426,7 +1510,7 @@ export class IdfViewer {
     for (let segment = 0; segment < this.edgeObjects.length; segment += 1) {
       const objectIndex = this.edgeObjects[segment];
       const offset = segment * 6;
-      if (!this.isObjectVisible(objectIndex)) {
+      if (!this.isObjectVisible(objectIndex) || !this.isObjectFacingCamera(objectIndex)) {
         positions.fill(0, offset, offset + 6);
         continue;
       }
@@ -1439,12 +1523,12 @@ export class IdfViewer {
     this.requestRender();
   }
 
-  // Draw selected polygon boundaries above occluding geometry so search and multi-selection stay visible.
+  // Highlight only eligible visible-side boundaries; explicit X-ray/inspection may expose hidden outlines.
   rebuildSelectionOutline() {
     const positions = [];
     for (let segment = 0; segment < this.edgeObjects.length; segment += 1) {
       const objectIndex = this.edgeObjects[segment];
-      if (!this.selected.has(objectIndex) || !this.isObjectVisible(objectIndex)) continue;
+      if (!this.selected.has(objectIndex) || !this.isObjectVisible(objectIndex) || !this.isObjectFacingCamera(objectIndex)) continue;
       const offset = segment * 6;
       const translation = this.currentOffsets?.[objectIndex] ?? new THREE.Vector3();
       for (let value = 0; value < 6; value += 1) {
@@ -1460,7 +1544,7 @@ export class IdfViewer {
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     this.selectionOutline = new THREE.LineSegments(
       geometry,
-      new THREE.LineBasicMaterial({ color: "#ff8a00", depthTest: false, transparent: true, opacity: 1 })
+      new THREE.LineBasicMaterial({ color: "#ff8a00", depthTest: !this.showBackFaces && !this.xray, depthWrite: false, transparent: true, opacity: 1 })
     );
     this.selectionOutline.renderOrder = 20;
     this.scene.add(this.selectionOutline);
@@ -1542,9 +1626,11 @@ export class IdfViewer {
     }
     colorAttribute.needsUpdate = true;
     this.updateEdgeColors(objectColors);
-    this.backMesh.visible = this.renderBy === "normal";
-    for (const [material, side] of [[this.material, this.renderBy === "normal" ? THREE.FrontSide : THREE.DoubleSide],
-      [this.pairedMaterial, this.renderBy === "normal" ? THREE.FrontSide : THREE.BackSide]]) {
+    const normalMode = this.renderBy === "normal";
+    this.backMesh.visible = normalMode && this.showBackFaces;
+    for (const [material, paired] of [[this.material, false], [this.pairedMaterial, true],
+      [this.glassMaterial, false], [this.pairedGlassMaterial, true]]) {
+      const side = surfaceSide(this.showBackFaces, paired, normalMode);
       if (material.side !== side) { material.side = side; material.needsUpdate = true; }
     }
     this.updateLegend();
@@ -1593,6 +1679,9 @@ export class IdfViewer {
       material.depthWrite = !this.xray;
       material.needsUpdate = true;
     }
+    for (const outline of [this.selectionOutline, this.hoverOutline]) {
+      if (outline) outline.material.depthTest = !this.showBackFaces && !this.xray;
+    }
     this.requestRender();
   }
 
@@ -1640,6 +1729,7 @@ export class IdfViewer {
     this.pairedMaterial.clippingPlanes = planes;
     this.glassMaterial.clippingPlanes = planes;
     this.pairedGlassMaterial.clippingPlanes = planes;
+    this.glazingLayer?.setClipping(planes);
     this.backMaterial.clippingPlanes = planes;
     this.edges.material.clippingPlanes = planes;
     if (this.selectionOutline) this.selectionOutline.material.clippingPlanes = planes;
@@ -1680,7 +1770,31 @@ export class IdfViewer {
     this.requestRender();
   }
 
-  // Update update legend for this viewer instance.
+  // Allocate a persistent quantitative legend so native range thumbs retain focus during filtering.
+  buildResultLegend() {
+    const root = element("div", "eplusr-viewer__result-legend-body");
+    const title = element("div", "eplusr-viewer__legend-title");
+    const time = element("div", "eplusr-viewer__legend-time");
+    const labels = element("div", "eplusr-viewer__legend-labels");
+    for (let index = 0; index < 5; index++) labels.append(element("span", "eplusr-viewer__legend-tick"));
+    const policyRow = element("div", "eplusr-viewer__value-policy");
+    const policy = element("span", "eplusr-viewer__legend-policy");
+    policyRow.append(policy, this.resultValueFilter.actions);
+    const missingRow = element("div", "eplusr-viewer__legend-item");
+    const unit = element("span", "eplusr-viewer__legend-unit");
+    const missing = element("span", "eplusr-viewer__legend-swatch");
+    missingRow.append(unit, missing, element("span", "", "Missing"));
+    const glass = element("div", "eplusr-viewer__legend-item");
+    const glassSwatch = element("span", "eplusr-viewer__legend-swatch");
+    glassSwatch.style.background = GLASS_COLOR;
+    glass.append(glassSwatch, element("span", "", "Glass · not color mapped"));
+    const marker = element("div", "eplusr-viewer__legend-marker");
+    const selection = element("div", "eplusr-viewer__legend-summary");
+    root.append(title, time, this.resultValueFilter.track, labels, policyRow, this.resultValueFilter.summary, missingRow, glass, marker, selection);
+    this.resultLegend = {root, title, time, labels, policy, missing, unit, glass, marker, selection};
+  }
+
+  // Refresh legend text while retaining its interactive value filter.
   updateLegend() {
     this.legend.classList.toggle("eplusr-viewer__legend--result", this.renderBy === "result");
     if (this.renderBy === "result" && !this.results) {
@@ -1689,42 +1803,35 @@ export class IdfViewer {
     }
     this.legend.style.removeProperty("display");
     this.legend.classList.add("eplusr-viewer__legend--visible");
-    this.legend.innerHTML = "";
     if (this.renderBy === "result") {
       const range = this.results.range ?? finiteRange(this.results.values);
-      this.legend.appendChild(element("div", "eplusr-viewer__legend-title", `${this.results.label ?? "Result"}${this.results.units ? ` (${displayUnit(this.results.units)})` : ""}`));
-      this.legend.appendChild(element("div", "eplusr-viewer__legend-time", String(this.results.times[this.frame] ?? "")));
-      const gradient = element("div", "eplusr-viewer__legend-gradient");
-      gradient.style.background = `linear-gradient(90deg, ${resultGradient(this.results.palette)})`;
-      const labels = element("div", "eplusr-viewer__legend-labels");
-      [0, 0.25, 0.5, 0.75, 1].forEach((amount) => {
-        const tick = element("span", "eplusr-viewer__legend-tick", formatNumber(range[0] + amount * (range[1] - range[0]), 4));
-        tick.title = String(range[0] + amount * (range[1] - range[0]));
-        labels.appendChild(tick);
+      if (!this.resultLegend) this.buildResultLegend();
+      const refs = this.resultLegend;
+      if (this.legend.firstChild !== refs.root) this.legend.replaceChildren(refs.root);
+      refs.title.textContent = (this.results.label ?? "Result") + (this.results.units ? " (" + displayUnit(this.results.units) + ")" : "");
+      refs.time.textContent = String(this.results.times[this.frame] ?? "");
+      [...refs.labels.children].forEach((tick, index) => {
+        const value = range[0] + index / 4 * (range[1] - range[0]);
+        tick.textContent = formatNumber(value, 4); tick.title = String(value);
       });
       const policies = { all: "All frames · fixed", frame: "Current frame", manual: "Manual range" };
-      this.legend.append(gradient, labels, element("div", "eplusr-viewer__legend-policy", policies[this.results.rangeMode] + (this.results.coverage < 1 ? " · " + Math.round(this.results.coverage * 100) + "%" : "")));
-      const missing = element("div", "eplusr-viewer__legend-item");
-      const missingSwatch = element("span", "eplusr-viewer__legend-swatch");
-      missingSwatch.style.background = this.results.missingColor ?? "#b8bdc5";
-      // Short IDE panes keep units and the missing-value key even when the long title is hidden.
-      missing.append(element("span", "eplusr-viewer__legend-unit", displayUnit(this.results.units)), missingSwatch, element("span", "", "Missing"));
-      this.legend.appendChild(missing);
-      this.appendGlassLegend();
-      if (this.selected.size === 1) {
-        const value = this.currentResultValue([...this.selected][0]);
-        if (Number.isFinite(value)) {
-          const amount = range[1] === range[0] ? 0.5 : Math.max(0, Math.min(1, (value - range[0]) / (range[1] - range[0])));
-          const marker = element("div", "eplusr-viewer__legend-marker", formatNumber(value));
-          marker.style.left = `${amount * 100}%`;
-          this.legend.appendChild(marker);
-        }
-      } else if (this.selected.size > 1) {
-        const stats = this.selectionResultStats([...this.selected]);
-        if (stats) this.legend.appendChild(element("div", "eplusr-viewer__legend-summary", `Selected: ${formatNumber(stats.minimum)} – ${formatNumber(stats.maximum)}, mean ${formatNumber(stats.mean)}`));
+      refs.policy.textContent = policies[this.results.rangeMode] + (this.results.coverage < 1 ? " · " + Math.round(this.results.coverage * 100) + "%" : "");
+      refs.missing.style.background = this.results.missingColor ?? "#b8bdc5";
+      refs.unit.textContent = displayUnit(this.results.units);
+      refs.glass.hidden = this.windowStyle !== "glass" || ![...this.glazingObjects].some(index => this.isObjectVisible(index));
+      const stats = this.selected.size > 1 ? this.selectionResultStats([...this.selected]) : null;
+      refs.selection.hidden = !stats;
+      refs.selection.textContent = stats ? "Selected: " + formatNumber(stats.minimum) + " – " + formatNumber(stats.maximum) + ", mean " + formatNumber(stats.mean) : "";
+      const value = this.selected.size === 1 ? this.currentResultValue([...this.selected][0]) : NaN;
+      refs.marker.hidden = !Number.isFinite(value);
+      if (Number.isFinite(value)) {
+        refs.marker.textContent = formatNumber(value);
+        refs.marker.style.left = (range[1] === range[0] ? 50 : Math.max(0, Math.min(100, (value - range[0]) / (range[1] - range[0]) * 100))) + "%";
       }
+      this.resultValueFilter.sync(this.results, resultGradient(this.results.palette));
       return;
     }
+    this.legend.replaceChildren();
 
     const titles = {
       surface_type: "Surface type",
@@ -1736,7 +1843,7 @@ export class IdfViewer {
     };
     this.legend.appendChild(element("div", "eplusr-viewer__legend-title", titles[this.renderBy] ?? "Categories"));
     if (this.renderBy === "normal") {
-      [["#f4f5f7", "Front face"], ["#d34747", "Back face"]].forEach(([color, label]) => {
+      [["#f4f5f7", "Front face"], ...(this.showBackFaces ? [["#d34747", "Back face"]] : [])].forEach(([color, label]) => {
         const row = element("div", "eplusr-viewer__legend-item");
         const swatch = element("span", "eplusr-viewer__legend-swatch");
         swatch.style.background = color;
@@ -1778,10 +1885,11 @@ export class IdfViewer {
     if (value === "result" && !this.results) return;
     this.renderBy = value;
     this.renderSelect.value = value;
-    this.updateColors();
+    const pending = this.results?.mode === "provider" && this.results.loadedFrame !== this.frame;
+    this.applyVisibilityChange({preserveSelection: pending});
   }
 
-  // Switch variables without rebuilding geometry; provider variables fetch only their active frame.
+  // Switch variables while preserving the camera and each variable’s numerical visibility interval.
   async setResultVariable(index) {
     if (!this.resultSet.length) return;
     this.pause();
@@ -1792,9 +1900,33 @@ export class IdfViewer {
     this.setRenderBy("result");
     if (this.results.mode === "provider") await this.setTime(this.frame);
     else {
-      this.updateColors();
-      this.updateSelectionPanel();
+      this.updateResultView();
     }
+  }
+
+  // Validate numeric filtering independently from color-scale normalization and retain the current camera.
+  setResultValueFilter(minimum, maximum) {
+    if (!this.results) return;
+    let bounds;
+    try { bounds = validateResultBounds(minimum, maximum); }
+    catch (error) { this.resultValueFilter.fail(error.message); return; }
+    this.resultValueFilter.error = null;
+    this.resultValueFilter.draft = false;
+    this.results.visibilityRange = bounds;
+    if (bounds) { this.renderBy = "result"; this.renderSelect.value = "result"; }
+    if (bounds) this.updateResultView();
+    else this.applyVisibilityChange();
+    this.root.dispatchEvent(new CustomEvent("eplusr-view"));
+  }
+
+  // Reconcile value-dependent geometry on every loaded, cached, embedded or pending frame.
+  updateResultView() {
+    if (this.renderBy === "result" && this.results?.visibilityRange) {
+      // A pending frame has unknown values, not confirmed exclusions. Keep selection until it arrives.
+      const pending = this.results.mode === "provider" && this.results.loadedFrame !== this.frame;
+      this.applyVisibilityChange({preserveSelection: pending});
+    }
+    else { this.updateColors(); this.updateSelectionPanel(); }
   }
 
   // Update set palette for this viewer instance.
@@ -1958,8 +2090,7 @@ export class IdfViewer {
     this.configureResultControls();
     if (this.results.mode === "provider") await this.setTime(0);
     else {
-      this.updateColors();
-      this.updateSelectionPanel();
+      this.updateResultView();
     }
   }
 
@@ -2003,8 +2134,7 @@ export class IdfViewer {
         requestedResult.values = requestedResult.cache.get(cacheKey);
         requestedResult.loadedFrame = requestedFrame;
         this.root.classList.remove("eplusr-viewer--error", "eplusr-viewer--loading");
-        this.updateColors();
-        this.updateSelectionPanel();
+        this.updateResultView();
         this.resultStatus.textContent = `Loaded ${requestedResult.times[requestedFrame]}.`;
         this.root.dispatchEvent(new CustomEvent("eplusr-frame"));
         return;
@@ -2016,8 +2146,7 @@ export class IdfViewer {
       this.root.classList.remove("eplusr-viewer--error");
       this.root.classList.add("eplusr-viewer--loading");
       this.resultStatus.textContent = `Loading ${requestedResult.times[requestedFrame]}…`;
-      this.updateColors();
-      this.updateSelectionPanel();
+      this.updateResultView();
       try {
         const response = await fetch(
           `${requestedResult.endpoint}${separator}variable=${encodeURIComponent(requestedResult.variable)}&frames=${encodeURIComponent(frames.join(","))}`,
@@ -2046,8 +2175,7 @@ export class IdfViewer {
         }
       }
     }
-    this.updateColors();
-    this.updateSelectionPanel();
+    this.updateResultView();
     this.root.dispatchEvent(new CustomEvent("eplusr-frame"));
   }
 
@@ -2267,13 +2395,22 @@ export class IdfViewer {
   }
 
   // Fit geometry to the unobstructed canvas at its current aspect ratio and viewing direction.
-  fitView(objectIndices = null) {
+  fitView(objectIndices = null, {reveal = false} = {}) {
     this.stopNavigationMotion();
     const box = this.visibleBox(objectIndices);
     const center = box.getCenter(new THREE.Vector3());
     const radius = Math.max(0.5, box.getSize(new THREE.Vector3()).length() / 2);
     const direction = this.camera.position.clone().sub(this.controls.target).normalize();
     if (direction.lengthSq() < 0.5) direction.set(1, -1, 0.8).normalize();
+    const targets = [...(objectIndices ?? this.visibleObjects)].filter(index => this.objectNormals?.[index] && this.isObjectVisible(index));
+    if (reveal && !this.showBackFaces && targets.length && !targets.some(index => this.isObjectFacingCamera(index))) {
+      // An explicit Fit must reveal a selected back-facing sheet; standard axis views keep their direction.
+      const normal = targets.reduce((sum,index) => sum.add(new THREE.Vector3().fromArray(this.objectNormals[index])), new THREE.Vector3());
+      if (normal.lengthSq() < 1e-9) normal.fromArray(this.objectNormals[targets[0]]);
+      direction.copy(normal).normalize();
+      if (Math.abs(direction.dot(this.camera.up)) > 0.9999) direction.y -= 1e-6;
+      direction.normalize(); this.viewSelect.value = "custom"; this.presetQuaternion = null;
+    }
     this.resize();
     const vertical = THREE.MathUtils.degToRad(this.perspectiveCamera.fov / 2);
     const horizontal = Math.atan(Math.tan(vertical) * this.perspectiveCamera.aspect);
@@ -2311,6 +2448,9 @@ export class IdfViewer {
 
   // Restore every visibility control and clear transient search, selection, and isolation state.
   showAll() {
+    this.resultValueFilter.error = null;
+    this.resultValueFilter.draft = false;
+    if (this.results) this.results.visibilityRange = null;
     this.remoteFilters = {};
     this.nameFilter = "";
     this.isolated = null;
@@ -2400,7 +2540,7 @@ export class IdfViewer {
         this.rebuildGeometry();
         this.emitSelection();
       }
-      if (event.key.toLowerCase() === "f") this.fitView(this.selected.size ? this.selected : null);
+      if (event.key.toLowerCase() === "f") this.fitView(this.selected.size ? this.selected : null, {reveal:true});
       if (event.key.toLowerCase() === "i") this.isolateSelection();
       if (event.key.toLowerCase() === "m") {
         const enabled = !this.measureMode;
@@ -2422,8 +2562,12 @@ export class IdfViewer {
     this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const intersection = this.raycaster.intersectObject(this.mesh, false).find((hit) =>
-      !this.clipEnabled || this.clipPlane.distanceToPoint(hit.point) >= -1e-6);
+    const targets = this.backMesh.visible ? [this.mesh, this.backMesh] : [this.mesh];
+    const intersection = this.raycaster.intersectObjects(targets, false).find((hit) => {
+      const index = this.visibleFaceObjects[hit.faceIndex];
+      return this.isObjectVisible(index) && this.isObjectFacingCamera(index) &&
+        (!this.clipEnabled || this.clipPlane.distanceToPoint(hit.point) >= -1e-6);
+    });
     if (!intersection || intersection.faceIndex === undefined) return null;
     const objectIndex = this.visibleFaceObjects[intersection.faceIndex];
     return objectIndex === undefined ? null : { objectIndex, point: intersection.point.clone() };
@@ -2442,7 +2586,7 @@ export class IdfViewer {
 
   // Repaint the numeric probe when time, variable, range, selection, or visibility changes.
   refreshTooltip() {
-    if (this.hovered === null || !this.isObjectVisible(this.hovered) || !this.hoverPosition) {
+    if (this.hovered === null || !this.isObjectVisible(this.hovered) || !this.isObjectFacingCamera(this.hovered) || !this.hoverPosition) {
       this.tooltip.style.display = "none";
       return;
     }
@@ -2468,14 +2612,14 @@ export class IdfViewer {
   // Hover boundaries provide feedback without changing a quantitative surface fill.
   updateHoverOutline() {
     const index = this.hovered;
-    const key = index + ":" + this.selected.has(index) + ":" + this.explodeAmount + ":" + this.explodeMode + ":" + this.visibleObjects.has(index);
+    const key = this.isObjectFacingCamera(index) + ":" + index + ":" + this.selected.has(index) + ":" + this.explodeAmount + ":" + this.explodeMode + ":" + this.visibleObjects.has(index);
     if (key === this.hoverOutlineKey) return;
     this.hoverOutlineKey = key;
     this.hoverOutline?.geometry.dispose();
     this.hoverOutline?.material.dispose();
     if (this.hoverOutline) this.scene.remove(this.hoverOutline);
     this.hoverOutline = null;
-    if (index === null || this.selected.has(index) || !this.isObjectVisible(index)) return;
+    if (index === null || this.selected.has(index) || !this.isObjectVisible(index) || !this.isObjectFacingCamera(index)) return;
     const positions = [];
     const translation = this.currentOffsets?.[index] ?? new THREE.Vector3();
     for (let segment = 0; segment < this.edgeObjects.length; segment++) {
@@ -2486,7 +2630,7 @@ export class IdfViewer {
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    this.hoverOutline = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: "#3874a8", depthTest: false }));
+    this.hoverOutline = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: "#3874a8", depthTest: !this.showBackFaces && !this.xray, depthWrite: false }));
     this.hoverOutline.material.clippingPlanes = this.clipEnabled ? [this.clipPlane] : [];
     this.hoverOutline.renderOrder = 19;
     this.scene.add(this.hoverOutline);
@@ -2843,12 +2987,14 @@ export class IdfViewer {
     if (command === "time") this.setTime(args.frame ?? 0).catch((error) => this.reportResultError(error));
     if (command === "variable") this.setResultVariable(args.index ?? 0).catch((error) => this.reportResultError(error));
     if (command === "render_by") this.setRenderBy(args.value);
+    if (command === "back_faces") this.setBackFaces(args.on);
     if (command === "window_style") this.setWindowStyle(args.value);
     if (command === "view") this.setView(args.value ?? "iso");
-    if (command === "fit") this.fitView(this.selected.size ? this.selected : null);
-    if (command === "fit_model") this.fitView();
-    if (command === "fit_selection" && this.selected.size) this.fitView(this.selected);
+    if (command === "fit") this.fitView(this.selected.size ? this.selected : null, {reveal:true});
+    if (command === "fit_model") this.fitView(null, {reveal:true});
+    if (command === "fit_selection" && this.selected.size) this.fitView(this.selected, {reveal:true});
     if (command === "projection") this.setProjection(args.value === "orthographic");
+    if (command === "result_filter") this.setResultValueFilter(args.minimum ?? null, args.maximum ?? null);
     if (command === "range_mode") this.setRangeMode(args.value);
     if (command === "show_all") this.showAll();
     if (command === "play") this.play(args.speed ?? this.playbackSpeed);
@@ -2970,6 +3116,7 @@ export class IdfViewer {
     this.animationFrame = window.requestAnimationFrame(() => this.animate());
     const controlsChanged = this.controls.update();
     if (controlsChanged || this.needsRender) {
+      this.syncFacingOutlines();
       this.updateCameraDepth();
       this.renderer.render(this.scene, this.camera);
       this.syncNavigation();
@@ -3000,6 +3147,7 @@ export class IdfViewer {
       this.measureLine?.geometry, this.clipCapMesh?.geometry, this.ground?.geometry
     ].filter(Boolean).forEach((geometry) => geometry.dispose());
     if (this.northLabel?.material?.map) this.northLabel.material.map.dispose();
+    this.glazingLayer?.dispose();
     this.renderer.dispose();
     this.container.innerHTML = "";
   }
