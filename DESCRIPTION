@@ -45,7 +45,7 @@ Suggests:
     png,
     ps,
     rgl (>= 0.105.13),
-    testthat (>= 3.0.0),
+    testthat (>= 3.3.0),
     units,
     webshot2,
     withr
