@@ -148,8 +148,8 @@ Function:
     tomorrowWeatherAlbedoAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherLiquidPrecipitationAtTime(pii)d state hour timeStepNum;
     currentSimTime(p)d state;
-Variadic: 
-FuncPtr: 
-Enum: 
-Struct: 
-Union: 
+Variadic:
+FuncPtr:
+Enum:
+Struct:
+Union:
