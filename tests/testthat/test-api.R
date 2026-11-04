@@ -3650,9 +3650,10 @@ describe("api", {
         fixture <- testrun__api_fixture()
         on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
         ready <- file.path(fixture$directory, "owner-ready.rds")
+        acknowledged <- file.path(fixture$directory, "owner-ready.ack")
         directory <- file.path(fixture$directory, "disconnected-history")
         owner <- callr::r_bg(
-            function(model, weather, version, directory, ready) {
+            function(model, weather, version, directory, ready, acknowledged) {
                 library(eplusr)
                 plugin <- eplus_plugin(
                     list(finalize = function(api, state, plugin) {
@@ -3677,11 +3678,21 @@ describe("api", {
                 )
                 session$initialize()
                 identity <- session$status()$identity
-                saveRDS(identity, ready)
                 handles <- lapply(
                     c(identity$pid, identity$pipeline_pid),
                     ps::ps_handle
                 )
+                saveRDS(identity, ready)
+                # Keep the peer connected until the parent holds these same process identities.
+                deadline <- Sys.time() + 30
+                while (!file.exists(acknowledged) && Sys.time() < deadline) {
+                    Sys.sleep(0.05)
+                }
+                if (!file.exists(acknowledged)) {
+                    stop(
+                        "Parent did not acknowledge session process identities before disconnection."
+                    )
+                }
                 # Drop the owner's real R socket without exiting its process or invoking processx cleanup.
                 closeAllConnections()
                 deadline <- Sys.time() + 30
@@ -3704,7 +3715,8 @@ describe("api", {
                 fixture$weather,
                 Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
                 directory,
-                ready
+                ready,
+                acknowledged
             ),
             libpath = .libPaths(),
             stdout = "|",
@@ -3732,6 +3744,9 @@ describe("api", {
             },
             add = TRUE
         )
+        expect_true(all(vapply(handles, ps::ps_is_running, logical(1L))))
+        # Releasing the owner only after identity capture prevents successful cleanup racing the observer.
+        writeLines("identities captured", acknowledged)
         # The owner reports worker cleanup before returning, so process exit cannot satisfy this assertion.
         owner$wait(timeout = 45000)
         expect_false(owner$is_alive())
