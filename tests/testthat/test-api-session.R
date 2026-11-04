@@ -934,8 +934,8 @@ test_that("stock session trend source failures and timeouts reap their workers",
     }
 })
 
-# Losing the owner process closes the authenticated socket while trends remain entirely worker-local.
-test_that("stock plugin sessions stop after owner disconnection and early close", {
+# Losing the IPC peer closes the authenticated socket while its owner remains alive through cleanup.
+test_that("stock plugin sessions stop after IPC disconnection and early close", {
     skip_if_not_installed("ps")
     fixture <- testrun__api_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
@@ -966,8 +966,25 @@ test_that("stock plugin sessions stop after owner disconnection and early close"
                 dir = directory
             )
             session$initialize()
-            saveRDS(session$status()$identity, ready)
-            Sys.sleep(120)
+            identity <- session$status()$identity
+            saveRDS(identity, ready)
+            handles <- lapply(
+                c(identity$pid, identity$pipeline_pid),
+                ps::ps_handle
+            )
+            # Drop the owner's real R socket without exiting its process or invoking processx cleanup.
+            closeAllConnections()
+            deadline <- Sys.time() + 30
+            while (
+                any(vapply(handles, ps::ps_is_running, logical(1L))) &&
+                    Sys.time() < deadline
+            ) {
+                Sys.sleep(0.05)
+            }
+            list(
+                alive = vapply(handles, ps::ps_is_running, logical(1L)),
+                finalized = file.exists(file.path(directory, "finalized.rds"))
+            )
         },
         args = list(
             fixture$model,
@@ -1000,17 +1017,13 @@ test_that("stock plugin sessions stop after owner disconnection and early close"
         },
         add = TRUE
     )
-    # kill() targets the owner alone; the paused engine must observe EOF and finish its own cleanup.
-    owner$kill()
-    deadline <- Sys.time() + 20
-    while (
-        any(vapply(handles, ps::ps_is_running, logical(1L))) &&
-            Sys.time() < deadline
-    ) {
-        Sys.sleep(0.05)
-    }
+    # The owner reports worker cleanup before returning, so process exit cannot satisfy this assertion.
+    owner$wait(timeout = 45000)
+    expect_false(owner$is_alive())
+    outcome <- owner$get_result()
+    expect_false(any(outcome$alive))
+    expect_true(outcome$finalized)
     expect_false(any(vapply(handles, ps::ps_is_running, logical(1L))))
-    expect_true(file.exists(file.path(directory, "finalized.rds")))
     plugin <- eplus_plugin(
         list(finalize = function(api, state, plugin) {
             plugin$data$finalized <- TRUE
