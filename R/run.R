@@ -3449,9 +3449,34 @@ run__api_failed_state <- function(state, condition, terminated = FALSE) {
 run__api_kill <- function(process) {
     tryCatch(
         {
+            # Retain descendant identities before signalling, while their parent is still present.
+            descendants <- tryCatch(
+                ps::ps_children(
+                    ps::ps_handle(process$get_pid()),
+                    recursive = TRUE
+                ),
+                no_such_process = function(condition) list(),
+                zombie_process = function(condition) list()
+            )
             process$kill_tree()
+            deadline <- proc.time()[["elapsed"]] + 2
             process$wait(1000)
-            !process$is_alive()
+            # An OS exit notification can precede process-table removal; verify both.
+            if (length(descendants)) {
+                remaining <- max(0, deadline - proc.time()[["elapsed"]])
+                ps::ps_wait(descendants, as.integer(1000 * remaining))
+            }
+            # Poll the same captured identities, including any exited but unreaped process.
+            alive <- function() {
+                any(vapply(descendants, ps::ps_is_running, logical(1L)))
+            }
+            while (alive() && proc.time()[["elapsed"]] < deadline) {
+                Sys.sleep(min(
+                    0.01,
+                    max(0, deadline - proc.time()[["elapsed"]])
+                ))
+            }
+            !process$is_alive() && !alive()
         },
         error = function(condition) FALSE
     )

@@ -1873,8 +1873,14 @@ describe("run-api", {
     })
 
     test_that("API tree shutdown remains bounded and reports failures explicitly", {
+        # Keep this external-process seam isolated; actual descendants are checked below.
+        local_mocked_bindings(
+            ps_children = function(...) list(),
+            .package = "ps"
+        )
         calls <- character()
         process <- list(
+            get_pid = function() Sys.getpid(),
             kill_tree = function() calls <<- c(calls, "tree"),
             wait = function(timeout) {
                 expect_identical(timeout, 1000)

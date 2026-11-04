@@ -34,6 +34,7 @@ Imports:
     jsonlite,
     lubridate,
     processx (>= 3.2.0),
+    ps (>= 1.8.0),
     R6,
     S7 (>= 0.2.1),
     stringi
@@ -43,7 +44,6 @@ Suggests:
     hms,
     decido,
     png,
-    ps,
     rgl (>= 0.105.13),
     testthat (>= 3.3.0),
     units,
