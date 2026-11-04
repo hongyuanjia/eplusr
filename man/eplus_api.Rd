@@ -55,11 +55,17 @@ error flag. \code{get_api_data(state)} copies a data frame and uses \code{freeAP
 \code{list_available_api_data_csv()} returns a character string reconstructed from
 that safely released data, without calling the unfreeable native CSV allocator.
 Its \code{plugin_only} column identifies global/trend methods available only to
-executable-hosted R plugins. Their handles remain state- and kind-bound.
+executable-hosted R plugins. For rows with \code{managed_plugin_trend = TRUE},
+\code{status} and \code{plugin_only} describe the native binding; declared host R trends
+provide separate conditional managed support. Their handles remain state-
+and kind-bound.
 Missing globals return a negative handle without entering the native fatal path;
 negative plugin handles cannot be used for reading or writing. Trend aggregates
-require \code{count >= 2}, matching stock 26.1/26.2. \code{get_trend_value()} remains disabled:
-the native upper index check permits an out-of-bounds read.
+require \code{count >= 2}, matching stock 26.1/26.2. For native plugin handles,
+\code{get_trend_value()} remains disabled:
+the native upper index check permits an out-of-bounds read. Separately,
+\code{\link[=eplus_plugin]{eplus_plugin()}} can declare bounded R-managed trends with safe lookup and
+indexed reads through these same method names, without PythonPlugin objects.
 
 \code{callback_register_external_hvac_manager()} uses the same callback safety
 boundary as other runtime hooks, but replaces the native HVAC manager entirely.

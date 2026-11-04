@@ -4,7 +4,7 @@
 \alias{eplus_plugin}
 \title{Define an R plugin hosted by eplusr}
 \usage{
-eplus_plugin(hooks, data = list(), warmup = FALSE)
+eplus_plugin(hooks, data = list(), warmup = FALSE, trends = list())
 }
 \arguments{
 \item{hooks}{Named list of functions \verb{function(api, state, plugin)}. Names
@@ -15,6 +15,11 @@ are supported state callback names from \code{eplus_api()$runtime}, without the
 
 \item{warmup}{Whether timestep hooks also run during simulation warmup.
 Environment, input and sizing lifecycle hooks are always delivered.}
+
+\item{trends}{Named list of managed histories. Each definition contains a
+numeric \verb{source = function(api, state, plugin)}, positive integer \code{capacity},
+and optional \code{warmup = FALSE}. Sources may read R-owned \code{plugin$data} or
+outputs declared with \code{request_variable()} and read through managed handles.}
 }
 \value{
 An initialization function accepted by \code{backend}.
@@ -50,7 +55,27 @@ plugin summaries. Completed summaries appear in state status and API Job
 metadata under \code{plugins}, including ordinary final \code{data} and hook counts.
 Progress/message callbacks and component hooks requiring additional arguments
 remain available through the low-level API, outside this state-hook interface.
-Host plugins do not enable PythonPlugin global/trend APIs or state cloning.
+Managed trends require no PythonPlugin declarations. Resolve their local names
+with \code{api$exchange$get_trend_handle(state, name)} and read index 1 (newest)
+with \code{get_trend_value(state, handle, index)}. Histories begin empty; invalid
+indices and insufficient valid history raise errors without zero padding.
+Outside a hook, lookup requires a unique name across active bindings. Handles
+cannot cross plugin bindings or states and retire after finalization or reset.
+
+One sample is committed after all end-zone hooks, including updates made by
+those hooks. Reads in the hooks see previously committed history. Collection
+defaults to formal weather simulation, excluding sizing and warmup. An
+explicitly warmup-enabled trend is cleared before formal-weather hooks; every
+new environment clears history. Reads, HVAC iterations and snapshot frequency
+do not add samples. Each finite numeric source is evaluated at the completed
+zone boundary; an engine output retains that output's averaging semantics.
+Plugin status and completed summaries expose each trend's capacity,
+valid_count, total_samples and latest environment/completed-zone time metadata.
+Storage retains at most capacity samples. Source errors and interrupts use the
+same deferred failure and cleanup boundary as hooks.
+
+Native PythonPlugin globals and trends remain distinct; the unsafe native
+trend value reader stays disabled. Host plugins do not enable state cloning.
 }
 \examples{
 \dontrun{
