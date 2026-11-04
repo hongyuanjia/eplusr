@@ -1526,3 +1526,521 @@ test_that("stock executable plugin exports reject unreviewed engines before writ
     )
     expect_false(dir.exists(directory))
 })
+
+# A public stock run supplies deterministic hook values without PythonPlugin objects.
+test_that("host plugin trends commit after hooks and retain bounded valid history", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    plugin <- eplus_plugin(
+        list(
+            initialize = function(api, state, plugin) {
+                plugin$data$n <- 0L
+                plugin$handles$trend <- api$exchange$get_trend_handle(
+                    state,
+                    "sequence"
+                )
+                plugin$data$empty <- tryCatch(
+                    api$exchange$get_trend_value(
+                        state,
+                        plugin$handles$trend,
+                        1L
+                    ),
+                    error = conditionMessage
+                )
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$n <- plugin$data$n + 1L
+                if (plugin$data$n > 1L) {
+                    plugin$data$previous <- api$exchange$get_trend_value(
+                        state,
+                        plugin$handles$trend,
+                        1L
+                    )
+                }
+                gc()
+                if (plugin$data$n == 5L) api$runtime$stop_simulation(state)
+            },
+            finalize = function(api, state, plugin) {
+                plugin$data$values <- vapply(
+                    1:3,
+                    function(index) {
+                        api$exchange$get_trend_value(
+                            state,
+                            plugin$handles$trend,
+                            index
+                        )
+                    },
+                    numeric(1L)
+                )
+                plugin$data$range <- tryCatch(
+                    api$exchange$get_trend_value(
+                        state,
+                        plugin$handles$trend,
+                        4L
+                    ),
+                    error = conditionMessage
+                )
+            }
+        ),
+        trends = list(
+            sequence = list(
+                source = function(api, state, plugin) plugin$data$n,
+                capacity = 3L
+            )
+        )
+    )
+    plugin(api, state)
+    expect_identical(
+        api$state_manager$status(state)$plugins[[
+            1L
+        ]]$trends$sequence$valid_count,
+        0L
+    )
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_match(result$data$empty, "valid history")
+    expect_identical(result$data$previous, 4)
+    expect_equal(result$data$values, c(5, 4, 3))
+    expect_match(result$data$range, "valid history")
+    expect_identical(result$trends$sequence$capacity, 3L)
+    expect_identical(result$trends$sequence$valid_count, 3L)
+    expect_identical(result$trends$sequence$total_samples, 5L)
+    expect_identical(result$trends$sequence$latest$warmup, FALSE)
+})
+
+# State inspection and managed ownership remain available without entering native trend arrays.
+test_that("managed trend handles reject retired cross-state and ambiguous ownership", {
+    withr::local_options(list(eplusr.test.trend.handle = NULL))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    factory <- eplus_plugin(
+        list(
+            initialize = function(api, state, plugin) {
+                if (plugin$id == "1") {
+                    options(
+                        eplusr.test.trend.handle = api$exchange$get_trend_handle(
+                            state,
+                            "n"
+                        )
+                    )
+                } else {
+                    message <- tryCatch(
+                        api$exchange$get_trend_value(
+                            state,
+                            getOption("eplusr.test.trend.handle"),
+                            1L
+                        ),
+                        error = conditionMessage
+                    )
+                    if (
+                        !is.character(message) ||
+                            !grepl("plugin binding", message)
+                    ) {
+                        stop(
+                            "A managed trend crossed plugin binding ownership."
+                        )
+                    }
+                }
+            },
+            begin_new_environment = function(api, state, plugin) {
+                plugin$data$initial <- tryCatch(
+                    api$exchange$get_trend_value(
+                        state,
+                        api$exchange$get_trend_handle(state, "n"),
+                        1L
+                    ),
+                    error = conditionMessage
+                )
+            }
+        ),
+        trends = list(
+            n = list(source = function(api, state, plugin) 1, capacity = 1L)
+        )
+    )
+    factory(api, state)
+    handle <- api$exchange$get_trend_handle(state, "n")
+    other <- api$state_manager$new_state()
+    expect_error(
+        api$exchange$get_trend_value(other, handle, 1L),
+        "another state"
+    )
+    factory(api, state)
+    expect_error(api$exchange$get_trend_handle(state, "n"), "ambiguous")
+    api$state_manager$reset_state(state)
+    expect_error(api$exchange$get_trend_value(state, handle, 1L), "retired")
+    factory(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_match(result$data$initial, "valid history")
+    expect_identical(result$trends$n$capacity, 1L)
+    expect_identical(result$trends$n$valid_count, 1L)
+    expect_identical(result$trends$n$total_samples, 96L)
+    expect_error(api$exchange$get_trend_value(state, handle, 1L), "retired")
+})
+
+# Warmup samples are optional and must disappear before formal-weather hooks observe history.
+test_that("managed trend warmup history clears before formal environment hooks", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    factory <- eplus_plugin(
+        list(
+            after_new_environment_warmup_complete = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$empty <- tryCatch(
+                    api$exchange$get_trend_value(
+                        state,
+                        api$exchange$get_trend_handle(state, "warm"),
+                        1L
+                    ),
+                    error = conditionMessage
+                )
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (
+                    api$exchange$kind_of_sim(state) == 3L &&
+                        !api$exchange$warmup_flag(state)
+                ) {
+                    api$runtime$stop_simulation(state)
+                }
+            }
+        ),
+        trends = list(
+            warm = list(
+                source = function(api, state, plugin) 7,
+                capacity = 2L,
+                warmup = TRUE
+            )
+        )
+    )
+    factory(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_match(result$data$empty, "valid history")
+    expect_identical(result$trends$warm$total_samples, 1L)
+    expect_identical(result$trends$warm$valid_count, 1L)
+    expect_false(result$trends$warm$latest$warmup)
+})
+
+# Source conditions cross the native boundary only after finalization and state cleanup.
+test_that("managed trend source failures preserve conditions and finalize once", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (failure in c("nonfinite", "complex", "error", "interrupt")) {
+        api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+        state <- api$state_manager$new_state()
+        factory <- eplus_plugin(
+            list(finalize = function(api, state, plugin) {
+                plugin$data$finalized <- 1L
+                stop("later cleanup failure")
+            }),
+            trends = list(
+                n = list(
+                    source = function(api, state, plugin) {
+                        if (failure == "complex") {
+                            return(1 + 1i)
+                        }
+                        if (failure == "nonfinite") {
+                            return(Inf)
+                        }
+                        stop(structure(
+                            list(
+                                message = "original trend failure",
+                                call = NULL,
+                                marker = 42L
+                            ),
+                            class = c(
+                                if (failure == "interrupt") {
+                                    "interrupt"
+                                } else {
+                                    "error"
+                                },
+                                "condition"
+                            )
+                        ))
+                    },
+                    capacity = 1L
+                )
+            )
+        )
+        factory(api, state)
+        condition <- tryCatch(
+            api$runtime$run_energyplus(
+                state,
+                c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+            ),
+            error = identity,
+            interrupt = identity
+        )
+        if (failure %in% c("nonfinite", "complex")) {
+            expect_match(conditionMessage(condition), "finite numeric")
+        } else {
+            expect_identical(condition$message, "original trend failure")
+            expect_identical(condition$marker, 42L)
+            expect_s3_class(
+                condition,
+                if (failure == "interrupt") "interrupt" else "error"
+            )
+        }
+        result <- api$state_manager$status(state)$plugins[[1L]]
+        expect_identical(result$data$finalized, 1L)
+        expect_identical(result$calls[["finalize"]], 1L)
+        expect_identical(result$trends$n$valid_count, 0L)
+        expect_identical(result$phase, "failed")
+        api$close()
+    }
+})
+
+# Multiple factories retain their own histories and can source real declared engine outputs.
+test_that("managed trend bindings isolate sources and retain engine output semantics", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    make <- function(offset) {
+        eplus_plugin(
+            list(
+                initialize = function(api, state, plugin) {
+                    plugin$data$n <- offset
+                    api$exchange$request_variable(
+                        state,
+                        "Zone Mean Air Temperature",
+                        "ZONE ONE"
+                    )
+                },
+                end_zone_timestep_after_zone_reporting = function(
+                    api,
+                    state,
+                    plugin
+                ) {
+                    if (api$exchange$kind_of_sim(state) != 3L) {
+                        return(NULL)
+                    }
+                    plugin$data$n <- plugin$data$n + 1L
+                    if (plugin$data$n == offset + 5L) {
+                        api$runtime$stop_simulation(state)
+                    }
+                },
+                finalize = function(api, state, plugin) {
+                    plugin$data$n <- api$exchange$get_trend_value(
+                        state,
+                        api$exchange$get_trend_handle(state, "n"),
+                        1L
+                    )
+                    plugin$data$temperature <- api$exchange$get_trend_value(
+                        state,
+                        api$exchange$get_trend_handle(state, "temperature"),
+                        1L
+                    )
+                }
+            ),
+            trends = list(
+                n = list(
+                    source = function(api, state, plugin) plugin$data$n,
+                    capacity = 1L
+                ),
+                temperature = list(
+                    source = function(api, state, plugin) {
+                        if (is.null(plugin$handles$temperature)) {
+                            plugin$handles$temperature <- api$exchange$get_variable_handle(
+                                state,
+                                "Zone Mean Air Temperature",
+                                "ZONE ONE"
+                            )
+                        }
+                        api$exchange$get_variable_value(
+                            state,
+                            plugin$handles$temperature
+                        )
+                    },
+                    capacity = 2L
+                )
+            )
+        )
+    }
+    make(0L)(api, state)
+    make(100L)(api, state)
+    api$runtime$clear_callbacks()
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    results <- api$state_manager$status(state)$plugins
+    expect_equal(vapply(results, function(x) x$data$n, numeric(1L)), c(5, 105))
+    expect_identical(results[[1L]]$trends$n$total_samples, 5L)
+    expect_identical(results[[2L]]$trends$n$total_samples, 5L)
+    expect_true(is.finite(results[[1L]]$data$temperature))
+    expect_equal(results[[1L]]$data$temperature, results[[2L]]$data$temperature)
+    expect_identical(
+        results[[1L]]$trends$temperature$latest$callback,
+        "end_zone_timestep_after_zone_reporting"
+    )
+})
+
+# New environments clear history before plugin lifecycle hooks; invalid indices never expose slots.
+test_that("managed trends reset before new environments and validate every history index", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    model <- read_idf(fixture$model)
+    model$add(
+        RunPeriod = list(
+            name = "SECOND",
+            begin_month = 1,
+            begin_day_of_month = 2,
+            end_month = 1,
+            end_day_of_month = 2
+        )
+    )
+    model$save(fixture$model, overwrite = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    eplus_plugin(
+        list(
+            initialize = function(api, state, plugin) {
+                plugin$data$environments <- 0L
+                plugin$data$empty <- character()
+            },
+            begin_new_environment = function(api, state, plugin) {
+                plugin$data$environments <- plugin$data$environments + 1L
+                plugin$data$empty <- c(
+                    plugin$data$empty,
+                    tryCatch(
+                        api$exchange$get_trend_value(
+                            state,
+                            api$exchange$get_trend_handle(state, "one"),
+                            1L
+                        ),
+                        error = conditionMessage
+                    )
+                )
+            },
+            finalize = function(api, state, plugin) {
+                handle <- api$exchange$get_trend_handle(state, "one")
+                plugin$data$invalid <- vapply(
+                    list(
+                        0L,
+                        -1L,
+                        1.5,
+                        NA_real_,
+                        Inf,
+                        1 + 1i,
+                        "1",
+                        numeric(),
+                        2L
+                    ),
+                    function(index) {
+                        tryCatch(
+                            api$exchange$get_trend_value(state, handle, index),
+                            error = conditionMessage
+                        )
+                    },
+                    character(1L)
+                )
+                plugin$data$newest <- api$exchange$get_trend_value(
+                    state,
+                    handle,
+                    1L
+                )
+            }
+        ),
+        trends = list(
+            one = list(source = function(api, state, plugin) 7, capacity = 1L)
+        )
+    )(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_gte(result$data$environments, 2L)
+    expect_true(all(grepl("valid history", result$data$empty)))
+    expect_true(all(grepl("valid history", result$data$invalid)))
+    expect_identical(result$data$newest, 7)
+    expect_identical(result$trends$one$total_samples, 96L)
+})
+
+# Declaration validation happens before workers/native calls and capability rows distinguish managed use.
+test_that("host plugin managed trend declarations and capability metadata are explicit", {
+    hook <- list(finalize = function(api, state, plugin) NULL)
+    source <- function(api, state, plugin) 1
+    expect_error(eplus_plugin(hook, trends = list(n = list(source = source))))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(n = list(source = source, capacity = 0L))
+    ))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(n = list(source = source, capacity = Inf))
+    ))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(n = list(source = 1, capacity = 1L))
+    ))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(n = list(source = source, capacity = 1L, warmup = NA))
+    ))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(n = list(source = source, capacity = 1L, extra = TRUE))
+    ))
+    expect_error(eplus_plugin(
+        hook,
+        trends = list(
+            n = list(source = source, capacity = 1L),
+            n = list(source = source, capacity = 1L)
+        )
+    ))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(api$close(), add = TRUE)
+    methods <- api$methods()
+    expect_identical(
+        methods$managed_plugin_trend[
+            methods$method %in%
+                c("get_trend_handle", "get_trend_value")
+        ],
+        c(TRUE, TRUE)
+    )
+    expect_identical(
+        methods$status[methods$method == "get_trend_value"],
+        "unsupported"
+    )
+})

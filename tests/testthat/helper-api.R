@@ -1,3 +1,12 @@
+# Prove the optional bridge before integration fixtures load rdyncall indirectly.
+# Requested stock-engine tests fail visibly here if their selected installation is unavailable.
+if (identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true")) {
+    local({
+        api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+        api$close()
+    })
+}
+
 # Read generated signatures for native stand-ins without loading an optional bridge.
 testapi__signatures <- function() {
     functions <- read.dcf(system.file(
