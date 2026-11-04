@@ -49,6 +49,15 @@
 
 ## Bug fixes
 
+* Count repeated warmup days in EnergyPlus 9.4/9.5 elapsed time so managed
+  trend directions and timestamps remain chronological (#656).
+
+* Confirm worker descendants have exited before returning from interrupted
+  predictions, and preserve accurate API cancellation statuses on Windows (#656).
+
+* Spread session port attempts across the available range and retain the final
+  binding error when no listening socket can be reserved (#656).
+
 * Normalize old readiness results, discovery fields and completed-zone clock
   metadata. Keep unavailable simulation years explicit instead of substituting
   weather-file years. Defer early native stops on affected releases until a safe
