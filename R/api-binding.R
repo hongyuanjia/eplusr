@@ -299,7 +299,7 @@ api_legacy__prepare <- function(ctx, entry, state) {
     # Warmup repeats the initial date; formal simulation starts a fresh relative coordinate.
     clear <- function(state) {
         clock$offset <- 0
-        clock$date <- NULL
+        clock$hour <- NULL
         clock$active <- TRUE
         invisible(NULL)
     }
@@ -316,11 +316,12 @@ api_legacy__prepare <- function(ctx, entry, state) {
         state,
         "callback_begin_zone_timestep_before_init_heat_balance",
         function(state) {
-            date <- ctx$call("dayOfYear", list(entry$pointer))
-            if (!is.null(clock$date) && !identical(clock$date, date)) {
+            # Observe the zone-boundary hour: warmup repeats dates but still rolls from 23 to 0.
+            hour <- ctx$call("hour", list(entry$pointer))
+            if (!is.null(clock$hour) && hour < clock$hour) {
                 clock$offset <- clock$offset + 24
             }
-            clock$date <- date
+            clock$hour <- hour
             invisible(NULL)
         }
     )

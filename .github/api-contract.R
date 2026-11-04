@@ -60,6 +60,14 @@ cases <- list(
         "executable export rejects managed trends before creating artifacts"
     )
 )
+# The worker backend also exercises early releases whose host constructor is intentionally unavailable.
+cases <- c(
+    cases,
+    list(list(
+        "plugin",
+        "stock warmup trends retain elapsed hours across repeated days and environments"
+    ))
+)
 if (version == "9.4") {
     # This release's public contract enters only through package-owned disposable workers.
     cases <- c(

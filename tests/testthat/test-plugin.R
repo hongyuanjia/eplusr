@@ -916,6 +916,140 @@ test_that("managed trend warmup history clears before formal environment hooks",
     expect_false(result$trends$warm$latest$warmup)
 })
 
+# Real repeated warmup dates must retain chronological trends and reset at both phase boundaries.
+test_that("stock warmup trends retain elapsed hours across repeated days and environments", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    model <- read_idf(fixture$model)
+    model$add(
+        RunPeriod = list(
+            name = "Second weather environment",
+            begin_month = 1,
+            begin_day_of_month = 2,
+            end_month = 1,
+            end_day_of_month = 2
+        )
+    )
+    model$save(fixture$model, overwrite = TRUE)
+    plugin <- eplus_plugin(
+        list(
+            # Retain ordinary evidence separately for each independently reset weather environment.
+            begin_new_environment = function(api, state, plugin) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$n <- 0L
+                plugin$data$weather[[length(plugin$data$weather) + 1L]] <- list(
+                    initial_count = api$state_manager$status(state)$plugins[[
+                        1L
+                    ]]$trends$warm$valid_count,
+                    midnight = list()
+                )
+            },
+            # Formal weather starts a new history and an independent elapsed coordinate.
+            after_new_environment_warmup_complete = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                index <- length(plugin$data$weather)
+                plugin$data$weather[[
+                    index
+                ]]$formal_count <- api$state_manager$status(state)$plugins[[
+                    1L
+                ]]$trends$warm$valid_count
+                plugin$data$n <- 0L
+            },
+            # Reads precede the current hook's commit, so hook 98 sees values 97 and 96.
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$n <- plugin$data$n + 1L
+                warmup <- api$exchange$warmup_flag(state)
+                if (
+                    (warmup && plugin$data$n %in% c(98L, 194L)) ||
+                        (!warmup && plugin$data$n == 3L)
+                ) {
+                    handle <- api$exchange$get_trend_handle(state, "warm")
+                    evidence <- list(
+                        values = c(
+                            api$exchange$get_trend_value(state, handle, 1L),
+                            api$exchange$get_trend_value(state, handle, 2L)
+                        ),
+                        slope = api$exchange$get_trend_direction(
+                            state,
+                            handle,
+                            2L
+                        ),
+                        latest = api$state_manager$status(state)$plugins[[
+                            1L
+                        ]]$trends$warm$latest
+                    )
+                    index <- length(plugin$data$weather)
+                    if (warmup) {
+                        checks <- plugin$data$weather[[index]]$midnight
+                        plugin$data$weather[[index]]$midnight[[
+                            length(checks) + 1L
+                        ]] <- evidence
+                    } else {
+                        plugin$data$weather[[index]]$formal <- evidence
+                    }
+                }
+            }
+        ),
+        data = list(n = 0L, weather = list()),
+        warmup = TRUE,
+        trends = list(
+            warm = list(
+                # Increasing once per quarter-hour gives a literal four value units per hour.
+                source = function(api, state, plugin) plugin$data$n,
+                capacity = 2L,
+                warmup = TRUE
+            )
+        )
+    )
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        backend = plugin,
+        output_dir = file.path(fixture$directory, "warmup"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_null(result$api$error)
+    weather <- result$api$plugins[[1L]]$data$weather
+    expect_length(weather, 2L)
+    for (environment in weather) {
+        expect_identical(environment$initial_count, 0L)
+        expect_identical(environment$formal_count, 0L)
+        expect_length(environment$midnight, 2L)
+        for (index in seq_along(environment$midnight)) {
+            checkpoint <- environment$midnight[[index]]
+            expect_equal(checkpoint$values, c(97, 96) + 96 * (index - 1L))
+            expect_equal(checkpoint$slope, 4)
+            expect_equal(checkpoint$latest$time, c(24.25, 48.25)[[index]])
+            expect_true(checkpoint$latest$warmup)
+        }
+        expect_equal(environment$formal$values, c(2, 1))
+        expect_equal(environment$formal$slope, 4)
+        expect_equal(environment$formal$latest$time, 0.5)
+        expect_false(environment$formal$latest$warmup)
+    }
+    expect_false(identical(
+        weather[[1L]]$formal$latest$environment,
+        weather[[2L]]$formal$latest$environment
+    ))
+})
+
 # Source conditions cross the native boundary only after finalization and state cleanup.
 test_that("managed trend source failures preserve conditions and finalize once", {
     fixture <- testrun__api_fixture()
