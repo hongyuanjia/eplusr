@@ -120,6 +120,10 @@ testrun__legacy <- function(shard) {
                     "test-api.R",
                     "api",
                     "stock early design-only callback failures finish safely with original conditions"
+                ),
+                c(
+                    "test-plugin.R",
+                    "stock warmup trends retain elapsed hours across repeated days and environments"
                 )
             )
         ),

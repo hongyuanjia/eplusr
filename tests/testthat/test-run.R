@@ -1958,6 +1958,11 @@ describe("run-api", {
     })
 
     test_that("synchronous API command conditions reap the worker tree before rethrow", {
+        # The external process fake owns no descendants; keep the real process tree outside this seam.
+        local_mocked_bindings(
+            ps_children = function(...) list(),
+            .package = "ps"
+        )
         alive <- TRUE
         reaped <- FALSE
         condition <- simpleError("foreground pipe failure")
@@ -1965,6 +1970,8 @@ describe("run-api", {
             r_bg = function(..., supervise) {
                 expect_true(supervise)
                 list(
+                    # Supply the external process identity used before bounded tree cleanup.
+                    get_pid = function() Sys.getpid(),
                     is_alive = function() alive,
                     poll_io = function(...) stop(condition),
                     kill_tree = function() {

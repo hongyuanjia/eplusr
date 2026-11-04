@@ -739,6 +739,19 @@ test_that("host plugin trends commit after hooks and retain bounded valid histor
         )
     )
     plugin(api, state)
+    # A second binding still receives every formal hook without acquiring or duplicating trend samples.
+    eplus_plugin(
+        list(end_zone_timestep_after_zone_reporting = function(
+            api,
+            state,
+            plugin
+        ) {
+            if (api$exchange$kind_of_sim(state) == 3L) {
+                plugin$data$n <- plugin$data$n + 1L
+            }
+        }),
+        data = list(n = 0L)
+    )(api, state)
     expect_identical(
         api$state_manager$status(state)$plugins[[
             1L
@@ -758,11 +771,18 @@ test_that("host plugin trends commit after hooks and retain bounded valid histor
     expect_identical(result$trends$sequence$valid_count, 3L)
     expect_identical(result$trends$sequence$total_samples, 5L)
     expect_identical(result$trends$sequence$latest$warmup, FALSE)
+    bindings <- api$state_manager$status(state)$plugins
+    expect_length(bindings, 2L)
+    expect_identical(bindings[[2L]]$data$n, 5L)
+    expect_length(bindings[[2L]]$trends, 0L)
 })
 
 # State inspection and managed ownership remain available without entering native trend arrays.
 test_that("managed trend handles reject retired cross-state and ambiguous ownership", {
-    withr::local_options(list(eplusr.test.trend.handle = NULL))
+    withr::local_options(list(
+        eplusr.test.trend.handle = NULL,
+        eplusr.test.trend.other_state = NULL
+    ))
     fixture <- testrun__api_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
@@ -772,6 +792,14 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
         list(
             initialize = function(api, state, plugin) {
                 if (plugin$id == "1") {
+                    # Names cannot escape the active binding even when another state declares that name.
+                    plugin$data$other_state <- tryCatch(
+                        api$exchange$get_trend_handle(
+                            getOption("eplusr.test.trend.other_state"),
+                            "n"
+                        ),
+                        error = conditionMessage
+                    )
                     options(
                         eplusr.test.trend.handle = api$exchange$get_trend_handle(
                             state,
@@ -821,9 +849,35 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
             n = list(source = function(api, state, plugin) 1, capacity = 1L)
         )
     )
+    other <- api$state_manager$new_state()
+    # Register the same name on an independent owned state without importing live objects into hooks.
+    eplus_plugin(
+        list(initialize = function(api, state, plugin) invisible(NULL)),
+        trends = list(
+            n = list(
+                # This independent source is never run; registration alone establishes its ownership.
+                source = function(api, state, plugin) 1,
+                capacity = 1L
+            )
+        )
+    )(api, other)
+    options(eplusr.test.trend.other_state = other)
     factory(api, state)
     handle <- api$exchange$get_trend_handle(state, "n")
-    other <- api$state_manager$new_state()
+    expect_error(api$exchange$get_trend_handle(state, "missing"), "not found")
+    # Transporting the whole ownership graph still cannot revive serialized native library pointers.
+    transported <- unserialize(serialize(
+        list(api = api, state = state, handle = handle),
+        NULL
+    ))
+    expect_error(
+        transported$api$exchange$get_trend_value(
+            transported$state,
+            transported$handle,
+            1L
+        ),
+        "API is closed"
+    )
     for (operation in c("value", "average", "min", "max", "sum", "direction")) {
         expect_error(
             api$exchange[[paste0("get_trend_", operation)]](other, handle, 1L),
@@ -846,6 +900,7 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
     )
     result <- api$state_manager$status(state)$plugins[[1L]]
     expect_match(result$data$initial, "valid history")
+    expect_match(result$data$other_state, "another state or plugin binding")
     expect_identical(result$trends$n$capacity, 1L)
     expect_identical(result$trends$n$valid_count, 1L)
     expect_identical(result$trends$n$total_samples, 96L)

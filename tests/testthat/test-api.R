@@ -4082,6 +4082,51 @@ describe("session-errors", {
         expect_identical(ctx$error$message, "command write failed")
     })
 
+    # A blocked contiguous port range must not prevent an otherwise healthy real worker session.
+    test_that("stock sessions initialize outside a blocked contiguous port range without changing RNG", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        listen <- base::serverSocket
+        blocked <- NULL
+        exclude <- FALSE
+        # Emulate an OS-reserved 100-port block; successful binds still create real TCP sockets.
+        local_mocked_bindings(
+            serverSocket = function(port) {
+                if (exclude) {
+                    if (is.null(blocked)) {
+                        blocked <<- port
+                    }
+                    if ((port - blocked + 50000L) %% 50000L < 100L) {
+                        stop("port belongs to an OS-reserved contiguous range")
+                    }
+                }
+                listen(port)
+            },
+            .package = "base"
+        )
+        withr::local_seed(891L)
+        seeds <- list()
+        for (index in seq_len(2L)) {
+            exclude <- index == 2L
+            # Compare identical worker startups: only the second listener encounters the blocked range.
+            set.seed(891L)
+            session <- eplus_session(
+                fixture$model,
+                fixture$weather,
+                eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+                dir = file.path(fixture$directory, paste0("ports-", index))
+            )
+            on.exit(try(session$close(), silent = TRUE), add = TRUE)
+            first <- session$initialize()
+            expect_identical(first$step, 1L)
+            expect_identical(session$observe(), first)
+            seeds[[index]] <- .Random.seed
+            session$close()
+        }
+        # callr bootstrap has its own RNG use; listener retries must add none to the normal startup.
+        expect_identical(seeds[[2L]], seeds[[1L]])
+    })
+
     test_that("socket reservation stops after twenty occupied candidates", {
         attempts <- 0L
         # Recreate a fully occupied candidate range and ensure no unbounded bind loop occurs.
@@ -4092,7 +4137,7 @@ describe("session-errors", {
             },
             .package = "base"
         )
-        expect_error(api_session__listen(), "Unable to reserve")
+        expect_error(api_session__listen(), "Unable to reserve.*port occupied")
         expect_identical(attempts, 20L)
     })
 

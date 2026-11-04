@@ -2181,12 +2181,20 @@ api_session__listen <- function() {
     start <- (Sys.getpid() +
         as.integer((as.numeric(Sys.time()) %% 1) * 100000)) %%
         50000L
+    last_error <- NULL
     for (offset in seq_len(20L)) {
-        port <- 10000L + (start + offset) %% 50000L
-        server <- tryCatch(serverSocket(port), error = function(e) NULL)
+        # Spread the bounded candidates across the range so one reserved block cannot exhaust them.
+        port <- 10000L + (start + (offset - 1L) * 2500L) %% 50000L
+        server <- tryCatch(serverSocket(port), error = function(e) {
+            last_error <<- e
+            NULL
+        })
         if (!is.null(server)) return(list(server = server, port = port))
     }
-    api_session__error("Unable to reserve a local session socket.")
+    api_session__error(paste0(
+        "Unable to reserve a local session socket: ",
+        conditionMessage(last_error)
+    ))
 }
 
 # Materialize and launch the existing Job pipeline, then wait for its first completed weather step.
