@@ -6,6 +6,8 @@ api_profile__select <- function(version) {
             !version %in%
                 c(
                     "9.4.0",
+                    "9.5.0",
+                    "9.6.0",
                     "23.1.0",
                     "23.2.0",
                     "24.1.0",
@@ -17,12 +19,15 @@ api_profile__select <- function(version) {
                 )
     ) {
         api__error(
-            "The API requires an EnergyPlus 9.4, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 9.4, 9.5, 9.6, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
         version = version,
-        abi = if (version %in% c("9.4.0", "23.1.0", "23.2.0", "24.1.0")) {
+        abi = if (
+            version %in%
+                c("9.4.0", "9.5.0", "9.6.0", "23.1.0", "23.2.0", "24.1.0")
+        ) {
             version
         } else if (version %in% c("24.2.0", "25.1.0")) {
             "24.2-26.2"
@@ -1190,6 +1195,35 @@ api_profile__methods <- function(methods, version) {
             "Safe full API discovery is unavailable: the stock release has no APIDataEntry array with a public deleter."
         reasons["calendar_year"] <-
             "The stock release has no public calendar-year getter; weather year is a different quantity."
+    }
+    if (numeric_version(version) <= "22.1") {
+        reasons["callback_register_external_hvac_manager"] <-
+            "The stock release cannot safely stop a failed mandatory HVAC calculation before report initialization."
+    }
+    if (numeric_version(version) <= "9.6") {
+        methods <- lapply(methods, function(spec) {
+            if (spec$method == "minutes") {
+                spec$symbol <- ""
+                spec$kind <- "legacy_minutes"
+            }
+            spec
+        })
+    }
+    if (numeric_version(version) < "9.6") {
+        methods <- lapply(methods, function(spec) {
+            if (
+                spec$method %in%
+                    c(
+                        "ep_version",
+                        "current_sim_time",
+                        "set_console_output_status"
+                    )
+            ) {
+                spec$symbol <- ""
+                spec$kind <- paste0("legacy_", spec$method)
+            }
+            spec
+        })
     }
     lapply(methods, function(spec) {
         # Older public deleters destroy owned property wrappers; 25.1+ deleters are no-ops.

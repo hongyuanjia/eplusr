@@ -80,7 +80,7 @@ A finalizer terminates the process tree as a fallback.
 }
 }
 \description{
-Create an experimental session proxy for stock EnergyPlus 23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
+Create an experimental session proxy for stock EnergyPlus 9.5/9.6/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
 handles and callbacks stay in one fresh engine worker. Pausing preserves that
 worker and the current native call; it is not a checkpoint or state copy.
 }
