@@ -879,22 +879,53 @@ test_that("native executable boundaries reject foreign threads and restore actua
             worker <- rdyncall::dynsym(fixture, "plugin_on_worker")
             handler <- rdyncall::dynsym(fixture, "plugin_signal_handler")
             interrupt <- rdyncall::dynsym(fixture, "plugin_raise_interrupt")
+            # Reject missing native addresses before any foreign call can dereference them.
+            symbols <- list(
+                package = package,
+                fixture = fixture,
+                bootstrap = bootstrap,
+                dispatch = dispatch,
+                worker = worker,
+                handler = handler,
+                interrupt = interrupt
+            )
+            missing <- vapply(
+                symbols,
+                function(pointer) {
+                    is.null(pointer) || rdyncall::is.nullptr(pointer)
+                },
+                logical(1L)
+            )
+            if (any(missing)) {
+                stop(
+                    "Missing native fixture symbols: ",
+                    paste(names(symbols)[missing], collapse = ", ")
+                )
+            }
             # Bootstrap on the owning R thread before any foreign call claims ownership.
+            message("native stage: owner bootstrap")
             initial <- rdyncall::dyncall(bootstrap, ")i")
             rdyncall::dyncall(handler, "i)i", 1L)
+            message("native stage: foreign entrypoints")
             foreign <- rdyncall::dyncall(worker, "pp)i", bootstrap, dispatch)
             foreign_handler <- rdyncall::dyncall(handler, "i)i", 0L)
             after_foreign <- rdyncall::dyncall(bootstrap, ")i")
             failures <- lapply(c("signal", "error"), function(mode) {
                 library <- if (mode == "signal") {
-                    function(...) rdyncall::dyncall(interrupt, ")v")
+                    function(...) {
+                        rdyncall::dyncall(interrupt, ")v")
+                        # Only R's own evaluation stack may raise the pending interrupt.
+                        Sys.sleep(0)
+                    }
                 } else {
                     function(...) stop("native bootstrap sentinel")
                 }
+                message("native stage: ", mode, " bootstrap")
                 assign("library", library, envir = .GlobalEnv)
                 on.exit(rm("library", envir = .GlobalEnv), add = TRUE)
                 rdyncall::dyncall(handler, "i)i", 1L)
                 status <- rdyncall::dyncall(bootstrap, ")i")
+                message("native stage: ", mode, " returned ", status)
                 restored <- rdyncall::dyncall(handler, "i)i", 0L)
                 rm("library", envir = .GlobalEnv)
                 on.exit(NULL, add = FALSE)
@@ -915,7 +946,8 @@ test_that("native executable boundaries reject foreign threads and restore actua
         },
         args = list(directory),
         libpath = .libPaths(),
-        timeout = 30
+        timeout = 30,
+        show = TRUE
     )
     expect_identical(result$initial, 0L)
     expect_identical(result$foreign, 11L)

@@ -52,7 +52,6 @@ int callback_on_worker(void *callback, int kind)
 #define R_NO_REMAP
 #include <R.h>
 #include <Rinternals.h>
-#include <R_ext/Utils.h>
 #include <signal.h>
 
 /* Retain an engine-visible proxy address after its owning guard is retired. */
@@ -124,9 +123,8 @@ int plugin_signal_handler(int save)
 #endif
 }
 
-/* Deliver an actual OS interrupt inside the installed plugin's R top-level boundary. */
+/* Return from the foreign frame before R checks the deferred OS interrupt. */
 void plugin_raise_interrupt(void)
 {
     raise(SIGINT);
-    R_CheckUserInterrupt();
 }
