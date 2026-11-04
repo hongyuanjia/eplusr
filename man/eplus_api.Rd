@@ -7,7 +7,7 @@
 eplus_api(eplus = "26.1")
 }
 \arguments{
-\item{eplus}{EnergyPlus version or installation directory. Only 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
+\item{eplus}{EnergyPlus version or installation directory. Only 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
 supported by this experimental library interface.}
 }
 \value{
@@ -15,7 +15,7 @@ An environment with \code{state_manager}, \code{functional}, \code{runtime}, and
 \code{exchange} groups, and \code{info()}, \code{methods()}, and \code{close()} methods.
 }
 \description{
-Create a managed interface to a stock EnergyPlus 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
+Create a managed interface to a stock EnergyPlus 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
 groups use the same method names as the bundled Python API, with an explicit
 managed \code{state} argument. This experimental interface does not change CLI jobs.
 }
@@ -31,6 +31,24 @@ methods. Each property method still takes its owning state. Public resource
 deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 Standalone factories support water and steam, matching the stock Python SDK.
 \code{functional$ep_version()} returns the full version string as an R character.
+On 9.5, which lacks a native version getter, \code{info()$identity_source} records
+identification from matching SDK version/build constants, library generation
+symbols and the selected CLI build. The library is never replaced by discovery.
+The 9.5 runtime cannot suppress console output: enabling output is a managed
+no-op, while requesting suppression reports a capability error. The selected
+IDD is supplied explicitly; native helper flags require prior external preparation.
+\code{current_sim_time()} on 9.5 requires an owned, observed running lifecycle;
+protected environment/zone hooks supply relative elapsed hours, resetting after
+warmup. It is unavailable on borrowed states or before a run. Calendar years
+are not inferred. On 9.5/9.6, \code{minutes()} uses the modern rounded convention.
+
+On 9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
+zone boundary, because earlier report finalization can dereference uninitialized
+stock resilience tables. After callback failure, user delivery stays disabled
+and the original condition is rethrown after native return. A design-only run
+without weather completes its configured finite run before that rethrow.
+Mandatory external HVAC calculation callbacks are unavailable on these releases
+because deferred failure cannot safely supply their missing calculations.
 Standalone functional files are isolated in a temporary state-owned directory.
 Property objects are invalidated when a simulation begins.
 

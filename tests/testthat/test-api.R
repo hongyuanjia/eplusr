@@ -1023,6 +1023,20 @@ test_that("plugin exchange checks handles, missing globals and aggregate ranges"
 test_that("stock external HVAC manager callback stops and reports callback failures", {
     fixture <- testapi__controlled_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    if (numeric_version(version) <= "22.1") {
+        api <- eplus_api(version)
+        on.exit(api$close(), add = TRUE)
+        state <- api$state_manager$new_state()
+        expect_error(
+            api$runtime$callback_register_external_hvac_manager(
+                state,
+                function(s) NULL
+            ),
+            "unavailable.*mandatory HVAC"
+        )
+        return(invisible(NULL))
+    }
     for (mode in c("stop", "error", "interrupt")) {
         marker <- file.path(fixture$directory, paste0(mode, ".txt"))
         setup <- function(api, state) {
@@ -1770,7 +1784,10 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
                 water$density(state, 20),
                 error = conditionMessage
             )
-            api$runtime$set_console_output_status(state, FALSE)
+            console <- tryCatch(
+                api$runtime$set_console_output_status(state, FALSE),
+                error = conditionMessage
+            )
             api$exchange$request_variable(
                 state,
                 "Zone Mean Air Temperature",
@@ -1784,6 +1801,7 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
             reset <- api$state_manager$status(state)
             api$state_manager$delete_state(state)
             list(
+                console = console,
                 info = api$info(),
                 heat_capacity = heat_capacity,
                 water_density = water_density,
@@ -1798,6 +1816,11 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
         args = list(version),
         libpath = .libPaths()
     )
+    if (version == "9.5") {
+        expect_match(result$console, "cannot suppress")
+    } else {
+        expect_null(result$console)
+    }
     expect_match(result$info$version, paste0(version, ".0"), fixed = TRUE)
     # The stock psychrometric equation clamps humidity ratio to 1e-5 kg/kg.
     expect_equal(result$heat_capacity, 1004.8585895, tolerance = 1e-9)
@@ -1814,11 +1837,11 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
     expect_true(all(c("implementation", "provenance") %in% names(methods)))
     expect_identical(
         methods$implementation[methods$method == "get_api_data"],
-        if (version == "23.1") "unsupported" else "native"
+        if (numeric_version(version) < "23.2") "unsupported" else "native"
     )
     expect_identical(
         methods$implementation[methods$method == "list_available_api_data_csv"],
-        if (version == "23.1") "unsupported" else "managed"
+        if (numeric_version(version) < "23.2") "unsupported" else "managed"
     )
     expect_identical(
         methods$implementation[methods$method == "get_trend_value"],
@@ -2035,10 +2058,10 @@ test_that("stock older API reports safe discovery and readiness capabilities", {
     measured <- readRDS(marker)
     expect_false(measured$before)
     expect_true(is.finite(measured$value))
-    if (version == "23.1") {
-        expect_match(measured$data, "unavailable.*23.1.0.*discovery")
-        expect_match(measured$csv, "unavailable.*23.1.0.*discovery")
-        expect_match(measured$year, "unavailable.*23.1.0.*calendar")
+    if (numeric_version(version) < "23.2") {
+        expect_match(measured$data, "unavailable.*discovery")
+        expect_match(measured$csv, "unavailable.*discovery")
+        expect_match(measured$year, "unavailable.*calendar")
     } else {
         data <- measured$data
         expect_identical(names(data), c("what", "name", "key", "type", "unit"))
@@ -2081,7 +2104,8 @@ test_that("stock callbacks preserve exchange units and typed control ownership",
             function(s) {
                 if (
                     !api$exchange$api_data_fully_ready(s) ||
-                        api$exchange$warmup_flag(s)
+                        api$exchange$warmup_flag(s) ||
+                        api$exchange$kind_of_sim(s) != 3L
                 ) {
                     return()
                 }
@@ -2103,7 +2127,10 @@ test_that("stock callbacks preserve exchange units and typed control ownership",
                 )
                 saveRDS(
                     list(
-                        data = api$exchange$get_api_data(s),
+                        data = tryCatch(
+                            api$exchange$get_api_data(s),
+                            error = conditionMessage
+                        ),
                         temperature = api$exchange$get_variable_value(
                             s,
                             temperature
@@ -2134,15 +2161,87 @@ test_that("stock callbacks preserve exchange units and typed control ownership",
     }
     actual <- readRDS(marker)
     data <- actual$data
-    expect_named(data, c("what", "name", "key", "type", "unit"))
-    row <- data[
-        data$what == "OutputVariable" &
-            data$name == "Zone Mean Air Temperature" &
-            data$key == "ZONE ONE",
-    ]
-    expect_equal(nrow(row), 1L)
-    expect_identical(row$unit, "C")
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    if (numeric_version(version) < "23.2") {
+        expect_match(data, "unavailable.*discovery")
+    } else {
+        expect_named(data, c("what", "name", "key", "type", "unit"))
+        row <- data[
+            data$what == "OutputVariable" &
+                data$name == "Zone Mean Air Temperature" &
+                data$key == "ZONE ONE",
+        ]
+        expect_equal(nrow(row), 1L)
+        if (numeric_version(version) < "24.2") {
+            expect_true(is.na(row$unit))
+        } else {
+            expect_identical(row$unit, "C")
+        }
+    }
     expect_true(is.finite(actual$temperature))
     expect_equal(actual$actuator, 22)
     expect_match(actual$wrong_kind, "data kind")
+})
+
+# The early state-based releases must identify the selected library without newer exports.
+test_that("stock early API identifies its selected installation and console limitation", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("9.5", "9.6"))
+    api <- eplus_api(version)
+    on.exit(api$close(), add = TRUE)
+    expect_match(api$info()$version, paste0(version, ".0"), fixed = TRUE)
+    expect_identical(api$functional$ep_version(), api$info()$version)
+    state <- api$state_manager$new_state()
+    psych <- api$functional$psychrometrics(state)
+    expect_equal(psych$specific_heat(state, 0), 1004.8585895, tolerance = 1e-9)
+    expect_false(api$exchange$api_data_fully_ready(state))
+    expect_error(api$exchange$get_api_data(state), "unavailable")
+    expect_error(api$exchange$calendar_year(state), "unavailable")
+    expect_silent(api$runtime$set_console_output_status(state, TRUE))
+    if (version == "9.5") {
+        expect_match(api$info()$identity_source, "SDK.*symbols.*CLI")
+        expect_error(
+            api$runtime$set_console_output_status(state, FALSE),
+            "cannot suppress"
+        )
+        expect_error(api$exchange$current_sim_time(state), "lifecycle")
+    } else {
+        expect_silent(api$runtime$set_console_output_status(state, FALSE))
+    }
+    api$state_manager$reset_state(state)
+    expect_identical(api$state_manager$status(state)$generation, 1L)
+    api$state_manager$delete_state(state)
+})
+
+# Match modern rounded minute semantics, including the completed hour's minute 60.
+test_that("stock early API rounds fractional minute boundaries consistently", {
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("9.5", "9.6"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    model <- read_idf(fixture$model)
+    model$set(Timestep := list(number_of_timesteps_per_hour = 6))
+    model$save(fixture$model, overwrite = TRUE)
+    api <- eplus_api(version)
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    minutes <- integer()
+    api$runtime$callback_end_zone_timestep_after_zone_reporting(
+        state,
+        function(s) {
+            if (
+                api$exchange$kind_of_sim(s) != 3L || api$exchange$warmup_flag(s)
+            ) {
+                return(NULL)
+            }
+            minutes <<- c(minutes, api$exchange$minutes(s))
+            if (length(minutes) == 6L) api$runtime$stop_simulation(s)
+        }
+    )
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    expect_identical(minutes, c(10L, 20L, 30L, 40L, 50L, 60L))
 })

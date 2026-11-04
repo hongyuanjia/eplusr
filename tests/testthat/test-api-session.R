@@ -688,10 +688,13 @@ test_that("stock sessions preserve calendar provenance across December and Janua
     expect_identical(january$step, 97L)
     expect_true(is.finite(january$values[["temperature"]]))
     for (observation in list(first, december, january)) {
-        expect_identical(observation$calendar_year_available, version != "23.1")
+        expect_identical(
+            observation$calendar_year_available,
+            numeric_version(version) >= "23.2"
+        )
         expect_true(is.finite(observation$weather_year))
     }
-    if (version == "23.1") {
+    if (numeric_version(version) < "23.2") {
         expect_identical(first$year, NA_integer_)
         expect_identical(december$year, NA_integer_)
         expect_identical(january$year, NA_integer_)
@@ -719,7 +722,7 @@ test_that("stock sessions preserve calendar provenance across December and Janua
         c(row$month, row$day, row$hour)
     )
     expect_equal(december$time_start, row$hour - row$interval / 60)
-    if (version != "23.1") {
+    if (numeric_version(version) >= "23.2") {
         expect_equal(december$year, row$year)
     }
     session$close()

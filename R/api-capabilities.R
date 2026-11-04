@@ -14,7 +14,9 @@ api_cap__check <- function(native, signatures, manifest, binding) {
         "stopSimulation",
         "apiErrorFlag",
         "resetErrorFlag",
-        "setEnergyPlusRootDirectory"
+        if (numeric_version(manifest$energyplus) >= "9.6") {
+            "setEnergyPlusRootDirectory"
+        }
     ))
     for (name in needed) {
         if (!is.function(native[[name]]) || is.null(signatures[[name]])) {

@@ -2044,3 +2044,77 @@ test_that("host plugin managed trend declarations and capability metadata are ex
         "unsupported"
     )
 })
+
+# Owned early lifecycles provide elapsed hours independently of the EPW year and calendar getter.
+test_that("stock early trends keep a chronological clock across New Year", {
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("9.5", "9.6"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    model <- read_idf(fixture$model)
+    model$set(
+        RunPeriod := list(
+            begin_month = 12,
+            begin_day_of_month = 31,
+            begin_year = 2019,
+            end_month = 1,
+            end_day_of_month = 1,
+            end_year = 2020
+        )
+    )
+    model$save(fixture$model, overwrite = TRUE)
+    api <- eplus_api(version)
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    plugin <- eplus_plugin(
+        list(
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                time <- api$exchange$current_sim_time(state)
+                plugin$data$times <- c(plugin$data$times, time)
+            },
+            finalize = function(api, state, plugin) {
+                handle <- api$exchange$get_trend_handle(state, "clock")
+                plugin$data$last <- api$exchange$get_trend_value(
+                    state,
+                    handle,
+                    1L
+                )
+            }
+        ),
+        data = list(times = numeric()),
+        trends = list(
+            clock = list(
+                source = function(api, state, plugin) {
+                    api$exchange$current_sim_time(state)
+                },
+                capacity = 2L
+            )
+        )
+    )
+    plugin(api, state)
+    # Clearing user callbacks must preserve the host's clock and history lifecycle hooks.
+    api$runtime$clear_callbacks()
+    # Rebind user hooks after the deliberate clear, preserving one independent active history.
+    plugin(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- tail(api$state_manager$status(state)$plugins, 1L)[[1L]]
+    expect_length(result$data$times, 192L)
+    expect_equal(
+        result$data$times[c(1L, 96L, 97L, 192L)],
+        c(0.25, 24, 24.25, 48)
+    )
+    expect_true(all(diff(result$data$times) > 0))
+    expect_equal(result$data$last, 48)
+    expect_identical(result$trends$clock$total_samples, 192L)
+    expect_equal(result$trends$clock$latest$time, 48)
+})
