@@ -24,7 +24,7 @@ eplus_session(
 
 \item{weather}{An EPW path or \link{Epw} object. Sessions control weather run periods.}
 
-\item{eplus}{EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2
+\item{eplus}{EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 25.2, 26.1 and 26.2
 are supported. The selected installation must match the model version.}
 
 \item{variables}{Named list of character pairs \code{c(variable_name, key)}.}
@@ -80,7 +80,7 @@ A finalizer terminates the process tree as a fallback.
 }
 }
 \description{
-Create an experimental session proxy for stock EnergyPlus 25.2/26.1/26.2. Native state,
+Create an experimental session proxy for stock EnergyPlus 23.1/23.2/24.1/25.2/26.1/26.2. Native state,
 handles and callbacks stay in one fresh engine worker. Pausing preserves that
 worker and the current native call; it is not a checkpoint or state copy.
 }
@@ -88,7 +88,8 @@ worker and the current native call; it is not a checkpoint or state copy.
 Observations contain named \code{values}, explicit \code{controller_state}, completed
 weather \code{step}, \code{environment}, \code{kind_of_sim}, calendar fields, zone-step index
 and the interval \verb{[time_start, time_end]} in hours. \code{year} is the simulation
-calendar year; \code{weather_year} retains the EPW year. \code{callback} identifies the
+calendar year, or \code{NA_integer_} when \code{calendar_year_available} is false
+(before 23.2); \code{weather_year} retains the separate EPW year. \code{callback} identifies the
 sampling point. Output-variable averaging follows EnergyPlus's variable
 definition: for example, Zone Mean Air Temperature is a zone-step average,
 not an instantaneous endpoint measurement. Warmup and sizing are excluded.

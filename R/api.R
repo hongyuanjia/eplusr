@@ -1,10 +1,10 @@
 #' Access the EnergyPlus library API
 #'
-#' Create a managed interface to a stock EnergyPlus 25.2, 26.1 or 26.2 installation. The four
+#' Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 25.2, 26.1 or 26.2 installation. The four
 #' groups use the same method names as the bundled Python API, with an explicit
 #' managed `state` argument. This experimental interface does not change CLI jobs.
 #'
-#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2 are
+#' @param eplus EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 25.2, 26.1 and 26.2 are
 #'   supported by this experimental library interface.
 #' @return An environment with `state_manager`, `functional`, `runtime`, and
 #'   `exchange` groups, and `info()`, `methods()`, and `close()` methods.
@@ -42,6 +42,11 @@
 #' Passing a handle from another state, kind, or reset generation is rejected
 #' before calling C. Invalid native exchange values are checked with the API
 #' error flag. `get_api_data(state)` copies a data frame and uses `freeAPIData()`.
+#' Releases before 23.2 have no safely releasable discovery array, so discovery
+#' reports a capability error. In 23.2/24.1 the common data frame has `unit = NA`;
+#' the reconstructed CSV uses an empty unit field for unavailable unit metadata.
+#' The 23.2 key/type field semantics are normalized to later releases.
+#' `calendar_year()` is unavailable before 23.2; `year()` remains the EPW year.
 #' `methods()` lists exact bindings, arguments, ownership, and unsupported methods.
 #' Its `implementation` and `provenance` columns distinguish native operations,
 #' reviewed managed adapters, and unavailable operations for the selected release.
@@ -300,6 +305,16 @@ api__construct <- function(ctx) {
             ": ",
             if (spec$implementation == "native") spec$symbol else spec$kind
         )
+        if (
+            spec$kind %in%
+                c("api_data", "api_data_csv") &&
+                ctx$manifest$energyplus %in% c("23.2.0", "24.1.0")
+        ) {
+            spec$provenance <- paste0(
+                spec$provenance,
+                "; generated four-pointer layout; units unavailable (NA in data, empty in CSV)"
+            )
+        }
         spec
     })
     ctx$pid <- Sys.getpid()
@@ -866,7 +881,7 @@ api__callback <- function(ctx, entry, state, spec, fun, extra) {
     invisible(NULL)
 }
 
-# Copy the five-pointer APIDataEntry layout, then always invoke its matching native deleter.
+# Copy the generated APIDataEntry stride, then always invoke its matching native deleter.
 api__data <- function(ctx, entry) {
     count <- integer(1L)
     pointer <- ctx$call(
@@ -896,11 +911,25 @@ api__data <- function(ctx, entry) {
     } else {
         matrix(character(), 0L, length(fields))
     }
-    stats::setNames(as.data.frame(matrix, stringsAsFactors = FALSE), fields)
+    data <- stats::setNames(
+        as.data.frame(matrix, stringsAsFactors = FALSE),
+        fields
+    )
+    # 23.2 stores control types in key and instance names in type despite its header field names.
+    if (isTRUE(ctx$manifest$data_key_type_swapped)) {
+        data[c("key", "type")] <- data[c("type", "key")]
+    }
+    # Four-pointer arrays contain no units. Preserve the common schema with explicit missing metadata.
+    if (!"unit" %in% names(data)) {
+        data$unit <- rep(NA_character_, nrow(data))
+    }
+    data
 }
 
 # Reconstruct the stock CSV from safely copied APIDataEntry rows, avoiding its unfreeable char[].
 api__data_csv <- function(data) {
+    # An empty CSV unit means unavailable metadata; the data-frame form preserves NA.
+    data$unit[is.na(data$unit)] <- ""
     sections <- list(
         ACTUATORS = c("Actuator", "name", "type", "key", "unit"),
         INTERNAL_VARIABLES = c("InternalVariable", "name", "key", "unit"),
@@ -1274,6 +1303,14 @@ api__run <- function(ctx, entry, args) {
     code
 }
 
+# Normalize the inverted readiness result in stock releases before 23.2.
+api__ready <- function(ctx, entry) {
+    identical(
+        as.integer(ctx$call("apiDataFullyReady", list(entry$pointer))),
+        ctx$manifest$ready_value %||% 1L
+    )
+}
+
 # Dispatch group operations through one lifecycle/ownership gate before the typed native call.
 api__invoke <- function(ctx, spec, values, resource) {
     if (ctx$pid != Sys.getpid()) {
@@ -1410,11 +1447,14 @@ api__invoke <- function(ctx, spec, values, resource) {
     if (
         spec$requires_ready &&
             (!entry$running ||
-                !ctx$call("apiDataFullyReady", list(entry$pointer)))
+                !api__ready(ctx, entry))
     ) {
         api__error(
             "Exchange data is only available in an initialized simulation callback."
         )
+    }
+    if (spec$method == "api_data_fully_ready") {
+        return(api__ready(ctx, entry))
     }
     if (spec$kind == "input_metadata") {
         return(api__input_metadata(ctx, entry, spec$method, values))
@@ -1515,13 +1555,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 25.2/26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 23.1/23.2/24.1/25.2/26.1/26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.
@@ -1567,7 +1607,8 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' Observations contain named `values`, explicit `controller_state`, completed
 #' weather `step`, `environment`, `kind_of_sim`, calendar fields, zone-step index
 #' and the interval `[time_start, time_end]` in hours. `year` is the simulation
-#' calendar year; `weather_year` retains the EPW year. `callback` identifies the
+#' calendar year, or `NA_integer_` when `calendar_year_available` is false
+#' (before 23.2); `weather_year` retains the separate EPW year. `callback` identifies the
 #' sampling point. Output-variable averaging follows EnergyPlus's variable
 #' definition: for example, Zone Mean Air Temperature is a zone-step average,
 #' not an instantaneous endpoint measurement. Warmup and sizing are excluded.
@@ -2410,6 +2451,12 @@ api_session__setup <- function(api, state, settings) {
             )
         )
     )
+    # Resolve immutable release capabilities once, outside the per-zone observation path.
+    methods <- api$methods()
+    control$calendar_year_available <- methods$status[
+        methods$method == "calendar_year"
+    ] ==
+        "supported"
     control$mode <- "initializing"
     control$step <- 0L
     control$remaining <- 0L
@@ -2619,11 +2666,14 @@ api_session__snapshot <- function(api, state, settings, control) {
     end <- exchange$hour(state) +
         exchange$zone_time_step_number(state) /
             exchange$num_time_steps_in_hour(state)
+    # Calendar metadata is explicitly unavailable before the public calendarYear API.
+    calendar <- control$calendar_year_available
     list(
         step = control$step,
         environment = exchange$current_environment_num(state),
         kind_of_sim = exchange$kind_of_sim(state),
-        year = exchange$calendar_year(state),
+        year = if (calendar) exchange$calendar_year(state) else NA_integer_,
+        calendar_year_available = calendar,
         weather_year = exchange$year(state),
         month = exchange$month(state),
         day = exchange$day_of_month(state),

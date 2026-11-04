@@ -2,22 +2,30 @@
 api_profile__select <- function(version) {
     version <- as.character(version)
     if (
-        length(version) != 1L || !version %in% c("25.2.0", "26.1.0", "26.2.0")
+        length(version) != 1L ||
+            !version %in%
+                c("23.1.0", "23.2.0", "24.1.0", "25.2.0", "26.1.0", "26.2.0")
     ) {
         api__error(
-            "The API requires an EnergyPlus 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 23.1, 23.2, 24.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
         version = version,
-        abi = if (version == "25.2.0") "25.2-26.2" else "26.1-26.2"
+        abi = if (version %in% c("23.1.0", "23.2.0", "24.1.0")) {
+            version
+        } else if (version == "25.2.0") {
+            "25.2-26.2"
+        } else {
+            "26.1-26.2"
+        }
     )
 }
 
 # Define reviewed management policy; function signatures and layouts come from the dynport.
 api__manifest <- function(version = "26.1.0") {
     profile <- api_profile__select(version)
-    list(
+    manifest <- list(
         energyplus = profile$version,
         abi = profile$abi,
         methods = list(
@@ -1133,6 +1141,56 @@ api__manifest <- function(version = "26.1.0") {
             )
         )
     )
+    # Release behavior is separate from the generated native declarations.
+    manifest$ready_value <- if (numeric_version(version) < "23.2") 0L else 1L
+    manifest$data_key_type_swapped <- version == "23.2.0"
+    manifest$methods <- api_profile__methods(manifest$methods, version)
+    manifest
+}
+
+# Limit older releases to safe public operations without guessing absent metadata.
+api_profile__methods <- function(methods, version) {
+    reasons <- character()
+    if (numeric_version(version) < "24.2") {
+        reasons[c(
+            "get_ems_global_handle",
+            "get_ems_global_value",
+            "set_ems_global_value"
+        )] <-
+            "The stock release has no public EMS global-variable API."
+    }
+    if (numeric_version(version) < "24.1") {
+        reasons["callback_user_defined_component_model"] <-
+            "The stock release has no public user-defined-component callback."
+    }
+    if (numeric_version(version) < "23.2") {
+        reasons[c(
+            "get_api_data",
+            "list_available_api_data_csv",
+            "get_global_handle"
+        )] <-
+            "Safe full API discovery is unavailable: the stock release has no APIDataEntry array with a public deleter."
+        reasons["calendar_year"] <-
+            "The stock release has no public calendar-year getter; weather year is a different quantity."
+    }
+    lapply(methods, function(spec) {
+        # Older public deleters destroy owned property wrappers; 25.1+ deleters are no-ops.
+        if (numeric_version(version) < "25.1") {
+            if (spec$kind == "delete_resource") {
+                spec$ownership <- "owned property wrapper; released by its matching public native deleter"
+            } else if (
+                spec$kind == "factory" &&
+                    spec$method %in% c("glycol", "refrigerant")
+            ) {
+                spec$ownership <- "state/generation-owned property wrapper; matching public native deleter"
+            }
+        }
+        if (spec$method %in% names(reasons)) {
+            spec$status <- "unsupported"
+            spec$reason <- reasons[[spec$method]]
+        }
+        spec
+    })
 }
 
 # Normalize one Python-compatible method contract without duplicating C ABI declarations.
