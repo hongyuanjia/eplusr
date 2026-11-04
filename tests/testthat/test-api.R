@@ -507,7 +507,8 @@ test_that("constructor uses installation discovery and rejects unreviewed versio
     expect_equal(eplus_api("stock-installation"), "stock-installation")
     expect_equal(eplus_api("26.1"), "discovered")
     expect_equal(eplus_api("26.2"), "discovered")
-    expect_error(eplus_api("25.2"), "26.1 or 26.2 installation")
+    expect_equal(eplus_api("25.2"), "discovered")
+    expect_error(eplus_api("25.1"), "25.2, 26.1 or 26.2 installation")
 })
 
 test_that("bridge safety gate handles missing, already loaded, failing and cached builds", {
@@ -1614,7 +1615,7 @@ test_that("version profiles select shared ABI and preserve the trend safety boun
         expect_identical(trend[[1L]]$status, "unsupported")
     }
     expect_error(api_profile__select(character()), "installation")
-    expect_error(api_profile__select("25.2.0"), "installation")
+    expect_error(api_profile__select("25.1.0"), "installation")
     expect_error(api_bind__select("unknown"))
 })
 
@@ -1744,4 +1745,151 @@ test_that("stock 26.2 exposes the first meter and recalculates overridden outdoo
         measured$expected_humidity,
         tolerance = 1e-8
     )
+})
+
+# Exercise the common public contract on each explicitly selected stock installation.
+test_that("stock API exposes four groups and reviewed operation provenance", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    # A fresh process owns its bridge safety proof and standalone native resources.
+    result <- callr::r(
+        function(version) {
+            api <- eplusr::eplus_api(version)
+            on.exit(api$close(), add = TRUE)
+            state <- api$state_manager$new_state()
+            psych <- api$functional$psychrometrics(state)
+            heat_capacity <- psych$specific_heat(state, 0)
+            api$runtime$set_console_output_status(state, FALSE)
+            api$exchange$request_variable(
+                state,
+                "Zone Mean Air Temperature",
+                "ZONE ONE"
+            )
+            limitation <- tryCatch(
+                api$exchange$get_trend_value(state, 1L, 1L),
+                error = conditionMessage
+            )
+            api$state_manager$reset_state(state)
+            reset <- api$state_manager$status(state)
+            api$state_manager$delete_state(state)
+            list(
+                info = api$info(),
+                heat_capacity = heat_capacity,
+                methods = api$methods(),
+                limitation = limitation,
+                reset = reset,
+                deleted = api$state_manager$status(state)
+            )
+        },
+        args = list(version),
+        libpath = .libPaths()
+    )
+    expect_match(result$info$version, paste0(version, ".0"), fixed = TRUE)
+    # The stock psychrometric equation clamps humidity ratio to 1e-5 kg/kg.
+    expect_equal(result$heat_capacity, 1004.8585895, tolerance = 1e-9)
+    methods <- result$methods
+    expect_true(all(c("implementation", "provenance") %in% names(methods)))
+    expect_identical(
+        methods$implementation[methods$method == "get_api_data"],
+        "native"
+    )
+    expect_identical(
+        methods$implementation[methods$method == "list_available_api_data_csv"],
+        "managed"
+    )
+    expect_identical(
+        methods$implementation[methods$method == "get_trend_value"],
+        "unsupported"
+    )
+    expect_match(result$limitation, paste0(version, ".0"), fixed = TRUE)
+    expect_identical(result$reset$generation, 1L)
+    expect_identical(result$deleted$phase, "closed")
+})
+
+# Reject prepared input from another release before a native run can change the state.
+test_that("stock runtime rejects IDF and epJSON model version mismatches", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    result <- callr::r(
+        function(version) {
+            api <- eplusr::eplus_api(version)
+            on.exit(api$close(), add = TRUE)
+            lapply(c("idf", "epJSON"), function(extension) {
+                directory <- tempfile("eplusr-model-version-")
+                dir.create(directory)
+                on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+                model <- file.path(directory, paste0("input.", extension))
+                writeLines(
+                    if (extension == "idf") {
+                        "! Prepared for another engine\nVersion,9.4;"
+                    } else {
+                        '{"Version":{"Version 1":{"version_identifier":"9.4"}}}'
+                    },
+                    model
+                )
+                state <- api$state_manager$new_state()
+                message <- tryCatch(
+                    {
+                        api$runtime$run_energyplus(
+                            state,
+                            c("-d", directory, model)
+                        )
+                        NA_character_
+                    },
+                    error = conditionMessage
+                )
+                status <- api$state_manager$status(state)
+                api$state_manager$delete_state(state)
+                list(message = message, phase = status$phase)
+            })
+        },
+        args = list(version),
+        libpath = .libPaths()
+    )
+    for (input in result) {
+        expect_match(input$message, "model version must match")
+        expect_match(input$message, paste0(version, ".0"), fixed = TRUE)
+        expect_identical(input$phase, "created")
+    }
+})
+
+# A native lifecycle cannot safely be selected when the prepared input identity is absent or ambiguous.
+test_that("stock runtime requires one valid prepared model version", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    result <- callr::r(
+        function(version) {
+            api <- eplusr::eplus_api(version)
+            on.exit(api$close(), add = TRUE)
+            inputs <- list(
+                c("idf", "Building,Unnamed;"),
+                c("idf", "Version,9.4; Version,9.5;"),
+                c("idf", "Version,unknown;"),
+                c("epJSON", "{}"),
+                c("epJSON", "{")
+            )
+            lapply(inputs, function(input) {
+                model <- tempfile(fileext = paste0(".", input[[1L]]))
+                on.exit(unlink(model), add = TRUE)
+                writeLines(input[[2L]], model)
+                state <- api$state_manager$new_state()
+                message <- tryCatch(
+                    {
+                        api$runtime$run_energyplus(state, model)
+                        NA_character_
+                    },
+                    error = conditionMessage
+                )
+                status <- api$state_manager$status(state)
+                api$state_manager$delete_state(state)
+                list(message = message, phase = status$phase)
+            })
+        },
+        args = list(version),
+        libpath = .libPaths()
+    )
+    for (input in result) {
+        expect_match(input$message, "model version")
+        expect_identical(input$phase, "created")
+    }
 })

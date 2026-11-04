@@ -7,7 +7,7 @@
 eplus_api(eplus = "26.1")
 }
 \arguments{
-\item{eplus}{EnergyPlus version or installation directory. Only 26.1 and 26.2 are
+\item{eplus}{EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2 are
 supported by this experimental library interface.}
 }
 \value{
@@ -15,7 +15,7 @@ An environment with \code{state_manager}, \code{functional}, \code{runtime}, and
 \code{exchange} groups, and \code{info()}, \code{methods()}, and \code{close()} methods.
 }
 \description{
-Create a managed interface to a stock EnergyPlus 26.1 or 26.2 installation. The four
+Create a managed interface to a stock EnergyPlus 25.2, 26.1 or 26.2 installation. The four
 groups use the same method names as the bundled Python API, with an explicit
 managed \code{state} argument. This experimental interface does not change CLI jobs.
 }
@@ -28,7 +28,7 @@ Reset invalidates callbacks, requests, functional objects, and data handles.
 \code{functional$psychrometrics(state)}, \code{glycol(state, name)}, and
 \code{refrigerant(state, name)} create state-bound objects with Python-compatible
 methods. Each property method still takes its owning state. Public resource
-deletion invalidates the R object; stock 26.1/26.2 may retain native allocations.
+deletion invalidates the R object; stock 25.2/26.1/26.2 may retain native allocations.
 Standalone factories support water and steam, matching the stock Python SDK.
 \code{functional$ep_version()} returns the full version string as an R character.
 Standalone functional files are isolated in a temporary state-owned directory.
@@ -36,7 +36,9 @@ Property objects are invalidated when a simulation begins.
 
 Register callbacks through \verb{runtime$callback_*(state, f)}, then call
 \code{runtime$run_energyplus(state, command_line_args)}. The program name is added
-automatically. State callbacks receive the managed state; progress/message
+automatically. Prepared IDF and epJSON input must declare the selected engine
+version; a mismatch fails before starting the native run. State callbacks receive
+the managed state; progress/message
 callbacks receive their native payload, and the functional error callback
 receives severity and message. Callbacks run synchronously on the R thread.
 A native proxy blocks foreign-thread delivery and reports failure after return.
@@ -52,6 +54,8 @@ Passing a handle from another state, kind, or reset generation is rejected
 before calling C. Invalid native exchange values are checked with the API
 error flag. \code{get_api_data(state)} copies a data frame and uses \code{freeAPIData()}.
 \code{methods()} lists exact bindings, arguments, ownership, and unsupported methods.
+Its \code{implementation} and \code{provenance} columns distinguish native operations,
+reviewed managed adapters, and unavailable operations for the selected release.
 \code{list_available_api_data_csv()} returns a character string reconstructed from
 that safely released data, without calling the unfreeable native CSV allocator.
 Its \code{plugin_only} column identifies global/trend methods available only to
@@ -61,7 +65,7 @@ provide separate conditional managed support. Their handles remain state-
 and kind-bound.
 Missing globals return a negative handle without entering the native fatal path;
 negative plugin handles cannot be used for reading or writing. Trend aggregates
-require \code{count >= 2}, matching stock 26.1/26.2. For native plugin handles,
+require \code{count >= 2}, matching stock 25.2/26.1/26.2. For native plugin handles,
 \code{get_trend_value()} remains disabled:
 the native upper index check permits an out-of-bounds read. Separately,
 \code{\link[=eplus_plugin]{eplus_plugin()}} can declare bounded R-managed trends with safe lookup and
@@ -97,7 +101,7 @@ version/API identity is checked. Do not serialize live API objects to workers.
 
 \code{close()} deletes states and resources before unloading the library. A
 finalizer is a fallback. Close/reset/delete and nested runs are rejected during
-simulation. Original 26.1/26.2 library leaks are not repaired: use a fresh R process
+simulation. Original 25.2/26.1/26.2 library leaks are not repaired: use a fresh R process
 for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
 \code{backend = "api"}; \code{\link[=eplus_session]{eplus_session()}} provides live worker stepping and pause.
 }

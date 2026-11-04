@@ -1,10 +1,10 @@
 #' Access the EnergyPlus library API
 #'
-#' Create a managed interface to a stock EnergyPlus 26.1 or 26.2 installation. The four
+#' Create a managed interface to a stock EnergyPlus 25.2, 26.1 or 26.2 installation. The four
 #' groups use the same method names as the bundled Python API, with an explicit
 #' managed `state` argument. This experimental interface does not change CLI jobs.
 #'
-#' @param eplus EnergyPlus version or installation directory. Only 26.1 and 26.2 are
+#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2 are
 #'   supported by this experimental library interface.
 #' @return An environment with `state_manager`, `functional`, `runtime`, and
 #'   `exchange` groups, and `info()`, `methods()`, and `close()` methods.
@@ -17,7 +17,7 @@
 #' `functional$psychrometrics(state)`, `glycol(state, name)`, and
 #' `refrigerant(state, name)` create state-bound objects with Python-compatible
 #' methods. Each property method still takes its owning state. Public resource
-#' deletion invalidates the R object; stock 26.1/26.2 may retain native allocations.
+#' deletion invalidates the R object; stock 25.2/26.1/26.2 may retain native allocations.
 #' Standalone factories support water and steam, matching the stock Python SDK.
 #' `functional$ep_version()` returns the full version string as an R character.
 #' Standalone functional files are isolated in a temporary state-owned directory.
@@ -25,7 +25,9 @@
 #'
 #' Register callbacks through `runtime$callback_*(state, f)`, then call
 #' `runtime$run_energyplus(state, command_line_args)`. The program name is added
-#' automatically. State callbacks receive the managed state; progress/message
+#' automatically. Prepared IDF and epJSON input must declare the selected engine
+#' version; a mismatch fails before starting the native run. State callbacks receive
+#' the managed state; progress/message
 #' callbacks receive their native payload, and the functional error callback
 #' receives severity and message. Callbacks run synchronously on the R thread.
 #' A native proxy blocks foreign-thread delivery and reports failure after return.
@@ -41,6 +43,8 @@
 #' before calling C. Invalid native exchange values are checked with the API
 #' error flag. `get_api_data(state)` copies a data frame and uses `freeAPIData()`.
 #' `methods()` lists exact bindings, arguments, ownership, and unsupported methods.
+#' Its `implementation` and `provenance` columns distinguish native operations,
+#' reviewed managed adapters, and unavailable operations for the selected release.
 #' `list_available_api_data_csv()` returns a character string reconstructed from
 #' that safely released data, without calling the unfreeable native CSV allocator.
 #' Its `plugin_only` column identifies global/trend methods available only to
@@ -50,7 +54,7 @@
 #' and kind-bound.
 #' Missing globals return a negative handle without entering the native fatal path;
 #' negative plugin handles cannot be used for reading or writing. Trend aggregates
-#' require `count >= 2`, matching stock 26.1/26.2. For native plugin handles,
+#' require `count >= 2`, matching stock 25.2/26.1/26.2. For native plugin handles,
 #' `get_trend_value()` remains disabled:
 #' the native upper index check permits an out-of-bounds read. Separately,
 #' [eplus_plugin()] can declare bounded R-managed trends with safe lookup and
@@ -86,7 +90,7 @@
 #'
 #' `close()` deletes states and resources before unloading the library. A
 #' finalizer is a fallback. Close/reset/delete and nested runs are rejected during
-#' simulation. Original 26.1/26.2 library leaks are not repaired: use a fresh R process
+#' simulation. Original 25.2/26.1/26.2 library leaks are not repaired: use a fresh R process
 #' for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
 #' `backend = "api"`; [eplus_session()] provides live worker stepping and pause.
 #' @examples
@@ -288,6 +292,20 @@ api__construct <- function(ctx) {
         if (is.null(spec$signature)) {
             spec$signature <- ""
         }
+        # Report whether a method enters C or supplies reviewed R behavior instead.
+        spec$implementation <- if (spec$status != "supported") {
+            "unsupported"
+        } else if (!nzchar(spec$symbol) || spec$kind == "api_data_csv") {
+            "managed"
+        } else {
+            "native"
+        }
+        spec$provenance <- paste0(
+            "EnergyPlus ",
+            ctx$manifest$energyplus,
+            ": ",
+            if (spec$implementation == "native") spec$symbol else spec$kind
+        )
         spec
     })
     ctx$pid <- Sys.getpid()
@@ -1108,6 +1126,60 @@ api__input_metadata <- function(ctx, entry, method, values) {
     metadata$objects[[kind]] %||% character()
 }
 
+# Check the frozen prepared input identity before entering or mutating native simulation state.
+api__validate_input_version <- function(model, source, version) {
+    if (grepl("[.]epjson$", model, ignore.case = TRUE)) {
+        input <- tryCatch(
+            jsonlite::fromJSON(source, simplifyVector = FALSE),
+            error = function(e) {
+                api__error("Cannot identify model version: invalid epJSON.")
+            }
+        )
+        versions <- vapply(
+            input[["Version"]],
+            function(object) {
+                object[["version_identifier"]] %||% NA_character_
+            },
+            character(1L)
+        )
+    } else {
+        # Semicolon-delimited objects allow comments and multiple objects on one line.
+        objects <- strsplit(gsub("![^\n]*", "", source), ";", fixed = TRUE)[[
+            1L
+        ]]
+        objects <- objects[grepl(
+            "^[[:space:]]*Version[[:space:]]*,",
+            objects,
+            ignore.case = TRUE
+        )]
+        versions <- trimws(sub(
+            "^[[:space:]]*Version[[:space:]]*,[[:space:]]*",
+            "",
+            objects,
+            ignore.case = TRUE
+        ))
+    }
+    if (
+        length(versions) != 1L ||
+            is.na(versions) ||
+            is.na(standardize_ver(versions, strict = TRUE))
+    ) {
+        api__error(
+            "Prepared input must declare exactly one valid model version."
+        )
+    }
+    if (standardize_ver(versions, strict = TRUE) != standardize_ver(version)) {
+        api__error(paste0(
+            "Prepared model version must match EnergyPlus ",
+            version,
+            "; input declares ",
+            versions,
+            "."
+        ))
+    }
+    invisible(NULL)
+}
+
 # Execute one native lifecycle, retaining argv/callbacks and reporting failures only after cleanup.
 api__run <- function(ctx, entry, args) {
     if (!is.character(args) || anyNA(args) || !length(args)) {
@@ -1144,9 +1216,10 @@ api__run <- function(ctx, entry, args) {
             grepl('"PythonPlugin:', source, fixed = TRUE)
     ) {
         api__error(
-            "PythonPlugin models are outside the EnergyPlus 26.1/26.2 R library workflow."
+            "PythonPlugin models are outside this R library workflow."
         )
     }
+    api__validate_input_version(models, source, ctx$manifest$energyplus)
     plugin__prepare(ctx, entry)
     entry$input_metadata <- api__capture_input(args, models, source)
     argv <- ctx$ffi$argv(enc2utf8(c("energyplus", args)))
@@ -1230,7 +1303,15 @@ api__invoke <- function(ctx, spec, values, resource) {
         return(plugin__trend_invoke(ctx, spec$method, values))
     }
     if (spec$status != "supported") {
-        api__error(spec$reason)
+        api__error(paste0(
+            spec$group,
+            "$",
+            spec$method,
+            " is unavailable for EnergyPlus ",
+            ctx$manifest$energyplus,
+            ": ",
+            spec$reason
+        ))
     }
     if (spec$plugin_only && !ctx$plugin_mode) {
         api__error("This method requires an executable-hosted R plugin state.")
@@ -1422,7 +1503,7 @@ api__invoke <- function(ctx, spec, values, resource) {
     }
     # Stock aggregate functions require at least two historical values, including min/max/sum.
     if (spec$input_handle_kind == "plugin_trend" && arguments[[3L]] < 2L) {
-        api__error("Stock 26.1/26.2 trend aggregates require count >= 2.")
+        api__error("Stock EnergyPlus trend aggregates require count >= 2.")
     }
     check_flag <- spec$group == "exchange" &&
         (length(handle_name) || nzchar(spec$handle_kind))
@@ -1450,13 +1531,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 25.2/26.1/26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.

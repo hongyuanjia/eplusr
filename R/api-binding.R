@@ -1,6 +1,7 @@
 # Map a reviewed ABI family to porter-generated declarations, never to handwritten signatures.
 api_bind__select <- function(abi) {
-    stopifnot(identical(abi, "26.1-26.2"))
+    stopifnot(abi %in% c("25.2-26.2", "26.1-26.2"))
+    # Porter output for stock 25.2 matches every 26.1 function and APIDataEntry field.
     list(
         dynport = "EnergyPlus-26.1.dynport",
         api_version = "0.2",
@@ -24,7 +25,7 @@ api__load <- function(directory, version = "26.1.0") {
     library <- rdyncall::dynload(path, auto.unload = FALSE)
     if (is.null(library)) {
         api__error(
-            "Cannot load the selected EnergyPlus API library into this R process."
+            "Cannot load the selected EnergyPlus API library into this R process. Check that R and the library have matching architectures."
         )
     }
     success <- FALSE
