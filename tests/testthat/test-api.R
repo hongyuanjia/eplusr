@@ -1963,6 +1963,58 @@ test_that("stock runtime requires one valid prepared model version", {
     }
 })
 
+# Reviewed 22.x libraries share D221 declarations while preserving managed resource ownership.
+test_that("stock 22.x APIs preserve uniform groups and reject stale functional resources", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("22.1", "22.2"))
+    result <- callr::r(
+        function(version) {
+            api <- eplusr::eplus_api(version)
+            on.exit(api$close(), add = TRUE)
+            state <- api$state_manager$new_state()
+            glycol <- api$functional$glycol(state, "water")
+            heat_capacity <- glycol$specific_heat(state, 20)
+            api$runtime$set_console_output_status(state, FALSE)
+            api$exchange$request_variable(
+                state,
+                "Zone Mean Air Temperature",
+                "ZONE ONE"
+            )
+            before <- api$exchange$api_data_fully_ready(state)
+            api$state_manager$reset_state(state)
+            stale <- tryCatch(
+                glycol$specific_heat(state, 20),
+                error = conditionMessage
+            )
+            api$state_manager$delete_state(state)
+            deleted <- tryCatch(
+                api$exchange$request_variable(state, "Temperature", "Zone"),
+                error = conditionMessage
+            )
+            list(
+                info = api$info(),
+                methods = api$methods(),
+                heat_capacity = heat_capacity,
+                before = before,
+                stale = stale,
+                deleted = deleted
+            )
+        },
+        args = list(version),
+        libpath = .libPaths()
+    )
+    expect_match(result$info$version, paste0(version, ".0"), fixed = TRUE)
+    expect_true(all(
+        c("state_manager", "functional", "runtime", "exchange") %in%
+            result$methods$group
+    ))
+    expect_equal(result$heat_capacity, 4180, tolerance = 0.02)
+    expect_false(result$before)
+    expect_match(result$stale, "reset|stale|generation|deleted")
+    expect_match(result$deleted, "closed|deleted")
+})
+
 # Stock release metadata must remain safe when discovery layouts or public getters differ.
 test_that("stock older API reports safe discovery and readiness capabilities", {
     fixture <- testrun__api_fixture()
@@ -2227,4 +2279,146 @@ test_that("stock early API rounds fractional minute boundaries consistently", {
         c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
     )
     expect_identical(minutes, c(10L, 20L, 30L, 40L, 50L, 60L))
+})
+
+# A failed early hook must return its original condition even when no weather boundary exists.
+test_that("stock early design-only callback failures finish safely with original conditions", {
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("9.5", "9.6", "22.1"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (mode in c("error", "interrupt")) {
+        result <- callr::r(
+            function(version, model, directory, mode) {
+                api <- eplusr::eplus_api(version)
+                on.exit(api$close(), add = TRUE)
+                state <- api$state_manager$new_state()
+                api$runtime$callback_begin_system_timestep_before_predictor(
+                    state,
+                    function(s) {
+                        if (api$exchange$warmup_flag(s)) {
+                            return(NULL)
+                        }
+                        stop(structure(
+                            list(
+                                message = "original early failure",
+                                call = NULL,
+                                marker = 42L
+                            ),
+                            class = c(mode, "condition")
+                        ))
+                    }
+                )
+                condition <- tryCatch(
+                    api$runtime$run_energyplus(
+                        state,
+                        c("--design-day", "-d", directory, model)
+                    ),
+                    error = identity,
+                    interrupt = identity
+                )
+                list(
+                    class = class(condition),
+                    marker = condition$marker,
+                    message = conditionMessage(condition),
+                    status = api$state_manager$status(state)
+                )
+            },
+            args = list(
+                version,
+                fixture$model,
+                file.path(fixture$directory, mode),
+                mode
+            ),
+            libpath = .libPaths(),
+            timeout = 120
+        )
+        expect_true(mode %in% result$class)
+        expect_identical(result$marker, 42L)
+        expect_identical(result$message, "original early failure")
+        expect_identical(result$status$phase, "closed")
+        expect_identical(
+            result$status$stop_reason,
+            if (mode == "interrupt") "interrupt" else "callback_error"
+        )
+    }
+})
+
+# Legacy identity checks inspect the selected installation without accepting unverified SDK metadata.
+test_that("stock early API rejects missing or conflicting SDK identity", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(identical(version, "9.5"))
+    root <- eplus_config(version)$dir
+    on.exit(use_eplus(root), add = TRUE)
+    directory <- tempfile("eplusr-early-identity-")
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(version)
+    source_library <- api$info()$library
+    library <- if (.Platform$OS.type == "windows") {
+        "EnergyPlusAPI.dll"
+    } else if (Sys.info()[["sysname"]] == "Darwin") {
+        "libenergyplusapi.dylib"
+    } else {
+        "libenergyplusapi.so"
+    }
+
+    api$close()
+    executable <- if (.Platform$OS.type == "windows") {
+        "energyplus.exe"
+    } else {
+        "energyplus"
+    }
+    for (name in c(library, executable, "Energy+.idd")) {
+        source_path <- if (name == library) {
+            source_library
+        } else {
+            file.path(root, name)
+        }
+        if (
+            !suppressWarnings(file.symlink(
+                source_path,
+                file.path(directory, name)
+            ))
+        ) {
+            expect_true(file.copy(
+                file.path(root, name),
+                file.path(directory, name)
+            ))
+        }
+    }
+    expect_error(eplus_api(directory), "matching installed SDK")
+    dir.create(file.path(directory, "pyenergyplus"))
+    sdk <- file.path(directory, "pyenergyplus", "func.py")
+    writeLines("invalid SDK", sdk)
+    expect_error(eplus_api(directory), "Cannot identify.*SDK")
+    source <- readLines(
+        file.path(root, "pyenergyplus", "func.py"),
+        warn = FALSE
+    )
+    writeLines(
+        sub(
+            'ep_version_minor = int("5")',
+            'ep_version_minor = int("6")',
+            source,
+            fixed = TRUE
+        ),
+        sdk
+    )
+    expect_error(eplus_api(directory), "symbols do not match.*SDK")
+    writeLines(
+        sub(
+            'ep_version_build = str("',
+            'ep_version_build = str("wrong',
+            source,
+            fixed = TRUE
+        ),
+        sdk
+    )
+    expect_error(eplus_api(directory), "CLI does not match.*SDK")
+    writeLines(source, sdk)
+    selected <- eplus_api(directory)
+    on.exit(selected$close(), add = TRUE)
+    expect_match(selected$info()$identity_source, "SDK.*symbols.*CLI")
 })

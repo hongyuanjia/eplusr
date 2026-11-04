@@ -144,8 +144,8 @@ Function:
     tomorrowWeatherDiffuseSolarRadiationAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherAlbedoAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherLiquidPrecipitationAtTime(pii)d state hour timeStepNum;
-Variadic: 
-FuncPtr: 
-Enum: 
-Struct: 
-Union: 
+Variadic:
+FuncPtr:
+Enum:
+Struct:
+Union:

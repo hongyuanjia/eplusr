@@ -1,10 +1,10 @@
 #' Access the EnergyPlus library API
 #'
-#' Create a managed interface to a stock EnergyPlus 9.5, 9.6, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
+#' Create a managed interface to a stock EnergyPlus 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
 #' groups use the same method names as the bundled Python API, with an explicit
 #' managed `state` argument. This experimental interface does not change CLI jobs.
 #'
-#' @param eplus EnergyPlus version or installation directory. Only 9.5, 9.6, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
+#' @param eplus EnergyPlus version or installation directory. Only 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
 #'   supported by this experimental library interface.
 #' @return An environment with `state_manager`, `functional`, `runtime`, and
 #'   `exchange` groups, and `info()`, `methods()`, and `close()` methods.
@@ -20,18 +20,18 @@
 #' deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 #' Standalone factories support water and steam, matching the stock Python SDK.
 #' `functional$ep_version()` returns the full version string as an R character.
-#' On 9.5, which lacks a native version getter, `info()$identity_source` records
+#' On 9.4/9.5, which lack a native version getter, `info()$identity_source` records
 #' identification from matching SDK version/build constants, library generation
 #' symbols and the selected CLI build. The library is never replaced by discovery.
-#' The 9.5 runtime cannot suppress console output: enabling output is a managed
+#' The 9.4/9.5 runtime cannot suppress console output: enabling output is a managed
 #' no-op, while requesting suppression reports a capability error. The selected
 #' IDD is supplied explicitly; native helper flags require prior external preparation.
-#' `current_sim_time()` on 9.5 requires an owned, observed running lifecycle;
+#' `current_sim_time()` on 9.4/9.5 requires an owned, observed running lifecycle;
 #' protected environment/zone hooks supply relative elapsed hours, resetting after
 #' warmup. It is unavailable on borrowed states or before a run. Calendar years
-#' are not inferred. On 9.5/9.6, `minutes()` uses the modern rounded convention.
+#' are not inferred. On 9.4/9.5/9.6, `minutes()` uses the modern rounded convention.
 #'
-#' On 9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
+#' On 9.4/9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
 #' zone boundary, because earlier report finalization can dereference uninitialized
 #' stock resilience tables. After callback failure, user delivery stays disabled
 #' and the original condition is rethrown after native return. A design-only run
@@ -1683,13 +1683,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 9.5/9.6/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 9.4/9.5/9.6/22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 9.4, 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.

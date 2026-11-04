@@ -722,7 +722,7 @@ test_that("stock sessions preserve calendar provenance across December and Janua
         c(row$month, row$day, row$hour)
     )
     expect_equal(december$time_start, row$hour - row$interval / 60)
-    if (version != "23.1") {
+    if (numeric_version(version) >= "23.2") {
         expect_equal(december$year, row$year)
     }
     session$close()
