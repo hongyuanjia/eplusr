@@ -1940,6 +1940,58 @@ test_that("stock runtime requires one valid prepared model version", {
     }
 })
 
+# Reviewed 22.x libraries share D221 declarations while preserving managed resource ownership.
+test_that("stock 22.x APIs preserve uniform groups and reject stale functional resources", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("22.1", "22.2"))
+    result <- callr::r(
+        function(version) {
+            api <- eplusr::eplus_api(version)
+            on.exit(api$close(), add = TRUE)
+            state <- api$state_manager$new_state()
+            glycol <- api$functional$glycol(state, "water")
+            heat_capacity <- glycol$specific_heat(state, 20)
+            api$runtime$set_console_output_status(state, FALSE)
+            api$exchange$request_variable(
+                state,
+                "Zone Mean Air Temperature",
+                "ZONE ONE"
+            )
+            before <- api$exchange$api_data_fully_ready(state)
+            api$state_manager$reset_state(state)
+            stale <- tryCatch(
+                glycol$specific_heat(state, 20),
+                error = conditionMessage
+            )
+            api$state_manager$delete_state(state)
+            deleted <- tryCatch(
+                api$exchange$request_variable(state, "Temperature", "Zone"),
+                error = conditionMessage
+            )
+            list(
+                info = api$info(),
+                methods = api$methods(),
+                heat_capacity = heat_capacity,
+                before = before,
+                stale = stale,
+                deleted = deleted
+            )
+        },
+        args = list(version),
+        libpath = .libPaths()
+    )
+    expect_match(result$info$version, paste0(version, ".0"), fixed = TRUE)
+    expect_true(all(
+        c("state_manager", "functional", "runtime", "exchange") %in%
+            result$methods$group
+    ))
+    expect_equal(result$heat_capacity, 4180, tolerance = 0.02)
+    expect_false(result$before)
+    expect_match(result$stale, "reset|stale|generation|deleted")
+    expect_match(result$deleted, "closed|deleted")
+})
+
 # Stock release metadata must remain safe when discovery layouts or public getters differ.
 test_that("stock older API reports safe discovery and readiness capabilities", {
     fixture <- testrun__api_fixture()
