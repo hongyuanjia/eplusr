@@ -428,7 +428,8 @@ test_that("HVAC substeps do not shift completed zone intervals and actuator rele
             heating = c(
                 "Zone Thermostat Heating Setpoint Temperature",
                 "ZONE ONE"
-            )
+            ),
+            temperature = c("Zone Mean Air Temperature", "ZONE ONE")
         ),
         actuators = list(
             heating = c(
@@ -456,6 +457,8 @@ test_that("HVAC substeps do not shift completed zone intervals and actuator rele
         tolerance = 1e-10
     )
     expect_equal(fourth$values[["heating"]], 20)
+    # The ideal-loads zone must physically respond to the higher thermostat action.
+    expect_gt(first$values[["temperature"]], fourth$values[["temperature"]] + 1)
     session$close()
 })
 
@@ -638,4 +641,86 @@ test_that("sessions reject model and installation version mismatches before star
         eplus_session("model.idf", "weather.epw"),
         "model version must match"
     )
+})
+
+# Completed observations distinguish calendar availability from EPW year across a real year boundary.
+test_that("stock sessions preserve calendar provenance across December and January", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    model <- read_idf(fixture$model)
+    model$set(
+        RunPeriod := list(
+            begin_month = 12,
+            begin_day_of_month = 31,
+            begin_year = 2019,
+            end_month = 1,
+            end_day_of_month = 1,
+            end_year = 2020
+        )
+    )
+    model$save(fixture$model, overwrite = TRUE)
+    cat(
+        "\nOutput:Variable,ZONE ONE,Zone Mean Air Temperature,Timestep;\n",
+        file = fixture$model,
+        append = TRUE
+    )
+    session <- eplus_session(
+        fixture$model,
+        fixture$weather,
+        eplus = version,
+        variables = list(
+            temperature = c("Zone Mean Air Temperature", "ZONE ONE")
+        ),
+        dir = file.path(fixture$directory, "calendar"),
+        sample_every = 128L
+    )
+    on.exit(try(session$close(), silent = TRUE), add = TRUE)
+    first <- session$initialize()
+    december <- session$step(n = 95L)
+    expect_identical(session$observe(wait = FALSE), december)
+    january <- session$step(n = 1L)
+    expect_identical(session$observe(wait = FALSE), january)
+    expect_identical(first$month, 12L)
+    expect_identical(first$day, 31L)
+    expect_identical(january$month, 1L)
+    expect_identical(january$day, 1L)
+    expect_identical(january$step, 97L)
+    expect_true(is.finite(january$values[["temperature"]]))
+    for (observation in list(first, december, january)) {
+        expect_identical(observation$calendar_year_available, version != "23.1")
+        expect_true(is.finite(observation$weather_year))
+    }
+    if (version == "23.1") {
+        expect_identical(first$year, NA_integer_)
+        expect_identical(december$year, NA_integer_)
+        expect_identical(january$year, NA_integer_)
+    } else {
+        expect_identical(first$year, 2019L)
+        expect_identical(december$year, 2019L)
+        expect_identical(january$year, 2020L)
+    }
+    expect_equal(
+        c(december$month, december$day, december$time_start, december$time_end),
+        c(12, 31, 23.75, 24)
+    )
+    session$resume()
+    job <- session$result()
+    expect_true(job$status()$successful)
+    # SQLite records the completed interval before native calendarYear advances for yearly reporting.
+    times <- job$read_table("Time")
+    row <- subset(
+        times,
+        month == 12 & day == 31 & hour == 24 & minute == 0 & interval == 15
+    )
+    expect_equal(nrow(row), 1L)
+    expect_equal(
+        c(december$month, december$day, december$time_end),
+        c(row$month, row$day, row$hour)
+    )
+    expect_equal(december$time_start, row$hour - row$interval / 60)
+    if (version != "23.1") {
+        expect_equal(december$year, row$year)
+    }
+    session$close()
 })

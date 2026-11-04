@@ -1759,17 +1759,17 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
             state <- api$state_manager$new_state()
             psych <- api$functional$psychrometrics(state)
             heat_capacity <- psych$specific_heat(state, 0)
-            # Verify both native resource families before their owning state is reset.
+            # Exercise both native resource owners and their public deletion boundary.
             water <- api$functional$glycol(state, "WATER")
             steam <- api$functional$refrigerant(state, "STEAM")
-            water_capacity <- water$specific_heat(state, 20)
+            water_density <- water$density(state, 20)
             steam_pressure <- steam$saturation_pressure(state, 100)
             water$delete(state)
+            steam$delete(state)
             retired <- tryCatch(
-                water$specific_heat(state, 20),
+                water$density(state, 20),
                 error = conditionMessage
             )
-            steam$delete(state)
             api$runtime$set_console_output_status(state, FALSE)
             api$exchange$request_variable(
                 state,
@@ -1786,7 +1786,7 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
             list(
                 info = api$info(),
                 heat_capacity = heat_capacity,
-                water_capacity = water_capacity,
+                water_density = water_density,
                 steam_pressure = steam_pressure,
                 retired = retired,
                 methods = api$methods(),
@@ -1801,11 +1801,9 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
     expect_match(result$info$version, paste0(version, ".0"), fixed = TRUE)
     # The stock psychrometric equation clamps humidity ratio to 1e-5 kg/kg.
     expect_equal(result$heat_capacity, 1004.8585895, tolerance = 1e-9)
-    expect_gt(result$water_capacity, 4100)
-    expect_lt(result$water_capacity, 4300)
-    expect_gt(result$steam_pressure, 90000)
-    expect_lt(result$steam_pressure, 110000)
-    expect_match(result$retired, "invalid|closed")
+    expect_equal(result$water_density, 998.2, tolerance = 0.001)
+    expect_equal(result$steam_pressure, 101325, tolerance = 0.01)
+    expect_match(result$retired, "closed")
     methods <- result$methods
     if (version == "24.2") {
         expect_true(all(grepl(
@@ -1816,11 +1814,11 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
     expect_true(all(c("implementation", "provenance") %in% names(methods)))
     expect_identical(
         methods$implementation[methods$method == "get_api_data"],
-        "native"
+        if (version == "23.1") "unsupported" else "native"
     )
     expect_identical(
         methods$implementation[methods$method == "list_available_api_data_csv"],
-        "managed"
+        if (version == "23.1") "unsupported" else "managed"
     )
     expect_identical(
         methods$implementation[methods$method == "get_trend_value"],
@@ -1971,8 +1969,102 @@ test_that("stock 22.x APIs preserve uniform groups and reject stale functional r
     expect_match(result$deleted, "closed|deleted")
 })
 
+# Stock release metadata must remain safe when discovery layouts or public getters differ.
+test_that("stock older API reports safe discovery and readiness capabilities", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    marker <- file.path(fixture$directory, "discovery.rds")
+    setup <- function(api, state) {
+        exchange <- api$exchange
+        methods <- api$methods()
+        before <- exchange$api_data_fully_ready(state)
+        exchange$request_variable(
+            state,
+            "Zone Mean Air Temperature",
+            "ZONE ONE"
+        )
+        api$runtime$callback_end_zone_timestep_after_zone_reporting(
+            state,
+            function(s) {
+                if (
+                    !exchange$api_data_fully_ready(s) ||
+                        exchange$warmup_flag(s) ||
+                        exchange$kind_of_sim(s) != 3L
+                ) {
+                    return(NULL)
+                }
+                capture <- function(f) tryCatch(f(), error = conditionMessage)
+                handle <- exchange$get_variable_handle(
+                    s,
+                    "Zone Mean Air Temperature",
+                    "ZONE ONE"
+                )
+                saveRDS(
+                    list(
+                        before = before,
+                        data = capture(function() exchange$get_api_data(s)),
+                        csv = capture(function() {
+                            exchange$list_available_api_data_csv(s)
+                        }),
+                        year = capture(function() exchange$calendar_year(s)),
+                        value = exchange$get_variable_value(s, handle),
+                        methods = methods
+                    ),
+                    marker
+                )
+                api$runtime$stop_simulation(s)
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = version,
+        backend = setup,
+        output_dir = file.path(fixture$directory, "discovery"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        result$api$stop_reason,
+        "user_stop",
+        info = result$api$error$message
+    )
+    expect_true(file.exists(marker))
+    measured <- readRDS(marker)
+    expect_false(measured$before)
+    expect_true(is.finite(measured$value))
+    if (version == "23.1") {
+        expect_match(measured$data, "unavailable.*23.1.0.*discovery")
+        expect_match(measured$csv, "unavailable.*23.1.0.*discovery")
+        expect_match(measured$year, "unavailable.*23.1.0.*calendar")
+    } else {
+        data <- measured$data
+        expect_identical(names(data), c("what", "name", "key", "type", "unit"))
+        variables <- subset(
+            data,
+            what == "OutputVariable" & name == "Zone Mean Air Temperature"
+        )
+        expect_true("ZONE ONE" %in% toupper(variables$key))
+        actuators <- subset(data, what == "Actuator" & name == "Weather Data")
+        expect_true("Outdoor Dry Bulb" %in% actuators$type)
+        expect_true("ENVIRONMENT" %in% toupper(actuators$key))
+        if (version %in% c("23.2", "24.1")) {
+            expect_true(all(is.na(data$unit)))
+        }
+        expect_match(measured$csv, "Weather Data,Outdoor Dry Bulb,Environment")
+        expect_true(is.finite(measured$year))
+    }
+})
+
 # Check the five-pointer API data contract while the stock callback reads and writes controls.
 test_that("stock callbacks preserve exchange units and typed control ownership", {
+    skip_if(
+        numeric_version(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")) <
+            "24.2",
+        "Five-pointer native units are available from 24.2"
+    )
     fixture <- testapi__controlled_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     marker <- file.path(fixture$directory, "exchange.rds")

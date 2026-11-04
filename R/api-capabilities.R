@@ -10,7 +10,7 @@ api_cap__check <- function(native, signatures, manifest, binding) {
         "stateNew",
         "stateDelete",
         "apiVersionFromEPlus",
-        "freeAPIData",
+        if (length(binding$api_data_fields)) "freeAPIData",
         "stopSimulation",
         "apiErrorFlag",
         "resetErrorFlag",
@@ -22,6 +22,9 @@ api_cap__check <- function(native, signatures, manifest, binding) {
         }
     }
     # The generated typeinfo owns the ABI layout; R only decides how its data is copied.
+    if (!length(binding$api_data_fields)) {
+        return(NULL)
+    }
     layout <- native$APIDataEntry
     if (
         !inherits(layout, "typeinfo") ||

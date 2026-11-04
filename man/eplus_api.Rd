@@ -7,17 +7,17 @@
 eplus_api(eplus = "26.1")
 }
 \arguments{
-\item{eplus}{EnergyPlus version or installation directory. Only 24.2, 25.1,
-25.2, 26.1 and 26.2 are supported by this experimental library interface.}
+\item{eplus}{EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
+supported by this experimental library interface.}
 }
 \value{
 An environment with \code{state_manager}, \code{functional}, \code{runtime}, and
 \code{exchange} groups, and \code{info()}, \code{methods()}, and \code{close()} methods.
 }
 \description{
-Create a managed interface to a stock EnergyPlus 24.2 through 26.2 installation.
-The four groups use the same method names as the bundled Python API, with an
-explicit managed \code{state} argument. This experimental interface does not change CLI jobs.
+Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
+groups use the same method names as the bundled Python API, with an explicit
+managed \code{state} argument. This experimental interface does not change CLI jobs.
 }
 \details{
 \code{state_manager$new_state()} returns an opaque state. Use \code{reset_state(state)}
@@ -53,9 +53,13 @@ Queries and actions requiring initialized data must run in a ready callback.
 Passing a handle from another state, kind, or reset generation is rejected
 before calling C. Invalid native exchange values are checked with the API
 error flag. \code{get_api_data(state)} copies a data frame and uses \code{freeAPIData()}.
-On 24.2, bracketed native units such as \verb{[C]} are normalized to \code{C}, matching
-later releases. \code{methods()} lists exact bindings, arguments, ownership,
-and unsupported methods.
+Releases before 23.2 have no safely releasable discovery array, so discovery
+reports a capability error. In 23.2/24.1 the common data frame has \code{unit = NA};
+the reconstructed CSV uses an empty unit field for unavailable unit metadata.
+The 23.2 key/type field semantics are normalized to later releases.
+\code{calendar_year()} is unavailable before 23.2; \code{year()} remains the EPW year.
+On 24.2, bracketed native units such as \verb{[C]} are normalized to \code{C}.
+\code{methods()} lists exact bindings, arguments, ownership, and unsupported methods.
 Its \code{implementation} and \code{provenance} columns distinguish native operations,
 reviewed managed adapters, and unavailable operations for the selected release.
 \code{list_available_api_data_csv()} returns a character string reconstructed from
