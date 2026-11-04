@@ -1,10 +1,17 @@
 # Select reviewed R behavior independently of the generated C binding format.
 api_profile__select <- function(version) {
     version <- as.character(version)
-    if (length(version) != 1L || !version %in% c("26.1.0", "26.2.0")) {
-        api__error("The API requires an EnergyPlus 26.1 or 26.2 installation.")
+    if (
+        length(version) != 1L || !version %in% c("25.2.0", "26.1.0", "26.2.0")
+    ) {
+        api__error(
+            "The API requires an EnergyPlus 25.2, 26.1 or 26.2 installation."
+        )
     }
-    list(version = version, abi = "26.1-26.2")
+    list(
+        version = version,
+        abi = if (version == "25.2.0") "25.2-26.2" else "26.1-26.2"
+    )
 }
 
 # Define reviewed management policy; function signatures and layouts come from the dynport.
@@ -752,7 +759,7 @@ api__manifest <- function(version = "26.1.0") {
                 "get_trend_value",
                 "getPluginTrendVariableValue",
                 parameters = "state, trend_handle, time_index",
-                reason = "Stock 26.1/26.2 index trend history out of bounds at time_index = history size; no public history-size query.",
+                reason = "Reviewed stock releases index trend history out of bounds at time_index = history size; no public history-size query.",
                 plugin_only = TRUE,
                 input_handle_kind = "plugin_trend",
                 requires_ready = TRUE
@@ -1148,7 +1155,7 @@ api__rule <- function(
         state = "owned state; managed stateDelete before library unload",
         reset = "stateReset; invalidates children, requests and callbacks",
         delete = "stateDelete; retires resources and retained callbacks",
-        resource_delete = "R view invalidation; stock 26.1/26.2 public native deleter is a no-op",
+        resource_delete = "R view invalidation; reviewed stock public native deleter is a no-op",
         scalar = "scalar return or copied argument; no caller-owned native allocation",
         resource = "state/generation-owned view; native allocations may survive public deletion",
         static_string = "borrowed static string copied to R character",
