@@ -1640,21 +1640,30 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
                         )
                     )
                 } else {
-                    message <- tryCatch(
-                        api$exchange$get_trend_value(
-                            state,
-                            getOption("eplusr.test.trend.handle"),
-                            1L
-                        ),
-                        error = conditionMessage
-                    )
-                    if (
-                        !is.character(message) ||
-                            !grepl("plugin binding", message)
-                    ) {
-                        stop(
-                            "A managed trend crossed plugin binding ownership."
+                    for (operation in c(
+                        "value",
+                        "average",
+                        "min",
+                        "max",
+                        "sum",
+                        "direction"
+                    )) {
+                        message <- tryCatch(
+                            api$exchange[[paste0("get_trend_", operation)]](
+                                state,
+                                getOption("eplusr.test.trend.handle"),
+                                1L
+                            ),
+                            error = conditionMessage
                         )
+                        if (
+                            !is.character(message) ||
+                                !grepl("plugin binding", message)
+                        ) {
+                            stop(
+                                "A managed trend crossed plugin binding ownership."
+                            )
+                        }
                     }
                 }
             },
@@ -1676,14 +1685,21 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
     factory(api, state)
     handle <- api$exchange$get_trend_handle(state, "n")
     other <- api$state_manager$new_state()
-    expect_error(
-        api$exchange$get_trend_value(other, handle, 1L),
-        "another state"
-    )
+    for (operation in c("value", "average", "min", "max", "sum", "direction")) {
+        expect_error(
+            api$exchange[[paste0("get_trend_", operation)]](other, handle, 1L),
+            "another state"
+        )
+    }
     factory(api, state)
     expect_error(api$exchange$get_trend_handle(state, "n"), "ambiguous")
     api$state_manager$reset_state(state)
-    expect_error(api$exchange$get_trend_value(state, handle, 1L), "retired")
+    for (operation in c("value", "average", "min", "max", "sum", "direction")) {
+        expect_error(
+            api$exchange[[paste0("get_trend_", operation)]](state, handle, 1L),
+            "retired"
+        )
+    }
     factory(api, state)
     api$runtime$run_energyplus(
         state,
@@ -1694,7 +1710,12 @@ test_that("managed trend handles reject retired cross-state and ambiguous owners
     expect_identical(result$trends$n$capacity, 1L)
     expect_identical(result$trends$n$valid_count, 1L)
     expect_identical(result$trends$n$total_samples, 96L)
-    expect_error(api$exchange$get_trend_value(state, handle, 1L), "retired")
+    for (operation in c("value", "average", "min", "max", "sum", "direction")) {
+        expect_error(
+            api$exchange[[paste0("get_trend_", operation)]](state, handle, 1L),
+            "retired"
+        )
+    }
 })
 
 # Warmup samples are optional and must disappear before formal-weather hooks observe history.
@@ -2035,9 +2056,17 @@ test_that("host plugin managed trend declarations and capability metadata are ex
     expect_identical(
         methods$managed_plugin_trend[
             methods$method %in%
-                c("get_trend_handle", "get_trend_value")
+                c(
+                    "get_trend_handle",
+                    "get_trend_value",
+                    "get_trend_average",
+                    "get_trend_min",
+                    "get_trend_max",
+                    "get_trend_sum",
+                    "get_trend_direction"
+                )
         ],
-        c(TRUE, TRUE)
+        rep(TRUE, 7L)
     )
     expect_identical(
         methods$status[methods$method == "get_trend_value"],
@@ -2117,4 +2146,265 @@ test_that("stock early trends keep a chronological clock across New Year", {
     expect_equal(result$data$last, 48)
     expect_identical(result$trends$clock$total_samples, 192L)
     expect_equal(result$trends$clock$latest$time, 48)
+})
+
+# Known hook values give independently worked aggregates through the public host plugin API.
+test_that("managed trend aggregates support one sample and newest wrapped windows", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    plugin <- eplus_plugin(
+        list(
+            initialize = function(api, state, plugin) {
+                plugin$data$n <- 0L
+                plugin$handles$trend <- api$exchange$get_trend_handle(
+                    state,
+                    "sequence"
+                )
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$n <- plugin$data$n + 1L
+                if (plugin$data$n == 2L) {
+                    plugin$data$single <- vapply(
+                        c("average", "min", "max", "sum"),
+                        function(operation) {
+                            api$exchange[[paste0("get_trend_", operation)]](
+                                state,
+                                plugin$handles$trend,
+                                1L
+                            )
+                        },
+                        numeric(1L)
+                    )
+                }
+                if (plugin$data$n == 5L) api$runtime$stop_simulation(state)
+            },
+            finalize = function(api, state, plugin) {
+                # The capacity-three history has wrapped from 1:5 to newest-first 5,4,3.
+                plugin$data$windows <- lapply(c(2L, 3L), function(count) {
+                    vapply(
+                        c("average", "min", "max", "sum"),
+                        function(operation) {
+                            api$exchange[[paste0("get_trend_", operation)]](
+                                state,
+                                plugin$handles$trend,
+                                count
+                            )
+                        },
+                        numeric(1L)
+                    )
+                })
+            }
+        ),
+        trends = list(
+            sequence = list(
+                source = function(api, state, plugin) plugin$data$n,
+                capacity = 3L
+            )
+        )
+    )
+    plugin(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_equal(unname(result$data$single), c(1, 1, 1, 1))
+    expect_equal(unname(result$data$windows[[1L]]), c(4.5, 4, 5, 9))
+    expect_equal(unname(result$data$windows[[2L]]), c(4, 3, 5, 12))
+})
+
+# A quarter-hour zone clock makes chronological slope units observable instead of index-based.
+test_that("managed trend direction uses elapsed hours and independent wrapped histories", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    for (sequence in list(
+        2 * (1:5) + 1,
+        20 - 3 * (1:5),
+        rep(7, 5),
+        c(2, 3, 10, 9, 20)
+    )) {
+        eplus_plugin(
+            list(
+                initialize = function(api, state, plugin) {
+                    plugin$data$n <- 0L
+                },
+                end_zone_timestep_after_zone_reporting = function(
+                    api,
+                    state,
+                    plugin
+                ) {
+                    if (api$exchange$kind_of_sim(state) != 3L) {
+                        return(NULL)
+                    }
+                    plugin$data$n <- plugin$data$n + 1L
+                    if (plugin$data$n == 5L && plugin$id == "4") {
+                        api$runtime$stop_simulation(state)
+                    }
+                },
+                finalize = function(api, state, plugin) {
+                    handle <- api$exchange$get_trend_handle(state, "sequence")
+                    plugin$data$slopes <- vapply(
+                        2:4,
+                        function(count) {
+                            api$exchange$get_trend_direction(
+                                state,
+                                handle,
+                                count
+                            )
+                        },
+                        numeric(1L)
+                    )
+                }
+            ),
+            data = list(sequence = sequence),
+            trends = list(
+                sequence = list(
+                    source = function(api, state, plugin) {
+                        plugin$data$sequence[[plugin$data$n]]
+                    },
+                    capacity = 4L
+                )
+            )
+        )(api, state)
+    }
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    results <- api$state_manager$status(state)$plugins
+    expect_equal(results[[1L]]$data$slopes, c(8, 8, 8))
+    expect_equal(results[[2L]]$data$slopes, c(-12, -12, -12))
+    expect_equal(results[[3L]]$data$slopes, c(0, 0, 0))
+    # Four-point least squares is 20 value units/hour; the endpoint slope is 22 2/3.
+    expect_equal(results[[4L]]$data$slopes, c(44, 20, 20))
+    expect_true(all(vapply(
+        results,
+        function(result) result$trends$sequence$valid_count == 4L,
+        logical(1L)
+    )))
+})
+
+# Aggregate validation uses valid samples, while a capacity-one buffer remains useful.
+test_that("managed trend aggregate counts reject invalid and insufficient history", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    eplus_plugin(
+        list(
+            initialize = function(api, state, plugin) {
+                plugin$data$n <- 0L
+                handle <- api$exchange$get_trend_handle(state, "sequence")
+                plugin$data$empty <- vapply(
+                    c("average", "min", "max", "sum", "direction"),
+                    function(operation) {
+                        tryCatch(
+                            api$exchange[[paste0("get_trend_", operation)]](
+                                state,
+                                handle,
+                                1L
+                            ),
+                            error = conditionMessage
+                        )
+                    },
+                    character(1L)
+                )
+            },
+            end_zone_timestep_after_zone_reporting = function(
+                api,
+                state,
+                plugin
+            ) {
+                if (api$exchange$kind_of_sim(state) != 3L) {
+                    return(NULL)
+                }
+                plugin$data$n <- plugin$data$n + 1L
+                if (plugin$data$n == 5L) api$runtime$stop_simulation(state)
+            },
+            finalize = function(api, state, plugin) {
+                handle <- api$exchange$get_trend_handle(state, "sequence")
+                plugin$data$invalid <- lapply(
+                    c("average", "min", "max", "sum", "direction"),
+                    function(operation) {
+                        vapply(
+                            list(
+                                0L,
+                                -1L,
+                                1.5,
+                                NA_real_,
+                                Inf,
+                                1 + 1i,
+                                "1",
+                                numeric(),
+                                c(1L, 2L),
+                                4L
+                            ),
+                            function(count) {
+                                tryCatch(
+                                    api$exchange[[paste0(
+                                        "get_trend_",
+                                        operation
+                                    )]](state, handle, count),
+                                    error = conditionMessage
+                                )
+                            },
+                            character(1L)
+                        )
+                    }
+                )
+                single <- api$exchange$get_trend_handle(state, "single")
+                plugin$data$single <- vapply(
+                    c("average", "min", "max", "sum"),
+                    function(operation) {
+                        api$exchange[[paste0("get_trend_", operation)]](
+                            state,
+                            single,
+                            1L
+                        )
+                    },
+                    numeric(1L)
+                )
+                plugin$data$direction_one <- tryCatch(
+                    api$exchange$get_trend_direction(state, single, 1L),
+                    error = conditionMessage
+                )
+            }
+        ),
+        trends = list(
+            sequence = list(
+                source = function(api, state, plugin) plugin$data$n,
+                capacity = 3L
+            ),
+            single = list(
+                source = function(api, state, plugin) plugin$data$n,
+                capacity = 1L
+            )
+        )
+    )(api, state)
+    api$runtime$run_energyplus(
+        state,
+        c("-w", fixture$weather, "-d", fixture$directory, fixture$model)
+    )
+    result <- api$state_manager$status(state)$plugins[[1L]]
+    expect_true(all(grepl("valid history", result$data$empty)))
+    expect_true(all(grepl(
+        "Trend count.*valid history",
+        unlist(result$data$invalid)
+    )))
+    expect_equal(unname(result$data$single), c(5, 5, 5, 5))
+    expect_match(result$data$direction_one, "at least two")
 })

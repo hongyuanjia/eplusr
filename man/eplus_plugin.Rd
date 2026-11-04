@@ -61,6 +61,13 @@ with \code{get_trend_value(state, handle, index)}. Histories begin empty; invali
 indices and insufficient valid history raise errors without zero padding.
 Outside a hook, lookup requires a unique name across active bindings. Handles
 cannot cross plugin bindings or states and retire after finalization or reset.
+\code{get_trend_average()}, \code{get_trend_min()}, \code{get_trend_max()} and
+\code{get_trend_sum()} aggregate the requested most recent valid samples, accepting
+a positive integer count including one. \code{get_trend_direction()} requires at
+least two samples and fits a least-squares slope against their actual completed-
+zone times in elapsed simulation hours. The slope has source-value units per
+hour and is positive when values increase chronologically, despite newest-first
+indexing. These counts cannot exceed the valid history; no storage is padded.
 
 One sample is committed after all end-zone hooks, including updates made by
 those hooks. Reads in the hooks see previously committed history. Collection

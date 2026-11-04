@@ -88,12 +88,16 @@ executable-hosted R plugins. For rows with \code{managed_plugin_trend = TRUE},
 provide separate conditional managed support. Their handles remain state-
 and kind-bound.
 Missing globals return a negative handle without entering the native fatal path;
-negative plugin handles cannot be used for reading or writing. Trend aggregates
-require \code{count >= 2}, matching stock 24.2 through 26.2. For native plugin handles,
+negative plugin handles cannot be used for reading or writing. Native trend
+aggregates require \code{count >= 2}, matching stock 24.2 through 26.2. For native plugin handles,
 \code{get_trend_value()} remains disabled:
 the native upper index check permits an out-of-bounds read. Separately,
 \code{\link[=eplus_plugin]{eplus_plugin()}} can declare bounded R-managed trends with safe lookup and
-indexed reads through these same method names, without PythonPlugin objects.
+indexed reads and aggregates through these same method names, without PythonPlugin
+objects. Managed average/minimum/maximum/sum accept any positive count within
+valid history, including one. Managed direction requires at least two samples
+and returns a least-squares slope in source-value units per elapsed simulation
+hour, positive for values increasing chronologically; see \code{\link[=eplus_plugin]{eplus_plugin()}}.
 
 \code{callback_register_external_hvac_manager()} uses the same callback safety
 boundary as other runtime hooks, but replaces the native HVAC manager entirely.

@@ -48,6 +48,13 @@
 #' indices and insufficient valid history raise errors without zero padding.
 #' Outside a hook, lookup requires a unique name across active bindings. Handles
 #' cannot cross plugin bindings or states and retire after finalization or reset.
+#' `get_trend_average()`, `get_trend_min()`, `get_trend_max()` and
+#' `get_trend_sum()` aggregate the requested most recent valid samples, accepting
+#' a positive integer count including one. `get_trend_direction()` requires at
+#' least two samples and fits a least-squares slope against their actual completed-
+#' zone times in elapsed simulation hours. The slope has source-value units per
+#' hour and is positive when values increase chronologically, despite newest-first
+#' indexing. These counts cannot exceed the valid history; no storage is padded.
 #'
 #' One sample is committed after all end-zone hooks, including updates made by
 #' those hooks. Reads in the hooks see previously committed history. Collection
@@ -499,10 +506,12 @@ plugin__trend_invoke <- function(ctx, method, values) {
         )
     }
     trend <- record$trends[[attr(handle, "name")]]
-    if (method != "get_trend_value") {
-        api__error("Managed trend aggregate is unavailable.")
+    # Indexed reads and aggregate windows share the same bounded valid-history limit.
+    index <- if (method == "get_trend_value") {
+        values$time_index
+    } else {
+        values$count
     }
-    index <- values$time_index
     if (
         !is.numeric(index) ||
             is.complex(index) ||
@@ -513,10 +522,37 @@ plugin__trend_invoke <- function(ctx, method, values) {
             index > length(trend$values)
     ) {
         api__error(
-            "Trend index must be a positive integer within valid history."
+            if (method == "get_trend_value") {
+                "Trend index must be a positive integer within valid history."
+            } else {
+                "Trend count must be a positive integer within valid history."
+            }
         )
     }
-    trend$values[[index]]
+    if (method == "get_trend_value") {
+        return(trend$values[[index]])
+    }
+    # Count one is meaningful for these aggregates, unlike the native plugin restriction.
+    samples <- trend$values[seq_len(index)]
+    switch(
+        method,
+        get_trend_average = mean(samples),
+        get_trend_min = min(samples),
+        get_trend_max = max(samples),
+        get_trend_sum = sum(samples),
+        get_trend_direction = {
+            if (index < 2L) {
+                api__error(
+                    "Trend direction requires at least two valid samples."
+                )
+            }
+            # Both vectors are newest-first; actual elapsed hours preserve chronological sign.
+            times <- trend$times[seq_len(index)]
+            centered <- times - mean(times)
+            sum(centered * (samples - mean(samples))) / sum(centered^2)
+        },
+        api__error("Managed trend aggregate is unavailable.")
+    )
 }
 
 # Install one protected final callback so all selected end-zone hooks precede the commit.

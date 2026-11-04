@@ -78,12 +78,16 @@
 #' provide separate conditional managed support. Their handles remain state-
 #' and kind-bound.
 #' Missing globals return a negative handle without entering the native fatal path;
-#' negative plugin handles cannot be used for reading or writing. Trend aggregates
-#' require `count >= 2`, matching stock 24.2 through 26.2. For native plugin handles,
+#' negative plugin handles cannot be used for reading or writing. Native trend
+#' aggregates require `count >= 2`, matching stock 24.2 through 26.2. For native plugin handles,
 #' `get_trend_value()` remains disabled:
 #' the native upper index check permits an out-of-bounds read. Separately,
 #' [eplus_plugin()] can declare bounded R-managed trends with safe lookup and
-#' indexed reads through these same method names, without PythonPlugin objects.
+#' indexed reads and aggregates through these same method names, without PythonPlugin
+#' objects. Managed average/minimum/maximum/sum accept any positive count within
+#' valid history, including one. Managed direction requires at least two samples
+#' and returns a least-squares slope in source-value units per elapsed simulation
+#' hour, positive for values increasing chronologically; see [eplus_plugin()].
 #'
 #' `callback_register_external_hvac_manager()` uses the same callback safety
 #' boundary as other runtime hooks, but replaces the native HVAC manager entirely.
@@ -400,7 +404,16 @@ api__construct <- function(ctx) {
         rows <- lapply(ctx$manifest$methods, function(x) {
             # Native method status remains independent of conditional R-managed trend support.
             x$managed_plugin_trend <- x$group == "exchange" &&
-                x$method %in% c("get_trend_handle", "get_trend_value")
+                x$method %in%
+                    c(
+                        "get_trend_handle",
+                        "get_trend_value",
+                        "get_trend_average",
+                        "get_trend_min",
+                        "get_trend_max",
+                        "get_trend_sum",
+                        "get_trend_direction"
+                    )
             x$parameters <- paste(unlist(x$parameters), collapse = ", ")
             as.data.frame(x, stringsAsFactors = FALSE)
         })
