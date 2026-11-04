@@ -2008,6 +2008,11 @@ test_that("stock older API reports safe discovery and readiness capabilities", {
 
 # Check the five-pointer API data contract while the stock callback reads and writes controls.
 test_that("stock callbacks preserve exchange units and typed control ownership", {
+    skip_if(
+        numeric_version(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")) <
+            "24.2",
+        "Five-pointer native units are available from 24.2"
+    )
     fixture <- testapi__controlled_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     marker <- file.path(fixture$directory, "exchange.rds")

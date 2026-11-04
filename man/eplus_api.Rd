@@ -58,6 +58,7 @@ reports a capability error. In 23.2/24.1 the common data frame has \code{unit = 
 the reconstructed CSV uses an empty unit field for unavailable unit metadata.
 The 23.2 key/type field semantics are normalized to later releases.
 \code{calendar_year()} is unavailable before 23.2; \code{year()} remains the EPW year.
+On 24.2, bracketed native units such as \verb{[C]} are normalized to \code{C}.
 \code{methods()} lists exact bindings, arguments, ownership, and unsupported methods.
 Its \code{implementation} and \code{provenance} columns distinguish native operations,
 reviewed managed adapters, and unavailable operations for the selected release.

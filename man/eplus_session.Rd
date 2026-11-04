@@ -88,7 +88,9 @@ worker and the current native call; it is not a checkpoint or state copy.
 Observations contain named \code{values}, explicit \code{controller_state}, completed
 weather \code{step}, \code{environment}, \code{kind_of_sim}, calendar fields, zone-step index
 and the interval \verb{[time_start, time_end]} in hours. \code{year} is the simulation
-calendar year, or \code{NA_integer_} when \code{calendar_year_available} is false
+calendar year captured at the start of that zone interval (before yearly
+reporting advances the native getter), or \code{NA_integer_} when
+\code{calendar_year_available} is false
 (before 23.2); \code{weather_year} retains the separate EPW year. \code{callback} identifies the
 sampling point. Output-variable averaging follows EnergyPlus's variable
 definition: for example, Zone Mean Air Temperature is a zone-step average,

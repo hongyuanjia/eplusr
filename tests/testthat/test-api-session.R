@@ -660,6 +660,11 @@ test_that("stock sessions preserve calendar provenance across December and Janua
         )
     )
     model$save(fixture$model, overwrite = TRUE)
+    cat(
+        "\nOutput:Variable,ZONE ONE,Zone Mean Air Temperature,Timestep;\n",
+        file = fixture$model,
+        append = TRUE
+    )
     session <- eplus_session(
         fixture$model,
         fixture$weather,
@@ -667,27 +672,55 @@ test_that("stock sessions preserve calendar provenance across December and Janua
         variables = list(
             temperature = c("Zone Mean Air Temperature", "ZONE ONE")
         ),
-        dir = file.path(fixture$directory, "calendar")
+        dir = file.path(fixture$directory, "calendar"),
+        sample_every = 128L
     )
     on.exit(try(session$close(), silent = TRUE), add = TRUE)
     first <- session$initialize()
-    january <- session$step(n = 96L)
+    december <- session$step(n = 95L)
+    expect_identical(session$observe(wait = FALSE), december)
+    january <- session$step(n = 1L)
+    expect_identical(session$observe(wait = FALSE), january)
     expect_identical(first$month, 12L)
     expect_identical(first$day, 31L)
     expect_identical(january$month, 1L)
     expect_identical(january$day, 1L)
     expect_identical(january$step, 97L)
     expect_true(is.finite(january$values[["temperature"]]))
-    for (observation in list(first, january)) {
+    for (observation in list(first, december, january)) {
         expect_identical(observation$calendar_year_available, version != "23.1")
         expect_true(is.finite(observation$weather_year))
     }
     if (version == "23.1") {
         expect_identical(first$year, NA_integer_)
+        expect_identical(december$year, NA_integer_)
         expect_identical(january$year, NA_integer_)
     } else {
         expect_identical(first$year, 2019L)
+        expect_identical(december$year, 2019L)
         expect_identical(january$year, 2020L)
+    }
+    expect_equal(
+        c(december$month, december$day, december$time_start, december$time_end),
+        c(12, 31, 23.75, 24)
+    )
+    session$resume()
+    job <- session$result()
+    expect_true(job$status()$successful)
+    # SQLite records the completed interval before native calendarYear advances for yearly reporting.
+    times <- job$read_table("Time")
+    row <- subset(
+        times,
+        month == 12 & day == 31 & hour == 24 & minute == 0 & interval == 15
+    )
+    expect_equal(nrow(row), 1L)
+    expect_equal(
+        c(december$month, december$day, december$time_end),
+        c(row$month, row$day, row$hour)
+    )
+    expect_equal(december$time_start, row$hour - row$interval / 60)
+    if (version != "23.1") {
+        expect_equal(december$year, row$year)
     }
     session$close()
 })
