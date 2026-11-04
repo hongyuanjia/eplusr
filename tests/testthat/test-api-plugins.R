@@ -934,7 +934,7 @@ test_that("executable plugin export validates artifacts and hook mappings", {
         export_eplus_plugin(plugin, directory, name = "bad-name"),
         "pattern"
     )
-    local_mocked_bindings(eplus_config = function(...) list(version = "25.2.0"))
+    local_mocked_bindings(eplus_config = function(...) list(version = "9.3.0"))
     expect_error(export_eplus_plugin(plugin, directory), "26.1")
     mapping <- plugin_cli__hooks()
     expect_identical(
@@ -1608,22 +1608,52 @@ test_that("host plugin trends commit after hooks and retain bounded valid histor
 
 # State inspection and managed ownership remain available without entering native trend arrays.
 test_that("managed trend handles reject retired cross-state and ambiguous ownership", {
+    withr::local_options(list(eplusr.test.trend.handle = NULL))
     fixture <- testrun__api_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
     on.exit(try(api$close(), silent = TRUE), add = TRUE)
     state <- api$state_manager$new_state()
     factory <- eplus_plugin(
-        list(begin_new_environment = function(api, state, plugin) {
-            plugin$data$initial <- tryCatch(
-                api$exchange$get_trend_value(
-                    state,
-                    api$exchange$get_trend_handle(state, "n"),
-                    1L
-                ),
-                error = conditionMessage
-            )
-        }),
+        list(
+            initialize = function(api, state, plugin) {
+                if (plugin$id == "1") {
+                    options(
+                        eplusr.test.trend.handle = api$exchange$get_trend_handle(
+                            state,
+                            "n"
+                        )
+                    )
+                } else {
+                    message <- tryCatch(
+                        api$exchange$get_trend_value(
+                            state,
+                            getOption("eplusr.test.trend.handle"),
+                            1L
+                        ),
+                        error = conditionMessage
+                    )
+                    if (
+                        !is.character(message) ||
+                            !grepl("plugin binding", message)
+                    ) {
+                        stop(
+                            "A managed trend crossed plugin binding ownership."
+                        )
+                    }
+                }
+            },
+            begin_new_environment = function(api, state, plugin) {
+                plugin$data$initial <- tryCatch(
+                    api$exchange$get_trend_value(
+                        state,
+                        api$exchange$get_trend_handle(state, "n"),
+                        1L
+                    ),
+                    error = conditionMessage
+                )
+            }
+        ),
         trends = list(
             n = list(source = function(api, state, plugin) 1, capacity = 1L)
         )
