@@ -5,6 +5,8 @@ api_profile__select <- function(version) {
         length(version) != 1L ||
             !version %in%
                 c(
+                    "22.1.0",
+                    "22.2.0",
                     "23.1.0",
                     "23.2.0",
                     "24.1.0",
@@ -16,12 +18,15 @@ api_profile__select <- function(version) {
                 )
     ) {
         api__error(
-            "The API requires an EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
         version = version,
-        abi = if (version %in% c("23.1.0", "23.2.0", "24.1.0")) {
+        # Independently generated 22.1/22.2 declarations match all 146 stock 23.1 functions.
+        abi = if (version %in% c("22.1.0", "22.2.0")) {
+            "23.1.0"
+        } else if (version %in% c("23.1.0", "23.2.0", "24.1.0")) {
             version
         } else if (version %in% c("24.2.0", "25.1.0")) {
             "24.2-26.2"

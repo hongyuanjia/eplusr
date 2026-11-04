@@ -7,7 +7,7 @@
 eplus_api(eplus = "26.1")
 }
 \arguments{
-\item{eplus}{EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
+\item{eplus}{EnergyPlus version or installation directory. Only 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
 supported by this experimental library interface.}
 }
 \value{
@@ -15,7 +15,7 @@ An environment with \code{state_manager}, \code{functional}, \code{runtime}, and
 \code{exchange} groups, and \code{info()}, \code{methods()}, and \code{close()} methods.
 }
 \description{
-Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
+Create a managed interface to a stock EnergyPlus 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
 groups use the same method names as the bundled Python API, with an explicit
 managed \code{state} argument. This experimental interface does not change CLI jobs.
 }

@@ -1,10 +1,10 @@
 #' Access the EnergyPlus library API
 #'
-#' Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
+#' Create a managed interface to a stock EnergyPlus 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
 #' groups use the same method names as the bundled Python API, with an explicit
 #' managed `state` argument. This experimental interface does not change CLI jobs.
 #'
-#' @param eplus EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
+#' @param eplus EnergyPlus version or installation directory. Only 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
 #'   supported by this experimental library interface.
 #' @return An environment with `state_manager`, `functional`, `runtime`, and
 #'   `exchange` groups, and `info()`, `methods()`, and `close()` methods.
@@ -1576,13 +1576,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.
