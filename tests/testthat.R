@@ -219,20 +219,45 @@ testrun__legacy <- function(shard) {
             "The coverage legacy installation does not match its reviewed shard."
         )
     }
-    # Each selected file reloads ordinary helpers under this version; engine children
-    # inherit the same instrumented package install and emit standard covr traces.
-    withr::local_envvar(c(`_EPLUSR_TEST_API_VERSION_` = version))
-    for (index in seq_along(definition$cases)) {
-        case <- definition$cases[[index]]
-        results <- testrun__phase(
-            paste0(shard, "-legacy-", version, "-", index),
-            file = case[[1L]],
-            desc = case[-1L]
+    if (version == "9.6") {
+        definition$cases <- c(
+            definition$cases,
+            list(c(
+                "test-api.R",
+                "legacy-python",
+                "stock 9.6 Linux restarts its selected CPython dependency across owned lifecycles"
+            ))
         )
-        if (any(as.data.frame(results)$skipped)) {
-            stop("A selected legacy coverage case was skipped.")
-        }
     }
+    # A fresh process owns this whole legacy group: RTLD_GLOBAL engine/Python
+    # dependencies from the baseline must not participate in its native resolution.
+    callr::r(
+        function(cases, version, shard, phase) {
+            library(testthat)
+            library(eplusr)
+            eplusr_option(verbose_info = FALSE)
+            for (index in seq_along(cases)) {
+                case <- cases[[index]]
+                results <- phase(
+                    paste0(shard, "-legacy-", version, "-", index),
+                    file = case[[1L]],
+                    desc = case[-1L]
+                )
+                if (any(as.data.frame(results)$skipped)) {
+                    stop("A selected legacy coverage case was skipped.")
+                }
+            }
+            invisible(NULL)
+        },
+        args = list(definition$cases, version, shard, testrun__phase),
+        libpath = .libPaths(),
+        env = c(
+            `_EPLUSR_TEST_API_VERSION_` = version,
+            TESTTHAT_PARALLEL = "false",
+            TESTTHAT_CPUS = "1"
+        ),
+        show = TRUE
+    )
     invisible(NULL)
 }
 

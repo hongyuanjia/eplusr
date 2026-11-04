@@ -177,6 +177,7 @@ api__load <- function(directory, version = "26.1.0") {
     ctx <- new.env(parent = emptyenv())
     ctx$directory <- normalizePath(directory)
     ctx$library <- normalizePath(path)
+    ctx$library_handle <- library
     ctx$identity_source <- if (numeric_version(version) < "9.6") {
         "selected SDK version/build, library generation symbols, selected CLI build; no native version getter"
     } else {
@@ -194,6 +195,29 @@ api__load <- function(directory, version = "26.1.0") {
     success <- TRUE
     api
 }
+# Correct the reviewed dependency's wide program name before it starts another interpreter.
+api_legacy__python <- function(ctx) {
+    if (!identical(ctx$manifest$energyplus, "9.6.0") || !is_linux()) {
+        return(invisible(NULL))
+    }
+    information <- .Call(
+        "eplusr_python_prepare",
+        ctx$library_handle,
+        ctx$directory,
+        PACKAGE = "eplusr"
+    )
+    ctx$python_runtime <- information[c("version", "library", "wchar_bytes")]
+    if (!is.null(information$error)) {
+        api__error(sprintf(
+            "%s [runtime %s; %s]",
+            information$error,
+            information$version,
+            information$library
+        ))
+    }
+    invisible(NULL)
+}
+
 # Identify pre-version-getter libraries using the selected SDK, symbol generation, and CLI.
 api_legacy__identity <- function(directory, version, library) {
     sdk <- file.path(directory, "pyenergyplus", "func.py")

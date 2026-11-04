@@ -26,6 +26,12 @@
 #' The 9.4/9.5 runtime cannot suppress console output: enabling output is a managed
 #' no-op, while requesting suppression reports a capability error. The selected
 #' IDD is supplied explicitly; native helper flags require prior external preparation.
+#' On Linux 9.6, the reviewed bundled CPython 3.7 dependency needs a valid native
+#' wide program name before each interpreter initialization. The host supplies
+#' this through its public dependency API, after checking the selected library,
+#' ABI and inactive interpreter. `info()$python_runtime` reports the copied
+#' dependency version, path and wide-character size after this check. An already
+#' initialized or conflicting Python runtime is rejected before native execution.
 #' `current_sim_time()` on 9.4/9.5 requires an owned, observed running lifecycle;
 #' protected environment/zone hooks supply relative elapsed hours, resetting after
 #' warmup. It is unavailable on borrowed states or before a run. Calendar years
@@ -95,6 +101,13 @@
 #' be 64-bit and have matching architectures; an x86-64 installation cannot load
 #' in arm64 R. The 9.4 library is available only through fresh job/session workers.
 #' Compatibility preserves R contracts, not identical numerical physics across releases.
+#' Acceptance covers one selected stock installation in a fresh matching-architecture
+#' R process, including its sequential owned lifecycles. High-level jobs and sessions
+#' provide that worker isolation. Mixing different EnergyPlus installations or
+#' bundled Python runtimes in one low-level R process has not been validated.
+#' `close()` releases owned loader references; the operating system may retain
+#' dependency libraries and their globals after those references are released.
+
 #' The maintained CI matrix checks every release on Linux x86-64, reviewed older
 #' ABI representatives on matching 64-bit macOS and Windows, and the full 26.1/26.2
 #' regression on all three platforms. Other OS/release combinations are not
@@ -454,6 +467,7 @@ api__construct <- function(ctx) {
             api_version = ctx$api_version,
             abi = ctx$manifest$abi,
             library = ctx$library,
+            python_runtime = ctx$python_runtime,
             pid = ctx$pid,
             closed = ctx$closed
         )
@@ -1370,6 +1384,7 @@ api__run <- function(ctx, entry, args) {
     plugin__prepare(ctx, entry)
     entry$input_metadata <- api__capture_input(args, models, source)
     args <- api_legacy__run_args(ctx, entry, args)
+    api_legacy__python(ctx)
     argv <- ctx$ffi$argv(enc2utf8(c("energyplus", args)))
     for (resource in entry$resources) {
         api__delete_resource(ctx, entry, resource)

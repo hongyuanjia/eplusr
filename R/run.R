@@ -3086,6 +3086,16 @@ run__api_command <- function(directory, args, wd, echo, api_setup) {
     result <- tryCatch(run$process$get_result(), error = function(condition) {
         run__api_failure(condition, wd, NULL)
     })
+    # Native helper options can exit(0) before callr writes a lifecycle result.
+    if (is.null(result)) {
+        result <- run__api_failure(
+            simpleError(
+                "EnergyPlus API worker exited without returning lifecycle metadata."
+            ),
+            wd,
+            NULL
+        )
+    }
     run$exit_status <- result$exit_status
     run$api <- result$api
     if (!is.null(result$api$error)) {

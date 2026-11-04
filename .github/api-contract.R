@@ -103,6 +103,18 @@ if (version == "9.4") {
         )
     )
 }
+if (version == "9.6" && Sys.info()[["sysname"]] == "Linux") {
+    cases <- c(
+        cases,
+        list(list(
+            "api",
+            c(
+                "legacy-python",
+                "stock 9.6 Linux restarts its selected CPython dependency across owned lifecycles"
+            )
+        ))
+    )
+}
 for (case in cases) {
     results <- testthat::test_file(
         file.path("tests/testthat", paste0("test-", case[[1L]], ".R")),

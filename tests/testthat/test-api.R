@@ -5206,3 +5206,73 @@ describe("replay", {
         expect_identical(session$step()$step, 2L)
     })
 })
+
+# The reviewed bundled runtime must survive reset and close/reopen without sharing an active owner.
+describe("legacy-python", {
+    test_that("stock 9.6 Linux restarts its selected CPython dependency across owned lifecycles", {
+        version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+        skip_if_not(version == "9.6" && is_linux())
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        api <- eplus_api(version)
+        on.exit(try(api$close(), silent = TRUE), add = TRUE)
+        # Every cycle executes the actual stock model and reports a completed native state.
+        execute <- function(api, state, name) {
+            expect_identical(
+                api$runtime$run_energyplus(
+                    state,
+                    c(
+                        "-w",
+                        fixture$weather,
+                        "-d",
+                        file.path(fixture$directory, name),
+                        fixture$model
+                    )
+                ),
+                0L
+            )
+            expect_identical(api$state_manager$status(state)$phase, "completed")
+        }
+        state <- api$state_manager$new_state()
+        execute(api, state, "first")
+        api$state_manager$reset_state(state)
+        execute(api, state, "after-reset")
+        api$close()
+        api <- eplus_api(version)
+        state <- api$state_manager$new_state()
+        execute(api, state, "after-reopen")
+        other <- api$state_manager$new_state()
+        condition <- tryCatch(
+            api$runtime$run_energyplus(
+                other,
+                c(
+                    "-w",
+                    fixture$weather,
+                    "-d",
+                    file.path(fixture$directory, "active-owner"),
+                    fixture$model
+                )
+            ),
+            error = identity
+        )
+        expect_s3_class(condition, "eplusr_api_error")
+        expect_match(conditionMessage(condition), "already initialized")
+        expect_identical(api$state_manager$status(other)$phase, "created")
+        api$state_manager$delete_state(state)
+        execute(api, other, "after-owner-retired")
+        information <- api$info()$python_runtime
+        message(
+            "Selected CPython ",
+            information$version,
+            " from ",
+            information$library
+        )
+        expect_match(information$version, "^3[.]7[.]")
+        expect_identical(information$wchar_bytes, 4L)
+        expect_true(startsWith(
+            normalizePath(information$library),
+            paste0(normalizePath(eplus_config(version)$dir), "/")
+        ))
+        api$close()
+    })
+})

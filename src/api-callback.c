@@ -154,8 +154,12 @@ static SEXP guard_release(SEXP object)
     return R_NilValue;
 }
 
+/* The dependency adapter uses only reviewed public CPython signatures. */
+extern SEXP eplusr_python_prepare(SEXP library, SEXP directory);
+
 /* Register only the private native seam; no EnergyPlus or rdyncall headers are needed here. */
 static const R_CallMethodDef call_entries[] = {
+    {"eplusr_python_prepare", (DL_FUNC)&eplusr_python_prepare, 2},
     {"eplusr_guard_create", (DL_FUNC)&guard_create, 2},
     {"eplusr_guard_foreign", (DL_FUNC)&guard_foreign, 1},
     {"eplusr_guard_original", (DL_FUNC)&guard_original, 1},
