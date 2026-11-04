@@ -366,6 +366,19 @@ plugin__status <- function(entry) {
     })
 }
 
+# Copy binding-local bounded histories for observations without transferring handles or contexts.
+plugin__history <- function(entry) {
+    lapply(entry$plugins, function(record) {
+        trends <- plugin__trend_status(record)
+        for (name in names(trends)) {
+            # Arrays contain valid newest-first samples only; unused capacity never crosses IPC.
+            trends[[name]]$values <- record$trends[[name]]$values
+            trends[[name]]$times <- record$trends[[name]]$times
+        }
+        list(id = record$id, trends = trends)
+    })
+}
+
 # Validate named finite histories before freezing their sources with the plugin hooks.
 plugin__trend_definitions <- function(trends) {
     checkmate::assert_list(trends, names = "unique")

@@ -16,7 +16,8 @@ eplus_session(
   dir = NULL,
   timeout = 120,
   record = FALSE,
-  sample_every = 1L
+  sample_every = 1L,
+  backend = "api"
 )
 }
 \arguments{
@@ -52,6 +53,9 @@ observations and effective actuator actions for replay prediction. Default FALSE
 \item{sample_every}{Positive number of completed zone timesteps between
 published snapshots during continuous running. Default 1. Controllers and
 replay recording still collect every step; publication follows this interval.}
+
+\item{backend}{\code{"api"} or an initialization function \verb{function(api, state)},
+including an \code{\link[=eplus_plugin]{eplus_plugin()}} factory. CLI execution cannot provide a live session.}
 }
 \value{
 An \code{EnergyPlusSession} environment with the following methods:
@@ -95,6 +99,19 @@ reporting advances the native getter), or \code{NA_integer_} when
 sampling point. Output-variable averaging follows EnergyPlus's variable
 definition: for example, Zone Mean Air Temperature is a zone-step average,
 not an instantaneous endpoint measurement. Warmup and sizing are excluded.
+
+Host plugins and user end-zone hooks supplied through \code{backend} run before the
+session boundary. Managed trend history commits after those hooks and before
+observation publication, pausing, or the next controller decision. Reads inside
+an end-zone hook see the previously committed history. Observations expose
+\code{plugins}, a list of bindings with \code{id} and named \code{trends}; each trend includes
+capacity, valid count, total samples, latest boundary metadata, and bounded
+newest-first numeric \code{values} and elapsed-environment-hour \code{times}. Native
+handles and plugin contexts stay in the worker. Trends advance on every eligible
+completed zone step independently of \code{sample_every}, observation reads and
+replay recording. Published snapshots contain only that boundary's bounded
+history; they do not accumulate the full run. Final Job plugin summaries retain
+ordinary metadata after the live trend buffers retire.
 
 The first returned observation already represents one completed zone step.
 A multi-step action is held until the next action or release. With a controller,

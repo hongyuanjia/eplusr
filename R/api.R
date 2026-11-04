@@ -1658,6 +1658,8 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' @param sample_every Positive number of completed zone timesteps between
 #'   published snapshots during continuous running. Default 1. Controllers and
 #'   replay recording still collect every step; publication follows this interval.
+#' @param backend `"api"` or an initialization function `function(api, state)`,
+#'   including an [eplus_plugin()] factory. CLI execution cannot provide a live session.
 #' @return An `EnergyPlusSession` environment with the following methods:
 #'   * `$initialize(timeout = ...)`: run through the first completed weather zone
 #'     step and return its observation while paused. Initialization happens once.
@@ -1692,6 +1694,19 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' sampling point. Output-variable averaging follows EnergyPlus's variable
 #' definition: for example, Zone Mean Air Temperature is a zone-step average,
 #' not an instantaneous endpoint measurement. Warmup and sizing are excluded.
+#'
+#' Host plugins and user end-zone hooks supplied through `backend` run before the
+#' session boundary. Managed trend history commits after those hooks and before
+#' observation publication, pausing, or the next controller decision. Reads inside
+#' an end-zone hook see the previously committed history. Observations expose
+#' `plugins`, a list of bindings with `id` and named `trends`; each trend includes
+#' capacity, valid count, total samples, latest boundary metadata, and bounded
+#' newest-first numeric `values` and elapsed-environment-hour `times`. Native
+#' handles and plugin contexts stay in the worker. Trends advance on every eligible
+#' completed zone step independently of `sample_every`, observation reads and
+#' replay recording. Published snapshots contain only that boundary's bounded
+#' history; they do not accumulate the full run. Final Job plugin summaries retain
+#' ordinary metadata after the live trend buffers retire.
 #'
 #' The first returned observation already represents one completed zone step.
 #' A multi-step action is held until the next action or release. With a controller,
@@ -1784,8 +1799,14 @@ eplus_session <- function(
     dir = NULL,
     timeout = 120,
     record = FALSE,
-    sample_every = 1L
+    sample_every = 1L,
+    backend = "api"
 ) {
+    # Sessions retain the existing API initializer convention while excluding CLI execution.
+    backend <- run__backend(backend)
+    if (backend$engine != "api") {
+        api_session__error("A live session requires the API backend.")
+    }
     checkmate::assert_flag(record)
     checkmate::assert_int(sample_every, lower = 1L)
     config <- if (
@@ -1827,6 +1848,7 @@ eplus_session <- function(
     ctx <- new.env(parent = emptyenv())
     ctx$config <- list(
         installation = normalizePath(config$dir),
+        setup = backend$setup,
         variables = variables,
         actuators = actuators,
         initial_action = initial_action,
@@ -2563,6 +2585,10 @@ api_session__setup <- function(api, state, settings) {
     for (definition in settings$variables) {
         api$exchange$request_variable(state, definition[1L], definition[2L])
     }
+    # Bind user plugins and end-zone hooks before installing the session boundary callback.
+    if (!is.null(settings$setup)) {
+        settings$setup(api, state)
+    }
     # Reporting can increment native CalendarYear before the completed-zone callback.
     # Capture it before calculation so the observation describes the interval just completed.
     if (control$calendar_year_available) {
@@ -2621,6 +2647,12 @@ api_session__setup <- function(api, state, settings) {
                 return(invisible(NULL))
             }
             api_session__handles(api, s, settings, control)
+            # Commit after user end-zone hooks and before publication, pause or the next policy.
+            # The final protected plugin callback deduplicates this same completed boundary.
+            entry <- attr(s, "entry")
+            if (length(entry$plugins)) {
+                plugin__commit(attr(s, "owner"), entry, s)
+            }
             control$step <- control$step + 1L
             # Sparse running skips variable reads and calendar construction, but never control or replay.
             due <- control$step %% settings$sample_every == 0L
@@ -2784,6 +2816,7 @@ api_session__snapshot <- function(api, state, settings, control) {
             numeric(1L)
         ),
         variables = settings$variables,
+        plugins = plugin__history(attr(state, "entry")),
         controller_state = control$controller_state
     )
 }

@@ -727,3 +727,313 @@ test_that("stock sessions preserve calendar provenance across December and Janua
     }
     session$close()
 })
+
+# A deterministic R history proves hook, commit, observation and policy ordering in real workers.
+test_that("stock sessions commit bounded plugin history before observation and control", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    plugin <- eplus_plugin(
+        list(end_zone_timestep_after_zone_reporting = function(
+            api,
+            state,
+            plugin
+        ) {
+            if (api$exchange$kind_of_sim(state) != 3L) {
+                return(NULL)
+            }
+            plugin$data$count <- plugin$data$count + 1L
+            if (plugin$data$count > 1L) {
+                handle <- api$exchange$get_trend_handle(state, "sequence")
+                previous <- api$exchange$get_trend_value(state, handle, 1L)
+                if (previous != plugin$data$count - 1L) {
+                    stop("hook history order")
+                }
+            }
+        }),
+        data = list(count = 0L),
+        trends = list(
+            sequence = list(
+                source = function(api, state, plugin) plugin$data$count,
+                capacity = 3L
+            )
+        )
+    )
+    controller <- function(observation, state) {
+        trend <- observation$plugins[[1L]]$trends$sequence
+        if (trend$values[[1L]] != observation$step) {
+            stop("policy history order")
+        }
+        list(action = NULL, state = state + 1L)
+    }
+    histories <- lapply(c(1L, 31L), function(frequency) {
+        session <- eplus_session(
+            fixture$model,
+            fixture$weather,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            backend = plugin,
+            controller = controller,
+            controller_state = 0L,
+            sample_every = frequency,
+            dir = file.path(fixture$directory, paste0("history-", frequency))
+        )
+        on.exit(try(session$close(), silent = TRUE), add = TRUE)
+        first <- session$initialize()
+        expect_identical(first$plugins[[1L]]$trends$sequence$values, 1)
+        expect_identical(first$plugins[[1L]]$trends$sequence$valid_count, 1L)
+        expect_identical(session$observe(), first)
+        expect_identical(session$observe(wait = FALSE), first)
+        fourth <- session$step(n = 3L)
+        trend <- fourth$plugins[[1L]]$trends$sequence
+        expect_identical(trend$values, c(4, 3, 2))
+        expect_identical(trend$times, c(1, 0.75, 0.5))
+        expect_identical(trend$total_samples, 4L)
+        expect_identical(trend$valid_count, 3L)
+        expect_identical(fourth$controller_state, 3L)
+        expect_identical(session$observe(), fourth)
+        session$resume()
+        session$result()
+        final <- session$observe()
+        expect_identical(
+            final$plugins[[1L]]$trends$sequence$values,
+            c(96, 95, 94)
+        )
+        expect_identical(final$plugins[[1L]]$trends$sequence$total_samples, 96L)
+        expect_identical(
+            session$status()$outcome$plugins[[
+                1L
+            ]]$trends$sequence$total_samples,
+            96L
+        )
+        session$close()
+        expect_false(session$status()$alive)
+        final$plugins
+    })
+    expect_identical(histories[[1L]], histories[[2L]])
+})
+
+# Sparse publication must still advance sources on every completed weather zone timestep.
+test_that("stock sparse session publication retains exact managed history", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    plugin <- eplus_plugin(
+        list(initialize = function(api, state, plugin) NULL),
+        data = list(n = 0L),
+        trends = list(
+            n = list(
+                source = function(api, state, plugin) {
+                    plugin$data$n <- plugin$data$n + 1L
+                    plugin$data$n
+                },
+                capacity = 1L
+            )
+        )
+    )
+    session <- eplus_session(
+        fixture$model,
+        fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        backend = plugin,
+        sample_every = 31L,
+        dir = file.path(fixture$directory, "sparse-history")
+    )
+    on.exit(try(session$close(), silent = TRUE), add = TRUE)
+    first <- session$initialize()
+    expect_identical(first$plugins[[1L]]$trends$n$values, 1)
+    expect_identical(session$pause(), first)
+    expect_identical(session$observe(wait = FALSE), first)
+    session$resume()
+    session$result()
+    sampled <- session$observe(wait = FALSE)
+    expect_identical(sampled$step, 93L)
+    expect_identical(sampled$plugins[[1L]]$trends$n$values, 93)
+    expect_identical(sampled$plugins[[1L]]$trends$n$total_samples, 93L)
+    expect_identical(
+        session$status()$outcome$plugins[[1L]]$trends$n$total_samples,
+        96L
+    )
+    expect_identical(
+        session$status()$outcome$plugins[[1L]]$trends$n$valid_count,
+        1L
+    )
+    session$close()
+    expect_false(session$status()$alive)
+})
+
+# Source conditions use the existing deferred boundary, and cleanup cannot replace the first failure.
+test_that("stock session trend source failures and timeouts reap their workers", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    expect_error(
+        eplus_session(
+            fixture$model,
+            fixture$weather,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            backend = "cli"
+        ),
+        "requires the API backend"
+    )
+    for (failure in c("error", "interrupt", "timeout")) {
+        plugin <- eplus_plugin(
+            list(finalize = function(api, state, plugin) {
+                plugin$data$finalized <- TRUE
+                if (failure != "timeout") stop("later cleanup failure")
+            }),
+            data = list(n = 0L),
+            trends = list(
+                n = list(
+                    source = function(api, state, plugin) {
+                        plugin$data$n <- plugin$data$n + 1L
+                        if (plugin$data$n == 2L) {
+                            if (failure == "timeout") {
+                                Sys.sleep(5)
+                            } else {
+                                stop(structure(
+                                    list(
+                                        message = "first session source failure",
+                                        call = NULL
+                                    ),
+                                    class = c(
+                                        paste0("source_", failure),
+                                        failure,
+                                        "condition"
+                                    )
+                                ))
+                            }
+                        }
+                        plugin$data$n
+                    },
+                    capacity = 2L
+                )
+            )
+        )
+        session <- eplus_session(
+            fixture$model,
+            fixture$weather,
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            backend = plugin,
+            dir = file.path(fixture$directory, failure)
+        )
+        on.exit(try(session$close(), silent = TRUE), add = TRUE)
+        first <- session$initialize()
+        expect_identical(first$plugins[[1L]]$trends$n$values, 1)
+        if (failure == "timeout") {
+            expect_error(session$step(timeout = 0.1), "timed out")
+        } else {
+            expect_error(session$step(), "first session source failure")
+            outcome <- session$status()$outcome
+            expect_identical(outcome$state_phase, "closed")
+            expect_true(
+                paste0("source_", failure) %in% session$status()$error$class
+            )
+            expect_identical(outcome$plugins[[1L]]$calls[["finalize"]], 1L)
+            expect_identical(outcome$plugins[[1L]]$trends$n$total_samples, 1L)
+        }
+        expect_false(session$status()$alive)
+        expect_identical(session$observe(wait = FALSE)$plugins, first$plugins)
+        session$close()
+    }
+})
+
+# Losing the owner process closes the authenticated socket while trends remain entirely worker-local.
+test_that("stock plugin sessions stop after owner disconnection and early close", {
+    skip_if_not_installed("ps")
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    ready <- file.path(fixture$directory, "owner-ready.rds")
+    directory <- file.path(fixture$directory, "disconnected-history")
+    owner <- callr::r_bg(
+        function(model, weather, version, directory, ready) {
+            library(eplusr)
+            plugin <- eplus_plugin(
+                list(finalize = function(api, state, plugin) {
+                    saveRDS(
+                        api$state_manager$status(state)$phase,
+                        file.path(directory, "finalized.rds")
+                    )
+                }),
+                trends = list(
+                    n = list(
+                        source = function(api, state, plugin) 1,
+                        capacity = 1L
+                    )
+                )
+            )
+            session <- eplus_session(
+                model,
+                weather,
+                eplus = version,
+                backend = plugin,
+                dir = directory
+            )
+            session$initialize()
+            saveRDS(session$status()$identity, ready)
+            Sys.sleep(120)
+        },
+        args = list(
+            fixture$model,
+            fixture$weather,
+            Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+            directory,
+            ready
+        ),
+        libpath = .libPaths(),
+        stdout = "|",
+        stderr = "|",
+        supervise = FALSE
+    )
+    on.exit(if (owner$is_alive()) owner$kill(), add = TRUE)
+    deadline <- Sys.time() + 120
+    while (!file.exists(ready) && owner$is_alive() && Sys.time() < deadline) {
+        Sys.sleep(0.05)
+    }
+    expect_true(
+        file.exists(ready),
+        info = paste(owner$read_error_lines(), collapse = "\n")
+    )
+    identity <- readRDS(ready)
+    handles <- lapply(c(identity$pid, identity$pipeline_pid), ps::ps_handle)
+    on.exit(
+        for (handle in handles) {
+            if (ps::ps_is_running(handle)) {
+                try(ps::ps_kill(handle), silent = TRUE)
+            }
+        },
+        add = TRUE
+    )
+    # kill() targets the owner alone; the paused engine must observe EOF and finish its own cleanup.
+    owner$kill()
+    deadline <- Sys.time() + 20
+    while (
+        any(vapply(handles, ps::ps_is_running, logical(1L))) &&
+            Sys.time() < deadline
+    ) {
+        Sys.sleep(0.05)
+    }
+    expect_false(any(vapply(handles, ps::ps_is_running, logical(1L))))
+    expect_true(file.exists(file.path(directory, "finalized.rds")))
+    plugin <- eplus_plugin(
+        list(finalize = function(api, state, plugin) {
+            plugin$data$finalized <- TRUE
+        }),
+        trends = list(
+            n = list(source = function(api, state, plugin) 1, capacity = 1L)
+        )
+    )
+    session <- eplus_session(
+        fixture$model,
+        fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        backend = plugin,
+        dir = file.path(fixture$directory, "early-history-close")
+    )
+    on.exit(try(session$close(), silent = TRUE), add = TRUE)
+    first <- session$initialize()
+    session$close()
+    expect_identical(session$observe(), first)
+    expect_false(session$status()$alive)
+    expect_identical(
+        session$status()$outcome$plugins[[1L]]$trends$n$total_samples,
+        1L
+    )
+    expect_true(session$status()$outcome$plugins[[1L]]$data$finalized)
+})
