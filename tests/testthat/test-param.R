@@ -330,3 +330,57 @@ test_that("==.ParametricJob and !=.ParametricJob", {
 })
 
 # vim: set fdm=marker:
+
+test_that("stock API parametric jobs run in the background", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "bootstrap")
+    dir.create(marker)
+    old <- eplusr_option(num_parallel = 2L)
+    on.exit(do.call(eplusr_option, old), add = TRUE)
+    setup <- local({
+        directory <- marker
+        # Signal that both native workers have loaded dependencies and initialized their API.
+        function(api, state) {
+            writeLines(
+                "started",
+                file.path(directory, paste0(Sys.getpid(), ".started"))
+            )
+        }
+    })
+    param <- param_job(fixture$model, fixture$weather)
+    param$apply_measure(function(idf, value) idf, value = 1:2)
+    param$run(
+        dir = file.path(fixture$directory, "param"),
+        backend = setup,
+        echo = FALSE,
+        readvars = FALSE,
+        wait = FALSE
+    )
+    on.exit(if (param$status()$alive) param$kill(), add = TRUE)
+    testrun__api_started(
+        function() length(list.files(marker, pattern = "[.]started$")) == 2L,
+        function() param$status()$alive,
+        diagnostic = function() {
+            status <- param$status()
+            list(
+                alive = status$alive,
+                started = list.files(marker),
+                jobs = status$job_status[,
+                    intersect(
+                        c("status", "exit_status", "api"),
+                        names(status$job_status)
+                    ),
+                    with = FALSE
+                ]
+            )
+        }
+    )
+    deadline <- Sys.time() + 30
+    while (param$status()$alive && Sys.time() < deadline) {
+        Sys.sleep(0.1)
+    }
+    expect_false(param$status()$alive)
+    expect_true(param$status()$successful)
+    expect_true(all(param$status()$job_status$backend == "api"))
+})

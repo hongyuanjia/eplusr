@@ -7,3 +7,14 @@ try.R
 inst/doc
 .lintr
 docs/
+
+# Native API builds and coverage counters
+/covr/
+/src/*.o
+/src/*.so
+/src/*.dll
+/src/*.gcda
+/src/*.gcno
+
+# Local EnergyPlus API validation scripts and measured outputs
+/tools/energyplus-api-m1/

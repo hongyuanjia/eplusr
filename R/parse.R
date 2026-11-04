@@ -191,8 +191,10 @@ parse_idf_file <- function(path, idd = NULL, ref = TRUE, encoding = "unknown") {
 
     idf_ver <- get_idf_ver(idf_dt)
 
-    if (has_ext(path, "ddy")) {
-        idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
+    # Inline model text has no file extension and must not enter OS path-length checks.
+    if (!stringi::stri_detect_regex(path, "[\r\n]") && has_ext(path, "ddy")) {
+        idd <- withCallingHandlers(
+            get_idd_from_ver(idf_ver, idd),
             eplusr_warning = function(w) invokeRestart("muffleWarning")
         )
     } else {

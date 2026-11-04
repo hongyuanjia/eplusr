@@ -23,3 +23,5 @@
 ^vignettes$
 ^revdep$
 ^\.devcontainer$
+^covr$
+^src/.*\.gc(da|no)$

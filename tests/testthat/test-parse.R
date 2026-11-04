@@ -585,3 +585,22 @@ test_that("parse_idf_file()", {
 # }}}
 
 # vim: set fdm=marker:
+# Long inline IDF input should stay model text rather than enter filename handling.
+test_that("long inline IDF text does not trigger file path length checks", {
+    # A small in-memory schema keeps this regression independent of installed engines.
+    cached_idds <- .globals$idd
+    on.exit(.globals$idd <- cached_idds, add = TRUE)
+    idd <- read_idd(paste0(
+        idftext("idd", LATEST_EPLUS_VER),
+        "\nVersion,\n  A1; \\field Version Identifier"
+    ))
+    source <- paste0(
+        "!",
+        strrep("Inline model text ", 500L),
+        "\nVersion, ",
+        LATEST_EPLUS_VER,
+        ";"
+    )
+    expect_warning(parsed <- parse_idf_file(source, idd), NA)
+    expect_type(parsed, "list")
+})

@@ -1,5 +1,78 @@
 # eplusr (development version)
 
+## Performance
+
+* Coverage runs reuse source coordinates, merge compact worker counters and record
+  stage timings while retaining real parallel engine groups (#652).
+
+* Plugin exports reuse an isolated bridge check while installed code and library
+  paths remain unchanged; every engine worker performs its own safety check (#652).
+
+## New features
+
+* Add an experimental `eplus_api()` interface for stock EnergyPlus 9.4 through
+  26.2, with uniform state, functional, runtime and data exchange methods.
+  Porter-generated dynports describe ABI declarations separately from reviewed
+  R version rules and capability checks. EnergyPlus 9.4 requires an isolated
+  worker and one native state lifetime. Ordinary workflows retain an optional
+  rdyncall dependency; API use requires its callback safety and existing-library
+  dynport capabilities (#651, #656).
+
+* Add the API backend to single, group and parametric jobs, using one fresh worker
+  per simulation. `backend` accepts `"cli"`, `"api"` or an initialization function;
+  the separate public `api_setup` argument is removed (#653).
+
+* Add live `eplus_session()` control with zone-step advancement, pause/resume,
+  explicit controller state, nonblocking snapshots and configurable publication
+  frequency. Session backend initializers can register R plugins; sparse snapshots
+  leave their per-zone history unchanged (#654, #665).
+
+* Add host R plugins with independent state, ordered lifecycle hooks and bounded
+  managed trends. Indexed reads, average, minimum, maximum, sum and time-based
+  direction use valid R-owned samples without PythonPlugin declarations. The
+  unsafe native trend value reader remains disabled (#663, #664).
+
+* Add MPC replay predictions in independent workers, preserving the original
+  paused session. Branches reconstruct deterministic plugin history, compare
+  recorded boundaries and retain successful results after ordinary candidate
+  failures. Trends declared `replay = FALSE` reject prediction before launching
+  branches. Replay does not clone native state (#651, #666).
+
+* Add `export_eplus_plugin()` for R hooks inside the stock EnergyPlus 26.1/26.2
+  executable through a generated PythonPlugin adapter and embedded R, with
+  borrowed state ownership and independent instance summaries (#652).
+
+* Add managed callback clearing, prepared-input metadata queries, safe API-data
+  discovery, typed executable-plugin globals and aggregate handles, and the
+  experimental external HVAC manager callback. Capabilities describe absent
+  getters, changed layouts and unsupported operations by release (#651, #656).
+
+## Bug fixes
+
+* Count repeated warmup days in EnergyPlus 9.4/9.5 elapsed time so managed
+  trend directions and timestamps remain chronological (#656).
+
+* Confirm worker descendants have exited before returning from interrupted
+  predictions, and preserve accurate API cancellation statuses on Windows (#656).
+
+* Spread session port attempts across the available range and retain the final
+  binding error when no listening socket can be reserved (#656).
+
+* Normalize old readiness results, discovery fields and completed-zone clock
+  metadata. Keep unavailable simulation years explicit instead of substituting
+  weather-file years. Defer early native stops on affected releases until a safe
+  boundary while preserving the original callback condition (#656).
+
+* Keep successful replay predictions after an ordinary branch failure or timeout;
+  caller interrupts still abort prediction and preserve the original session (#651).
+
+* Avoid Windows socket polling delays during continuously running sessions (#653).
+
+* Preserve shared lexical dependencies across plugin hooks and distinguish callback
+  interrupts from ordinary errors (#651).
+
+* Avoid filename path-length checks when reading long inline IDF model text.
+
 # eplusr 0.18.0
 
 ## New features
