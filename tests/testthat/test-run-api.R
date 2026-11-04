@@ -967,3 +967,42 @@ test_that("stock 9.4 callback failures retire their worker without poisoning the
     )
     expect_false(identical(failed$api$pid, completed$api$pid))
 })
+
+# Stock 9.4 calls exit() for helper flags and malformed arguments even in library mode.
+test_that("stock 9.4 CLI exits are contained by the public worker backend", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (flag in c("--help", "--eplusr-invalid-argument")) {
+        # Deliberately exercise ProcessArgs in the disposable worker, where native exit cannot kill the caller.
+        setup <- function(api, state) {
+            api$runtime$run_energyplus(state, c(flag, fixture$model))
+        }
+        failed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = setup,
+            output_dir = file.path(fixture$directory, gsub("-", "", flag)),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(failed$api$phase, "failed")
+        expect_identical(failed$api$stop_reason, "worker_error")
+        expect_false(identical(failed$exit_status, 0L))
+    }
+    completed <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "9.4",
+        backend = "api",
+        output_dir = file.path(fixture$directory, "after-cli-exits"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        completed$api$phase,
+        "completed",
+        info = completed$api$error$message
+    )
+})

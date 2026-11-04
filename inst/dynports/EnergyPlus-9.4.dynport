@@ -1,8 +1,8 @@
 Package: EnergyPlus94
 Version: 9.4.0
 Library: energyplusapi
-Constant: 
-Function: 
+Constant:
+Function:
     stateNew()p;
     stateReset(p)v state;
     stateDelete(p)v state;
@@ -143,8 +143,8 @@ Function:
     tomorrowWeatherDiffuseSolarRadiationAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherAlbedoAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherLiquidPrecipitationAtTime(pii)d state hour timeStepNum;
-Variadic: 
-FuncPtr: 
-Enum: 
-Struct: 
-Union: 
+Variadic:
+FuncPtr:
+Enum:
+Struct:
+Union:

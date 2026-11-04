@@ -3,6 +3,7 @@ api_bind__select <- function(abi) {
     stopifnot(
         abi %in%
             c(
+                "9.4.0",
                 "23.1.0",
                 "23.2.0",
                 "24.1.0",
@@ -13,14 +14,14 @@ api_bind__select <- function(abi) {
     )
     # Porter output for 24.2, 25.1 and 25.2 matches all 26.1 functions and APIDataEntry fields.
     list(
-        dynport = if (abi %in% c("23.1.0", "23.2.0", "24.1.0")) {
+        dynport = if (abi %in% c("9.4.0", "23.1.0", "23.2.0", "24.1.0")) {
             paste0("EnergyPlus-", sub("[.]0$", "", abi), ".dynport")
         } else {
             "EnergyPlus-26.1.dynport"
         },
         api_version = "0.2",
         pointer_bytes = 8L,
-        api_data_fields = if (abi == "23.1.0") {
+        api_data_fields = if (abi %in% c("9.4.0", "23.1.0")) {
             character()
         } else if (abi %in% c("23.2.0", "24.1.0")) {
             c("what", "name", "key", "type")
