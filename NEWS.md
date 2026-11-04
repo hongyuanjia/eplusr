@@ -2,74 +2,65 @@
 
 ## Performance
 
-* Coverage runs reuse source coordinates and merge compact worker counters,
-  record stage timings, and partition the full suite across independent runners
-  while retaining real parallel engine groups (#652).
+* Coverage runs reuse source coordinates, merge compact worker counters and record
+  stage timings while retaining real parallel engine groups (#652).
 
-* Plugin exports reuse a successful isolated bridge check while installed code
-  and library paths remain unchanged; each engine worker still performs its own
-  safety check (#652).
+* Plugin exports reuse an isolated bridge check while installed code and library
+  paths remain unchanged; every engine worker performs its own safety check (#652).
 
 ## New features
 
-* Support the stock EnergyPlus 26.2 library, sessions, replay predictions and R
-  plugin hosts alongside 26.1. Separate generated ABI bindings, reviewed R version
-  rules and required-capability checks. Individual trend reads remain disabled
-  for both releases because of the native history-index defect (#652).
+* Add an experimental `eplus_api()` interface for stock EnergyPlus 9.4 through
+  26.2, with uniform state, functional, runtime and data exchange methods.
+  Porter-generated dynports describe ABI declarations separately from reviewed
+  R version rules and capability checks. EnergyPlus 9.4 requires an isolated
+  worker and one native state lifetime. Ordinary workflows retain an optional
+  rdyncall dependency; API use requires its callback safety and existing-library
+  dynport capabilities (#651, #656).
 
-* Add managed callback clearing and prepared-input path/object-name queries without
-  the leaking stock 26.1 getters. Keep host and engine-calculation callbacks active
-  and retain native proxies until reset/delete. Individual trend reads remain
-  restricted (#651).
+* Add the API backend to single, group and parametric jobs, using one fresh worker
+  per simulation. `backend` accepts `"cli"`, `"api"` or an initialization function;
+  the separate public `api_setup` argument is removed (#653).
 
-* Enable executable R plugin globals and trend aggregates with typed handles,
-  guard missing globals before native lookup, and expose the experimental external
-  HVAC manager callback. Build CSV discovery from safely released API data.
-  Retain explicit restrictions for individual stock 26.1 trend reads (#652).
+* Add live `eplus_session()` control with zone-step advancement, pause/resume,
+  explicit controller state, nonblocking snapshots and configurable publication
+  frequency. Session backend initializers can register R plugins; sparse snapshots
+  leave their per-zone history unchanged (#654, #665).
 
-* Add nonblocking session snapshot reads and configurable continuous-run sampling,
-  retaining exact control boundaries and complete replay recording (#653).
+* Add host R plugins with independent state, ordered lifecycle hooks and bounded
+  managed trends. Indexed reads, average, minimum, maximum, sum and time-based
+  direction use valid R-owned samples without PythonPlugin declarations. The
+  unsafe native trend value reader remains disabled (#663, #664).
 
-* Add `export_eplus_plugin()` to run R hooks inside the stock EnergyPlus 26.1
+* Add MPC replay predictions in independent workers, preserving the original
+  paused session. Branches reconstruct deterministic plugin history, compare
+  recorded boundaries and retain successful results after ordinary candidate
+  failures. Trends declared `replay = FALSE` reject prediction before launching
+  branches. Replay does not clone native state (#651, #666).
+
+* Add `export_eplus_plugin()` for R hooks inside the stock EnergyPlus 26.1/26.2
   executable through a generated PythonPlugin adapter and embedded R, with
-  borrowed native state ownership and per-instance result summaries (#652).
+  borrowed state ownership and independent instance summaries (#652).
 
-* Add eplusr-hosted R plugins with multiple lifecycle hooks, independent state,
-  ordered execution and safe finalization through the existing `backend`
-  initialization function for stock EnergyPlus 26.1 (#652).
-
-* Add recorded MPC replay prediction to live sessions. Independent workers
-  replay verified history before branching, retaining the original paused
-  session; this does not clone native state (#652).
-
-* Use one `backend` argument for `"cli"`, `"api"` or a worker initialization
-  function. Remove the separate public `api_setup` argument (#653).
-
-* Add live `eplus_session()` control for stock EnergyPlus 26.1, including zone-step
-  advancement, pause/resume, explicit controller state and worker-hosted scripts
-  (#654).
-
-* Add an experimental API backend to single, group and parametric simulation
-  jobs. Run each EnergyPlus 26.1 library lifecycle in a fresh R worker, with
-  worker-local setup, backend identity and stop/condition metadata (#653).
-
-* Add an experimental `eplus_api()` interface for stock EnergyPlus 26.1 with
-  managed state, functional resources, runtime callbacks and data exchange
-  handles. A dynport generated by porter supplies native bindings and layouts.
-  The optional bridge must include the `rdyncall` callback safety fix and
-  existing-handle dynport support (#651).
+* Add managed callback clearing, prepared-input metadata queries, safe API-data
+  discovery, typed executable-plugin globals and aggregate handles, and the
+  experimental external HVAC manager callback. Capabilities describe absent
+  getters, changed layouts and unsupported operations by release (#651, #656).
 
 ## Bug fixes
 
-* Keep successful replay predictions and continue remaining candidates after an
-  ordinary branch failure or timeout. Return each candidate's status and reason;
+* Normalize old readiness results, discovery fields and completed-zone clock
+  metadata. Keep unavailable simulation years explicit instead of substituting
+  weather-file years. Defer early native stops on affected releases until a safe
+  boundary while preserving the original callback condition (#656).
+
+* Keep successful replay predictions after an ordinary branch failure or timeout;
   caller interrupts still abort prediction and preserve the original session (#651).
 
-* Avoid Windows socket polling delays that could make continuously running
-  sessions exceed their result timeout (#653).
+* Avoid Windows socket polling delays during continuously running sessions (#653).
 
-* Preserve shared lexical state and metadata dependencies across plugin hooks,
-  and classify callback interrupts separately from ordinary callback errors (#651).
+* Preserve shared lexical dependencies across plugin hooks and distinguish callback
+  interrupts from ordinary errors (#651).
 
 * Avoid filename path-length checks when reading long inline IDF model text.
 
