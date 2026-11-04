@@ -77,6 +77,16 @@ indexed reads through these same method names, without PythonPlugin objects.
 boundary as other runtime hooks, but replaces the native HVAC manager entirely.
 This is an experimental engine interface, not a general HVAC control hook;
 the caller must supply its HVAC calculations. Native initialization is limited.
+EnergyPlus 9.4 runs only in a fresh package-owned job or session worker.
+Use \code{backend = "api"}, a backend initialization function, or \code{\link[=eplus_session]{eplus_session()}}.
+Direct \code{eplus_api("9.4")} calls are rejected because its state handles do not
+isolate native globals and invalid command-line arguments can exit the host.
+A 9.4 worker owns one API and one state lifetime; resetting, replacing the state,
+or opening another API is unavailable. Its native library and callback proxies
+remain pinned until worker exit because \code{stateDelete()} leaves global callback
+pointers alive. Functional, runtime and exchange calls use the same method names
+inside the worker, with unavailable operations reported as capability errors.
+
 Each group's \code{clear_callbacks()} detaches its user functions across this API's
 states, including during a callback. Native proxies remain pinned until reset
 or delete, so clearing does not recover callback capacity. Host session/plugin
@@ -101,7 +111,8 @@ until the fix has an official release. Start a fresh R process if rdyncall
 was already loaded by other code. EnergyPlus is loaded lazily and its
 version/API identity is checked. Do not serialize live API objects to workers.
 
-\code{close()} deletes states and resources before unloading the library. A
+\code{close()} deletes states and resources before unloading the library (9.4 retains
+the library and callbacks until its worker exits). A
 finalizer is a fallback. Close/reset/delete and nested runs are rejected during
 simulation. Original library leaks are not repaired: use a fresh R process
 for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses

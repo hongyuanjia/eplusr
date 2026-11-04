@@ -2,8 +2,14 @@
 # Requested stock-engine tests fail visibly here if their selected installation is unavailable.
 if (identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true")) {
     local({
-        api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
-        api$close()
+        version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+        if (version == "9.4") {
+            # Real 9.4 acceptance enters through backend/session workers, not the forbidden host constructor.
+            eplus_config(version)
+        } else {
+            api <- eplus_api(version)
+            api$close()
+        }
     })
 }
 

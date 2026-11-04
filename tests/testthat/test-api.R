@@ -882,6 +882,10 @@ test_that("late bridge interrupts retain their category after native return", {
 
 # A stock property error can enter rdyncall's boundary before the managed R handler runs.
 test_that("stock functional bridge interrupts return safely with their original category", {
+    skip_if(
+        identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"),
+        "9.4 requires a package-owned backend/session worker; dedicated worker tests cover its contract"
+    )
     fixture <- testrun__api_fixture()
     on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
     result <- callr::r(
@@ -1480,7 +1484,12 @@ test_that("stock managed clearing and metadata queries preserve the native lifec
         counts <- new.env(parent = emptyenv())
         counts$functional <- counts$user <- counts$host <- counts$finalized <- 0L
         counts$metadata <- NULL
-        functional_state <- api$state_manager$new_state()
+        legacy94 <- grepl("Version 9.4.0", api$info()$version, fixed = TRUE)
+        functional_state <- if (legacy94) {
+            state
+        } else {
+            api$state_manager$new_state()
+        }
         api$functional$callback_error(functional_state, function(...) {
             counts$functional <- counts$functional + 1L
         })
@@ -1490,7 +1499,9 @@ test_that("stock managed clearing and metadata queries preserve the native lifec
         api$functional$clear_callbacks()
         fluid$specific_heat(functional_state, -1000)
         counts$after <- counts$functional
-        api$state_manager$delete_state(functional_state)
+        if (!legacy94) {
+            api$state_manager$delete_state(functional_state)
+        }
         api$runtime$callback_begin_zone_timestep_before_init_heat_balance(
             state,
             local({
@@ -1749,6 +1760,10 @@ test_that("stock 26.2 exposes the first meter and recalculates overridden outdoo
 
 # Exercise the common public contract on each explicitly selected stock installation.
 test_that("stock API exposes four groups and reviewed operation provenance", {
+    skip_if(
+        identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"),
+        "9.4 requires a package-owned backend/session worker; dedicated worker tests cover its contract"
+    )
     skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
     version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
     # A fresh process owns its bridge safety proof and standalone native resources.
@@ -1833,6 +1848,10 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
 
 # Reject prepared input from another release before a native run can change the state.
 test_that("stock runtime rejects IDF and epJSON model version mismatches", {
+    skip_if(
+        identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"),
+        "9.4 requires a package-owned backend/session worker; dedicated worker tests cover its contract"
+    )
     skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
     version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
     result <- callr::r(
@@ -1880,6 +1899,10 @@ test_that("stock runtime rejects IDF and epJSON model version mismatches", {
 
 # A native lifecycle cannot safely be selected when the prepared input identity is absent or ambiguous.
 test_that("stock runtime requires one valid prepared model version", {
+    skip_if(
+        identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"),
+        "9.4 requires a package-owned backend/session worker; dedicated worker tests cover its contract"
+    )
     skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
     version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
     result <- callr::r(
@@ -2001,4 +2024,16 @@ test_that("stock callbacks preserve exchange units and typed control ownership",
     expect_true(is.finite(actual$temperature))
     expect_equal(actual$actuator, 22)
     expect_match(actual$wrong_kind, "data kind")
+})
+
+# The 9.4 C API retains process-global simulation and error callbacks after state deletion.
+test_that("stock 9.4 state lifecycles require a package-owned fresh worker", {
+    skip_if_not(
+        dir.exists(file.path(
+            path.expand("~/Applications"),
+            "EnergyPlus-9-4-0"
+        )) ||
+            identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4")
+    )
+    expect_error(eplus_api("9.4"), "9[.]4.*fresh worker|fresh worker.*9[.]4")
 })
