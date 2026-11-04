@@ -53,11 +53,17 @@
 #' `list_available_api_data_csv()` returns a character string reconstructed from
 #' that safely released data, without calling the unfreeable native CSV allocator.
 #' Its `plugin_only` column identifies global/trend methods available only to
-#' executable-hosted R plugins. Their handles remain state- and kind-bound.
+#' executable-hosted R plugins. For rows with `managed_plugin_trend = TRUE`,
+#' `status` and `plugin_only` describe the native binding; declared host R trends
+#' provide separate conditional managed support. Their handles remain state-
+#' and kind-bound.
 #' Missing globals return a negative handle without entering the native fatal path;
 #' negative plugin handles cannot be used for reading or writing. Trend aggregates
-#' require `count >= 2`, matching stock 25.2/26.1/26.2. `get_trend_value()` remains disabled:
-#' the native upper index check permits an out-of-bounds read.
+#' require `count >= 2`, matching stock 25.2/26.1/26.2. For native plugin handles,
+#' `get_trend_value()` remains disabled:
+#' the native upper index check permits an out-of-bounds read. Separately,
+#' [eplus_plugin()] can declare bounded R-managed trends with safe lookup and
+#' indexed reads through these same method names, without PythonPlugin objects.
 #'
 #' `callback_register_external_hvac_manager()` uses the same callback safety
 #' boundary as other runtime hooks, but replaces the native HVAC manager entirely.
@@ -370,6 +376,9 @@ api__construct <- function(ctx) {
     # Expose the versioned signature, support, and ownership contract for every method.
     api$methods <- function() {
         rows <- lapply(ctx$manifest$methods, function(x) {
+            # Native method status remains independent of conditional R-managed trend support.
+            x$managed_plugin_trend <- x$group == "exchange" &&
+                x$method %in% c("get_trend_handle", "get_trend_value")
             x$parameters <- paste(unlist(x$parameters), collapse = ", ")
             as.data.frame(x, stringsAsFactors = FALSE)
         })
@@ -479,6 +488,7 @@ api__new_state <- function(ctx) {
     entry$callback_records <- list()
     entry$resources <- list()
     entry$plugins <- list()
+    entry$trend_lifecycle <- FALSE
     entry$functional_directory <- NULL
     entry$callback_directory <- NULL
     entry$input_metadata <- NULL
@@ -565,6 +575,7 @@ api__reset <- function(ctx, entry) {
         return(invisible(NULL))
     }
     entry$plugins <- list()
+    entry$trend_lifecycle <- FALSE
     for (resource in entry$resources) {
         api__delete_resource(ctx, entry, resource)
     }
@@ -1238,6 +1249,7 @@ api__run <- function(ctx, entry, args) {
         )
     }
     api__validate_input_version(models, source, ctx$manifest$energyplus)
+    plugin__prepare(ctx, entry)
     entry$input_metadata <- api__capture_input(args, models, source)
     argv <- ctx$ffi$argv(enc2utf8(c("energyplus", args)))
     ctx$call("setEnergyPlusRootDirectory", list(entry$pointer, ctx$directory))
@@ -1322,6 +1334,10 @@ api__invoke <- function(ctx, spec, values, resource) {
         api__error(
             "This API is quarantined after an unexpected native unwind; exit this R process."
         )
+    }
+    # Managed histories have their own safe implementation, including on native-disabled readers.
+    if (plugin__trend_operation(ctx, spec, values)) {
+        return(plugin__trend_invoke(ctx, spec$method, values))
     }
     if (spec$status != "supported") {
         api__error(paste0(
