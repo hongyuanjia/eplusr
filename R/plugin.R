@@ -14,7 +14,9 @@
 #'
 #' @param trends Named list of managed histories. Each definition contains a
 #'   numeric `source = function(api, state, plugin)`, positive integer `capacity`,
-#'   and optional `warmup = FALSE`. Sources may read R-owned `plugin$data` or
+#'   and optional `warmup = FALSE` and `replay = TRUE`. Set `replay = FALSE`
+#'   for sources that cannot be safely reconstructed in a fresh worker.
+#'   Sources may read R-owned `plugin$data` or
 #'   outputs declared with `request_variable()` and read through managed handles.
 #'
 #' @details
@@ -64,9 +66,18 @@
 #' do not add samples. Each finite numeric source is evaluated at the completed
 #' zone boundary; an engine output retains that output's averaging semantics.
 #' Plugin status and completed summaries expose each trend's capacity,
-#' valid_count, total_samples and latest environment/completed-zone time metadata.
+#' valid_count, total_samples, replay eligibility and latest environment/completed-zone
+#' time metadata.
 #' Storage retains at most capacity samples. Source errors and interrupts use the
 #' same deferred failure and cleanup boundary as hooks.
+#'
+#' Session prediction rebuilds each binding from its frozen backend initializer,
+#' replays recorded controls and compares bounded history before future policies.
+#' `replay = TRUE` requires deterministic hooks and sources under those inputs;
+#' the host cannot prove arbitrary R functions deterministic. Declare external,
+#' random or worker-specific sources with `replay = FALSE` to reject prediction
+#' before any branch starts. Undeclared differences are caught by prefix comparison
+#' before a future policy runs. Matching history does not establish native state equality.
 #'
 #' Native PythonPlugin globals and trends remain distinct; the unsafe native
 #' trend value reader stays disabled. Host plugins do not enable state cloning.
@@ -393,10 +404,13 @@ plugin__trend_definitions <- function(trends) {
         if (
             !is.list(trend) ||
                 !all(c("source", "capacity") %in% names(trend)) ||
-                any(!names(trend) %in% c("source", "capacity", "warmup"))
+                any(
+                    !names(trend) %in%
+                        c("source", "capacity", "warmup", "replay")
+                )
         ) {
             api__error(
-                "Each trend needs source and capacity, with optional warmup."
+                "Each trend needs source and capacity, with optional warmup and replay."
             )
         }
         checkmate::assert_function(trend$source, nargs = 3L)
@@ -405,6 +419,9 @@ plugin__trend_definitions <- function(trends) {
         trend$capacity <- as.integer(trend$capacity)
         trend$warmup <- trend$warmup %||% FALSE
         checkmate::assert_flag(trend$warmup)
+        # Replay eligibility is explicit; it cannot be inferred from an arbitrary R source.
+        trend$replay <- trend$replay %||% TRUE
+        checkmate::assert_flag(trend$replay)
         trend
     })
 }
@@ -427,6 +444,7 @@ plugin__trend_status <- function(record) {
     lapply(record$trends, function(trend) {
         list(
             capacity = trend$capacity,
+            replay = trend$replay,
             valid_count = length(trend$values),
             total_samples = trend$total_samples,
             latest = trend$latest

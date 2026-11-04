@@ -137,13 +137,22 @@ With \code{record = TRUE}, historical observations, explicit controller state an
 effective actions are journaled to disk; no native pointers are saved. Prediction
 freezes a prefix ending at the paused boundary, replays its actions without
 re-running the original controller, and checks every registered observation
-and calendar field before applying future branch controls. Future function
+and calendar field before applying future branch controls. Plugin bindings are
+rebuilt independently from the frozen \code{backend} initializer in every branch;
+their buffers and live handles are never transferred. Bounded history values,
+valid counts and environment/time keys are checked at each prefix boundary.
+A trend declared with \code{replay = FALSE} rejects prediction before any branch
+starts. Reconstructible sources and hooks must be deterministic under the
+recorded inputs; unrecorded differences can still fail prefix comparison.
+Future function
 controllers start with the original boundary's explicit controller state.
 A NULL future action holds prior actuator claims; NA releases them.
 Each branch uses a fresh worker, executes sequentially and is closed before
 the next branch. Results contain ordinary observations, worker identity,
 elapsed time, replay/future step counts and \code{method = "replay"}.
-\code{tolerance} is an absolute bound for each registered numeric value.
+\code{tolerance} is an absolute bound for each registered numeric value and managed
+trend sample. Trend configuration, counts, environment/time keys and restored
+explicit controller state must match exactly.
 An early natural end returns a shorter horizon with \code{complete = FALSE}.
 Each branch reports \code{status = "success"}, \code{"incomplete"} (natural end before
 the requested horizon), or \code{"failed"}, with a textual \code{reason} for non-success.

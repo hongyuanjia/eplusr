@@ -2038,6 +2038,10 @@ test_that("host plugin managed trend declarations and capability metadata are ex
         trends = list(n = list(source = source, capacity = 1L, warmup = NA))
     ))
     expect_error(eplus_plugin(
+        list(initialize = function(api, state, plugin) NULL),
+        trends = list(n = list(source = source, capacity = 1L, replay = NA))
+    ))
+    expect_error(eplus_plugin(
         hook,
         trends = list(n = list(source = source, capacity = 1L, extra = TRUE))
     ))

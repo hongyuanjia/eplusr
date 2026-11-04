@@ -18,7 +18,9 @@ Environment, input and sizing lifecycle hooks are always delivered.}
 
 \item{trends}{Named list of managed histories. Each definition contains a
 numeric \verb{source = function(api, state, plugin)}, positive integer \code{capacity},
-and optional \code{warmup = FALSE}. Sources may read R-owned \code{plugin$data} or
+and optional \code{warmup = FALSE} and \code{replay = TRUE}. Set \code{replay = FALSE}
+for sources that cannot be safely reconstructed in a fresh worker.
+Sources may read R-owned \code{plugin$data} or
 outputs declared with \code{request_variable()} and read through managed handles.}
 }
 \value{
@@ -77,9 +79,18 @@ new environment clears history. Reads, HVAC iterations and snapshot frequency
 do not add samples. Each finite numeric source is evaluated at the completed
 zone boundary; an engine output retains that output's averaging semantics.
 Plugin status and completed summaries expose each trend's capacity,
-valid_count, total_samples and latest environment/completed-zone time metadata.
+valid_count, total_samples, replay eligibility and latest environment/completed-zone
+time metadata.
 Storage retains at most capacity samples. Source errors and interrupts use the
 same deferred failure and cleanup boundary as hooks.
+
+Session prediction rebuilds each binding from its frozen backend initializer,
+replays recorded controls and compares bounded history before future policies.
+\code{replay = TRUE} requires deterministic hooks and sources under those inputs;
+the host cannot prove arbitrary R functions deterministic. Declare external,
+random or worker-specific sources with \code{replay = FALSE} to reject prediction
+before any branch starts. Undeclared differences are caught by prefix comparison
+before a future policy runs. Matching history does not establish native state equality.
 
 Native PythonPlugin globals and trends remain distinct; the unsafe native
 trend value reader stays disabled. Host plugins do not enable state cloning.

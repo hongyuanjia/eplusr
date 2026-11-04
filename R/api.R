@@ -1795,13 +1795,22 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' effective actions are journaled to disk; no native pointers are saved. Prediction
 #' freezes a prefix ending at the paused boundary, replays its actions without
 #' re-running the original controller, and checks every registered observation
-#' and calendar field before applying future branch controls. Future function
+#' and calendar field before applying future branch controls. Plugin bindings are
+#' rebuilt independently from the frozen `backend` initializer in every branch;
+#' their buffers and live handles are never transferred. Bounded history values,
+#' valid counts and environment/time keys are checked at each prefix boundary.
+#' A trend declared with `replay = FALSE` rejects prediction before any branch
+#' starts. Reconstructible sources and hooks must be deterministic under the
+#' recorded inputs; unrecorded differences can still fail prefix comparison.
+#' Future function
 #' controllers start with the original boundary's explicit controller state.
 #' A NULL future action holds prior actuator claims; NA releases them.
 #' Each branch uses a fresh worker, executes sequentially and is closed before
 #' the next branch. Results contain ordinary observations, worker identity,
 #' elapsed time, replay/future step counts and `method = "replay"`.
-#' `tolerance` is an absolute bound for each registered numeric value.
+#' `tolerance` is an absolute bound for each registered numeric value and managed
+#' trend sample. Trend configuration, counts, environment/time keys and restored
+#' explicit controller state must match exactly.
 #' An early natural end returns a shorter horizon with `complete = FALSE`.
 #' Each branch reports `status = "success"`, `"incomplete"` (natural end before
 #' the requested horizon), or `"failed"`, with a textual `reason` for non-success.
@@ -3131,21 +3140,54 @@ api_replay__history <- function(ctx, limit) {
 
 # Compare registered outputs and exact boundary semantics without claiming hidden-state equivalence.
 api_replay__match <- function(actual, expected, tolerance) {
-    exact <- setdiff(names(expected), "values")
-    values <- actual$values
-    reference <- expected$values
-    # Absolute tolerance applies to every registered value, not their mean error.
-    equal <- identical(names(values), names(reference)) &&
-        length(values) == length(reference) &&
-        identical(is.na(values), is.na(reference)) &&
-        isTRUE(all(
-            is.na(reference) |
-                values == reference |
-                (is.finite(values) &
-                    is.finite(reference) &
-                    abs(values - reference) <= tolerance)
-        ))
-    if (!identical(actual[exact], expected[exact]) || !equal) {
+    exact <- setdiff(names(expected), c("values", "plugins"))
+    # Numeric samples use a per-value absolute bound, preserving names and missing-value positions.
+    equal_values <- function(values, reference) {
+        identical(names(values), names(reference)) &&
+            length(values) == length(reference) &&
+            identical(is.na(values), is.na(reference)) &&
+            isTRUE(all(
+                is.na(reference) |
+                    values == reference |
+                    (is.finite(values) &
+                        is.finite(reference) &
+                        abs(values - reference) <= tolerance)
+            ))
+    }
+    actual_plugins <- actual$plugins
+    expected_plugins <- expected$plugins
+    histories_equal <- length(actual_plugins) == length(expected_plugins) &&
+        identical(names(actual_plugins), names(expected_plugins))
+    if (histories_equal) {
+        for (index in seq_along(expected_plugins)) {
+            actual_trends <- actual_plugins[[index]]$trends
+            expected_trends <- expected_plugins[[index]]$trends
+            if (!identical(names(actual_trends), names(expected_trends))) {
+                histories_equal <- FALSE
+                break
+            }
+            for (name in names(expected_trends)) {
+                if (
+                    !equal_values(
+                        actual_trends[[name]]$values,
+                        expected_trends[[name]]$values
+                    )
+                ) {
+                    histories_equal <- FALSE
+                }
+                # Only values are approximate; ownership, counts, capacity and environment/time keys are exact.
+                actual_plugins[[index]]$trends[[name]]$values <- NULL
+                expected_plugins[[index]]$trends[[name]]$values <- NULL
+            }
+        }
+    }
+    # Explicit controller memory is restored from the journal, so its complete ordinary value must match exactly.
+    if (
+        !identical(actual[exact], expected[exact]) ||
+            !equal_values(actual$values, expected$values) ||
+            !histories_equal ||
+            !identical(actual_plugins, expected_plugins)
+    ) {
         api_session__error(paste(
             "Replay diverged at completed step",
             expected$step
@@ -3218,6 +3260,18 @@ api_replay__predict <- function(
         }
     }
     history <- api_replay__history(ctx, history_limit)
+    # Reject declared external or otherwise unreconstructible sources before creating any branch.
+    for (binding in ctx$observation$plugins) {
+        for (name in names(binding$trends)) {
+            if (identical(binding$trends[[name]]$replay, FALSE)) {
+                api_session__error(sprintf(
+                    "Managed trend '%s' in binding '%s' cannot be reconstructed for replay (replay = FALSE).",
+                    name,
+                    binding$id
+                ))
+            }
+        }
+    }
     origin <- list(
         identity = ctx$identity,
         observation = ctx$observation,
@@ -3341,7 +3395,9 @@ api_replay__branch <- function(
         initial_action = history[[1L]]$action,
         controller = api_replay__controller(history, future, tolerance),
         controller_state = history[[1L]]$observation$controller_state,
-        dir = directory
+        dir = directory,
+        # Recreate each binding from the frozen initializer; never transfer its live context.
+        backend = ctx$config$setup %||% "api"
     )
     on.exit(try(branch$close(), silent = TRUE), add = TRUE)
     observation <- api_replay__advance(
