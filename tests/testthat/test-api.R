@@ -4898,9 +4898,10 @@ describe("replay", {
             fixture$directory,
             "interrupted-prediction"
         )
+        attempt <- NULL
         interrupted <- tryCatch(
             {
-                session$predict(
+                attempt <- session$predict(
                     list(cancel = cancel, later = cooler),
                     1L,
                     dir = interrupted_directory
@@ -4909,7 +4910,24 @@ describe("replay", {
             },
             interrupt = function(condition) TRUE
         )
-        expect_true(interrupted)
+        # Retain plain terminal classification if a platform loses interrupt propagation.
+        diagnostics <- lapply(attempt$branches, function(branch) {
+            list(
+                status = branch$status,
+                reason = branch$reason,
+                error = branch$error,
+                outcome = branch$outcome[c(
+                    "phase",
+                    "stop_reason",
+                    "error",
+                    "native_exit_status"
+                )]
+            )
+        })
+        expect_true(
+            interrupted,
+            info = jsonlite::toJSON(diagnostics, auto_unbox = TRUE)
+        )
         expect_false(dir.exists(file.path(interrupted_directory, "branch-002")))
         expect_false(tryCatch(
             ps::ps_is_running(ps::ps_handle(readRDS(interrupted_worker))),

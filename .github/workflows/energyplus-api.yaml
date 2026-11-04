@@ -4,45 +4,67 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      target_version:
+        description: Stock release to rerun (empty selects the complete maintained matrix)
+        type: string
+        default: ""
+      target_os:
+        description: Runner label to rerun (empty selects all maintained platforms)
+        type: string
+        default: ""
 
 permissions: read-all
 
 jobs:
+  matrix:
+    name: Select maintained stock matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+    steps:
+      - uses: actions/github-script@v8
+        id: select
+        env:
+          TARGET_VERSION: ${{ inputs.target_version }}
+          TARGET_OS: ${{ inputs.target_os }}
+        with:
+          script: |
+            // Select real maintained cells rather than creating skipped placeholder jobs.
+            const cells = [];
+            const platforms = ["ubuntu-latest", "macos-latest", "windows-latest"];
+            for (const os of platforms) {
+              for (const eplus of ["26.1", "26.2"]) cells.push({os, eplus, suite: "full"});
+            }
+            const older = {
+              "ubuntu-latest": ["9.4", "9.5", "9.6", "22.1", "22.2", "23.1", "23.2", "24.1", "24.2", "25.1", "25.2"],
+              "macos-latest": ["9.5", "23.2", "24.2"],
+              "windows-latest": ["9.4", "9.6", "23.2", "24.1", "24.2"]
+            };
+            for (const [os, releases] of Object.entries(older)) {
+              for (const eplus of releases) cells.push({os, eplus, suite: "contract"});
+            }
+            const version = process.env.TARGET_VERSION || "";
+            const os = process.env.TARGET_OS || "";
+            if (version && !cells.some(cell => cell.eplus === version)) throw new Error("Unknown stock release: " + version);
+            if (os && !platforms.includes(os)) throw new Error("Unknown runner label: " + os);
+            const selected = cells.filter(cell => (!version || cell.eplus === version) && (!os || cell.os === os));
+            if (!selected.length) throw new Error("No maintained stock cell matches the requested release/platform.");
+            core.setOutput("matrix", JSON.stringify({include: selected}));
   api:
+    needs: matrix
     name: Stock ${{ matrix.eplus }} (${{ matrix.os }}, ${{ matrix.suite }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        eplus: ["26.1", "26.2"]
-        suite: [full]
-        include:
-          - {os: ubuntu-latest, eplus: "9.4", suite: contract}
-          - {os: ubuntu-latest, eplus: "9.5", suite: contract}
-          - {os: ubuntu-latest, eplus: "9.6", suite: contract}
-          - {os: ubuntu-latest, eplus: "22.1", suite: contract}
-          - {os: ubuntu-latest, eplus: "22.2", suite: contract}
-          - {os: ubuntu-latest, eplus: "23.1", suite: contract}
-          - {os: ubuntu-latest, eplus: "23.2", suite: contract}
-          - {os: ubuntu-latest, eplus: "24.1", suite: contract}
-          - {os: ubuntu-latest, eplus: "24.2", suite: contract}
-          - {os: ubuntu-latest, eplus: "25.1", suite: contract}
-          - {os: ubuntu-latest, eplus: "25.2", suite: contract}
-          - {os: macos-latest, eplus: "9.5", suite: contract}
-          - {os: macos-latest, eplus: "23.2", suite: contract}
-          - {os: macos-latest, eplus: "24.2", suite: contract}
-          - {os: windows-latest, eplus: "9.4", suite: contract}
-          - {os: windows-latest, eplus: "9.6", suite: contract}
-          - {os: windows-latest, eplus: "23.2", suite: contract}
-          - {os: windows-latest, eplus: "24.1", suite: contract}
-          - {os: windows-latest, eplus: "24.2", suite: contract}
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: true
       RGL_USE_NULL: true
       _EPLUSR_RUN_API_TESTS_: true
       _EPLUSR_TEST_API_VERSION_: ${{ matrix.eplus }}
+      _EPLUSR_TEST_API_SUITE_: ${{ matrix.suite }}
     steps:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-r@v2
@@ -67,7 +89,9 @@ jobs:
           # Engine preparation owns installation; test helpers run in the test step.
           pkgload::load_all(".", quiet = TRUE, helpers = FALSE)
           # Helpers and restored installations may already provide either engine.
-          versions <- unique(c(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
+          # Full regression retains the default 26.1 installation as well as the selected baseline.
+          selected <- if (Sys.getenv("_EPLUSR_TEST_API_SUITE_") == "full") c("26.1", "26.2") else Sys.getenv("_EPLUSR_TEST_API_VERSION_")
+          versions <- unique(c(selected, get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
           for (version in versions) {
               if (!eplusr::is_avail_eplus(version)) {
                   eplusr::install_eplus(version, local = TRUE, portable = TRUE)

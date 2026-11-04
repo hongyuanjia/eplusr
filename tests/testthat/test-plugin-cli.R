@@ -442,7 +442,11 @@ test_that("stock executable hosts two R plugin instances and reports cleanup", {
         "already exist"
     )
     expect_error(
-        export_eplus_plugin(make("A", 22), paste0(directory, ",bad")),
+        export_eplus_plugin(
+            make("A", 22),
+            paste0(directory, ",bad"),
+            eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+        ),
         "delimiter"
     )
     cat(
