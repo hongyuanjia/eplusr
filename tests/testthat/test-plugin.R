@@ -1551,3 +1551,25 @@ test_that("managed trend aggregate counts reject invalid and insufficient histor
     expect_equal(unname(result$data$single), c(5, 5, 5, 5))
     expect_match(result$data$direction_one, "at least two")
 })
+
+# A new close-time interrupt remains observable after all owned states are retired.
+test_that("stock explicit close preserves fresh plugin cleanup interrupts", {
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    api <- eplus_api(Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"))
+    on.exit(try(api$close(), silent = TRUE), add = TRUE)
+    state <- api$state_manager$new_state()
+    plugin <- eplus_plugin(list(finalize = function(api, state, plugin) {
+        stop(structure(
+            list(message = "fresh close interrupt", call = NULL, marker = 42L),
+            class = c("interrupt", "condition")
+        ))
+    }))
+    plugin(api, state)
+    condition <- tryCatch(api$close(), interrupt = identity)
+    expect_s3_class(condition, "interrupt")
+    expect_identical(condition$message, "fresh close interrupt")
+    expect_identical(condition$marker, 42L)
+    expect_identical(api$state_manager$status(state)$phase, "closed")
+    expect_null(api$close())
+})

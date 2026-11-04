@@ -35,6 +35,31 @@ api_bind__select <- function(abi) {
     )
 }
 
+# Load the selected library with a scoped sibling-dependency search path and one native owner.
+api_bind__load_library <- function(path) {
+    original <- Sys.getenv("PATH", unset = NA_character_)
+    on.exit(
+        {
+            if (is.na(original)) {
+                Sys.unsetenv("PATH")
+            } else {
+                Sys.setenv(PATH = original)
+            }
+        },
+        add = TRUE
+    )
+    # Backslashes are required by LoadLibraryW; normalizePath ignores winslash on Unix.
+    path <- normalizePath(path, winslash = "\\")
+    directory <- dirname(path)
+    Sys.setenv(
+        PATH = paste(
+            c(directory, original[!is.na(original)]),
+            collapse = .Platform$path.sep
+        )
+    )
+    rdyncall::dynload(path, auto.unload = FALSE)
+}
+
 # Load generated bindings and identify the selected library before exposing managed methods.
 api__load <- function(directory, version = "26.1.0") {
     manifest <- api__manifest(version)
@@ -47,7 +72,7 @@ api__load <- function(directory, version = "26.1.0") {
     if (!file.exists(path)) {
         api__error(paste("EnergyPlus API library not found:", path))
     }
-    library <- rdyncall::dynload(path, auto.unload = FALSE)
+    library <- api_bind__load_library(path)
     if (is.null(library)) {
         api__error(
             "Cannot load the selected EnergyPlus API library into this R process. Check that R and the library have matching architectures."

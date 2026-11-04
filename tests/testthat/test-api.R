@@ -523,6 +523,17 @@ describe("api", {
         expect_match(api$info()$version, "26.2.0")
         expect_identical(api$info()$abi, "26.1-26.2")
         api$close()
+        # Native loading failures must restore both an inherited PATH and an unset PATH.
+        for (path in list(Sys.getenv("PATH"), NA_character_)) {
+            withr::with_envvar(c(PATH = path), {
+                ctx$load <- FALSE
+                expect_error(api__load(ctx$directory), "Cannot load")
+                expect_identical(
+                    Sys.getenv("PATH", unset = NA_character_),
+                    path
+                )
+            })
+        }
     })
 
     test_that("constructor uses installation discovery and rejects unreviewed versions", {
@@ -1872,7 +1883,9 @@ describe("api", {
         # A fresh process owns its bridge safety proof and standalone native resources.
         result <- callr::r(
             function(version) {
+                original_path <- Sys.getenv("PATH")
                 api <- eplusr::eplus_api(version)
+                restored_path <- identical(Sys.getenv("PATH"), original_path)
                 on.exit(api$close(), add = TRUE)
                 state <- api$state_manager$new_state()
                 psych <- api$functional$psychrometrics(state)
@@ -1905,6 +1918,7 @@ describe("api", {
                 reset <- api$state_manager$status(state)
                 api$state_manager$delete_state(state)
                 list(
+                    restored_path = restored_path,
                     console = console,
                     info = api$info(),
                     heat_capacity = heat_capacity,
@@ -1920,6 +1934,7 @@ describe("api", {
             args = list(version),
             libpath = .libPaths()
         )
+        expect_true(result$restored_path)
         if (version == "9.5") {
             expect_match(result$console, "cannot suppress")
         } else {

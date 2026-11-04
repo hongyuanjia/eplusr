@@ -734,8 +734,10 @@ api__close <- function(ctx) {
     }
     condition <- NULL
     for (entry in entries) {
+        # Pinned retired states keep callbacks alive, but their run condition was already delivered.
+        was_open <- !entry$closed
         api__dispose(ctx, entry)
-        if (is.null(condition)) condition <- entry$condition
+        if (was_open && is.null(condition)) condition <- entry$condition
     }
     if (isTRUE(ctx$legacy94)) {
         # Neither public deletion nor reset provides a reviewed global callback retirement contract.
