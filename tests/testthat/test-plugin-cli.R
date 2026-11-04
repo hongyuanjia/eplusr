@@ -879,6 +879,15 @@ test_that("native executable boundaries reject foreign threads and restore actua
             worker <- rdyncall::dynsym(fixture, "plugin_on_worker")
             handler <- rdyncall::dynsym(fixture, "plugin_signal_handler")
             interrupt <- rdyncall::dynsym(fixture, "plugin_raise_interrupt")
+            # Register the fixture separately for a managed R interrupt-check frame.
+            registered <- dyn.load(file.path(
+                directory,
+                paste0("callback-thread", .Platform$dynlib.ext)
+            ))
+            check_interrupt <- getNativeSymbolInfo(
+                "plugin_check_interrupt",
+                registered
+            )$address
             # Reject missing native addresses before any foreign call can dereference them.
             symbols <- list(
                 package = package,
@@ -915,7 +924,7 @@ test_that("native executable boundaries reject foreign threads and restore actua
                     function(...) {
                         rdyncall::dyncall(interrupt, ")v")
                         # Only R's own evaluation stack may raise the pending interrupt.
-                        Sys.sleep(0)
+                        .Call(check_interrupt)
                     }
                 } else {
                     function(...) stop("native bootstrap sentinel")

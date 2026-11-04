@@ -52,6 +52,7 @@ int callback_on_worker(void *callback, int kind)
 #define R_NO_REMAP
 #include <R.h>
 #include <Rinternals.h>
+#include <R_ext/Utils.h>
 #include <signal.h>
 
 /* Retain an engine-visible proxy address after its owning guard is retired. */
@@ -127,4 +128,11 @@ int plugin_signal_handler(int save)
 void plugin_raise_interrupt(void)
 {
     raise(SIGINT);
+}
+
+/* A managed .Call frame checks SIGINT only after the foreign raise frame returned. */
+SEXP plugin_check_interrupt(void)
+{
+    R_CheckUserInterrupt();
+    return R_NilValue;
 }

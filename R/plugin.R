@@ -665,11 +665,14 @@ plugin__commit <- function(ctx, entry, state) {
                             "Managed trend source must return one finite numeric value."
                         )
                     }
-                    trend$values <- head(
+                    trend$values <- utils::head(
                         c(as.double(value), trend$values),
                         trend$capacity
                     )
-                    trend$times <- head(c(time, trend$times), trend$capacity)
+                    trend$times <- utils::head(
+                        c(time, trend$times),
+                        trend$capacity
+                    )
                     trend$total_samples <- trend$total_samples + 1L
                     trend$latest <- boundary
                     trend$boundary <- boundary
