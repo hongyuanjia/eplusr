@@ -550,8 +550,7 @@ plugin__trend_invoke <- function(ctx, method, values) {
             times <- trend$times[seq_len(index)]
             centered <- times - mean(times)
             sum(centered * (samples - mean(samples))) / sum(centered^2)
-        },
-        api__error("Managed trend aggregate is unavailable.")
+        }
     )
 }
 
