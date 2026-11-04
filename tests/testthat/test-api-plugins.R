@@ -934,7 +934,7 @@ test_that("executable plugin export validates artifacts and hook mappings", {
         export_eplus_plugin(plugin, directory, name = "bad-name"),
         "pattern"
     )
-    local_mocked_bindings(eplus_config = function(...) list(version = "9.3.0"))
+    local_mocked_bindings(eplus_config = function(...) list(version = "25.2.0"))
     expect_error(export_eplus_plugin(plugin, directory), "26.1")
     mapping <- plugin_cli__hooks()
     expect_identical(
