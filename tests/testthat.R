@@ -77,6 +77,11 @@ testrun__legacy <- function(shard) {
             version = "9.4",
             cases = list(
                 c(
+                    "test-api.R",
+                    "api",
+                    "stock 9.4 state lifecycles require a package-owned fresh worker"
+                ),
+                c(
                     "test-run.R",
                     "run-api",
                     "stock 9.4 workers contain one state and preserve functional and feedback calls"

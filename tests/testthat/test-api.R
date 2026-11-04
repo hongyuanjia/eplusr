@@ -2369,6 +2369,10 @@ describe("api", {
                 api$runtime$set_console_output_status(state, FALSE),
                 "cannot suppress"
             )
+            expect_error(
+                api$runtime$set_console_output_status(state, NA),
+                "print_output must be one non-missing logical value"
+            )
             expect_error(api$exchange$current_sim_time(state), "lifecycle")
             fixture <- testrun__api_fixture()
             on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
