@@ -20,18 +20,18 @@
 #' deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 #' Standalone factories support water and steam, matching the stock Python SDK.
 #' `functional$ep_version()` returns the full version string as an R character.
-#' On 9.5, which lacks a native version getter, `info()$identity_source` records
+#' On 9.4/9.5, which lack a native version getter, `info()$identity_source` records
 #' identification from matching SDK version/build constants, library generation
 #' symbols and the selected CLI build. The library is never replaced by discovery.
-#' The 9.5 runtime cannot suppress console output: enabling output is a managed
+#' The 9.4/9.5 runtime cannot suppress console output: enabling output is a managed
 #' no-op, while requesting suppression reports a capability error. The selected
 #' IDD is supplied explicitly; native helper flags require prior external preparation.
-#' `current_sim_time()` on 9.5 requires an owned, observed running lifecycle;
+#' `current_sim_time()` on 9.4/9.5 requires an owned, observed running lifecycle;
 #' protected environment/zone hooks supply relative elapsed hours, resetting after
 #' warmup. It is unavailable on borrowed states or before a run. Calendar years
-#' are not inferred. On 9.5/9.6, `minutes()` uses the modern rounded convention.
+#' are not inferred. On 9.4/9.5/9.6, `minutes()` uses the modern rounded convention.
 #'
-#' On 9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
+#' On 9.4/9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
 #' zone boundary, because earlier report finalization can dereference uninitialized
 #' stock resilience tables. After callback failure, user delivery stays disabled
 #' and the original condition is rethrown after native return. A design-only run
@@ -78,17 +78,32 @@
 #' provide separate conditional managed support. Their handles remain state-
 #' and kind-bound.
 #' Missing globals return a negative handle without entering the native fatal path;
-#' negative plugin handles cannot be used for reading or writing. Trend aggregates
-#' require `count >= 2`, matching stock 24.2 through 26.2. For native plugin handles,
+#' negative plugin handles cannot be used for reading or writing. Native trend
+#' aggregates require `count >= 2`, matching stock 24.2 through 26.2. For native plugin handles,
 #' `get_trend_value()` remains disabled:
 #' the native upper index check permits an out-of-bounds read. Separately,
 #' [eplus_plugin()] can declare bounded R-managed trends with safe lookup and
-#' indexed reads through these same method names, without PythonPlugin objects.
+#' indexed reads and aggregates through these same method names, without PythonPlugin
+#' objects. Managed average/minimum/maximum/sum accept any positive count within
+#' valid history, including one. Managed direction requires at least two samples
+#' and returns a least-squares slope in source-value units per elapsed simulation
+#' hour, positive for values increasing chronologically; see [eplus_plugin()].
 #'
 #' `callback_register_external_hvac_manager()` uses the same callback safety
 #' boundary as other runtime hooks, but replaces the native HVAC manager entirely.
 #' This is an experimental engine interface, not a general HVAC control hook;
 #' the caller must supply its HVAC calculations. Native initialization is limited.
+#'
+#' EnergyPlus 9.4 runs only in a fresh package-owned job or session worker.
+#' Use `backend = "api"`, a backend initialization function, or [eplus_session()].
+#' Direct `eplus_api("9.4")` calls are rejected because its state handles do not
+#' isolate native globals and invalid command-line arguments can exit the host.
+#' A 9.4 worker owns one API and one state lifetime; resetting, replacing the state,
+#' or opening another API is unavailable. Its native library and callback proxies
+#' remain pinned until worker exit because `stateDelete()` leaves global callback
+#' pointers alive. Functional, runtime and exchange calls use the same method names
+#' inside the worker, with unavailable operations reported as capability errors.
+#'
 #' Each group's `clear_callbacks()` detaches its user functions across this API's
 #' states, including during a callback. Native proxies remain pinned until reset
 #' or delete, so clearing does not recover callback capacity. Host session/plugin
@@ -113,7 +128,8 @@
 #' was already loaded by other code. EnergyPlus is loaded lazily and its
 #' version/API identity is checked. Do not serialize live API objects to workers.
 #'
-#' `close()` deletes states and resources before unloading the library. A
+#' `close()` deletes states and resources before unloading the library (9.4 retains
+#' the library and callbacks until its worker exits). A
 #' finalizer is a fallback. Close/reset/delete and nested runs are rejected during
 #' simulation. Original library leaks are not repaired: use a fresh R process
 #' for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
@@ -185,6 +201,7 @@ eplus_api <- function(eplus = "26.1") {
     } else {
         suppressMessages(eplus_config(eplus))
     }
+    api94__check_constructor(as.character(config$version))
     api_profile__select(config$version)
     api__check_bridge()
     api__load(config$dir, as.character(config$version))
@@ -195,6 +212,26 @@ api__running <- new.env(parent = emptyenv())
 api__running$state <- NULL
 api__running$plugin_depth <- 0L
 api__bridge_cache <- new.env(parent = emptyenv())
+
+# Restrict the global-state 9.4 library to one package-owned disposable worker lifecycle.
+api94__check_constructor <- function(version) {
+    if (isTRUE(api__running$legacy94_claimed)) {
+        api__error(
+            "EnergyPlus 9.4 owns this fresh worker; create another job or session for another API lifecycle."
+        )
+    }
+    if (!identical(version, "9.4.0")) {
+        return(invisible(NULL))
+    }
+    if (!identical(api__running$worker_pid, Sys.getpid())) {
+        api__error(
+            "EnergyPlus 9.4 requires a package-owned fresh worker; use backend = 'api', a backend initialization function, or eplus_session()."
+        )
+    }
+    # Native state deletion does not retire global runtime and functional error callbacks.
+    api__running$legacy94_claimed <- TRUE
+    invisible(NULL)
+}
 
 # Throw a conventional R condition before an invalid request can reach native code.
 api__error <- function(message) {
@@ -343,6 +380,7 @@ api__construct <- function(ctx) {
         }
         spec
     })
+    ctx$legacy94 <- identical(ctx$manifest$energyplus, "9.4.0")
     ctx$pid <- Sys.getpid()
     ctx$closed <- FALSE
     ctx$next_id <- 0L
@@ -400,7 +438,16 @@ api__construct <- function(ctx) {
         rows <- lapply(ctx$manifest$methods, function(x) {
             # Native method status remains independent of conditional R-managed trend support.
             x$managed_plugin_trend <- x$group == "exchange" &&
-                x$method %in% c("get_trend_handle", "get_trend_value")
+                x$method %in%
+                    c(
+                        "get_trend_handle",
+                        "get_trend_value",
+                        "get_trend_average",
+                        "get_trend_min",
+                        "get_trend_max",
+                        "get_trend_sum",
+                        "get_trend_direction"
+                    )
             x$parameters <- paste(unlist(x$parameters), collapse = ", ")
             as.data.frame(x, stringsAsFactors = FALSE)
         })
@@ -490,6 +537,11 @@ api__new_state <- function(ctx) {
     if (ctx$pid != Sys.getpid()) {
         api__error("Create EnergyPlus states in their owning R process.")
     }
+    if (isTRUE(ctx$legacy94) && ctx$next_id > 0L) {
+        api__error(
+            "EnergyPlus 9.4 permits one state lifetime per fresh worker; start another job or session."
+        )
+    }
     pointer <- ctx$call("stateNew")
     if (ctx$ffi$null(pointer)) {
         api__error("EnergyPlus could not allocate a state.")
@@ -569,13 +621,19 @@ api__dispose <- function(ctx, entry) {
     entry$phase <- "closed"
     entry$pointer <- NULL
     entry$input_metadata <- NULL
-    for (callback in entry$callbacks) {
-        ctx$ffi$release(callback)
+    # 9.4 stateDelete leaves global callback pointers alive; their trampolines live until worker exit.
+    if (!isTRUE(ctx$legacy94)) {
+        for (callback in entry$callbacks) {
+            ctx$ffi$release(callback)
+        }
+        entry$callbacks <- list()
+        entry$callback_records <- list()
     }
-    entry$callbacks <- list()
-    entry$callback_records <- list()
     entry$resources <- list()
-    rm(list = entry$id, envir = ctx$states)
+    # Closed 9.4 entries keep their callback closures reachable from the process-pinned context.
+    if (!isTRUE(ctx$legacy94)) {
+        rm(list = entry$id, envir = ctx$states)
+    }
     invisible(NULL)
 }
 
@@ -654,7 +712,12 @@ api__close <- function(ctx) {
         api__dispose(ctx, entry)
         if (is.null(condition)) condition <- entry$condition
     }
-    ctx$ffi$unload()
+    if (isTRUE(ctx$legacy94)) {
+        # Neither public deletion nor reset provides a reviewed global callback retirement contract.
+        api__running$legacy94_retained <- ctx
+    } else {
+        ctx$ffi$unload()
+    }
     ctx$closed <- TRUE
     # Report cleanup failure only after every state and the library have been drained.
     if (!is.null(condition)) {
@@ -1633,13 +1696,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 9.5/9.6/22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 9.4/9.5/9.6/22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 9.4, 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.

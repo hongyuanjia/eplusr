@@ -5,6 +5,7 @@ api_profile__select <- function(version) {
         length(version) != 1L ||
             !version %in%
                 c(
+                    "9.4.0",
                     "9.5.0",
                     "9.6.0",
                     "22.1.0",
@@ -20,7 +21,7 @@ api_profile__select <- function(version) {
                 )
     ) {
         api__error(
-            "The API requires an EnergyPlus 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 9.4, 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
@@ -29,7 +30,8 @@ api_profile__select <- function(version) {
         abi = if (version %in% c("22.1.0", "22.2.0")) {
             "23.1.0"
         } else if (
-            version %in% c("9.5.0", "9.6.0", "23.1.0", "23.2.0", "24.1.0")
+            version %in%
+                c("9.4.0", "9.5.0", "9.6.0", "23.1.0", "23.2.0", "24.1.0")
         ) {
             version
         } else if (version %in% c("24.2.0", "25.1.0")) {
@@ -1171,6 +1173,12 @@ api__manifest <- function(version = "26.1.0") {
 # Limit older releases to safe public operations without guessing absent metadata.
 api_profile__methods <- function(methods, version) {
     reasons <- character()
+    if (identical(version, "9.4.0")) {
+        reasons["reset_state"] <-
+            "EnergyPlus 9.4 globals and callbacks require one state lifetime per fresh worker; resetting is unavailable."
+        reasons["get_num_nodes_in_cond_fd_surf_layer"] <-
+            "The stock 9.4 release has no public CondFD node-count getter."
+    }
     if (numeric_version(version) < "24.2") {
         reasons[c(
             "get_ems_global_handle",
@@ -1232,6 +1240,16 @@ api_profile__methods <- function(methods, version) {
                     spec$method %in% c("glycol", "refrigerant")
             ) {
                 spec$ownership <- "state/generation-owned property wrapper; matching public native deleter"
+            }
+        }
+        if (identical(version, "9.4.0")) {
+            # Native state deletion leaves global callback captures alive until the worker exits.
+            if (spec$kind == "new_state") {
+                spec$ownership <- "one nonisolated native state per fresh package-owned worker"
+            } else if (spec$kind == "callback") {
+                spec$ownership <- "native trampoline retained until fresh worker exit; user function may be detached"
+            } else if (spec$kind == "delete_state") {
+                spec$ownership <- "retires resources and state; library and callbacks remain pinned until worker exit"
             }
         }
         if (spec$method %in% names(reasons)) {

@@ -2961,6 +2961,10 @@ run__api_version <- function(version) {
 
 # Own exactly one engine lifecycle inside a fresh process; only plain result metadata leaves it.
 run__api_engine <- function(directory, args, api_setup = NULL) {
+    # This marker is scoped to the package-owned engine worker, never inherited through environment variables.
+    worker_pid <- api__running$worker_pid
+    api__running$worker_pid <- Sys.getpid()
+    on.exit(api__running$worker_pid <- worker_pid, add = TRUE)
     api <- NULL
     state <- NULL
     stage <- "load"

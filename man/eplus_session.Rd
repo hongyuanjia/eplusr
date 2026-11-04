@@ -25,7 +25,7 @@ eplus_session(
 
 \item{weather}{An EPW path or \link{Epw} object. Sessions control weather run periods.}
 
-\item{eplus}{EnergyPlus version or installation directory. Only 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
+\item{eplus}{EnergyPlus version or installation directory. Only 9.4, 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2
 are supported. The selected installation must match the model version.}
 
 \item{variables}{Named list of character pairs \code{c(variable_name, key)}.}
@@ -84,7 +84,7 @@ A finalizer terminates the process tree as a fallback.
 }
 }
 \description{
-Create an experimental session proxy for stock EnergyPlus 9.5/9.6/22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
+Create an experimental session proxy for stock EnergyPlus 9.4/9.5/9.6/22.1/22.2/23.1/23.2/24.1/24.2/25.1/25.2/26.1/26.2. Native state,
 handles and callbacks stay in one fresh engine worker. Pausing preserves that
 worker and the current native call; it is not a checkpoint or state copy.
 }

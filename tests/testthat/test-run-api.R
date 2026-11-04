@@ -822,3 +822,187 @@ test_that("freezing preserves methods stored in their own lexical environment", 
     expect_identical(value$read(), 8L)
     expect_identical(object$value, 99L)
 })
+
+# 9.4 exposes its four groups inside the same public worker backend used by later releases.
+test_that("stock 9.4 workers contain one state and preserve functional and feedback calls", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "legacy94.rds")
+    # Keep native objects in the worker and publish only plain measurements and capability errors.
+    setup <- function(api, state) {
+        psych <- api$functional$psychrometrics(state)
+        water <- api$functional$glycol(state, "WATER")
+        steam <- api$functional$refrigerant(state, "STEAM")
+        evidence <- list(
+            info = api$info(),
+            methods = api$methods(),
+            heat_capacity = psych$specific_heat(state, 0),
+            water_capacity = water$specific_heat(state, 20),
+            steam_pressure = steam$saturation_pressure(state, 100),
+            second_state = tryCatch(
+                api$state_manager$new_state(),
+                error = conditionMessage
+            ),
+            reset = tryCatch(
+                api$state_manager$reset_state(state),
+                error = conditionMessage
+            ),
+            second_api = tryCatch(
+                eplusr::eplus_api("9.4"),
+                error = conditionMessage
+            ),
+            version = api$functional$ep_version()
+        )
+        water$delete(state)
+        steam$delete(state)
+        api$exchange$request_variable(
+            state,
+            "Zone Mean Air Temperature",
+            "ZONE ONE"
+        )
+        # Feedback remains on the owning R thread and runs only after real exchange readiness.
+        api$runtime$callback_begin_system_timestep_before_predictor(
+            state,
+            function(s) {
+                if (
+                    !api$exchange$api_data_fully_ready(s) ||
+                        api$exchange$warmup_flag(s)
+                ) {
+                    return()
+                }
+                temperature <- api$exchange$get_variable_handle(
+                    s,
+                    "Zone Mean Air Temperature",
+                    "ZONE ONE"
+                )
+                schedule <- api$exchange$get_actuator_handle(
+                    s,
+                    "Schedule:Constant",
+                    "Schedule Value",
+                    "Session Heating"
+                )
+                evidence$temperature <- api$exchange$get_variable_value(
+                    s,
+                    temperature
+                )
+                api$exchange$set_actuator_value(s, schedule, 22)
+                evidence$control <- api$exchange$get_actuator_value(s, schedule)
+                saveRDS(evidence, marker)
+                api$runtime$stop_simulation(s)
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "9.4",
+        backend = setup,
+        output_dir = file.path(fixture$directory, "feedback"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        result$api$stop_reason,
+        "user_stop",
+        info = result$api$error$message
+    )
+    expect_true(file.exists(marker))
+    if (!file.exists(marker)) {
+        return()
+    }
+    evidence <- readRDS(marker)
+    expect_match(evidence$version, "9.4.0", fixed = TRUE)
+    expect_equal(evidence$heat_capacity, 1004.8585895, tolerance = 1e-9)
+    expect_gt(evidence$water_capacity, 4100)
+    expect_lt(evidence$water_capacity, 4300)
+    expect_gt(evidence$steam_pressure, 90000)
+    expect_lt(evidence$steam_pressure, 110000)
+    expect_match(evidence$second_state, "one state lifetime")
+    expect_match(evidence$reset, "9[.]4.*reset|reset.*9[.]4")
+    expect_match(evidence$second_api, "fresh worker")
+    expect_true(is.finite(evidence$temperature))
+    expect_equal(evidence$control, 22)
+    expect_false(identical(evidence$info$pid, Sys.getpid()))
+})
+
+# Global functional error callbacks must remain valid through disposal and vanish with their worker.
+test_that("stock 9.4 callback failures retire their worker without poisoning the caller", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    # A functional callback runs before the simulation, through the shared managed callback boundary.
+    setup <- function(api, state) {
+        api$functional$callback_error(state, function(level, message) {
+            stop("legacy functional callback failure")
+        })
+        water <- api$functional$glycol(state, "WATER")
+        water$specific_heat(state, -1000)
+    }
+    failed <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "9.4",
+        backend = setup,
+        output_dir = file.path(fixture$directory, "failure"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(failed$api$phase, "failed")
+    expect_match(failed$api$error$message, "legacy functional callback failure")
+    # The next call starts a distinct process instead of reusing global callback storage.
+    completed <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "9.4",
+        backend = "api",
+        output_dir = file.path(fixture$directory, "following"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        completed$api$phase,
+        "completed",
+        info = completed$api$error$message
+    )
+    expect_false(identical(failed$api$pid, completed$api$pid))
+})
+
+# Stock 9.4 calls exit() for helper flags and malformed arguments even in library mode.
+test_that("stock 9.4 CLI exits are contained by the public worker backend", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    for (flag in c("--help", "--eplusr-invalid-argument")) {
+        # Deliberately exercise ProcessArgs in the disposable worker, where native exit cannot kill the caller.
+        setup <- function(api, state) {
+            api$runtime$run_energyplus(state, c(flag, fixture$model))
+        }
+        failed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = setup,
+            output_dir = file.path(fixture$directory, gsub("-", "", flag)),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(failed$api$phase, "failed")
+        expect_identical(failed$api$stop_reason, "worker_error")
+        expect_false(identical(failed$exit_status, 0L))
+    }
+    completed <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = "9.4",
+        backend = "api",
+        output_dir = file.path(fixture$directory, "after-cli-exits"),
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(
+        completed$api$phase,
+        "completed",
+        info = completed$api$error$message
+    )
+})
