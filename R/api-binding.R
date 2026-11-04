@@ -89,20 +89,25 @@ api__load <- function(directory, version = "26.1.0") {
     ) {
         api__error(paste("Loaded library is not EnergyPlus", version))
     }
-    pointer <- call("stateNew")
-    if (rdyncall::is.nullptr(pointer)) {
-        api__error("EnergyPlus could not allocate an identity-check state.")
+    if (identical(version, "9.4.0")) {
+        # The reviewed 9.4 getter ignores its state argument; do not create an extra global-state lifetime.
+        api_version <- call("apiVersionFromEPlus", list(NULL))
+    } else {
+        pointer <- call("stateNew")
+        if (rdyncall::is.nullptr(pointer)) {
+            api__error("EnergyPlus could not allocate an identity-check state.")
+        }
+        # Retire the probe state even when API-version conversion fails.
+        probe_live <- TRUE
+        on.exit(
+            if (probe_live) call("stateDelete", list(pointer)),
+            add = TRUE,
+            after = FALSE
+        )
+        api_version <- call("apiVersionFromEPlus", list(pointer))
+        call("stateDelete", list(pointer))
+        probe_live <- FALSE
     }
-    # Retire the probe state even when API-version conversion fails.
-    probe_live <- TRUE
-    on.exit(
-        if (probe_live) call("stateDelete", list(pointer)),
-        add = TRUE,
-        after = FALSE
-    )
-    api_version <- call("apiVersionFromEPlus", list(pointer))
-    call("stateDelete", list(pointer))
-    probe_live <- FALSE
     if (api_version != binding$api_version) {
         api__error(
             "Loaded EnergyPlus API version does not match the reviewed ABI."
@@ -200,7 +205,11 @@ api_legacy__identity <- function(directory, version, library) {
         library,
         "energyPlusVersion"
     ))
-    if (sdk_version != version || !has_nodes || has_version) {
+    if (
+        sdk_version != version ||
+            has_nodes != (numeric_version(version) >= "9.5") ||
+            has_version
+    ) {
         api__error(
             "Selected EnergyPlus library symbols do not match its early SDK identity."
         )
