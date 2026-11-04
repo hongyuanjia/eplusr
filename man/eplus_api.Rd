@@ -31,18 +31,18 @@ methods. Each property method still takes its owning state. Public resource
 deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 Standalone factories support water and steam, matching the stock Python SDK.
 \code{functional$ep_version()} returns the full version string as an R character.
-On 9.5, which lacks a native version getter, \code{info()$identity_source} records
+On 9.4/9.5, which lack a native version getter, \code{info()$identity_source} records
 identification from matching SDK version/build constants, library generation
 symbols and the selected CLI build. The library is never replaced by discovery.
-The 9.5 runtime cannot suppress console output: enabling output is a managed
+The 9.4/9.5 runtime cannot suppress console output: enabling output is a managed
 no-op, while requesting suppression reports a capability error. The selected
 IDD is supplied explicitly; native helper flags require prior external preparation.
-\code{current_sim_time()} on 9.5 requires an owned, observed running lifecycle;
+\code{current_sim_time()} on 9.4/9.5 requires an owned, observed running lifecycle;
 protected environment/zone hooks supply relative elapsed hours, resetting after
 warmup. It is unavailable on borrowed states or before a run. Calendar years
-are not inferred. On 9.5/9.6, \code{minutes()} uses the modern rounded convention.
+are not inferred. On 9.4/9.5/9.6, \code{minutes()} uses the modern rounded convention.
 
-On 9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
+On 9.4/9.5/9.6/22.1, early stop requests are deferred until a completed formal weather
 zone boundary, because earlier report finalization can dereference uninitialized
 stock resilience tables. After callback failure, user delivery stays disabled
 and the original condition is rethrown after native return. A design-only run
@@ -103,6 +103,17 @@ hour, positive for values increasing chronologically; see \code{\link[=eplus_plu
 boundary as other runtime hooks, but replaces the native HVAC manager entirely.
 This is an experimental engine interface, not a general HVAC control hook;
 the caller must supply its HVAC calculations. Native initialization is limited.
+
+EnergyPlus 9.4 runs only in a fresh package-owned job or session worker.
+Use \code{backend = "api"}, a backend initialization function, or \code{\link[=eplus_session]{eplus_session()}}.
+Direct \code{eplus_api("9.4")} calls are rejected because its state handles do not
+isolate native globals and invalid command-line arguments can exit the host.
+A 9.4 worker owns one API and one state lifetime; resetting, replacing the state,
+or opening another API is unavailable. Its native library and callback proxies
+remain pinned until worker exit because \code{stateDelete()} leaves global callback
+pointers alive. Functional, runtime and exchange calls use the same method names
+inside the worker, with unavailable operations reported as capability errors.
+
 Each group's \code{clear_callbacks()} detaches its user functions across this API's
 states, including during a callback. Native proxies remain pinned until reset
 or delete, so clearing does not recover callback capacity. Host session/plugin
@@ -127,7 +138,8 @@ until the fix has an official release. Start a fresh R process if rdyncall
 was already loaded by other code. EnergyPlus is loaded lazily and its
 version/API identity is checked. Do not serialize live API objects to workers.
 
-\code{close()} deletes states and resources before unloading the library. A
+\code{close()} deletes states and resources before unloading the library (9.4 retains
+the library and callbacks until its worker exits). A
 finalizer is a fallback. Close/reset/delete and nested runs are rejected during
 simulation. Original library leaks are not repaired: use a fresh R process
 for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
