@@ -46,6 +46,196 @@ testrun__phase <- function(name, ..., file = NULL, desc = NULL) {
     invisible(results)
 }
 
+# Exercise only reviewed legacy boundaries in each existing worker and coverage denominator.
+testrun__legacy <- function(shard) {
+    version <- Sys.getenv("_EPLUSR_TEST_COVERAGE_LEGACY_")
+    if (!nzchar(version)) {
+        return(invisible(NULL))
+    }
+    definitions <- list(
+        api = list(
+            version = "23.2",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock older API reports safe discovery and readiness capabilities"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock API exposes four groups and reviewed operation provenance"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock runtime rejects IDF and epJSON model version mismatches"
+                )
+            )
+        ),
+        `session-errors` = list(
+            version = "9.4",
+            cases = list(
+                c(
+                    "test-run.R",
+                    "run-api",
+                    "stock 9.4 workers contain one state and preserve functional and feedback calls"
+                ),
+                c(
+                    "test-run.R",
+                    "run-api",
+                    "stock 9.4 callback failures retire their worker without poisoning the caller"
+                ),
+                c(
+                    "test-run.R",
+                    "run-api",
+                    "stock 9.4 CLI exits are contained by the public worker backend"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock sessions commit bounded plugin history before observation and control"
+                )
+            )
+        ),
+        replay = list(
+            version = "9.5",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early API rejects missing or conflicting SDK identity"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early API identifies its selected installation and console limitation"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early API rounds fractional minute boundaries consistently"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early design-only callback failures finish safely with original conditions"
+                )
+            )
+        ),
+        plugins = list(
+            version = "9.6",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early API identifies its selected installation and console limitation"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early API rounds fractional minute boundaries consistently"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early design-only callback failures finish safely with original conditions"
+                )
+            )
+        ),
+        run = list(
+            version = "24.2",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock callbacks preserve exchange units and typed control ownership"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock API exposes four groups and reviewed operation provenance"
+                )
+            )
+        ),
+        `run-api` = list(
+            version = "24.1",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock older API reports safe discovery and readiness capabilities"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock API exposes four groups and reviewed operation provenance"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock runtime requires one valid prepared model version"
+                )
+            )
+        ),
+        engine = list(
+            version = "22.1",
+            cases = list(
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock 22.x APIs preserve uniform groups and reject stale functional resources"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock early design-only callback failures finish safely with original conditions"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock older API reports safe discovery and readiness capabilities"
+                )
+            )
+        ),
+        ordinary = list(
+            version = "9.5",
+            cases = list(
+                c(
+                    "test-plugin.R",
+                    "stock early trends keep a chronological clock across New Year"
+                ),
+                c(
+                    "test-api.R",
+                    "api",
+                    "stock sessions preserve calendar provenance across December and January"
+                )
+            )
+        )
+    )
+    definition <- definitions[[shard]]
+    if (is.null(definition) || !identical(version, definition$version)) {
+        stop(
+            "The coverage legacy installation does not match its reviewed shard."
+        )
+    }
+    # Each selected file reloads ordinary helpers under this version; engine children
+    # inherit the same instrumented package install and emit standard covr traces.
+    withr::local_envvar(c(`_EPLUSR_TEST_API_VERSION_` = version))
+    for (index in seq_along(definition$cases)) {
+        case <- definition$cases[[index]]
+        results <- testrun__phase(
+            paste0(shard, "-legacy-", version, "-", index),
+            file = case[[1L]],
+            desc = case[-1L]
+        )
+        if (any(as.data.frame(results)$skipped)) {
+            stop("A selected legacy coverage case was skipped.")
+        }
+    }
+    invisible(NULL)
+}
+
 # Separate runner shards avoid competing engine worker trees without omitting test files.
 shard <- Sys.getenv("_EPLUSR_TEST_SHARD_")
 if (nzchar(shard)) {
@@ -77,6 +267,7 @@ if (nzchar(shard)) {
     } else {
         stop("Unknown coverage test shard.")
     }
+    testrun__legacy(shard)
 } else if (identical(Sys.getenv("_EPLUSR_SERIAL_API_TESTS_"), "true")) {
     worker_tests <- "^(api|plugin(-cli)?|run|job|group|param)$"
     withr::with_envvar(

@@ -25,7 +25,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [api, session-errors, replay, plugins, run, run-api, engine, ordinary]
+        include:
+          - {shard: api, legacy: "23.2"}
+          - {shard: session-errors, legacy: "9.4"}
+          - {shard: replay, legacy: "9.5"}
+          - {shard: plugins, legacy: "9.6"}
+          - {shard: run, legacy: "24.2"}
+          - {shard: run-api, legacy: "24.1"}
+          - {shard: engine, legacy: "22.1"}
+          - {shard: ordinary, legacy: "9.5"}
     if: >-
       ${{
         (
@@ -52,6 +60,7 @@ jobs:
       TESTTHAT_PARALLEL: ${{ matrix.shard == 'ordinary' }}
       TESTTHAT_CPUS: 2
       _EPLUSR_TEST_SHARD_: ${{ matrix.shard }}
+      _EPLUSR_TEST_COVERAGE_LEGACY_: ${{ matrix.legacy }}
       # Weather archive transfers can outlast R's default 60-second network budget.
       R_DEFAULT_INTERNET_TIMEOUT: 180
       _EPLUSR_RUN_INTEGRATION_TESTS_: true
@@ -98,13 +107,13 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.local/EnergyPlus-*
-          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-26.1-22.2-9.6
+          key: ${{ runner.os }}-energyplus-${{ hashFiles('R/constants.R') }}-latest-26.1-22.2-9.6-legacy-${{ matrix.legacy }}
 
       - name: Prepare EnergyPlus
         run: |
           pkgload::load_all(".", quiet = TRUE, export_all = FALSE)
           latest <- get("LATEST_EPLUS_VER", asNamespace("eplusr"))
-          versions <- c(latest, "26.1", "22.2", "9.6")
+          versions <- unique(c(latest, "26.1", "22.2", "9.6", Sys.getenv("_EPLUSR_TEST_COVERAGE_LEGACY_")))
           for (ver in versions) {
             if (!eplusr::is_avail_eplus(ver)) eplusr::install_eplus(ver, local = TRUE)
             stopifnot(eplusr::is_avail_eplus(ver))
