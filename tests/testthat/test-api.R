@@ -508,7 +508,7 @@ test_that("constructor uses installation discovery and rejects unreviewed versio
     expect_equal(eplus_api("26.1"), "discovered")
     expect_equal(eplus_api("26.2"), "discovered")
     expect_equal(eplus_api("25.2"), "discovered")
-    expect_error(eplus_api("25.1"), "25.2, 26.1 or 26.2 installation")
+    expect_error(eplus_api("9.3"), "installation")
 })
 
 test_that("bridge safety gate handles missing, already loaded, failing and cached builds", {
@@ -1615,7 +1615,7 @@ test_that("version profiles select shared ABI and preserve the trend safety boun
         expect_identical(trend[[1L]]$status, "unsupported")
     }
     expect_error(api_profile__select(character()), "installation")
-    expect_error(api_profile__select("25.1.0"), "installation")
+    expect_error(api_profile__select("9.3.0"), "installation")
     expect_error(api_bind__select("unknown"))
 })
 
@@ -1805,6 +1805,12 @@ test_that("stock API exposes four groups and reviewed operation provenance", {
     expect_equal(result$steam_pressure, 101325, tolerance = 0.01)
     expect_match(result$retired, "closed")
     methods <- result$methods
+    if (version == "24.2") {
+        expect_true(all(grepl(
+            "native wrapper deletion",
+            methods$ownership[methods$method == "delete"]
+        )))
+    }
     expect_true(all(c("implementation", "provenance") %in% names(methods)))
     expect_identical(
         methods$implementation[methods$method == "get_api_data"],
@@ -1998,4 +2004,88 @@ test_that("stock older API reports safe discovery and readiness capabilities", {
         expect_match(measured$csv, "Weather Data,Outdoor Dry Bulb,Environment")
         expect_true(is.finite(measured$year))
     }
+})
+
+# Check the five-pointer API data contract while the stock callback reads and writes controls.
+test_that("stock callbacks preserve exchange units and typed control ownership", {
+    fixture <- testapi__controlled_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "exchange.rds")
+    # Bind requested outputs and control callbacks to this worker-owned state.
+    setup <- function(api, state) {
+        api$exchange$request_variable(
+            state,
+            "Zone Mean Air Temperature",
+            "ZONE ONE"
+        )
+        # Inspect live data only after readiness, before predictor reads the thermostat schedule.
+        api$runtime$callback_begin_system_timestep_before_predictor(
+            state,
+            function(s) {
+                if (
+                    !api$exchange$api_data_fully_ready(s) ||
+                        api$exchange$warmup_flag(s)
+                ) {
+                    return()
+                }
+                temperature <- api$exchange$get_variable_handle(
+                    s,
+                    "Zone Mean Air Temperature",
+                    "ZONE ONE"
+                )
+                schedule <- api$exchange$get_actuator_handle(
+                    s,
+                    "Schedule:Constant",
+                    "Schedule Value",
+                    "Session Heating"
+                )
+                api$exchange$set_actuator_value(s, schedule, 22)
+                wrong_kind <- tryCatch(
+                    api$exchange$get_variable_value(s, schedule),
+                    error = conditionMessage
+                )
+                saveRDS(
+                    list(
+                        data = api$exchange$get_api_data(s),
+                        temperature = api$exchange$get_variable_value(
+                            s,
+                            temperature
+                        ),
+                        actuator = api$exchange$get_actuator_value(s, schedule),
+                        wrong_kind = wrong_kind
+                    ),
+                    marker
+                )
+                api$exchange$reset_actuator(s, schedule)
+                api$runtime$stop_simulation(s)
+            }
+        )
+    }
+    result <- energyplus(
+        fixture$model,
+        fixture$weather,
+        eplus = Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1"),
+        output_dir = file.path(fixture$directory, "exchange"),
+        backend = setup,
+        readvars = FALSE,
+        echo = FALSE
+    )
+    expect_identical(result$api$stop_reason, "user_stop")
+    expect_true(file.exists(marker))
+    if (!file.exists(marker)) {
+        return(invisible(NULL))
+    }
+    actual <- readRDS(marker)
+    data <- actual$data
+    expect_named(data, c("what", "name", "key", "type", "unit"))
+    row <- data[
+        data$what == "OutputVariable" &
+            data$name == "Zone Mean Air Temperature" &
+            data$key == "ZONE ONE",
+    ]
+    expect_equal(nrow(row), 1L)
+    expect_identical(row$unit, "C")
+    expect_true(is.finite(actual$temperature))
+    expect_equal(actual$actuator, 22)
+    expect_match(actual$wrong_kind, "data kind")
 })

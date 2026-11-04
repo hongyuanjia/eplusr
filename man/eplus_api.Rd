@@ -7,7 +7,7 @@
 eplus_api(eplus = "26.1")
 }
 \arguments{
-\item{eplus}{EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 25.2, 26.1 and 26.2 are
+\item{eplus}{EnergyPlus version or installation directory. Only 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 and 26.2 are
 supported by this experimental library interface.}
 }
 \value{
@@ -15,7 +15,7 @@ An environment with \code{state_manager}, \code{functional}, \code{runtime}, and
 \code{exchange} groups, and \code{info()}, \code{methods()}, and \code{close()} methods.
 }
 \description{
-Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 25.2, 26.1 or 26.2 installation. The four
+Create a managed interface to a stock EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation. The four
 groups use the same method names as the bundled Python API, with an explicit
 managed \code{state} argument. This experimental interface does not change CLI jobs.
 }
@@ -28,7 +28,7 @@ Reset invalidates callbacks, requests, functional objects, and data handles.
 \code{functional$psychrometrics(state)}, \code{glycol(state, name)}, and
 \code{refrigerant(state, name)} create state-bound objects with Python-compatible
 methods. Each property method still takes its owning state. Public resource
-deletion invalidates the R object; stock 25.2/26.1/26.2 may retain native allocations.
+deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 Standalone factories support water and steam, matching the stock Python SDK.
 \code{functional$ep_version()} returns the full version string as an R character.
 Standalone functional files are isolated in a temporary state-owned directory.
@@ -70,7 +70,7 @@ provide separate conditional managed support. Their handles remain state-
 and kind-bound.
 Missing globals return a negative handle without entering the native fatal path;
 negative plugin handles cannot be used for reading or writing. Trend aggregates
-require \code{count >= 2}, matching stock 25.2/26.1/26.2. For native plugin handles,
+require \code{count >= 2}, matching stock 24.2 through 26.2. For native plugin handles,
 \code{get_trend_value()} remains disabled:
 the native upper index check permits an out-of-bounds read. Separately,
 \code{\link[=eplus_plugin]{eplus_plugin()}} can declare bounded R-managed trends with safe lookup and
@@ -106,7 +106,7 @@ version/API identity is checked. Do not serialize live API objects to workers.
 
 \code{close()} deletes states and resources before unloading the library. A
 finalizer is a fallback. Close/reset/delete and nested runs are rejected during
-simulation. Original 25.2/26.1/26.2 library leaks are not repaired: use a fresh R process
+simulation. Original library leaks are not repaired: use a fresh R process
 for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
 \code{backend = "api"}; \code{\link[=eplus_session]{eplus_session()}} provides live worker stepping and pause.
 }

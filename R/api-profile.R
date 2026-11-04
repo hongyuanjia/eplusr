@@ -4,16 +4,27 @@ api_profile__select <- function(version) {
     if (
         length(version) != 1L ||
             !version %in%
-                c("23.1.0", "23.2.0", "24.1.0", "25.2.0", "26.1.0", "26.2.0")
+                c(
+                    "23.1.0",
+                    "23.2.0",
+                    "24.1.0",
+                    "24.2.0",
+                    "25.1.0",
+                    "25.2.0",
+                    "26.1.0",
+                    "26.2.0"
+                )
     ) {
         api__error(
-            "The API requires an EnergyPlus 23.1, 23.2, 24.1, 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 23.1, 23.2, 24.1, 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
         version = version,
         abi = if (version %in% c("23.1.0", "23.2.0", "24.1.0")) {
             version
+        } else if (version %in% c("24.2.0", "25.1.0")) {
+            "24.2-26.2"
         } else if (version == "25.2.0") {
             "25.2-26.2"
         } else {
@@ -1177,7 +1188,7 @@ api_profile__methods <- function(methods, version) {
         # Older public deleters destroy owned property wrappers; 25.1+ deleters are no-ops.
         if (numeric_version(version) < "25.1") {
             if (spec$kind == "delete_resource") {
-                spec$ownership <- "owned property wrapper; released by its matching public native deleter"
+                spec$ownership <- "native wrapper deletion; invalidates the R resource"
             } else if (
                 spec$kind == "factory" &&
                     spec$method %in% c("glycol", "refrigerant")

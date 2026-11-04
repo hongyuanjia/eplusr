@@ -1,9 +1,17 @@
 # Map a reviewed ABI family to porter-generated declarations, never to handwritten signatures.
 api_bind__select <- function(abi) {
     stopifnot(
-        abi %in% c("23.1.0", "23.2.0", "24.1.0", "25.2-26.2", "26.1-26.2")
+        abi %in%
+            c(
+                "23.1.0",
+                "23.2.0",
+                "24.1.0",
+                "24.2-26.2",
+                "25.2-26.2",
+                "26.1-26.2"
+            )
     )
-    # Porter output for stock 25.2 matches every 26.1 function and APIDataEntry field.
+    # Porter output for 24.2, 25.1 and 25.2 matches all 26.1 functions and APIDataEntry fields.
     list(
         dynport = if (abi %in% c("23.1.0", "23.2.0", "24.1.0")) {
             paste0("EnergyPlus-", sub("[.]0$", "", abi), ".dynport")

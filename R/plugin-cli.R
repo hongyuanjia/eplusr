@@ -52,7 +52,12 @@ export_eplus_plugin <- function(
     } else {
         eplus_config(eplus)
     }
-    api_profile__select(config$version)
+    # Standalone PythonPlugin hosting has its own reviewed executable capability boundary.
+    if (!as.character(config$version) %in% c("26.1.0", "26.2.0")) {
+        api__error(
+            "The executable plugin exporter requires EnergyPlus 26.1 or 26.2."
+        )
+    }
     plugin_cli__check_bridge()
     definition <- unserialize(environment(plugin)$payload)
     mapping <- plugin_cli__hooks()
