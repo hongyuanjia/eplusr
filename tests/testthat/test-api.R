@@ -2370,6 +2370,35 @@ describe("api", {
                 "cannot suppress"
             )
             expect_error(api$exchange$current_sim_time(state), "lifecycle")
+            fixture <- testrun__api_fixture()
+            on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+            started <- FALSE
+            # A forbidden helper flag must fail before any native simulation lifecycle callback.
+            api$runtime$callback_begin_new_environment(state, function(s) {
+                started <<- TRUE
+            })
+            expect_error(
+                api$runtime$run_energyplus(
+                    state,
+                    c(
+                        "-r",
+                        "-w",
+                        fixture$weather,
+                        "-d",
+                        fixture$directory,
+                        fixture$model
+                    )
+                ),
+                "selected-installation helpers.*preprocessing and reporting"
+            )
+            status <- api$state_manager$status(state)
+            expect_identical(status$phase, "created")
+            expect_identical(status$generation, 0L)
+            expect_false(started)
+            expect_false(file.exists(file.path(
+                fixture$directory,
+                "eplusout.err"
+            )))
         } else {
             expect_silent(api$runtime$set_console_output_status(state, FALSE))
         }
