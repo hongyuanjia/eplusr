@@ -1685,7 +1685,9 @@ api__invoke <- function(ctx, spec, values, resource) {
 #' Observations contain named `values`, explicit `controller_state`, completed
 #' weather `step`, `environment`, `kind_of_sim`, calendar fields, zone-step index
 #' and the interval `[time_start, time_end]` in hours. `year` is the simulation
-#' calendar year, or `NA_integer_` when `calendar_year_available` is false
+#' calendar year captured at the start of that zone interval (before yearly
+#' reporting advances the native getter), or `NA_integer_` when
+#' `calendar_year_available` is false
 #' (before 23.2); `weather_year` retains the separate EPW year. `callback` identifies the
 #' sampling point. Output-variable averaging follows EnergyPlus's variable
 #' definition: for example, Zone Mean Air Temperature is a zone-step average,
@@ -2548,6 +2550,7 @@ api_session__setup <- function(api, state, settings) {
     control$controller <- settings$controller
     control$variable_handles <- NULL
     control$actuator_handles <- NULL
+    control$calendar_year <- NA_integer_
     if (is.character(control$controller)) {
         scope <- new.env(parent = globalenv())
         sys.source(control$controller, envir = scope)
@@ -2559,6 +2562,21 @@ api_session__setup <- function(api, state, settings) {
     }
     for (definition in settings$variables) {
         api$exchange$request_variable(state, definition[1L], definition[2L])
+    }
+    # Reporting can increment native CalendarYear before the completed-zone callback.
+    # Capture it before calculation so the observation describes the interval just completed.
+    if (control$calendar_year_available) {
+        api__host_callback(
+            api,
+            state,
+            "callback_begin_zone_timestep_after_init_heat_balance",
+            function(s) {
+                if (api_session__weather(api, s)) {
+                    control$calendar_year <- api$exchange$calendar_year(s)
+                }
+                invisible(NULL)
+            }
+        )
     }
     # Apply controls before predictor reads schedules, repeating through system substeps of a zone step.
     if (length(settings$actuators) || !is.null(control$controller)) {
@@ -2750,7 +2768,7 @@ api_session__snapshot <- function(api, state, settings, control) {
         step = control$step,
         environment = exchange$current_environment_num(state),
         kind_of_sim = exchange$kind_of_sim(state),
-        year = if (calendar) exchange$calendar_year(state) else NA_integer_,
+        year = control$calendar_year,
         calendar_year_available = calendar,
         weather_year = exchange$year(state),
         month = exchange$month(state),
