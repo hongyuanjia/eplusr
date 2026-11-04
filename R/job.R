@@ -187,7 +187,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #'
         #' @param backend Simulation engine: `"cli"` (default), experimental `"api"`,
         #'   or an initialization `function(api, state)` which selects the API engine.
-        #'   The API backend supports stock EnergyPlus 26.1 and creates a fresh R process
+        #'   The API backend supports stock EnergyPlus 9.4 through 26.2 and creates a fresh R process
         #'   for each engine run. Preprocessing and result collection use the same pipeline.
         #'   A function is executed once in the engine worker
         #'   before simulation. Register requests and callbacks using the supplied managed

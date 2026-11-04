@@ -1,203 +1,204 @@
-test_that("clean_wd()", {
-    skip_on_cran()
+describe("run", {
+    test_that("clean_wd()", {
+        skip_on_cran()
 
-    expect_true(file.create(f <- tempfile()))
-    expect_true({
-        clean_wd(f)
-        file.exists(f)
+        expect_true(file.create(f <- tempfile()))
+        expect_true({
+            clean_wd(f)
+            file.exists(f)
+        })
+        unlink(f)
+
+        expect_true(file.create(f <- tempfile(fileext = ".idf")))
+        expect_silent({
+            clean_wd(f)
+            file.exists(f)
+        })
+        unlink(f)
+
+        expect_true(file.create(f <- file.path(tempdir(), "in.idf")))
+        expect_true({
+            clean_wd(f)
+            file.exists(f)
+        })
+
+        expect_true(file.create(fidf <- file.path(tempdir(), "test.idf")))
+        expect_true(file.create(fcsv <- file.path(tempdir(), "test.csv")))
+        expect_true({
+            .clean_wd(fidf, "D", basename(fcsv))
+            file.exists(fcsv)
+        })
+        unlink(c(fidf, fcsv))
     })
-    unlink(f)
 
-    expect_true(file.create(f <- tempfile(fileext = ".idf")))
-    expect_silent({
-        clean_wd(f)
-        file.exists(f)
+    test_that("path_eplus()", {
+        skip_on_cran()
+
+        expect_equal(basename(path_eplus(LATEST_EPLUS_VER, "a", "b")), "b")
+        expect_error(basename(path_eplus(
+            LATEST_EPLUS_VER,
+            "a",
+            "b",
+            strict = TRUE
+        )))
+
+        expect_true(is.character(path_eplus_processor(
+            LATEST_EPLUS_VER,
+            "EPMacro",
+            strict = TRUE
+        )))
+        expect_true(is.character(path_eplus_processor(
+            LATEST_EPLUS_VER,
+            "PreProcess",
+            "GrndTempCalc",
+            "Slab",
+            strict = TRUE
+        )))
+
+        expect_true(is.character(path_eplus_example(
+            LATEST_EPLUS_VER,
+            "1ZoneUncontrolled.idf"
+        )))
+        expect_true(is.character(path_eplus_example(
+            LATEST_EPLUS_VER,
+            "BasicFiles/Exercise1A.idf"
+        )))
+
+        expect_true(is.character(path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
+        )))
+
+        expect_true(is.character(path_eplus_dataset(
+            LATEST_EPLUS_VER,
+            "Boilers.idf"
+        )))
+        expect_true(is.character(path_eplus_dataset(
+            LATEST_EPLUS_VER,
+            "FMUs/MoistAir.fmu"
+        )))
     })
-    unlink(f)
 
-    expect_true(file.create(f <- file.path(tempdir(), "in.idf")))
-    expect_true({
-        clean_wd(f)
-        file.exists(f)
-    })
+    test_that("copy_energyplus_idd()", {
+        skip_on_cran()
 
-    expect_true(file.create(fidf <- file.path(tempdir(), "test.idf")))
-    expect_true(file.create(fcsv <- file.path(tempdir(), "test.csv")))
-    expect_true({
-        .clean_wd(fidf, "D", basename(fcsv))
-        file.exists(fcsv)
-    })
-    unlink(c(fidf, fcsv))
-})
-
-test_that("path_eplus()", {
-    skip_on_cran()
-
-    expect_equal(basename(path_eplus(LATEST_EPLUS_VER, "a", "b")), "b")
-    expect_error(basename(path_eplus(
-        LATEST_EPLUS_VER,
-        "a",
-        "b",
-        strict = TRUE
-    )))
-
-    expect_true(is.character(path_eplus_processor(
-        LATEST_EPLUS_VER,
-        "EPMacro",
-        strict = TRUE
-    )))
-    expect_true(is.character(path_eplus_processor(
-        LATEST_EPLUS_VER,
-        "PreProcess",
-        "GrndTempCalc",
-        "Slab",
-        strict = TRUE
-    )))
-
-    expect_true(is.character(path_eplus_example(
-        LATEST_EPLUS_VER,
-        "1ZoneUncontrolled.idf"
-    )))
-    expect_true(is.character(path_eplus_example(
-        LATEST_EPLUS_VER,
-        "BasicFiles/Exercise1A.idf"
-    )))
-
-    expect_true(is.character(path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
-    )))
-
-    expect_true(is.character(path_eplus_dataset(
-        LATEST_EPLUS_VER,
-        "Boilers.idf"
-    )))
-    expect_true(is.character(path_eplus_dataset(
-        LATEST_EPLUS_VER,
-        "FMUs/MoistAir.fmu"
-    )))
-})
-
-test_that("copy_energyplus_idd()", {
-    skip_on_cran()
-
-    expect_silent(
-        res <- copy_energyplus_idd(
-            path_eplus(LATEST_EPLUS_VER, "energyplus"),
-            tempdir()
+        expect_silent(
+            res <- copy_energyplus_idd(
+                path_eplus(LATEST_EPLUS_VER, "energyplus"),
+                tempdir()
+            )
         )
-    )
-    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
-    expect_true(attr(res, "copied"))
+        expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+        expect_true(attr(res, "copied"))
 
-    expect_silent(res <- copy_energyplus_idd(NULL, tempdir(), res))
-    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
-    expect_false(attr(res, "copied"))
+        expect_silent(res <- copy_energyplus_idd(NULL, tempdir(), res))
+        expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+        expect_false(attr(res, "copied"))
 
-    unlink(file.path(tempdir(), "Energy+.idd"))
+        unlink(file.path(tempdir(), "Energy+.idd"))
 
-    expect_silent(
-        res <- copy_energyplus_idd(
-            NULL,
-            tempdir(),
-            path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+        expect_silent(
+            res <- copy_energyplus_idd(
+                NULL,
+                tempdir(),
+                path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+            )
         )
-    )
-    expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
-    unlink(file.path(tempdir(), "Energy+.idd"))
-})
+        expect_true(file.exists(file.path(tempdir(), "Energy+.idd")))
+        unlink(file.path(tempdir(), "Energy+.idd"))
+    })
 
-test_that("EPMacro()", {
-    skip_on_cran()
-    skip_if_not_integration()
+    test_that("EPMacro()", {
+        skip_on_cran()
+        skip_if_not_integration()
 
-    out_dir <- file.path(tempdir(), "EPMacro")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
+        out_dir <- file.path(tempdir(), "EPMacro")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
 
-    main <- file.path(out_dir, "macro.imf")
-    part <- file.path(out_dir, "part.idf")
-    write_lines(
-        sprintf("##include part.idf\nVersion,%s;", LATEST_EPLUS_VER),
-        main
-    )
-    write_lines("Building,\nBldg;", part)
-
-    res <- EPMacro(part, echo = FALSE, eplus = LATEST_EPLUS_VER)
-    expect_equal(names(res), c("file", "run"))
-    expect_equal(res$file, NULL)
-    expect_equal(res$run, NULL)
-
-    res <- EPMacro(main, echo = FALSE, eplus = LATEST_EPLUS_VER)
-    expect_equal(names(res), c("file", "run"))
-    expect_true(file.exists(res$file$imf))
-    expect_true(file.exists(res$file$epmidf))
-    expect_true(file.exists(res$file$epmdet))
-    expect_equal(names(res$file), c("imf", "epmidf", "epmdet"))
-    expect_equal(
-        names(res$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
+        main <- file.path(out_dir, "macro.imf")
+        part <- file.path(out_dir, "part.idf")
+        write_lines(
+            sprintf("##include part.idf\nVersion,%s;", LATEST_EPLUS_VER),
+            main
         )
-    )
-    expect_equal(res$run$stdout, NULL)
-    expect_equal(res$run$stderr, NULL)
-    unlink(c(res$file$epmidf, res$file$epmdet))
+        write_lines("Building,\nBldg;", part)
 
-    res <- EPMacro(main, tempdir())
-    expect_equal(dirname(res$file$imf), normalizePath(tempdir(), "/"))
-    expect_equal(dirname(res$file$epmidf), normalizePath(tempdir(), "/"))
-    expect_equal(dirname(res$file$epmdet), normalizePath(tempdir(), "/"))
-    unlink(unlist(res$file))
+        res <- EPMacro(part, echo = FALSE, eplus = LATEST_EPLUS_VER)
+        expect_equal(names(res), c("file", "run"))
+        expect_equal(res$file, NULL)
+        expect_equal(res$run, NULL)
 
-    res <- EPMacro(main, output_prefix = "test")
-    expect_equal(basename(res$file$epmidf), "test.epmidf")
-    expect_equal(basename(res$file$epmdet), "test.epmdet")
-    unlink(c(res$file$epmidf, res$file$epmdet))
+        res <- EPMacro(main, echo = FALSE, eplus = LATEST_EPLUS_VER)
+        expect_equal(names(res), c("file", "run"))
+        expect_true(file.exists(res$file$imf))
+        expect_true(file.exists(res$file$epmidf))
+        expect_true(file.exists(res$file$epmdet))
+        expect_equal(names(res$file), c("imf", "epmidf", "epmdet"))
+        expect_equal(
+            names(res$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_equal(res$run$stdout, NULL)
+        expect_equal(res$run$stderr, NULL)
+        unlink(c(res$file$epmidf, res$file$epmdet))
 
-    res <- EPMacro(main, wait = FALSE, echo = FALSE)
-    expect_equal(res$file, NULL)
-    expect_equal(res$run$exit_status, NULL)
-    expect_equal(res$run$stdout, NULL)
-    expect_equal(res$run$stderr, NULL)
-    expect_equal(res$run$end_time, NULL)
-    while (res$run$process$is_alive()) {
-        Sys.sleep(0.1)
-    }
-    post <- res$run$process$get_result()
-    expect_equal(names(post), c("file", "run"))
-    res <- modifyList(res, post)
-    expect_equal(basename(res$file$imf), "macro.imf")
-    expect_equal(basename(res$file$epmidf), "macro.epmidf")
-    expect_equal(basename(res$file$epmdet), "macro.epmdet")
-    expect_null(res$run$stdout)
-    expect_null(res$run$stderr)
-    expect_equal(res$run$process$get_exit_status(), 0L)
-    unlink(unlist(res$file))
+        res <- EPMacro(main, tempdir())
+        expect_equal(dirname(res$file$imf), normalizePath(tempdir(), "/"))
+        expect_equal(dirname(res$file$epmidf), normalizePath(tempdir(), "/"))
+        expect_equal(dirname(res$file$epmdet), normalizePath(tempdir(), "/"))
+        unlink(unlist(res$file))
 
-    unlink(out_dir, recursive = TRUE)
-    unlink(c(main, part))
-})
+        res <- EPMacro(main, output_prefix = "test")
+        expect_equal(basename(res$file$epmidf), "test.epmidf")
+        expect_equal(basename(res$file$epmdet), "test.epmdet")
+        unlink(c(res$file$epmidf, res$file$epmdet))
 
-test_that("ExpandObjects()", {
-    skip_on_cran()
-    skip_if_not_integration()
+        res <- EPMacro(main, wait = FALSE, echo = FALSE)
+        expect_equal(res$file, NULL)
+        expect_equal(res$run$exit_status, NULL)
+        expect_equal(res$run$stdout, NULL)
+        expect_equal(res$run$stderr, NULL)
+        expect_equal(res$run$end_time, NULL)
+        while (res$run$process$is_alive()) {
+            Sys.sleep(0.1)
+        }
+        post <- res$run$process$get_result()
+        expect_equal(names(post), c("file", "run"))
+        res <- modifyList(res, post)
+        expect_equal(basename(res$file$imf), "macro.imf")
+        expect_equal(basename(res$file$epmidf), "macro.epmidf")
+        expect_equal(basename(res$file$epmdet), "macro.epmdet")
+        expect_null(res$run$stdout)
+        expect_null(res$run$stderr)
+        expect_equal(res$run$process$get_exit_status(), 0L)
+        unlink(unlist(res$file))
 
-    out_dir <- file.path(tempdir(), "ExpandObjects")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
+        unlink(out_dir, recursive = TRUE)
+        unlink(c(main, part))
+    })
 
-    path <- file.path(out_dir, "expandobj.idf")
-    write_lines(
-        sprintf(
-            "Version, %s;
+    test_that("ExpandObjects()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "ExpandObjects")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        path <- file.path(out_dir, "expandobj.idf")
+        write_lines(
+            sprintf(
+                "Version, %s;
         HVACTemplate:Thermostat,
             All Zones,
             ,
@@ -205,90 +206,90 @@ test_that("ExpandObjects()", {
             ,
             26;
         ",
-            LATEST_EPLUS_VER
-        ),
-        path
-    )
-
-    res <- ExpandObjects(
-        path,
-        echo = FALSE,
-        idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
-    )
-    expect_equal(names(res), c("file", "run"))
-    expect_equal(
-        names(res$file),
-        c("idf", "expidf", "basement", "slab", "experr")
-    )
-    expect_true(file.exists(res$file$idf))
-    expect_true(file.exists(res$file$expidf))
-    expect_equal(res$file$basement, NA_character_)
-    expect_equal(res$file$slab, NA_character_)
-    expect_equal(res$file$experr, NA_character_)
-    expect_equal(
-        names(res$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
+                LATEST_EPLUS_VER
+            ),
+            path
         )
-    )
-    expect_false(is.null(res$run$stdout))
-    expect_null(res$run$stderr)
-    unlink(res$file$expidf)
 
-    res <- ExpandObjects(path, tempdir(), echo = FALSE)
-    expect_equal(dirname(res$file$idf), normalizePath(tempdir(), "/"))
-    expect_equal(dirname(res$file$expidf), normalizePath(tempdir(), "/"))
-    expect_equal(res$file$basement, NA_character_)
-    expect_equal(res$file$slab, NA_character_)
-    expect_equal(res$file$experr, NA_character_)
-    unlink(c(res$file$idf, res$file$expidf))
+        res <- ExpandObjects(
+            path,
+            echo = FALSE,
+            idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+        )
+        expect_equal(names(res), c("file", "run"))
+        expect_equal(
+            names(res$file),
+            c("idf", "expidf", "basement", "slab", "experr")
+        )
+        expect_true(file.exists(res$file$idf))
+        expect_true(file.exists(res$file$expidf))
+        expect_equal(res$file$basement, NA_character_)
+        expect_equal(res$file$slab, NA_character_)
+        expect_equal(res$file$experr, NA_character_)
+        expect_equal(
+            names(res$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(res$run$stdout))
+        expect_null(res$run$stderr)
+        unlink(res$file$expidf)
 
-    res <- ExpandObjects(path, output_prefix = "test", echo = FALSE)
-    expect_equal(basename(res$file$expidf), "test.expidf")
-    expect_equal(res$file$basement, NA_character_)
-    expect_equal(res$file$slab, NA_character_)
-    expect_equal(res$file$experr, NA_character_)
-    unlink(res$file$expidf)
+        res <- ExpandObjects(path, tempdir(), echo = FALSE)
+        expect_equal(dirname(res$file$idf), normalizePath(tempdir(), "/"))
+        expect_equal(dirname(res$file$expidf), normalizePath(tempdir(), "/"))
+        expect_equal(res$file$basement, NA_character_)
+        expect_equal(res$file$slab, NA_character_)
+        expect_equal(res$file$experr, NA_character_)
+        unlink(c(res$file$idf, res$file$expidf))
 
-    res <- ExpandObjects(path, wait = FALSE, echo = FALSE)
-    expect_equal(res$file, NULL)
-    expect_equal(res$run$exit_status, NULL)
-    expect_equal(res$run$stdout, NULL)
-    expect_equal(res$run$stderr, NULL)
-    expect_equal(res$run$end_time, NULL)
-    while (res$run$process$is_alive()) {
-        Sys.sleep(0.1)
-    }
-    post <- res$run$process$get_result()
-    expect_equal(names(post), c("file", "run"))
-    res <- modifyList(res, post)
-    expect_equal(basename(res$file$expidf), "expandobj.expidf")
-    expect_false(is.null(res$run$stdout))
-    expect_null(res$run$stderr)
-    expect_equal(res$file$experr, NA_character_)
-    expect_equal(res$run$process$get_exit_status(), 0L)
-    unlink(res$file$expidf)
+        res <- ExpandObjects(path, output_prefix = "test", echo = FALSE)
+        expect_equal(basename(res$file$expidf), "test.expidf")
+        expect_equal(res$file$basement, NA_character_)
+        expect_equal(res$file$slab, NA_character_)
+        expect_equal(res$file$experr, NA_character_)
+        unlink(res$file$expidf)
 
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
+        res <- ExpandObjects(path, wait = FALSE, echo = FALSE)
+        expect_equal(res$file, NULL)
+        expect_equal(res$run$exit_status, NULL)
+        expect_equal(res$run$stdout, NULL)
+        expect_equal(res$run$stderr, NULL)
+        expect_equal(res$run$end_time, NULL)
+        while (res$run$process$is_alive()) {
+            Sys.sleep(0.1)
+        }
+        post <- res$run$process$get_result()
+        expect_equal(names(post), c("file", "run"))
+        res <- modifyList(res, post)
+        expect_equal(basename(res$file$expidf), "expandobj.expidf")
+        expect_false(is.null(res$run$stdout))
+        expect_null(res$run$stderr)
+        expect_equal(res$file$experr, NA_character_)
+        expect_equal(res$run$process$get_exit_status(), 0L)
+        unlink(res$file$expidf)
 
-test_that("Basement()", {
-    skip_on_cran()
-    skip_if_not_integration()
-    out_dir <- file.path(tempdir(), "Basement")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
 
-    path <- file.path(out_dir, "basement.idf")
-    write_lines(
-        "SimParameters,
+    test_that("Basement()", {
+        skip_on_cran()
+        skip_if_not_integration()
+        out_dir <- file.path(tempdir(), "Basement")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        path <- file.path(out_dir, "basement.idf")
+        write_lines(
+            "SimParameters,
            0.1,
            1;
 
@@ -366,66 +367,66 @@ test_that("Basement()", {
            0.1,
            0.5;
         ",
-        path
-    )
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- Basement(
-        path,
-        weather,
-        echo = FALSE,
-        eplus = LATEST_EPLUS_VER,
-        idd = path_eplus(
+            path
+        )
+        weather <- path_eplus_weather(
             LATEST_EPLUS_VER,
-            "PreProcess",
-            "GrndTempCalc",
-            "BasementGHT.idd"
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
         )
-    )
-    expect_equal(names(res), c("file", "run"))
-    expect_equal(
-        names(res$file),
-        c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit")
-    )
-    expect_true(file.exists(res$file$idf))
-    expect_true(file.exists(res$file$epw))
-    expect_equal(basename(res$file$bsmt_idf), "basement_bsmt.idf")
-    expect_equal(basename(res$file$bsmt_csv), "basement_bsmt.csv")
-    expect_equal(basename(res$file$bsmt_out), "basement_bsmt.out")
-    expect_equal(basename(res$file$bsmt_audit), "basement_bsmt.audit")
-    expect_equal(
-        names(res$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
+
+        res <- Basement(
+            path,
+            weather,
+            echo = FALSE,
+            eplus = LATEST_EPLUS_VER,
+            idd = path_eplus(
+                LATEST_EPLUS_VER,
+                "PreProcess",
+                "GrndTempCalc",
+                "BasementGHT.idd"
+            )
         )
-    )
-    expect_false(is.null(res$run$stdout))
-    expect_false(is.null(res$run$stderr))
-    unlink(unlist(res$file))
+        expect_equal(names(res), c("file", "run"))
+        expect_equal(
+            names(res$file),
+            c("idf", "epw", "bsmt_idf", "bsmt_csv", "bsmt_out", "bsmt_audit")
+        )
+        expect_true(file.exists(res$file$idf))
+        expect_true(file.exists(res$file$epw))
+        expect_equal(basename(res$file$bsmt_idf), "basement_bsmt.idf")
+        expect_equal(basename(res$file$bsmt_csv), "basement_bsmt.csv")
+        expect_equal(basename(res$file$bsmt_out), "basement_bsmt.out")
+        expect_equal(basename(res$file$bsmt_audit), "basement_bsmt.audit")
+        expect_equal(
+            names(res$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(res$run$stdout))
+        expect_false(is.null(res$run$stderr))
+        unlink(unlist(res$file))
 
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
 
-test_that("Slab()", {
-    skip_on_cran()
-    skip_if_not_integration()
-    out_dir <- file.path(tempdir(), "Basement")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
+    test_that("Slab()", {
+        skip_on_cran()
+        skip_if_not_integration()
+        out_dir <- file.path(tempdir(), "Basement")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
 
-    path <- file.path(out_dir, "slab.idf")
-    write_lines(
-        "Materials,
+        path <- file.path(out_dir, "slab.idf")
+        write_lines(
+            "Materials,
              1,
              0.158,
              0.379,
@@ -483,948 +484,2066 @@ test_that("Slab()", {
              15,
              10.;
         ",
-        path
-    )
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- Slab(
-        path,
-        weather,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE,
-        idd = path_eplus(
+            path
+        )
+        weather <- path_eplus_weather(
             LATEST_EPLUS_VER,
-            "PreProcess",
-            "GrndTempCalc",
-            "SlabGHT.idd"
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
         )
-    )
-    expect_equal(names(res), c("file", "run"))
-    expect_equal(
-        names(res$file),
-        c("idf", "epw", "slab_gtp", "slab_out", "slab_ger")
-    )
-    expect_true(file.exists(res$file$idf))
-    expect_true(file.exists(res$file$epw))
-    expect_equal(basename(res$file$slab_gtp), "slab_slab.gtp")
-    expect_equal(basename(res$file$slab_out), "slab_slab.out")
-    expect_equal(basename(res$file$slab_ger), "slab_slab.ger")
-    expect_equal(
-        names(res$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_false(is.null(res$run$stdout))
-    expect_false(is.null(res$run$stderr))
-    unlink(unlist(res$file))
 
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
-
-test_that("EnergyPlus()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    out_dir <- file.path(tempdir(), "Energyplus")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
-
-    path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- EnergyPlus(
-        path,
-        weather,
-        out_dir,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE
-    )
-    expect_equal(names(res), c("file", "run", "backend"))
-    expect_identical(res$backend, "cli")
-    expect_equal(length(res$file), 51L)
-    expect_equal(
-        sort(names(which(vapply(res$file, function(x) !anyNA(x), logical(1))))),
-        c(
-            "audit",
-            "bnd",
-            "dxf",
-            "eio",
-            "end",
-            "epw",
-            "err",
-            "eso",
-            "idf",
-            # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-            # a SQLite output
-            "mdd",
-            "mtd",
-            "mtr",
-            "rdd",
-            "shd",
-            "table"
-        )
-    )
-    expect_equal(
-        names(res$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_false(is.null(res$run$stdout))
-
-    # can use legacy output name style
-    res_legacy <- EnergyPlus(
-        path,
-        weather,
-        out_dir,
-        output_suffix = "L",
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE
-    )
-    files <- basename(unlist(res_legacy$file, FALSE, FALSE))
-    files <- files[!is.na(files)]
-    expect_equal(
-        setdiff(
-            names(tbl <- table(tools::file_path_sans_ext(files))),
-            c(
-                "1ZoneUncontrolled",
-                "eplusout",
-                "eplustbl",
-                "sqlite",
-                "USA_CO_Golden-NREL.724666_TMY3"
+        res <- Slab(
+            path,
+            weather,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE,
+            idd = path_eplus(
+                LATEST_EPLUS_VER,
+                "PreProcess",
+                "GrndTempCalc",
+                "SlabGHT.idd"
             )
-        ),
-        character()
-    )
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(sort(as.integer(tbl)), c(1L, 1L, 5L, 12L))
+        )
+        expect_equal(names(res), c("file", "run"))
+        expect_equal(
+            names(res$file),
+            c("idf", "epw", "slab_gtp", "slab_out", "slab_ger")
+        )
+        expect_true(file.exists(res$file$idf))
+        expect_true(file.exists(res$file$epw))
+        expect_equal(basename(res$file$slab_gtp), "slab_slab.gtp")
+        expect_equal(basename(res$file$slab_out), "slab_slab.out")
+        expect_equal(basename(res$file$slab_ger), "slab_slab.ger")
+        expect_equal(
+            names(res$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(res$run$stdout))
+        expect_false(is.null(res$run$stderr))
+        unlink(unlist(res$file))
 
-    # can run annual simulation with custom IDD
-    expect_silent(
-        EnergyPlus(
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
+
+    test_that("EnergyPlus()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "Energyplus")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
+        weather <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        res <- EnergyPlus(
             path,
             weather,
             out_dir,
-            annual = TRUE,
             eplus = LATEST_EPLUS_VER,
-            echo = FALSE,
-            idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
-        )
-    )
-
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
-
-test_that("convertESOMTR()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    out_dir <- file.path(tempdir(), "convertESOMTR")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
-
-    path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- EnergyPlus(
-        path,
-        weather,
-        out_dir,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE
-    )
-
-    eso <- convertESOMTR(
-        res$file$eso,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE,
-        rules = path_eplus(
-            LATEST_EPLUS_VER,
-            "PostProcess",
-            "convertESOMTRpgm",
-            "convert.txt"
-        )
-    )
-    expect_equal(names(eso), c("file", "run"))
-    expect_equal(names(eso$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
-    expect_true(file.exists(eso$file$eso))
-    expect_true(file.exists(eso$file$ipeso))
-    expect_true(is.na(eso$file$mtr))
-    expect_true(is.na(eso$file$ipmtr))
-    expect_true(is.na(eso$file$iperr))
-    expect_equal(
-        names(eso$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_false(is.null(eso$run$stdout))
-    expect_true(is.null(eso$run$stderr))
-    unlink(unlist(eso$file))
-
-    mtr <- convertESOMTR(res$file$mtr, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(names(mtr), c("file", "run"))
-    expect_equal(names(mtr$file), c("eso", "mtr", "ipeso", "ipmtr", "iperr"))
-    expect_true(file.exists(mtr$file$mtr))
-    expect_true(file.exists(mtr$file$ipmtr))
-    expect_true(is.na(mtr$file$eso))
-    expect_true(is.na(mtr$file$ipeso))
-    expect_true(is.na(mtr$file$iperr))
-    expect_equal(
-        names(mtr$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_false(is.null(mtr$run$stdout))
-    expect_true(is.null(mtr$run$stderr))
-    unlink(unlist(mtr$file))
-    unlink(unlist(res$file))
-
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
-
-test_that("ReadVarsESO()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    out_dir <- file.path(tempdir(), "ReadVarsESO")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
-
-    path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- EnergyPlus(
-        path,
-        weather,
-        out_dir,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE
-    )
-
-    eso <- ReadVarsESO(res$file$eso, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(names(eso), c("file", "run"))
-    expect_equal(
-        names(eso$file),
-        c("eso", "mtr", "variable", "meter", "rvaudit")
-    )
-    expect_true(file.exists(eso$file$eso))
-    expect_true(file.exists(eso$file$variable))
-    expect_true(file.exists(eso$file$rvaudit))
-    expect_true(is.na(eso$file$mtr))
-    expect_true(is.na(eso$file$meter))
-    expect_equal(
-        names(eso$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_true(!is.na(eso$file$variable))
-    expect_true(is.na(eso$file$meter))
-    expect_true(!is.na(eso$file$rvaudit))
-    unlink(unlist(eso$file))
-
-    mtr <- ReadVarsESO(res$file$mtr, eplus = LATEST_EPLUS_VER, echo = FALSE)
-    expect_equal(
-        names(mtr$file),
-        c("eso", "mtr", "variable", "meter", "rvaudit")
-    )
-    expect_true(file.exists(mtr$file$mtr))
-    expect_true(file.exists(mtr$file$meter))
-    expect_true(file.exists(mtr$file$rvaudit))
-    expect_true(is.na(mtr$file$eso))
-    expect_true(is.na(mtr$file$variable))
-    expect_equal(
-        names(mtr$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_true(is.na(mtr$file$variable))
-    expect_true(!is.na(mtr$file$meter))
-    expect_true(!is.na(mtr$file$rvaudit))
-    unlink(unlist(mtr$file))
-    unlink(unlist(res$file))
-
-    unlink(out_dir, recursive = TRUE)
-    unlink(path)
-})
-
-test_that("HVAC_Diagram()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    out_dir <- file.path(tempdir(), "HVAC_Diagram")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
-
-    model <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    res <- EnergyPlus(
-        model,
-        weather,
-        out_dir,
-        eplus = LATEST_EPLUS_VER,
-        echo = FALSE
-    )
-
-    svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
-    expect_equal(names(svg), c("file", "run"))
-    expect_equal(names(svg$file), c("bnd", "svg"))
-    expect_true(file.exists(svg$file$bnd))
-    expect_true(file.exists(svg$file$bnd))
-    expect_equal(
-        names(svg$run),
-        c(
-            "process",
-            "exit_status",
-            "stdout",
-            "stderr",
-            "start_time",
-            "end_time"
-        )
-    )
-    expect_true(!is.na(svg$file$svg))
-    unlink(unlist(svg$file))
-    unlink(unlist(res$file))
-
-    unlink(out_dir, recursive = TRUE)
-    unlink(model)
-})
-
-test_that("energyplus()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    out_dir <- file.path(tempdir(), "run-energyplus")
-    if (!dir.exists(out_dir)) {
-        dir.create(out_dir)
-    }
-
-    weather <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    # can run EPMacro
-    path_imf <- copy_eplus_example(
-        LATEST_EPLUS_VER,
-        "AbsorptionChiller_Macro.imf"
-    )
-    path_resources <- c(
-        copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneChillerSpec.imf"),
-        copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneGeometry.imf"),
-        copy_eplus_example(LATEST_EPLUS_VER, "HVAC3Zone-IntGains-Def.imf"),
-        copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneMat-Const.imf")
-    )
-    res_imf <- energyplus(
-        path_imf,
-        weather,
-        out_dir,
-        echo = FALSE,
-        resources = path_resources
-    )
-    expect_equal(
-        names(res_imf),
-        c(
-            "version",
-            "energyplus",
-            "start_time",
-            "end_time",
-            "exit_status",
-            "output_dir",
-            "file",
-            "run",
-            "backend"
-        )
-    )
-    expect_equal(as.character(res_imf$version), LATEST_EPLUS_VER)
-    expect_equal(res_imf$energyplus, eplus_config(LATEST_EPLUS_VER)$dir)
-    expect_s3_class(res_imf$start_time, "POSIXct")
-    expect_s3_class(res_imf$end_time, "POSIXct")
-    expect_equal(res_imf$output_dir, normalizePath(out_dir))
-    expect_equal(length(res_imf$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files <- unlist(res_imf$file)
-            files <- files[!is.na(files)]
-            length(files)
-        },
-        23L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(
-        sort(unname(files[names(files) != "epw"])),
-        sort(c(
-            list.files(out_dir, "AbsorptionChiller_Macro"),
-            basename(path_resources)
-        ))
-    )
-    expect_s3_class(res_imf$run, "data.table")
-    expect_equal(
-        names(res_imf$run),
-        c(
-            "program",
-            "exit_status",
-            "start_time",
-            "end_time",
-            "stdout",
-            "stderr"
-        )
-    )
-    expect_equal(
-        res_imf$run$program,
-        c(
-            "EPMacro",
-            "ExpandObjects",
-            "Basement",
-            "Slab",
-            "EnergyPlus",
-            "convertESOMTR",
-            "ReadVarsESO_MTR",
-            "ReadVarsESO_ESO",
-            "HVAC_Diagram"
-        )
-    )
-    expect_equal(res_imf$run[program == "EPMacro", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["epmidf"])))
-    expect_true(file.exists(file.path(out_dir, files["epmdet"])))
-    expect_true(file.exists(file.path(out_dir, files["eso"])))
-    expect_true(file.exists(file.path(out_dir, files["mtr"])))
-    expect_true(file.exists(file.path(out_dir, files["bnd"])))
-    expect_true(file.exists(file.path(out_dir, files["svg"])))
-    unlink(c(path_imf, path_resources, out_dir), recursive = TRUE)
-
-    # can run ExpandObjects
-    path_exp <- copy_eplus_example(
-        LATEST_EPLUS_VER,
-        "HVACTemplate-5ZoneFanCoil.idf"
-    )
-    res_exp <- energyplus(path_exp, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_exp$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files <- unlist(res_exp$file)
-            files <- files[!is.na(files)]
-            length(files)
-        },
-        22L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(
-        sort(unname(files[names(files) != "epw"])),
-        list.files(out_dir, "HVACTemplate-5ZoneFanCoil")
-    )
-    expect_equal(res_exp$run[program == "ExpandObjects", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["expidf"])))
-    expect_true(is.na(files["experr"]))
-    unlink(c(path_exp, out_dir), recursive = TRUE)
-
-    # NOTE: There is a bug in the basement preprocessor in EnergyPlus from v9.4 to v22.1
-    # Ref: https://github.com/NREL/EnergyPlus/pull/9356
-    if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
-        # can run Basement
-        path_base <- copy_eplus_example(
-            LATEST_EPLUS_VER,
-            "LgOffVAVusingBasement.idf"
-        )
-        expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
-        # modify the input in order to reduce the simulation time
-        l <- read_lines(path_base)
-        l[
-            grepl("IYRS: Maximum number of yearly iterations", string),
-            string := "1;"
-        ]
-        l[
-            grepl("NMAT: Number of materials in this domain", string),
-            string := "1,"
-        ]
-        l[
-            grepl("CLEARANCE: Distance from outside of wall", string),
-            string := "1,"
-        ]
-        l[
-            grepl("BaseDepth: Depth of the basement wall", string),
-            string := "0.5;"
-        ]
-        write_lines(l, path_base)
-        res_base <- energyplus(
-            path_base,
-            weather,
-            out_dir,
-            design_day = TRUE,
             echo = FALSE
         )
-        expect_equal(length(res_base$file), 57L)
+        expect_equal(names(res), c("file", "run", "backend"))
+        expect_identical(res$backend, "cli")
+        expect_equal(length(res$file), 51L)
+        expect_equal(
+            sort(names(which(vapply(
+                res$file,
+                function(x) !anyNA(x),
+                logical(1)
+            )))),
+            c(
+                "audit",
+                "bnd",
+                "dxf",
+                "eio",
+                "end",
+                "epw",
+                "err",
+                "eso",
+                "idf",
+                # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+                # a SQLite output
+                "mdd",
+                "mtd",
+                "mtr",
+                "rdd",
+                "shd",
+                "table"
+            )
+        )
+        expect_equal(
+            names(res$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(res$run$stdout))
+
+        # can use legacy output name style
+        res_legacy <- EnergyPlus(
+            path,
+            weather,
+            out_dir,
+            output_suffix = "L",
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE
+        )
+        files <- basename(unlist(res_legacy$file, FALSE, FALSE))
+        files <- files[!is.na(files)]
+        expect_equal(
+            setdiff(
+                names(tbl <- table(tools::file_path_sans_ext(files))),
+                c(
+                    "1ZoneUncontrolled",
+                    "eplusout",
+                    "eplustbl",
+                    "sqlite",
+                    "USA_CO_Golden-NREL.724666_TMY3"
+                )
+            ),
+            character()
+        )
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(sort(as.integer(tbl)), c(1L, 1L, 5L, 12L))
+
+        # can run annual simulation with custom IDD
+        expect_silent(
+            EnergyPlus(
+                path,
+                weather,
+                out_dir,
+                annual = TRUE,
+                eplus = LATEST_EPLUS_VER,
+                echo = FALSE,
+                idd = path_eplus(LATEST_EPLUS_VER, "Energy+.idd")
+            )
+        )
+
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
+
+    test_that("convertESOMTR()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "convertESOMTR")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
+        weather <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        res <- EnergyPlus(
+            path,
+            weather,
+            out_dir,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE
+        )
+
+        eso <- convertESOMTR(
+            res$file$eso,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE,
+            rules = path_eplus(
+                LATEST_EPLUS_VER,
+                "PostProcess",
+                "convertESOMTRpgm",
+                "convert.txt"
+            )
+        )
+        expect_equal(names(eso), c("file", "run"))
+        expect_equal(
+            names(eso$file),
+            c("eso", "mtr", "ipeso", "ipmtr", "iperr")
+        )
+        expect_true(file.exists(eso$file$eso))
+        expect_true(file.exists(eso$file$ipeso))
+        expect_true(is.na(eso$file$mtr))
+        expect_true(is.na(eso$file$ipmtr))
+        expect_true(is.na(eso$file$iperr))
+        expect_equal(
+            names(eso$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(eso$run$stdout))
+        expect_true(is.null(eso$run$stderr))
+        unlink(unlist(eso$file))
+
+        mtr <- convertESOMTR(
+            res$file$mtr,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE
+        )
+        expect_equal(names(mtr), c("file", "run"))
+        expect_equal(
+            names(mtr$file),
+            c("eso", "mtr", "ipeso", "ipmtr", "iperr")
+        )
+        expect_true(file.exists(mtr$file$mtr))
+        expect_true(file.exists(mtr$file$ipmtr))
+        expect_true(is.na(mtr$file$eso))
+        expect_true(is.na(mtr$file$ipeso))
+        expect_true(is.na(mtr$file$iperr))
+        expect_equal(
+            names(mtr$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_false(is.null(mtr$run$stdout))
+        expect_true(is.null(mtr$run$stderr))
+        unlink(unlist(mtr$file))
+        unlink(unlist(res$file))
+
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
+
+    test_that("ReadVarsESO()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "ReadVarsESO")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        path <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
+        weather <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        res <- EnergyPlus(
+            path,
+            weather,
+            out_dir,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE
+        )
+
+        eso <- ReadVarsESO(res$file$eso, eplus = LATEST_EPLUS_VER, echo = FALSE)
+        expect_equal(names(eso), c("file", "run"))
+        expect_equal(
+            names(eso$file),
+            c("eso", "mtr", "variable", "meter", "rvaudit")
+        )
+        expect_true(file.exists(eso$file$eso))
+        expect_true(file.exists(eso$file$variable))
+        expect_true(file.exists(eso$file$rvaudit))
+        expect_true(is.na(eso$file$mtr))
+        expect_true(is.na(eso$file$meter))
+        expect_equal(
+            names(eso$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_true(!is.na(eso$file$variable))
+        expect_true(is.na(eso$file$meter))
+        expect_true(!is.na(eso$file$rvaudit))
+        unlink(unlist(eso$file))
+
+        mtr <- ReadVarsESO(res$file$mtr, eplus = LATEST_EPLUS_VER, echo = FALSE)
+        expect_equal(
+            names(mtr$file),
+            c("eso", "mtr", "variable", "meter", "rvaudit")
+        )
+        expect_true(file.exists(mtr$file$mtr))
+        expect_true(file.exists(mtr$file$meter))
+        expect_true(file.exists(mtr$file$rvaudit))
+        expect_true(is.na(mtr$file$eso))
+        expect_true(is.na(mtr$file$variable))
+        expect_equal(
+            names(mtr$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_true(is.na(mtr$file$variable))
+        expect_true(!is.na(mtr$file$meter))
+        expect_true(!is.na(mtr$file$rvaudit))
+        unlink(unlist(mtr$file))
+        unlink(unlist(res$file))
+
+        unlink(out_dir, recursive = TRUE)
+        unlink(path)
+    })
+
+    test_that("HVAC_Diagram()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "HVAC_Diagram")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        model <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
+        weather <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        res <- EnergyPlus(
+            model,
+            weather,
+            out_dir,
+            eplus = LATEST_EPLUS_VER,
+            echo = FALSE
+        )
+
+        svg <- HVAC_Diagram(res$file$bnd, echo = FALSE)
+        expect_equal(names(svg), c("file", "run"))
+        expect_equal(names(svg$file), c("bnd", "svg"))
+        expect_true(file.exists(svg$file$bnd))
+        expect_true(file.exists(svg$file$bnd))
+        expect_equal(
+            names(svg$run),
+            c(
+                "process",
+                "exit_status",
+                "stdout",
+                "stderr",
+                "start_time",
+                "end_time"
+            )
+        )
+        expect_true(!is.na(svg$file$svg))
+        unlink(unlist(svg$file))
+        unlink(unlist(res$file))
+
+        unlink(out_dir, recursive = TRUE)
+        unlink(model)
+    })
+
+    test_that("energyplus()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        out_dir <- file.path(tempdir(), "run-energyplus")
+        if (!dir.exists(out_dir)) {
+            dir.create(out_dir)
+        }
+
+        weather <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        # can run EPMacro
+        path_imf <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "AbsorptionChiller_Macro.imf"
+        )
+        path_resources <- c(
+            copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneChillerSpec.imf"),
+            copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneGeometry.imf"),
+            copy_eplus_example(LATEST_EPLUS_VER, "HVAC3Zone-IntGains-Def.imf"),
+            copy_eplus_example(LATEST_EPLUS_VER, "HVAC3ZoneMat-Const.imf")
+        )
+        res_imf <- energyplus(
+            path_imf,
+            weather,
+            out_dir,
+            echo = FALSE,
+            resources = path_resources
+        )
+        expect_equal(
+            names(res_imf),
+            c(
+                "version",
+                "energyplus",
+                "start_time",
+                "end_time",
+                "exit_status",
+                "output_dir",
+                "file",
+                "run",
+                "backend"
+            )
+        )
+        expect_equal(as.character(res_imf$version), LATEST_EPLUS_VER)
+        expect_equal(res_imf$energyplus, eplus_config(LATEST_EPLUS_VER)$dir)
+        expect_s3_class(res_imf$start_time, "POSIXct")
+        expect_s3_class(res_imf$end_time, "POSIXct")
+        expect_equal(res_imf$output_dir, normalizePath(out_dir))
+        expect_equal(length(res_imf$file), 57L)
         # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
         # a SQLite output
         expect_equal(
             {
-                files <- unlist(res_base$file)
+                files <- unlist(res_imf$file)
                 files <- files[!is.na(files)]
                 length(files)
             },
-            26L
+            23L
         )
         expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
         expect_equal(
             sort(unname(files[names(files) != "epw"])),
-            list.files(out_dir, "LgOffVAVusingBasement")
+            sort(c(
+                list.files(out_dir, "AbsorptionChiller_Macro"),
+                basename(path_resources)
+            ))
         )
-        expect_equal(res_base$run[program == "Basement", exit_status], list(0L))
+        expect_s3_class(res_imf$run, "data.table")
+        expect_equal(
+            names(res_imf$run),
+            c(
+                "program",
+                "exit_status",
+                "start_time",
+                "end_time",
+                "stdout",
+                "stderr"
+            )
+        )
+        expect_equal(
+            res_imf$run$program,
+            c(
+                "EPMacro",
+                "ExpandObjects",
+                "Basement",
+                "Slab",
+                "EnergyPlus",
+                "convertESOMTR",
+                "ReadVarsESO_MTR",
+                "ReadVarsESO_ESO",
+                "HVAC_Diagram"
+            )
+        )
+        expect_equal(res_imf$run[program == "EPMacro", exit_status], list(0L))
+        expect_true(file.exists(file.path(out_dir, files["epmidf"])))
+        expect_true(file.exists(file.path(out_dir, files["epmdet"])))
+        expect_true(file.exists(file.path(out_dir, files["eso"])))
+        expect_true(file.exists(file.path(out_dir, files["mtr"])))
+        expect_true(file.exists(file.path(out_dir, files["bnd"])))
+        expect_true(file.exists(file.path(out_dir, files["svg"])))
+        unlink(c(path_imf, path_resources, out_dir), recursive = TRUE)
+
+        # can run ExpandObjects
+        path_exp <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "HVACTemplate-5ZoneFanCoil.idf"
+        )
+        res_exp <- energyplus(path_exp, weather, out_dir, echo = FALSE)
+        expect_equal(length(res_exp$file), 57L)
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(
+            {
+                files <- unlist(res_exp$file)
+                files <- files[!is.na(files)]
+                length(files)
+            },
+            22L
+        )
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(
+            sort(unname(files[names(files) != "epw"])),
+            list.files(out_dir, "HVACTemplate-5ZoneFanCoil")
+        )
+        expect_equal(
+            res_exp$run[program == "ExpandObjects", exit_status],
+            list(0L)
+        )
         expect_true(file.exists(file.path(out_dir, files["expidf"])))
-        expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
-        expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
-        expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
-        expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
-        unlink(c(path_base, out_dir), recursive = TRUE)
-    }
+        expect_true(is.na(files["experr"]))
+        unlink(c(path_exp, out_dir), recursive = TRUE)
 
-    # can run Slab
-    path_slab <- copy_eplus_example(
-        LATEST_EPLUS_VER,
-        "5ZoneAirCooledWithSlab.idf"
-    )
-    expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
-    # modify the input in order to reduce the simulation time
-    l <- read_lines(path_slab)
-    l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
-    l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
-    write_lines(l, path_slab)
-    res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_slab$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files <- unlist(res_slab$file)
-            files <- files[!is.na(files)]
-            length(files)
-        },
-        25L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(
-        sort(unname(files[names(files) != "epw"])),
-        list.files(out_dir, "5ZoneAirCooledWithSlab")
-    )
-    expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
-    expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
-    expect_true(file.exists(file.path(out_dir, files["slab_out"])))
-    unlink(c(path_slab, out_dir), recursive = TRUE)
+        # NOTE: There is a bug in the basement preprocessor in EnergyPlus from v9.4 to v22.1
+        # Ref: https://github.com/NREL/EnergyPlus/pull/9356
+        if (numeric_version(LATEST_EPLUS_VER) > "22.1") {
+            # can run Basement
+            path_base <- copy_eplus_example(
+                LATEST_EPLUS_VER,
+                "LgOffVAVusingBasement.idf"
+            )
+            expect_error(energyplus(path_base, NULL, out_dir, echo = FALSE))
+            # modify the input in order to reduce the simulation time
+            l <- read_lines(path_base)
+            l[
+                grepl("IYRS: Maximum number of yearly iterations", string),
+                string := "1;"
+            ]
+            l[
+                grepl("NMAT: Number of materials in this domain", string),
+                string := "1,"
+            ]
+            l[
+                grepl("CLEARANCE: Distance from outside of wall", string),
+                string := "1,"
+            ]
+            l[
+                grepl("BaseDepth: Depth of the basement wall", string),
+                string := "0.5;"
+            ]
+            write_lines(l, path_base)
+            res_base <- energyplus(
+                path_base,
+                weather,
+                out_dir,
+                design_day = TRUE,
+                echo = FALSE
+            )
+            expect_equal(length(res_base$file), 57L)
+            # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+            # a SQLite output
+            expect_equal(
+                {
+                    files <- unlist(res_base$file)
+                    files <- files[!is.na(files)]
+                    length(files)
+                },
+                26L
+            )
+            expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+            expect_equal(
+                sort(unname(files[names(files) != "epw"])),
+                list.files(out_dir, "LgOffVAVusingBasement")
+            )
+            expect_equal(
+                res_base$run[program == "Basement", exit_status],
+                list(0L)
+            )
+            expect_true(file.exists(file.path(out_dir, files["expidf"])))
+            expect_true(file.exists(file.path(out_dir, files["bsmt_idf"])))
+            expect_true(file.exists(file.path(out_dir, files["bsmt_csv"])))
+            expect_true(file.exists(file.path(out_dir, files["bsmt_out"])))
+            expect_true(file.exists(file.path(out_dir, files["bsmt_audit"])))
+            unlink(c(path_base, out_dir), recursive = TRUE)
+        }
 
-    # can convert eso to IP
-    path_ip <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    res_ip <- energyplus(
-        path_ip,
-        weather,
-        out_dir,
-        eso_to_ip = TRUE,
-        echo = FALSE
-    )
-    expect_equal(length(res_ip$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files <- unlist(res_ip$file)
-            files <- files[!is.na(files)]
-            length(files)
-        },
-        25L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(
-        sort(unname(files[names(files) != "epw"])),
-        list.files(out_dir, "1ZoneUncontrolled")
-    )
-    expect_equal(res_ip$run[program == "convertESOMTR", exit_status], list(0L))
-    expect_true(file.exists(file.path(out_dir, files["ipeso"])))
-    expect_true(file.exists(file.path(out_dir, files["ipmtr"])))
-    expect_true(is.na(files["iperr"]))
-    unlink(out_dir, recursive = TRUE)
-    res_ip2 <- energyplus(
-        path_ip,
-        weather,
-        out_dir,
-        eso_to_ip = TRUE,
-        readvars = FALSE,
-        echo = FALSE
-    )
-    expect_equal(length(res_ip2$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files2 <- unlist(res_ip2$file)
-            files2 <- files2[!is.na(files2)]
-            length(files2)
-        },
-        22L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files2))), 0L)
-    expect_true(file.exists(file.path(out_dir, files2["ipeso"])))
-    expect_true(file.exists(file.path(out_dir, files2["ipmtr"])))
-    expect_true(is.na(files2["iperr"]))
-    unlink(out_dir, recursive = TRUE)
+        # can run Slab
+        path_slab <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "5ZoneAirCooledWithSlab.idf"
+        )
+        expect_error(energyplus(path_slab, NULL, out_dir, echo = FALSE))
+        # modify the input in order to reduce the simulation time
+        l <- read_lines(path_slab)
+        l[grepl("IYRS: Number of years to iterate", string), string := "1,"]
+        l[grepl("ConvTol: Convergence Tolerance", string), string := "1;"]
+        write_lines(l, path_slab)
+        res_slab <- energyplus(path_slab, weather, out_dir, echo = FALSE)
+        expect_equal(length(res_slab$file), 57L)
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(
+            {
+                files <- unlist(res_slab$file)
+                files <- files[!is.na(files)]
+                length(files)
+            },
+            25L
+        )
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(
+            sort(unname(files[names(files) != "epw"])),
+            list.files(out_dir, "5ZoneAirCooledWithSlab")
+        )
+        expect_equal(res_slab$run[program == "Slab", exit_status], list(0L))
+        expect_true(file.exists(file.path(out_dir, files["slab_ger"])))
+        expect_true(file.exists(file.path(out_dir, files["slab_gtp"])))
+        expect_true(file.exists(file.path(out_dir, files["slab_out"])))
+        unlink(c(path_slab, out_dir), recursive = TRUE)
 
-    # can run with EnergyPlus < 8.3
-    options("eplusr.eplus_legacy" = TRUE)
-    path_legacy <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    expect_error(energyplus(
-        path_legacy,
-        weather,
-        out_dir,
-        design_day = TRUE,
-        echo = FALSE
-    ))
-    res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
-    expect_equal(length(res_legacy$file), 57L)
-    # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
-    # a SQLite output
-    expect_equal(
-        {
-            files <- unlist(res_legacy$file)
-            files <- files[!is.na(files)]
-            length(files)
-        },
-        23L
-    )
-    expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
-    expect_equal(
-        sort(unname(files[names(files) != "epw"])),
-        list.files(out_dir, "1ZoneUncontrolled")
-    )
-    unlink(out_dir, recursive = TRUE)
-    options("eplusr.eplus_legacy" = NULL)
-    expect_error(energyplus(
-        path_legacy,
-        weather,
-        out_dir,
-        design_day = TRUE,
-        annual = TRUE,
-        echo = FALSE
-    ))
-    res_norm <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
-    expect_equal(res_legacy$file, res_norm$file)
-
-    unlink(out_dir, recursive = TRUE)
-})
-
-test_that("run_idf()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    path_idf <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
-    path_epw <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CO_Golden-NREL.724666_TMY3.epw"
-    )
-
-    # can run ddy simulation
-    expect_type(
-        res <- run_idf(path_idf, NULL, output_dir = tempdir(), echo = FALSE),
-        "list"
-    )
-    # can specify EnergyPlus version
-    expect_type(
-        res <- run_idf(
-            path_idf,
-            NULL,
-            output_dir = tempdir(),
-            echo = FALSE,
-            LATEST_EPLUS_VER
-        ),
-        "list"
-    )
-    expect_null(res$epw)
-    # can stop if failed to find version
-    expect_error(
-        {
-            f <- tempfile(fileext = ".idf")
-            write_lines(read_lines(path_idf)[-91], f)
-            run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
-        },
-        "Missing version field"
-    )
-    # can use input file directory
-    expect_type(
-        {
-            f <- tempfile(fileext = ".idf")
-            file.copy(path_idf, f, overwrite = TRUE)
-            res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
-        },
-        "list"
-    )
-
-    # can run simulation with weather
-    expect_type(
-        res <- run_idf(
-            path_idf,
-            path_epw,
-            output_dir = tempdir(),
+        # can convert eso to IP
+        path_ip <- copy_eplus_example(LATEST_EPLUS_VER, "1ZoneUncontrolled.idf")
+        res_ip <- energyplus(
+            path_ip,
+            weather,
+            out_dir,
+            eso_to_ip = TRUE,
             echo = FALSE
-        ),
-        "list"
-    )
-    expect_equal(res$idf, normalizePath(path_idf))
-    expect_equal(res$epw, normalizePath(path_epw))
-    expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
-    expect_equal(res$exit_status, 0L)
-    expect_s3_class(res$start_time, "POSIXct")
-    expect_s3_class(res$end_time, "POSIXct")
-    expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
-    expect_equal(res$energyplus, eplus_exe(LATEST_EPLUS_VER))
-    expect_type(res$stdout, "character")
-    expect_true("stderr" %in% names(res))
-    expect_s3_class(res$process, "process")
-    expect_true(file.exists(res$idf))
-    expect_true(file.exists(res$epw))
+        )
+        expect_equal(length(res_ip$file), 57L)
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(
+            {
+                files <- unlist(res_ip$file)
+                files <- files[!is.na(files)]
+                length(files)
+            },
+            25L
+        )
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(
+            sort(unname(files[names(files) != "epw"])),
+            list.files(out_dir, "1ZoneUncontrolled")
+        )
+        expect_equal(
+            res_ip$run[program == "convertESOMTR", exit_status],
+            list(0L)
+        )
+        expect_true(file.exists(file.path(out_dir, files["ipeso"])))
+        expect_true(file.exists(file.path(out_dir, files["ipmtr"])))
+        expect_true(is.na(files["iperr"]))
+        unlink(out_dir, recursive = TRUE)
+        res_ip2 <- energyplus(
+            path_ip,
+            weather,
+            out_dir,
+            eso_to_ip = TRUE,
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_equal(length(res_ip2$file), 57L)
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(
+            {
+                files2 <- unlist(res_ip2$file)
+                files2 <- files2[!is.na(files2)]
+                length(files2)
+            },
+            22L
+        )
+        expect_equal(sum(!file.exists(file.path(out_dir, files2))), 0L)
+        expect_true(file.exists(file.path(out_dir, files2["ipeso"])))
+        expect_true(file.exists(file.path(out_dir, files2["ipmtr"])))
+        expect_true(is.na(files2["iperr"]))
+        unlink(out_dir, recursive = TRUE)
 
-    # can run in the background
-    expect_s3_class(
-        proc <- run_idf(path_idf, NULL, output_dir = tempdir(), wait = FALSE),
-        "r_process"
-    )
-    expect_type(
-        {
-            proc$wait()
-            res <- proc$get_result()
-        },
-        "list"
-    )
-    expect_equal(res$idf, normalizePath(path_idf))
-    expect_null(res$epw)
-    expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
-    expect_equal(res$exit_status, 0L)
-    expect_s3_class(res$start_time, "POSIXct")
-    expect_s3_class(res$end_time, "POSIXct")
-    expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
-    expect_equal(res$energyplus, eplus_exe(LATEST_EPLUS_VER))
-    expect_type(res$stdout, "character")
-    expect_null(res$process)
+        # can run with EnergyPlus < 8.3
+        options("eplusr.eplus_legacy" = TRUE)
+        path_legacy <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "1ZoneUncontrolled.idf"
+        )
+        expect_error(energyplus(
+            path_legacy,
+            weather,
+            out_dir,
+            design_day = TRUE,
+            echo = FALSE
+        ))
+        res_legacy <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
+        expect_equal(length(res_legacy$file), 57L)
+        # NOTE: From EnergyPlus v22.1.0, Sqlite.err is only generated if there is
+        # a SQLite output
+        expect_equal(
+            {
+                files <- unlist(res_legacy$file)
+                files <- files[!is.na(files)]
+                length(files)
+            },
+            23L
+        )
+        expect_equal(sum(!file.exists(file.path(out_dir, files))), 0L)
+        expect_equal(
+            sort(unname(files[names(files) != "epw"])),
+            list.files(out_dir, "1ZoneUncontrolled")
+        )
+        unlink(out_dir, recursive = TRUE)
+        options("eplusr.eplus_legacy" = NULL)
+        expect_error(energyplus(
+            path_legacy,
+            weather,
+            out_dir,
+            design_day = TRUE,
+            annual = TRUE,
+            echo = FALSE
+        ))
+        res_norm <- energyplus(path_legacy, weather, out_dir, echo = FALSE)
+        expect_equal(res_legacy$file, res_norm$file)
+
+        unlink(out_dir, recursive = TRUE)
+    })
+
+    test_that("run_idf()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        path_idf <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            "1ZoneUncontrolled.idf"
+        )
+        path_epw <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CO_Golden-NREL.724666_TMY3.epw"
+        )
+
+        # can run ddy simulation
+        expect_type(
+            res <- run_idf(
+                path_idf,
+                NULL,
+                output_dir = tempdir(),
+                echo = FALSE
+            ),
+            "list"
+        )
+        # can specify EnergyPlus version
+        expect_type(
+            res <- run_idf(
+                path_idf,
+                NULL,
+                output_dir = tempdir(),
+                echo = FALSE,
+                LATEST_EPLUS_VER
+            ),
+            "list"
+        )
+        expect_null(res$epw)
+        # can stop if failed to find version
+        expect_error(
+            {
+                f <- tempfile(fileext = ".idf")
+                write_lines(read_lines(path_idf)[-91], f)
+                run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
+            },
+            "Missing version field"
+        )
+        # can use input file directory
+        expect_type(
+            {
+                f <- tempfile(fileext = ".idf")
+                file.copy(path_idf, f, overwrite = TRUE)
+                res <- run_idf(f, NULL, output_dir = NULL, echo = FALSE)
+            },
+            "list"
+        )
+
+        # can run simulation with weather
+        expect_type(
+            res <- run_idf(
+                path_idf,
+                path_epw,
+                output_dir = tempdir(),
+                echo = FALSE
+            ),
+            "list"
+        )
+        expect_equal(res$idf, normalizePath(path_idf))
+        expect_equal(res$epw, normalizePath(path_epw))
+        expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
+        expect_equal(res$exit_status, 0L)
+        expect_s3_class(res$start_time, "POSIXct")
+        expect_s3_class(res$end_time, "POSIXct")
+        expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
+        expect_equal(res$energyplus, eplus_exe(LATEST_EPLUS_VER))
+        expect_type(res$stdout, "character")
+        expect_true("stderr" %in% names(res))
+        expect_s3_class(res$process, "process")
+        expect_true(file.exists(res$idf))
+        expect_true(file.exists(res$epw))
+
+        # can run in the background
+        expect_s3_class(
+            proc <- run_idf(
+                path_idf,
+                NULL,
+                output_dir = tempdir(),
+                wait = FALSE
+            ),
+            "r_process"
+        )
+        expect_type(
+            {
+                proc$wait()
+                res <- proc$get_result()
+            },
+            "list"
+        )
+        expect_equal(res$idf, normalizePath(path_idf))
+        expect_null(res$epw)
+        expect_equal(res$version, numeric_version(LATEST_EPLUS_VER))
+        expect_equal(res$exit_status, 0L)
+        expect_s3_class(res$start_time, "POSIXct")
+        expect_s3_class(res$end_time, "POSIXct")
+        expect_equal(res$output_dir, normalizePath(tempdir(), mustWork = FALSE))
+        expect_equal(res$energyplus, eplus_exe(LATEST_EPLUS_VER))
+        expect_type(res$stdout, "character")
+        expect_null(res$process)
+    })
+
+    test_that("run_multi()", {
+        skip_on_cran()
+        skip_if_not_integration()
+
+        path_idf <- copy_eplus_example(
+            LATEST_EPLUS_VER,
+            c("1ZoneUncontrolled.idf", "5Zone_Transformer.idf")
+        )
+        path_epw <- path_eplus_weather(
+            LATEST_EPLUS_VER,
+            "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+        )
+
+        # can stop if idf and epw does not have the same length
+        expect_error(
+            run_multi(path_idf, rep(path_epw, 3), NULL),
+            "Must have same length"
+        )
+        # can stop if idf and eplus does not have the same length
+        expect_error(
+            run_multi(path_idf, NULL, NULL, eplus = rep(LATEST_EPLUS_VER, 3)),
+            "Must have same length"
+        )
+        # can stop if idf and design does not have the same length
+        expect_error(
+            run_multi(path_idf, NULL, NULL, design_day = rep(FALSE, 3)),
+            "Must have same length"
+        )
+        # can stop if idf and annual does not have the same length
+        expect_error(
+            run_multi(path_idf, NULL, NULL, annual = rep(FALSE, 3)),
+            "Must have same length"
+        )
+        # can stop if both design and annual is TRUE
+        expect_error(
+            run_multi(path_idf, NULL, NULL, annual = TRUE, design_day = TRUE),
+            "both design-day-only",
+            class = "eplusr_error_both_ddy_annual"
+        )
+        # can stop if model does not exist
+        expect_error(run_multi(tempfile(), NULL))
+        # can stop if model does not contain version
+        expect_error(
+            {
+                f <- tempfile(fileext = ".idf")
+                write_lines(read_lines(path_idf[1])[-91], f)
+                run_multi(f, NULL, output_dir = tempdir())
+            },
+            "Failed to determine the version of EnergyPlus",
+            class = "eplusr_error_miss_idf_ver"
+        )
+        # can stop if target EnergyPlus is not found
+        expect_error(
+            run_multi(path_idf, NULL, NULL, eplus = 8.0),
+            "Cannot locate EnergyPlus",
+            class = "eplusr_error_locate_eplus"
+        )
+        # can stop if input idf contain duplications
+        expect_error(
+            run_multi(rep(path_idf, 2), NULL, NULL),
+            class = "eplusr_error_duplicated_sim"
+        )
+        # can stop if idf and output directory does not have the same length
+        expect_error(
+            run_multi(path_idf, NULL, output_dir = tempdir()),
+            "Must have same length"
+        )
+        # can stop if idf and output directory combines same job
+        expect_error(
+            run_multi(rep(path_idf[1], 2), NULL, rep(tempdir(), 2L)),
+            "Duplication found"
+        )
+
+        expect_message(
+            res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b"))),
+            "FAILED"
+        )
+        expect_s3_class(res, "data.table")
+        expect_equal(
+            names(res),
+            c(
+                "index",
+                "status",
+                "idf",
+                "epw",
+                "version",
+                "exit_status",
+                "start_time",
+                "end_time",
+                "output_dir",
+                "energyplus",
+                "stdout",
+                "stderr",
+                "backend"
+            )
+        )
+        expect_identical(res$backend, rep("cli", 2L))
+        expect_equal(res$index, 1:2)
+        expect_equal(res$status, rep("failed", 2))
+        expect_equal(res$idf, normalizePath(path_idf))
+        expect_equal(res$epw, rep(NA_character_, 2))
+        expect_equal(res$version, rep(LATEST_EPLUS_VER, 2))
+        expect_equal(res$exit_status > 0, rep(TRUE, 2))
+        expect_s3_class(res$start_time, "POSIXct")
+        expect_s3_class(res$end_time, "POSIXct")
+        expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
+        checkmate::expect_list(res$stdout, "character")
+
+        expect_silent(
+            res <- run_multi(
+                path_idf,
+                NULL,
+                file.path(tempdir(), c("a", "b")),
+                wait = FALSE
+            )
+        )
+        expect_s3_class(res, "r_process")
+        expect_equal(
+            {
+                res$wait()
+                res$get_exit_status()
+            },
+            0L
+        )
+        expect_silent(res <- res$get_result())
+        expect_s3_class(res, "data.table")
+        expect_equal(
+            names(res),
+            c(
+                "index",
+                "status",
+                "idf",
+                "epw",
+                "version",
+                "exit_status",
+                "start_time",
+                "end_time",
+                "output_dir",
+                "energyplus",
+                "stdout",
+                "stderr",
+                "backend"
+            )
+        )
+        expect_identical(res$backend, rep("cli", 2L))
+        expect_equal(res$index, 1:2)
+        expect_equal(res$status, rep("failed", 2))
+        expect_equal(res$idf, normalizePath(path_idf, mustWork = FALSE))
+        expect_equal(res$epw, rep(NA_character_, 2))
+        expect_equal(res$version, rep(LATEST_EPLUS_VER, 2))
+        expect_equal(res$exit_status > 0, rep(TRUE, 2))
+        expect_s3_class(res$start_time, "POSIXct")
+        expect_s3_class(res$end_time, "POSIXct")
+        expect_equal(
+            res$output_dir,
+            normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE)
+        )
+        expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
+        checkmate::expect_list(res$stdout, "character")
+    })
 })
 
-test_that("run_multi()", {
-    skip_on_cran()
-    skip_if_not_integration()
-
-    path_idf <- copy_eplus_example(
-        LATEST_EPLUS_VER,
-        c("1ZoneUncontrolled.idf", "5Zone_Transformer.idf")
-    )
-    path_epw <- path_eplus_weather(
-        LATEST_EPLUS_VER,
-        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-    )
-
-    # can stop if idf and epw does not have the same length
-    expect_error(
-        run_multi(path_idf, rep(path_epw, 3), NULL),
-        "Must have same length"
-    )
-    # can stop if idf and eplus does not have the same length
-    expect_error(
-        run_multi(path_idf, NULL, NULL, eplus = rep(LATEST_EPLUS_VER, 3)),
-        "Must have same length"
-    )
-    # can stop if idf and design does not have the same length
-    expect_error(
-        run_multi(path_idf, NULL, NULL, design_day = rep(FALSE, 3)),
-        "Must have same length"
-    )
-    # can stop if idf and annual does not have the same length
-    expect_error(
-        run_multi(path_idf, NULL, NULL, annual = rep(FALSE, 3)),
-        "Must have same length"
-    )
-    # can stop if both design and annual is TRUE
-    expect_error(
-        run_multi(path_idf, NULL, NULL, annual = TRUE, design_day = TRUE),
-        "both design-day-only",
-        class = "eplusr_error_both_ddy_annual"
-    )
-    # can stop if model does not exist
-    expect_error(run_multi(tempfile(), NULL))
-    # can stop if model does not contain version
-    expect_error(
-        {
-            f <- tempfile(fileext = ".idf")
-            write_lines(read_lines(path_idf[1])[-91], f)
-            run_multi(f, NULL, output_dir = tempdir())
-        },
-        "Failed to determine the version of EnergyPlus",
-        class = "eplusr_error_miss_idf_ver"
-    )
-    # can stop if target EnergyPlus is not found
-    expect_error(
-        run_multi(path_idf, NULL, NULL, eplus = 8.0),
-        "Cannot locate EnergyPlus",
-        class = "eplusr_error_locate_eplus"
-    )
-    # can stop if input idf contain duplications
-    expect_error(
-        run_multi(rep(path_idf, 2), NULL, NULL),
-        class = "eplusr_error_duplicated_sim"
-    )
-    # can stop if idf and output directory does not have the same length
-    expect_error(
-        run_multi(path_idf, NULL, output_dir = tempdir()),
-        "Must have same length"
-    )
-    # can stop if idf and output directory combines same job
-    expect_error(
-        run_multi(rep(path_idf[1], 2), NULL, rep(tempdir(), 2L)),
-        "Duplication found"
-    )
-
-    expect_message(
-        res <- run_multi(path_idf, NULL, file.path(tempdir(), c("a", "b"))),
-        "FAILED"
-    )
-    expect_s3_class(res, "data.table")
-    expect_equal(
-        names(res),
-        c(
-            "index",
-            "status",
-            "idf",
-            "epw",
-            "version",
-            "exit_status",
-            "start_time",
-            "end_time",
-            "output_dir",
-            "energyplus",
-            "stdout",
-            "stderr",
-            "backend"
+describe("run-api", {
+    test_that("API backend setup is portable and rejects native ownership across workers", {
+        expect_identical(
+            run__backend("cli"),
+            list(engine = "cli", setup = NULL)
         )
-    )
-    expect_identical(res$backend, rep("cli", 2L))
-    expect_equal(res$index, 1:2)
-    expect_equal(res$status, rep("failed", 2))
-    expect_equal(res$idf, normalizePath(path_idf))
-    expect_equal(res$epw, rep(NA_character_, 2))
-    expect_equal(res$version, rep(LATEST_EPLUS_VER, 2))
-    expect_equal(res$exit_status > 0, rep(TRUE, 2))
-    expect_s3_class(res$start_time, "POSIXct")
-    expect_s3_class(res$end_time, "POSIXct")
-    expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
-    checkmate::expect_list(res$stdout, "character")
-
-    expect_silent(
-        res <- run_multi(
-            path_idf,
+        expect_identical(
+            run__backend("api"),
+            list(engine = "api", setup = NULL)
+        )
+        expect_error(run__backend("other"), "backend")
+        for (invalid in list(
             NULL,
-            file.path(tempdir(), c("a", "b")),
-            wait = FALSE
-        )
-    )
-    expect_s3_class(res, "r_process")
-    expect_equal(
-        {
-            res$wait()
-            res$get_exit_status()
-        },
-        0L
-    )
-    expect_silent(res <- res$get_result())
-    expect_s3_class(res, "data.table")
-    expect_equal(
-        names(res),
-        c(
-            "index",
-            "status",
-            "idf",
-            "epw",
-            "version",
-            "exit_status",
-            "start_time",
-            "end_time",
-            "output_dir",
-            "energyplus",
-            "stdout",
-            "stderr",
-            "backend"
-        )
-    )
-    expect_identical(res$backend, rep("cli", 2L))
-    expect_equal(res$index, 1:2)
-    expect_equal(res$status, rep("failed", 2))
-    expect_equal(res$idf, normalizePath(path_idf, mustWork = FALSE))
-    expect_equal(res$epw, rep(NA_character_, 2))
-    expect_equal(res$version, rep(LATEST_EPLUS_VER, 2))
-    expect_equal(res$exit_status > 0, rep(TRUE, 2))
-    expect_s3_class(res$start_time, "POSIXct")
-    expect_s3_class(res$end_time, "POSIXct")
-    expect_equal(
-        res$output_dir,
-        normalizePath(file.path(tempdir(), c("a", "b")), mustWork = FALSE)
-    )
-    expect_equal(res$energyplus, rep(eplus_exe(LATEST_EPLUS_VER), 2L))
-    checkmate::expect_list(res$stdout, "character")
-})
+            NA_character_,
+            character(),
+            c("cli", "api"),
+            "a",
+            "CLI",
+            1,
+            list(),
+            new.env()
+        )) {
+            expect_error(run__backend(invalid), "backend")
+        }
+        ordinary <- local({
+            config <- data.table(target = 21)
+            function(api, state) config$target
+        })
+        expect_identical(run__backend(ordinary)$engine, "api")
+        native <- local({
+            state <- structure(new.env(), class = "EnergyPlusState")
+            function(api, current) state
+        })
+        expect_error(run__backend(native), "live objects")
+        skip_if_not_installed("rdyncall")
+        pointer <- local({
+            value <- rdyncall::as.externalptr(integer(1L))
+            function(api, state) value
+        })
+        expect_error(run__backend(pointer), "live objects")
+        expect_null(run__api_version(numeric_version("26.1")))
+        expect_null(run__api_version(numeric_version("26.2")))
+        expect_null(run__api_version(numeric_version("25.2")))
+        expect_error(run__api_version(numeric_version("9.3")), "installation")
+    })
 
-# vim: set fdm=marker:
+    test_that("API workers clean up on completion, stops, setup and callback conditions", {
+        phase <- "completed"
+        stopped <- FALSE
+        closed <- 0L
+        fake <- list(
+            info = function() {
+                list(
+                    version = "26.1.0-test",
+                    api_version = "0.2",
+                    library = "test-library",
+                    pid = Sys.getpid()
+                )
+            },
+            state_manager = list(
+                new_state = function() {
+                    # Host callback registration keeps its retention record on the owning state.
+                    state <- new.env(parent = emptyenv())
+                    attr(state, "entry") <- list2env(
+                        list(callback_records = list()),
+                        parent = emptyenv()
+                    )
+                    state
+                },
+                status = function(state) {
+                    list(
+                        phase = if (stopped) "closed" else phase,
+                        stop_reason = if (stopped) "callback_error" else NULL,
+                        exit_code = 0L
+                    )
+                }
+            ),
+            runtime = list(
+                set_console_output_status = function(...) NULL,
+                callback_begin_zone_timestep_before_init_heat_balance = function(
+                    state,
+                    f
+                ) {
+                    # Mirror registration without entering a native engine in lifecycle-only checks.
+                    entry <- attr(state, "entry")
+                    entry$callback_records[[
+                        length(entry$callback_records) + 1L
+                    ]] <- new.env(parent = emptyenv())
+                    invisible(NULL)
+                },
+                run_energyplus = function(...) {
+                    if (stopped) {
+                        stop("callback failure")
+                    }
+                    0L
+                }
+            ),
+            close = function() {
+                closed <<- closed + 1L
+                invisible(NULL)
+            }
+        )
+        local_mocked_bindings(eplus_api = function(directory) fake)
+        result <- run__api_engine("test", "model.idf")
+        expect_identical(result$exit_status, 0L)
+        expect_identical(result$api$phase, "completed")
+        expect_identical(result$api$library, "test-library")
+        phase <- "stopped"
+        expect_identical(run__api_engine("test", "model.idf")$exit_status, 1L)
+        expect_identical(
+            run__api_engine("test", "model.idf")$api$native_exit_status,
+            0L
+        )
+        setup <- function(api, state) stop("setup failure")
+        result <- run__api_engine("test", "model.idf", setup)
+        expect_identical(result$api$stop_reason, "setup_error")
+        expect_match(result$api$error$message, "setup failure")
+        stopped <- TRUE
+        result <- run__api_engine("test", "model.idf")
+        expect_identical(result$api$stop_reason, "callback_error")
+        expect_identical(result$api$phase, "failed")
+        expect_identical(result$api$state_phase, "closed")
+        interrupt <- function(api, state) {
+            stop(structure(
+                list(message = "interrupt", call = NULL),
+                class = c("interrupt", "condition")
+            ))
+        }
+        result <- run__api_engine("test", "model.idf", interrupt)
+        expect_identical(result$exit_status, 130L)
+        expect_identical(result$api$stop_reason, "interrupt")
+        expect_equal(closed, 6L)
+        # Unexpected native unwinds retain quarantine rather than claiming normal state disposal.
+        fake$state_manager$status <- function(state) {
+            list(
+                phase = "quarantined",
+                stop_reason = "unexpected_unwind",
+                exit_code = NULL
+            )
+        }
+        result <- run__api_engine("test", "model.idf")
+        expect_identical(result$api$phase, "quarantined")
+        expect_identical(result$api$state_phase, "quarantined")
+        expect_true(is.na(result$api$native_exit_status))
+        local_mocked_bindings(eplus_api = function(directory) {
+            stop("missing bridge")
+        })
+        result <- run__api_engine("test", "model.idf")
+        expect_identical(result$api$stop_reason, "load_error")
+        expect_match(result$api$error$message, "missing bridge")
+    })
+
+    test_that("API command runners retain process output and diagnose dead workers", {
+        failure <- FALSE
+        local_mocked_bindings(run_command = function(command, args, ...) {
+            expect_equal(args$directory, "test")
+            list(
+                exit_status = 0L,
+                stdout = "native output",
+                stderr = character(),
+                process = list(
+                    get_result = function() {
+                        if (failure) {
+                            stop("worker crashed")
+                        }
+                        list(
+                            exit_status = 0L,
+                            api = list(phase = "completed", error = NULL)
+                        )
+                    }
+                )
+            )
+        })
+        result <- run__api_command("test", "model.idf", tempdir(), FALSE, NULL)
+        expect_equal(result$stdout, "native output")
+        expect_equal(result$api$phase, "completed")
+        failure <- TRUE
+        result <- run__api_command("test", "model.idf", tempdir(), FALSE, NULL)
+        expect_equal(result$exit_status, 1L)
+        expect_equal(result$api$stop_reason, "worker_error")
+        expect_match(result$stderr, "worker crashed")
+    })
+
+    test_that("stock API execution adapters support background and run_idf workflows", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        process <- energyplus(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "background"),
+            backend = "api",
+            wait = FALSE,
+            readvars = FALSE,
+            echo = FALSE
+        )
+        on.exit(if (process$is_alive()) process$kill(), add = TRUE)
+        # Instrumented worker startup can exceed the ordinary simulation deadline.
+        process$wait(180000)
+        expect_false(process$is_alive())
+        expect_identical(process$get_result()$api$phase, "completed")
+        single <- run_idf(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "run-idf"),
+            backend = "api",
+            expand_obj = FALSE,
+            echo = FALSE
+        )
+        expect_identical(single$backend, "api")
+        expect_identical(single$exit_status, 0L)
+        low <- EnergyPlus(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "low-background"),
+            backend = "api",
+            wait = FALSE,
+            echo = FALSE
+        )
+        on.exit(
+            if (low$run$process$is_alive()) low$run$process$kill(),
+            add = TRUE
+        )
+        low$run$process$wait(180000)
+        expect_identical(
+            low$run$process$get_result()$run$api$phase,
+            "completed"
+        )
+    })
+
+    test_that("stock API controls stop safely and independent parallel jobs retain identity", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        setup <- function(api, state) {
+            api$runtime$callback_begin_zone_timestep_after_init_heat_balance(
+                state,
+                function(s) {
+                    api$runtime$stop_simulation(s)
+                }
+            )
+        }
+        stopped <- energyplus(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "stop"),
+            backend = setup,
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(
+            stopped$api$phase,
+            "stopped",
+            info = jsonlite::toJSON(
+                list(api = stopped$api, stderr = stopped$stderr),
+                auto_unbox = TRUE,
+                null = "null"
+            )
+        )
+        expect_identical(stopped$api$stop_reason, "user_stop")
+        expect_identical(stopped$api$native_exit_status, 0L)
+        expect_false(stopped$exit_status == 0L)
+        failed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "error"),
+            readvars = FALSE,
+            echo = FALSE,
+            backend = function(api, state) {
+                api$runtime$callback_begin_zone_timestep_after_init_heat_balance(
+                    state,
+                    function(s) stop("controller failed")
+                )
+            }
+        )
+        expect_identical(
+            failed$api$stop_reason,
+            "callback_error",
+            info = jsonlite::toJSON(
+                list(api = failed$api, stderr = failed$stderr),
+                auto_unbox = TRUE,
+                null = "null"
+            )
+        )
+        expect_match(failed$api$error$message, "controller failed")
+        expect_identical(failed$api$state_phase, "closed")
+    })
+
+    test_that("stock API run_multi reports finalized controller stops", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        setup <- function(api, state) {
+            api$runtime$callback_begin_zone_timestep_after_init_heat_balance(
+                state,
+                function(s) {
+                    api$runtime$stop_simulation(s)
+                }
+            )
+        }
+        multiple <- run_multi(
+            rep(fixture$model, 2L),
+            fixture$weather,
+            output_dir = file.path(fixture$directory, c("multi-a", "multi-b")),
+            backend = setup,
+            echo = FALSE
+        )
+        expect_true(all(multiple$status == "stopped"))
+        expect_true(all(multiple$backend == "api"))
+    })
+
+    test_that("API setup snapshots lexical data and recursive helpers without unrelated native captures", {
+        expect_null(run__prepare_setup(NULL))
+        expect_identical(run__prepare_setup(sum), sum)
+        expect_identical(run__prepare_setup(stats::median), stats::median)
+        setup <- local({
+            config <- data.table(target = 21)
+            unrelated <- structure(new.env(), class = "EnergyPlusState")
+            countdown <- function(n) {
+                if (n == 0L) config$target else countdown(n - 1L)
+            }
+            function(api, state) countdown(3L)
+        })
+        expect_identical(run__backend(setup)$engine, "api")
+        frozen <- run__prepare_setup(setup)
+        portable <- unserialize(serialize(frozen, NULL))
+        expect_equal(portable(NULL, NULL), 21)
+        expect_false(exists("unrelated", environment(frozen), inherits = FALSE))
+        environment(setup)$config <- data.table(target = 30)
+        expect_equal(frozen(NULL, NULL), 21)
+
+        cyclic <- local({
+            config <- new.env(parent = emptyenv())
+            config$self <- config
+            config$target <- 22
+            function(api, state) config$target
+        })
+        expect_identical(run__backend(cyclic)$engine, "api")
+        expect_equal(
+            unserialize(serialize(run__prepare_setup(cyclic), NULL))(
+                NULL,
+                NULL
+            ),
+            22
+        )
+
+        attributed <- local({
+            config <- structure(
+                1,
+                owner = structure(new.env(), class = "EnergyPlusState")
+            )
+            function(api, state) config
+        })
+        expect_error(run__backend(attributed), "live objects")
+    })
+
+    test_that("unavailable API pipeline results keep explicit failure and termination semantics", {
+        process <- list(get_result = function() stop("pipeline lost"))
+        failed <- run__api_collect(process, tempdir(), "weather.epw")
+        expect_identical(failed$api$stop_reason, "worker_error")
+        expect_identical(failed$file$epw, "weather.epw")
+        terminated <- run__api_collect(process, tempdir(), NULL, TRUE)
+        expect_identical(terminated$api$phase, "terminated")
+        expect_identical(terminated$api$stop_reason, "process_terminated")
+        expect_true(is.na(terminated$api$native_exit_status))
+        state <- list(
+            jobs = data.table(
+                model = "model.idf",
+                weather = list(NULL),
+                output_dir = tempdir(),
+                energyplus_exe = file.path(tempdir(), "energyplus"),
+                index = 1L
+            ),
+            options = list(backend = "api")
+        )
+        interrupted <- run__api_failed_state(state, simpleError("lost"), TRUE)
+        expect_identical(interrupted$jobs$status, "terminated")
+        expect_identical(
+            interrupted$jobs$result[[1L]]$api$stop_reason,
+            "process_terminated"
+        )
+        failed <- run__api_failed_state(state, simpleError("crashed"))
+        expect_identical(failed$jobs$status, "failed")
+        expect_identical(failed$jobs$result[[1L]]$api$phase, "failed")
+    })
+
+    test_that("API setup rejects native objects in captured environment parent chains", {
+        setup <- local({
+            parent <- new.env(parent = emptyenv())
+            parent$owner <- structure(
+                new.env(parent = emptyenv()),
+                class = "EnergyPlusState"
+            )
+            config <- new.env(parent = parent)
+            config$target <- 22
+            function(api, state) config$target
+        })
+        expect_error(run__backend(setup), "live objects")
+        pointer <- local({
+            parent <- new.env(parent = emptyenv())
+            parent$pointer <- new("externalptr")
+            config <- new.env(parent = parent)
+            function(api, state) config
+        })
+        expect_error(run__backend(pointer), "live objects")
+    })
+
+    test_that("API tree shutdown remains bounded and reports failures explicitly", {
+        calls <- character()
+        process <- list(
+            kill_tree = function() calls <<- c(calls, "tree"),
+            wait = function(timeout) {
+                expect_identical(timeout, 1000)
+                calls <<- c(calls, "wait")
+            },
+            is_alive = function() FALSE
+        )
+        expect_true(run__api_kill(process))
+        expect_identical(calls, c("tree", "wait"))
+        process$kill_tree <- function() stop("kill denied")
+        expect_false(run__api_kill(process))
+    })
+
+    test_that("foreground API loop interruption reaps its actual native engine descendant", {
+        skip_if_not_installed("ps")
+        fixture <- testrun__api_fixture()
+        marker <- tempfile()
+        setup <- local({
+            path <- marker
+            function(api, state) {
+                api$runtime$callback_begin_new_environment(
+                    state,
+                    function(state) {
+                        writeLines(as.character(Sys.getpid()), path)
+                        Sys.sleep(60)
+                    }
+                )
+                writeLines("started", paste0(path, ".started"))
+            }
+        })
+        handle <- NULL
+        interruption <- structure(
+            list(message = "test foreground interrupt", call = NULL),
+            class = c("interrupt", "condition")
+        )
+        local_mocked_bindings(handle_sim_events = function(state) {
+            testrun__api_started(
+                function() file.exists(paste0(marker, ".started")),
+                function() {
+                    any(vapply(
+                        state$jobs$process,
+                        function(p) p$is_alive(),
+                        logical(1L)
+                    ))
+                }
+            )
+            deadline <- Sys.time() + 30
+            while (!file.exists(marker) && Sys.time() < deadline) {
+                Sys.sleep(.1)
+            }
+            expect_true(file.exists(marker))
+            handle <<- ps::ps_handle(as.integer(readLines(marker)))
+            expect_true(ps::ps_is_running(handle))
+            stop(interruption)
+        })
+        condition <- tryCatch(
+            run_multi(
+                fixture$model,
+                fixture$weather,
+                output_dir = file.path(
+                    fixture$directory,
+                    "foreground-interrupt"
+                ),
+                backend = setup,
+                echo = FALSE
+            ),
+            interrupt = identity
+        )
+        expect_identical(condition, interruption)
+        deadline <- Sys.time() + 10
+        while (ps::ps_is_running(handle) && Sys.time() < deadline) {
+            Sys.sleep(.1)
+        }
+        expect_false(ps::ps_is_running(handle))
+    })
+
+    test_that("synchronous API command conditions reap the worker tree before rethrow", {
+        alive <- TRUE
+        reaped <- FALSE
+        condition <- simpleError("foreground pipe failure")
+        local_mocked_bindings(
+            r_bg = function(..., supervise) {
+                expect_true(supervise)
+                list(
+                    is_alive = function() alive,
+                    poll_io = function(...) stop(condition),
+                    kill_tree = function() {
+                        alive <<- FALSE
+                        reaped <<- TRUE
+                    },
+                    wait = function(...) invisible(NULL)
+                )
+            },
+            .package = "callr"
+        )
+        caught <- tryCatch(
+            run_command(
+                function() NULL,
+                wd = tempdir(),
+                wait = TRUE,
+                echo = FALSE,
+                call_r = TRUE,
+                kill_tree = TRUE
+            ),
+            error = identity
+        )
+        expect_identical(caught, condition)
+        expect_true(reaped)
+        expect_false(alive)
+    })
+
+    test_that("empty failure messages retain API diagnostics and single-case columns", {
+        failure <- run__api_failure(simpleError(""), tempdir(), NULL)
+        expect_identical(failure$run$stderr, "Simulation pipeline failed.")
+        expect_identical(failure$api$phase, "failed")
+        condition <- structure(
+            list(call = NULL),
+            class = c("interrupt", "condition")
+        )
+        result <- run__api_failure(condition, tempdir(), NULL, TRUE)
+        expect_match(result$run$stderr, "interrupted")
+        state <- list(
+            jobs = data.table(
+                model = "m.idf",
+                weather = list(NULL),
+                output_dir = tempdir(),
+                energyplus_exe = "energyplus",
+                index = 1L
+            ),
+            options = list(backend = "api")
+        )
+        result <- run__api_failed_state(state, condition, TRUE)
+        expect_true(all(c("stdout", "stderr") %in% names(result$jobs)))
+        expect_match(result$jobs$stderr[[1L]], "interrupted")
+    })
+
+    test_that("raw background API process death automatically reaps its engine worker", {
+        skip_if_not_installed("ps")
+        fixture <- testrun__api_fixture()
+        marker <- tempfile()
+        setup <- local({
+            path <- marker
+            function(api, state) {
+                api$runtime$callback_begin_new_environment(
+                    state,
+                    function(state) {
+                        writeLines(as.character(Sys.getpid()), path)
+                        Sys.sleep(60)
+                    }
+                )
+                writeLines("started", paste0(path, ".started"))
+            }
+        })
+        process <- energyplus(
+            fixture$model,
+            fixture$weather,
+            output_dir = file.path(fixture$directory, "parent-death"),
+            backend = setup,
+            wait = FALSE,
+            echo = FALSE,
+            readvars = FALSE
+        )
+        on.exit(if (process$is_alive()) run__api_kill(process), add = TRUE)
+        testrun__api_started(
+            function() file.exists(paste0(marker, ".started")),
+            function() process$is_alive()
+        )
+        deadline <- Sys.time() + 30
+        while (!file.exists(marker) && Sys.time() < deadline) {
+            Sys.sleep(.1)
+        }
+        expect_true(file.exists(marker))
+        handle <- ps::ps_handle(as.integer(readLines(marker)))
+        expect_true(ps::ps_is_running(handle))
+        expect_true(process$kill())
+        process$wait(1000)
+        deadline <- Sys.time() + 10
+        while (ps::ps_is_running(handle) && Sys.time() < deadline) {
+            Sys.sleep(.1)
+        }
+        expect_false(ps::ps_is_running(handle))
+    })
+
+    # Every public execution entry exposes only the unified backend selector.
+    test_that("public runners expose one backend selector without setup compatibility", {
+        methods <- lapply(
+            list(Idf, EplusJob, EplusGroupJob, ParametricJob),
+            function(class) {
+                class$public_methods$run
+            }
+        )
+        for (runner in c(
+            list(EnergyPlus, energyplus, run_idf, run_multi),
+            methods
+        )) {
+            expect_false("api_setup" %in% names(formals(runner)))
+            expect_identical(formals(runner)$backend, "cli")
+        }
+        expect_error(
+            energyplus("unused.idf", NULL, api_setup = function(api, state) {
+                NULL
+            }),
+            "unused argument"
+        )
+        expect_error(
+            run_idf("unused.idf", NULL, "unused", api_setup = NULL),
+            "unused argument"
+        )
+    })
+
+    # Check both orchestration modes using actual workers, rather than mocked forwarding.
+    test_that("function backends initialize once through low-level and standalone runners", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        for (runner in c("EnergyPlus", "energyplus", "run_idf")) {
+            for (wait in c(TRUE, FALSE)) {
+                directory <- file.path(
+                    fixture$directory,
+                    paste(
+                        match(runner, c("EnergyPlus", "energyplus", "run_idf")),
+                        wait,
+                        sep = "-"
+                    )
+                )
+                marker <- paste0(directory, ".initialized")
+                setup <- local({
+                    file <- marker
+                    # A non-NULL return is ignored; initialization still runs once before simulation.
+                    function(api, state) {
+                        write(as.character(Sys.getpid()), file, append = TRUE)
+                        "ignored initialization result"
+                    }
+                })
+                args <- list(
+                    model = fixture$model,
+                    weather = fixture$weather,
+                    output_dir = directory,
+                    backend = setup,
+                    wait = wait,
+                    echo = FALSE
+                )
+                if (runner == "energyplus") {
+                    args$readvars <- FALSE
+                }
+                result <- do.call(get(runner), args)
+                if (!wait) {
+                    process <- if (runner == "EnergyPlus") {
+                        result$run$process
+                    } else {
+                        result
+                    }
+                    on.exit(
+                        if (process$is_alive()) run__api_kill(process),
+                        add = TRUE
+                    )
+                    process$wait(180000)
+                    expect_false(process$is_alive())
+                    result <- process$get_result()
+                }
+                metadata <- if (runner == "EnergyPlus") {
+                    result$run$api
+                } else {
+                    result$api
+                }
+                expect_identical(
+                    metadata$phase,
+                    "completed",
+                    info = jsonlite::toJSON(
+                        metadata,
+                        auto_unbox = TRUE,
+                        null = "null"
+                    )
+                )
+                expect_length(readLines(marker), 1L)
+                expect_identical(as.integer(readLines(marker)), metadata$pid)
+                expect_false(identical(metadata$pid, Sys.getpid()))
+                expect_identical(result$backend, "api")
+            }
+        }
+    })
+
+    # Stock CLI results expose the same engine identity without native API metadata.
+    test_that("standalone CLI results retain a string backend identity", {
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        for (runner in c("EnergyPlus", "energyplus", "run_idf")) {
+            directory <- file.path(
+                fixture$directory,
+                paste0(
+                    "cli-",
+                    match(runner, c("EnergyPlus", "energyplus", "run_idf"))
+                )
+            )
+            args <- list(
+                model = fixture$model,
+                weather = fixture$weather,
+                output_dir = directory,
+                backend = "cli",
+                echo = FALSE
+            )
+            if (runner == "energyplus") {
+                args$readvars <- FALSE
+            }
+            result <- do.call(get(runner), args)
+            expect_identical(result$backend, "cli")
+            expect_null(result$api)
+        }
+    })
+
+    # A frame can be both a function's lexical scope and an explicit environment with active fields.
+    test_that("freezing shares active bindings between lexical and explicit environments", {
+        holder <- new.env(parent = baseenv())
+        makeActiveBinding(
+            "value",
+            local({
+                count <- 0L
+                function(value) {
+                    if (missing(value)) {
+                        count <<- count + 1L
+                        count
+                    } else {
+                        count <<- value
+                    }
+                }
+            }),
+            holder
+        )
+        fun <- function() value
+        environment(fun) <- holder
+        recipe <- local({
+            afun <- fun
+            zdata <- holder
+            function() list(afun = afun, zdata = zdata)
+        })
+        frozen <- run__prepare_setup(recipe)()
+        expect_identical(environment(frozen$afun), frozen$zdata)
+        expect_true(bindingIsActive("value", frozen$zdata))
+        expect_identical(frozen$afun(), 1L)
+        expect_identical(frozen$zdata$value, 2L)
+        frozen$zdata$value <- 10L
+        expect_identical(frozen$afun(), 11L)
+        expect_identical(holder$value, 1L)
+    })
+
+    # Explicit environment values must not reconnect frozen closures to the caller's live globals.
+    test_that("explicit environments preserve frozen global parent bindings", {
+        assign(".eplusr_freeze_test_value", 7L, globalenv())
+        on.exit(
+            rm(".eplusr_freeze_test_value", envir = globalenv()),
+            add = TRUE
+        )
+        holder <- new.env(parent = globalenv())
+        fun <- function() .eplusr_freeze_test_value
+        environment(fun) <- holder
+        recipe <- local({
+            afun <- fun
+            zdata <- holder
+            function() list(afun = afun, zdata = zdata)
+        })
+        frozen <- run__prepare_setup(recipe)
+        assign(".eplusr_freeze_test_value", 99L, globalenv())
+        value <- unserialize(serialize(frozen, NULL))()
+        expect_identical(environment(value$afun), value$zdata)
+        expect_identical(value$afun(), 7L)
+    })
+
+    # Ordinary metadata can carry dependencies and aliases just like list elements and environment fields.
+    test_that("freezing snapshots helpers in ordinary object attributes", {
+        amount <- 7L
+        helper <- function() amount
+        holder <- new.env(parent = baseenv())
+        holder$self <- holder
+        attr(holder, "helper") <- helper
+        vector <- structure(1L, helper = helper)
+        fun <- structure(function() NULL, helper = helper)
+        container <- structure(list(holder, vector, fun), helper = helper)
+        recipe <- function() container
+        run__check_setup(recipe)
+        frozen <- run__prepare_setup(recipe)
+        amount <- 99L
+        value <- unserialize(serialize(frozen, NULL))()
+        expect_identical(attr(value, "helper")(), 7L)
+        expect_identical(attr(value[[1L]], "helper")(), 7L)
+        expect_identical(attr(value[[2L]], "helper")(), 7L)
+        expect_identical(attr(value[[3L]], "helper")(), 7L)
+        expect_identical(value[[1L]]$self, value[[1L]])
+        expect_identical(attr(value, "helper"), attr(value[[1L]], "helper"))
+        expect_identical(helper(), 99L)
+    })
+
+    # Function metadata may point through an environment back to the same function.
+    test_that("freezing preserves cyclic function metadata without retaining caller state", {
+        amount <- 7L
+        metadata <- new.env(parent = baseenv())
+        helper <- structure(function() amount, metadata = metadata)
+        metadata$helper <- helper
+        recipe <- function() helper
+        frozen <- run__prepare_setup(recipe)
+        amount <- 99L
+        value <- unserialize(serialize(frozen, NULL))()
+        expect_identical(value(), 7L)
+        expect_identical(attr(value, "metadata")$helper(), 7L)
+        expect_identical(
+            attr(attr(value, "metadata")$helper, "metadata"),
+            attr(value, "metadata")
+        )
+    })
+
+    # An attribute can reach the original closure indirectly through another closure's lexical binding.
+    test_that("freezing closes metadata cycles through deferred lexical bindings", {
+        amount <- 7L
+        holder <- new.env(parent = baseenv())
+        sibling <- function() helper
+        environment(sibling) <- holder
+        helper <- structure(function() amount, sibling = sibling)
+        holder$helper <- helper
+        frozen <- run__prepare_setup(function() helper)
+        amount <- 99L
+        value <- unserialize(serialize(frozen, NULL))()
+        second <- attr(value, "sibling")()
+        third <- attr(second, "sibling")()
+        expect_identical(value(), 7L)
+        expect_identical(second(), 7L)
+        expect_identical(third(), 7L)
+        expect_identical(value, second)
+        expect_identical(second, third)
+    })
+
+    # A method stored on an ordinary environment must read and update the same frozen object's fields.
+    test_that("freezing preserves methods stored in their own lexical environment", {
+        object <- new.env(parent = baseenv())
+        object$value <- 7L
+        object$read <- function() value
+        environment(object$read) <- object
+        frozen <- run__prepare_setup(function() object)
+        object$value <- 99L
+        value <- unserialize(serialize(frozen, NULL))()
+        expect_identical(environment(value$read), value)
+        expect_identical(value$read(), 7L)
+        value$value <- 8L
+        expect_identical(value$read(), 8L)
+        expect_identical(object$value, 99L)
+    })
+
+    # 9.4 exposes its four groups inside the same public worker backend used by later releases.
+    test_that("stock 9.4 workers contain one state and preserve functional and feedback calls", {
+        skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+        fixture <- testapi__controlled_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        marker <- file.path(fixture$directory, "legacy94.rds")
+        # Keep native objects in the worker and publish only plain measurements and capability errors.
+        setup <- function(api, state) {
+            psych <- api$functional$psychrometrics(state)
+            water <- api$functional$glycol(state, "WATER")
+            steam <- api$functional$refrigerant(state, "STEAM")
+            evidence <- list(
+                info = api$info(),
+                methods = api$methods(),
+                heat_capacity = psych$specific_heat(state, 0),
+                water_capacity = water$specific_heat(state, 20),
+                steam_pressure = steam$saturation_pressure(state, 100),
+                second_state = tryCatch(
+                    api$state_manager$new_state(),
+                    error = conditionMessage
+                ),
+                reset = tryCatch(
+                    api$state_manager$reset_state(state),
+                    error = conditionMessage
+                ),
+                second_api = tryCatch(
+                    eplusr::eplus_api("9.4"),
+                    error = conditionMessage
+                ),
+                version = api$functional$ep_version()
+            )
+            water$delete(state)
+            steam$delete(state)
+            api$exchange$request_variable(
+                state,
+                "Zone Mean Air Temperature",
+                "ZONE ONE"
+            )
+            # Feedback remains on the owning R thread and runs only after real exchange readiness.
+            api$runtime$callback_begin_system_timestep_before_predictor(
+                state,
+                function(s) {
+                    if (
+                        !api$exchange$api_data_fully_ready(s) ||
+                            api$exchange$warmup_flag(s)
+                    ) {
+                        return()
+                    }
+                    temperature <- api$exchange$get_variable_handle(
+                        s,
+                        "Zone Mean Air Temperature",
+                        "ZONE ONE"
+                    )
+                    schedule <- api$exchange$get_actuator_handle(
+                        s,
+                        "Schedule:Constant",
+                        "Schedule Value",
+                        "Session Heating"
+                    )
+                    evidence$temperature <- api$exchange$get_variable_value(
+                        s,
+                        temperature
+                    )
+                    api$exchange$set_actuator_value(s, schedule, 22)
+                    evidence$control <- api$exchange$get_actuator_value(
+                        s,
+                        schedule
+                    )
+                    saveRDS(evidence, marker)
+                    api$runtime$stop_simulation(s)
+                }
+            )
+        }
+        result <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = setup,
+            output_dir = file.path(fixture$directory, "feedback"),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(
+            result$api$stop_reason,
+            "user_stop",
+            info = result$api$error$message
+        )
+        expect_true(file.exists(marker))
+        if (!file.exists(marker)) {
+            return()
+        }
+        evidence <- readRDS(marker)
+        expect_match(evidence$version, "9.4.0", fixed = TRUE)
+        expect_equal(evidence$heat_capacity, 1004.8585895, tolerance = 1e-9)
+        expect_gt(evidence$water_capacity, 4100)
+        expect_lt(evidence$water_capacity, 4300)
+        expect_gt(evidence$steam_pressure, 90000)
+        expect_lt(evidence$steam_pressure, 110000)
+        expect_match(evidence$second_state, "one state lifetime")
+        expect_match(evidence$reset, "9[.]4.*reset|reset.*9[.]4")
+        expect_match(evidence$second_api, "fresh worker")
+        expect_true(is.finite(evidence$temperature))
+        expect_equal(evidence$control, 22)
+        expect_false(identical(evidence$info$pid, Sys.getpid()))
+    })
+
+    # Global functional error callbacks must remain valid through disposal and vanish with their worker.
+    test_that("stock 9.4 callback failures retire their worker without poisoning the caller", {
+        skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        # A functional callback runs before the simulation, through the shared managed callback boundary.
+        setup <- function(api, state) {
+            api$functional$callback_error(state, function(level, message) {
+                stop("legacy functional callback failure")
+            })
+            water <- api$functional$glycol(state, "WATER")
+            water$specific_heat(state, -1000)
+        }
+        failed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = setup,
+            output_dir = file.path(fixture$directory, "failure"),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(failed$api$phase, "failed")
+        expect_match(
+            failed$api$error$message,
+            "legacy functional callback failure"
+        )
+        # The next call starts a distinct process instead of reusing global callback storage.
+        completed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = "api",
+            output_dir = file.path(fixture$directory, "following"),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(
+            completed$api$phase,
+            "completed",
+            info = completed$api$error$message
+        )
+        expect_false(identical(failed$api$pid, completed$api$pid))
+    })
+
+    # Stock 9.4 calls exit() for helper flags and malformed arguments even in library mode.
+    test_that("stock 9.4 CLI exits are contained by the public worker backend", {
+        skip_if_not(identical(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), "9.4"))
+        fixture <- testrun__api_fixture()
+        on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+        for (flag in c("--help", "--eplusr-invalid-argument")) {
+            # Deliberately exercise ProcessArgs in the disposable worker, where native exit cannot kill the caller.
+            setup <- function(api, state) {
+                api$runtime$run_energyplus(state, c(flag, fixture$model))
+            }
+            failed <- energyplus(
+                fixture$model,
+                fixture$weather,
+                eplus = "9.4",
+                backend = setup,
+                output_dir = file.path(fixture$directory, gsub("-", "", flag)),
+                readvars = FALSE,
+                echo = FALSE
+            )
+            expect_identical(failed$api$phase, "failed")
+            expect_identical(failed$api$stop_reason, "worker_error")
+            expect_false(identical(failed$exit_status, 0L))
+        }
+        completed <- energyplus(
+            fixture$model,
+            fixture$weather,
+            eplus = "9.4",
+            backend = "api",
+            output_dir = file.path(fixture$directory, "after-cli-exits"),
+            readvars = FALSE,
+            echo = FALSE
+        )
+        expect_identical(
+            completed$api$phase,
+            "completed",
+            info = completed$api$error$message
+        )
+    })
+
+    # Dependency analysis must distinguish caller references from worker-created locals and quoted code.
+    test_that("backend dependency freezing handles replacement roots and omitted indices", {
+        helper <- new.env(parent = emptyenv())
+        helper$n <- 0L
+        code <- function(argument) {
+            local <- list()
+            local$field <- 1
+            for (index in 1:2) {
+                helper$n <- helper$n + index
+            }
+            matrix <- matrix(1:4, 2)
+            matrix[, 1] <- 0
+            quote(unused$field <- 1)
+            nested <- function(parameter) helper$n <- helper$n + parameter
+            nested(argument)
+            helper$n
+        }
+        globals <- run__setup_globals(code)
+        expect_true("helper" %in% globals)
+        expect_false(any(
+            c("local", "index", "parameter", "matrix", "unused") %in%
+                setdiff(globals, codetools::findGlobals(code, merge = TRUE))
+        ))
+        copy <- run__prepare_setup(code)
+        helper$n <- 100L
+        expect_identical(copy(2L), 5L)
+        expect_identical(helper$n, 100L)
+        ctx <- testapi__fake()
+        cached <- ctx$api$state_manager$new_state()
+        expect_error(
+            eplus_plugin(list(initialize = function(api, state, plugin) {
+                cached$field <- 1
+            })),
+            "live"
+        )
+        ctx$api$close()
+    })
+})

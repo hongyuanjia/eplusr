@@ -70,6 +70,31 @@
 #' `methods()` lists exact bindings, arguments, ownership, and unsupported methods.
 #' Its `implementation` and `provenance` columns distinguish native operations,
 #' reviewed managed adapters, and unavailable operations for the selected release.
+#'
+#' Supported releases are 9.4, 9.5, 9.6, 22.1, 22.2, 23.1, 23.2, 24.1,
+#' 24.2, 25.1, 25.2, 26.1 and 26.2. R and the selected native library must both
+#' be 64-bit and have matching architectures; an x86-64 installation cannot load
+#' in arm64 R. The 9.4 library is available only through fresh job/session workers.
+#' Compatibility preserves R contracts, not identical numerical physics across releases.
+#' The maintained CI matrix checks every release on Linux x86-64, reviewed older
+#' ABI representatives on macOS arm64 and Windows x86-64, and the full 26.1/26.2
+#' regression on all three platforms. Other OS/release combinations are not
+#' established by those representative cells.
+#'
+#' The main capability differences are:
+#' \tabular{lll}{
+#' Releases \tab API discovery / calendar year \tab API data units \cr
+#' 9.4--23.1 \tab unavailable / unavailable \tab unavailable \cr
+#' 23.2--24.1 \tab managed normalized copy / native \tab missing (`NA`) \cr
+#' 24.2--26.2 \tab managed normalized copy / native \tab native normalized units \cr
+#' }
+#' Prepared-input object names are managed from the model rather than the native
+#' getter whose allocated strings cannot all be released. Host-managed trend
+#' samples and aggregates work independently of native PythonPlugin declarations
+#' across the supported range. The unsafe native individual trend reader remains
+#' unavailable. Executable plugin export is separately restricted to 26.1/26.2
+#' and rejects host-managed trends; see [export_eplus_plugin()].
+
 #' `list_available_api_data_csv()` returns a character string reconstructed from
 #' that safely released data, without calling the unfreeable native CSV allocator.
 #' Its `plugin_only` column identifies global/trend methods available only to

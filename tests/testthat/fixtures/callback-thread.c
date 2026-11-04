@@ -48,3 +48,85 @@ int callback_on_worker(void *callback, int kind)
 #endif
     return 0;
 }
+
+#define R_NO_REMAP
+#include <R.h>
+#include <Rinternals.h>
+#include <R_ext/Utils.h>
+#include <signal.h>
+
+/* Retain an engine-visible proxy address after its owning guard is retired. */
+SEXP callback_retain(SEXP guard)
+{
+    return R_MakeExternalPtr(R_ExternalPtrAddr(guard), R_NilValue, guard);
+}
+
+/* Only native addresses and plain integer results cross the plugin worker boundary. */
+typedef struct {
+    int (*bootstrap)(void);
+    int (*dispatch)(const char *, const char *, const char *, void *);
+    int bootstrap_result;
+    int dispatch_result;
+} plugin_task;
+
+/* The joined worker must reject both installed plugin entry points before touching R. */
+#ifdef _WIN32
+static DWORD WINAPI plugin_worker(LPVOID data)
+#else
+static void *plugin_worker(void *data)
+#endif
+{
+    plugin_task *task = (plugin_task *)data;
+    task->bootstrap_result = task->bootstrap();
+    task->dispatch_result = task->dispatch("", "", "", NULL);
+#ifdef _WIN32
+    return 0;
+#else
+    return NULL;
+#endif
+}
+
+/* Encode both statuses independently; creation failure is distinct from rejection. */
+int plugin_on_worker(void *bootstrap, void *dispatch)
+{
+    plugin_task task = {bootstrap, dispatch, -1, -1};
+#ifdef _WIN32
+    HANDLE thread = CreateThread(NULL, 0, plugin_worker, &task, 0, NULL);
+    if (!thread) return -1;
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+#else
+    pthread_t thread;
+    if (pthread_create(&thread, NULL, plugin_worker, &task)) return -1;
+    pthread_join(thread, NULL);
+#endif
+    return 10 * task.bootstrap_result + task.dispatch_result;
+}
+
+/* Compare the process SIGINT handler before and after each protected native entry. */
+int plugin_signal_handler(int save)
+{
+#ifdef _WIN32
+    static void (*saved)(int);
+    void (*current)(int) = signal(SIGINT, SIG_IGN);
+    signal(SIGINT, current);
+#else
+    static void (*saved)(int);
+    struct sigaction current;
+    if (sigaction(SIGINT, NULL, &current)) return -1;
+#endif
+#ifdef _WIN32
+    if (save) saved = current;
+    return saved == current;
+#else
+    if (save) saved = current.sa_handler;
+    return saved == current.sa_handler;
+#endif
+}
+
+/* Deliver an actual OS interrupt inside the installed plugin's R top-level boundary. */
+void plugin_raise_interrupt(void)
+{
+    raise(SIGINT);
+    R_CheckUserInterrupt();
+}

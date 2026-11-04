@@ -9,13 +9,34 @@ permissions: read-all
 
 jobs:
   api:
-    name: Stock ${{ matrix.eplus }} (${{ matrix.os }})
+    name: Stock ${{ matrix.eplus }} (${{ matrix.os }}, ${{ matrix.suite }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         eplus: ["26.1", "26.2"]
+        suite: [full]
+        include:
+          - {os: ubuntu-latest, eplus: "9.4", suite: contract}
+          - {os: ubuntu-latest, eplus: "9.5", suite: contract}
+          - {os: ubuntu-latest, eplus: "9.6", suite: contract}
+          - {os: ubuntu-latest, eplus: "22.1", suite: contract}
+          - {os: ubuntu-latest, eplus: "22.2", suite: contract}
+          - {os: ubuntu-latest, eplus: "23.1", suite: contract}
+          - {os: ubuntu-latest, eplus: "23.2", suite: contract}
+          - {os: ubuntu-latest, eplus: "24.1", suite: contract}
+          - {os: ubuntu-latest, eplus: "24.2", suite: contract}
+          - {os: ubuntu-latest, eplus: "25.1", suite: contract}
+          - {os: ubuntu-latest, eplus: "25.2", suite: contract}
+          - {os: macos-latest, eplus: "9.5", suite: contract}
+          - {os: macos-latest, eplus: "23.2", suite: contract}
+          - {os: macos-latest, eplus: "24.2", suite: contract}
+          - {os: windows-latest, eplus: "9.4", suite: contract}
+          - {os: windows-latest, eplus: "9.6", suite: contract}
+          - {os: windows-latest, eplus: "23.2", suite: contract}
+          - {os: windows-latest, eplus: "24.1", suite: contract}
+          - {os: windows-latest, eplus: "24.2", suite: contract}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: true
@@ -46,7 +67,7 @@ jobs:
           # Engine preparation owns installation; test helpers run in the test step.
           pkgload::load_all(".", quiet = TRUE, helpers = FALSE)
           # Helpers and restored installations may already provide either engine.
-          versions <- unique(c("26.1", "26.2", get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
+          versions <- unique(c(Sys.getenv("_EPLUSR_TEST_API_VERSION_"), get("LATEST_EPLUS_VER", asNamespace("eplusr"))))
           for (version in versions) {
               if (!eplusr::is_avail_eplus(version)) {
                   eplusr::install_eplus(version, local = TRUE, portable = TRUE)
@@ -55,7 +76,13 @@ jobs:
           }
           eplusr::install_duckdb_sqlite()
           devtools::install(".", upgrade = FALSE, quiet = TRUE)
-      - name: Exercise API jobs
+      - name: Exercise full baseline regression
+        if: matrix.suite == 'full'
         shell: Rscript {0}
         run: |
-          devtools::test(filter = "^(api(-.*)?|run(-.*)?|job|group|param)$", stop_on_failure = TRUE)
+          # Test the installed candidate so native and engine children use the same code.
+          testthat::test_local(".", filter = "^(api|plugin(-cli)?|run|job|group|param)$", load_package = "installed", stop_on_failure = TRUE)
+      - name: Exercise maintained release contract
+        if: matrix.suite == 'contract'
+        shell: Rscript {0}
+        run: source(".github/api-contract.R")

@@ -28,9 +28,9 @@ An initialization function accepted by \code{backend}.
 }
 \description{
 Create a reusable initialization function for \code{backend}. The plugin runs in
-the same R worker and thread as the EnergyPlus 26.1 library. This is an eplusr
-host plugin. Use \code{\link[=export_eplus_plugin]{export_eplus_plugin()}} to run the same hooks in the
-EnergyPlus executable through its plugin loader.
+the same R worker and thread as a supported stock EnergyPlus 9.4 through 26.2
+library. This is an eplusr host plugin. Use \code{\link[=export_eplus_plugin]{export_eplus_plugin()}} to run hooks
+without managed trends in the reviewed 26.1/26.2 executable plugin loader.
 }
 \details{
 Pass the returned function directly as \code{backend}, or call several returned

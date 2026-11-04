@@ -21,6 +21,8 @@
 #' R interpreter. Global variables and trend aggregates declared in the model
 #' are available through the borrowed exchange API. Individual trend reads remain
 #' disabled because stock 26.1/26.2 have an unsafe upper index boundary.
+#' Managed `trends` declared by [eplus_plugin()] require the host job/session
+#' commit boundary and are rejected before export creates any files.
 #' Prepared-input metadata queries require an R-managed launch context and are
 #' unavailable through this standalone executable adapter. Callback clearers do
 #' not remove the adapter's host hooks.
@@ -47,6 +49,13 @@ export_eplus_plugin <- function(
     checkmate::assert_class(plugin, "EnergyPlusPlugin")
     checkmate::assert_string(name, pattern = "^[A-Za-z][A-Za-z0-9_]*$")
     checkmate::assert_string(dir)
+    # The standalone adapter has no host-managed history commit boundary.
+    definition <- unserialize(environment(plugin)$payload)
+    if (length(definition$trends)) {
+        api__error(
+            "Managed trends require an eplusr host plugin; executable export is unavailable."
+        )
+    }
     config <- if (is_eplus_path(eplus)) {
         suppressMessages(use_eplus(eplus))
     } else {
@@ -59,7 +68,6 @@ export_eplus_plugin <- function(
         )
     }
     plugin_cli__check_bridge()
-    definition <- unserialize(environment(plugin)$payload)
     mapping <- plugin_cli__hooks()
     if (
         any(

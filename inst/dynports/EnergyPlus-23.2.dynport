@@ -1,8 +1,8 @@
 Package: EnergyPlus232
 Version: 23.2.0
 Library: energyplusapi
-Constant: 
-Function: 
+Constant:
+Function:
     stateNew()p;
     stateNewPython()p;
     stateReset(p)v state;
@@ -154,8 +154,8 @@ Function:
     tomorrowWeatherAlbedoAtTime(pii)d state hour timeStepNum;
     tomorrowWeatherLiquidPrecipitationAtTime(pii)d state hour timeStepNum;
     currentSimTime(p)d state;
-Variadic: 
-FuncPtr: 
-Enum: 
+Variadic:
+FuncPtr:
+Enum:
 Struct: APIDataEntry{*c*c*c*c}what name key type;
-Union: 
+Union:

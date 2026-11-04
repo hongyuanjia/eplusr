@@ -35,6 +35,8 @@ Each PythonPlugin instance has an independent R context in a shared embedded
 R interpreter. Global variables and trend aggregates declared in the model
 are available through the borrowed exchange API. Individual trend reads remain
 disabled because stock 26.1/26.2 have an unsafe upper index boundary.
+Managed \code{trends} declared by \code{\link[=eplus_plugin]{eplus_plugin()}} require the host job/session
+commit boundary and are rejected before export creates any files.
 Prepared-input metadata queries require an R-managed launch context and are
 unavailable through this standalone executable adapter. Callback clearers do
 not remove the adapter's host hooks.
