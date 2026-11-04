@@ -2,22 +2,29 @@
 api_profile__select <- function(version) {
     version <- as.character(version)
     if (
-        length(version) != 1L || !version %in% c("25.2.0", "26.1.0", "26.2.0")
+        length(version) != 1L ||
+            !version %in% c("24.2.0", "25.1.0", "25.2.0", "26.1.0", "26.2.0")
     ) {
         api__error(
-            "The API requires an EnergyPlus 25.2, 26.1 or 26.2 installation."
+            "The API requires an EnergyPlus 24.2, 25.1, 25.2, 26.1 or 26.2 installation."
         )
     }
     list(
         version = version,
-        abi = if (version == "25.2.0") "25.2-26.2" else "26.1-26.2"
+        abi = if (version %in% c("24.2.0", "25.1.0")) {
+            "24.2-26.2"
+        } else if (version == "25.2.0") {
+            "25.2-26.2"
+        } else {
+            "26.1-26.2"
+        }
     )
 }
 
 # Define reviewed management policy; function signatures and layouts come from the dynport.
 api__manifest <- function(version = "26.1.0") {
     profile <- api_profile__select(version)
-    list(
+    manifest <- list(
         energyplus = profile$version,
         abi = profile$abi,
         methods = list(
@@ -1133,6 +1140,21 @@ api__manifest <- function(version = "26.1.0") {
             )
         )
     )
+    if (numeric_version(profile$version) < "25.1.0") {
+        # Before 25.1 the public fluid deleters release caller-owned wrapper objects.
+        manifest$methods <- lapply(manifest$methods, function(rule) {
+            if (rule$kind == "delete_resource") {
+                rule$ownership <- "native wrapper deletion; invalidates the R resource"
+            } else if (
+                rule$kind == "factory" &&
+                    rule$method %in% c("glycol", "refrigerant")
+            ) {
+                rule$ownership <- "state/generation-owned view; fluid wrapper released before state cleanup"
+            }
+            rule
+        })
+    }
+    manifest
 }
 
 # Normalize one Python-compatible method contract without duplicating C ABI declarations.
