@@ -238,6 +238,50 @@ test_that("killing a background API job reaps its native worker and returns a te
     expect_false(ps::ps_is_running(handle))
 })
 
+# A process-wait notification failure must not override successful physical tree termination.
+test_that("API job cancellation verifies exit despite failed process wait notifications", {
+    skip_if_not_installed("ps")
+    fixture <- testrun__api_fixture()
+    on.exit(unlink(fixture$directory, recursive = TRUE), add = TRUE)
+    marker <- file.path(fixture$directory, "worker-pid")
+    # Keep a real native callback active so cancellation owns a live engine descendant.
+    setup <- local({
+        path <- marker
+        function(api, state) {
+            api$runtime$callback_begin_new_environment(state, function(state) {
+                writeLines(as.character(Sys.getpid()), path)
+                Sys.sleep(60)
+            })
+        }
+    })
+    job <- read_idf(fixture$model)$run(
+        fixture$weather,
+        dir = file.path(fixture$directory, "wait-notification"),
+        wait = FALSE,
+        echo = FALSE,
+        readvars = FALSE,
+        backend = setup
+    )
+    on.exit(job$kill(), add = TRUE)
+    testrun__api_started(
+        function() file.exists(marker),
+        function() job$status()$alive
+    )
+    handle <- ps::ps_handle(as.integer(readLines(marker)))
+    expect_true(ps::ps_is_running(handle))
+    # Model the OS wait-notification failure independently of actual process identity/liveness queries.
+    local_mocked_bindings(
+        ps_wait = function(...) stop("WaitForMultipleObjects: invalid handle"),
+        .package = "ps"
+    )
+    expect_true(job$kill())
+    status <- job$status()
+    expect_false(status$alive)
+    expect_true(status$terminated)
+    expect_identical(status$api$stop_reason, "process_terminated")
+    expect_false(ps::ps_is_running(handle))
+})
+
 test_that("foreground API Job conditions replace previous success before rethrow", {
     fixture <- testrun__api_fixture()
     condition <- NULL

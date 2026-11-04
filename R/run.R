@@ -3461,12 +3461,8 @@ run__api_kill <- function(process) {
             process$kill_tree()
             deadline <- proc.time()[["elapsed"]] + 2
             process$wait(1000)
-            # An OS exit notification can precede process-table removal; verify both.
-            if (length(descendants)) {
-                remaining <- max(0, deadline - proc.time()[["elapsed"]])
-                ps::ps_wait(descendants, as.integer(1000 * remaining))
-            }
-            # Poll the same captured identities, including any exited but unreaped process.
+            # Verify the same captured identities directly: OS wait notifications can fail after exit.
+            # This also detects exited but unreaped descendants within the existing total waiting budget.
             alive <- function() {
                 any(vapply(descendants, ps::ps_is_running, logical(1L)))
             }

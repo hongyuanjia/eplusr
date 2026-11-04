@@ -74,6 +74,10 @@ cases <- c(
                 "session-errors",
                 "stock sessions initialize outside a blocked contiguous port range without changing RNG"
             )
+        ),
+        list(
+            "job",
+            "API job cancellation verifies exit despite failed process wait notifications"
         )
     )
 )
