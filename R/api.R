@@ -1,11 +1,11 @@
 #' Access the EnergyPlus library API
 #'
-#' Create a managed interface to a stock EnergyPlus 25.2, 26.1 or 26.2 installation. The four
-#' groups use the same method names as the bundled Python API, with an explicit
-#' managed `state` argument. This experimental interface does not change CLI jobs.
+#' Create a managed interface to a stock EnergyPlus 24.2 through 26.2 installation.
+#' The four groups use the same method names as the bundled Python API, with an
+#' explicit managed `state` argument. This experimental interface does not change CLI jobs.
 #'
-#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2 are
-#'   supported by this experimental library interface.
+#' @param eplus EnergyPlus version or installation directory. Only 24.2, 25.1,
+#'   25.2, 26.1 and 26.2 are supported by this experimental library interface.
 #' @return An environment with `state_manager`, `functional`, `runtime`, and
 #'   `exchange` groups, and `info()`, `methods()`, and `close()` methods.
 #' @details
@@ -17,7 +17,7 @@
 #' `functional$psychrometrics(state)`, `glycol(state, name)`, and
 #' `refrigerant(state, name)` create state-bound objects with Python-compatible
 #' methods. Each property method still takes its owning state. Public resource
-#' deletion invalidates the R object; stock 25.2/26.1/26.2 may retain native allocations.
+#' deletion invalidates the R object; stock 25.1 and later may retain native allocations.
 #' Standalone factories support water and steam, matching the stock Python SDK.
 #' `functional$ep_version()` returns the full version string as an R character.
 #' Standalone functional files are isolated in a temporary state-owned directory.
@@ -42,7 +42,9 @@
 #' Passing a handle from another state, kind, or reset generation is rejected
 #' before calling C. Invalid native exchange values are checked with the API
 #' error flag. `get_api_data(state)` copies a data frame and uses `freeAPIData()`.
-#' `methods()` lists exact bindings, arguments, ownership, and unsupported methods.
+#' On 24.2, bracketed native units such as `[C]` are normalized to `C`, matching
+#' later releases. `methods()` lists exact bindings, arguments, ownership,
+#' and unsupported methods.
 #' Its `implementation` and `provenance` columns distinguish native operations,
 #' reviewed managed adapters, and unavailable operations for the selected release.
 #' `list_available_api_data_csv()` returns a character string reconstructed from
@@ -54,7 +56,7 @@
 #' and kind-bound.
 #' Missing globals return a negative handle without entering the native fatal path;
 #' negative plugin handles cannot be used for reading or writing. Trend aggregates
-#' require `count >= 2`, matching stock 25.2/26.1/26.2. For native plugin handles,
+#' require `count >= 2`, matching stock 24.2 through 26.2. For native plugin handles,
 #' `get_trend_value()` remains disabled:
 #' the native upper index check permits an out-of-bounds read. Separately,
 #' [eplus_plugin()] can declare bounded R-managed trends with safe lookup and
@@ -90,7 +92,7 @@
 #'
 #' `close()` deletes states and resources before unloading the library. A
 #' finalizer is a fallback. Close/reset/delete and nested runs are rejected during
-#' simulation. Original 25.2/26.1/26.2 library leaks are not repaired: use a fresh R process
+#' simulation. Original library leaks are not repaired: use a fresh R process
 #' for each long-lived simulation lifecycle. PythonPlugin models and clone are outside this scope. Job integration uses
 #' `backend = "api"`; [eplus_session()] provides live worker stepping and pause.
 #' @examples
@@ -907,7 +909,15 @@ api__data <- function(ctx, entry) {
     } else {
         matrix(character(), 0L, length(fields))
     }
-    stats::setNames(as.data.frame(matrix, stringsAsFactors = FALSE), fields)
+    data <- stats::setNames(
+        as.data.frame(matrix, stringsAsFactors = FALSE),
+        fields
+    )
+    if (ctx$manifest$energyplus == "24.2.0") {
+        # 24.2 unitToString wraps standard units in brackets; 25.1+ returns bare units.
+        data$unit <- sub("^\\[(.*)\\]$", "\\1", data$unit)
+    }
+    data
 }
 
 # Reconstruct the stock CSV from safely copied APIDataEntry rows, avoiding its unfreeable char[].
@@ -1531,13 +1541,13 @@ api__invoke <- function(ctx, spec, values, resource) {
 
 #' Control a live EnergyPlus simulation
 #'
-#' Create an experimental session proxy for stock EnergyPlus 25.2/26.1/26.2. Native state,
+#' Create an experimental session proxy for stock EnergyPlus 24.2 through 26.2. Native state,
 #' handles and callbacks stay in one fresh engine worker. Pausing preserves that
 #' worker and the current native call; it is not a checkpoint or state copy.
 #'
 #' @param model An IDF path or [Idf] object, as accepted by [eplus_job()].
 #' @param weather An EPW path or [Epw] object. Sessions control weather run periods.
-#' @param eplus EnergyPlus version or installation directory. Only 25.2, 26.1 and 26.2
+#' @param eplus EnergyPlus version or installation directory. Only 24.2, 25.1, 25.2, 26.1 and 26.2
 #'   are supported. The selected installation must match the model version.
 #' @param variables Named list of character pairs `c(variable_name, key)`.
 #' @param actuators Named list of character triples `c(component_type, control_type, key)`.

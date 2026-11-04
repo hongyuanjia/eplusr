@@ -1512,6 +1512,21 @@ test_that("executable bridge identity detects library and installed code changes
     expect_null(plugin_cli__bridge_identity(directory))
 })
 
+# Library compatibility does not validate standalone PythonPlugin hosting for older executables.
+test_that("stock executable plugin exports reject unreviewed engines before writing files", {
+    skip_if_not(identical(Sys.getenv("_EPLUSR_RUN_API_TESTS_"), "true"))
+    version <- Sys.getenv("_EPLUSR_TEST_API_VERSION_", "26.1")
+    skip_if_not(version %in% c("24.2", "25.1", "25.2"))
+    plugin <- eplus_plugin(list(initialize = function(api, state, plugin) NULL))
+    directory <- tempfile("eplusr-unreviewed-plugin-")
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    expect_error(
+        export_eplus_plugin(plugin, directory, eplus = version),
+        "executable.*26.1.*26.2"
+    )
+    expect_false(dir.exists(directory))
+})
+
 # A public stock run supplies deterministic hook values without PythonPlugin objects.
 test_that("host plugin trends commit after hooks and retain bounded valid history", {
     fixture <- testrun__api_fixture()
